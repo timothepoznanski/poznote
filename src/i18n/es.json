@@ -95,7 +95,8 @@
       "yesterday": "Ayer"
     },
     "network_error": "Error de red",
-    "none": "Ninguno"
+    "none": "Ninguno",
+    "show_more_notes": "Mostrar más ({{count}} restantes)"
   },
   "snapshot": {
     "menu_item": "Instantáneas",
@@ -2431,7 +2432,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "Descargar copia de seguridad completa (ZIP)",
+      "download_complete_backup": "Crear copia de seguridad completa (ZIP)",
       "download_structured_export": "Descargar exportación estructurada (ZIP)",
       "download_attachments_export": "Descargar adjuntos (ZIP)"
     },
@@ -4488,6 +4489,13 @@
       "modified": "Última modificación",
       "tags": "Etiquetas",
       "reset": "Restablecer filtros"
+    },
+    "note_modal": {
+      "open_editor": "Abrir en el editor",
+      "save_error": "No se pudo guardar esta nota.",
+      "load_error": "No se pudo cargar esta nota.",
+      "conflict": "Esta nota se modificó en otro lugar. Tus últimos cambios aquí no se guardaron: recarga la página para ver la versión actual.",
+      "empty_tasks": "Aún no hay tareas."
     }
   },
   "graph": {

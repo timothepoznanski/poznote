@@ -119,26 +119,8 @@ try {
             return '';
         }
         
-        // Convert to lowercase for case-insensitive comparison
-        $text = mb_strtolower($text, 'UTF-8');
-        
-        // Replace accented characters with their non-accented equivalents
-        $accents = [
-            'á' => 'a', 'à' => 'a', 'â' => 'a', 'ä' => 'a', 'ã' => 'a', 'å' => 'a', 'ā' => 'a',
-            'é' => 'e', 'è' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ė' => 'e', 'ę' => 'e',
-            'í' => 'i', 'ì' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'į' => 'i',
-            'ó' => 'o', 'ò' => 'o', 'ô' => 'o', 'ö' => 'o', 'õ' => 'o', 'ø' => 'o', 'ō' => 'o',
-            'ú' => 'u', 'ù' => 'u', 'û' => 'u', 'ü' => 'u', 'ū' => 'u', 'ų' => 'u',
-            'ý' => 'y', 'ÿ' => 'y',
-            'ñ' => 'n', 'ń' => 'n',
-            'ç' => 'c', 'ć' => 'c', 'č' => 'c',
-            'ş' => 's', 'š' => 's', 'ś' => 's',
-            'ž' => 'z', 'ź' => 'z', 'ż' => 'z',
-            'ł' => 'l',
-            'æ' => 'ae', 'œ' => 'oe'
-        ];
-        
-        return strtr($text, $accents);
+        // Lowercase and fold accents (lib/search-text.php)
+        return poznoteFoldAccents((string)$text);
     }, 1);
     
     // Register custom SQLite function to clean content for search

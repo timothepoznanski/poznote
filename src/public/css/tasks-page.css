@@ -1,10 +1,17 @@
 /* Styles for the global tasks page */
 
+/* Grey page and white cards, like the diary (css/dashboard.css, css/diary.css);
+   the dark rules at the end keep the dark page and raised cards. The html
+   element has its own background: grey too, below short pages. */
+html:has(body.tasks-page) {
+    background-color: var(--pz-surface);
+}
+
 body.tasks-page {
     margin: 0;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--bg-color, var(--pz-bg));
+    background-color: var(--pz-surface);
     color: var(--text-color, var(--pz-text));
 }
 
@@ -296,7 +303,7 @@ body.tasks-page {
     padding: 12px 16px;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
-    background-color: var(--pz-surface);
+    background-color: var(--pz-bg);
 }
 
 .tasks-note-header {
@@ -478,10 +485,18 @@ html[data-theme='dark'] .tasks-note-source-badge {
     font-weight: var(--pz-weight-semibold);
 }
 
+/* A line box of the task's font (same size, line-height normal), so it lines
+   up with the first line of the text; the icon is centred on the lowercase
+   letters there. A plain 1em box at the top of the row sat 1.5px high, and
+   about 2px more with Segoe UI (Windows), whose ascent is taller. */
 .tasks-task-star {
     color: var(--pz-danger-text);
     font-size: 14px;
     flex-shrink: 0;
+}
+
+.tasks-task-star .lucide {
+    vertical-align: middle;
 }
 
 /* Calendar button to add a due date to an undated open task */

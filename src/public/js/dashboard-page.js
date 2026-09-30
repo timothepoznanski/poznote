@@ -25,6 +25,20 @@
     var activeFilterTerm = '';
     var allNotesCache = null;
 
+    // Note cards drawn per view before a "Show more" button: a filter can
+    // match thousands of notes, and drawing them all at once froze the page.
+    var CARD_PAGE_SIZE = 100;
+    var cardLimit = CARD_PAGE_SIZE;
+    var cardLimitView = null;
+
+    // The page carries each note's title, tags and excerpt, not its full
+    // text: the rest of the content is searched on the server
+    // (scheduleContentSearch). ids holds the matches for term.
+    var contentSearch = { term: '', ids: null, timer: 0, seq: 0, cache: {} };
+    // The filter found nothing locally and the content search has not
+    // answered yet: the "no results" message waits for it
+    var contentSearchAwaited = false;
+
     function currentLevel() {
         return navStack.length === 0 ? rootData : navStack[navStack.length - 1];
     }
@@ -98,7 +112,7 @@
         if (Array.isArray(note.tasks)) {
             taskText = note.tasks.map(function (task) { return task.text || ''; }).join(' ');
         }
-        return normalizeSearchText(note.search || (note.heading + ' ' + tags.join(' ') + ' ' + (note.text || '') + ' ' + taskText));
+        return normalizeSearchText(note.heading + ' ' + tags.join(' ') + ' ' + (note.text || '') + ' ' + taskText);
     }
 
     function collectNotes(level, notes) {
@@ -114,12 +128,72 @@
         return allNotesCache;
     }
 
-    function noteMatchesSearch(note, term) {
+    function noteMatchesLocally(note, term) {
         var haystack = getNoteSearchValue(note);
         var tokens = term.split(/\s+/).filter(Boolean);
         return tokens.every(function (token) {
             return haystack.indexOf(token) !== -1;
         });
+    }
+
+    function noteMatchesSearch(note, term) {
+        if (contentSearch.ids && contentSearch.term === term && contentSearch.ids.has(String(note.id))) return true;
+        return noteMatchesLocally(note, term);
+    }
+
+    // Workspace to search in, or '' on a multi-workspace board (the answer
+    // is then narrowed to the notes the board holds)
+    function singleScopeWorkspace() {
+        var scope = rootData.scope || {};
+        var workspaces = scope.workspaces || [];
+        return (!scope.mode || scope.mode === 'single') && workspaces.length === 1 ? workspaces[0] : '';
+    }
+
+    // Local matches show at once; the notes whose content alone holds the
+    // words join them when GET /api/v1/notes/search/ids answers. Offline or
+    // on an error, the local matches stand.
+    function scheduleContentSearch(rawTerm, term) {
+        clearTimeout(contentSearch.timer);
+        var seq = ++contentSearch.seq;
+        if (!term) {
+            contentSearch.term = '';
+            contentSearch.ids = null;
+            return;
+        }
+        if (contentSearch.cache[term]) {
+            useContentMatches(term, contentSearch.cache[term]);
+            return;
+        }
+        contentSearch.timer = setTimeout(function () {
+            var url = 'api/v1/notes/search/ids?q=' + encodeURIComponent(rawTerm);
+            var workspace = singleScopeWorkspace();
+            if (workspace) url += '&workspace=' + encodeURIComponent(workspace);
+            fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+                .then(function (response) { return response.ok ? response.json() : null; })
+                .then(function (data) {
+                    if (!data || !Array.isArray(data.ids)) throw new Error('search/ids');
+                    var ids = new Set(data.ids.map(String));
+                    if (Object.keys(contentSearch.cache).length >= 20) contentSearch.cache = {};
+                    contentSearch.cache[term] = ids;
+                    if (seq === contentSearch.seq) useContentMatches(term, ids);
+                })
+                .catch(function () {
+                    // The local matches stand, and an empty result may now say so
+                    if (seq === contentSearch.seq) useContentMatches(term, null);
+                });
+        }, 250);
+    }
+
+    function useContentMatches(term, ids) {
+        contentSearch.term = term;
+        contentSearch.ids = ids;
+        if (term !== activeFilterTerm) return;
+        // Redraw only when the content found a card the local filter missed,
+        // or to settle a "no results" message that was held back
+        var adds = !!ids && getAllNotes().some(function (note) {
+            return ids.has(String(note.id)) && !noteMatchesLocally(note, term);
+        });
+        if (adds || contentSearchAwaited) renderAll();
     }
 
     function setNoResultsVisible(visible) {
@@ -134,7 +208,6 @@
     function buildFolderCard(folder, index) {
         var count = countNotes(folder);
         var iconStyle = folder.color ? ' style="color:' + esc(folder.color) + ' !important"' : '';
-        var search = folder.name.toLowerCase();
         // Same --note-color mechanism as note cards (see buildNoteCard).
         var colorAttrs = '';
         if (folder.cardColorHex) {
@@ -157,7 +230,7 @@
         return '<button class="dash-card dash-folder-card' + (folder.cardColorHex ? ' has-note-color' : '') +
             (folder.pinned ? ' is-pinned' : '') + '"' +
             ' data-type="folder" data-folder-index="' + index + '"' +
-            ' data-folder-id="' + esc(String(folder.id)) + '" data-search="' + esc(search) + '"' + colorAttrs + '>' +
+            ' data-folder-id="' + esc(String(folder.id)) + '"' + colorAttrs + '>' +
             pinBtn +
             '<div class="dash-card-icon"><i class="' + esc(folder.icon) + '"' + iconStyle + '></i></div>' +
             '<span class="dash-card-name">' + esc(folder.name) + '</span>' +
@@ -180,7 +253,6 @@
 
     function buildNoteCard(note) {
         var tags      = note.tags || [];
-        var searchVal = getNoteSearchValue(note);
         var tooltip   = buildNoteTooltip(note, tags);
 
         var content = '';
@@ -272,7 +344,7 @@
 
         return '<div class="dash-card dash-note-card' + (note.colorHex ? ' has-note-color' : '') +
             (note.pinned ? ' is-pinned' : '') + '"' +
-            ' data-note-id="' + note.id + '" data-search="' + esc(searchVal) + '" title="' + esc(tooltip) + '"' + colorAttrs + dragAttr + '>' +
+            ' data-note-id="' + note.id + '" title="' + esc(tooltip) + '"' + colorAttrs + dragAttr + '>' +
             pinBtn +
             '<a class="dash-card-link" href="' + esc(note.url) + '"' + linkTarget + ' draggable="false">' +
                 '<div class="dash-card-note-title">' + iconHtml + esc(note.heading) + '</div>' +
@@ -296,12 +368,55 @@
         return html;
     }
 
+    // What the card limit is counted against: another folder or another
+    // filter starts again from one page, while a redraw of the same view
+    // (a pin, a reorder, content matches arriving) keeps what was revealed.
+    function cardLimitViewKey() {
+        return JSON.stringify([
+            navStack.map(function (folder) { return folder.id; }),
+            activeFilterTerm, activeColorFilter, activeModifiedFilter, activeTagFilter
+        ]);
+    }
+
+    function buildShowMoreButton(hidden) {
+        var label = (window.DASHBOARD_SHOW_MORE_TXT || 'Show more ({count} remaining)').replace('{count}', hidden);
+        return '<div class="dash-show-more"><button type="button" class="btn btn-secondary dash-show-more-btn">' +
+            esc(label) + '</button></div>';
+    }
+
+    // Reveal the next page of cards and move the focus to the first of them,
+    // where the button used to be
+    function showMoreCards() {
+        var drawn = {};
+        Array.prototype.forEach.call(document.querySelectorAll('#dashboardGrid .dash-note-card'), function (card) {
+            drawn[card.getAttribute('data-note-id')] = true;
+        });
+        cardLimit += CARD_PAGE_SIZE;
+        renderGrid(currentLevel());
+        var cards = document.querySelectorAll('#dashboardGrid .dash-note-card');
+        for (var i = 0; i < cards.length; i++) {
+            if (drawn[cards[i].getAttribute('data-note-id')]) continue;
+            var link = cards[i].querySelector('.dash-card-link');
+            if (link) link.focus({ preventScroll: true });
+            break;
+        }
+    }
+
     function renderGrid(level) {
         var grid = document.getElementById('dashboardGrid');
         if (!grid) return;
 
+        var viewKey = cardLimitViewKey();
+        if (viewKey !== cardLimitView) {
+            cardLimitView = viewKey;
+            cardLimit = CARD_PAGE_SIZE;
+        }
+
         var html = '';
         var sectioned = false;
+        // Note cards left out by the card limit in a single-list view
+        var hidden = 0;
+        contentSearchAwaited = false;
         // A text term, a color filter or a modification-date filter all search
         // the whole tree rather than the current folder, so results are never
         // hidden behind navigation.
@@ -327,20 +442,25 @@
             matchingFolders.forEach(function (folder) {
                 html += buildFolderCard(folder, findFolderIndexInParent(folder));
             });
-            matchingNotes.forEach(function (note) { html += buildNoteCard(note); });
-            setNoResultsVisible(matchingFolders.length === 0 && matchingNotes.length === 0);
+            matchingNotes.slice(0, cardLimit).forEach(function (note) { html += buildNoteCard(note); });
+            hidden = Math.max(0, matchingNotes.length - cardLimit);
+            var nothing = matchingFolders.length === 0 && matchingNotes.length === 0;
+            contentSearchAwaited = nothing && !!activeFilterTerm && contentSearch.term !== activeFilterTerm;
+            setNoResultsVisible(nothing && !contentSearchAwaited);
         } else if (navStack.length === 0 && isMultiScope()) {
             // Root of a multi-workspace scope: one titled section per workspace
             sectioned = true;
             var groupEmptyTxt = (window.DASHBOARD_SCOPE_TXT && window.DASHBOARD_SCOPE_TXT.groupEmpty) || 'Nothing here yet.';
             rootLevels().forEach(function (group) {
                 var cards = '';
+                var groupNotes = group.notes || [];
                 (group.folders || []).forEach(function (folder, i) { cards += buildFolderCard(folder, i); });
-                (group.notes || []).forEach(function (note) { cards += buildNoteCard(note); });
+                groupNotes.slice(0, cardLimit).forEach(function (note) { cards += buildNoteCard(note); });
                 html += buildGroupTitle(group) +
                     '<div class="dashboard-grid-container dash-grid-section dash-group-grid">' +
                     (cards || '<div class="dash-group-empty">' + esc(groupEmptyTxt) + '</div>') +
-                    '</div>';
+                    '</div>' +
+                    (groupNotes.length > cardLimit ? buildShowMoreButton(groupNotes.length - cardLimit) : '');
             });
             setNoResultsVisible(false);
         } else {
@@ -362,20 +482,33 @@
             if (pinnedCount > 0 && (otherFolders.length > 0 || otherNotes.length > 0)) {
                 sectioned = true;
                 var pinnedHtml = '', restHtml = '';
+                // Pinned cards come first out of the card limit too
+                var pinnedShown = pinnedNotes.slice(0, cardLimit);
+                var otherShown = otherNotes.slice(0, cardLimit - pinnedShown.length);
+                var sectionHidden = pinnedNotes.length + otherNotes.length - pinnedShown.length - otherShown.length;
                 pinnedFolders.forEach(function (entry) { pinnedHtml += buildFolderCard(entry.folder, entry.index); });
-                pinnedNotes.forEach(function (note) { pinnedHtml += buildNoteCard(note); });
+                pinnedShown.forEach(function (note) { pinnedHtml += buildNoteCard(note); });
                 otherFolders.forEach(function (entry) { restHtml += buildFolderCard(entry.folder, entry.index); });
-                otherNotes.forEach(function (note) { restHtml += buildNoteCard(note); });
+                otherShown.forEach(function (note) { restHtml += buildNoteCard(note); });
 
                 var othersTitle = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.others) || 'Others';
                 html = '<div class="dashboard-grid-container dash-grid-section">' + pinnedHtml + '</div>' +
                     '<div class="dash-section-title">' + esc(othersTitle) + '</div>' +
-                    '<div class="dashboard-grid-container dash-grid-section">' + restHtml + '</div>';
+                    '<div class="dashboard-grid-container dash-grid-section">' + restHtml + '</div>' +
+                    (sectionHidden > 0 ? buildShowMoreButton(sectionHidden) : '');
             } else {
                 level.folders.forEach(function (folder, i) { html += buildFolderCard(folder, i); });
-                level.notes.forEach(function (note)         { html += buildNoteCard(note); });
+                level.notes.slice(0, cardLimit).forEach(function (note) { html += buildNoteCard(note); });
+                hidden = Math.max(0, level.notes.length - cardLimit);
             }
             setNoResultsVisible(false);
+        }
+        // The button sits under the cards, not in a grid cell: the single list
+        // then goes into a section of its own, as the pinned layout does
+        if (hidden > 0) {
+            sectioned = true;
+            html = '<div class="dashboard-grid-container dash-grid-section">' + html + '</div>' +
+                buildShowMoreButton(hidden);
         }
         grid.classList.toggle('dash-grid-sectioned', sectioned);
         grid.innerHTML = html;
@@ -574,6 +707,7 @@
     function applyFilter(term) {
         activeFilterTerm = normalizeSearchText(term.trim());
         renderAll();
+        scheduleContentSearch(term.trim(), activeFilterTerm);
     }
 
     // --- Note color picker ---
@@ -763,6 +897,27 @@
             if (String(notes[i].id) === String(noteId)) return notes[i];
         }
         return null;
+    }
+
+    // A task list saved from the modal (js/dashboard-note-modal.js): its
+    // card shows the new tasks, and it counts as modified today for the
+    // "modified since" filter
+    function applyNoteEdit(note, preview) {
+        note.text = preview.text;
+        note.tasks = preview.tasks;
+        note.image = preview.image;
+        var now = new Date();
+        note.updated = now.getFullYear() + '-' +
+            String(now.getMonth() + 1).padStart(2, '0') + '-' +
+            String(now.getDate()).padStart(2, '0');
+        note.updatedAt = Math.floor(now.getTime() / 1000);
+        // Server matches of the old content no longer hold
+        contentSearch.cache = {};
+        if (activeFilterTerm) {
+            var filterInput = document.getElementById('filterInput');
+            scheduleContentSearch(filterInput ? filterInput.value.trim() : activeFilterTerm, activeFilterTerm);
+        }
+        renderAll();
     }
 
     // --- Pinning ---
@@ -2280,6 +2435,27 @@
                     toggleFolderPinned(pinFolderId);
                 } else {
                     toggleNotePinned(pinBtn.getAttribute('data-pin-note-id'));
+                }
+                return;
+            }
+
+            if (e.target.closest('.dash-show-more-btn')) {
+                showMoreCards();
+                return;
+            }
+
+            // A task list opens in the board's modal (js/dashboard-note-modal.js),
+            // any other note in index.php. A modified or middle click keeps
+            // the link's own behaviour (index.php, new tab).
+            var noteLink = e.target.closest('.dash-note-card .dash-card-link');
+            if (noteLink && !e.defaultPrevented && e.button === 0 &&
+                !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
+                var noteCard = noteLink.closest('.dash-note-card');
+                var modalNote = findNoteById(noteCard.getAttribute('data-note-id'));
+                var noteModal = window.poznoteDashboardNoteModal;
+                if (modalNote && noteModal && noteModal.canOpen(modalNote)) {
+                    e.preventDefault();
+                    noteModal.open(modalNote, { onSaved: function (preview) { applyNoteEdit(modalNote, preview); } });
                 }
                 return;
             }

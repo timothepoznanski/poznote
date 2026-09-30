@@ -649,8 +649,12 @@
         }
 
         if (task.important && !task.completed) {
-            var star = document.createElement('i');
-            star.className = 'lucide lucide-star tasks-task-star';
+            // The icon sits in a line box of the task's font, where
+            // vertical-align: middle centres it on the lowercase letters
+            // whatever the system font (css/tasks-page.css)
+            var star = document.createElement('span');
+            star.className = 'tasks-task-star';
+            star.innerHTML = '<i class="lucide lucide-star"></i>';
             row.appendChild(star);
         }
 

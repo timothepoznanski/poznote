@@ -86,6 +86,7 @@ function routeTable(): array
             'target_note_id' => '{other_note}', 'position' => 'before', 'workspace' => '{workspace}']],
         'GET /notes/resolve' => [OWNED, 'query' => ['reference' => '{marker}']],
         'GET /notes/search' => [SCOPED, 'query' => ['q' => '{marker}']],
+        'GET /notes/search/ids' => [SCOPED, 'query' => ['q' => '{marker}']],
         'POST /notes/favorites/clear' => [SCOPED, 'query' => ['workspace' => '{workspace}']],
         'GET /notes/with-attachments' => [SCOPED],
         'GET /notes/templates' => [SCOPED],
@@ -740,12 +741,12 @@ function checkAppPasswords(IsolationContext $ctx): void
 function checkWorkspaceScoping(IsolationContext $ctx): void
 {
     $workspace = $ctx->fixtures['workspace'];
-    $routes = ['/notes', '/notes/templates', '/folders', '/folders/counts', '/tags', '/trash', '/graph', '/tasks', '/reminders', '/notes/search'];
+    $routes = ['/notes', '/notes/templates', '/folders', '/folders/counts', '/tags', '/trash', '/graph', '/tasks', '/reminders', '/notes/search', '/notes/search/ids'];
 
     foreach ($routes as $path) {
         test("workspace scoping: GET $path?workspace=<owner's>", function () use ($ctx, $path, $workspace) {
             $query = ['workspace' => $workspace];
-            if ($path === '/notes/search') {
+            if ($path === '/notes/search' || $path === '/notes/search/ids') {
                 $query['q'] = $ctx->fixtures['marker'];
             }
             $response = $ctx->stranger->api->get($path, ['query' => $query]);
@@ -753,6 +754,10 @@ function checkWorkspaceScoping(IsolationContext $ctx): void
                 fail("$path: server error -> " . $response->summary());
             }
             assertNoLeak($response, $ctx->fixtures, "GET $path", $query);
+            // Bare ids carry no marker to spot: the stranger must find nothing
+            if ($path === '/notes/search/ids' && ($response->json['ids'] ?? []) !== []) {
+                fail("$path: the owner's marker matched notes -> " . $response->summary());
+            }
         });
     }
 }

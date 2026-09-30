@@ -3111,6 +3111,66 @@ class NotesController {
             $this->sendError(500, 'Search error occurred');
         }
     }
+
+    /**
+     * Ids of the notes whose title, tags or content hold every word of q.
+     *
+     * The dashboard filters its cards on what the page carries (titles, tags,
+     * excerpts) and asks this for the rest of the content, which it no longer
+     * embeds. Words may sit anywhere, in any order, compared lowercased and
+     * with accents folded (poznoteFoldAccents). A tasklist matches on its task
+     * labels, not on the keys of its JSON.
+     */
+    public function searchIds(): void {
+        $query = trim((string)($_GET['q'] ?? ''));
+        $workspace = $_GET['workspace'] ?? null;
+
+        if ($query === '') {
+            $this->sendError(400, 'Search query (q) is required');
+            return;
+        }
+
+        $words = preg_split('/\s+/u', poznoteFoldAccents($query), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        try {
+            $sql = "SELECT id, type, heading, tags,
+                           CASE WHEN type = 'tasklist' THEN entry ELSE search_clean_entry(entry, type) END AS body
+                    FROM entries
+                    WHERE trash = 0";
+            $params = [];
+            if ($workspace) {
+                $sql .= " AND workspace = ?";
+                $params[] = $workspace;
+            }
+
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute($params);
+
+            $ids = [];
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $body = (string)($row['body'] ?? '');
+                if ($row['type'] === 'tasklist' && $body !== '') {
+                    $json = normalizeTasklistJsonContent($body);
+                    $items = json_decode($json !== '' ? $json : $body, true);
+                    $labels = [];
+                    foreach (is_array($items) ? $items : [] as $item) {
+                        if (is_array($item)) $labels[] = (string)($item['text'] ?? '');
+                    }
+                    $body = implode(' ', $labels);
+                }
+
+                $haystack = poznoteFoldAccents(($row['heading'] ?? '') . ' ' . ($row['tags'] ?? '') . ' ' . $body);
+                foreach ($words as $word) {
+                    if (strpos($haystack, $word) === false) continue 2;
+                }
+                $ids[] = (int)$row['id'];
+            }
+
+            $this->sendSuccess(['ids' => $ids]);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Search error occurred');
+        }
+    }
     
     /**
      * Determine whether a structured-note payload (tasklist/excalidraw) is

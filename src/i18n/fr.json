@@ -94,7 +94,8 @@
       "yesterday": "Hier"
     },
     "network_error": "Erreur réseau",
-    "none": "Aucun"
+    "none": "Aucun",
+    "show_more_notes": "Afficher plus ({{count}} restantes)"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -2436,7 +2437,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "Télécharger la sauvegarde complète (ZIP)",
+      "download_complete_backup": "Créer une sauvegarde complète (ZIP)",
       "download_structured_export": "Télécharger l'export structuré (ZIP)",
       "download_attachments_export": "Télécharger les pièces jointes (ZIP)"
     },
@@ -4592,6 +4593,13 @@
       "modified": "Dernière modification",
       "tags": "Tags",
       "reset": "Réinitialiser les filtres"
+    },
+    "note_modal": {
+      "open_editor": "Ouvrir dans l'éditeur",
+      "save_error": "Impossible d'enregistrer cette note.",
+      "load_error": "Impossible de charger cette note.",
+      "conflict": "Cette note a été modifiée ailleurs. Vos dernières modifications ici n'ont pas été enregistrées : rechargez la page pour voir la version actuelle.",
+      "empty_tasks": "Aucune tâche pour le moment."
     }
   },
   "graph": {

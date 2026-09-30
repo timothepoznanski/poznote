@@ -52,6 +52,7 @@ $currentLang = getUserLanguage();
       data-txt-moving="<?php echo t_h('notes_manager.moving', [], 'Moving...'); ?>"
       data-txt-moved="<?php echo t_h('notes_manager.moved', [], 'Moved successfully'); ?>"
       data-txt-root="<?php echo t_h('notes_manager.root', [], 'Root (no folder)'); ?>"
+      data-txt-show-more="<?php echo t_h('common.show_more_notes', ['count' => '{count}'], 'Show more ({count} remaining)'); ?>"
       data-txt-age-labels="<?php echo htmlspecialchars(json_encode([
           '0'   => t('modals.note_age_filter.options.all', [], 'All notes'),
           '30'  => t('modals.note_age_filter.options.last_30_days', [], 'Last 30 days'),
@@ -144,6 +145,9 @@ $currentLang = getUserLanguage();
 				<?php echo t_h('common.loading', [], 'Loading...'); ?>
 			</div>
 			<div id="nmNotesContainer"></div>
+			<div id="nmShowMore" class="nm-show-more" hidden>
+				<button type="button" id="nmShowMoreBtn" class="btn btn-sm btn-secondary"></button>
+			</div>
 			<div id="nmEmptyMessage" class="empty-message initially-hidden">
 				<p><?php echo t_h('notes_manager.empty', [], 'No notes found.'); ?></p>
 			</div>

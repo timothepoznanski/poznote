@@ -56,6 +56,8 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
     return [
         'id'        => $noteId,
         'heading'   => $heading,
+        // A task list opens in the card's modal (js/dashboard-note-modal.js)
+        'type'      => (string)($note['type'] ?? 'note'),
         // newtab=1 tells tabs.js to open the note as a new internal tab
         // instead of replacing the active one (see _init in js/tabs.js).
         'url'       => 'index.php?note=' . $noteId . '&newtab=1' . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
@@ -63,7 +65,10 @@ function dashboardBuildNoteData(array $note, string $pageWorkspace): array {
         'tasks'     => $preview['tasks'],
         'image'     => $preview['image'] ?? null,
         'tags'      => $tags,
-        'search'    => trim($heading . ' ' . implode(' ', $tags) . ' ' . ($preview['search'] ?? '')),
+        // No full-text 'search' field: the board filters on the title, tags
+        // and excerpt it carries and asks GET /api/v1/notes/search/ids for
+        // the rest of the content (js/dashboard-page.js). Embedding every
+        // note's text made the page weigh megabytes on a large workspace.
         'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
         // Unix time of the last change, for the "modified since" filter
         'updatedAt' => (int)(strtotime((string)($note['updated'] ?? '') . ' UTC') ?: 0),
@@ -873,6 +878,24 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			</div>
 		</div>
 
+		<?php // A task list card opens here, its tasks ticked and edited in place (js/dashboard-note-modal.js) ?>
+		<div id="dashboardNoteModal" class="modal dashboard-note-modal" role="dialog" aria-modal="true" aria-labelledby="dashboardNoteModalTitle">
+			<div class="modal-content dashboard-note-modal-content">
+				<div class="dashboard-note-modal-header">
+					<h3 id="dashboardNoteModalTitle" class="dashboard-note-modal-title"></h3>
+					<button type="button" class="dashboard-note-modal-icon-btn dashboard-note-modal-close" data-action="close-note-modal" title="<?php echo t_h('common.close'); ?>" aria-label="<?php echo t_h('common.close'); ?>"><i class="lucide lucide-x"></i></button>
+				</div>
+				<div id="dashboardNoteModalBody" class="dashboard-note-modal-body"></div>
+				<div class="dashboard-note-modal-footer">
+					<span id="dashboardNoteModalStatus" class="dashboard-note-modal-status" aria-live="polite"></span>
+					<div class="modal-buttons">
+						<button type="button" class="btn-cancel" data-action="close-note-modal"><?php echo t_h('common.close'); ?></button>
+						<a id="dashboardNoteModalOpen" class="btn btn-primary dashboard-note-modal-open" href="#"><i class="lucide lucide-pencil"></i> <?php echo t_h('dashboard.note_modal.open_editor', [], 'Open in the editor'); ?></a>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<script>
 		window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;
 		window.TAG_COLORS = <?php echo json_encode(getTagColorsMap(), JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT); ?>;
@@ -894,6 +917,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		window.DASHBOARD_REORDER_TXT = {
 			error: <?php echo json_encode(t('dashboard.reorder_error', [], 'Could not save the card order.')); ?>
 		};
+		window.DASHBOARD_SHOW_MORE_TXT = <?php echo json_encode(t('common.show_more_notes', ['count' => '{count}'], 'Show more ({count} remaining)')); ?>;
 		window.DASHBOARD_SCOPE_TXT = {
 			all: <?php echo json_encode(t('dashboard.scope.all', [], 'All workspaces')); ?>,
 			byTag: <?php echo json_encode(t('dashboard.scope.by_tag', [], 'By tag')); ?>,
@@ -920,6 +944,17 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			search: <?php echo json_encode(t('dashboard.tag_filter.search', [], 'Filter tags...')); ?>,
 			noMatch: <?php echo json_encode(t('dashboard.tag_filter.no_match', [], 'No matching tag.')); ?>
 		};
+		window.DASHBOARD_NOTE_MODAL_TXT = {
+			loading: <?php echo json_encode(t('common.loading', [], 'Loading...')); ?>,
+			saving: <?php echo json_encode(t('diary.journal_saving', [], 'Saving...')); ?>,
+			saved: <?php echo json_encode(t('diary.journal_saved', [], 'Saved')); ?>,
+			saveError: <?php echo json_encode(t('dashboard.note_modal.save_error', [], 'Could not save this note.')); ?>,
+			loadError: <?php echo json_encode(t('dashboard.note_modal.load_error', [], 'Could not load this note.')); ?>,
+			conflict: <?php echo json_encode(t('dashboard.note_modal.conflict', [], 'This note was changed elsewhere. Your latest changes here were not saved: reload the page to see the current version.')); ?>,
+			addTask: <?php echo json_encode(t('tasklist.input_placeholder', [], 'Write a new task and press Enter to add to list...')); ?>,
+			emptyTasks: <?php echo json_encode(t('dashboard.note_modal.empty_tasks', [], 'No tasks yet.')); ?>,
+			deleteTask: <?php echo json_encode(t('common.delete', [], 'Delete')); ?>
+		};
 		window.NOTIFICATIONS_TXT = {
 			dismiss: <?php echo json_encode(t('reminder.dismiss', [], 'Dismiss')); ?>,
 			justNow: <?php echo json_encode(t('reminder.just_now', [], 'Just now')); ?>,
@@ -929,6 +964,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		<script src="js/pwa-helpers.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+		<script src="<?php echo poznoteAsset('js/dashboard-note-modal.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/dashboard-page.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
 		<?php if ($aiChatEnabled): ?>

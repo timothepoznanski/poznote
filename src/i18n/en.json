@@ -77,7 +77,8 @@
     "notes": "Notes",
     "saved": "saved",
     "unknown_error": "Unknown error",
-    "none": "None"
+    "none": "None",
+    "show_more_notes": "Show more ({{count}} remaining)"
   },
   "snapshot": {
     "menu_item": "Snapshots",
@@ -2036,7 +2037,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "Download complete backup (ZIP)",
+      "download_complete_backup": "Create complete backup (ZIP)",
       "download_structured_export": "Download structured export (ZIP)",
       "download_attachments_export": "Download attachments (ZIP)"
     },
@@ -4113,6 +4114,13 @@
       "modified": "Last modified",
       "tags": "Tags",
       "reset": "Reset filters"
+    },
+    "note_modal": {
+      "open_editor": "Open in the editor",
+      "save_error": "Could not save this note.",
+      "load_error": "Could not load this note.",
+      "conflict": "This note was changed elsewhere. Your latest changes here were not saved: reload the page to see the current version.",
+      "empty_tasks": "No tasks yet."
     }
   },
   "graph": {

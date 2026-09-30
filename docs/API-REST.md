@@ -330,6 +330,28 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/search?q=docker&created_from=2026-01-01&created_to=2026-01-31"
 ```
 
+### Search Note Ids
+
+```
+GET /notes/search/ids
+```
+
+Ids of every note whose title, tags or content contain all the words of the query, in any order. The comparison ignores case and accents, and a tasklist matches on its task labels. There is no limit: the answer holds every match. The dashboard uses it to search note content it does not load.
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `q` | string | Words to find (required) |
+| `workspace` | string | Restrict search to a workspace |
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/search/ids?q=docker%20compose&workspace=Poznote"
+```
+
+Response: `{"success": true, "ids": [12, 48]}`
+
 ### Create Note
 
 ```
@@ -3735,6 +3757,7 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/notes/templates` | List notes usable as templates |
 | `GET` | `/notes/resolve` | Resolve note by reference |
 | `GET` | `/notes/search` | Search notes |
+| `GET` | `/notes/search/ids` | Ids of the notes holding every word of a query |
 | `GET` | `/notes/{id}` | Get note |
 | `POST` | `/notes` | Create note |
 | `PATCH` | `/notes/{id}` | Update note |

@@ -270,6 +270,14 @@ html[data-theme='dark'] .dash-section-title {
     color: var(--pz-text-muted);
 }
 
+/* "Show more" under a list cut at the card limit (renderGrid in
+   js/dashboard-page.js), centred below the cards */
+.dash-show-more {
+    display: flex;
+    justify-content: center;
+    margin: 18px 0 6px;
+}
+
 /* ---------- View menu (card size + layout) ---------- */
 
 /* Row holding the View button and the filter bar, centered like the filter */
@@ -2065,4 +2073,281 @@ html[data-theme='dark'] .dashboard-scope-open {
 html[data-theme='dark'] .dashboard-scope-open:hover {
     background: var(--pz-surface-hover);
     color: var(--pz-accent-text);
+}
+
+/* ---------- Task list modal ----------
+   A task list card opens here (js/dashboard-note-modal.js), its tasks ticked
+   and edited in place. The dialog fills most of the screen height so a long
+   list stays workable. */
+
+.dashboard-note-modal {
+    align-items: center;
+}
+
+html.dashboard-note-modal-open,
+html.dashboard-note-modal-open body {
+    overflow: hidden;
+}
+
+#dashboardNoteModal .dashboard-note-modal-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 760px;
+    height: min(720px, calc(100dvh - 40px));
+    padding: 20px 24px;
+    overflow: hidden;
+}
+
+.dashboard-note-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-bottom: 14px;
+}
+
+#dashboardNoteModal .dashboard-note-modal-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0 8px 0 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-note-modal-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.dashboard-note-modal-icon-btn:hover,
+.dashboard-note-modal-icon-btn:focus-visible {
+    background: var(--pz-surface-hover);
+    color: var(--pz-text-strong);
+}
+
+.dashboard-note-modal-icon-btn .lucide {
+    width: 18px;
+    height: 18px;
+}
+
+.dashboard-note-modal-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+.dashboard-note-modal-message {
+    margin: 0;
+    color: var(--pz-text-muted);
+    font-size: 14px;
+}
+
+.dashboard-note-modal-message.is-error {
+    color: var(--pz-danger-text);
+}
+
+.dashboard-note-modal-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    margin-top: 14px;
+}
+
+.dashboard-note-modal-status {
+    flex: 1;
+    min-width: 0;
+    color: var(--pz-text-muted);
+    font-size: 13px;
+}
+
+.dashboard-note-modal-status.is-error {
+    color: var(--pz-danger-text);
+}
+
+.dashboard-note-modal-footer .modal-buttons {
+    margin-top: 0;
+}
+
+/* A link styled as the dialog's primary button (.modal-buttons only shapes
+   <button>) */
+#dashboardNoteModal .dashboard-note-modal-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.dashboard-note-modal-open .lucide {
+    width: 15px;
+    height: 15px;
+}
+
+/* Task list editor */
+.dashboard-note-editor-tasks {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+}
+
+#dashboardNoteModal .dashboard-note-task-add {
+    flex-shrink: 0;
+    width: 100%;
+    margin: 0 0 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-surface);
+    color: var(--pz-text-strong);
+    font-size: 14px;
+}
+
+#dashboardNoteModal .dashboard-note-task-add:focus {
+    border-color: var(--pz-accent-text);
+}
+
+.dashboard-note-task-list {
+    flex: 1;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-y: auto;
+}
+
+.dashboard-note-task {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 4px 4px 4px 2px;
+    border-radius: var(--pz-radius-sm);
+}
+
+.dashboard-note-task:hover {
+    background: var(--pz-surface-hover);
+}
+
+#dashboardNoteModal .dashboard-note-task-check {
+    flex-shrink: 0;
+    width: 17px;
+    height: 17px;
+    margin: 5px 0 0;
+    padding: 0;
+    accent-color: var(--pz-accent);
+    cursor: pointer;
+}
+
+/* The text reads as a <div> with its links and is edited in a <textarea>
+   (.dashboard-note-task-field) of the same box, so the swap does not move
+   the row */
+#dashboardNoteModal .dashboard-note-task-text {
+    flex: 1;
+    min-width: 0;
+    max-width: none !important;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 2px 4px;
+    border: 1px solid transparent;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-text-strong);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    cursor: text;
+    resize: none;
+    overflow: hidden;
+    outline: none;
+}
+
+#dashboardNoteModal .dashboard-note-task-text:focus-visible,
+#dashboardNoteModal .dashboard-note-task-field:focus {
+    border-color: var(--pz-accent-text);
+    background: var(--pz-surface);
+}
+
+#dashboardNoteModal .dashboard-note-task-text a {
+    color: var(--pz-accent-text);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#dashboardNoteModal .dashboard-note-task.is-important .dashboard-note-task-text {
+    font-weight: var(--pz-weight-semibold);
+}
+
+#dashboardNoteModal .dashboard-note-task.is-done .dashboard-note-task-text {
+    color: var(--pz-text-muted);
+    text-decoration: line-through;
+}
+
+.dashboard-note-task-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.dashboard-note-task-delete:hover,
+.dashboard-note-task-delete:focus-visible {
+    background: var(--pz-danger-soft);
+    color: var(--pz-danger-text);
+}
+
+.dashboard-note-task-delete .lucide {
+    width: 15px;
+    height: 15px;
+}
+
+.dashboard-note-task-empty {
+    margin: 8px 2px;
+    color: var(--pz-text-muted);
+    font-size: 14px;
+}
+
+@media (max-width: 800px) {
+    .dashboard-note-modal {
+        padding: 0;
+    }
+
+    #dashboardNoteModal .dashboard-note-modal-content {
+        width: 100%;
+        max-width: none;
+        height: 100dvh;
+        padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+        border-radius: 0;
+    }
+
+    /* 16px: iOS zooms into a smaller field on focus */
+    #dashboardNoteModal .dashboard-note-task-add,
+    #dashboardNoteModal .dashboard-note-task-text {
+        font-size: 16px;
+    }
 }

@@ -95,7 +95,8 @@
       "yesterday": "Gestern"
     },
     "network_error": "Netzwerkfehler",
-    "none": "Keine"
+    "none": "Keine",
+    "show_more_notes": "Mehr anzeigen (noch {{count}})"
   },
   "snapshot": {
     "menu_item": "Schnappschüsse",
@@ -2431,7 +2432,7 @@
       }
     },
     "buttons": {
-      "download_complete_backup": "Vollständige Sicherung herunterladen (ZIP)",
+      "download_complete_backup": "Vollständige Sicherung erstellen (ZIP)",
       "download_structured_export": "Strukturierten Export herunterladen (ZIP)",
       "download_attachments_export": "Anhänge herunterladen (ZIP)"
     },
@@ -4487,6 +4488,13 @@
       "modified": "Zuletzt geändert",
       "tags": "Tags",
       "reset": "Filter zurücksetzen"
+    },
+    "note_modal": {
+      "open_editor": "Im Editor öffnen",
+      "save_error": "Diese Notiz konnte nicht gespeichert werden.",
+      "load_error": "Diese Notiz konnte nicht geladen werden.",
+      "conflict": "Diese Notiz wurde anderswo geändert. Ihre letzten Änderungen hier wurden nicht gespeichert: Laden Sie die Seite neu, um die aktuelle Version zu sehen.",
+      "empty_tasks": "Noch keine Aufgaben."
     }
   },
   "graph": {

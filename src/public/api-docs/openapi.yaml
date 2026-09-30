@@ -699,6 +699,41 @@ paths:
                         created:
                           type: string
 
+  /notes/search/ids:
+    get:
+      tags: [Notes]
+      summary: Ids of the notes matching every word
+      description: Ids of every note whose title, tags or content contain all the words of q, in any order, ignoring case and accents. A tasklist matches on its task labels. No limit, every match is returned.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Words to find
+        - name: workspace
+          in: query
+          schema:
+            type: string
+          description: Restrict search to a workspace
+      responses:
+        '200':
+          description: Matching note ids
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  ids:
+                    type: array
+                    items:
+                      type: integer
+        '400':
+          description: Missing q
+
   /notes/with-attachments:
     get:
       tags: [Notes]
