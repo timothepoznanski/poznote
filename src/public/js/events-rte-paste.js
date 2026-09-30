@@ -406,6 +406,12 @@ function handleRichTextPaste(htmlData) {
             el.removeAttribute('width');
             el.removeAttribute('height');
         }
+
+        // A table without a width of its own (OneNote, most web pages) keeps
+        // the size of its content instead of spreading over the note (#1522)
+        if (el.tagName === 'TABLE' && !el.style.width) {
+            el.style.width = 'auto';
+        }
     }
 
     var cleanHtml = doc.body.innerHTML;

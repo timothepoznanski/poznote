@@ -2257,6 +2257,8 @@
       "align_center": "Zentriert",
       "align_right": "Rechts",
       "reset_column_widths": "Spaltenbreiten zurücksetzen",
+      "fit_to_content": "Tabelle an Inhalt anpassen",
+      "full_width": "Tabelle in voller Breite",
       "delete_row": "Zeile löschen",
       "delete_column": "Spalte löschen",
       "delete_table": "Tabelle löschen",

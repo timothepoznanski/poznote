@@ -2255,6 +2255,8 @@
       "align_center": "居中",
       "align_right": "右对齐",
       "reset_column_widths": "重置列宽",
+      "fit_to_content": "表格适应内容",
+      "full_width": "表格全宽",
       "delete_row": "删除行",
       "delete_column": "删除列",
       "delete_table": "删除表格",

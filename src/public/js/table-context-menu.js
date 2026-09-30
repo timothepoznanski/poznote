@@ -54,6 +54,8 @@
             { separator: true },
             { align: true },
             { label: tr('table.context_menu.reset_column_widths', 'Reset column widths'), action: 'resetColumnWidths', icon: '↔', id: 'resetColumnWidths' },
+            { label: tr('table.context_menu.fit_to_content', 'Fit table to content'), action: 'fitTable', icon: '→←', id: 'fitTable' },
+            { label: tr('table.context_menu.full_width', 'Full-width table'), action: 'fullWidthTable', icon: '←→', id: 'fullWidthTable' },
             { separator: true },
             { label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true },
             { label: tr('table.context_menu.delete_column', 'Delete column'), action: 'deleteCol', icon: '🗑️', danger: true },
@@ -141,7 +143,8 @@
 
     /**
      * Reflects the table under the pointer in the menu (current alignment,
-     * width reset only offered when some width was set)
+     * width reset only offered when some width was set, table width options
+     * other than the current one)
      */
     function refreshAlignButtons(menu, table, cell) {
         const columns = window.pzTableColumns;
@@ -161,6 +164,11 @@
         if (reset) {
             reset.style.display = columns && columns.hasColumnWidths(table) ? '' : 'none';
         }
+        const mode = columns ? columns.getTableWidthMode(table) : null;
+        const fit = menu.querySelector('[data-item="fitTable"]');
+        if (fit) fit.style.display = mode && mode !== 'fit' ? '' : 'none';
+        const full = menu.querySelector('[data-item="fullWidthTable"]');
+        if (full) full.style.display = mode && mode !== 'full' ? '' : 'none';
     }
 
     /**
@@ -247,6 +255,10 @@
                 break;
             case 'resetColumnWidths':
                 if (!window.pzTableColumns || !window.pzTableColumns.resetColumnWidths(activeTable)) return;
+                break;
+            case 'fitTable':
+            case 'fullWidthTable':
+                if (!window.pzTableColumns || !window.pzTableColumns.setTableWidthMode(activeTable, action === 'fitTable' ? 'fit' : 'full')) return;
                 break;
             case 'deleteTable':
                 // Asynchronous (styled confirmation): it saves the note itself

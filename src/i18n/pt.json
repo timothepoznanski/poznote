@@ -2257,6 +2257,8 @@
       "align_center": "Centralizar",
       "align_right": "Direita",
       "reset_column_widths": "Redefinir a largura das colunas",
+      "fit_to_content": "Ajustar a tabela ao conteúdo",
+      "full_width": "Tabela em largura total",
       "delete_row": "Excluir linha",
       "delete_column": "Excluir coluna",
       "delete_table": "Excluir tabela",

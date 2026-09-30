@@ -135,70 +135,39 @@ function closeTagContextMenu() {
 
 function handleRenameTag(tagItem) {
     const oldName = tagItem.dataset.tag;
+    const actions = window.PoznoteTagActions;
 
-    showTagInputModal(
-        window.t ? window.t('tags.rename.title', {}, 'Rename tag') : 'Rename tag',
-        window.t ? window.t('tags.rename.label', {}, 'New name') : 'New name',
-        oldName,
-        window.t ? window.t('tags.action.rename', {}, 'Rename') : 'Rename',
-        function(newName) {
-            if (!newName || newName === oldName) return;
-            renameTagRequest(tagItem, oldName, newName);
-        }
-    );
-}
+    actions.openRenameDialog(oldName)
+        .then(function(newName) {
+            return newName ? actions.rename(oldName, newName, window.pageWorkspace || '') : null;
+        })
+        .then(function(storedName) {
+            if (!storedName) return;
 
-function renameTagRequest(tagItem, oldName, newName) {
-    const workspace = window.pageWorkspace || '';
+            // Renamed into a tag that already exists (a typo merged into the
+            // right tag): its note count is only known to the server now.
+            const merged = Array.prototype.some.call(
+                document.querySelectorAll('#tagsList .tag-item'),
+                function(item) { return item !== tagItem && item.dataset.tag === storedName; }
+            );
+            if (merged) {
+                window.location.reload();
+                return;
+            }
 
-    fetch('/api/v1/tags/' + encodeURIComponent(oldName), {
-        method: 'PATCH',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ new_name: newName, workspace: workspace || undefined })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-        if (data.success) {
             // Update DOM in place, keeping the count span
-            tagItem.dataset.tag = newName;
+            tagItem.dataset.tag = storedName;
             const nameEl = tagItem.querySelector('.tag-name');
             if (nameEl) {
                 const countEl = nameEl.querySelector('.tag-note-count');
-                nameEl.textContent = newName;
+                nameEl.textContent = storedName;
                 if (countEl) nameEl.appendChild(countEl);
-            }
-
-            // Carry the tag color over to the new name
-            const colorMap = getTagColorsMap();
-            const oldKey = String(oldName).trim().toLowerCase();
-            const newKey = String(newName).trim().toLowerCase();
-            if (oldKey !== newKey && Object.prototype.hasOwnProperty.call(colorMap, oldKey)) {
-                colorMap[newKey] = colorMap[oldKey];
-                delete colorMap[oldKey];
-                saveTagColors();
             }
             updateTagItemDot(tagItem);
 
             // Re-sort the grid
             resortTagGrid();
-        } else {
-            if (window.modalAlert) {
-                window.modalAlert.alert(
-                    data.message || (window.t ? window.t('tags.rename.error', {}, 'Rename failed') : 'Rename failed'),
-                    'error'
-                );
-            }
-        }
-    })
-    .catch(function() {
-        if (window.modalAlert) {
-            window.modalAlert.alert(
-                window.t ? window.t('ui.alerts.network_error', {}, 'Network error') : 'Network error',
-                'error'
-            );
-        }
-    });
+        });
 }
 
 // ─── Delete ────────────────────────────────────────────────────────────────────
@@ -244,11 +213,8 @@ function deleteTagRequest(tagItem, tagName) {
             updateTagCount();
 
             // Drop the deleted tag's color mapping
-            const colorMap = getTagColorsMap();
-            const key = String(tagName).trim().toLowerCase();
-            if (Object.prototype.hasOwnProperty.call(colorMap, key)) {
-                delete colorMap[key];
-                saveTagColors();
+            if (window.PoznoteTagActions.resolveHex(tagName)) {
+                window.PoznoteTagActions.setColor(tagName, '');
             }
 
             // The removed tag may have been the last one wearing its color.
@@ -273,61 +239,13 @@ function deleteTagRequest(tagItem, tagName) {
 }
 
 // ─── Tag colors ────────────────────────────────────────────────────────────────
-// window.TAG_COLORS maps a lowercased tag name to a palette id or '#rrggbb'
-// (same semantics as note colors). Persisted in the 'tag_colors' setting.
-
-function getTagColorsMap() {
-    if (!window.TAG_COLORS || typeof window.TAG_COLORS !== 'object') {
-        window.TAG_COLORS = {};
-    }
-    return window.TAG_COLORS;
-}
-
-function getTagColorPalette() {
-    return Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
-}
-
-function resolveTagColorValueHex(value) {
-    if (typeof value !== 'string' || value === '') return '';
-    if (value.charAt(0) === '#') return value;
-    const entry = getTagColorPalette().find(function(c) { return c.id === value.toLowerCase(); });
-    return entry ? entry.hex : '';
-}
-
-function resolveTagHex(tagName) {
-    const value = getTagColorsMap()[String(tagName || '').trim().toLowerCase()];
-    return resolveTagColorValueHex(value);
-}
-
-function saveTagColors(callback) {
-    fetch('/api/v1/settings/tag_colors', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        credentials: 'same-origin',
-        body: JSON.stringify({ value: JSON.stringify(getTagColorsMap()) })
-    })
-    .then(function(r) { return r.json(); })
-    .then(function(data) { if (callback) callback(!!(data && data.success)); })
-    .catch(function() { if (callback) callback(false); });
-}
-
-function setTagColor(tagName, colorValue, callback) {
-    const key = String(tagName || '').trim().toLowerCase();
-    if (!key) return;
-    const map = getTagColorsMap();
-    if (colorValue) {
-        map[key] = colorValue;
-    } else {
-        delete map[key];
-    }
-    saveTagColors(callback);
-}
+// Stored and picked through js/tag-actions.js, shared with the tag menu in notes.
 
 function updateTagItemDot(tagItem) {
     const nameEl = tagItem.querySelector('.tag-name');
     if (!nameEl) return;
     let dot = nameEl.querySelector('.tag-color-dot');
-    const hex = resolveTagHex(tagItem.dataset.tag);
+    const hex = window.PoznoteTagActions.resolveHex(tagItem.dataset.tag);
     // data-color backs the color filter, so it has to track the dot.
     tagItem.dataset.color = hex ? hex.toLowerCase() : '';
     if (!hex) {
@@ -345,198 +263,9 @@ function updateTagItemDot(tagItem) {
 }
 
 function showTagColorModal(tagItem) {
-    const tagName = tagItem.dataset.tag;
-    const currentValue = getTagColorsMap()[String(tagName).trim().toLowerCase()] || '';
-
-    const overlay = document.createElement('div');
-    overlay.className = 'alert-modal-overlay';
-    overlay.style.zIndex = '10000';
-
-    const modal = document.createElement('div');
-    modal.className = 'alert-modal';
-
-    const header = document.createElement('div');
-    header.className = 'alert-modal-header';
-    const titleEl = document.createElement('h3');
-    titleEl.className = 'alert-modal-title';
-    titleEl.textContent = (window.t ? window.t('tags.color.modal_title', {}, 'Tag color') : 'Tag color') + ' — ' + tagName;
-    header.appendChild(titleEl);
-
-    const body = document.createElement('div');
-    body.className = 'alert-modal-body';
-
-    let selectedValue = currentValue;
-
-    const grid = document.createElement('div');
-    grid.className = 'tag-color-grid';
-
-    function refreshSelection() {
-        grid.querySelectorAll('.tag-color-swatch').forEach(function(swatch) {
-            swatch.classList.toggle('selected', swatch.dataset.value === selectedValue);
-        });
-        customInput.classList.toggle('selected', !!selectedValue && selectedValue.charAt(0) === '#');
-    }
-
-    getTagColorPalette().forEach(function(color) {
-        const swatch = document.createElement('button');
-        swatch.type = 'button';
-        swatch.className = 'tag-color-swatch';
-        swatch.dataset.value = color.id;
-        swatch.style.background = color.hex;
-        swatch.title = color.name || color.id;
-        swatch.addEventListener('click', function() {
-            selectedValue = (selectedValue === color.id) ? '' : color.id;
-            refreshSelection();
-        });
-        grid.appendChild(swatch);
+    window.PoznoteTagActions.openColorDialog(tagItem.dataset.tag).then(function(saved) {
+        if (saved) updateTagItemDot(tagItem);
     });
-
-    // Custom hex color, mirroring the note color picker's custom option
-    const customInput = document.createElement('input');
-    customInput.type = 'color';
-    customInput.className = 'tag-color-swatch tag-color-custom';
-    customInput.title = window.t ? window.t('note_color.custom', {}, 'Custom color') : 'Custom color';
-    customInput.value = (currentValue && currentValue.charAt(0) === '#') ? currentValue : '#3b82f6';
-    customInput.addEventListener('input', function() {
-        selectedValue = customInput.value;
-        refreshSelection();
-    });
-    grid.appendChild(customInput);
-
-    body.appendChild(grid);
-
-    const footer = document.createElement('div');
-    footer.className = 'alert-modal-footer';
-
-    function closeColorModal(cb) {
-        overlay.classList.remove('show');
-        setTimeout(function() { overlay.remove(); if (cb) cb(); }, 300);
-    }
-
-    function persist(value) {
-        closeColorModal(function() {
-            setTagColor(tagName, value, function(success) {
-                if (success) {
-                    updateTagItemDot(tagItem);
-                } else if (window.modalAlert) {
-                    window.modalAlert.alert(
-                        window.t ? window.t('tags.color.apply_error', {}, 'Could not update the tag color.') : 'Could not update the tag color.',
-                        'error'
-                    );
-                }
-            });
-        });
-    }
-
-    const removeBtn = document.createElement('button');
-    removeBtn.className = 'alert-modal-button secondary';
-    removeBtn.textContent = window.t ? window.t('note_color.remove', {}, 'Remove color') : 'Remove color';
-    removeBtn.addEventListener('click', function() { persist(''); });
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'alert-modal-button secondary';
-    cancelBtn.textContent = window.t ? window.t('common.cancel', {}, 'Cancel') : 'Cancel';
-    cancelBtn.addEventListener('click', function() { closeColorModal(); });
-
-    const applyBtn = document.createElement('button');
-    applyBtn.className = 'alert-modal-button primary';
-    applyBtn.textContent = window.t ? window.t('common.apply', {}, 'Apply') : 'Apply';
-    applyBtn.addEventListener('click', function() { persist(selectedValue); });
-
-    footer.appendChild(removeBtn);
-    footer.appendChild(cancelBtn);
-    footer.appendChild(applyBtn);
-
-    modal.appendChild(header);
-    modal.appendChild(body);
-    modal.appendChild(footer);
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-
-    refreshSelection();
-    requestAnimationFrame(function() { overlay.classList.add('show'); });
-}
-
-// ─── Input Modal (inline — no server round-trip for the prompt) ────────────────
-
-function showTagInputModal(title, label, defaultValue, confirmText, onConfirm) {
-    // Build a lightweight modal with an input field
-    const overlay = document.createElement('div');
-    overlay.className = 'alert-modal-overlay';
-    overlay.style.zIndex = '10000';
-
-    const modal = document.createElement('div');
-    modal.className = 'alert-modal';
-
-    const header = document.createElement('div');
-    header.className = 'alert-modal-header';
-
-    const titleEl = document.createElement('h3');
-    titleEl.className = 'alert-modal-title';
-    titleEl.textContent = title;
-    header.appendChild(titleEl);
-
-    const body = document.createElement('div');
-    body.className = 'alert-modal-body';
-    body.style.display = 'flex';
-    body.style.flexDirection = 'column';
-    body.style.gap = '8px';
-
-    const labelEl = document.createElement('label');
-    labelEl.textContent = label;
-    labelEl.style.fontWeight = '500';
-
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = defaultValue;
-    input.className = 'tag-rename-input';
-    input.setAttribute('autocomplete', 'off');
-
-    body.appendChild(labelEl);
-    body.appendChild(input);
-
-    const footer = document.createElement('div');
-    footer.className = 'alert-modal-footer';
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'alert-modal-button secondary';
-    cancelBtn.textContent = window.t ? window.t('common.cancel', {}, 'Cancel') : 'Cancel';
-    function closeInputModal(cb) {
-        overlay.classList.remove('show');
-        setTimeout(function() { overlay.remove(); if (cb) cb(); }, 300);
-    }
-
-    cancelBtn.addEventListener('click', function() { closeInputModal(); });
-
-    const confirmBtn = document.createElement('button');
-    confirmBtn.className = 'alert-modal-button primary';
-    confirmBtn.textContent = confirmText;
-    confirmBtn.addEventListener('click', function() {
-        const val = input.value.trim();
-        closeInputModal(function() { onConfirm(val); });
-    });
-
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') confirmBtn.click();
-        if (e.key === 'Escape') cancelBtn.click();
-    });
-
-    footer.appendChild(cancelBtn);
-    footer.appendChild(confirmBtn);
-
-    modal.appendChild(header);
-    modal.appendChild(body);
-    modal.appendChild(footer);
-    overlay.appendChild(modal);
-    document.body.appendChild(overlay);
-
-    // Trigger the CSS transition
-    requestAnimationFrame(function() {
-        overlay.classList.add('show');
-    });
-
-    // Select all text in the input for quick replacement
-    setTimeout(function() { input.select(); }, 50);
 }
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────

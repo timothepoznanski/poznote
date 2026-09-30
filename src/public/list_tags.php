@@ -175,6 +175,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/navigation.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="js/tag-actions.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/list_tags.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/clickable-tags.js?v=<?php echo $cache_v; ?>"></script>
 </body>

@@ -1758,6 +1758,8 @@
       "align_center": "Center",
       "align_right": "Right",
       "reset_column_widths": "Reset column widths",
+      "fit_to_content": "Fit table to content",
+      "full_width": "Full-width table",
       "delete_row": "Delete row",
       "delete_column": "Delete column",
       "delete_table": "Delete table",
