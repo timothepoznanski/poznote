@@ -423,23 +423,24 @@ html[data-theme='dark'] .app-tab-context-separator {
 
 /* Keep the title clear of the toggle. Reserved at all times rather than on
    hover: padding sits inside the link's background, so the band still spans
-   the full width, and the text does not jump when the toggle appears. */
+   the full width, and the text does not jump when the toggle appears.
+   Allow 26px for the button plus an 8px gap to the title. */
 .note-list-item > a.links_arbo_left {
-    padding-right: 26px;
+    padding-right: 34px;
 }
 
 /* .note-actions-hidden is set by syncNoteActionToggles() in
    js/ui-customization.js when every item of the note menu is unchecked: with
    no toggle to clear, give the title the reserved strip back. */
 body.note-actions-hidden .note-list-item > a.links_arbo_left {
-    padding-right: 6px;
+    padding-right: 8px;
 }
 
 /* Favorite folder shortcuts share the row markup but carry no controls of
    their own (renderFavoriteFolderItems in notes_list.php), so they keep the
    full width for the folder name. */
 .note-list-item.favorite-folder-item > a.links_arbo_left {
-    padding-right: 6px;
+    padding-right: 8px;
 }
 
 /* The note three-dot toggle (.note-actions-toggle) and its menu

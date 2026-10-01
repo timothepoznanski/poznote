@@ -186,7 +186,7 @@
 .notes-list-actions .sidebar-folder-toggle {
     flex: 0 0 auto;
     min-width: 18px;
-    min-height: 22px;
+    min-height: 26px;
     padding: 2px;
 }
 
@@ -202,7 +202,6 @@
 
 .notes-list-actions .folder-actions-toggle {
     flex: 0 0 auto;
-    width: 16px;
     border: none;
     background-color: transparent;
     font: inherit;
