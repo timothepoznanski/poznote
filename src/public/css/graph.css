@@ -185,13 +185,36 @@ body.graph-page {
     user-select: none;
 }
 
+/* Folder hubs: a ring in the folder color (graph.js sets it as the node's
+   color), tied to its notes by lighter lines than the links between notes. */
+.graph-node.is-folder {
+    cursor: grab;
+}
+
+.graph-node.is-folder circle {
+    fill: var(--pz-surface);
+    stroke: currentColor;
+    stroke-width: 3;
+}
+
+.graph-node.is-folder .graph-label {
+    font-size: 12px;
+    font-weight: var(--pz-weight-semibold);
+    fill: var(--pz-text);
+}
+
+.graph-edge-folder {
+    stroke-dasharray: 3 3;
+}
+
 /* Crowded graphs: labels only on zoom, hover or search */
 .labels-hidden .graph-label {
     display: none;
 }
 
 .labels-hidden .graph-node.hl .graph-label,
-.labels-hidden .graph-node.search-hit .graph-label {
+.labels-hidden .graph-node.search-hit .graph-label,
+.labels-hidden .graph-node.is-folder .graph-label {
     display: block;
 }
 
@@ -347,6 +370,15 @@ html[data-theme='dark'] .graph-node circle {
 
 html[data-theme='dark'] .graph-label {
     fill: var(--pz-text-muted);
+}
+
+html[data-theme='dark'] .graph-node.is-folder circle {
+    fill: var(--pz-chrome-bg, var(--pz-bg));
+    stroke: currentColor;
+}
+
+html[data-theme='dark'] .graph-node.is-folder .graph-label {
+    fill: var(--pz-text);
 }
 
 html[data-theme='dark'] .graph-node.search-hit circle {

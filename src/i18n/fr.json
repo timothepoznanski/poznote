@@ -4609,6 +4609,8 @@
     "show_orphans_hint": "Afficher les notes sans aucun lien",
     "show_labels": "Titres des notes",
     "show_labels_hint": "Afficher les titres des notes sous les points",
+    "show_folders": "Dossiers",
+    "show_folders_hint": "Afficher chaque dossier comme un point central relié à ses notes",
     "reset_layout": "Réinitialiser la disposition",
     "reset_layout_hint": "Oublier les positions enregistrées et réorganiser le graphe automatiquement",
     "drag_hint": "Ctrl + glisser déplace un point indépendamment de ses liens",
@@ -4619,7 +4621,8 @@
       "placeholder": "Rechercher une note..."
     },
     "tooltip": {
-      "links": "{{count}} liens"
+      "links": "{{count}} liens",
+      "folder_notes": "Dossier · {{count}} notes"
     }
   },
   "ai_settings": {

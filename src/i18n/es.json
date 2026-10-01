@@ -4505,6 +4505,8 @@
     "show_orphans_hint": "Mostrar notas sin enlaces",
     "show_labels": "Títulos de notas",
     "show_labels_hint": "Mostrar los títulos de las notas bajo los puntos",
+    "show_folders": "Carpetas",
+    "show_folders_hint": "Mostrar cada carpeta como un nodo central enlazado a sus notas",
     "reset_layout": "Restablecer disposición",
     "reset_layout_hint": "Olvidar las posiciones guardadas y reorganizar el grafo automáticamente",
     "drag_hint": "Ctrl + arrastrar mueve un punto independientemente de sus enlaces",
@@ -4515,7 +4517,8 @@
       "placeholder": "Buscar una nota..."
     },
     "tooltip": {
-      "links": "{{count}} enlaces"
+      "links": "{{count}} enlaces",
+      "folder_notes": "Carpeta · {{count}} notas"
     }
   },
   "ai_settings": {

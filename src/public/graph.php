@@ -53,6 +53,10 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<input type="checkbox" id="graphShowLabels" checked>
 					<span><?php echo t_h('graph.show_labels', [], 'Note titles'); ?></span>
 				</label>
+				<label class="graph-orphans-toggle initially-hidden" title="<?php echo t_h('graph.show_folders_hint', [], 'Show each folder as a hub linked to its notes'); ?>">
+					<input type="checkbox" id="graphShowFolders">
+					<span><?php echo t_h('graph.show_folders', [], 'Folders'); ?></span>
+				</label>
 				<button id="graphResetLayout" class="graph-reset-btn initially-hidden" title="<?php echo t_h('graph.reset_layout_hint', [], 'Forget the saved positions and rearrange the graph automatically'); ?>">
 					<i class="lucide lucide-rotate-ccw"></i>
 					<span><?php echo t_h('graph.reset_layout', [], 'Reset layout'); ?></span>
@@ -75,13 +79,13 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				<p class="graph-empty-hint"><?php echo t_h('graph.empty_hint', [], 'Link notes together with [[Note Title]] to see connections here.'); ?></p>
 			</div>
 			<svg id="graphSvg" role="img" aria-label="<?php echo t_h('graph.title', [], 'Note graph'); ?>"></svg>
-			<div class="graph-tooltip initially-hidden" id="graphTooltip" data-txt-links="<?php echo t_h('graph.tooltip.links', [], '{{count}} links'); ?>"></div>
+			<div class="graph-tooltip initially-hidden" id="graphTooltip" data-txt-links="<?php echo t_h('graph.tooltip.links', [], '{{count}} links'); ?>" data-txt-folder="<?php echo t_h('graph.tooltip.folder_notes', [], 'Folder · {{count}} notes'); ?>"></div>
 		</div>
 	</div>
 
 	<script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/navigation.js?v=<?php echo $cache_v; ?>"></script>
-	<script src="js/graph.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="<?php echo poznoteAsset('js/graph.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 </body>
 </html>

@@ -4130,6 +4130,8 @@
     "show_orphans_hint": "Show notes that have no links",
     "show_labels": "Note titles",
     "show_labels_hint": "Show note titles under the dots",
+    "show_folders": "Folders",
+    "show_folders_hint": "Show each folder as a hub linked to its notes",
     "reset_layout": "Reset layout",
     "reset_layout_hint": "Forget the saved positions and rearrange the graph automatically",
     "drag_hint": "Ctrl + drag moves a dot independently of its links",
@@ -4140,7 +4142,8 @@
       "placeholder": "Find a note..."
     },
     "tooltip": {
-      "links": "{{count}} links"
+      "links": "{{count}} links",
+      "folder_notes": "Folder · {{count}} notes"
     }
   },
   "note_reference": {

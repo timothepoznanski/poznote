@@ -33,9 +33,12 @@
     /* --------------------------------------------------------------------- */
 
     var nodes = [];            // {id, title, folder, folderSlot, degree, x, y, vx, vy, el, labelEl, circleEl, orphan}
-    var edges = [];            // {source: node, target: node, el}
+                               // a folder hub adds {isFolder: true, noteCount, ring}, its id is 'f' + folder id
+    var edges = [];            // {source: node, target: node, el}; {membership: true} ties a note or subfolder to its folder
     var nodeById = {};
+    var hubs = [];             // the folder nodes
     var neighbors = {};        // id -> {otherId: true}
+    var rawData = null;        // last /api/v1/graph response, kept to rebuild when folders are toggled
 
     var svg, viewport, edgesGroup, nodesGroup, tooltip, wrapper;
     var width = 0, height = 0;
@@ -48,6 +51,7 @@
     var alpha = 0;
     var running = false;
     var SPRING_LENGTH = 90;
+    var HUB_GAP = 40;          // room left between the wheels of two folder hubs
     var SPRING_STRENGTH = 0.5;
     var CHARGE = 1500;
     var GRAVITY = 0.04;
@@ -55,12 +59,14 @@
 
     var showOrphans = true;
     var showLabels = true;
+    var showFolders = false;
     var searchTerm = '';
     var folderFilter = '';     // '' = all folders
     var hoveredNode = null;
 
     var PREF_SHOW_ORPHANS = 'graph-show-orphans';
     var PREF_SHOW_LABELS = 'graph-show-labels';
+    var PREF_SHOW_FOLDERS = 'graph-show-folders';
     var PREF_POSITIONS = 'graph-positions';
 
     function prefStorage() {
@@ -101,9 +107,23 @@
         }
     }
 
+    function isFolderId(id) {
+        return String(id).charAt(0) === 'f';
+    }
+
     function savePinnedPositions() {
         var positions = {};
         var any = false;
+        if (!showFolders) {
+            // The hubs are not on screen: keep where they were dropped
+            var saved = loadSavedPositions();
+            Object.keys(saved).forEach(function (id) {
+                if (isFolderId(id)) {
+                    positions[id] = saved[id];
+                    any = true;
+                }
+            });
+        }
         nodes.forEach(function (node) {
             if (node.pinned) {
                 positions[node.id] = [Math.round(node.x * 10) / 10, Math.round(node.y * 10) / 10];
@@ -153,7 +173,13 @@
                 document.getElementById('graphEmpty').classList.remove('initially-hidden');
                 return;
             }
-            buildGraph(data.nodes, data.edges || []);
+            rawData = data;
+            initFoldersToggle(data.folders || []);
+            populateFolderFilter(folderNamesOf(data.nodes));
+            buildGraph();
+            fitView();
+            initLabelDefault();
+            startSimulation(1);
         })
         .catch(function () {
             document.getElementById('graphLoading').classList.add('initially-hidden');
@@ -165,20 +191,69 @@
     /* Graph construction                                                      */
     /* --------------------------------------------------------------------- */
 
-    function buildGraph(rawNodes, rawEdges) {
-        // Assign palette slots to folders in alphabetical order (fixed order,
-        // never cycled); folders beyond the 8 slots use the neutral color.
+    function folderNamesOf(rawNodes) {
         var folderNames = {};
         rawNodes.forEach(function (n) {
             if (n.folder) { folderNames[n.folder] = true; }
         });
-        var sortedFolders = Object.keys(folderNames).sort(function (a, b) {
+        return Object.keys(folderNames).sort(function (a, b) {
             return a.localeCompare(b);
         });
+    }
+
+    // Builds the nodes, edges and SVG from rawData. Runs again when the
+    // folder hubs are toggled: hiding them leaves the notes where they are,
+    // showing them lays the graph out again, each folder's notes around its
+    // hub (a layout settled without the hubs does not untangle into wheels).
+    function buildGraph() {
+        var rawNodes = rawData.nodes;
+        var rawEdges = rawData.edges || [];
+        var rawFolders = showFolders ? (rawData.folders || []) : [];
+
+        var previous = showFolders ? {} : nodeById;
+        nodes = [];
+        edges = [];
+        nodeById = {};
+        neighbors = {};
+        hoveredNode = null;
+        edgesGroup.textContent = '';
+        nodesGroup.textContent = '';
+        svg.classList.remove('has-highlight');
+        hideTooltip();
+
+        // Assign palette slots to folders in alphabetical order (fixed order,
+        // never cycled); folders beyond the 8 slots use the neutral color.
         var folderSlots = {};
-        sortedFolders.forEach(function (name, i) {
+        folderNamesOf(rawNodes).forEach(function (name, i) {
             folderSlots[name] = i < PALETTE_LIGHT.length ? i : -1;
         });
+
+        function addNode(node) {
+            var before = previous[node.id];
+            if (before) {
+                node.x = before.x;
+                node.y = before.y;
+            }
+            node.degree = 0;
+            node.vx = 0;
+            node.vy = 0;
+            nodes.push(node);
+            nodeById[node.id] = node;
+            neighbors[node.id] = {};
+        }
+
+        function addEdge(source, target, extra) {
+            var edge = { source: source, target: target };
+            if (extra) {
+                edge.membership = true;
+                edge.length = extra.length;
+            }
+            edges.push(edge);
+            source.degree++;
+            target.degree++;
+            neighbors[source.id][target.id] = true;
+            neighbors[target.id][source.id] = true;
+        }
 
         // Initial positions on a spiral so the simulation starts untangled
         var n = rawNodes.length;
@@ -186,46 +261,132 @@
         rawNodes.forEach(function (raw, i) {
             var angle = i * 2.39996;             // golden angle
             var radius = spread * Math.sqrt((i + 1) / n);
-            var node = {
+            addNode({
                 id: raw.id,
                 title: raw.title,
                 folder: raw.folder || '',
-                folderSlot: raw.folder ? folderSlots[raw.folder] : -1,
-                degree: 0,
+                folderSlot: raw.folder && folderSlots[raw.folder] !== undefined ? folderSlots[raw.folder] : -1,
                 x: Math.cos(angle) * radius,
-                y: Math.sin(angle) * radius,
-                vx: 0,
-                vy: 0
-            };
-            nodes.push(node);
-            nodeById[node.id] = node;
-            neighbors[node.id] = {};
+                y: Math.sin(angle) * radius
+            });
         });
 
         rawEdges.forEach(function (raw) {
             var source = nodeById[raw.source];
             var target = nodeById[raw.target];
             if (!source || !target) { return; }
-            edges.push({ source: source, target: target });
-            source.degree++;
-            target.degree++;
-            neighbors[source.id][target.id] = true;
-            neighbors[target.id][source.id] = true;
+            addEdge(source, target);
         });
+
+        // Tooltips count the links between notes, not the tie to the folder
+        nodes.forEach(function (node) {
+            node.linkCount = node.degree;
+        });
+
+        // Folder hubs: one node per folder, tied to its notes and to its
+        // parent folder. Top-level hubs start on a wide spiral, a subfolder
+        // next to its parent, and the notes of a folder in a ring around it.
+        var members = {};          // folder id -> [note node]
+        rawNodes.forEach(function (raw) {
+            if (raw.folder_id === null || raw.folder_id === undefined) { return; }
+            (members[raw.folder_id] = members[raw.folder_id] || []).push(nodeById[raw.id]);
+        });
+        var subfolders = {};       // parent folder id ('' = top level) -> [raw folder]
+        rawFolders.forEach(function (raw) {
+            var parentKey = raw.parent_id === null || raw.parent_id === undefined ? '' : raw.parent_id;
+            (subfolders[parentKey] = subfolders[parentKey] || []).push(raw);
+        });
+        function placeFolder(raw, x, y, outward) {
+            if (nodeById['f' + raw.id]) { return; }
+            var notes = members[raw.id] || [];
+            var ring = wheelRadius(notes.length);
+            addNode({
+                id: 'f' + raw.id,
+                title: raw.name,
+                folder: raw.name,
+                folderSlot: folderSlots[raw.name] !== undefined ? folderSlots[raw.name] : -1,
+                isFolder: true,
+                noteCount: notes.length,
+                ring: ring,
+                x: x,
+                y: y
+            });
+            notes.forEach(function (note, i) {
+                var angle = i * 2 * Math.PI / notes.length;
+                note.x = x + Math.cos(angle) * ring;
+                note.y = y + Math.sin(angle) * ring;
+            });
+            // Subfolders fan out away from the center of the graph
+            var children = subfolders[raw.id] || [];
+            children.forEach(function (child, i) {
+                var angle = outward + (i - (children.length - 1) / 2) * 0.9;
+                var reach = ring + wheelRadius((members[child.id] || []).length) + HUB_GAP;
+                placeFolder(child, x + Math.cos(angle) * reach, y + Math.sin(angle) * reach, angle);
+            });
+        }
+        var widest = 0;
+        rawFolders.forEach(function (raw) {
+            widest = Math.max(widest, wheelRadius((members[raw.id] || []).length));
+        });
+        (subfolders[''] || []).forEach(function (raw, i) {
+            var angle = i * 2.39996;
+            var radius = (widest * 2 + HUB_GAP) * Math.sqrt(i);
+            placeFolder(raw, Math.cos(angle) * radius, Math.sin(angle) * radius, angle);
+        });
+        // Whatever is left has a broken parent chain: place it on its own
+        rawFolders.forEach(function (raw, i) {
+            placeFolder(raw, (i + 1) * 40, -(i + 1) * 40, 0);
+        });
+        rawFolders.forEach(function (raw) {
+            var hub = nodeById['f' + raw.id];
+            (members[raw.id] || []).forEach(function (note) {
+                addEdge(note, hub, { length: hub.ring });
+                note.anchored = true;
+            });
+            var parent = raw.parent_id === null || raw.parent_id === undefined ? null : nodeById['f' + raw.parent_id];
+            if (parent && parent !== hub) {
+                addEdge(hub, parent, { length: hub.ring + parent.ring + HUB_GAP });
+            }
+        });
+
+        hubs = nodes.filter(function (node) { return node.isFolder; });
 
         nodes.forEach(function (node) {
             node.orphan = node.degree === 0;
-            node.radius = Math.min(16, 4 + 2.2 * Math.sqrt(node.degree));
+            node.radius = node.isFolder
+                ? Math.min(18, 7 + 1.4 * Math.sqrt(node.degree))
+                : Math.min(16, 4 + 2.2 * Math.sqrt(node.degree));
         });
 
         assignComponents();
         restorePinnedPositions();
 
-        populateFolderFilter(sortedFolders);
         renderSvg();
-        fitView();
-        initLabelDefault();
-        startSimulation(1);
+        applySearch();
+    }
+
+    // Distance between a folder hub and its notes: the usual link length,
+    // wider for a folder holding more notes than fit on that circle.
+    function wheelRadius(noteCount) {
+        if (noteCount === 0) { return SPRING_LENGTH / 3; }
+        return Math.min(SPRING_LENGTH * 3, Math.max(SPRING_LENGTH, noteCount * 2.5));
+    }
+
+    function initFoldersToggle(rawFolders) {
+        var toggle = document.getElementById('graphShowFolders');
+        if (!toggle || rawFolders.length === 0) { return; }
+        showFolders = readPref(PREF_SHOW_FOLDERS) === true;
+        toggle.checked = showFolders;
+        toggle.parentNode.classList.remove('initially-hidden');
+        toggle.addEventListener('change', function () {
+            showFolders = toggle.checked;
+            savePref(PREF_SHOW_FOLDERS, showFolders);
+            buildGraph();
+            if (!userInteracted) {
+                fitView();
+            }
+            startSimulation(0.8);
+        });
     }
 
     function populateFolderFilter(folderNames) {
@@ -312,19 +473,19 @@
     function renderSvg() {
         edges.forEach(function (edge) {
             var line = document.createElementNS(SVG_NS, 'line');
-            line.setAttribute('class', 'graph-edge');
+            line.setAttribute('class', edge.membership ? 'graph-edge graph-edge-folder' : 'graph-edge');
             edge.el = line;
             edgesGroup.appendChild(line);
         });
 
         nodes.forEach(function (node) {
             var g = document.createElementNS(SVG_NS, 'g');
-            g.setAttribute('class', 'graph-node');
+            g.setAttribute('class', node.isFolder ? 'graph-node is-folder' : 'graph-node');
             g.setAttribute('data-id', String(node.id));
 
             var circle = document.createElementNS(SVG_NS, 'circle');
             circle.setAttribute('r', String(node.radius));
-            circle.setAttribute('fill', nodeColor(node));
+            paintNode(node, g, circle);
 
             var label = document.createElementNS(SVG_NS, 'text');
             label.setAttribute('class', 'graph-label');
@@ -343,9 +504,19 @@
         updateVisibility();
     }
 
+    // A note is a filled dot; a folder hub is a ring in the folder color
+    // (css/graph.css strokes it with currentColor).
+    function paintNode(node, groupEl, circleEl) {
+        if (node.isFolder) {
+            groupEl.style.color = nodeColor(node);
+        } else {
+            circleEl.setAttribute('fill', nodeColor(node));
+        }
+    }
+
     function recolorNodes() {
         nodes.forEach(function (node) {
-            node.circleEl.setAttribute('fill', nodeColor(node));
+            paintNode(node, node.el, node.circleEl);
         });
     }
 
@@ -408,8 +579,9 @@
     function updateStats() {
         var statsEl = document.getElementById('graphStats');
         var template = statsEl.getAttribute('data-txt-stats') || '{{notes}} · {{links}}';
-        var visibleNodes = nodes.filter(function (n) { return n.visible; }).length;
-        var visibleEdges = edges.filter(function (e) { return e.visible; }).length;
+        // Folder hubs and their ties are neither notes nor links
+        var visibleNodes = nodes.filter(function (n) { return n.visible && !n.isFolder; }).length;
+        var visibleEdges = edges.filter(function (e) { return e.visible && !e.membership; }).length;
         statsEl.textContent = template
             .replace('{{notes}}', String(visibleNodes))
             .replace('{{links}}', String(visibleEdges));
@@ -442,7 +614,7 @@
     }
 
     function simulate() {
-        var i, j, node, other, dx, dy, dist2, dist, force;
+        var i, j, node, other, dx, dy, dist2, dist, force, spacing;
 
         // Repulsion between nodes: exact within the local grid neighborhood,
         // approximated against cell centroids farther away.
@@ -502,13 +674,32 @@
             }
         }
 
+        // Folder hubs keep a wheel's width between them, so the notes of
+        // two folders do not end up interleaved.
+        for (i = 0; i < hubs.length; i++) {
+            for (j = i + 1; j < hubs.length; j++) {
+                node = hubs[i];
+                other = hubs[j];
+                dx = node.x - other.x;
+                dy = node.y - other.y;
+                dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                spacing = node.ring + other.ring + HUB_GAP;
+                if (dist >= spacing) { continue; }
+                force = (spacing - dist) / dist * SPRING_STRENGTH * alpha / 2;
+                node.vx += dx * force;
+                node.vy += dy * force;
+                other.vx -= dx * force;
+                other.vy -= dy * force;
+            }
+        }
+
         // Link springs
         for (i = 0; i < edges.length; i++) {
             var edge = edges[i];
             dx = edge.target.x - edge.source.x;
             dy = edge.target.y - edge.source.y;
             dist = Math.sqrt(dx * dx + dy * dy) || 1;
-            force = (dist - SPRING_LENGTH) / dist * SPRING_STRENGTH * alpha;
+            force = (dist - (edge.length || SPRING_LENGTH)) / dist * SPRING_STRENGTH * alpha;
             var fx = dx * force;
             var fy = dy * force;
             // Heavier (higher-degree) endpoints move less
@@ -523,8 +714,13 @@
         // Gravity toward the center + integration
         for (i = 0; i < nodes.length; i++) {
             node = nodes[i];
-            node.vx += -node.x * GRAVITY * alpha;
-            node.vy += -node.y * GRAVITY * alpha;
+            // A note tied to a folder hub is held by the hub alone: pulled
+            // to the center as well, the notes would all sit on the inner
+            // side of their hub instead of around it.
+            if (!node.anchored) {
+                node.vx += -node.x * GRAVITY * alpha;
+                node.vy += -node.y * GRAVITY * alpha;
+            }
             if (node.dragging || node.pinned) {
                 node.vx = 0;
                 node.vy = 0;
@@ -663,7 +859,7 @@
 
             var nodeEl = e.target.closest('.graph-node');
             if (nodeEl) {
-                dragNode = nodeById[parseInt(nodeEl.getAttribute('data-id'), 10)];
+                dragNode = nodeById[nodeEl.getAttribute('data-id')];
                 // Dragging moves the whole connected group; Ctrl/Cmd or Shift
                 // restricts the move to the grabbed node alone.
                 var single = e.ctrlKey || e.metaKey || e.shiftKey;
@@ -744,7 +940,8 @@
                 }
                 releaseDrag();
                 if (clicked) {
-                    openNote(clicked);
+                    // A folder hub has no page of its own to open
+                    if (!clicked.isFolder) { openNote(clicked); }
                 } else {
                     savePinnedPositions();
                     updateResetButton();
@@ -767,7 +964,7 @@
 
     function handleHover(e) {
         var nodeEl = e.target.closest ? e.target.closest('.graph-node') : null;
-        var node = nodeEl ? nodeById[parseInt(nodeEl.getAttribute('data-id'), 10)] : null;
+        var node = nodeEl ? nodeById[nodeEl.getAttribute('data-id')] : null;
         if (node === hoveredNode) {
             if (node) { moveTooltip(e); }
             return;
@@ -809,9 +1006,15 @@
         var meta = document.createElement('div');
         meta.className = 'graph-tooltip-meta';
         var parts = [];
-        if (node.folder) { parts.push(node.folder); }
-        var template = tooltip.getAttribute('data-txt-links') || '{{count}} links';
-        parts.push(template.replace('{{count}}', String(node.degree)));
+        var template;
+        if (node.isFolder) {
+            template = tooltip.getAttribute('data-txt-folder') || '{{count}} notes';
+            parts.push(template.replace('{{count}}', String(node.noteCount)));
+        } else {
+            if (node.folder) { parts.push(node.folder); }
+            template = tooltip.getAttribute('data-txt-links') || '{{count}} links';
+            parts.push(template.replace('{{count}}', String(node.linkCount)));
+        }
         meta.textContent = parts.join(' · ');
         tooltip.appendChild(meta);
 

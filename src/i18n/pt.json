@@ -4505,6 +4505,8 @@
     "show_orphans_hint": "Mostrar notas sem links",
     "show_labels": "Títulos das notas",
     "show_labels_hint": "Mostrar os títulos das notas sob os pontos",
+    "show_folders": "Pastas",
+    "show_folders_hint": "Mostrar cada pasta como um ponto central ligado às suas notas",
     "reset_layout": "Redefinir disposição",
     "reset_layout_hint": "Esquecer as posições salvas e reorganizar o grafo automaticamente",
     "drag_hint": "Ctrl + arrastar move um ponto independentemente dos seus links",
@@ -4515,7 +4517,8 @@
       "placeholder": "Procurar uma nota..."
     },
     "tooltip": {
-      "links": "{{count}} links"
+      "links": "{{count}} links",
+      "folder_notes": "Pasta · {{count}} notas"
     }
   },
   "ai_settings": {

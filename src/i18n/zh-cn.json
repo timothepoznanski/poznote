@@ -4604,6 +4604,8 @@
     "show_orphans_hint": "显示没有链接的笔记",
     "show_labels": "笔记标题",
     "show_labels_hint": "在圆点下方显示笔记标题",
+    "show_folders": "文件夹",
+    "show_folders_hint": "将每个文件夹显示为与其笔记相连的中心节点",
     "reset_layout": "重置布局",
     "reset_layout_hint": "忘记已保存的位置并自动重新排列图谱",
     "drag_hint": "Ctrl + 拖动可独立于链接移动单个点",
@@ -4614,7 +4616,8 @@
       "placeholder": "查找笔记..."
     },
     "tooltip": {
-      "links": "{{count}} 个链接"
+      "links": "{{count}} 个链接",
+      "folder_notes": "文件夹 · {{count}} 篇笔记"
     }
   },
   "ai_settings": {
