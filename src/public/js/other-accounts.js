@@ -362,8 +362,8 @@
         button.setAttribute('aria-label', label);
         var glyph = button.querySelector('.lucide');
         if (glyph) {
-            glyph.classList.toggle('lucide-chevrons-up-down', expand);
-            glyph.classList.toggle('lucide-chevrons-down-up', !expand);
+            glyph.classList.toggle('lucide-chevron-down', expand);
+            glyph.classList.toggle('lucide-chevron-up', !expand);
         }
     }
 

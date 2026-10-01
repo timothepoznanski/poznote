@@ -934,8 +934,6 @@
     "show_offline_dots": "Afficher les points hors ligne",
     "hide_offline_dots": "Masquer les points hors ligne",
     "view_options": "Options d'affichage",
-    "expand_all_folders_hint": "Ouvrir tous les dossiers de l'arborescence",
-    "collapse_all_folders_hint": "Fermer tous les dossiers de l'arborescence",
     "customize": "Personnaliser la barre latérale",
     "customize_hint": "Choisir les éléments affichés dans la barre latérale"
   },
@@ -4611,17 +4609,26 @@
     "show_orphans_hint": "Afficher les notes sans aucun lien",
     "show_labels": "Titres des notes",
     "show_labels_hint": "Afficher les titres des notes sous les points",
+    "show_folders": "Dossiers",
+    "show_folders_hint": "Afficher chaque dossier comme un point central relié à ses notes",
+    "tree_layout": "Vue en arbre",
+    "tree_layout_hint": "Aligner dossiers, sous-dossiers et notes de gauche à droite, avec des liens droits",
+    "separate_groups": "Séparer les groupes",
+    "separate_groups_hint": "Disposer chaque groupe de notes liées à l'écart des autres",
     "reset_layout": "Réinitialiser la disposition",
     "reset_layout_hint": "Oublier les positions enregistrées et réorganiser le graphe automatiquement",
     "drag_hint": "Ctrl + glisser déplace un point indépendamment de ses liens",
     "folder_filter_all": "Tous les dossiers",
     "folder_filter_hint": "Afficher uniquement les notes d'un dossier",
+    "folder_modal_title": "Choisir un dossier",
+    "folder_modal_empty": "Aucun dossier ne correspond.",
     "stats": "{{notes}} notes · {{links}} liens",
     "search": {
       "placeholder": "Rechercher une note..."
     },
     "tooltip": {
-      "links": "{{count}} liens"
+      "links": "{{count}} liens",
+      "folder_notes": "Dossier · {{count}} notes"
     }
   },
   "ai_settings": {

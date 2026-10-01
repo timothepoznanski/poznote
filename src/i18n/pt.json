@@ -934,8 +934,6 @@
     "show_offline_dots": "Mostrar os pontos offline",
     "hide_offline_dots": "Ocultar os pontos offline",
     "view_options": "Opções de exibição",
-    "expand_all_folders_hint": "Abrir todas as pastas da árvore",
-    "collapse_all_folders_hint": "Fechar todas as pastas da árvore",
     "customize": "Personalizar a barra lateral",
     "customize_hint": "Escolher quais elementos da barra lateral são exibidos"
   },
@@ -4507,17 +4505,26 @@
     "show_orphans_hint": "Mostrar notas sem links",
     "show_labels": "Títulos das notas",
     "show_labels_hint": "Mostrar os títulos das notas sob os pontos",
+    "show_folders": "Pastas",
+    "show_folders_hint": "Mostrar cada pasta como um ponto central ligado às suas notas",
+    "tree_layout": "Visualização em árvore",
+    "tree_layout_hint": "Alinhar pastas, subpastas e notas da esquerda para a direita, com ligações retas",
+    "separate_groups": "Separar grupos",
+    "separate_groups_hint": "Dispor cada grupo de notas ligadas separado dos demais",
     "reset_layout": "Redefinir disposição",
     "reset_layout_hint": "Esquecer as posições salvas e reorganizar o grafo automaticamente",
     "drag_hint": "Ctrl + arrastar move um ponto independentemente dos seus links",
     "folder_filter_all": "Todas as pastas",
     "folder_filter_hint": "Mostrar apenas as notas de uma pasta",
+    "folder_modal_title": "Escolher uma pasta",
+    "folder_modal_empty": "Nenhuma pasta correspondente.",
     "stats": "{{notes}} notas · {{links}} links",
     "search": {
       "placeholder": "Procurar uma nota..."
     },
     "tooltip": {
-      "links": "{{count}} links"
+      "links": "{{count}} links",
+      "folder_notes": "Pasta · {{count}} notas"
     }
   },
   "ai_settings": {

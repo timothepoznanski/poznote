@@ -505,9 +505,15 @@
 
         syncToggleAllButton();
 
-        // Resolve [[Note Title]] references into clickable links
+        // Resolve [[Note Title]] references into clickable links. The list
+        // view scans the task rows only: the group headers link to the notes
+        // just listed, and checking each of them for a dead target costs one
+        // request per note on every render (so on every toggle)
         if (typeof window.processNoteReferences === 'function') {
-            window.processNoteReferences(container, config.workspace);
+            var targets = viewMode === 'calendar' ? [container] : container.querySelectorAll('.tasks-note-list');
+            Array.prototype.forEach.call(targets, function (target) {
+                window.processNoteReferences(target, config.workspace);
+            });
         }
     }
 
@@ -1088,6 +1094,18 @@
         }, null, pickerOptions);
     }
 
+    // Saves rewrite the whole note content (read-modify-write), so two of
+    // them running at once on the same note would overwrite each other.
+    // Chain them per note: each one reads what the previous one wrote.
+    var noteSaveQueues = {};
+
+    function queueNoteSave(noteId, save) {
+        var key = String(noteId);
+        var run = (noteSaveQueues[key] || Promise.resolve()).then(save);
+        noteSaveQueues[key] = run.catch(function () {});
+        return run;
+    }
+
     // Apply a mutation to one task of a note by rewriting the note content
     // through the notes API (same read-modify-write flow as moving a task
     // between lists). The optional transformTasks(tasks, target) hook can
@@ -1096,51 +1114,53 @@
     function mutateTaskInNote(note, task, mutate, transformTasks) {
         var workspaceParam = 'workspace=' + encodeURIComponent(config.workspace);
 
-        return fetch('api/v1/notes/' + note.id + '?' + workspaceParam)
-            .then(function (response) { return response.json(); })
-            .then(function (data) {
-                if (!data || !data.success || !data.note || data.note.type !== 'tasklist') {
-                    throw new Error(config.txtError);
-                }
+        return queueNoteSave(note.id, function () {
+            return fetch('api/v1/notes/' + note.id + '?' + workspaceParam)
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (!data || !data.success || !data.note || data.note.type !== 'tasklist') {
+                        throw new Error(config.txtError);
+                    }
 
-                var tasks;
-                try {
-                    tasks = JSON.parse(data.note.content || '[]');
-                } catch (e) {
-                    tasks = [];
-                }
-                if (!Array.isArray(tasks)) tasks = [];
+                    var tasks;
+                    try {
+                        tasks = JSON.parse(data.note.content || '[]');
+                    } catch (e) {
+                        tasks = [];
+                    }
+                    if (!Array.isArray(tasks)) tasks = [];
 
-                var target = tasks.find(function (t) { return String(t.id) === String(task.id); });
-                if (!target) {
-                    throw new Error(config.txtError);
-                }
-                mutate(target);
-                if (transformTasks) {
-                    tasks = transformTasks(tasks, target);
-                }
+                    var target = tasks.find(function (t) { return String(t.id) === String(task.id); });
+                    if (!target) {
+                        throw new Error(config.txtError);
+                    }
+                    mutate(target);
+                    if (transformTasks) {
+                        tasks = transformTasks(tasks, target);
+                    }
 
-                var editorSessionId = getEditorSessionId();
-                var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-                var payload = { content: JSON.stringify(tasks) };
-                if (editorSessionId) {
-                    headers['X-Editor-Session-ID'] = editorSessionId;
-                    payload.editor_session_id = editorSessionId;
-                }
+                    var editorSessionId = getEditorSessionId();
+                    var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+                    var payload = { content: JSON.stringify(tasks) };
+                    if (editorSessionId) {
+                        headers['X-Editor-Session-ID'] = editorSessionId;
+                        payload.editor_session_id = editorSessionId;
+                    }
 
-                return fetch('api/v1/notes/' + note.id, {
-                    method: 'PATCH',
-                    headers: headers,
-                    credentials: 'same-origin',
-                    body: JSON.stringify(payload)
+                    return fetch('api/v1/notes/' + note.id, {
+                        method: 'PATCH',
+                        headers: headers,
+                        credentials: 'same-origin',
+                        body: JSON.stringify(payload)
+                    });
+                })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (!data || !data.success) {
+                        throw new Error(config.txtError);
+                    }
                 });
-            })
-            .then(function (response) { return response.json(); })
-            .then(function (data) {
-                if (!data || !data.success) {
-                    throw new Error(config.txtError);
-                }
-            });
+        });
     }
 
     // Flip the "- [ ]" / "- [x]" marker of one line of a markdown note. The
@@ -1185,61 +1205,92 @@
     function mutateChecklistInNote(note, task, completed) {
         var workspaceParam = 'workspace=' + encodeURIComponent(config.workspace);
 
-        return fetch('api/v1/notes/' + note.id + '?' + workspaceParam)
-            .then(function (response) { return response.json(); })
-            .then(function (data) {
-                if (!data || !data.success || !data.note) {
-                    throw new Error(config.txtError);
-                }
-                var noteType = data.note.type || 'note';
-                var index = parseInt(task.id, 10);
-                var newContent = null;
-                if (noteType === 'markdown') {
-                    newContent = toggleMarkdownChecklistLine(data.note.content, index, completed);
-                } else if (noteType === 'note') {
-                    newContent = toggleHtmlChecklistItem(data.note.content, index, completed);
-                }
-                if (newContent === null) {
-                    throw new Error(config.txtError);
-                }
+        return queueNoteSave(note.id, function () {
+            return fetch('api/v1/notes/' + note.id + '?' + workspaceParam)
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (!data || !data.success || !data.note) {
+                        throw new Error(config.txtError);
+                    }
+                    var noteType = data.note.type || 'note';
+                    var index = parseInt(task.id, 10);
+                    var newContent = null;
+                    if (noteType === 'markdown') {
+                        newContent = toggleMarkdownChecklistLine(data.note.content, index, completed);
+                    } else if (noteType === 'note') {
+                        newContent = toggleHtmlChecklistItem(data.note.content, index, completed);
+                    }
+                    if (newContent === null) {
+                        throw new Error(config.txtError);
+                    }
 
-                var editorSessionId = getEditorSessionId();
-                var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
-                var payload = { content: newContent };
-                if (editorSessionId) {
-                    headers['X-Editor-Session-ID'] = editorSessionId;
-                    payload.editor_session_id = editorSessionId;
-                }
+                    var editorSessionId = getEditorSessionId();
+                    var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+                    var payload = { content: newContent };
+                    if (editorSessionId) {
+                        headers['X-Editor-Session-ID'] = editorSessionId;
+                        payload.editor_session_id = editorSessionId;
+                    }
 
-                return fetch('api/v1/notes/' + note.id, {
-                    method: 'PATCH',
-                    headers: headers,
-                    credentials: 'same-origin',
-                    body: JSON.stringify(payload)
+                    return fetch('api/v1/notes/' + note.id, {
+                        method: 'PATCH',
+                        headers: headers,
+                        credentials: 'same-origin',
+                        body: JSON.stringify(payload)
+                    });
+                })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (!data || !data.success) {
+                        throw new Error(config.txtError);
+                    }
                 });
+        });
+    }
+
+    // A toggle shows right away and saves in the background: the save is two
+    // requests, long enough on a phone for the box to look stuck. Per task
+    // being saved: how many saves are still running and the last state the
+    // server confirmed, which the task returns to if the last save failed.
+    var pendingToggles = new Map();
+
+    function applyToggle(task, newCompleted, regroup, save) {
+        var pending = pendingToggles.get(task);
+        if (!pending) {
+            pending = { count: 0, confirmed: !!task.completed };
+            pendingToggles.set(task, pending);
+        }
+        pending.count++;
+
+        task.completed = newCompleted;
+        regroup();
+        render();
+
+        save()
+            .then(function () {
+                pending.confirmed = newCompleted;
+            }, function (e) {
+                console.debug('tasks-page: applyToggle() failed:', e);
             })
-            .then(function (response) { return response.json(); })
-            .then(function (data) {
-                if (!data || !data.success) {
-                    throw new Error(config.txtError);
+            .then(function () {
+                pending.count--;
+                if (pending.count > 0) return;
+                pendingToggles.delete(task);
+                if (!!task.completed !== pending.confirmed) {
+                    task.completed = pending.confirmed;
+                    regroup();
+                    render();
                 }
             });
     }
 
     function toggleChecklistItem(note, task, checkbox) {
         var newCompleted = checkbox.checked;
-        checkbox.disabled = true;
 
-        mutateChecklistInNote(note, task, newCompleted)
-            .then(function () {
-                // Items keep their place in the note, no regrouping
-                task.completed = newCompleted;
-                render();
-            })
-            .catch(function () {
-                checkbox.checked = !newCompleted;
-                checkbox.disabled = false;
-            });
+        // Items keep their place in the note, no regrouping
+        applyToggle(task, newCompleted, function () {}, function () {
+            return mutateChecklistInNote(note, task, newCompleted);
+        });
     }
 
     function toggleTask(note, task, checkbox) {
@@ -1249,37 +1300,33 @@
         }
 
         var newCompleted = checkbox.checked;
-        checkbox.disabled = true;
-
         var clearReminder = newCompleted && task.dueReminder;
 
-        mutateTaskInNote(note, task, function (target) {
-            target.completed = newCompleted;
-            if (clearReminder) target.dueReminder = false;
-        }, reorderTasksAfterToggle)
-            .then(function () {
-                task.completed = newCompleted;
-                // Mirror the saved order locally: completed tasks sink to the
-                // bottom of their note group, like in the tasklist note
-                note.tasks = reorderTasksAfterToggle(note.tasks, task);
-                if (clearReminder) {
-                    task.dueReminder = false;
-                    // Completing a task cancels its pending reminder
-                    fetch('api/v1/notes/' + note.id + '/task-reminder', {
-                        method: 'DELETE',
-                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                        credentials: 'same-origin',
-                        body: JSON.stringify({ task_id: String(task.id) })
-                    }).catch(function (e) {
-                        console.debug('tasks-page: toggleTask() failed:', e);
-                    });
-                }
+        // Mirror the saved order locally: completed tasks sink to the bottom
+        // of their note group, like in the tasklist note
+        var regroup = function () {
+            note.tasks = reorderTasksAfterToggle(note.tasks, task);
+        };
+
+        applyToggle(task, newCompleted, regroup, function () {
+            return mutateTaskInNote(note, task, function (target) {
+                target.completed = newCompleted;
+                if (clearReminder) target.dueReminder = false;
+            }, reorderTasksAfterToggle).then(function () {
+                if (!clearReminder) return;
+                task.dueReminder = false;
+                // Completing a task cancels its pending reminder
+                fetch('api/v1/notes/' + note.id + '/task-reminder', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ task_id: String(task.id) })
+                }).catch(function (e) {
+                    console.debug('tasks-page: toggleTask() failed:', e);
+                });
                 render();
-            })
-            .catch(function () {
-                checkbox.checked = !newCompleted;
-                checkbox.disabled = false;
             });
+        });
     }
 
     document.addEventListener('DOMContentLoaded', function () {

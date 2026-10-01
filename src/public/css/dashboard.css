@@ -61,12 +61,6 @@ body.dashboard-page {
     width: 420px;
     max-width: 90%;
     margin: 20px auto 0;
-    animation: filterSlideIn 0.18s ease;
-}
-
-@keyframes filterSlideIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
 }
 
 .dashboard-topbar-filter.is-collapsed {
@@ -1855,6 +1849,67 @@ html[data-theme='dark'] .dash-ws-dot {
    (the modal content is not a flex column), so the row would touch the list */
 .dashboard-scope-modal .modal-buttons {
     margin-top: 20px;
+    flex-wrap: nowrap;
+}
+
+/* Three footer buttons on one row, whatever the language: the modal is
+   widened (same recipe as #noteColorModal), Close and Apply keep their
+   size, and the manage label is what gives way, first to an ellipsis then,
+   on small screens, to its icon alone (the label stays in title/aria-label). */
+.dashboard-scope-modal {
+    --modal-max-width: 560px;
+}
+
+.dashboard-scope-modal .modal-buttons button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.dashboard-scope-modal .modal-buttons button.dashboard-scope-manage-btn {
+    flex: 0 1 auto;
+}
+
+.dashboard-scope-manage-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+@media (max-width: 560px) {
+    .dashboard-scope-modal.modal-content {
+        width: 94%;
+        padding: 24px 20px;
+    }
+
+    .dashboard-scope-modal .modal-buttons {
+        gap: 8px;
+    }
+
+    /* Close and Apply tighten up, and shrink as a last resort */
+    .dashboard-scope-modal .modal-buttons button.btn-cancel,
+    .dashboard-scope-modal .modal-buttons button.btn-primary {
+        flex: 0 1 auto;
+        padding-left: 10px;
+        padding-right: 10px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .dashboard-scope-manage-label {
+        display: none;
+    }
+
+    .dashboard-scope-modal .modal-buttons button.dashboard-scope-manage-btn {
+        flex: 0 0 auto;
+        justify-content: center;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .dashboard-scope-manage-btn .lucide {
+        width: 16px;
+        height: 16px;
+    }
 }
 
 /* Rows are divs (a button cannot nest the arrow button), so they need the
@@ -2333,16 +2388,17 @@ html.dashboard-note-modal-open body {
 }
 
 @media (max-width: 800px) {
+    /* Still a dialog on a phone: a thin margin all around, the board showing
+       through behind it */
     .dashboard-note-modal {
-        padding: 0;
+        padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
     }
 
     #dashboardNoteModal .dashboard-note-modal-content {
         width: 100%;
         max-width: none;
-        height: 100dvh;
-        padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
-        border-radius: 0;
+        height: 100%;
+        padding: 14px;
     }
 
     /* 16px: iOS zooms into a smaller field on focus */

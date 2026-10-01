@@ -101,6 +101,36 @@ body.notes-manager-page {
     box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
+/* Single collapse-all / expand-all toggle, right of the type dropdown: the
+   Tasks page's button, as tall as the dropdowns of this row */
+.nm-collapse-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    align-self: stretch;
+    padding: 0 12px;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius-lg);
+    background: transparent;
+    color: var(--text-color, var(--pz-text));
+    font-size: 14px;
+    font-family: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nm-collapse-btn:hover {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent);
+}
+
+html[data-theme='dark'] .nm-collapse-btn:hover {
+    color: var(--pz-accent-text);
+}
+
 /* Bulk action bar */
 .nm-bulk-bar {
     display: flex;
@@ -484,7 +514,8 @@ html[data-theme='dark'] .nm-folder-option-selected {
         width: 100%;
     }
 
-    /* The type dropdown shares the filter input's row, the age one wraps below */
+    /* The type dropdown and the collapse toggle share the filter input's row,
+       the age dropdown wraps below */
     .nm-filter-bar .filter-input-wrapper {
         flex: 1 1 0;
         min-width: 0;
@@ -494,6 +525,16 @@ html[data-theme='dark'] .nm-folder-option-selected {
         width: auto;
         min-width: 0;
         max-width: 45%;
+    }
+
+    /* Icon only, like on the Tasks page (its label moves to the title) */
+    .nm-collapse-btn {
+        width: 40px;
+        padding: 0;
+    }
+
+    #nmToggleAllLabel {
+        display: none;
     }
 
     /* One line per note: the title keeps its width and ends in an ellipsis

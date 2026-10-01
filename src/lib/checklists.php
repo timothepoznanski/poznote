@@ -6,11 +6,29 @@
  */
 
 /**
+ * Whitespace of a note's plain text as a card shows it: runs of spaces
+ * collapsed, single line breaks kept. Views that want the breaks render the
+ * excerpt with white-space: pre-line (diary), others show spaces.
+ */
+function collapseNoteCardWhitespace($text) {
+    $text = preg_replace('/[^\S\n]+/u', ' ', $text);
+    $text = preg_replace('/ ?\n ?/u', "\n", $text);
+    $text = preg_replace('/\n{2,}/u', "\n", $text);
+    return trim((string)$text);
+}
+
+/**
  * Build a short plain-text excerpt (or task preview) for a note card.
  * Shared by the dashboard and diary board views.
+ *
+ * $withSearch = false leaves 'search' (the note's whole text, for a filter
+ * running in the page) empty. The excerpt is then worked out from the head of
+ * the note alone: collapsing the whitespace of every note in full was most of
+ * the dashboard's response time on a large workspace.
  * @return array{text: string, tasks: ?array, search: string, image: ?string}
  */
-function buildNoteCardPreview($noteId, $type) {
+function buildNoteCardPreview($noteId, $type, $withSearch = true) {
+    $excerptLength = 220;
     $file = getEntryFilename($noteId, $type);
     if (!is_readable($file)) {
         return ['text' => '', 'tasks' => null, 'search' => '', 'image' => null];
@@ -76,18 +94,29 @@ function buildNoteCardPreview($noteId, $type) {
     $text = strip_tags($text);
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $text = str_replace("\r", '', $text);
-    // Collapse spaces but keep single line breaks: views that want them render
-    // the excerpt with white-space: pre-line (diary), others show spaces.
-    $text = preg_replace('/[^\S\n]+/u', ' ', $text);
-    $text = preg_replace('/ ?\n ?/u', "\n", $text);
-    $text = preg_replace('/\n{2,}/u', "\n", $text);
-    $text = trim((string)$text);
+    if ($withSearch) {
+        $text = collapseNoteCardWhitespace($text);
+    } else {
+        // Collapsing only ever shortens, and what it does to the head of the
+        // text does not depend on what follows: a head already longer than
+        // the excerpt once collapsed gives the same excerpt as the whole
+        // note. Otherwise (a note opening on a long run of blank lines) the
+        // head is widened until it is, or until it is the whole note.
+        $length = strlen($text);
+        $window = 2048;
+        do {
+            $head = $window < $length ? mb_strcut($text, 0, $window, 'UTF-8') : $text;
+            $collapsed = collapseNoteCardWhitespace($head);
+            $window *= 4;
+        } while (strlen($head) < $length && mb_strlen($collapsed, 'UTF-8') <= $excerptLength);
+        $text = $collapsed;
+    }
     $previewText = $text;
-    if ($previewText !== '' && mb_strlen($previewText, 'UTF-8') > 220) {
-        $previewText = rtrim(mb_substr($previewText, 0, 220, 'UTF-8')) . '…';
+    if ($previewText !== '' && mb_strlen($previewText, 'UTF-8') > $excerptLength) {
+        $previewText = rtrim(mb_substr($previewText, 0, $excerptLength, 'UTF-8')) . '…';
     }
 
-    $search = preg_replace('/\s+/u', ' ', $text);
+    $search = $withSearch ? preg_replace('/\s+/u', ' ', $text) : '';
     return ['text' => $previewText, 'tasks' => null, 'search' => $search, 'image' => $image];
 }
 

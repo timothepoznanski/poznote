@@ -31,6 +31,8 @@
         txtMoved:       body.getAttribute('data-txt-moved') || 'Moved successfully',
         txtRoot:        body.getAttribute('data-txt-root') || 'Root (no folder)',
         txtShowMore:    body.getAttribute('data-txt-show-more') || 'Show more ({count} remaining)',
+        txtCollapseAll: body.getAttribute('data-txt-collapse-all') || 'Collapse all',
+        txtExpandAll:   body.getAttribute('data-txt-expand-all') || 'Expand all',
         ageLabels:      (function() { try { return JSON.parse(body.getAttribute('data-txt-age-labels') || '{}'); } catch(e) { return {}; } })(),
         ageCustom:      body.getAttribute('data-txt-age-custom') || 'Last {days} days',
     };
@@ -46,6 +48,7 @@
     var noteAgeFilterDays = 0; // loaded from settings
     var movingToFolderId = null; // null = root; number = folder id
     var currentTagAction = '';
+    var collapsedGroupKeys = new Set(); // folder groups folded shut (folder id, or '__none__')
 
     // Rows drawn at a time. Drawing thousands of rows in one go took seconds;
     // the next batch follows when the "Show more" button under the list comes
@@ -80,6 +83,8 @@
     var nmCancelTag      = document.getElementById('nmCancelTag');
     var nmShowMore       = document.getElementById('nmShowMore');
     var nmShowMoreBtn    = document.getElementById('nmShowMoreBtn');
+    var nmToggleAllBtn   = document.getElementById('nmToggleAllBtn');
+    var nmToggleAllLabel = document.getElementById('nmToggleAllLabel');
 
     // ── Helpers ───────────────────────────────────────────────────────────────
     function apiUrl(path) {
@@ -340,6 +345,7 @@
         if (filteredNotes.length === 0) {
             show(nmEmptyMessage);
             updateShowMore();
+            syncToggleAllButton();
             return;
         }
         hide(nmEmptyMessage);
@@ -375,6 +381,7 @@
             folderById: folderById
         };
         renderMoreRows(ROW_BATCH_SIZE);
+        syncToggleAllButton();
     }
 
     // Draw the next rows of the queue, opening a folder section wherever a
@@ -405,6 +412,7 @@
         }
         nmContainer.appendChild(frag);
         updateShowMore();
+        rearmShowMoreObserver();
     }
 
     function updateShowMore() {
@@ -419,12 +427,72 @@
         renderMoreRows(ROW_BATCH_SIZE);
     });
 
+    var showMoreObserver = null;
     if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (entries) {
+        showMoreObserver = new IntersectionObserver(function (entries) {
             if (entries.some(function (entry) { return entry.isIntersecting; })) {
                 renderMoreRows(ROW_BATCH_SIZE);
             }
-        }, { rootMargin: '0px 0px 400px 0px' }).observe(nmShowMore);
+        }, { rootMargin: '0px 0px 400px 0px' });
+        showMoreObserver.observe(nmShowMore);
+    }
+
+    // The observer only reports a change: a batch drawn into collapsed folders
+    // adds no height, the button stays in view and nothing would follow.
+    // Observing it again reports where it stands now.
+    function rearmShowMoreObserver() {
+        if (!showMoreObserver || !renderQueue || renderQueue.remaining <= 0) return;
+        showMoreObserver.unobserve(nmShowMore);
+        showMoreObserver.observe(nmShowMore);
+    }
+
+    // ── Collapse / expand ────────────────────────────────────────────────────
+    function setSectionCollapsed(section, collapsed) {
+        var chevron = section.querySelector('.nm-folder-chevron');
+        var notesList = section.querySelector('.nm-notes-list');
+        chevron.classList.toggle('nm-open', !collapsed);
+        chevron.innerHTML = '<i class="lucide lucide-chevron-' + (collapsed ? 'right' : 'down') + '"></i>';
+        notesList.style.display = collapsed ? 'none' : '';
+    }
+
+    // Collapse/expand is a single toggle, like the Tasks page: it expands
+    // everything as soon as one listed folder is collapsed, and collapses
+    // everything otherwise. It covers every group, drawn or not.
+    function shouldExpandAllGroups() {
+        return !!renderQueue && renderQueue.groups.some(function (group) {
+            return collapsedGroupKeys.has(group.key);
+        });
+    }
+
+    function syncToggleAllButton() {
+        if (!nmToggleAllBtn) return;
+
+        var shouldExpand = shouldExpandAllGroups();
+        var label = shouldExpand ? cfg.txtExpandAll : cfg.txtCollapseAll;
+        var icon = nmToggleAllBtn.querySelector('.lucide');
+
+        nmToggleAllBtn.title = label;
+        nmToggleAllBtn.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
+        if (nmToggleAllLabel) {
+            nmToggleAllLabel.textContent = label;
+        }
+        if (icon) {
+            icon.classList.toggle('lucide-chevron-down', shouldExpand);
+            icon.classList.toggle('lucide-chevron-up', !shouldExpand);
+        }
+    }
+
+    if (nmToggleAllBtn) {
+        nmToggleAllBtn.addEventListener('click', function () {
+            var collapse = !shouldExpandAllGroups();
+            collapsedGroupKeys = new Set(collapse && renderQueue
+                ? renderQueue.groups.map(function (group) { return group.key; })
+                : []);
+            nmContainer.querySelectorAll('.nm-folder-section').forEach(function (section) {
+                setSectionCollapsed(section, collapse);
+            });
+            syncToggleAllButton();
+        });
     }
 
     // Header (name, select-all, count, collapse) and row list of one folder group.
@@ -494,20 +562,16 @@
         notesList.className = 'nm-notes-list';
         header.addEventListener('click', function (e) {
             if (e.target.closest('.nm-group-select-btn') || e.target.closest('input')) return;
-            var isOpen = chevron.classList.contains('nm-open');
-            if (isOpen) {
-                chevron.classList.remove('nm-open');
-                chevron.innerHTML = '<i class="lucide lucide-chevron-right"></i>';
-                notesList.style.display = 'none';
-            } else {
-                chevron.classList.add('nm-open');
-                chevron.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
-                notesList.style.display = '';
-            }
+            var collapse = !collapsedGroupKeys.has(key);
+            if (collapse) collapsedGroupKeys.add(key);
+            else          collapsedGroupKeys.delete(key);
+            setSectionCollapsed(section, collapse);
+            syncToggleAllButton();
         });
 
         section.appendChild(header);
         section.appendChild(notesList);
+        if (collapsedGroupKeys.has(key)) setSectionCollapsed(section, true);
         return { element: section, notesList: notesList };
     }
 

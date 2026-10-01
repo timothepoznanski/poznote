@@ -58,21 +58,6 @@ body.graph-page {
     border-color: var(--pz-accent-text);
 }
 
-.graph-folder-select {
-    max-width: 220px;
-    padding: 7px 10px;
-    border: 1px solid var(--pz-border-strong);
-    border-radius: var(--pz-radius);
-    font-size: 13px;
-    background: var(--pz-bg);
-    color: var(--pz-text-secondary);
-    cursor: pointer;
-}
-
-.graph-folder-select:focus {
-    outline: none;
-    border-color: var(--pz-accent-text);
-}
 
 .graph-options {
     display: flex;
@@ -115,6 +100,104 @@ body.graph-page {
 
 .graph-reset-btn:hover {
     background: var(--pz-surface-hover);
+}
+
+/* A button that stays on: the tree view, a folder picked in the filter */
+.graph-reset-btn[aria-pressed='true'],
+.graph-folder-btn.is-filtering {
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+}
+
+/* Folder filter: the button beside the search field, as tall as it is */
+.graph-folder-btn {
+    max-width: 220px;
+    padding: 7px 10px;
+}
+
+.graph-folder-btn:focus-visible {
+    outline: none;
+    border-color: var(--pz-accent-text);
+}
+
+.graph-folder-btn span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.graph-folder-btn .lucide {
+    flex-shrink: 0;
+}
+
+/* ...and the dialog it opens */
+#graphFolderModal .modal-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+#graphFolderModal .graph-folder-search {
+    width: 100%;
+    margin: 0 0 10px;
+    background: var(--pz-bg);
+    color: var(--pz-text);
+}
+
+.graph-folder-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: min(350px, 50vh);
+    overflow-y: auto;
+    margin-bottom: 16px;
+}
+
+.graph-folder-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 9px 12px;
+    border: none;
+    border-radius: var(--pz-radius);
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--pz-text);
+    text-align: left;
+    cursor: pointer;
+}
+
+.graph-folder-option span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.graph-folder-option .lucide {
+    flex-shrink: 0;
+    color: var(--pz-text-muted);
+}
+
+.graph-folder-option:hover,
+.graph-folder-option:focus-visible {
+    outline: none;
+    background: var(--pz-surface-hover);
+}
+
+.graph-folder-option.is-selected {
+    background: var(--pz-surface-hover);
+    font-weight: var(--pz-weight-medium);
+}
+
+.graph-folder-empty {
+    margin: 0;
+    padding: 12px;
+    font-size: 13px;
+    color: var(--pz-text-muted);
+    text-align: center;
 }
 
 /* Canvas --------------------------------------------------------------- */
@@ -162,6 +245,7 @@ body.graph-page {
 /* Nodes and edges ------------------------------------------------------ */
 
 .graph-edge {
+    fill: none;
     stroke: #c6cbd2;
     stroke-width: 1.2;
     vector-effect: non-scaling-stroke;
@@ -185,13 +269,54 @@ body.graph-page {
     user-select: none;
 }
 
+/* Folder hubs: a ring in the folder color (graph.js sets it as the node's
+   color), tied to its notes by lighter lines than the links between notes. */
+.graph-node.is-folder {
+    cursor: grab;
+}
+
+.graph-node.is-folder circle {
+    fill: var(--pz-surface);
+    stroke: currentColor;
+    stroke-width: 3;
+}
+
+.graph-node.is-folder .graph-label {
+    font-size: 12px;
+    font-weight: var(--pz-weight-semibold);
+    fill: var(--pz-text);
+}
+
+.graph-edge-folder {
+    stroke-dasharray: 3 3;
+}
+
+/* Tree view: titles beside the dots, plain lines from a folder to what it
+   holds, nothing to drag */
+.tree-layout .graph-label {
+    text-anchor: start;
+}
+
+.tree-layout .graph-edge-folder {
+    stroke-dasharray: none;
+}
+
+.tree-layout .graph-node.is-folder {
+    cursor: inherit;
+}
+
+.tree-layout .graph-hint {
+    display: none;
+}
+
 /* Crowded graphs: labels only on zoom, hover or search */
 .labels-hidden .graph-label {
     display: none;
 }
 
 .labels-hidden .graph-node.hl .graph-label,
-.labels-hidden .graph-node.search-hit .graph-label {
+.labels-hidden .graph-node.search-hit .graph-label,
+.labels-hidden .graph-node.is-folder .graph-label {
     display: block;
 }
 
@@ -303,15 +428,6 @@ html[data-theme='dark'] .graph-search-input:focus {
     border-color: var(--pz-accent-text);
 }
 
-html[data-theme='dark'] .graph-folder-select {
-    border-color: var(--pz-border);
-    color: var(--pz-text-muted);
-}
-
-html[data-theme='dark'] .graph-folder-select:focus {
-    border-color: var(--pz-accent-text);
-}
-
 html[data-theme='dark'] .graph-hint {
     color: var(--pz-text-muted, var(--pz-text-subtle));
     opacity: 0.9;
@@ -333,6 +449,18 @@ html[data-theme='dark'] .graph-reset-btn:hover {
     background: var(--pz-surface);
 }
 
+html[data-theme='dark'] .graph-reset-btn[aria-pressed='true'],
+html[data-theme='dark'] .graph-folder-btn.is-filtering {
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+}
+
+html[data-theme='dark'] .graph-folder-option:hover,
+html[data-theme='dark'] .graph-folder-option:focus-visible,
+html[data-theme='dark'] .graph-folder-option.is-selected {
+    background: color-mix(in srgb, var(--pz-text-muted) 16%, transparent);
+}
+
 html[data-theme='dark'] .graph-edge {
     stroke: var(--pz-surface-sunken);
 }
@@ -347,6 +475,15 @@ html[data-theme='dark'] .graph-node circle {
 
 html[data-theme='dark'] .graph-label {
     fill: var(--pz-text-muted);
+}
+
+html[data-theme='dark'] .graph-node.is-folder circle {
+    fill: var(--pz-chrome-bg, var(--pz-bg));
+    stroke: currentColor;
+}
+
+html[data-theme='dark'] .graph-node.is-folder .graph-label {
+    fill: var(--pz-text);
 }
 
 html[data-theme='dark'] .graph-node.search-hit circle {
@@ -375,13 +512,13 @@ html[data-theme='dark'] .graph-tooltip-meta {
         padding: 8px 10px;
     }
 
-    /* Search and folder dropdown share the first row, options go below */
+    /* Search and folder button share the first row, options go below */
     .graph-search-wrapper {
         flex: 1 1 0;
         min-width: 0;
     }
 
-    .graph-folder-select {
+    .graph-folder-btn {
         flex: 0 1 auto;
         align-self: stretch;
         max-width: 45%;

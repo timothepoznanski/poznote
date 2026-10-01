@@ -162,13 +162,14 @@
     width: 100%;
 }
 
-/* View options toggle (notes_list.php, js/tree-options-menu.js): the
-   three-dot toggle of the folder rows (css/folders/actions-menu.css) at the
-   right end of a thin rule between Favorites and the rest of the tree. */
+/* "Expand all folders" and the view options toggle (notes_list.php,
+   js/tree-options-menu.js), the three-dot toggle of the folder rows
+   (css/folders/actions-menu.css): two small buttons at the right end of a thin
+   rule between Favorites and the rest of the tree. The rule stops at the
+   first button, nothing is drawn between the two. */
 .notes-list-actions {
     display: flex;
     align-items: center;
-    gap: 8px;
     margin: 2px 0;
 }
 
@@ -176,13 +177,32 @@
     content: "";
     flex: 1 1 auto;
     height: 1px;
-    /* Up to the button */
-    margin-right: -8px;
     background: var(--pz-border);
+}
+
+/* As tall as the three-dot toggle next to it. Both boxes are narrower than
+   they are tall and touch each other: each glyph is far narrower than a 22px
+   square, whose empty sides kept the two apart. */
+.notes-list-actions .sidebar-folder-toggle {
+    flex: 0 0 auto;
+    min-width: 18px;
+    min-height: 22px;
+    padding: 2px;
+}
+
+.notes-list-actions .sidebar-folder-toggle i,
+.notes-list-actions .sidebar-folder-toggle [class*="lucide-"] {
+    font-size: 0.75em !important;
+}
+
+/* Same hover background as the toggle */
+.notes-list-actions .sidebar-folder-toggle:hover {
+    background: color-mix(in srgb, var(--pz-text-muted) 12%, transparent);
 }
 
 .notes-list-actions .folder-actions-toggle {
     flex: 0 0 auto;
+    width: 16px;
     border: none;
     background-color: transparent;
     font: inherit;

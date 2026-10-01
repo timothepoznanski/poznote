@@ -934,8 +934,6 @@
     "show_offline_dots": "Offline-Punkte anzeigen",
     "hide_offline_dots": "Offline-Punkte ausblenden",
     "view_options": "Ansichtsoptionen",
-    "expand_all_folders_hint": "Alle Ordner des Baums öffnen",
-    "collapse_all_folders_hint": "Alle Ordner des Baums schließen",
     "customize": "Seitenleiste anpassen",
     "customize_hint": "Auswählen, welche Elemente der Seitenleiste angezeigt werden"
   },
@@ -4506,17 +4504,26 @@
     "show_orphans_hint": "Notizen ohne Verknüpfungen anzeigen",
     "show_labels": "Notiztitel",
     "show_labels_hint": "Notiztitel unter den Punkten anzeigen",
+    "show_folders": "Ordner",
+    "show_folders_hint": "Jeden Ordner als Knotenpunkt anzeigen, der mit seinen Notizen verbunden ist",
+    "tree_layout": "Baumansicht",
+    "tree_layout_hint": "Ordner, Unterordner und Notizen von links nach rechts ausrichten, mit geraden Verbindungen",
+    "separate_groups": "Gruppen trennen",
+    "separate_groups_hint": "Jede Gruppe verknüpfter Notizen getrennt von den anderen anordnen",
     "reset_layout": "Anordnung zurücksetzen",
     "reset_layout_hint": "Gespeicherte Positionen verwerfen und den Graphen automatisch neu anordnen",
     "drag_hint": "Strg + Ziehen bewegt einen Punkt unabhängig von seinen Verknüpfungen",
     "folder_filter_all": "Alle Ordner",
     "folder_filter_hint": "Nur die Notizen eines Ordners anzeigen",
+    "folder_modal_title": "Ordner auswählen",
+    "folder_modal_empty": "Kein passender Ordner.",
     "stats": "{{notes}} Notizen · {{links}} Verknüpfungen",
     "search": {
       "placeholder": "Notiz suchen..."
     },
     "tooltip": {
-      "links": "{{count}} Verknüpfungen"
+      "links": "{{count}} Verknüpfungen",
+      "folder_notes": "Ordner · {{count}} Notizen"
     }
   },
   "ai_settings": {

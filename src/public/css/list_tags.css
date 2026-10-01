@@ -63,7 +63,6 @@ html.tags-page {
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
 /* Classe pour masquer les tags lors du filtrage */
@@ -74,7 +73,6 @@ html.tags-page {
 .tag-item:hover {
     border-color: var(--pz-accent-text);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
 .tag-name {

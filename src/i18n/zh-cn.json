@@ -933,8 +933,6 @@
     "show_offline_dots": "显示离线圆点",
     "hide_offline_dots": "隐藏离线圆点",
     "view_options": "视图选项",
-    "expand_all_folders_hint": "展开树中的所有文件夹",
-    "collapse_all_folders_hint": "折叠树中的所有文件夹",
     "customize": "自定义侧边栏",
     "customize_hint": "选择侧边栏中显示的元素"
   },
@@ -4606,17 +4604,26 @@
     "show_orphans_hint": "显示没有链接的笔记",
     "show_labels": "笔记标题",
     "show_labels_hint": "在圆点下方显示笔记标题",
+    "show_folders": "文件夹",
+    "show_folders_hint": "将每个文件夹显示为与其笔记相连的中心节点",
+    "tree_layout": "树状视图",
+    "tree_layout_hint": "将文件夹、子文件夹和笔记从左到右对齐排列，使用直线连接",
+    "separate_groups": "分开各组",
+    "separate_groups_hint": "将每组相互链接的笔记与其他组分开排列",
     "reset_layout": "重置布局",
     "reset_layout_hint": "忘记已保存的位置并自动重新排列图谱",
     "drag_hint": "Ctrl + 拖动可独立于链接移动单个点",
     "folder_filter_all": "所有文件夹",
     "folder_filter_hint": "仅显示某个文件夹中的笔记",
+    "folder_modal_title": "选择文件夹",
+    "folder_modal_empty": "没有匹配的文件夹。",
     "stats": "{{notes}} 篇笔记 · {{links}} 个链接",
     "search": {
       "placeholder": "查找笔记..."
     },
     "tooltip": {
-      "links": "{{count}} 个链接"
+      "links": "{{count}} 个链接",
+      "folder_notes": "文件夹 · {{count}} 篇笔记"
     }
   },
   "ai_settings": {

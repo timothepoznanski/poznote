@@ -52,6 +52,8 @@ $currentLang = getUserLanguage();
       data-txt-moving="<?php echo t_h('notes_manager.moving', [], 'Moving...'); ?>"
       data-txt-moved="<?php echo t_h('notes_manager.moved', [], 'Moved successfully'); ?>"
       data-txt-root="<?php echo t_h('notes_manager.root', [], 'Root (no folder)'); ?>"
+      data-txt-collapse-all="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>"
+      data-txt-expand-all="<?php echo t_h('tasks_page.expand_all', [], 'Expand all'); ?>"
       data-txt-show-more="<?php echo t_h('common.show_more_notes', ['count' => '{count}'], 'Show more ({count} remaining)'); ?>"
       data-txt-age-labels="<?php echo htmlspecialchars(json_encode([
           '0'   => t('modals.note_age_filter.options.all', [], 'All notes'),
@@ -94,6 +96,11 @@ $currentLang = getUserLanguage();
 				<option value="markdown"><?php echo t_h('notes_manager.type_markdown', [], 'Markdown'); ?></option>
 				<option value="tasklist"><?php echo t_h('notes_manager.type_tasklist', [], 'Tasklist'); ?></option>
 			</select>
+			<?php // Single collapse-all / expand-all toggle for the folder groups, like tasks.php ?>
+			<button type="button" id="nmToggleAllBtn" class="nm-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
+				<i class="lucide lucide-chevron-up"></i>
+				<span id="nmToggleAllLabel"><?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?></span>
+			</button>
 			<select
 				id="nmAgeFilter"
 				class="nm-filter-select"

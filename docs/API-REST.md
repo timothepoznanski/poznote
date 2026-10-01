@@ -1716,7 +1716,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 GET /graph
 ```
 
-Return the note-link graph used by the graph view: one node per non-trashed note (`note`, `markdown` and `tasklist` types), and one edge per link between two notes.
+Return the note-link graph used by the graph view: one node per non-trashed note (`note`, `markdown` and `tasklist` types), and one edge per link between two notes. `folders` lists the folders that hold at least one of those notes, directly or through a subfolder, so a client can draw each folder as a hub tied to its notes (`folder_id` on a node) and to its parent folder (`parent_id`).
 
 **Query Parameters:**
 
@@ -1730,10 +1730,13 @@ Return the note-link graph used by the graph view: one node per non-trashed note
 {
   "success": true,
   "nodes": [
-    { "id": 123, "title": "Project plan", "folder": "Work", "type": "note", "favorite": false }
+    { "id": 123, "title": "Project plan", "folder": "Work", "folder_id": 7, "type": "note", "favorite": false }
   ],
   "edges": [
     { "source": 123, "target": 456 }
+  ],
+  "folders": [
+    { "id": 7, "name": "Work", "parent_id": null }
   ]
 }
 ```

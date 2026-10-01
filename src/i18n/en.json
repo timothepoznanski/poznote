@@ -2683,8 +2683,6 @@
     "show_offline_dots": "Show offline dots",
     "hide_offline_dots": "Hide offline dots",
     "view_options": "View options",
-    "expand_all_folders_hint": "Open every folder of the tree",
-    "collapse_all_folders_hint": "Close every folder of the tree",
     "customize": "Customize sidebar",
     "customize_hint": "Choose which elements of the sidebar are shown"
   },
@@ -4132,17 +4130,26 @@
     "show_orphans_hint": "Show notes that have no links",
     "show_labels": "Note titles",
     "show_labels_hint": "Show note titles under the dots",
+    "show_folders": "Folders",
+    "show_folders_hint": "Show each folder as a hub linked to its notes",
+    "tree_layout": "Tree view",
+    "tree_layout_hint": "Line up folders, subfolders and notes from left to right, with straight links",
+    "separate_groups": "Separate groups",
+    "separate_groups_hint": "Lay out each group of linked notes apart from the others",
     "reset_layout": "Reset layout",
     "reset_layout_hint": "Forget the saved positions and rearrange the graph automatically",
     "drag_hint": "Ctrl + drag moves a dot independently of its links",
     "folder_filter_all": "All folders",
     "folder_filter_hint": "Show only the notes of one folder",
+    "folder_modal_title": "Choose a folder",
+    "folder_modal_empty": "No matching folder.",
     "stats": "{{notes}} notes · {{links}} links",
     "search": {
       "placeholder": "Find a note..."
     },
     "tooltip": {
-      "links": "{{count}} links"
+      "links": "{{count}} links",
+      "folder_notes": "Folder · {{count}} notes"
     }
   },
   "note_reference": {

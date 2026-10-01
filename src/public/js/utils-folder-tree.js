@@ -139,9 +139,9 @@ function getShouldExpandAllFolders() {
 }
 
 function updateToggleAllFoldersButton() {
-    // Several controls share this action: the item of the tree's view options
-    // menu (or the button of the active account's row), the buttons of the
-    // icon rail, so every match has to be kept in sync, not just the first.
+    // Several controls share this action: the button left of the tree's view
+    // options toggle (or the one of the active account's row), the buttons of
+    // the icon rail, so every match has to be kept in sync, not just the first.
     var buttons = document.querySelectorAll('[data-action="toggle-all-folders"]');
     if (!buttons.length) return;
 
@@ -156,26 +156,15 @@ function updateToggleAllFoldersButton() {
         var icon = button.querySelector('.lucide');
 
         button.setAttribute('aria-expanded', shouldExpand ? 'false' : 'true');
-        // The menu item (index.php) says it in its label, and leaves the menu
-        // while there is no folder to fold
-        var label = button.querySelector('.menu-item-label');
-        if (label) {
-            label.textContent = title;
-            button.title = shouldExpand
-                ? (window.t ? window.t('sidebar.expand_all_folders_hint', null, 'Open every folder of the tree') : 'Open every folder of the tree')
-                : (window.t ? window.t('sidebar.collapse_all_folders_hint', null, 'Close every folder of the tree') : 'Close every folder of the tree');
-            button.style.display = hasFolders ? '' : 'none';
-        } else {
-            button.disabled = !hasFolders;
-            button.title = title;
-            button.setAttribute('aria-label', title);
-        }
+        button.disabled = !hasFolders;
+        button.title = title;
+        button.setAttribute('aria-label', title);
 
-        // Unfold / fold glyphs (chevrons pointing apart, then together): a
-        // single chevron read as "open this one", not "open them all".
+        // A single chevron: down while the click unfolds the tree, up while
+        // it folds it.
         if (icon) {
-            icon.classList.toggle('lucide-chevrons-up-down', shouldExpand);
-            icon.classList.toggle('lucide-chevrons-down-up', !shouldExpand);
+            icon.classList.toggle('lucide-chevron-down', shouldExpand);
+            icon.classList.toggle('lucide-chevron-up', !shouldExpand);
         }
     });
 }

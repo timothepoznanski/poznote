@@ -10,6 +10,9 @@
  *   1. HTML internal link attribute  — data-note-id="{id}"
  *   2. URL-based link                — ?note={id} or &note={id}
  *   3. Wiki-link syntax              — [[Note Title]]
+ *
+ * The folders holding those notes come back next to them, so the view can
+ * draw each folder as a hub linked to its notes and to its parent folder.
  */
 require_once __DIR__ . '/../../../note_loader.php';
 
@@ -31,7 +34,8 @@ class GraphController
      * GET /api/v1/graph
      *
      * Returns every non-trash note of the workspace as a node, plus one edge
-     * per (source, target) pair of linked notes.
+     * per (source, target) pair of linked notes, and the folders those notes
+     * sit in.
      */
     public function index(): void
     {
@@ -41,7 +45,7 @@ class GraphController
                 $workspace = trim($_GET['workspace']);
             }
 
-            $sql = "SELECT id, heading, type, folder, favorite
+            $sql = "SELECT id, heading, type, folder, folder_id, favorite
                       FROM entries
                      WHERE trash = 0
                        AND type IN ('note', 'markdown', 'tasklist')";
@@ -55,6 +59,8 @@ class GraphController
             $stmt->execute($params);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            $folderRows = $this->loadFolders($workspace);
+
             // --- Build nodes and lookup tables
             $nodes      = [];
             $idSet      = [];
@@ -64,12 +70,23 @@ class GraphController
                 $id      = (int) $row['id'];
                 $heading = (string) ($row['heading'] ?? '');
 
+                // The folders table is authoritative: the legacy folder text
+                // column stays empty for notes filed by folder_id alone.
+                $folderId = (int) ($row['folder_id'] ?? 0);
+                if (!isset($folderRows[$folderId])) {
+                    $folderId = 0;
+                }
+                $folderName = $folderId !== 0
+                    ? $folderRows[$folderId]['name']
+                    : (string) ($row['folder'] ?? '');
+
                 $nodes[] = [
-                    'id'       => $id,
-                    'title'    => $heading !== '' ? $heading : 'Untitled',
-                    'folder'   => (string) ($row['folder'] ?? ''),
-                    'type'     => (string) $row['type'],
-                    'favorite' => (int) ($row['favorite'] ?? 0) === 1,
+                    'id'        => $id,
+                    'title'     => $heading !== '' ? $heading : 'Untitled',
+                    'folder'    => $folderName,
+                    'folder_id' => $folderId !== 0 ? $folderId : null,
+                    'type'      => (string) $row['type'],
+                    'favorite'  => (int) ($row['favorite'] ?? 0) === 1,
                 ];
 
                 $idSet[$id] = true;
@@ -141,8 +158,9 @@ class GraphController
             }
 
             $this->sendSuccess([
-                'nodes' => $nodes,
-                'edges' => $edges,
+                'nodes'   => $nodes,
+                'edges'   => $edges,
+                'folders' => $this->foldersHoldingNotes($folderRows, $nodes),
             ]);
 
         } catch (Exception $e) {
@@ -153,6 +171,69 @@ class GraphController
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Folders of the workspace, keyed by id.
+     *
+     * @return array<int, array{id: int, name: string, parent_id: ?int}>
+     */
+    private function loadFolders(string $workspace): array
+    {
+        $sql = 'SELECT id, name, parent_id FROM folders';
+        $params = [];
+        if ($workspace !== '') {
+            $sql .= ' WHERE workspace = ?';
+            $params[] = $workspace;
+        }
+        $stmt = $this->con->prepare($sql);
+        $stmt->execute($params);
+
+        $folders = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            $id = (int) $row['id'];
+            $folders[$id] = [
+                'id'        => $id,
+                'name'      => (string) ($row['name'] ?? ''),
+                'parent_id' => $row['parent_id'] !== null ? (int) $row['parent_id'] : null,
+            ];
+        }
+        return $folders;
+    }
+
+    /**
+     * Keeps the folders that hold at least one graph node, directly or
+     * through a subfolder: an empty folder would only add a stray dot.
+     *
+     * @param array<int, array{id: int, name: string, parent_id: ?int}> $folders
+     * @param array<int, array<string, mixed>> $nodes
+     * @return array<int, array{id: int, name: string, parent_id: ?int}>
+     */
+    private function foldersHoldingNotes(array $folders, array $nodes): array
+    {
+        $kept = [];
+        foreach ($nodes as $node) {
+            $folderId = $node['folder_id'];
+            // Walk up to the root; stops on a folder already kept, which
+            // also ends a parent_id cycle.
+            while ($folderId !== null && isset($folders[$folderId]) && !isset($kept[$folderId])) {
+                $kept[$folderId] = true;
+                $folderId = $folders[$folderId]['parent_id'];
+            }
+        }
+
+        $result = [];
+        foreach ($folders as $id => $folder) {
+            if (!isset($kept[$id])) {
+                continue;
+            }
+            // A parent outside the set (other workspace, deleted) reads as root
+            if ($folder['parent_id'] !== null && !isset($kept[$folder['parent_id']])) {
+                $folder['parent_id'] = null;
+            }
+            $result[] = $folder;
+        }
+        return $result;
+    }
 
     private function sendSuccess(array $data): void
     {

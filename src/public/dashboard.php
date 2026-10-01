@@ -29,7 +29,8 @@ try {
  * @return array{text: string, tasks: ?array, search: string}
  */
 function dashboardBuildNotePreview($noteId, $type) {
-    return buildNoteCardPreview($noteId, $type);
+    // No full text: the board does not embed it (see dashboardBuildNoteData)
+    return buildNoteCardPreview($noteId, $type, false);
 }
 
 function dashboardFolderHasNotes(int $id, array &$folders): bool {
@@ -260,245 +261,6 @@ function dashboardResolveRememberedScope(PDO $con, array $params, string $pageWo
     return $scope;
 }
 
-function dashboardGetTopbarCounts($con, string $pageWorkspace): array {
-    $counts = [
-        'notes' => 0,
-        'favorites' => 0,
-        'notifications' => 0,
-        'notifications_unread' => 0,
-        'tags' => 0,
-        'folders' => 0,
-        'shares' => 0,
-        'attachments' => 0,
-        'trash' => 0,
-    ];
-
-    if (!$con) {
-        return $counts;
-    }
-
-    try {
-        $query = "SELECT COUNT(*) FROM entries WHERE trash = 0";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $query .= " AND workspace = ?";
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $counts['notes'] = (int)$stmt->fetchColumn();
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        $query = "SELECT COUNT(*) FROM entries WHERE trash = 0 AND favorite = 1";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $query .= " AND workspace = ?";
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $counts['favorites'] = (int)$stmt->fetchColumn();
-
-        // Favorite folders are board items too, so the badge counts them
-        // alongside favorite notes.
-        $query = "SELECT COUNT(*) FROM folders WHERE favorite = 1";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $query .= " AND workspace = ?";
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $counts['favorites'] += (int)$stmt->fetchColumn();
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        $stmt = $con->prepare("
-            SELECT
-                COUNT(*) as total_count,
-                COALESCE(SUM(CASE WHEN is_read = 0 THEN 1 ELSE 0 END), 0) as unread_count
-            FROM notifications
-            WHERE dismissed = 0 AND trigger_at <= datetime('now')
-        ");
-        $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
-        $counts['notifications'] = (int)($row['total_count'] ?? 0);
-        $counts['notifications_unread'] = (int)($row['unread_count'] ?? 0);
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        $query = "SELECT tags FROM entries WHERE trash = 0 AND tags IS NOT NULL AND tags != ''";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $query .= " AND workspace = ?";
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $uniqueTags = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            foreach (explode(',', $row['tags'] ?? '') as $tag) {
-                $tag = trim($tag);
-                if ($tag !== '') {
-                    $uniqueTags[$tag] = true;
-                }
-            }
-        }
-        $counts['tags'] = count($uniqueTags);
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        $query = "SELECT COUNT(*) FROM folders";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $query .= " WHERE workspace = ?";
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $counts['folders'] = (int)$stmt->fetchColumn();
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        $query = "SELECT entry, attachments FROM entries WHERE trash = 0 AND attachments IS NOT NULL AND attachments != '' AND attachments != '[]'";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $query .= " AND workspace = ?";
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $counts['attachments'] += poznoteCountDisplayableAttachments($row['attachments'] ?? '', $row['entry'] ?? '');
-        }
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        $query = "SELECT COUNT(*) FROM entries WHERE trash = 1";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $query .= " AND workspace = ?";
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $counts['trash'] = (int)$stmt->fetchColumn();
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        $workspaceClauseF = $pageWorkspace !== '' ? "WHERE f.workspace = ?" : "";
-        $workspaceClauseE = $pageWorkspace !== '' ? "AND e.workspace = ?" : "";
-        $query = "
-            WITH RECURSIVE shared_hierarchy(id) AS (
-                SELECT sf.folder_id FROM shared_folders sf
-                INNER JOIN folders f ON sf.folder_id = f.id
-                $workspaceClauseF
-                UNION ALL
-                SELECT f.id FROM folders f
-                INNER JOIN shared_hierarchy sh ON f.parent_id = sh.id
-            )
-            SELECT COUNT(DISTINCT e.id) as cnt
-            FROM entries e
-            LEFT JOIN shared_notes sn ON e.id = sn.note_id AND sn.access_mode IS NOT NULL
-            WHERE e.trash = 0
-            $workspaceClauseE
-            AND (sn.note_id IS NOT NULL OR e.folder_id IN (SELECT id FROM shared_hierarchy))
-        ";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $params[] = $pageWorkspace;
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $counts['shares'] += (int)$stmt->fetchColumn();
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        $workspaceClauseF = $pageWorkspace !== '' ? "WHERE f.workspace = ?" : "";
-        $workspaceClauseF2 = $pageWorkspace !== '' ? "AND f.workspace = ?" : "";
-        $query = "
-            WITH RECURSIVE shared_hierarchy(id) AS (
-                SELECT sf.folder_id FROM shared_folders sf
-                INNER JOIN folders f ON sf.folder_id = f.id
-                $workspaceClauseF
-                UNION ALL
-                SELECT f.id FROM folders f
-                INNER JOIN shared_hierarchy sh ON f.parent_id = sh.id
-            )
-            SELECT COUNT(DISTINCT f.id) as cnt FROM folders f
-            WHERE f.id IN (SELECT id FROM shared_hierarchy)
-            $workspaceClauseF2
-        ";
-        $params = [];
-        if ($pageWorkspace !== '') {
-            $params[] = $pageWorkspace;
-            $params[] = $pageWorkspace;
-        }
-        $stmt = $con->prepare($query);
-        $stmt->execute($params);
-        $counts['shares'] += (int)$stmt->fetchColumn();
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    try {
-        require_once __DIR__ . '/../users/db_master.php';
-        require_once __DIR__ . '/../users/UserDataManager.php';
-        $currentUserId = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
-        if ($currentUserId) {
-            foreach (getAllUserProfiles() as $otherUser) {
-                if ((int)$otherUser['id'] === $currentUserId) continue;
-                $udm = new UserDataManager((int)$otherUser['id']);
-                $dbPath = $udm->getUserDatabasePath();
-                if (!file_exists($dbPath)) continue;
-
-                try {
-                    $ownerCon = new PDO('sqlite:' . $dbPath);
-                    $ownerCon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                    $stmt = $ownerCon->query("SELECT allowed_users FROM shared_notes WHERE allowed_users IS NOT NULL AND allowed_users != ''");
-                    foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $json) {
-                        $ids = json_decode($json, true);
-                        if (is_array($ids) && in_array($currentUserId, array_map('intval', $ids), true)) {
-                            $counts['shares']++;
-                        }
-                    }
-                    $stmt = $ownerCon->query("SELECT allowed_users FROM shared_folders WHERE allowed_users IS NOT NULL AND allowed_users != ''");
-                    foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $json) {
-                        $ids = json_decode($json, true);
-                        if (is_array($ids) && in_array($currentUserId, array_map('intval', $ids), true)) {
-                            $counts['shares']++;
-                        }
-                    }
-                } catch (Exception $e) {
-                    error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-                }
-            }
-        }
-    } catch (Exception $e) {
-        error_log('dashboard: dashboardGetTopbarCounts() failed: ' . $e->getMessage());
-    }
-
-    return $counts;
-}
-
 $favoritesOnly = isset($_GET['favorites']) && $_GET['favorites'] === '1';
 
 /**
@@ -626,7 +388,6 @@ if ($aiPanelWorkspace === '') {
 
 $dashboardData = ['folders' => [], 'notes' => [], 'groups' => []];
 $isEmpty = true;
-$dashboardTopbarCounts = [];
 
 try {
     if (isset($con)) {
@@ -676,8 +437,6 @@ if ($dashboardScope['mode'] === 'tag' && empty($dashboardScope['workspaces'])) {
     $dashboardEmptyMessage = t_h('dashboard.scope.no_workspace_for_tag', ['tag' => $dashboardScope['tag']], 'No workspace carries the tag "{{tag}}".');
 }
 
-$dashboardTopbarCounts = dashboardGetTopbarCounts($con ?? null, $dashboardScopeIsMulti ? '' : $pageWorkspace);
-
 // getAppVersion() reads version.txt through an absolute path. Reading it
 // relatively broke when the entry points moved into src/public/: the file
 // stayed one level up, so this fell back to time() and changed the asset
@@ -695,6 +454,13 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderStylesheets('dashboard'); ?>
+	<?php
+	// Nothing is painted before the end of the page is parsed (#dashboardPageEnd,
+	// last element of the body): the scripts loaded at the bottom draw the
+	// cards, and the browser otherwise showed an empty board in between. A
+	// browser that does not know rel="expect" paints as it did before.
+	?>
+	<link rel="expect" href="#dashboardPageEnd" blocking="render">
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 	<?php if ($aiChatEnabled): ?>
@@ -856,7 +622,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				<div class="modal-buttons">
 					<?php // workspaces.php is refused on an account that is not one's own ?>
 					<?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
-					<button type="button" class="dashboard-scope-manage-btn" onclick="window.location.href='workspaces.php'"><i class="lucide lucide-layers"></i> <?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?></button>
+					<button type="button" class="dashboard-scope-manage-btn" onclick="window.location.href='workspaces.php'" title="<?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?>" aria-label="<?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?>"><i class="lucide lucide-layers"></i> <span class="dashboard-scope-manage-label"><?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?></span></button>
 					<?php endif; ?>
 					<button type="button" class="btn-cancel" data-action="close-workspace-switcher-modal"><?php echo t_h('common.close'); ?></button>
 					<button type="button" class="btn-primary" id="dashboardScopeApplyBtn" disabled><?php echo t_h('common.apply', [], 'Apply'); ?></button>
@@ -965,8 +731,9 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="<?php echo poznoteAsset('js/dashboard-note-modal.js'); ?>"></script>
-		<script src="<?php echo poznoteAsset('js/dashboard-page.js'); ?>"></script>
+		<?php // Before dashboard-page.js: the card size and column count are set before the cards are drawn ?>
 		<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/dashboard-page.js'); ?>"></script>
 		<?php if ($aiChatEnabled): ?>
 		<!-- AI chat panel: js/globals.js brings the i18n runtime (window.t) and
 		     getSelectedWorkspace(). The assistant's answers are rendered with
@@ -982,5 +749,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <!-- Contextual UI Customization panel (see ui_customization_panel.php) -->
     <script src="<?php echo poznoteAsset('js/ui-customization.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/ui-customization-panel.js'); ?>"></script>
+    <?php // Target of the rel="expect" link in <head>: keep it last ?>
+    <span id="dashboardPageEnd" hidden></span>
 </body>
 </html>

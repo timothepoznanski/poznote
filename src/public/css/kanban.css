@@ -595,10 +595,6 @@
     cursor: pointer;
 }
 
-.kanban-tasklist-preview.is-saving {
-    opacity: 0.65;
-}
-
 .kanban-task-preview-text {
     flex: 1;
     min-width: 0;

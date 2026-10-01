@@ -307,6 +307,8 @@ function poznoteCssManifest(): array
             'css/home/base.css',
             'css/home/search.css',
             'css/home/buttons.css',
+            'css/modals/base.css',
+            'css/modals/responsive.css',
             '@theme',
             'css/graph.css',
             '@icon-sidebar',

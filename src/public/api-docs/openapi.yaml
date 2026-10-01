@@ -1156,7 +1156,8 @@ paths:
       description: >
         Returns the graph used by the graph view: one node per non-trashed note
         (note, markdown and tasklist types) and one edge per link between two
-        notes.
+        notes. `folders` lists the folders holding at least one of those notes,
+        directly or through a subfolder.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
@@ -1187,6 +1188,9 @@ paths:
                           type: string
                         folder:
                           type: string
+                        folder_id:
+                          type: integer
+                          nullable: true
                         type:
                           type: string
                         favorite:
@@ -1200,6 +1204,18 @@ paths:
                           type: integer
                         target:
                           type: integer
+                  folders:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        parent_id:
+                          type: integer
+                          nullable: true
 
   /notes/{id}/backlinks:
     get:
