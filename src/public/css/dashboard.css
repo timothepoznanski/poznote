@@ -61,12 +61,6 @@ body.dashboard-page {
     width: 420px;
     max-width: 90%;
     margin: 20px auto 0;
-    animation: filterSlideIn 0.18s ease;
-}
-
-@keyframes filterSlideIn {
-    from { opacity: 0; transform: translateY(-6px); }
-    to   { opacity: 1; transform: translateY(0); }
 }
 
 .dashboard-topbar-filter.is-collapsed {

@@ -2345,13 +2345,25 @@
 
     // --- Init ---
 
+    // The cards are drawn as this script runs (it is loaded below the grid),
+    // not on DOMContentLoaded: the scripts that follow no longer stand between
+    // the page and its cards, and the browser never paints an empty board
+    // first (see the rel="expect" link in dashboard.php).
+    restoreNavigationPath();
+    // Restore before the first render so the board comes up already filtered.
+    restoreColorFilter();
+    restoreModifiedFilter();
+    restoreTagFilter();
+    // The stored text filter too; the input is filled and the content search
+    // started with the rest of the wiring below.
+    if (document.getElementById('filterInput')) {
+        try {
+            activeFilterTerm = normalizeSearchText((localStorage.getItem(FILTER_VALUE_KEY) || '').trim());
+        } catch (err) { /* ignore */ }
+    }
+    renderAll();
+
     document.addEventListener('DOMContentLoaded', function () {
-        restoreNavigationPath();
-        // Restore before the first render so the board comes up already filtered.
-        restoreColorFilter();
-        restoreModifiedFilter();
-        restoreTagFilter();
-        renderAll();
         initNoteColorPicker();
         initFilterPanel();
         initCardReorder();

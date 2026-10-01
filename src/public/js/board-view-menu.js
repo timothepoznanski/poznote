@@ -99,7 +99,17 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('.board-view-controls').forEach(initControls);
-    });
+    // The pages load this script below the controls and before the one that
+    // draws the cards: the size is applied as the script runs, so the cards
+    // are laid out once, in their final columns. Waiting for DOMContentLoaded
+    // measured the container with every card already in it, at the default
+    // column count, and the board then jumped to the real one.
+    var controls = document.querySelectorAll('.board-view-controls');
+    if (controls.length || document.readyState !== 'loading') {
+        controls.forEach(initControls);
+    } else {
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.board-view-controls').forEach(initControls);
+        });
+    }
 })();
