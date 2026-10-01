@@ -742,8 +742,12 @@ function duplicateNote(noteId) {
                 if (data.share_delta && typeof updateSharedCount === 'function') {
                     updateSharedCount(data.share_delta);
                 }
-                // Stay on current note - just reload the page to refresh the list
-                window.location.reload();
+                // Stay on the current note and where the tree was scrolled:
+                // the copy lands next to the original (#1536)
+                var sourceLink = findTreeRow({ type: 'note', id: noteId });
+                var folderContent = sourceLink ? sourceLink.closest('.folder-content') : null;
+                var folderId = folderContent && folderContent.id ? folderContent.id.replace(/^folder-/, '') : null;
+                showAddedTreeRow({ type: 'note', id: data.id }, folderId);
             } else {
                 // Fallback: reload the page
                 window.location.reload();

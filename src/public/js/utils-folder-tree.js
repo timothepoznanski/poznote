@@ -307,6 +307,60 @@ function keepTreeSelection(items, reloads) {
 }
 
 /**
+ * Draw the tree again in place and show the row an action just added
+ * (issue #1536). A page reload sent a long tree back to its top: here it
+ * stays where it was scrolled, the new row is selected like a moved one
+ * (keepTreeSelection) and only brought into view when it landed outside of it.
+ * @param {{type: string, id: string|number}} item - The note or folder that was added
+ * @param {string|number|null} folderId - Folder it landed in, opened with its ancestors
+ */
+function showAddedTreeRow(item, folderId) {
+    var leftCol = document.getElementById('left_col');
+
+    // Pages without the tree (list_folders) have nothing to redraw in place
+    if (!leftCol || typeof window.refreshNotesListAfterFolderAction !== 'function') {
+        persistFolderStatesFromDOM();
+        markFolderPathOpen(folderId);
+        keepTreeSelection([item], true);
+        window.location.reload();
+        return;
+    }
+
+    // refreshNotesListAfterFolderAction() puts the list back where it was scrolled
+    Promise.resolve(window.refreshNotesListAfterFolderAction(folderId)).then(function () {
+        keepTreeSelection([item], false);
+
+        var row = findTreeRow(item);
+        // Absent or folded away (search mode, folder filter): nothing to scroll to
+        if (!row || row.offsetParent === null) return;
+
+        // Not scrollIntoView(): it would walk up to <body>, the sideways
+        // scroller of the mobile two-pane layout (css/index-mobile.css)
+        var scroller = row.closest('.notes-list-scrollable-content') || leftCol;
+        var rowRect = row.getBoundingClientRect();
+        var viewRect = scroller.getBoundingClientRect();
+        if (rowRect.top >= viewRect.top && rowRect.bottom <= viewRect.bottom) return;
+
+        var offset = (rowRect.top - viewRect.top) - (scroller.clientHeight - rowRect.height) / 2;
+        scroller.scrollTop = Math.max(0, Math.min(scroller.scrollTop + offset, scroller.scrollHeight - scroller.clientHeight));
+    });
+}
+
+// The row of a note or folder in the tree proper, not its twin in Favorites
+function findTreeRow(item) {
+    if (item.type === 'folder') {
+        // The header wraps the whole folder: its first line is the row
+        return document.querySelector("#left_col .folder-header[data-folder-key='folder_" + item.id + "'] > .folder-toggle");
+    }
+
+    var links = document.querySelectorAll('#left_col .links_arbo_left[data-note-db-id="' + item.id + '"]');
+    for (var i = 0; i < links.length; i++) {
+        if (!links[i].closest('.folder-header.system-folder')) return links[i];
+    }
+    return links.length ? links[0] : null;
+}
+
+/**
  * Persist current folder open/closed states to localStorage
  * Useful before actions that reload the page (e.g., drag & drop moves)
  */

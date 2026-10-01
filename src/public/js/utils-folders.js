@@ -419,8 +419,8 @@ function archiveFolderErrorMessage(status, data) {
 /**
  * Duplicate a folder with all its notes and subfolders.
  *
- * The copy lands next to the original under a unique name; the page reloads
- * so the tree picks it up, like the other folder actions.
+ * The copy lands next to the original under a unique name; the tree is drawn
+ * again where it was scrolled, with the copy selected (#1536).
  */
 function duplicateFolder(folderId, folderName) {
     var ws = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '';
@@ -442,7 +442,8 @@ function duplicateFolder(folderId, folderName) {
                 if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
                     window.setNeedsAutoPush(true);
                 }
-                window.location.reload();
+                var copy = data.folder || {};
+                showAddedTreeRow({ type: 'folder', id: data.folder_id }, copy.parent_id || null);
             } else {
                 var message = data.error || data.message || 'Unknown error';
                 showNotificationPopup(

@@ -117,6 +117,11 @@ function refreshNotesListAfterFolderAction(folderIdToOpen, options) {
             const currentLeftCol = document.getElementById('left_col');
 
             if (newLeftCol && currentLeftCol) {
+                // The list is what scrolls and it goes with the swap: without
+                // this the tree came back at its top (issue #1536)
+                const list = currentLeftCol.querySelector('.notes-list-scrollable-content');
+                const listScrollTop = list ? list.scrollTop : 0;
+
                 currentLeftCol.innerHTML = newLeftCol.innerHTML;
 
                 // Reinitialize components
@@ -174,6 +179,12 @@ function refreshNotesListAfterFolderAction(folderIdToOpen, options) {
                     }
                 } catch (error) {
                     console.error('Error reinitializing after folder action:', error);
+                }
+
+                // Once the folders are open again, or there is nothing to scroll back to
+                const newList = currentLeftCol.querySelector('.notes-list-scrollable-content');
+                if (newList) {
+                    newList.scrollTop = listScrollTop;
                 }
             }
         })
