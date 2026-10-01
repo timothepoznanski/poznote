@@ -48,7 +48,33 @@
     var noteAgeFilterDays = 0; // loaded from settings
     var movingToFolderId = null; // null = root; number = folder id
     var currentTagAction = '';
-    var collapsedGroupKeys = new Set(); // folder groups folded shut (folder id, or '__none__')
+
+    // Folder groups folded shut (folder id, or '__none__'), persisted per user
+    // across visits. One entry per workspace: each has its own "No folder" group.
+    var COLLAPSED_KEY = 'poznote-notes-manager-collapsed:' + cfg.workspace;
+
+    function getPrefsStorage() {
+        return window.__poznoteUserStorage || window.localStorage;
+    }
+
+    function loadCollapsedGroupKeys() {
+        try {
+            var parsed = JSON.parse(getPrefsStorage().getItem(COLLAPSED_KEY) || '[]');
+            return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+        } catch (e) {
+            return new Set();
+        }
+    }
+
+    var collapsedGroupKeys = loadCollapsedGroupKeys();
+
+    function saveCollapsedGroupKeys() {
+        try {
+            getPrefsStorage().setItem(COLLAPSED_KEY, JSON.stringify(Array.from(collapsedGroupKeys)));
+        } catch (e) {
+            console.debug('notes-manager: saveCollapsedGroupKeys() failed:', e);
+        }
+    }
 
     // Rows drawn at a time. Drawing thousands of rows in one go took seconds;
     // the next batch follows when the "Show more" button under the list comes
@@ -485,9 +511,12 @@
     if (nmToggleAllBtn) {
         nmToggleAllBtn.addEventListener('click', function () {
             var collapse = !shouldExpandAllGroups();
-            collapsedGroupKeys = new Set(collapse && renderQueue
-                ? renderQueue.groups.map(function (group) { return group.key; })
-                : []);
+            // Only the listed folders change: one hidden by a filter keeps its state
+            (renderQueue ? renderQueue.groups : []).forEach(function (group) {
+                if (collapse) collapsedGroupKeys.add(group.key);
+                else          collapsedGroupKeys.delete(group.key);
+            });
+            saveCollapsedGroupKeys();
             nmContainer.querySelectorAll('.nm-folder-section').forEach(function (section) {
                 setSectionCollapsed(section, collapse);
             });
@@ -565,6 +594,7 @@
             var collapse = !collapsedGroupKeys.has(key);
             if (collapse) collapsedGroupKeys.add(key);
             else          collapsedGroupKeys.delete(key);
+            saveCollapsedGroupKeys();
             setSectionCollapsed(section, collapse);
             syncToggleAllButton();
         });

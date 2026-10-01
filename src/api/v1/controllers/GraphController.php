@@ -13,6 +13,9 @@
  *
  * The folders holding those notes come back next to them, so the view can
  * draw each folder as a hub linked to its notes and to its parent folder.
+ *
+ * A note or a folder whose icon was customised in the sidebar carries that
+ * icon, which the view draws in place of the dot.
  */
 require_once __DIR__ . '/../../../note_loader.php';
 
@@ -45,7 +48,7 @@ class GraphController
                 $workspace = trim($_GET['workspace']);
             }
 
-            $sql = "SELECT id, heading, type, folder, folder_id, favorite
+            $sql = "SELECT id, heading, type, folder, folder_id, favorite, icon, icon_color
                       FROM entries
                      WHERE trash = 0
                        AND type IN ('note', 'markdown', 'tasklist')";
@@ -87,7 +90,7 @@ class GraphController
                     'folder_id' => $folderId !== 0 ? $folderId : null,
                     'type'      => (string) $row['type'],
                     'favorite'  => (int) ($row['favorite'] ?? 0) === 1,
-                ];
+                ] + $this->customIcon($row, defaultNoteIconForType($row['type']));
 
                 $idSet[$id] = true;
                 if ($heading !== '') {
@@ -175,11 +178,11 @@ class GraphController
     /**
      * Folders of the workspace, keyed by id.
      *
-     * @return array<int, array{id: int, name: string, parent_id: ?int}>
+     * @return array<int, array{id: int, name: string, parent_id: ?int, icon: ?string, icon_color: ?string}>
      */
     private function loadFolders(string $workspace): array
     {
-        $sql = 'SELECT id, name, parent_id FROM folders';
+        $sql = 'SELECT id, name, parent_id, icon, icon_color FROM folders';
         $params = [];
         if ($workspace !== '') {
             $sql .= ' WHERE workspace = ?';
@@ -195,18 +198,43 @@ class GraphController
                 'id'        => $id,
                 'name'      => (string) ($row['name'] ?? ''),
                 'parent_id' => $row['parent_id'] !== null ? (int) $row['parent_id'] : null,
-            ];
+            ] + $this->customIcon($row, 'lucide-folder');
         }
         return $folders;
+    }
+
+    /**
+     * The icon of a note or folder as customised in the sidebar. Both keys
+     * are null when nothing was changed; a colour chosen alone comes with
+     * the default icon it tints there.
+     *
+     * @param array<string, mixed> $row
+     * @return array{icon: ?string, icon_color: ?string}
+     */
+    private function customIcon(array $row, string $defaultIcon): array
+    {
+        // Stored as 'lucide-star', 'lucide lucide-star' or a Font Awesome name
+        $icon = (string) convertFontAwesomeToLucide(trim((string) ($row['icon'] ?? '')));
+        $icon = preg_match('/lucide-[a-z0-9-]+/', $icon, $m) ? $m[0] : null;
+
+        $color = trim((string) ($row['icon_color'] ?? ''));
+        if (!poznoteIsSafeCssColor($color)) {
+            $color = null;
+        }
+
+        if ($icon === null && $color === null) {
+            return ['icon' => null, 'icon_color' => null];
+        }
+        return ['icon' => $icon ?? $defaultIcon, 'icon_color' => $color];
     }
 
     /**
      * Keeps the folders that hold at least one graph node, directly or
      * through a subfolder: an empty folder would only add a stray dot.
      *
-     * @param array<int, array{id: int, name: string, parent_id: ?int}> $folders
+     * @param array<int, array{id: int, name: string, parent_id: ?int, icon: ?string, icon_color: ?string}> $folders
      * @param array<int, array<string, mixed>> $nodes
-     * @return array<int, array{id: int, name: string, parent_id: ?int}>
+     * @return array<int, array{id: int, name: string, parent_id: ?int, icon: ?string, icon_color: ?string}>
      */
     private function foldersHoldingNotes(array $folders, array $nodes): array
     {

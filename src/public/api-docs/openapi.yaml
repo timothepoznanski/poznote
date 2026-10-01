@@ -1157,7 +1157,8 @@ paths:
         Returns the graph used by the graph view: one node per non-trashed note
         (note, markdown and tasklist types) and one edge per link between two
         notes. `folders` lists the folders holding at least one of those notes,
-        directly or through a subfolder.
+        directly or through a subfolder. A node or a folder whose icon was
+        customised carries it in `icon` and `icon_color`.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
@@ -1195,6 +1196,13 @@ paths:
                           type: string
                         favorite:
                           type: boolean
+                        icon:
+                          type: string
+                          nullable: true
+                          description: Lucide class of the customised icon (the default icon when only its color was changed), null when nothing was customised
+                        icon_color:
+                          type: string
+                          nullable: true
                   edges:
                     type: array
                     items:
@@ -1215,6 +1223,13 @@ paths:
                           type: string
                         parent_id:
                           type: integer
+                          nullable: true
+                        icon:
+                          type: string
+                          nullable: true
+                          description: Lucide class of the customised icon (`lucide-folder` when only its color was changed), null when nothing was customised
+                        icon_color:
+                          type: string
                           nullable: true
 
   /notes/{id}/backlinks:
