@@ -363,6 +363,12 @@ function handleRichTextPaste(htmlData) {
         }
     });
 
+    // Numbered lists that do not start at 1 (a OneNote list going on after
+    // a picture) keep their numbers (js/bulletlist.js)
+    if (typeof window.applyListStartNumbers === 'function') {
+        window.applyListStartNumbers(doc.body);
+    }
+
     // Remove conflicting attributes from all elements
     var elements = doc.body.querySelectorAll('*');
 

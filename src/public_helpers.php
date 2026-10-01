@@ -215,7 +215,7 @@ function sanitizePublicNoteHtml(string $content): string {
         'source' => ['src', 'srcset', 'type', 'media'],
         'td' => ['colspan', 'rowspan'],
         'th' => ['colspan', 'rowspan', 'scope'],
-        'ol' => ['type'],
+        'ol' => ['type', 'start'],
         'col' => ['span'],
         'colgroup' => ['span'],
         'input' => ['type', 'checked', 'disabled', 'readonly', 'value', 'placeholder'],
@@ -316,6 +316,11 @@ function sanitizePublicNoteHtml(string $content): string {
             } elseif ($name === 'type' && $tag === 'ol') {
                 // A list marker type is one of the five HTML values
                 if (preg_match('/^[1aAiI]$/', $attr->value) !== 1) {
+                    $el->removeAttribute($attr->name);
+                }
+            } elseif ($name === 'start' && $tag === 'ol') {
+                // The first number of a list is a plain integer
+                if (preg_match('/^-?\d{1,6}$/', $attr->value) !== 1) {
                     $el->removeAttribute($attr->name);
                 }
             }

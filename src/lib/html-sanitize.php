@@ -205,6 +205,30 @@ function unescapeMediaInHtml($content) {
 }
 
 /**
+ * Style attribute of a numbered list, brought in line with its start number.
+ *
+ * The editor draws the numbers of an <ol> with the CSS counter "item"
+ * (css/checklists.css), and CSS cannot read the start attribute, so a list
+ * that does not start at 1 carries the matching counter-reset in its style
+ * (#1534: a OneNote list cut in two by a picture went back to 1 after it).
+ * The attribute is what counts: a counter-reset without it is dropped.
+ * js/bulletlist.js does the same on paste, for the note on screen.
+ *
+ * @param string   $style Current style attribute
+ * @param int|null $start Start number, null when the list has none
+ * @return string Style attribute to store, '' for none
+ */
+function poznoteListStartStyle(string $style, ?int $start): string {
+    // The other declarations stay as they are written
+    $style = preg_replace('/(^|;)\s*counter-reset\s*:[^;]*/i', '$1', $style) ?? $style;
+    $style = trim(preg_replace('/;(\s*;)+/', ';', $style) ?? $style, "; \t\n\r");
+    if ($start !== null && $start !== 1) {
+        $style = ($style !== '' ? $style . '; ' : '') . 'counter-reset: item ' . ($start - 1);
+    }
+    return $style !== '' ? $style . ';' : '';
+}
+
+/**
  * Sanitize HTML content to prevent XSS attacks
  * 
  * This function removes dangerous HTML tags and attributes that could be used
@@ -244,7 +268,7 @@ function sanitizeHtml($html) {
         'img' => ['src', 'alt', 'title', 'width', 'height', 'data-is-excalidraw', 'data-excalidraw-note-id'],
         'td' => ['colspan', 'rowspan'],
         'th' => ['colspan', 'rowspan', 'scope'],
-        'ol' => ['type'], // Lettered / roman list markers (#1429)
+        'ol' => ['type', 'start'], // Lettered / roman list markers (#1429), first number (#1534)
         'div' => ['class', 'data-tasklist-json', 'data-markdown-content', 'data-excalidraw', 'data-diagram-id', 'data-task-embed', 'contenteditable'],
         'span' => ['class'],
         'input' => ['type', 'checked', 'disabled'],
@@ -438,11 +462,29 @@ function sanitizeHtml($html) {
             if ($attrName === 'type' && $tagName === 'ol' && !preg_match('/^[1aAiI]$/', $attrValue)) {
                 $attributesToRemove[] = $attrName;
             }
+
+            // The first number of a list is a plain integer
+            if ($attrName === 'start' && $tagName === 'ol' && !preg_match('/^-?\d{1,6}$/', $attrValue)) {
+                $attributesToRemove[] = $attrName;
+            }
         }
         
         // Remove dangerous attributes
         foreach ($attributesToRemove as $attrName) {
             $element->removeAttribute($attrName);
+        }
+
+        if ($tagName === 'ol' && ($element->hasAttribute('start') || stripos($element->getAttribute('style'), 'counter-reset') !== false)) {
+            $start = $element->hasAttribute('start') ? (int)$element->getAttribute('start') : null;
+            if ($start === 1) {
+                $element->removeAttribute('start');
+            }
+            $style = poznoteListStartStyle($element->getAttribute('style'), $start);
+            if ($style !== '') {
+                $element->setAttribute('style', $style);
+            } else {
+                $element->removeAttribute('style');
+            }
         }
     }
     

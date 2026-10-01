@@ -574,15 +574,17 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 }
 
 /* Lettered a) and roman i. lists, laid out as in the editor: the marker in a
-   left-aligned column hanging in the padding (checklists.css, #1429) */
+   left-aligned column hanging in the padding (checklists.css, #1429).
+   The counter has the editor's name: a list that does not start at 1
+   carries its own counter-reset on it (lib/html-sanitize.php, #1534). */
 .diary-journal-body ol:is([type="a"], [type="i"]) {
     list-style: none;
-    counter-reset: pz-list;
+    counter-reset: item;
     padding-left: 2em;
 }
 
 .diary-journal-body ol:is([type="a"], [type="i"])>li {
-    counter-increment: pz-list;
+    counter-increment: item;
 }
 
 .diary-journal-body ol:is([type="a"], [type="i"])>li::before {
@@ -594,11 +596,11 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 }
 
 .diary-journal-body ol[type="a"]>li::before {
-    content: counter(pz-list, lower-alpha) ")";
+    content: counter(item, lower-alpha) ")";
 }
 
 .diary-journal-body ol[type="i"]>li::before {
-    content: counter(pz-list, lower-roman) ".";
+    content: counter(item, lower-roman) ".";
 }
 
 .diary-journal-body :is(ul.task-list, ul.diary-journal-tasks) {

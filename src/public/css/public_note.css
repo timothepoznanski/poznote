@@ -445,14 +445,16 @@ body.public-note-page {
 }
 
 /* Lettered a) and roman i. lists, laid out as in the editor: the marker in a
-   left-aligned column hanging in the padding (checklists.css, #1429) */
+   left-aligned column hanging in the padding (checklists.css, #1429).
+   The counter has the editor's name: a list that does not start at 1
+   carries its own counter-reset on it (lib/html-sanitize.php, #1534). */
 .public-note .content ol:is([type="a"], [type="i"]) {
     list-style: none;
-    counter-reset: pz-list;
+    counter-reset: item;
 }
 
 .public-note .content ol:is([type="a"], [type="i"])>li {
-    counter-increment: pz-list;
+    counter-increment: item;
 }
 
 .public-note .content ol:is([type="a"], [type="i"])>li::before {
@@ -464,11 +466,11 @@ body.public-note-page {
 }
 
 .public-note .content ol[type="a"]>li::before {
-    content: counter(pz-list, lower-alpha) ")";
+    content: counter(item, lower-alpha) ")";
 }
 
 .public-note .content ol[type="i"]>li::before {
-    content: counter(pz-list, lower-roman) ".";
+    content: counter(item, lower-roman) ".";
 }
 
 /* Task list styles */
