@@ -395,6 +395,15 @@ function handleRichTextPaste(htmlData) {
                 el.style.minWidth = '';
             }
 
+            // The weight an Office list sets on itself is the one of its
+            // numbers, which Poznote draws its own way. Left there, it made
+            // every nested item bold and the browser dropped the bold spans
+            // inside them as redundant (#1540). Items keep their own style.
+            if (el.tagName === 'OL' || el.tagName === 'UL') {
+                el.style.fontWeight = '';
+                el.style.fontStyle = '';
+            }
+
             // Clean up empty style attribute
             var styleAttr = el.getAttribute('style').trim();
             if (styleAttr === '' || el.style.length === 0 || /^;+$/.test(styleAttr)) {
