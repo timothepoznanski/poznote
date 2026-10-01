@@ -727,13 +727,13 @@ button.poznote-page-title-workspace-item {
    the title would sit flush against the top edge. The other hosts pad by 20px. */
 .trash-container > .poznote-page-title,
 .dashboard-container > .poznote-page-title,
-.graph-container > .poznote-page-title {
+.graph-head > .poznote-page-title {
     padding-top: 20px;
 }
 
 /* graph.php is a full-height flex column whose canvas takes the leftover space;
-   the title must not stretch or shrink. */
-.graph-container > .poznote-page-title {
+   the block holding the title must not stretch or shrink. */
+.graph-container > .graph-head {
     flex: 0 0 auto;
 }
 

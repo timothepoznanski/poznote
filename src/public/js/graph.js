@@ -41,12 +41,13 @@
     var neighbors = {};        // id -> {otherId: true}
     var rawData = null;        // last /api/v1/graph response, kept to rebuild when folders are toggled
 
-    var svg, viewport, edgesGroup, nodesGroup, tooltip, wrapper;
+    var svg, viewport, edgesGroup, nodesGroup, tooltip, wrapper, head;
     var width = 0, height = 0;
 
     // Pan/zoom transform
     var tx = 0, ty = 0, scale = 1;
     var userInteracted = false;
+    var fitStep = 0;           // how far the fitted view was pushed below the controls, 0 to HEAD_STEPS
 
     // Simulation
     var alpha = 0;
@@ -64,6 +65,9 @@
     var ICON_MIN_SIZE = 13;    // an icon drawn in place of a dot is never smaller than this
     var ICON_SCALE = 1.7;      // size of an icon, as a multiple of the radius of the dot it replaces
     var ICON_BACKDROP = 0.62;  // radius of the disc behind an icon, as a share of its size
+    var HEAD_STEPS = 4;        // fit: the view is pushed below the controls a quarter of their height at a time
+    var HEAD_MARGIN = 24;      // fit: room kept between the controls and the nearest dot
+    var LABEL_REACH = 70;      // fit: how far a note title is taken to run on each side of its dot
     var SPRING_STRENGTH = 0.5;
     var CHARGE = 1500;
     var GRAVITY = 0.04;
@@ -1474,6 +1478,34 @@
         });
     }
 
+    // On a wide window the title, the toolbar and the checkboxes float over
+    // the top of the canvas (css/graph.css): the box they cover, in canvas
+    // pixels, or null where they sit above it
+    function headBox() {
+        if (!head) { return null; }
+        var box = head.getBoundingClientRect();
+        var canvas = svg.getBoundingClientRect();
+        if (box.bottom <= canvas.top + 1) { return null; }
+        return {
+            left: box.left - canvas.left,
+            right: box.right - canvas.left,
+            bottom: box.bottom - canvas.top
+        };
+    }
+
+    // Whether the current view puts a dot, or its title, behind the controls
+    function behindControls(box, margin) {
+        // A title runs to the right of its dot in the tree, under it otherwise
+        var before = margin + (treeMode ? treeLabelRoom() : (showLabels ? LABEL_REACH : 0));
+        var after = margin + (!treeMode && showLabels ? LABEL_REACH : 0);
+        return nodes.some(function (node) {
+            if (!node.visible) { return false; }
+            var x = node.x * scale + tx;
+            return node.y * scale + ty < box.bottom + margin &&
+                x > box.left - before && x < box.right + after;
+        });
+    }
+
     function fitView() {
         if (nodes.length === 0) { return; }
         var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -1488,20 +1520,38 @@
         var pad = treeMode ? TREE_PAD : 60;
         var graphW = Math.max(1, maxX - minX + pad * 2);
         var graphH = Math.max(1, maxY - minY + pad * 2);
-        if (treeMode) {
-            // The titles run to the right of the last column. A tree too
-            // big for the canvas is not shrunk until it fits: it stays
-            // readable and starts at its top left corner.
-            var room = Math.max(1, width - treeLabelRoom());
-            scale = Math.max(TREE_MIN_SCALE, Math.min(TREE_MAX_SCALE, room / graphW, height / graphH));
-            tx = graphW * scale > room ? (pad - minX) * scale : (room - (minX + maxX) * scale) / 2;
-            ty = graphH * scale > height ? (pad - minY) * scale : height / 2 - (minY + maxY) / 2 * scale;
-            applyTransform();
-            return;
+
+        // Fits the graph into the canvas, less a band of that height at its top
+        function place(top) {
+            var tall = Math.max(1, height - top);
+            if (treeMode) {
+                // The titles run to the right of the last column. A tree too
+                // big for the canvas is not shrunk until it fits: it stays
+                // readable and starts at its top left corner.
+                var room = Math.max(1, width - treeLabelRoom());
+                scale = Math.max(TREE_MIN_SCALE, Math.min(TREE_MAX_SCALE, room / graphW, tall / graphH));
+                tx = graphW * scale > room ? (pad - minX) * scale : (room - (minX + maxX) * scale) / 2;
+                ty = top + (graphH * scale > tall ? (pad - minY) * scale : tall / 2 - (minY + maxY) / 2 * scale);
+                return;
+            }
+            scale = Math.min(2, Math.min(width / graphW, tall / graphH));
+            tx = width / 2 - (minX + maxX) / 2 * scale;
+            ty = top + tall / 2 - (minY + maxY) / 2 * scale;
         }
-        scale = Math.min(2, Math.min(width / graphW, height / graphH));
-        tx = width / 2 - (minX + maxX) / 2 * scale;
-        ty = height / 2 - (minY + maxY) / 2 * scale;
+
+        // The graph takes the whole canvas as long as nothing ends up behind
+        // the controls; otherwise it is pushed down, no further than needed.
+        // Going back up asks for more room than staying put, so a graph still
+        // settling does not hop between two steps.
+        var box = headBox();
+        var step = 0;
+        place(0);
+        while (box && step < HEAD_STEPS &&
+                behindControls(box, step < fitStep ? HEAD_MARGIN * 2 : HEAD_MARGIN)) {
+            step++;
+            place(box.bottom * step / HEAD_STEPS);
+        }
+        fitStep = step;
         applyTransform();
     }
 
@@ -1884,6 +1934,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         wrapper = document.getElementById('graphCanvasWrapper');
+        head = document.getElementById('graphHead');
         svg = document.getElementById('graphSvg');
         tooltip = document.getElementById('graphTooltip');
 

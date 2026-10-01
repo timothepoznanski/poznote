@@ -11,8 +11,9 @@ body.graph-page {
 }
 
 body.graph-page {
+    --graph-page-bg: var(--pz-surface);
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    background: var(--pz-surface);
+    background: var(--graph-page-bg);
     overflow: hidden;
 }
 
@@ -30,10 +31,9 @@ body.graph-page {
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    /* The buttons sit close under the title, the checkboxes a little apart
-       from them */
-    gap: 18px 12px;
-    padding: 2px 14px 10px;
+    /* The buttons sit close under the title */
+    gap: 12px;
+    padding: 2px 14px 0;
     /* Transparent so the page background shows through, matching the filter
        rows on the other pages now that the title sits above it. */
     background: transparent;
@@ -77,14 +77,15 @@ body.graph-page {
     gap: 12px;
 }
 
-/* The checkboxes, on a line of their own under the rest of the toolbar */
+/* The checkboxes, on a line of their own under the toolbar, a little apart
+   from its buttons */
 .graph-checks {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    flex-basis: 100%;
     gap: 6px 14px;
+    padding: 18px 14px 10px;
 }
 
 .graph-orphans-toggle {
@@ -442,7 +443,7 @@ body.graph-page {
 /* Dark mode ------------------------------------------------------------- */
 
 html[data-theme='dark'] body.graph-page {
-    background: var(--pz-chrome-bg, var(--pz-bg));
+    --graph-page-bg: var(--pz-chrome-bg, var(--pz-bg));
 }
 
 html[data-theme='dark'] .graph-toolbar {
@@ -548,10 +549,42 @@ html[data-theme='dark'] .graph-tooltip-meta {
 
 /* Responsive ------------------------------------------------------------ */
 
+/* Wide windows: the canvas takes the whole page and the title, the toolbar
+   and the checkboxes float over the top of it, so the graph also shows on
+   both sides of them. Their block is no wider than what it holds and has the
+   color of the page, which hides what passes right behind it. */
+@media (min-width: 641px) {
+    .graph-container {
+        position: relative;
+    }
+
+    .graph-canvas-wrapper {
+        position: absolute;
+        inset: 0;
+    }
+
+    .graph-head {
+        position: relative;
+        z-index: 1;
+        width: fit-content;
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0 10px;
+        border-radius: 0 0 var(--pz-radius-xl) var(--pz-radius-xl);
+        background: var(--graph-page-bg);
+    }
+
+    /* The block is sized by what it holds: the open search field has its
+       full width there, or it would push the buttons to a second row */
+    .graph-search-wrapper {
+        flex: 0 0 340px;
+    }
+}
+
 @media (max-width: 640px) {
     .graph-toolbar {
         gap: 12px 8px;
-        padding: 2px 10px 8px;
+        padding: 2px 10px 0;
     }
 
     /* The checkboxes keep to one line: a label that does not fit is cut
@@ -560,6 +593,7 @@ html[data-theme='dark'] .graph-tooltip-meta {
         flex-wrap: nowrap;
         gap: 10px;
         min-width: 0;
+        padding: 12px 10px 8px;
     }
 
     .graph-orphans-toggle {
