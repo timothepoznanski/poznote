@@ -2388,16 +2388,17 @@ html.dashboard-note-modal-open body {
 }
 
 @media (max-width: 800px) {
+    /* Still a dialog on a phone: a thin margin all around, the board showing
+       through behind it */
     .dashboard-note-modal {
-        padding: 0;
+        padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
     }
 
     #dashboardNoteModal .dashboard-note-modal-content {
         width: 100%;
         max-width: none;
-        height: 100dvh;
-        padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
-        border-radius: 0;
+        height: 100%;
+        padding: 14px;
     }
 
     /* 16px: iOS zooms into a smaller field on focus */
