@@ -216,6 +216,28 @@ document.addEventListener('DOMContentLoaded', function () {
         flushPendingImageDeletions(false, true);
     });
 
+    // Deletes them all now and resolves once the server is done, one request
+    // after the other. For an action that copies the note as the server
+    // holds it (commitOpenNoteBeforeCopy): a copy made while they wait gets
+    // the removed pictures as attachments (#1535).
+    window.deletePendingNoteImagesNow = function () {
+        const removed = [];
+        pendingImageDeletions.forEach(function (pending, attachmentId) {
+            pendingImageDeletions.delete(attachmentId);
+            if (!isImageStillInNote(pending)) removed.push(pending);
+        });
+
+        return removed.reduce(function (previous, pending) {
+            return previous.then(function () {
+                return fetch('/api/v1/notes/' + pending.noteId + '/attachments/' + pending.attachmentId, {
+                    method: 'DELETE',
+                    headers: { 'Accept': 'application/json' },
+                    credentials: 'same-origin'
+                }).catch(function () { /* the copy goes on with one picture too many */ });
+            });
+        }, Promise.resolve());
+    };
+
     // Listen for note content changes via mutation observer (e.g., for checklists and image deletions)
     const rightCol = document.getElementById('right_col');
     if (rightCol) {

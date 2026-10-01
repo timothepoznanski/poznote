@@ -425,12 +425,16 @@ function archiveFolderErrorMessage(status, data) {
 function duplicateFolder(folderId, folderName) {
     var ws = typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '';
 
-    fetch('/api/v1/folders/' + encodeURIComponent(folderId) + '/duplicate?workspace=' + encodeURIComponent(ws || ''), {
-        method: 'POST',
-        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-        credentials: 'same-origin',
-        body: '{}'
-    })
+    // The open note may be one of the folder's (utils-note-create.js)
+    commitOpenNoteBeforeCopy()
+        .then(function () {
+            return fetch('/api/v1/folders/' + encodeURIComponent(folderId) + '/duplicate?workspace=' + encodeURIComponent(ws || ''), {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: '{}'
+            });
+        })
         .then(function (response) { return response.json(); })
         .then(function (data) {
             if (data.success) {
