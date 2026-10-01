@@ -2684,8 +2684,6 @@
     "show_offline_dots": "Показывать точки офлайн",
     "hide_offline_dots": "Скрыть точки офлайн",
     "view_options": "Параметры вида",
-    "expand_all_folders_hint": "Развернуть все папки дерева",
-    "collapse_all_folders_hint": "Свернуть все папки дерева",
     "customize": "Настроить боковую панель",
     "customize_hint": "Выбрать, какие элементы боковой панели показывать"
   },

@@ -934,8 +934,6 @@
     "show_offline_dots": "Offline-Punkte anzeigen",
     "hide_offline_dots": "Offline-Punkte ausblenden",
     "view_options": "Ansichtsoptionen",
-    "expand_all_folders_hint": "Alle Ordner des Baums öffnen",
-    "collapse_all_folders_hint": "Alle Ordner des Baums schließen",
     "customize": "Seitenleiste anpassen",
     "customize_hint": "Auswählen, welche Elemente der Seitenleiste angezeigt werden"
   },

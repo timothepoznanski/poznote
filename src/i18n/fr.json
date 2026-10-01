@@ -934,8 +934,6 @@
     "show_offline_dots": "Afficher les points hors ligne",
     "hide_offline_dots": "Masquer les points hors ligne",
     "view_options": "Options d'affichage",
-    "expand_all_folders_hint": "Ouvrir tous les dossiers de l'arborescence",
-    "collapse_all_folders_hint": "Fermer tous les dossiers de l'arborescence",
     "customize": "Personnaliser la barre latérale",
     "customize_hint": "Choisir les éléments affichés dans la barre latérale"
   },

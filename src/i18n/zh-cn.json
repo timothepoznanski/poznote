@@ -933,8 +933,6 @@
     "show_offline_dots": "显示离线圆点",
     "hide_offline_dots": "隐藏离线圆点",
     "view_options": "视图选项",
-    "expand_all_folders_hint": "展开树中的所有文件夹",
-    "collapse_all_folders_hint": "折叠树中的所有文件夹",
     "customize": "自定义侧边栏",
     "customize_hint": "选择侧边栏中显示的元素"
   },

@@ -934,8 +934,6 @@
     "show_offline_dots": "Mostrar los puntos sin conexión",
     "hide_offline_dots": "Ocultar los puntos sin conexión",
     "view_options": "Opciones de vista",
-    "expand_all_folders_hint": "Abrir todas las carpetas del árbol",
-    "collapse_all_folders_hint": "Cerrar todas las carpetas del árbol",
     "customize": "Personalizar la barra lateral",
     "customize_hint": "Elegir qué elementos de la barra lateral se muestran"
   },

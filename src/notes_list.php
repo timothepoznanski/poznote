@@ -173,8 +173,8 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
 
 <?php
 // $showAccountRows, $activeAccountProfile and $otherAccountProfiles are decided
-// by index.php before the sidebar header ("Expand all folders" moves between
-// the view options menu and the account row below).
+// by index.php before the sidebar header (the "Expand all folders" button
+// moves between the row after Favorites and the account row below).
 $otherAccountProfiles = $otherAccountProfiles ?? [];
 $activeAccountProfile = $activeAccountProfile ?? null;
 $showAccountRows = !empty($showAccountRows);
@@ -202,7 +202,7 @@ $renderOtherAccounts = static function (array $profiles): void {
             . '<span class="other-account-name">' . $name . '</span>'
             . '</button>'
             . '<button type="button" class="other-account-folders" data-other-account="folders" title="' . $expandFoldersLabel . '" aria-label="' . $expandFoldersLabel . '">'
-            . '<i class="lucide lucide-chevrons-up-down" aria-hidden="true"></i>'
+            . '<i class="lucide lucide-chevron-down" aria-hidden="true"></i>'
             . '</button>'
             . '<button type="button" class="other-account-open" data-other-account="open" title="' . $openLabel . '" aria-label="' . $openLabel . '">'
             . '<i class="lucide lucide-arrow-right" aria-hidden="true"></i>'
@@ -222,7 +222,7 @@ $renderOtherAccounts = static function (array $profiles): void {
 // whole own tree), with the "Expand all folders" button at its end, where the
 // other rows carry their "Open this account" arrow. Only where several
 // accounts are reachable: with a single one no row names the tree and the
-// action stays in the view options menu.
+// button stays on the row after Favorites, left of the view options toggle.
 if ($showAccountRows):
     $activeAccountName = htmlspecialchars((string)($activeAccountProfile['username'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 ?>
@@ -641,12 +641,15 @@ if ($favoritesFolder && ($favorites_count > 0 || (!empty($favorite_folders) && !
     }
 }
 
-// View options toggle (sort mode, "Expand all folders", offline dots), built by
-// index.php, at the right end of a thin rule between Favorites and the rest of
-// the tree (at the top of the tree when there are no favorites). Its menu is
-// rendered below, with the other shared menus.
-if (!empty($treeOptionsButton)) {
-    echo '<div class="notes-list-actions">' . $treeOptionsButton . '</div>';
+// "Expand all folders" and, to its right, the view options toggle (sort mode,
+// offline dots), built by index.php, at the right end of a thin rule between
+// Favorites and the rest of the tree (at the top of the tree when there are no
+// favorites). With account rows the expand button heads the active account's
+// row instead. The menu of the toggle is rendered below, with the other shared
+// menus.
+$notesListActions = (empty($showAccountRows) ? $expandFoldersButton : '') . ($treeOptionsButton ?? '');
+if ($notesListActions !== '') {
+    echo '<div class="notes-list-actions">' . $notesListActions . '</div>';
 }
 
 // Add drop zone for moving notes to root (no folder)

@@ -934,8 +934,6 @@
     "show_offline_dots": "Mostrar os pontos offline",
     "hide_offline_dots": "Ocultar os pontos offline",
     "view_options": "Opções de exibição",
-    "expand_all_folders_hint": "Abrir todas as pastas da árvore",
-    "collapse_all_folders_hint": "Fechar todas as pastas da árvore",
     "customize": "Personalizar a barra lateral",
     "customize_hint": "Escolher quais elementos da barra lateral são exibidos"
   },

@@ -3,12 +3,11 @@
 // ============================================================================
 // The three-dot toggle at the right end of the rule after Favorites
 // (#sidebarTreeOptionsBtn, notes_list.php) opens #tree-options-menu, rendered
-// by index.php: the sort mode, "Expand all folders" and the offline dots.
+// by index.php: the sort mode and the offline dots.
 //
 // This file only opens, places and closes the menu. Each item keeps the
 // data-action its former button had, handled where it was:
 //   set-note-sort       js/note-sort-cycle.js
-//   toggle-all-folders  js/index-events.js (label kept by utils-folder-tree.js)
 //   toggle-offline-dots js/offline-marks.js
 //
 // Both the toggle and the menu are rendered inside #left_col, so a sidebar
@@ -54,9 +53,6 @@
         var menu = getMenu();
         if (!menu || typeof adjustMenuPosition !== 'function') return;
         closeOtherMenus();
-        // The label and icon of "Expand all folders" follow the folders
-        // opened or closed one by one since the last refresh
-        if (typeof window.updateToggleAllFoldersButton === 'function') window.updateToggleAllFoldersButton();
         if (typeof syncActionsMenuSeparators === 'function') syncActionsMenuSeparators(menu);
         menu.classList.add('show');
         markToggle(true);

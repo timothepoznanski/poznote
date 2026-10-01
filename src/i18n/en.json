@@ -2683,8 +2683,6 @@
     "show_offline_dots": "Show offline dots",
     "hide_offline_dots": "Hide offline dots",
     "view_options": "View options",
-    "expand_all_folders_hint": "Open every folder of the tree",
-    "collapse_all_folders_hint": "Close every folder of the tree",
     "customize": "Customize sidebar",
     "customize_hint": "Choose which elements of the sidebar are shown"
   },
