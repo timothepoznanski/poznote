@@ -34,6 +34,7 @@
 
     var nodes = [];            // {id, title, folder, folderSlot, degree, x, y, vx, vy, el, labelEl, circleEl, orphan}
                                // a folder hub adds {isFolder: true, noteCount, ring}, its id is 'f' + folder id
+                               // an icon customised in the sidebar adds {icon, iconColor, shape, iconSize, iconEl}
     var edges = [];            // {source: node, target: node, el}; {membership: true} ties a note or subfolder to its folder
     var nodeById = {};
     var hubs = [];             // the folder nodes
@@ -59,6 +60,10 @@
     var TREE_LABEL_ROOM = 190; // tree view: screen width kept for the note titles
     var TREE_PAD = 24;         // tree view: margin around the tree
     var TREE_MIN_SCALE = 0.85; // tree view: below this a folder name runs into the row above
+    var TREE_MAX_SCALE = 1.3;  // tree view: a small tree is not blown up further than this
+    var ICON_MIN_SIZE = 13;    // an icon drawn in place of a dot is never smaller than this
+    var ICON_SCALE = 1.7;      // size of an icon, as a multiple of the radius of the dot it replaces
+    var ICON_BACKDROP = 0.62;  // radius of the disc behind an icon, as a share of its size
     var SPRING_STRENGTH = 0.5;
     var CHARGE = 1500;
     var GRAVITY = 0.04;
@@ -66,7 +71,9 @@
 
     var showOrphans = true;
     var showLabels = true;
-    var showFolders = false;
+    var showFolders = false;       // network view: folder hubs, off until asked for
+    var showTreeFolders = true;    // tree view: the folders it is built on, on until hidden
+    var showIcons = true;      // icons customised in the sidebar are drawn in place of the dots
     var treeMode = false;      // tree view: folders, subfolders and notes in columns, no simulation
     var searchTerm = '';
     var folderFilter = '';     // '' = all folders
@@ -75,8 +82,11 @@
     var PREF_SHOW_ORPHANS = 'graph-show-orphans';
     var PREF_SHOW_LABELS = 'graph-show-labels';
     var PREF_SHOW_FOLDERS = 'graph-show-folders';
+    var PREF_TREE_SHOW_FOLDERS = 'graph-tree-show-folders';
+    var PREF_SHOW_ICONS = 'graph-show-icons';
     var PREF_TREE_LAYOUT = 'graph-tree-layout';
     var PREF_POSITIONS = 'graph-positions';
+    var PREF_TREE_OFFSETS = 'graph-tree-offsets';
 
     function prefStorage() {
         return window.__poznoteUserStorage || window.localStorage;
@@ -118,7 +128,7 @@
 
     // The tree view is built on the folders, whatever the "Folders" box says
     function hubsShown() {
-        return showFolders || treeMode;
+        return treeMode ? showTreeFolders : showFolders;
     }
 
     function isFolderId(id) {
@@ -159,6 +169,67 @@
         } catch (e) { /* storage unavailable */ }
     }
 
+    // Tree view: a node dragged aside is remembered by how far it sits from
+    // the place the tree gives it, which changes with the canvas and with
+    // what is shown.
+    function treeOffsetsKey() {
+        var workspace = getPageWorkspace();
+        return PREF_TREE_OFFSETS + (workspace ? ':' + workspace : '');
+    }
+
+    function loadTreeOffsets() {
+        try {
+            var parsed = JSON.parse(prefStorage().getItem(treeOffsetsKey()) || 'null');
+            return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function restoreTreeOffsets() {
+        var saved = loadTreeOffsets();
+        nodes.forEach(function (node) {
+            var offset = saved[node.id];
+            var valid = offset && offset.length === 2 && isFinite(offset[0]) && isFinite(offset[1]);
+            node.treeDx = valid ? offset[0] : 0;
+            node.treeDy = valid ? offset[1] : 0;
+        });
+    }
+
+    function clearTreeOffsets() {
+        try {
+            prefStorage().removeItem(treeOffsetsKey());
+        } catch (e) { /* storage unavailable */ }
+    }
+
+    function saveTreeOffsets() {
+        var offsets = {};
+        var any = false;
+        if (!hubsShown()) {
+            // The folders are not on screen: keep how far they were taken
+            var saved = loadTreeOffsets();
+            Object.keys(saved).forEach(function (id) {
+                if (isFolderId(id)) {
+                    offsets[id] = saved[id];
+                    any = true;
+                }
+            });
+        }
+        nodes.forEach(function (node) {
+            if (node.treeDx || node.treeDy) {
+                offsets[node.id] = [Math.round(node.treeDx * 10) / 10, Math.round(node.treeDy * 10) / 10];
+                any = true;
+            }
+        });
+        try {
+            if (any) {
+                prefStorage().setItem(treeOffsetsKey(), JSON.stringify(offsets));
+            } else {
+                prefStorage().removeItem(treeOffsetsKey());
+            }
+        } catch (e) { /* storage unavailable */ }
+    }
+
     /* --------------------------------------------------------------------- */
     /* Data loading                                                            */
     /* --------------------------------------------------------------------- */
@@ -189,6 +260,7 @@
             }
             rawData = data;
             initFoldersToggle(data.folders || []);
+            initIconsToggle(data);
             initTreeToggle(data.folders || []);
             populateFolderFilter(folderNamesOf(data.nodes));
             buildGraph(false);
@@ -283,6 +355,8 @@
                 folder: raw.folder || '',
                 folderId: raw.folder_id,
                 folderSlot: raw.folder && folderSlots[raw.folder] !== undefined ? folderSlots[raw.folder] : -1,
+                icon: raw.icon || '',
+                iconColor: iconColorCss(raw.icon_color),
                 x: Math.cos(angle) * radius,
                 y: Math.sin(angle) * radius
             });
@@ -322,6 +396,8 @@
                 title: raw.name,
                 folder: raw.name,
                 folderSlot: folderSlots[raw.name] !== undefined ? folderSlots[raw.name] : -1,
+                icon: raw.icon || '',
+                iconColor: iconColorCss(raw.icon_color),
                 isFolder: true,
                 parentId: raw.parent_id,
                 noteCount: notes.length,
@@ -372,13 +448,20 @@
         nodes.forEach(function (node) {
             node.orphan = node.degree === 0;
             node.radius = node.isFolder
-                ? Math.min(18, 7 + 1.4 * Math.sqrt(node.degree))
-                : Math.min(16, 4 + 2.2 * Math.sqrt(node.degree));
+                ? Math.min(15, 6 + 1.2 * Math.sqrt(node.degree))
+                : Math.min(13, 3.5 + 1.8 * Math.sqrt(node.degree));
+            // An icon takes the place of the dot, at a size that stays
+            // readable; the radius becomes the disc drawn behind it.
+            node.shape = showIcons && node.icon ? iconShape(node.icon) : null;
+            if (node.shape) {
+                node.iconSize = Math.max(ICON_MIN_SIZE, node.radius * ICON_SCALE);
+                node.radius = node.iconSize * ICON_BACKDROP;
+            }
         });
 
         assignComponents();
+        restoreTreeOffsets();
         restorePinnedPositions();
-        updateSeparateButton();
 
         renderSvg();
         applySearch();
@@ -391,13 +474,124 @@
         return Math.min(SPRING_LENGTH * 3, Math.max(SPRING_LENGTH, noteCount * 2.5));
     }
 
+    /* --------------------------------------------------------------------- */
+    /* Icons                                                                   */
+    /* --------------------------------------------------------------------- */
+
+    // Lucide icons are CSS masks (css/lucide.css), which an SVG shape cannot
+    // take: the drawing of an icon is read back from the mask of a probe
+    // element and inlined, once per icon. null for a class the stylesheet
+    // does not know, whose node then keeps its dot.
+    var iconShapes = {};       // icon class -> <svg> to clone, or null
+
+    function iconShape(iconClass) {
+        if (Object.prototype.hasOwnProperty.call(iconShapes, iconClass)) {
+            return iconShapes[iconClass];
+        }
+        var shape = null;
+        var probe = document.createElement('i');
+        probe.className = 'lucide ' + iconClass;
+        document.body.appendChild(probe);
+        var style = window.getComputedStyle(probe);
+        var mask = style.maskImage || style.webkitMaskImage || '';
+        document.body.removeChild(probe);
+
+        var match = /^url\(["']?data:image\/svg\+xml,(.+?)["']?\)$/.exec(mask);
+        if (match) {
+            try {
+                var source = new DOMParser()
+                    .parseFromString(decodeURIComponent(match[1]), 'image/svg+xml').documentElement;
+                if (source.nodeName === 'svg') {
+                    shape = document.createElementNS(SVG_NS, 'svg');
+                    shape.setAttribute('class', 'graph-icon');
+                    ['viewBox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin'].forEach(function (name) {
+                        if (source.hasAttribute(name)) {
+                            shape.setAttribute(name, source.getAttribute(name));
+                        }
+                    });
+                    Array.prototype.forEach.call(source.children, function (child) {
+                        shape.appendChild(document.importNode(child, true));
+                    });
+                }
+            } catch (e) {
+                shape = null;
+            }
+        }
+        iconShapes[iconClass] = shape;
+        return shape;
+    }
+
+    // Outside the tree view an icon stays within the sizes the tree shows it
+    // at, however far the graph is zoomed in or out: the factor that undoes
+    // the rest of the zoom.
+    function iconZoom() {
+        if (treeMode) { return 1; }
+        return Math.max(TREE_MIN_SCALE, Math.min(TREE_MAX_SCALE, scale)) / scale;
+    }
+
+    // Radius of a node as drawn: the disc behind an icon follows the icon
+    function drawnRadius(node) {
+        return node.shape ? node.radius * iconZoom() : node.radius;
+    }
+
+    var iconZoomApplied = null;
+
+    function updateIconSizes() {
+        var zoom = iconZoom();
+        if (zoom === iconZoomApplied) { return; }
+        iconZoomApplied = zoom;
+        nodes.forEach(function (node) {
+            if (!node.iconEl) { return; }
+            var size = node.iconSize * zoom;
+            node.iconEl.setAttribute('x', String(-size / 2));
+            node.iconEl.setAttribute('y', String(-size / 2));
+            node.iconEl.setAttribute('width', String(size));
+            node.iconEl.setAttribute('height', String(size));
+            node.circleEl.setAttribute('r', String(node.radius * zoom));
+        });
+    }
+
+    // The box is offered once something was customised; unticked, every
+    // node is back to its dot.
+    function initIconsToggle(data) {
+        var toggle = document.getElementById('graphShowIcons');
+        var customised = function (raw) { return !!raw.icon; };
+        if (!toggle || !(data.nodes.some(customised) || (data.folders || []).some(customised))) { return; }
+        showIcons = readPref(PREF_SHOW_ICONS) !== false;
+        toggle.checked = showIcons;
+        toggle.parentNode.classList.remove('initially-hidden');
+        toggle.addEventListener('change', function () {
+            showIcons = toggle.checked;
+            savePref(PREF_SHOW_ICONS, showIcons);
+            buildGraph(true);
+            draw();
+        });
+    }
+
+    // A palette color follows the theme through its token (js/color-palette.js)
+    function iconColorCss(color) {
+        if (!color) { return ''; }
+        return window.poznoteIconColorCss ? window.poznoteIconColorCss(color) : color;
+    }
+
     function initFoldersToggle(rawFolders) {
         var toggle = document.getElementById('graphShowFolders');
         if (!toggle || rawFolders.length === 0) { return; }
+        // One choice per view: the network starts without its folders, the
+        // tree with them
         showFolders = readPref(PREF_SHOW_FOLDERS) === true;
-        toggle.checked = showFolders;
+        showTreeFolders = readPref(PREF_TREE_SHOW_FOLDERS) !== false;
+        toggle.checked = hubsShown();
         toggle.parentNode.classList.remove('initially-hidden');
         toggle.addEventListener('change', function () {
+            if (treeMode) {
+                showTreeFolders = toggle.checked;
+                savePref(PREF_TREE_SHOW_FOLDERS, showTreeFolders);
+                buildGraph(false);
+                userInteracted = false;
+                fitView();
+                return;
+            }
             showFolders = toggle.checked;
             savePref(PREF_SHOW_FOLDERS, showFolders);
             buildGraph(!showFolders);
@@ -413,7 +607,7 @@
     /* --------------------------------------------------------------------- */
 
     function initTreeToggle(rawFolders) {
-        var btn = document.getElementById('graphTreeLayout');
+        var btn = document.getElementById('graphViewToggle');
         if (!btn || rawFolders.length === 0) { return; }
         treeMode = readPref(PREF_TREE_LAYOUT) === true;
         btn.classList.remove('initially-hidden');
@@ -437,14 +631,21 @@
         });
     }
 
-    // The tree is laid out by rule: nothing to drag, pin, reset or separate,
-    // and the folders are always part of it.
+    // The tree is laid out by rule: nothing to pin or separate, and a node
+    // only moves when it is taken somewhere (Ctrl + drag).
     function syncTreeUi() {
-        var btn = document.getElementById('graphTreeLayout');
-        if (btn) { btn.setAttribute('aria-pressed', treeMode ? 'true' : 'false'); }
+        // The view button shows the icon of the view on screen
+        var btn = document.getElementById('graphViewToggle');
+        if (btn) {
+            btn.firstElementChild.className = 'lucide ' + (treeMode ? 'lucide-folder-tree' : 'lucide-share-2');
+            var name = btn.getAttribute('data-txt-view') + ' · ' + btn.getAttribute(treeMode ? 'data-txt-tree' : 'data-txt-network');
+            btn.title = name;
+            btn.setAttribute('aria-label', name);
+        }
         wrapper.classList.toggle('tree-layout', treeMode);
+        // The "Folders" box shows the choice made for the view on screen
         var foldersToggle = document.getElementById('graphShowFolders');
-        if (foldersToggle) { foldersToggle.parentNode.classList.toggle('initially-hidden', treeMode); }
+        if (foldersToggle) { foldersToggle.checked = hubsShown(); }
     }
 
     // Columns from left to right, as in a file explorer: what a folder holds
@@ -538,6 +739,15 @@
             note.y = row * TREE_ROW;
             row++;
         });
+
+        // A node dragged aside keeps its distance from its place in the tree
+        nodes.forEach(function (node) {
+            if (!node.visible) { return; }
+            node.treeX = node.x;
+            node.treeY = node.y;
+            node.x += node.treeDx;
+            node.y += node.treeDy;
+        });
     }
 
     function treeLabelRoom() {
@@ -556,24 +766,109 @@
                 'V' + to.y.toFixed(1) +
                 'H' + to.x.toFixed(1);
         }
-        var bow = Math.min(140, 24 + Math.abs(to.y - from.y) * 0.3);
+        var bow = treeLinkBow(from, to);
         return 'M' + from.x.toFixed(1) + ' ' + from.y.toFixed(1) +
             'C' + (from.x + bow).toFixed(1) + ' ' + from.y.toFixed(1) +
             ' ' + (to.x + bow).toFixed(1) + ' ' + to.y.toFixed(1) +
             ' ' + to.x.toFixed(1) + ' ' + to.y.toFixed(1);
     }
 
-    // The folder filter: a button showing the current choice, which opens a
-    // dialog listing the folders under a field that narrows the list.
+    function treeLinkBow(from, to) {
+        return Math.min(140, 24 + Math.abs(to.y - from.y) * 0.3);
+    }
+
+    /* --------------------------------------------------------------------- */
+    /* Lines under the pointer                                                 */
+    /* --------------------------------------------------------------------- */
+
+    // The points a line is drawn through, in either view (a curve is cut
+    // into short straight pieces)
+    function edgePoints(edge) {
+        if (!treeMode) {
+            return [[edge.source.x, edge.source.y], [edge.target.x, edge.target.y]];
+        }
+        var from = edge.target;
+        var to = edge.source;
+        if (edge.membership) {
+            var mid = (from.x + to.x) / 2;
+            return [[from.x, from.y], [mid, from.y], [mid, to.y], [to.x, to.y]];
+        }
+        var bow = treeLinkBow(from, to);
+        var points = [];
+        for (var i = 0; i <= 16; i++) {
+            var t = i / 16;
+            var u = 1 - t;
+            points.push([
+                u * u * u * from.x + 3 * u * u * t * (from.x + bow) + 3 * u * t * t * (to.x + bow) + t * t * t * to.x,
+                u * u * u * from.y + 3 * u * u * t * from.y + 3 * u * t * t * to.y + t * t * t * to.y
+            ]);
+        }
+        return points;
+    }
+
+    function distanceToSegment(x, y, a, b) {
+        var dx = b[0] - a[0];
+        var dy = b[1] - a[1];
+        var length2 = dx * dx + dy * dy;
+        var t = length2 ? Math.max(0, Math.min(1, ((x - a[0]) * dx + (y - a[1]) * dy) / length2)) : 0;
+        return Math.hypot(x - a[0] - t * dx, y - a[1] - t * dy);
+    }
+
+    // The line passing within reach of a point of the graph, the closest one.
+    // A line is too thin to be aimed at: it is found by distance instead.
+    function edgeAt(x, y, reach) {
+        var found = null;
+        edges.forEach(function (edge) {
+            if (!edge.visible) { return; }
+            var points = edgePoints(edge);
+            for (var i = 1; i < points.length; i++) {
+                var distance = distanceToSegment(x, y, points[i - 1], points[i]);
+                if (distance < reach) {
+                    reach = distance;
+                    found = edge;
+                }
+            }
+        });
+        return found;
+    }
+
+    // What a line carries when it is dragged: the folder it comes from with
+    // all that folder holds, down to the last note; for a link between two
+    // notes, the two notes.
+    function lineNodes(edge) {
+        if (!edge.membership) { return [edge.source, edge.target]; }
+        var held = {};             // folder id -> [what it holds]
+        edges.forEach(function (other) {
+            if (other.membership && other.visible) {
+                (held[other.target.id] = held[other.target.id] || []).push(other.source);
+            }
+        });
+        var group = [edge.target];
+        var seen = {};
+        seen[edge.target.id] = true;
+        for (var i = 0; i < group.length; i++) {
+            (held[group[i].id] || []).forEach(function (node) {
+                if (!seen[node.id]) {
+                    seen[node.id] = true;
+                    group.push(node);
+                }
+            });
+        }
+        return group;
+    }
+
+    // The folder filter: a folder icon, lit and named after the folder while
+    // one is picked, which opens a dialog listing the folders under a field
+    // that narrows the list.
     function populateFolderFilter(folderNames) {
         var btn = document.getElementById('graphFolderFilterBtn');
-        var label = document.getElementById('graphFolderFilterLabel');
         var modal = document.getElementById('graphFolderModal');
         var search = document.getElementById('graphFolderSearch');
         var list = document.getElementById('graphFolderList');
         var closeBtn = document.getElementById('graphFolderModalClose');
-        if (!btn || !label || !modal || !search || !list || folderNames.length === 0) { return; }
-        var allLabel = label.textContent;
+        if (!btn || !modal || !search || !list || folderNames.length === 0) { return; }
+        var allLabel = btn.getAttribute('data-txt-all') || '';
+        var hint = btn.title;
 
         function isOpen() {
             return modal.style.display === 'flex';
@@ -586,7 +881,8 @@
 
         function choose(name) {
             folderFilter = name;
-            label.textContent = name === '' ? allLabel : name;
+            btn.title = name === '' ? hint : name;
+            btn.setAttribute('aria-label', btn.title);
             btn.classList.toggle('is-filtering', name !== '');
             close();
             updateVisibility();
@@ -696,10 +992,22 @@
                 node.pinned = true;
             }
         });
-        updateResetButton();
     }
 
     function resetLayout() {
+        if (treeMode) {
+            // Back to the places the tree gives; the graph keeps its own
+            nodes.forEach(function (node) {
+                node.treeDx = 0;
+                node.treeDy = 0;
+            });
+            clearTreeOffsets();
+            layoutTree();
+            draw();
+            userInteracted = false;
+            fitView();
+            return;
+        }
         clearSavedPositions();
         nodes.forEach(function (node) {
             node.pinned = false;
@@ -707,60 +1015,49 @@
             node.vy = 0;
         });
         userInteracted = false;
-        updateResetButton();
+        updateSeparateButton();
         startSimulation(1);
     }
 
-    function updateResetButton() {
-        var btn = document.getElementById('graphResetLayout');
-        if (!btn) { return; }
-        var anyPinned = nodes.some(function (node) { return node.pinned; });
-        btn.classList.toggle('initially-hidden', !anyPinned || treeMode);
-    }
-
-    // Lays the connected groups out side by side in rows, the ones on screen
-    // first. A group moves as one block, so its own arrangement is kept, and
-    // is pinned where it lands, exactly as if it had been dragged there:
-    // "Reset layout" undoes it. The notes linked to nothing are not a group
-    // each: they stay together, as one block of dots placed last.
-    function separateGroups() {
-        // Groups are packed by their extent: let a running simulation settle
-        while (alpha > 0.005) {
-            simulate();
-            alpha *= 0.985;
-        }
-
+    // Where "Separate groups" puts every node: the connected groups side by
+    // side in rows, the ones on screen first. A group moves as one block, so
+    // its own arrangement is kept. The notes linked to nothing are not a
+    // group each: they stay together, as one block of dots placed last.
+    // Nothing is moved here; null when there is a single group.
+    function separatedPositions() {
         var byComponent = {};
         var groups = [];
         nodes.forEach(function (node) {
             var group = byComponent[node.component];
             if (!group) {
-                group = { nodes: [], minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity, visible: false };
+                group = { members: [], minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity, visible: false };
                 byComponent[node.component] = group;
                 groups.push(group);
             }
-            group.nodes.push(node);
+            group.members.push({ node: node, x: node.x, y: node.y });
             group.minX = Math.min(group.minX, node.x);
             group.minY = Math.min(group.minY, node.y);
             group.maxX = Math.max(group.maxX, node.x);
             group.maxY = Math.max(group.maxY, node.y);
             if (node.visible) { group.visible = true; }
         });
-        if (groups.length < 2) { return; }
+        if (groups.length < 2) { return null; }
 
-        var lone = groups.filter(function (group) { return group.nodes.length === 1; });
+        var lone = groups.filter(function (group) { return group.members.length === 1; });
         if (lone.length > 1) {
-            groups = groups.filter(function (group) { return group.nodes.length > 1; });
+            groups = groups.filter(function (group) { return group.members.length > 1; });
             lone.sort(function (a, b) { return b.visible - a.visible; });
             var columns = Math.ceil(Math.sqrt(lone.length * width / Math.max(1, height)));
-            var block = { nodes: [], minX: 0, minY: 0, maxX: 0, maxY: 0, visible: lone[0].visible, last: true };
+            var block = { members: [], minX: 0, minY: 0, maxX: 0, maxY: 0, visible: lone[0].visible, last: true };
             lone.forEach(function (group, i) {
-                var node = group.nodes[0];
-                node.x = (i % columns) * LONE_SPACING;
-                node.y = Math.floor(i / columns) * LONE_SPACING;
-                block.nodes.push(node);
-                block.maxX = Math.max(block.maxX, node.x);
-                block.maxY = Math.max(block.maxY, node.y);
+                var member = {
+                    node: group.members[0].node,
+                    x: (i % columns) * LONE_SPACING,
+                    y: Math.floor(i / columns) * LONE_SPACING
+                };
+                block.members.push(member);
+                block.maxX = Math.max(block.maxX, member.x);
+                block.maxY = Math.max(block.maxY, member.y);
             });
             groups.push(block);
         }
@@ -792,36 +1089,60 @@
             row.h = Math.max(row.h, group.h);
         });
 
+        var positions = [];
         var y = 0;
         rows.forEach(function (current) {
             var x = 0;
             current.groups.forEach(function (group) {
                 var dx = x + GROUP_GAP / 2 - group.minX;
                 var dy = y + (current.h - group.h + GROUP_GAP) / 2 - group.minY;
-                group.nodes.forEach(function (node) {
-                    node.x += dx;
-                    node.y += dy;
-                    node.vx = 0;
-                    node.vy = 0;
-                    node.pinned = true;
+                group.members.forEach(function (member) {
+                    positions.push({ node: member.node, x: member.x + dx, y: member.y + dy });
                 });
                 x += group.w;
             });
             y += current.h;
         });
+        return positions;
+    }
+
+    // Every node is pinned where it lands, exactly as if it had been dragged
+    // there: "Reset layout" undoes it.
+    function separateGroups() {
+        // Groups are packed by their extent: let a running simulation settle
+        while (alpha > 0.005) {
+            simulate();
+            alpha *= 0.985;
+        }
+
+        var positions = separatedPositions();
+        if (!positions) { return; }
+        positions.forEach(function (place) {
+            place.node.x = place.x;
+            place.node.y = place.y;
+            place.node.vx = 0;
+            place.node.vy = 0;
+            place.node.pinned = true;
+        });
 
         savePinnedPositions();
-        updateResetButton();
         draw();
         userInteracted = false;
         fitView();
+        updateSeparateButton();
     }
 
+    // Always there, greyed out when a click would change nothing: in the
+    // tree, which is laid out by rule, with a single group, or once the
+    // groups already sit where it would put them.
     function updateSeparateButton() {
         var btn = document.getElementById('graphSeparateGroups');
         if (!btn) { return; }
-        var several = nodes.some(function (node) { return node.component > 0; });
-        btn.classList.toggle('initially-hidden', !several || treeMode);
+        var positions = treeMode ? null : separatedPositions();
+        btn.disabled = !positions || !positions.some(function (place) {
+            return !place.node.pinned ||
+                Math.abs(place.x - place.node.x) > 0.5 || Math.abs(place.y - place.node.y) > 0.5;
+        });
     }
 
     /* --------------------------------------------------------------------- */
@@ -838,7 +1159,7 @@
 
         nodes.forEach(function (node) {
             var g = document.createElementNS(SVG_NS, 'g');
-            g.setAttribute('class', node.isFolder ? 'graph-node is-folder' : 'graph-node');
+            g.setAttribute('class', 'graph-node' + (node.isFolder ? ' is-folder' : '') + (node.shape ? ' has-icon' : ''));
             g.setAttribute('data-id', String(node.id));
 
             var circle = document.createElementNS(SVG_NS, 'circle');
@@ -850,6 +1171,10 @@
             label.textContent = node.title.length > 24 ? node.title.slice(0, 23) + '…' : node.title;
 
             g.appendChild(circle);
+            if (node.shape) {
+                node.iconEl = node.shape.cloneNode(true);
+                g.appendChild(node.iconEl);
+            }
             g.appendChild(label);
             node.el = g;
             node.circleEl = circle;
@@ -857,15 +1182,20 @@
             nodesGroup.appendChild(g);
         });
 
+        iconZoomApplied = null;
+        updateIconSizes();
         updateLabelTransforms();
         updateLabelVisibility();
         updateVisibility();
     }
 
     // A note is a filled dot; a folder hub is a ring in the folder color
-    // (css/graph.css strokes it with currentColor).
+    // (css/graph.css strokes it with currentColor). An icon is drawn in the
+    // color picked for it in the sidebar, in the folder color without one.
     function paintNode(node, groupEl, circleEl) {
-        if (node.isFolder) {
+        if (node.shape) {
+            groupEl.style.color = node.iconColor || nodeColor(node);
+        } else if (node.isFolder) {
             groupEl.style.color = nodeColor(node);
         } else {
             circleEl.setAttribute('fill', nodeColor(node));
@@ -932,6 +1262,7 @@
         });
         updateLabelVisibility();
         updateStats();
+        updateSeparateButton();
         if (treeMode) {
             layoutTree();
             draw();
@@ -977,6 +1308,7 @@
             requestAnimationFrame(tick);
         } else {
             running = false;
+            updateSeparateButton();
         }
     }
 
@@ -1120,6 +1452,7 @@
 
     function applyTransform() {
         viewport.setAttribute('transform', 'translate(' + tx + ',' + ty + ') scale(' + scale + ')');
+        updateIconSizes();
         updateLabelTransforms();
         updateLabelVisibility();
     }
@@ -1133,10 +1466,10 @@
             if (treeMode) {
                 // Beside the dot: a note title on its row, a folder name
                 // above the line that leaves it
-                node.labelEl.setAttribute('x', String(node.radius * scale + 6));
+                node.labelEl.setAttribute('x', String(drawnRadius(node) * scale + 6));
                 node.labelEl.setAttribute('y', node.isFolder ? '-7' : '4');
             } else {
-                node.labelEl.setAttribute('y', String(node.radius * scale + 14));
+                node.labelEl.setAttribute('y', String(drawnRadius(node) * scale + 14));
             }
         });
     }
@@ -1160,7 +1493,7 @@
             // big for the canvas is not shrunk until it fits: it stays
             // readable and starts at its top left corner.
             var room = Math.max(1, width - treeLabelRoom());
-            scale = Math.max(TREE_MIN_SCALE, Math.min(1.3, room / graphW, height / graphH));
+            scale = Math.max(TREE_MIN_SCALE, Math.min(TREE_MAX_SCALE, room / graphW, height / graphH));
             tx = graphW * scale > room ? (pad - minX) * scale : (room - (minX + maxX) * scale) / 2;
             ty = graphH * scale > height ? (pad - minY) * scale : height / 2 - (minY + maxY) / 2 * scale;
             applyTransform();
@@ -1185,9 +1518,27 @@
     }
 
     function setupPanZoom() {
+        // The wheel scrolls the view, up and down (sideways with Shift or a
+        // trackpad); held with Ctrl/Cmd it zooms, which is also what a
+        // trackpad pinch sends.
         svg.addEventListener('wheel', function (e) {
             e.preventDefault();
-            zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.002));
+            if (e.ctrlKey || e.metaKey) {
+                zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.002));
+                return;
+            }
+            // Firefox counts in lines, or in pages
+            var unit = e.deltaMode === 1 ? 16 : (e.deltaMode === 2 ? height : 1);
+            var dx = e.deltaX * unit;
+            var dy = e.deltaY * unit;
+            if (e.shiftKey && dx === 0) {
+                dx = dy;
+                dy = 0;
+            }
+            tx -= dx;
+            ty -= dy;
+            userInteracted = true;
+            applyTransform();
         }, { passive: false });
 
         var pointers = {};       // pointerId -> {x, y}
@@ -1244,21 +1595,25 @@
             }
 
             var nodeEl = e.target.closest('.graph-node');
-            if (nodeEl && treeMode) {
+            // Ctrl/Cmd or Shift restricts the move to the grabbed node alone,
+            // or, pressed on a line, to what that line carries
+            var single = e.ctrlKey || e.metaKey || e.shiftKey;
+            var origin = graphCoords(e);
+            var line = !nodeEl && single ? edgeAt(origin.x, origin.y, 7 / scale) : null;
+            if (nodeEl && treeMode && !single) {
                 // The tree places the nodes itself: a press pans the view
                 tapNode = nodeById[nodeEl.getAttribute('data-id')];
                 panStart = { x: e.clientX, y: e.clientY, tx: tx, ty: ty };
-            } else if (nodeEl) {
-                dragNode = nodeById[nodeEl.getAttribute('data-id')];
-                // Dragging moves the whole connected group; Ctrl/Cmd or Shift
-                // restricts the move to the grabbed node alone.
-                var single = e.ctrlKey || e.metaKey || e.shiftKey;
-                var group = single ? [dragNode] : componentNodes(dragNode);
+            } else if (nodeEl || line) {
+                dragNode = nodeEl ? nodeById[nodeEl.getAttribute('data-id')] : null;
+                // Dragging moves the whole connected group; in the tree a
+                // node only ever moves alone
+                var group = line ? lineNodes(line) : (single ? [dragNode] : componentNodes(dragNode));
                 dragGroup = group.map(function (node) {
                     node.dragging = true;
                     return { node: node, startX: node.x, startY: node.y };
                 });
-                dragOrigin = graphCoords(e);
+                dragOrigin = origin;
                 dragStartClient = { x: e.clientX, y: e.clientY };
                 dragMoved = 0;
                 // Stop auto-fit right away so the drag frame of reference
@@ -1303,7 +1658,11 @@
                 dragMoved = Math.max(dragMoved,
                     Math.abs(e.clientX - dragStartClient.x) + Math.abs(e.clientY - dragStartClient.y));
                 userInteracted = true;
-                startSimulation(0.3);
+                if (treeMode) {
+                    draw();
+                } else {
+                    startSimulation(0.3);
+                }
                 return;
             }
 
@@ -1322,20 +1681,32 @@
             }
             if (dragGroup) {
                 // An aborted gesture is never a click: don't open the note.
-                var clicked = (!cancelled && dragMoved < 5) ? dragNode : null;
-                if (!clicked) {
+                var moved = cancelled || dragMoved >= 5;
+                var clicked = moved ? null : dragNode;
+                if (moved) {
                     // Keep the group exactly where it was dropped: pin every
                     // moved node and remember the positions for next time.
-                    dragGroup.forEach(function (entry) { entry.node.pinned = true; });
+                    // The tree remembers how far the node was taken instead.
+                    dragGroup.forEach(function (entry) {
+                        if (treeMode) {
+                            entry.node.treeDx = entry.node.x - entry.node.treeX;
+                            entry.node.treeDy = entry.node.y - entry.node.treeY;
+                        } else {
+                            entry.node.pinned = true;
+                        }
+                    });
                 }
                 releaseDrag();
                 if (clicked) {
                     // A folder hub has no page of its own to open
                     if (!clicked.isFolder) { openNote(clicked); }
-                } else {
+                } else if (moved && treeMode) {
+                    saveTreeOffsets();
+                } else if (moved) {
                     savePinnedPositions();
-                    updateResetButton();
+                    updateSeparateButton();
                 }
+                // else a line was pressed and let go: nothing was taken anywhere
             }
             if (tapNode) {
                 var tapped = !cancelled && panStart &&
@@ -1367,7 +1738,7 @@
         }
         hoveredNode = node;
         if (node) {
-            highlightNeighborhood(node);
+            highlightConnected(node);
             showTooltip(node, e);
         } else {
             clearHighlight();
@@ -1375,14 +1746,51 @@
         }
     }
 
-    function highlightNeighborhood(node) {
+    // Lights up the line the hovered node sits on, from end to end: what it
+    // is in (its folder, the folder above, up to the top) and what it holds
+    // (subfolders and notes, all the way down); for a note, the notes it
+    // links to and the notes linking to it, each as far as the links go.
+    // A branch is never turned back down or up, so the other notes of its
+    // folder, or the other notes linking to the same one, stay dimmed.
+    function highlightConnected(node) {
+        // An edge runs from a note or subfolder to its folder, or from a
+        // note to the note it links to: four ways to step along one.
+        var up = {}, down = {}, out = {}, back = {};   // id -> [{edge, node}]
+        function addStep(map, from, edge, to) {
+            (map[from.id] = map[from.id] || []).push({ edge: edge, node: to });
+        }
+        edges.forEach(function (edge) {
+            edge.lit = false;
+            if (!edge.visible) { return; }
+            addStep(edge.membership ? up : out, edge.source, edge, edge.target);
+            addStep(edge.membership ? down : back, edge.target, edge, edge.source);
+        });
+
+        var reached = {};
+        reached[node.id] = true;
+        function follow(map) {
+            var seen = {};
+            seen[node.id] = true;
+            var queue = [node];
+            while (queue.length) {
+                (map[queue.pop().id] || []).forEach(function (step) {
+                    step.edge.lit = true;
+                    reached[step.node.id] = true;
+                    if (!seen[step.node.id]) {
+                        seen[step.node.id] = true;
+                        queue.push(step.node);
+                    }
+                });
+            }
+        }
+        [up, down, out, back].forEach(follow);
+
         svg.classList.add('has-highlight');
         nodes.forEach(function (other) {
-            var isNeighbor = other === node || neighbors[node.id][other.id] === true;
-            other.el.classList.toggle('hl', isNeighbor);
+            other.el.classList.toggle('hl', reached[other.id] === true);
         });
         edges.forEach(function (edge) {
-            edge.el.classList.toggle('hl', edge.source === node || edge.target === node);
+            edge.el.classList.toggle('hl', edge.lit);
         });
     }
 
@@ -1486,12 +1894,50 @@
         var backHomeBtn = document.getElementById('backToHomeBtn');
         if (backHomeBtn) { backHomeBtn.addEventListener('click', goBackToHome); }
 
+        // Search: a button unfolds the field in its place. The cross and
+        // Escape empty the field and fold it; so does leaving it empty.
         var searchInput = document.getElementById('graphSearchInput');
-        if (searchInput) {
+        var searchBtn = document.getElementById('graphSearchBtn');
+        if (searchInput && searchBtn) {
+            var searchWrapper = searchInput.parentNode;
+            var searchClear = document.getElementById('graphSearchClear');
+            var setSearchOpen = function (open) {
+                searchWrapper.classList.toggle('initially-hidden', !open);
+                searchBtn.classList.toggle('initially-hidden', open);
+                searchBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            };
+            var closeSearch = function (refocus) {
+                searchInput.value = '';
+                searchTerm = '';
+                applySearch();
+                setSearchOpen(false);
+                if (refocus) { searchBtn.focus(); }
+            };
+            searchBtn.addEventListener('click', function () {
+                setSearchOpen(true);
+                searchInput.focus();
+            });
             searchInput.addEventListener('input', function () {
                 searchTerm = searchInput.value;
                 applySearch();
             });
+            searchInput.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') { closeSearch(true); }
+            });
+            searchInput.addEventListener('blur', function () {
+                if (searchInput.value === '') { closeSearch(false); }
+            });
+            // A press on the canvas keeps the focus where it is (the graph
+            // cancels it to drag), so the blur above never comes
+            document.addEventListener('pointerdown', function (e) {
+                var open = !searchWrapper.classList.contains('initially-hidden');
+                if (open && searchInput.value === '' && !searchWrapper.contains(e.target)) {
+                    closeSearch(false);
+                }
+            });
+            if (searchClear) {
+                searchClear.addEventListener('click', function () { closeSearch(true); });
+            }
         }
 
         var orphansToggle = document.getElementById('graphShowOrphans');
@@ -1509,6 +1955,29 @@
                 if (!userInteracted) {
                     fitView();
                 }
+            });
+        }
+
+        // Information: the dialog with the counts of the page and what the
+        // mouse does on the canvas
+        var infoBtn = document.getElementById('graphInfoBtn');
+        var infoModal = document.getElementById('graphInfoModal');
+        if (infoBtn && infoModal) {
+            var infoClose = document.getElementById('graphInfoModalClose');
+            var closeInfo = function () {
+                infoModal.style.display = 'none';
+                infoBtn.focus();
+            };
+            infoBtn.addEventListener('click', function () {
+                infoModal.style.display = 'flex';
+                if (infoClose) { infoClose.focus(); }
+            });
+            if (infoClose) { infoClose.addEventListener('click', closeInfo); }
+            infoModal.addEventListener('click', function (e) {
+                if (e.target === infoModal) { closeInfo(); }
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && infoModal.style.display === 'flex') { closeInfo(); }
             });
         }
 

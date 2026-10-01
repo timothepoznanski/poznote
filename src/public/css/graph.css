@@ -30,22 +30,32 @@ body.graph-page {
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 10px 14px;
+    /* The buttons sit close under the title, the checkboxes a little apart
+       from them */
+    gap: 18px 12px;
+    padding: 2px 14px 10px;
     /* Transparent so the page background shows through, matching the filter
        rows on the other pages now that the title sits above it. */
     background: transparent;
 }
 
 .graph-search-wrapper {
+    position: relative;
     flex: 0 1 340px;
     min-width: 180px;
+}
+
+/* The search field stays folded behind its button, which it replaces while
+   it is open; its cross (css/home/search.css) empties and folds it again */
+
+.graph-search-wrapper .home-search-clear {
+    display: flex;
 }
 
 .graph-search-input {
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 12px;
+    padding: 8px 36px 8px 12px;
     border: 1px solid var(--pz-border-strong);
     border-radius: var(--pz-radius);
     font-size: 14px;
@@ -64,7 +74,17 @@ body.graph-page {
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 12px;
+}
+
+/* The checkboxes, on a line of their own under the rest of the toolbar */
+.graph-checks {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-basis: 100%;
+    gap: 6px 14px;
 }
 
 .graph-orphans-toggle {
@@ -78,16 +98,13 @@ body.graph-page {
     white-space: nowrap;
 }
 
-.graph-stats {
-    font-size: 13px;
-    color: var(--pz-text-muted);
-    white-space: nowrap;
-}
 
 .graph-reset-btn {
     display: flex;
     align-items: center;
     gap: 6px;
+    box-sizing: border-box;
+    height: 34px;
     padding: 5px 10px;
     border: 1px solid var(--pz-border-strong);
     border-radius: var(--pz-radius);
@@ -102,32 +119,43 @@ body.graph-page {
     background: var(--pz-surface-hover);
 }
 
-/* A button that stays on: the tree view, a folder picked in the filter */
-.graph-reset-btn[aria-pressed='true'],
+/* Greyed out: "Separate groups" in the tree view, or with a single group */
+.graph-reset-btn:disabled {
+    background: var(--pz-bg);
+    opacity: 0.45;
+    cursor: default;
+}
+
+/* The toolbar buttons are their icon alone: the view (network or tree, a
+   click goes to the other one), the search, the folder filter, "Separate
+   groups" and "Reset layout" */
+.graph-icon-btn {
+    justify-content: center;
+    flex-shrink: 0;
+    width: 34px;
+    padding: 0;
+    font-size: 15px;
+    /* The icon color of the app, lighter than the text of a labelled button */
+    color: var(--pz-icon);
+}
+
+/* The icon takes the color of its button, at rest and under the pointer */
+.graph-icon-btn .lucide,
+.graph-icon-btn .lucide:hover {
+    color: inherit;
+    transform: none;
+}
+
+/* A button that stays on: a folder picked in the filter */
 .graph-folder-btn.is-filtering {
     border-color: var(--pz-accent-text);
     color: var(--pz-accent-text);
 }
 
-/* Folder filter: the button beside the search field, as tall as it is */
-.graph-folder-btn {
-    max-width: 220px;
-    padding: 7px 10px;
-}
-
+/* Folder filter: the folder icon beside the search */
 .graph-folder-btn:focus-visible {
     outline: none;
     border-color: var(--pz-accent-text);
-}
-
-.graph-folder-btn span {
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.graph-folder-btn .lucide {
-    flex-shrink: 0;
 }
 
 /* ...and the dialog it opens */
@@ -192,6 +220,25 @@ body.graph-page {
     font-weight: var(--pz-weight-medium);
 }
 
+/* The information dialog: how many notes and links are on screen, then what
+   the mouse does on the canvas */
+#graphInfoModal .graph-stats {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-text);
+}
+
+.graph-info-help {
+    display: grid;
+    gap: 6px;
+    margin: 0 0 16px;
+    padding: 0 0 0 18px;
+    font-size: 13px;
+    color: var(--pz-text-secondary);
+    text-align: left;
+}
+
 .graph-folder-empty {
     margin: 0;
     padding: 12px;
@@ -207,25 +254,6 @@ body.graph-page {
     flex: 1;
     min-height: 0;
     overflow: hidden;
-}
-
-.graph-hint {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    color: var(--pz-text-subtle);
-    white-space: nowrap;
-    pointer-events: none;
-}
-
-.graph-hint .lucide {
-    font-size: 13px;
 }
 
 #graphSvg {
@@ -255,7 +283,7 @@ body.graph-page {
     cursor: pointer;
 }
 
-.graph-node circle {
+.graph-node > circle {
     stroke: var(--pz-bg);
     stroke-width: 1.5;
     vector-effect: non-scaling-stroke;
@@ -275,10 +303,24 @@ body.graph-page {
     cursor: grab;
 }
 
-.graph-node.is-folder circle {
+.graph-node.is-folder > circle {
     fill: var(--pz-surface);
     stroke: currentColor;
     stroke-width: 3;
+}
+
+/* A note or a folder whose icon was customised in the sidebar shows that icon
+   instead (graph.js sets its color on the node). The circle stays behind it,
+   in the color of the page: it hides the links running under the icon, takes
+   the pointer, and carries the ring of a search hit. */
+.graph-node.has-icon > circle {
+    fill: var(--pz-surface);
+    stroke: none;
+}
+
+.graph-icon {
+    overflow: visible;
+    pointer-events: none;
 }
 
 .graph-node.is-folder .graph-label {
@@ -292,7 +334,7 @@ body.graph-page {
 }
 
 /* Tree view: titles beside the dots, plain lines from a folder to what it
-   holds, nothing to drag */
+   holds */
 .tree-layout .graph-label {
     text-anchor: start;
 }
@@ -303,10 +345,6 @@ body.graph-page {
 
 .tree-layout .graph-node.is-folder {
     cursor: inherit;
-}
-
-.tree-layout .graph-hint {
-    display: none;
 }
 
 /* Crowded graphs: labels only on zoom, hover or search */
@@ -320,7 +358,8 @@ body.graph-page {
     display: block;
 }
 
-/* Hover highlight: dim everything except the hovered neighborhood */
+/* Hover highlight: dim everything except the line the hovered node sits on,
+   from end to end */
 #graphSvg.has-highlight .graph-node:not(.hl),
 #graphSvg.has-highlight .graph-edge:not(.hl) {
     opacity: 0.15;
@@ -340,7 +379,7 @@ body.graph-page {
     opacity: 0.12;
 }
 
-.graph-node.search-hit circle {
+.graph-node.search-hit > circle {
     stroke: var(--pz-accent-text);
     stroke-width: 2.5;
 }
@@ -428,13 +467,7 @@ html[data-theme='dark'] .graph-search-input:focus {
     border-color: var(--pz-accent-text);
 }
 
-html[data-theme='dark'] .graph-hint {
-    color: var(--pz-text-muted, var(--pz-text-subtle));
-    opacity: 0.9;
-}
-
 html[data-theme='dark'] .graph-orphans-toggle,
-html[data-theme='dark'] .graph-stats,
 html[data-theme='dark'] .graph-loading,
 html[data-theme='dark'] .graph-empty {
     color: var(--pz-text-muted);
@@ -449,10 +482,18 @@ html[data-theme='dark'] .graph-reset-btn:hover {
     background: var(--pz-surface);
 }
 
-html[data-theme='dark'] .graph-reset-btn[aria-pressed='true'],
+html[data-theme='dark'] .graph-reset-btn:disabled {
+    background: var(--pz-bg);
+}
+
 html[data-theme='dark'] .graph-folder-btn.is-filtering {
     border-color: var(--pz-accent-text);
     color: var(--pz-accent-text);
+}
+
+html[data-theme='dark'] .graph-icon-btn .lucide,
+html[data-theme='dark'] .graph-icon-btn .lucide:hover {
+    color: inherit;
 }
 
 html[data-theme='dark'] .graph-folder-option:hover,
@@ -469,7 +510,7 @@ html[data-theme='dark'] .graph-edge.hl {
     stroke: #7d8590;
 }
 
-html[data-theme='dark'] .graph-node circle {
+html[data-theme='dark'] .graph-node > circle {
     stroke: var(--pz-chrome-bg, var(--pz-bg));
 }
 
@@ -477,17 +518,26 @@ html[data-theme='dark'] .graph-label {
     fill: var(--pz-text-muted);
 }
 
-html[data-theme='dark'] .graph-node.is-folder circle {
+html[data-theme='dark'] .graph-node.is-folder > circle {
     fill: var(--pz-chrome-bg, var(--pz-bg));
     stroke: currentColor;
+}
+
+html[data-theme='dark'] .graph-node.has-icon > circle {
+    fill: var(--pz-chrome-bg, var(--pz-bg));
+    stroke: none;
 }
 
 html[data-theme='dark'] .graph-node.is-folder .graph-label {
     fill: var(--pz-text);
 }
 
-html[data-theme='dark'] .graph-node.search-hit circle {
+html[data-theme='dark'] .graph-node.search-hit > circle {
     stroke: var(--pz-accent-text);
+}
+
+html[data-theme='dark'] .graph-info-help {
+    color: var(--pz-text-muted);
 }
 
 html[data-theme='dark'] .graph-tooltip {
@@ -508,30 +558,38 @@ html[data-theme='dark'] .graph-tooltip-meta {
 
 @media (max-width: 640px) {
     .graph-toolbar {
-        gap: 8px;
-        padding: 8px 10px;
+        gap: 12px 8px;
+        padding: 2px 10px 8px;
     }
 
-    /* Search and folder button share the first row, options go below */
+    /* The checkboxes keep to one line: a label that does not fit is cut
+       short with an ellipsis */
+    .graph-checks {
+        flex-wrap: nowrap;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .graph-orphans-toggle {
+        min-width: 0;
+        gap: 4px;
+    }
+
+    .graph-orphans-toggle input {
+        flex-shrink: 0;
+    }
+
+    .graph-orphans-toggle span {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* The open search field takes the room left on its row; what no longer
+       fits beside it goes to the next one */
     .graph-search-wrapper {
         flex: 1 1 0;
-        min-width: 0;
-    }
-
-    .graph-folder-btn {
-        flex: 0 1 auto;
-        align-self: stretch;
-        max-width: 45%;
-        min-width: 0;
-    }
-
-    .graph-options {
-        flex-basis: 100%;
-    }
-
-    /* Keyboard-modifier hint is meaningless on touch screens */
-    .graph-hint {
-        display: none;
+        min-width: 140px;
     }
 
 }
