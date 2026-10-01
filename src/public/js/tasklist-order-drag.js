@@ -88,8 +88,10 @@ function uncheckAllTasks(noteId) {
 
     let tasks = parseTaskData(noteEntry);
 
-    // Count checked tasks
-    const checkedCount = tasks.filter(task => task.completed).length;
+    // Count checked tasks, subtasks included
+    const checkedCount = tasks.reduce((count, task) => count
+        + (task.completed ? 1 : 0)
+        + getTaskSubtasks(task).filter(subtask => subtask.completed).length, 0);
     
     if (checkedCount === 0) {
         // No checked tasks to uncheck
@@ -110,9 +112,10 @@ function uncheckAllTasks(noteId) {
         window.modalAlert.confirm(message).then(confirmed => {
             if (!confirmed) return;
             
-            // Mark all tasks as incomplete
+            // Mark all tasks and their subtasks as incomplete
             tasks.forEach(task => {
                 task.completed = false;
+                getTaskSubtasks(task).forEach(subtask => { subtask.completed = false; });
             });
             saveAndRenderTasks(noteId, tasks);
 
@@ -124,6 +127,7 @@ function uncheckAllTasks(noteId) {
         if (confirm(message)) {
             tasks.forEach(task => {
                 task.completed = false;
+                getTaskSubtasks(task).forEach(subtask => { subtask.completed = false; });
             });
             saveAndRenderTasks(noteId, tasks);
 

@@ -630,7 +630,12 @@ if ($noteType === 'tasklist') {
             $checked = !empty($task['completed']) ? ' checked' : '';
             $disabled = $taskAccessMode === 'read_only' ? ' disabled' : '';
             $important = !empty($task['important']) ? ' important' : '';
-            $tasksHtml .= '<div class="task-item'.$completed.$important.'" data-index="'.$i.'">';
+            // Subtasks can be ticked wherever tasks can (js/public-note.js)
+            $subtasksHtml = renderTasklistSubtasksHtml($task, null, static function ($subtaskIndex) use ($disabled) {
+                return ' data-subtask-index="' . (int) $subtaskIndex . '"' . $disabled;
+            });
+            $hasSubtasks = $subtasksHtml !== '' ? ' has-subtasks' : '';
+            $tasksHtml .= '<div class="task-item'.$completed.$important.$hasSubtasks.'" data-index="'.$i.'">';
             $tasksHtml .= '<input type="checkbox" class="task-checkbox" data-index="'.$i.'"'.$checked.$disabled.' /> ';
             $tasksHtml .= '<span class="task-text" data-text="'.$text.'">'.$text.'</span>';
             if ($taskAccessMode === 'full') {
@@ -638,6 +643,7 @@ if ($noteType === 'tasklist') {
                 $tasksHtml .= '<button class="task-action-btn public-task-delete-btn" title="Delete"><i class="lucide lucide-trash-2"></i></button>';
                 $tasksHtml .= '</div>';
             }
+            $tasksHtml .= $subtasksHtml;
             $tasksHtml .= '</div>';
         }
         $tasksHtml .= '</div></div>';

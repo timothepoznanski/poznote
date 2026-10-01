@@ -625,6 +625,25 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     font-weight: var(--pz-weight-semibold);
 }
 
+/* Subtasks of a task: indented under it, and styled on their own state rather
+   than on their task's (a done or important task says nothing of them) */
+.diary-journal-body ul.diary-journal-subtasks {
+    list-style: none;
+    margin: 0.2em 0 0;
+    padding-left: 1.6em;
+}
+
+.diary-journal-body .diary-journal-subtasks li:not(.completed) span {
+    color: var(--pz-text);
+    font-weight: inherit;
+    text-decoration: none;
+}
+
+.diary-journal-body .diary-journal-subtasks li.completed span {
+    color: var(--pz-text-muted);
+    font-weight: inherit;
+}
+
 .diary-journal-body blockquote {
     margin: 0.8em 0;
     padding-left: 14px;

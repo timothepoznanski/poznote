@@ -78,6 +78,7 @@ $scripts = [
     poznoteAsset('js/tasklist-core.js'),
     poznoteAsset('js/tasklist-render.js'),
     poznoteAsset('js/tasklist-crud.js'),
+    poznoteAsset('js/tasklist-subtasks.js'),
     poznoteAsset('js/tasklist-actions.js'),
     poznoteAsset('js/tasklist-edit-modal.js'),
     poznoteAsset('js/tasklist-order-drag.js'),

@@ -3154,7 +3154,11 @@ class NotesController {
                     $items = json_decode($json !== '' ? $json : $body, true);
                     $labels = [];
                     foreach (is_array($items) ? $items : [] as $item) {
-                        if (is_array($item)) $labels[] = (string)($item['text'] ?? '');
+                        if (!is_array($item)) continue;
+                        $labels[] = (string)($item['text'] ?? '');
+                        foreach (getTasklistSubtasks($item) as $subtask) {
+                            $labels[] = $subtask['text'];
+                        }
                     }
                     $body = implode(' ', $labels);
                 }

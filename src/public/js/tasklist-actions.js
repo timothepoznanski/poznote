@@ -166,6 +166,13 @@ function openTaskActionsMenu(taskId, noteId, event) {
 
     const items = [
         {
+            icon: 'lucide lucide-corner-down-right',
+            label: t('tasklist.add_subtask', null, 'Add a subtask'),
+            run: function () {
+                openSubtaskInput(taskId, noteId);
+            }
+        },
+        {
             icon: 'lucide lucide-calendar-alt',
             label: t('tasklist.due_date', null, 'Due date'),
             run: function () {

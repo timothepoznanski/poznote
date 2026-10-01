@@ -388,6 +388,22 @@ components:
             Repeat interval of the reminder, "<count><unit>" with unit
             i/h/d/w/m/y. Only present when set.
           example: "1w"
+        subtasks:
+          type: array
+          description: >
+            Subtasks of the task, one level deep. Only present when the task
+            has some. The per-task endpoints return them and keep them on
+            every write; to add, rename or remove one, send the full array
+            of the note through PATCH /notes/{id}.
+          items:
+            type: object
+            properties:
+              id:
+                type: number
+              text:
+                type: string
+              completed:
+                type: boolean
 
     Error:
       type: object
@@ -5408,6 +5424,12 @@ paths:
                   type: boolean
                 text:
                   type: string
+                subtask:
+                  type: integer
+                  description: >
+                    Tasklist notes only: zero-based position of a subtask of
+                    that task. `completed` then applies to the subtask and is
+                    required, `text` is refused.
       responses:
         '200':
           description: Task updated

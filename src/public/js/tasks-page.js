@@ -435,7 +435,11 @@
             var tasks = note.tasks.filter(function (task) {
                 if (!taskMatchesMode(task)) return false;
                 if (!filterText) return true;
-                return noteMatchesText || (task.text || '').toLowerCase().includes(filterText);
+                if (noteMatchesText || (task.text || '').toLowerCase().includes(filterText)) return true;
+                // A task also matches on the text of one of its subtasks
+                return getSubtasks(task).some(function (subtask) {
+                    return (subtask.text || '').toLowerCase().includes(filterText);
+                });
             });
 
             return { note: note, tasks: tasks };
@@ -609,7 +613,14 @@
             list.className = 'tasks-note-list';
 
             group.tasks.forEach(function (task) {
-                list.appendChild(renderTaskRow(note, task));
+                var row = renderTaskRow(note, task);
+                list.appendChild(row);
+
+                var subtasks = renderSubtaskList(note, task);
+                if (subtasks) {
+                    row.classList.add('has-subtasks');
+                    list.appendChild(subtasks);
+                }
             });
 
             section.appendChild(list);
@@ -698,6 +709,45 @@
         }
 
         return row;
+    }
+
+    // Subtasks of a tasklist task (js/tasklist-subtasks.js): an optional
+    // array of { id, text, completed } on the task itself
+    function getSubtasks(task) {
+        return (task && Array.isArray(task.subtasks)) ? task.subtasks : [];
+    }
+
+    // Indented rows under a task of the list view, each with its checkbox.
+    // Null when the task has no subtask.
+    function renderSubtaskList(note, task) {
+        var subtasks = getSubtasks(task);
+        if (subtasks.length === 0) return null;
+
+        var list = document.createElement('div');
+        list.className = 'tasks-subtask-list';
+
+        subtasks.forEach(function (subtask, index) {
+            var row = document.createElement('label');
+            row.className = 'tasks-subtask-item' + (subtask.completed ? ' completed' : '');
+
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'tasks-subtask-checkbox';
+            checkbox.checked = !!subtask.completed;
+            checkbox.addEventListener('change', function () {
+                toggleSubtask(note, task, subtask, index, checkbox.checked);
+            });
+            row.appendChild(checkbox);
+
+            var text = document.createElement('span');
+            text.className = 'tasks-subtask-text';
+            text.innerHTML = linkifyTaskText(subtask.text);
+            row.appendChild(text);
+
+            list.appendChild(row);
+        });
+
+        return list;
     }
 
     /* ------------------------------------------------------------------ */
@@ -1282,6 +1332,26 @@
                     render();
                 }
             });
+    }
+
+    // A subtask keeps its place under its task: the box flips right away and
+    // goes back if the save fails
+    function toggleSubtask(note, task, subtask, index, newCompleted) {
+        subtask.completed = newCompleted;
+        render();
+
+        mutateTaskInNote(note, task, function (target) {
+            var stored = Array.isArray(target.subtasks) ? target.subtasks : [];
+            var match = (subtask.id !== null && subtask.id !== undefined)
+                ? stored.find(function (item) { return item && String(item.id) === String(subtask.id); })
+                : stored[index];
+            if (!match) throw new Error(config.txtError);
+            match.completed = newCompleted;
+        }).catch(function (e) {
+            console.debug('tasks-page: toggleSubtask() failed:', e);
+            subtask.completed = !newCompleted;
+            render();
+        });
     }
 
     function toggleChecklistItem(note, task, checkbox) {

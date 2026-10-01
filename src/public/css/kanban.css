@@ -603,6 +603,18 @@
     white-space: nowrap;
 }
 
+/* Subtasks: indented under the text of their task (checkbox width plus the
+   row gap), with a smaller box */
+.kanban-task-preview-subitem {
+    padding-left: 20px;
+}
+
+.kanban-task-preview-subitem input[type="checkbox"] {
+    width: 12px;
+    height: 12px;
+    margin-top: 3px;
+}
+
 .kanban-task-preview-item.completed .kanban-task-preview-text {
     color: var(--pz-text-subtle);
     text-decoration: line-through;

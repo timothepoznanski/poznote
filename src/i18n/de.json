@@ -1018,7 +1018,10 @@
     "unmark_important": "Wichtig-Markierung entfernen",
     "task_options": "Aufgabenoptionen",
     "remind_me": "Erinnere mich",
-    "remind_me_hint": "Eine Benachrichtigung wird zum Fälligkeitstermin ausgelöst."
+    "remind_me_hint": "Eine Benachrichtigung wird zum Fälligkeitstermin ausgelöst.",
+    "add_subtask": "Unteraufgabe hinzufügen",
+    "subtask_placeholder": "Unteraufgabe hinzufügen...",
+    "delete_subtask": "Unteraufgabe löschen"
   },
   "tags": {
     "add_single": "Tag hinzufügen...",

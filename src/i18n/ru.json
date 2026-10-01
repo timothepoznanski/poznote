@@ -579,7 +579,10 @@
     "confirm_uncheck_all": "Снять отметку с задач: {{count}}?",
     "move_error": "Не удалось переместить задачу",
     "no_checked_tasks": "Нет отмеченных задач.",
-    "uncheck_all": "Снять отметку со всех задач"
+    "uncheck_all": "Снять отметку со всех задач",
+    "add_subtask": "Добавить подзадачу",
+    "subtask_placeholder": "Добавить подзадачу...",
+    "delete_subtask": "Удалить подзадачу"
   },
   "tags": {
     "add_single": "Добавить тег...",

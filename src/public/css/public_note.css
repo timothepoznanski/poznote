@@ -518,6 +518,11 @@ body.public-note-page {
     color: var(--pz-text-muted);
 }
 
+/* Subtask rows space their checkbox with the row gap (css/tasks.css) */
+.public-note .content .task-item .task-subitem-checkbox {
+    margin-right: 0;
+}
+
 /* Task actions (edit/delete buttons) */
 .task-actions {
     display: flex;

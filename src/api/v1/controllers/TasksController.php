@@ -33,6 +33,7 @@ class TasksController
      * decoded task array, plus the checklist items found in regular notes:
      *   { success: true,
      *     notes:      [{ id, heading, folder, workspace, updated, tasks: [...] }],
+     *                 (a task with subtasks carries subtasks: [{ id, text, completed }])
      *     checklists: [{ id, heading, folder, workspace, updated, type, tasks: [{ id, text, completed }] }] }
      *
      * A checklist task's id is the item's position in the note source (see
@@ -778,6 +779,11 @@ class TasksController
             $dueRecurrence = $task['dueRecurrence'] ?? null;
             if (is_string($dueRecurrence) && preg_match('/^[1-9]\d{0,2}[ihdwmy]$/', $dueRecurrence)) {
                 $cleanTask['dueRecurrence'] = $dueRecurrence;
+            }
+            // Only present on a task that has subtasks: [{ id, text, completed }]
+            $subtasks = getTasklistSubtasks($task);
+            if ($subtasks !== []) {
+                $cleanTask['subtasks'] = $subtasks;
             }
             $clean[] = $cleanTask;
         }

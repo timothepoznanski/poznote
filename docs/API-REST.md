@@ -1150,6 +1150,7 @@ To manage a single task without rewriting the array, use the per-task endpoints 
 | `dueReminder` | boolean | Whether a reminder is scheduled for the due date |
 | `dueReminderEmail` | boolean | Whether that reminder also sends an email. Only present once configured; defaults to enabled otherwise |
 | `dueRecurrence` | string | Repeat interval of the reminder as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` (e.g. `1w` weekly). Only present when set. Dismissing the notification schedules the next one and advances `dueAt` by the same interval |
+| `subtasks` | array | Subtasks of the task, one level deep, each `{ "id": number, "text": string, "completed": boolean }`. Only present when the task has some. A subtask has no due date, reminder or important flag, and ticking it does not complete its task. The per-task endpoints return subtasks and keep them on every write; to add, rename or remove one, send the note's full array through `PATCH /notes/{id}` |
 
 ### List All Tasks
 
@@ -3612,6 +3613,7 @@ Update a task's status or text on a shared note.
 |-------|------|-------------|
 | `completed` | boolean | Task completion status |
 | `text` | string | Task text |
+| `subtask` | integer | Tasklist notes only: zero-based position of a subtask of that task. `completed` then applies to the subtask and is required, `text` is refused |
 
 ```bash
 curl -X PATCH \

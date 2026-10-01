@@ -150,6 +150,11 @@
                         var checked = task.completed || task.checked || task.done ? '☑' : '☐';
                         var text = task.text || task.content || '';
                         html += '<div style="margin: 4px 0;">' + checked + ' ' + escapeHtml(text) + '</div>';
+                        // Subtasks, indented under their task
+                        (Array.isArray(task.subtasks) ? task.subtasks : []).forEach(function (subtask) {
+                            if (!subtask || !subtask.text) return;
+                            html += '<div style="margin: 2px 0 2px 24px;">' + (subtask.completed ? '☑' : '☐') + ' ' + escapeHtml(subtask.text) + '</div>';
+                        });
                     });
                 }
                 contentEl.innerHTML = html || escapeHtml(content);

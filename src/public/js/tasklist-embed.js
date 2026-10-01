@@ -498,6 +498,8 @@
             list.className = 'tasklist-embed-list';
             tasks.forEach(function (task) {
                 list.appendChild(renderTaskRow(embed, noteId, task));
+                var subtasks = renderSubtaskRows(embed, noteId, task);
+                if (subtasks) list.appendChild(subtasks);
             });
             body.appendChild(list);
         } else {
@@ -612,6 +614,42 @@
         return row;
     }
 
+    // Subtasks of a task (js/tasklist-subtasks.js), as indented rows under it:
+    // they can be ticked here, the rest is edited in the tasklist note. Null
+    // when the task has none.
+    function renderSubtaskRows(embed, noteId, task) {
+        var subtasks = Array.isArray(task.subtasks) ? task.subtasks : [];
+        if (subtasks.length === 0) return null;
+
+        var block = document.createElement('div');
+        block.className = 'tasklist-embed-subtasks';
+
+        subtasks.forEach(function (subtask, index) {
+            if (!subtask || typeof subtask !== 'object') return;
+
+            var row = document.createElement('label');
+            row.className = 'tasklist-embed-subtask' + (subtask.completed ? ' completed' : '');
+
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.className = 'tasklist-embed-checkbox';
+            checkbox.checked = !!subtask.completed;
+            checkbox.addEventListener('change', function () {
+                toggleEmbedSubtask(embed, noteId, task, subtask, index, checkbox.checked);
+            });
+            row.appendChild(checkbox);
+
+            var text = document.createElement('span');
+            text.className = 'tasklist-embed-subtask-text';
+            text.textContent = subtask.text || '';
+            row.appendChild(text);
+
+            block.appendChild(row);
+        });
+
+        return block;
+    }
+
     // "Add a task" field at the bottom of the list
     function renderAddRow(embed, noteId) {
         var form = document.createElement('form');
@@ -698,6 +736,29 @@
                 return reorderAfterToggle(tasks, target);
             }, true);
             if (clearReminder) cancelTaskReminder(noteId, task.id);
+        } catch (e) {
+            showEmbedError(embed);
+        }
+    }
+
+    async function toggleEmbedSubtask(embed, noteId, task, subtask, index, newCompleted) {
+        try {
+            await mutateTaskList(noteId, function (tasks) {
+                var target = requireTask(tasks, task.id);
+                var subtasks = Array.isArray(target.subtasks) ? target.subtasks : [];
+                var position = (subtask.id !== null && subtask.id !== undefined)
+                    ? subtasks.findIndex(function (item) { return item && String(item.id) === String(subtask.id); })
+                    : index;
+                if (!subtasks[position]) throw new Error('tasklist embed: subtask not found');
+
+                // A new array and a new object: the optimistic pass runs on
+                // shallow copies of the tasks, which share their subtasks
+                // with the saved state
+                target.subtasks = subtasks.map(function (item, i) {
+                    return i === position ? Object.assign({}, item, { completed: newCompleted }) : item;
+                });
+                return tasks;
+            }, true);
         } catch (e) {
             showEmbedError(embed);
         }
