@@ -65,3 +65,33 @@ test('sanitizeHtml drops the labels inside an svg', function () {
     assertNotContains('Icon name', $out, 'an svg label is not note text');
     assertContains('<path d="M0 0">', $out);
 });
+
+// #1534: a numbered list pasted from OneNote went back to 1 after each
+// picture. The start number was dropped on save, and the editor's CSS counter
+// could not have read it anyway, hence the counter-reset kept in step with it.
+
+test('a numbered list keeps its start number', function () {
+    $html = sanitizeHtml('<ol start="3"><li>three</li></ol>');
+    assertContains('start="3"', $html);
+    assertContains('counter-reset: item 2', $html);
+});
+
+test('the counter of a list follows its start number, not the other way round', function () {
+    assertContains('counter-reset: item 6;', sanitizeHtml('<ol start="7" style="counter-reset: item 41"><li>x</li></ol>'), 'stale counter');
+    assertNotContains('counter-reset', sanitizeHtml('<ol style="counter-reset: item 41"><li>x</li></ol>'), 'no start number');
+    assertSame('<ol><li>x</li></ol>', sanitizeHtml('<ol start="1"><li>x</li></ol>'), 'a list starting at 1 needs nothing');
+});
+
+test('the rest of the style of a list is left as written', function () {
+    $html = sanitizeHtml('<ol start="3" style="margin-left: 0.375in; font-weight: bold;"><li>x</li></ol>');
+    assertContains('margin-left: 0.375in; font-weight: bold; counter-reset: item 2;', $html);
+});
+
+test('a start number that is not an integer is dropped', function () {
+    foreach (['abc', '3;color:red', '1e3', '12345678', ''] as $start) {
+        $html = sanitizeHtml('<ol start="' . $start . '"><li>x</li></ol>');
+        assertNotContains('start=', $html, "start={$start}");
+        assertNotContains('counter-reset', $html, "start={$start}");
+    }
+    assertContains('counter-reset: item -1', sanitizeHtml('<ol start="0"><li>x</li></ol>'), 'zero is a number');
+});

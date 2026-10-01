@@ -93,6 +93,9 @@ function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
             foreach ($items as $item) {
                 if (!is_array($item)) continue;
                 $lines[] = (!empty($item['completed']) ? '[x] ' : '[ ] ') . (string)($item['text'] ?? '');
+                foreach (getTasklistSubtasks($item) as $subtask) {
+                    $lines[] = '    ' . ($subtask['completed'] ? '[x] ' : '[ ] ') . $subtask['text'];
+                }
                 $tasks[] = aiTaskView($item);
             }
             $content = implode("\n", $lines);
@@ -483,6 +486,13 @@ function aiTaskView(array $task): array {
         $view['due_at'] = substr($dueAt, 0, empty($m[1]) ? 10 : 16);
         $view['reminder'] = !empty($task['dueReminder']);
         if (!empty($task['dueRecurrence'])) $view['recurrence'] = (string)$task['dueRecurrence'];
+    }
+    // Read-only for the model: subtasks are edited in the interface
+    $subtasks = getTasklistSubtasks($task);
+    if ($subtasks !== []) {
+        $view['subtasks'] = array_map(static function (array $subtask): array {
+            return ['text' => $subtask['text'], 'completed' => $subtask['completed']];
+        }, $subtasks);
     }
     return $view;
 }

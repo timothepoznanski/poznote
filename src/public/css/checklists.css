@@ -150,7 +150,10 @@
 }
 
 /* ===== HIERARCHICAL NUMBERED LISTS (1.1, 1.2, 2.1, etc.) ===== */
-/* Reset default list styling for ordered lists in notes */
+/* Reset default list styling for ordered lists in notes. A counter cannot
+   read the start attribute: <ol start="3"> carries its own
+   "counter-reset: item 2" in its style, written on paste (js/bulletlist.js)
+   and on save (lib/html-sanitize.php), #1534. */
 .noteentry ol {
     counter-reset: item;
     list-style-type: none;

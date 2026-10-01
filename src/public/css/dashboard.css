@@ -2355,6 +2355,41 @@ html.dashboard-note-modal-open body {
     text-decoration: line-through;
 }
 
+/* Subtasks: indented under the text of their task, smaller, and ticked in
+   place. The indent is where the task's letters start: row padding (2px),
+   checkbox (17px), gap (8px), then the border and padding of the text box
+   (1px + 4px) */
+.dashboard-note-subtask {
+    padding-left: 32px;
+}
+
+#dashboardNoteModal .dashboard-note-subtask .dashboard-note-task-check {
+    width: 14px;
+    height: 14px;
+    margin-top: 4px;
+}
+
+.dashboard-note-subtask-text {
+    flex: 1;
+    min-width: 0;
+    padding: 1px 4px;
+    color: var(--pz-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.dashboard-note-subtask-text a {
+    color: var(--pz-accent-text);
+    text-decoration: underline;
+}
+
+.dashboard-note-subtask.is-done .dashboard-note-subtask-text {
+    color: var(--pz-text-muted);
+    text-decoration: line-through;
+}
+
 .dashboard-note-task-delete {
     display: inline-flex;
     align-items: center;

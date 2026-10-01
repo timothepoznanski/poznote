@@ -445,6 +445,66 @@ html[data-theme='dark'] .tasks-note-source-badge {
     cursor: pointer;
 }
 
+/* Subtasks of a task: indented rows under it. The divider moves from the
+   task row to the end of its subtasks, so the pair reads as one entry. */
+.tasks-task-item.has-subtasks {
+    border-bottom: none;
+    padding-bottom: 2px;
+}
+
+.tasks-subtask-list {
+    /* Under the task text: row padding (4px), the task checkbox with the
+       browser's own side margins (4px + 16px + 3px) and the row gap (10px) */
+    padding: 0 4px 8px 37px;
+    border-bottom: 1px solid rgba(var(--pz-shadow-rgb), 0.04);
+}
+
+.tasks-note-list > .tasks-subtask-list:last-child {
+    border-bottom: none;
+}
+
+.tasks-subtask-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 2px 0;
+    cursor: pointer;
+}
+
+.tasks-subtask-checkbox {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: var(--pz-accent);
+    flex-shrink: 0;
+    margin: 2px 0 0;
+}
+
+.tasks-subtask-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    color: var(--pz-text-secondary);
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.tasks-subtask-text a {
+    color: var(--pz-accent-text);
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.tasks-subtask-text a:hover {
+    color: var(--pz-accent-text-hover);
+    text-decoration: underline;
+}
+
+.tasks-subtask-item.completed .tasks-subtask-text {
+    color: var(--pz-text-subtle);
+    text-decoration: line-through;
+}
+
 .tasks-task-checkbox {
     width: 16px;
     height: 16px;
@@ -1095,7 +1155,8 @@ html[data-theme='dark'] .tasks-note-toggle:hover {
     color: var(--pz-accent-text);
 }
 
-html[data-theme='dark'] .tasks-task-item {
+html[data-theme='dark'] .tasks-task-item,
+html[data-theme='dark'] .tasks-subtask-list {
     border-bottom-color: rgba(var(--pz-highlight-rgb), 0.06);
 }
 

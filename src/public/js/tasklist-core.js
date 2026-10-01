@@ -151,7 +151,7 @@ function initializeTaskList(noteId, noteType) {
             };
         }
 
-        return {
+        const normalized = {
             ...task,
             id: normalizeTaskId(task.id),
             noteId: noteId,
@@ -160,6 +160,14 @@ function initializeTaskList(noteId, noteType) {
             text: typeof task.text === 'string' ? task.text : String(task.text ?? ''),
             dueAt: normalizeTaskDueAt(task.dueAt)
         };
+
+        // Optional subtasks (js/tasklist-subtasks.js); the key only exists on
+        // tasks that have some
+        const subtasks = normalizeSubtasks(task.subtasks);
+        if (subtasks.length > 0) normalized.subtasks = subtasks;
+        else delete normalized.subtasks;
+
+        return normalized;
     });
 
     // Persist normalized data for subsequent actions

@@ -1018,7 +1018,10 @@
     "unmark_important": "Quitar importante",
     "task_options": "Opciones de la tarea",
     "remind_me": "Recuérdamelo",
-    "remind_me_hint": "Se activa una notificación en la fecha y hora límite."
+    "remind_me_hint": "Se activa una notificación en la fecha y hora límite.",
+    "add_subtask": "Añadir una subtarea",
+    "subtask_placeholder": "Añadir una subtarea...",
+    "delete_subtask": "Eliminar subtarea"
   },
   "tags": {
     "add_single": "Agregar etiqueta...",

@@ -21,6 +21,8 @@ class PublicController {
      * Body (JSON):
      *   - completed: Optional boolean status
      *   - text: Optional string for task text
+     *   - subtask: Optional position of a subtask of that task (tasklist
+     *     notes only); `completed` then applies to it and is required
      */
     public function updateTask(string $id_or_index): void {
         $sharedNote = $this->resolveSharedNoteFromRequest();
@@ -57,15 +59,28 @@ class PublicController {
                 $this->sendError(400, 'Invalid task index');
                 return;
             }
-            if (isset($input['completed'])) $tasks[$index]['completed'] = (bool)$input['completed'];
-            if (isset($input['text'])) $tasks[$index]['text'] = $this->normalizePublicTaskText((string)$input['text'], $type);
-            
-            // Re-sort: uncompleted first, then completed
-            usort($tasks, function($a, $b) {
-                $aComp = !empty($a['completed']) ? 1 : 0;
-                $bComp = !empty($b['completed']) ? 1 : 0;
-                return $aComp <=> $bComp;
-            });
+            if (array_key_exists('subtask', $input)) {
+                // One subtask of that task, designated by its position in the
+                // rendered list: only its completion changes, and nothing moves
+                $subtaskKey = is_numeric($input['subtask'])
+                    ? resolveTasklistSubtaskKey($tasks[$index], (int)$input['subtask'])
+                    : null;
+                if ($subtaskKey === null || !isset($input['completed']) || array_key_exists('text', $input)) {
+                    $this->sendError(400, 'Invalid subtask update');
+                    return;
+                }
+                $tasks[$index]['subtasks'][$subtaskKey]['completed'] = (bool)$input['completed'];
+            } else {
+                if (isset($input['completed'])) $tasks[$index]['completed'] = (bool)$input['completed'];
+                if (isset($input['text'])) $tasks[$index]['text'] = $this->normalizePublicTaskText((string)$input['text'], $type);
+
+                // Re-sort: uncompleted first, then completed
+                usort($tasks, function($a, $b) {
+                    $aComp = !empty($a['completed']) ? 1 : 0;
+                    $bComp = !empty($b['completed']) ? 1 : 0;
+                    return $aComp <=> $bComp;
+                });
+            }
             
             $updatedContent = json_encode($tasks, JSON_UNESCAPED_UNICODE);
         } elseif ($type === 'markdown') {

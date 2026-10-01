@@ -95,6 +95,7 @@ function renderTasks(tasks, noteId) {
         const dueTitle = t('tasklist.due_date', null, 'Due date');
         const menuTitle = t('tasklist.task_options', null, 'Task options');
         const dragTitle = t('tasklist.drag_to_reorder', null, 'Drag to reorder');
+        const subtaskTitle = t('tasklist.add_subtask', null, 'Add a subtask');
 
         const dueAt = normalizeTaskDueAt(task.dueAt);
         const dueBellHtml = task.dueReminder ? '<i class="lucide lucide-bell"></i>' : '';
@@ -127,6 +128,9 @@ function renderTasks(tasks, noteId) {
             // Incomplete tasks: individual buttons on desktop, collapsed into a
             // three-dot menu on mobile (visibility handled in tasks.css)
             buttonsHtml = `
+            <button class="task-subtask-btn" title="${subtaskTitle}" onclick="openSubtaskInput(${task.id}, ${task.noteId || 'null'}, event)">
+                <i class="lucide lucide-corner-down-right"></i>
+            </button>
             ${dueBtnHtml}
             <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
                 <i class="${starClass}"></i>
@@ -142,12 +146,16 @@ function renderTasks(tasks, noteId) {
             </div>`;
         }
 
+        // Subtasks sit inside the row of their task (js/tasklist-subtasks.js)
+        const subtasksHtml = renderSubtasks(task, task.noteId || noteId);
+
         return `
-        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''} ${dueAt ? 'has-due' : ''}" data-task-id="${task.id}" draggable="false">
+        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''} ${dueAt ? 'has-due' : ''} ${subtasksHtml ? 'has-subtasks' : ''}" data-task-id="${task.id}" draggable="false">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
             ${dueChipHtml}
             <div class="task-row-actions">${buttonsHtml}</div>
+            ${subtasksHtml}
         </div>
         `;
     }).join('');

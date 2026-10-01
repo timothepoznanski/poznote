@@ -392,8 +392,60 @@
         return ['full', 'edit'].includes(getTaskAccessMode());
     }
 
+    // Subtask of a tasklist task: ticked in place, it keeps its position
+    function togglePublicSubtask(checkbox) {
+        const config = getPublicConfig();
+        if (!config || !config.token) return;
+
+        const completed = checkbox.checked;
+        if (!canToggleTasks()) {
+            checkbox.checked = !completed;
+            return;
+        }
+
+        const taskItem = checkbox.closest('.task-item');
+        const row = checkbox.closest('.task-subitem');
+        if (!taskItem || !row) return;
+
+        const apiBaseUrl = config.apiBaseUrl || 'api/v1';
+        const revert = function () {
+            checkbox.checked = !completed;
+            row.classList.toggle('completed', !completed);
+        };
+
+        // Optimistic UI update
+        row.classList.toggle('completed', completed);
+
+        // The task's index is read now: it follows the task when a toggle
+        // re-sorts the list (renumberPublicTasks)
+        fetch(`${apiBaseUrl}/public/tasks/${taskItem.getAttribute('data-index')}?${getApiAuthQuery(config)}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                completed: completed,
+                subtask: parseInt(checkbox.getAttribute('data-subtask-index'), 10)
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('Failed to update subtask', data.error);
+                    revert();
+                }
+            })
+            .catch(err => {
+                console.error('Network error', err);
+                revert();
+            });
+    }
+
     // Task list interaction (Checkboxes)
     document.addEventListener('change', function (e) {
+        if (e.target && e.target.matches('.task-subitem-checkbox')) {
+            togglePublicSubtask(e.target);
+            return;
+        }
+
         if (!e.target || !e.target.matches('.task-checkbox, .markdown-task-checkbox')) return;
 
         const checkbox = e.target;

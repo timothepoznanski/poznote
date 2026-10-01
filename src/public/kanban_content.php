@@ -338,6 +338,19 @@ try {
             echo '<input type="checkbox" class="kanban-task-checkbox" data-task-index="' . (int) $taskIndex . '" data-task-id="' . $taskIdAttr . '"' . ($completed ? ' checked' : '') . '>';
             echo '<span class="kanban-task-preview-text">' . htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
             echo '</label>';
+
+            // Subtasks, indented under their task and ticked the same way
+            // (toggleKanbanTaskFromCard in js/kanban.js)
+            foreach (getTasklistSubtasks($task) as $subtaskIndex => $subtask) {
+                // json_encode keeps the full precision of a float id
+                $subtaskId = is_float($subtask['id']) ? json_encode($subtask['id']) : (string) ($subtask['id'] ?? '');
+                $subtaskIdAttr = htmlspecialchars((string) $subtaskId, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+                echo '<label class="kanban-task-preview-item kanban-task-preview-subitem' . ($subtask['completed'] ? ' completed' : '') . '">';
+                echo '<input type="checkbox" class="kanban-subtask-checkbox" data-task-index="' . (int) $taskIndex . '" data-task-id="' . $taskIdAttr . '" data-subtask-index="' . (int) $subtaskIndex . '" data-subtask-id="' . $subtaskIdAttr . '"' . ($subtask['completed'] ? ' checked' : '') . '>';
+                echo '<span class="kanban-task-preview-text">' . htmlspecialchars($subtask['text'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
+                echo '</label>';
+            }
         }
         echo '</div>';
 

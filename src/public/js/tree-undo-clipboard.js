@@ -422,6 +422,17 @@
     }
 
     /**
+     * POST to a duplicate endpoint, once the server holds the note on screen
+     * as the editor shows it (commitOpenNoteBeforeCopy, utils-note-create.js).
+     */
+    function duplicateRequest(url, body) {
+        var committed = typeof commitOpenNoteBeforeCopy === 'function' ? commitOpenNoteBeforeCopy() : Promise.resolve();
+        return committed.then(function () {
+            return api('POST', url, body);
+        });
+    }
+
+    /**
      * Copy a note into a folder. Same workspace: the duplicate endpoint takes
      * the target folder directly. Other workspace: duplicate next to the
      * original, then move the copy (the move carries the workspace) and try
@@ -433,12 +444,12 @@
         var url = '/api/v1/notes/' + encode(sourceNoteId) + '/duplicate';
 
         if (sameWorkspace) {
-            return api('POST', url, { folder_id: dest.folderId || '', workspace: dest.workspace }).then(function (data) {
+            return duplicateRequest(url, { folder_id: dest.folderId || '', workspace: dest.workspace }).then(function (data) {
                 return data.id;
             });
         }
 
-        return api('POST', url, {}).then(function (data) {
+        return duplicateRequest(url, {}).then(function (data) {
             var newId = data.id;
             return moveNote(newId, dest).then(function () {
                 if (dest.name) {
@@ -467,7 +478,7 @@
     function duplicateFolderInto(sourceFolderId, sourceWorkspace, dest) {
         var url = '/api/v1/folders/' + encode(sourceFolderId) + '/duplicate?workspace=' + encode(sourceWorkspace || '');
 
-        return api('POST', url, {}).then(function (data) {
+        return duplicateRequest(url, {}).then(function (data) {
             var newId = data.folder_id || (data.folder && data.folder.id);
             var copyParentId = data.folder ? data.folder.parent_id : null;
             var copyWorkspace = (data.folder && data.folder.workspace) || sourceWorkspace;

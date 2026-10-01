@@ -5,6 +5,8 @@
  * Extracted from functions.php. Loaded through it, so no caller changed.
  */
 
+require_once __DIR__ . '/tasklists.php';
+
 /**
  * Whitespace of a note's plain text as a card shows it: runs of spaces
  * collapsed, single line breaks kept. Views that want the breaks render the
@@ -50,6 +52,10 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true) {
                 $label = trim((string)($item['text'] ?? ''));
                 if ($label === '') continue;
                 $taskSearch[] = $label;
+                // Subtasks are searchable, the card itself lists tasks only
+                foreach (getTasklistSubtasks($item) as $subtask) {
+                    $taskSearch[] = $subtask['text'];
+                }
                 if (count($tasks) < 4) {
                     $tasks[] = ['text' => $label, 'done' => !empty($item['completed'])];
                 }

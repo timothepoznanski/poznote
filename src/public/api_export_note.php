@@ -168,6 +168,7 @@ try {
                     $tasksContent .= '<div class="task-item' . $completed . $important . '">';
                     $tasksContent .= '<input type="checkbox" disabled' . $checked . ' /> ';
                     $tasksContent .= '<span class="task-text">' . $text . '</span>';
+                    $tasksContent .= renderTasklistSubtasksHtml($task);
                     $tasksContent .= '</div>' . "\n";
                 }
                 $tasksContent .= '</div>' . "\n";
@@ -773,11 +774,38 @@ function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [
 
         .task-item {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             padding: 8px 12px;
             border: 1px solid #e0e0e0;
             border-radius: 6px;
             background: #fafafa;
+        }
+
+        /* Subtasks: a full-width block under the line of their task */
+        .task-subtasks {
+            flex: 0 0 100%;
+            margin-top: 6px;
+            padding-left: 24px;
+            box-sizing: border-box;
+        }
+
+        .task-subitem {
+            display: flex;
+            align-items: baseline;
+            padding: 2px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+
+        .task-subitem-text {
+            flex: 1;
+            overflow-wrap: anywhere;
+        }
+
+        .task-subitem.completed .task-subitem-text {
+            text-decoration: line-through;
+            color: #666;
         }
 
         .task-item input[type="checkbox"] {

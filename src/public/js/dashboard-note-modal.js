@@ -338,11 +338,44 @@
         return row;
     }
 
+    // A subtask of a task (js/tasklist-subtasks.js): an indented row that can
+    // be ticked here; its text is edited in the task list itself
+    function buildSubtaskRow(subtask) {
+        var row = document.createElement('li');
+        row.className = 'dashboard-note-task dashboard-note-subtask' + (subtask.completed ? ' is-done' : '');
+
+        var box = document.createElement('input');
+        box.type = 'checkbox';
+        box.className = 'dashboard-note-task-check';
+        box.checked = !!subtask.completed;
+        box.setAttribute('aria-label', String(subtask.text || ''));
+        box.addEventListener('change', function () {
+            subtask.completed = box.checked;
+            row.classList.toggle('is-done', box.checked);
+            saveNow();
+        });
+        row.appendChild(box);
+
+        var text = document.createElement('div');
+        text.className = 'dashboard-note-subtask-text';
+        text.innerHTML = linkifyTaskText(subtask.text);
+        row.appendChild(text);
+
+        return row;
+    }
+
     function renderTasks() {
         var list = state.editor.querySelector('.dashboard-note-task-list');
         var empty = state.editor.querySelector('.dashboard-note-task-empty');
         list.innerHTML = '';
-        state.tasks.forEach(function (task) { list.appendChild(buildTaskRow(task)); });
+        state.tasks.forEach(function (task) {
+            list.appendChild(buildTaskRow(task));
+            (Array.isArray(task.subtasks) ? task.subtasks : []).forEach(function (subtask) {
+                if (subtask && typeof subtask === 'object' && String(subtask.text || '').trim()) {
+                    list.appendChild(buildSubtaskRow(subtask));
+                }
+            });
+        });
         empty.hidden = state.tasks.length > 0;
     }
 

@@ -350,7 +350,8 @@
     justify-content: center;
 }
 
-.task-move-btn {
+.task-move-btn,
+.task-subtask-btn {
     padding: 4px 8px;
     background: transparent;
     border: none;
@@ -372,13 +373,15 @@
     font-size: 16px !important;
 }
 
-.task-move-btn i {
+.task-move-btn i,
+.task-subtask-btn i {
     font-size: 16px !important;
 }
 
 .task-delete-btn i,
 .task-important-btn i,
 .task-move-btn i,
+.task-subtask-btn i,
 .task-drag-handle i {
     color: var(--pz-text-subtle);
     font-family: "Font Awesome 5 Pro" !important;
@@ -394,7 +397,8 @@
     color: var(--pz-warning-hover);
 }
 
-.task-move-btn:hover i {
+.task-move-btn:hover i,
+.task-subtask-btn:hover i {
     color: var(--pz-accent-text);
 }
 
@@ -471,6 +475,128 @@
     flex-shrink: 0;
 }
 
+/* Subtasks: a full-width block under the task's own line. The row wraps so
+   the block lands on a line of its own; the text keeps a zero minimum so it
+   shrinks instead of being pushed to a second line itself. */
+.task-item.has-subtasks {
+    flex-wrap: wrap;
+}
+
+.task-item.has-subtasks > .task-text {
+    min-width: 0;
+}
+
+/* Two classes: the blanket `.noteentry div { margin: 0; padding: 0 }` reset
+   of noteentry.css outweighs a single one */
+.task-item .task-subtasks {
+    flex: 0 0 100%;
+    box-sizing: border-box;
+    /* Aligned with the task text: checkbox width plus its right margin */
+    padding-left: 28px;
+    margin-top: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.task-item .task-subitem {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 1px 0;
+}
+
+.task-subitem-checkbox {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: var(--pz-accent);
+    margin: 3px 0 0;
+    flex-shrink: 0;
+}
+
+.task-subitem-text {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--note-font-size, 15px);
+    line-height: 1.4;
+    color: var(--pz-text-secondary);
+    cursor: text;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.task-subitem-text a {
+    color: var(--pz-accent-text);
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.task-subitem-text a:hover {
+    color: var(--pz-accent-text-hover);
+    text-decoration: underline;
+}
+
+.task-subitem.completed .task-subitem-text {
+    text-decoration: line-through;
+    color: var(--pz-text-muted);
+}
+
+/* Centred under the drag handle of the task row: the handle is a 16px box
+   flush with the row's right edge, so this wider button (kept for the click
+   area) reaches 5px into the row padding to share its axis */
+.task-subitem-delete {
+    width: 26px;
+    margin-right: -5px;
+    padding: 2px 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    /* Always shown, like the other controls of a task row */
+    opacity: 0.7;
+}
+
+.task-subitem-delete i {
+    font-size: 14px;
+    color: var(--pz-text-subtle);
+}
+
+.task-subitem-delete:hover i,
+.task-subitem-delete:hover i[class*="lucide-"] {
+    color: var(--pz-danger-text);
+}
+
+.task-subitem-form {
+    margin: 2px 0 0;
+    display: flex;
+}
+
+.task-subitem-input {
+    flex: 1;
+    min-width: 0;
+    padding: 3px 8px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    font-size: var(--note-font-size, 15px);
+    font-family: inherit;
+    color: var(--pz-text);
+    background: var(--pz-bg);
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.task-subitem-input:focus {
+    outline: none;
+    border-color: var(--pz-accent-text);
+}
+
 /* Three-dot menu button: mobile only, replaces the individual action buttons */
 .task-menu-btn {
     display: none;
@@ -541,7 +667,8 @@
     /* Incomplete tasks: collapse the individual action buttons into the menu */
     .task-item:not(.completed) .task-row-actions .task-due-btn,
     .task-item:not(.completed) .task-row-actions .task-important-btn,
-    .task-item:not(.completed) .task-row-actions .task-move-btn {
+    .task-item:not(.completed) .task-row-actions .task-move-btn,
+    .task-item:not(.completed) .task-row-actions .task-subtask-btn {
         display: none;
     }
 
@@ -578,6 +705,11 @@
     .task-item.has-due .task-row-actions {
         grid-area: actions;
         justify-self: end;
+    }
+
+    /* Third row of the dated-task grid, under the checkbox and text */
+    .task-item.has-due .task-subtasks {
+        grid-column: 1 / -1;
     }
 }
 
@@ -1062,6 +1194,42 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 }
 
 .noteentry .tasklist-embed-task.completed .tasklist-embed-text {
+    text-decoration: line-through;
+    color: var(--pz-text-muted);
+}
+
+/* Subtasks of an embedded task: indented under its text (checkbox width plus
+   the row gap) */
+.noteentry .tasklist-embed-subtasks {
+    display: flex;
+    flex-direction: column;
+    padding: 0 2px 2px 27px;
+}
+
+.noteentry .tasklist-embed-subtask {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 2px 0;
+    min-width: 0;
+    cursor: pointer;
+}
+
+.noteentry .tasklist-embed-subtask .tasklist-embed-checkbox {
+    width: 13px;
+    height: 13px;
+}
+
+.noteentry .tasklist-embed-subtask-text {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.4;
+    color: var(--pz-text-secondary);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.noteentry .tasklist-embed-subtask.completed .tasklist-embed-subtask-text {
     text-decoration: line-through;
     color: var(--pz-text-muted);
 }

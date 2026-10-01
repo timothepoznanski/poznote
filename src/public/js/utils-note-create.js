@@ -693,12 +693,41 @@ function toggleFolderFavorite(folderId) {
         });
 }
 
+/**
+ * Brings the server up to date with the note on screen before something
+ * copies it. A copy is made from what the server holds, which lags behind the
+ * editor in two ways: changes the autosave has not sent yet, and pictures
+ * taken out of the text, whose attachments are only deleted when the note is
+ * left (js/main.js). Copied in between, the note came out with its previous
+ * text, or with the removed pictures as attachments (#1535).
+ *
+ * Resolves in every case, a failed save included: the copy still goes on.
+ */
+function commitOpenNoteBeforeCopy() {
+    return new Promise(function (resolve) {
+        var openNoteId = window.noteid;
+        var unsaved = openNoteId && typeof hasUnsavedChanges === 'function' && hasUnsavedChanges(openNoteId);
+        if (unsaved && typeof showSaveInProgressNotification === 'function') {
+            showSaveInProgressNotification(resolve);
+        } else {
+            resolve();
+        }
+    }).then(function () {
+        if (typeof window.deletePendingNoteImagesNow === 'function') {
+            return window.deletePendingNoteImagesNow();
+        }
+    });
+}
+
 function duplicateNote(noteId) {
-    fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/duplicate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'same-origin'
-    })
+    commitOpenNoteBeforeCopy()
+        .then(function () {
+            return fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/duplicate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin'
+            });
+        })
         .then(function (response) {
             return response.json();
         })
@@ -713,8 +742,12 @@ function duplicateNote(noteId) {
                 if (data.share_delta && typeof updateSharedCount === 'function') {
                     updateSharedCount(data.share_delta);
                 }
-                // Stay on current note - just reload the page to refresh the list
-                window.location.reload();
+                // Stay on the current note and where the tree was scrolled:
+                // the copy lands next to the original (#1536)
+                var sourceLink = findTreeRow({ type: 'note', id: noteId });
+                var folderContent = sourceLink ? sourceLink.closest('.folder-content') : null;
+                var folderId = folderContent && folderContent.id ? folderContent.id.replace(/^folder-/, '') : null;
+                showAddedTreeRow({ type: 'note', id: data.id }, folderId);
             } else {
                 // Fallback: reload the page
                 window.location.reload();

@@ -7,6 +7,8 @@
  * to change.
  */
 
+require_once __DIR__ . '/tasklists.php';
+
 /**
  * Note type used when creating a diary entry: 'markdown' when the
  * diary_default_note_type setting asks for it, 'note' (HTML) otherwise.
@@ -521,7 +523,17 @@ function renderDiaryJournalContent(string $content, string $type): string {
             $classes = trim(($done ? 'completed' : '') . (!empty($item['important']) ? ' important' : ''));
             $html .= '<li' . ($classes !== '' ? ' class="' . $classes . '"' : '') . '>'
                 . '<input type="checkbox" disabled' . ($done ? ' checked' : '') . '> '
-                . '<span>' . htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span></li>';
+                . '<span>' . htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
+            $subHtml = '';
+            foreach (getTasklistSubtasks($item) as $subtask) {
+                $subHtml .= '<li' . ($subtask['completed'] ? ' class="completed"' : '') . '>'
+                    . '<input type="checkbox" disabled' . ($subtask['completed'] ? ' checked' : '') . '> '
+                    . '<span>' . htmlspecialchars($subtask['text'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span></li>';
+            }
+            if ($subHtml !== '') {
+                $html .= '<ul class="diary-journal-subtasks">' . $subHtml . '</ul>';
+            }
+            $html .= '</li>';
         }
         return $html !== '' ? '<ul class="diary-journal-tasks">' . $html . '</ul>' : '';
     }

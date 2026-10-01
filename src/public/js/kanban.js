@@ -307,7 +307,7 @@
 
         // Task checkbox delegation. The task area is interactive but the rest of the card still opens/drags normally.
         document.addEventListener('change', (e) => {
-            const checkbox = e.target.closest('.kanban-task-checkbox');
+            const checkbox = e.target.closest('.kanban-task-checkbox, .kanban-subtask-checkbox');
             if (!checkbox) return;
 
             e.stopPropagation();
@@ -705,6 +705,14 @@
             .replace(/'/g, '&#039;');
     }
 
+    // Subtasks of a task that have a text, the ones the card lists (same
+    // filter as getTasklistSubtasks in lib/tasklists.php, so positions match)
+    function getKanbanSubtasks(task) {
+        return (Array.isArray(task.subtasks) ? task.subtasks : []).filter((subtask) => {
+            return subtask && typeof subtask === 'object' && String(subtask.text ?? '').trim() !== '';
+        });
+    }
+
     function renderKanbanTaskPreview(preview, tasks) {
         if (!preview || !Array.isArray(tasks)) return;
 
@@ -719,10 +727,18 @@
             const taskId = taskObject.id ?? '';
             const className = 'kanban-task-preview-item' + (completed ? ' completed' : '') + (important ? ' important' : '');
 
-            return '<label class="' + className + '">'
+            const taskHtml = '<label class="' + className + '">'
                 + '<input type="checkbox" class="kanban-task-checkbox" data-task-index="' + index + '" data-task-id="' + escapeKanbanHtml(taskId) + '"' + (completed ? ' checked' : '') + '>'
                 + '<span class="kanban-task-preview-text">' + escapeKanbanHtml(text) + '</span>'
                 + '</label>';
+
+            // Subtasks, indented under their task
+            return taskHtml + getKanbanSubtasks(taskObject).map((subtask, subtaskIndex) => {
+                return '<label class="kanban-task-preview-item kanban-task-preview-subitem' + (subtask.completed ? ' completed' : '') + '">'
+                    + '<input type="checkbox" class="kanban-subtask-checkbox" data-task-index="' + index + '" data-task-id="' + escapeKanbanHtml(taskId) + '" data-subtask-index="' + subtaskIndex + '" data-subtask-id="' + escapeKanbanHtml(subtask.id ?? '') + '"' + (subtask.completed ? ' checked' : '') + '>'
+                    + '<span class="kanban-task-preview-text">' + escapeKanbanHtml(subtask.text) + '</span>'
+                    + '</label>';
+            }).join('');
         }).join('');
 
         preview.scrollTop = previousScrollTop;
@@ -1065,21 +1081,38 @@
     // Tasks of a card as its preview shows them (the preview carries no due
     // dates: the due badge is only recomputed from saved tasks)
     function readKanbanPreviewTasks(preview) {
-        return Array.from(preview.querySelectorAll('.kanban-task-preview-item')).map((item) => {
-            const box = item.querySelector('.kanban-task-checkbox');
+        const tasks = [];
+        preview.querySelectorAll('.kanban-task-preview-item').forEach((item) => {
+            const box = item.querySelector('input[type="checkbox"]');
             const text = item.querySelector('.kanban-task-preview-text');
-            return {
+
+            // A subtask row belongs to the task row above it
+            if (item.classList.contains('kanban-task-preview-subitem')) {
+                const task = tasks[tasks.length - 1];
+                if (!task) return;
+                task.subtasks.push({
+                    id: box ? (box.dataset.subtaskId || '') : '',
+                    text: text ? text.textContent : '',
+                    completed: item.classList.contains('completed')
+                });
+                return;
+            }
+
+            tasks.push({
                 id: box ? (box.dataset.taskId || '') : '',
                 text: text ? text.textContent : '',
                 completed: item.classList.contains('completed'),
-                important: item.classList.contains('important')
-            };
+                important: item.classList.contains('important'),
+                subtasks: []
+            });
         });
+        return tasks;
     }
 
     // One read-modify-write of the tasklist note behind a card. Resolves to
-    // the saved tasks.
-    async function saveKanbanTaskToggle(taskNoteId, taskId, taskIndex, completed) {
+    // the saved tasks. With `subtask` ({ id, index }), the toggle applies to
+    // that subtask of the task, which then keeps its place in the list.
+    async function saveKanbanTaskToggle(taskNoteId, taskId, taskIndex, completed, subtask) {
         const noteResponse = await fetch(`/api/v1/notes/${encodeURIComponent(taskNoteId)}`, {
             method: 'GET',
             headers: {
@@ -1105,8 +1138,18 @@
         if (targetIndex === -1) throw new Error('Task not found');
 
         const toggledTask = tasks[targetIndex];
-        toggledTask.completed = completed;
-        tasks = reorderKanbanTasksAfterToggle(tasks, toggledTask);
+        if (subtask) {
+            // By id, or by its position among the listed subtasks when the
+            // card could not carry a usable id
+            const stored = Array.isArray(toggledTask.subtasks) ? toggledTask.subtasks : [];
+            const target = (subtask.id !== '' ? stored.find((item) => item && String(item.id) === subtask.id) : null)
+                || getKanbanSubtasks(toggledTask)[subtask.index];
+            if (!target) throw new Error('Subtask not found');
+            target.completed = completed;
+        } else {
+            toggledTask.completed = completed;
+            tasks = reorderKanbanTasksAfterToggle(tasks, toggledTask);
+        }
 
         let updateResult = await patchKanbanTasklistContent(taskNoteId, tasks, '');
         if (updateResult.status === 423) {
@@ -1148,6 +1191,10 @@
         const taskId = checkbox.dataset.taskId || '';
         const taskIndex = Number.parseInt(checkbox.dataset.taskIndex || '', 10);
         const completed = checkbox.checked;
+        // Set when the box is the one of a subtask
+        const subtask = checkbox.classList.contains('kanban-subtask-checkbox')
+            ? { id: checkbox.dataset.subtaskId || '', index: Number.parseInt(checkbox.dataset.subtaskIndex || '', 10) }
+            : null;
 
         if (!preview || !taskNoteId) {
             checkbox.checked = !completed;
@@ -1159,14 +1206,24 @@
 
         let state = kanbanToggleStates.get(preview);
         if (!state) {
-            state = { pending: 0, failures: 0, saved: shown.map((task) => Object.assign({}, task)), fromServer: false, queue: Promise.resolve() };
+            // A deep copy: the optimistic change below edits the shown tasks and their subtasks
+            state = { pending: 0, failures: 0, saved: JSON.parse(JSON.stringify(shown)), fromServer: false, queue: Promise.resolve() };
             kanbanToggleStates.set(preview, state);
         }
         state.pending++;
 
-        const item = checkbox.closest('.kanban-task-preview-item');
-        const toggled = shown[Array.from(preview.querySelectorAll('.kanban-task-preview-item')).indexOf(item)];
-        if (toggled) {
+        // The task row: the box's own row, or for a subtask the task row above it
+        let item = checkbox.closest('.kanban-task-preview-item');
+        while (item && item.classList.contains('kanban-task-preview-subitem')) {
+            item = item.previousElementSibling;
+        }
+        const taskItems = Array.from(preview.querySelectorAll('.kanban-task-preview-item:not(.kanban-task-preview-subitem)'));
+        const toggled = shown[taskItems.indexOf(item)];
+        if (toggled && subtask) {
+            const shownSubtask = toggled.subtasks[subtask.index];
+            if (shownSubtask) shownSubtask.completed = completed;
+            renderKanbanTaskPreview(preview, shown);
+        } else if (toggled) {
             toggled.completed = completed;
             renderKanbanTaskPreview(preview, reorderKanbanTasksAfterToggle(shown, toggled));
         }
@@ -1178,7 +1235,7 @@
         state.queue = state.queue
             .then(() => {
                 if (state.failures !== failuresBefore) return null;
-                return saveKanbanTaskToggle(taskNoteId, taskId, taskIndex, completed);
+                return saveKanbanTaskToggle(taskNoteId, taskId, taskIndex, completed, subtask);
             })
             .then((tasks) => {
                 if (!tasks) return;

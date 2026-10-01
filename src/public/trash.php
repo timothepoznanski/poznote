@@ -41,9 +41,12 @@ function renderTasklistHtml($tasks) {
         $completed = !empty($task['completed']) ? ' completed' : '';
         $checked = !empty($task['completed']) ? ' checked' : '';
         
-        $html .= '<div class="task-item' . $completed . '">';
+        $subtasksHtml = renderTasklistSubtasksHtml($task, 'linkify_html');
+
+        $html .= '<div class="task-item' . $completed . ($subtasksHtml !== '' ? ' has-subtasks' : '') . '">';
         $html .= '<input type="checkbox" disabled' . $checked . ' /> ';
         $html .= '<span class="task-text">' . $text . '</span>';
+        $html .= $subtasksHtml;
         $html .= '</div>';
     }
     

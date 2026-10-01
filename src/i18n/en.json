@@ -579,7 +579,10 @@
     "confirm_uncheck_all": "Uncheck {{count}} task(s)?",
     "move_error": "Unable to move task",
     "no_checked_tasks": "No checked tasks to uncheck.",
-    "uncheck_all": "Uncheck all tasks"
+    "uncheck_all": "Uncheck all tasks",
+    "add_subtask": "Add a subtask",
+    "subtask_placeholder": "Add a subtask...",
+    "delete_subtask": "Delete subtask"
   },
   "tags": {
     "add_single": "Add tag...",

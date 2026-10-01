@@ -363,6 +363,12 @@ function handleRichTextPaste(htmlData) {
         }
     });
 
+    // Numbered lists that do not start at 1 (a OneNote list going on after
+    // a picture) keep their numbers (js/bulletlist.js)
+    if (typeof window.applyListStartNumbers === 'function') {
+        window.applyListStartNumbers(doc.body);
+    }
+
     // Remove conflicting attributes from all elements
     var elements = doc.body.querySelectorAll('*');
 
@@ -387,6 +393,15 @@ function handleRichTextPaste(htmlData) {
             if (!/^(IMG|VIDEO|IFRAME|TABLE|COLGROUP|COL|TR|TD|TH)$/.test(el.tagName)) {
                 el.style.width = '';
                 el.style.minWidth = '';
+            }
+
+            // The weight an Office list sets on itself is the one of its
+            // numbers, which Poznote draws its own way. Left there, it made
+            // every nested item bold and the browser dropped the bold spans
+            // inside them as redundant (#1540). Items keep their own style.
+            if (el.tagName === 'OL' || el.tagName === 'UL') {
+                el.style.fontWeight = '';
+                el.style.fontStyle = '';
             }
 
             // Clean up empty style attribute

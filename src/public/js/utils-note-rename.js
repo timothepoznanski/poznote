@@ -142,11 +142,14 @@ function showConvertNoteModal(noteId, target) {
     if (duplicateBtn) {
         duplicateBtn.onclick = function () {
             // Duplicate the note without reloading the page
-            fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/duplicate', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'same-origin'
-            })
+            commitOpenNoteBeforeCopy()
+                .then(function () {
+                    return fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/duplicate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin'
+                    });
+                })
                 .then(function (response) {
                     return response.json();
                 })

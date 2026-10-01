@@ -318,8 +318,40 @@
     initBulletList();
   }
 
+  /**
+   * Make the numbered lists under root start where they say they do (#1534).
+   *
+   * The numbers are drawn by the CSS counter "item" (css/checklists.css),
+   * which cannot read the start attribute, so a list that does not start at 1
+   * also carries the matching counter-reset in its style; lib/html-sanitize.php
+   * writes the same on save. The value of a first item counts as the start:
+   * that is how OneNote goes on numbering in a new <ol> after a picture.
+   * @param {ParentNode} root - Pasted content, before it goes into the note
+   */
+  function applyListStartNumbers(root) {
+    root.querySelectorAll('ol').forEach(function(list) {
+      const firstItem = list.querySelector(':scope > li');
+      let start = parseInt(list.getAttribute('start'), 10);
+      if (firstItem && firstItem.hasAttribute('value')) {
+        const value = parseInt(firstItem.getAttribute('value'), 10);
+        if (!isNaN(value)) start = value;
+        firstItem.removeAttribute('value');
+      }
+
+      if (isNaN(start) || start === 1 || Math.abs(start) > 999999) {
+        list.removeAttribute('start');
+        list.style.counterReset = '';
+        if (!list.getAttribute('style')) list.removeAttribute('style');
+        return;
+      }
+      list.setAttribute('start', String(start));
+      list.style.counterReset = 'item ' + (start - 1);
+    });
+  }
+
   // Expose for external use if needed
   window.bulletListIndent = indentListItem;
   window.bulletListOutdent = outdentListItem;
+  window.applyListStartNumbers = applyListStartNumbers;
 
 })();

@@ -142,6 +142,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/tasklist-core.js',
         'js/tasklist-render.js',
         'js/tasklist-crud.js',
+        'js/tasklist-subtasks.js',
         'js/tasklist-edit-modal.js',
         'js/tasklist-actions.js',
         'js/tasklist-move.js',

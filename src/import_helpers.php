@@ -32,12 +32,32 @@ function extractTaskListFromHTML($htmlContent) {
         $textSpan = $xpath->query('.//span[contains(@class, "task-text")]', $taskItem)->item(0);
         $text = $textSpan ? trim($textSpan->textContent) : '';
         
-        $tasks[] = [
+        $task = [
             'id' => floatval($taskId),
             'text' => $text,
             'completed' => $completed,
             'important' => $important
         ];
+
+        // Subtask rows sit inside their task (renderTasks in js/tasklist-render.js)
+        $subtasks = [];
+        foreach ($xpath->query('.//div[contains(@class, "task-subitem")]', $taskItem) as $subItem) {
+            $subTextSpan = $xpath->query('.//span[contains(@class, "task-subitem-text")]', $subItem)->item(0);
+            $subText = $subTextSpan ? trim($subTextSpan->textContent) : '';
+            if ($subText === '') continue;
+
+            $subId = $subItem->getAttribute('data-subtask-id');
+            $subtasks[] = [
+                'id' => $subId !== '' ? floatval($subId) : generateImportedTaskId(),
+                'text' => $subText,
+                'completed' => strpos($subItem->getAttribute('class'), 'completed') !== false
+            ];
+        }
+        if (!empty($subtasks)) {
+            $task['subtasks'] = $subtasks;
+        }
+
+        $tasks[] = $task;
     }
     
     return json_encode($tasks);
@@ -171,13 +191,31 @@ function convertMarkdownCheckboxListToTasklistJson($markdownContent) {
 
     $tasks = [];
     $lines = explode("\n", $markdownContent);
+    // Indentation of the task the next indented lines belong to
+    $parentIndent = null;
 
     foreach ($lines as $line) {
-        if (!preg_match('/^\s*[-*+]\s+\[([ xX])\]\s+(.*)$/u', $line, $matches)) {
+        if (!preg_match('/^(\s*)[-*+]\s+\[([ xX])\]\s+(.*)$/u', $line, $matches)) {
             continue;
         }
 
-        $text = trim($matches[2]);
+        $indent = strlen(str_replace("\t", '    ', $matches[1]));
+        $text = trim($matches[3]);
+        $completed = strtolower($matches[2]) === 'x';
+
+        // A checkbox indented under a task is one of its subtasks (one level:
+        // deeper lines join the same task)
+        if ($parentIndent !== null && $indent > $parentIndent && !empty($tasks)) {
+            if ($text !== '') {
+                $tasks[count($tasks) - 1]['subtasks'][] = [
+                    'id' => generateImportedTaskId(),
+                    'text' => $text,
+                    'completed' => $completed,
+                ];
+            }
+            continue;
+        }
+
         $important = false;
 
         if (preg_match('/\s+⭐\s*$/u', $text)) {
@@ -191,14 +229,14 @@ function convertMarkdownCheckboxListToTasklistJson($markdownContent) {
             continue;
         }
 
+        $parentIndent = $indent;
         $tasks[] = [
-            'id' => (int) (microtime(true) * 10000),
+            'id' => generateImportedTaskId(),
             'text' => $text,
-            'completed' => strtolower($matches[1]) === 'x',
+            'completed' => $completed,
             'noteId' => '',
             'important' => $important,
         ];
-        usleep(1);
     }
 
     if (empty($tasks)) {
@@ -367,15 +405,38 @@ function insertNoteIntoDb($con, $title, $content, $folderName, $folderId, $works
 }
 
 /**
+ * Id of an imported task or subtask: a timestamp, never handed out twice in
+ * one request. Reading the clock alone gave two tasks imported in the same
+ * 100 microseconds the same id, and the interface then acted on the first.
+ */
+function generateImportedTaskId() {
+    static $last = 0;
+    $id = (int) (microtime(true) * 10000);
+    if ($id <= $last) {
+        $id = $last + 1;
+    }
+    $last = $id;
+    return $id;
+}
+
+/**
  * Regenerate tasklist IDs and noteId for imported JSON tasklist data.
  * Updates the database entry with the regenerated data.
  */
 function regenerateTasklistIds($con, $noteId, $originalJsonData, &$content) {
     if ($originalJsonData === null) return;
     foreach ($originalJsonData as &$task) {
-        $task['id'] = (int)(microtime(true) * 10000);
+        $task['id'] = generateImportedTaskId();
         $task['noteId'] = (int)$noteId;
-        usleep(1);
+
+        if (isset($task['subtasks']) && is_array($task['subtasks'])) {
+            foreach ($task['subtasks'] as &$subtask) {
+                if (is_array($subtask)) {
+                    $subtask['id'] = generateImportedTaskId();
+                }
+            }
+            unset($subtask);
+        }
     }
     unset($task);
     $content = json_encode($originalJsonData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

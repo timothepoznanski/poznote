@@ -244,6 +244,12 @@ function convertTasklistToMarkdown($jsonContent) {
         } else {
             $markdown .= '- ' . $checkbox . ' ' . $text . "\n";
         }
+
+        // Subtasks: checkbox lines indented under their task, which is what
+        // convertMarkdownCheckboxListToTasklistJson() reads back on import
+        foreach (getTasklistSubtasks($task) as $subtask) {
+            $markdown .= '    - ' . ($subtask['completed'] ? '[x]' : '[ ]') . ' ' . $subtask['text'] . "\n";
+        }
     }
 
     return $markdown;

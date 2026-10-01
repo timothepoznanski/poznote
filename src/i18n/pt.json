@@ -1018,7 +1018,10 @@
     "unmark_important": "Remover importante",
     "task_options": "Opções da tarefa",
     "remind_me": "Lembrar-me",
-    "remind_me_hint": "Uma notificação é disparada na data e hora de vencimento."
+    "remind_me_hint": "Uma notificação é disparada na data e hora de vencimento.",
+    "add_subtask": "Adicionar uma subtarefa",
+    "subtask_placeholder": "Adicionar uma subtarefa...",
+    "delete_subtask": "Excluir subtarefa"
   },
   "tags": {
     "add_single": "Adicionar etiqueta...",
