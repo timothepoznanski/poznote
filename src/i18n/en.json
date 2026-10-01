@@ -4132,6 +4132,8 @@
     "show_labels_hint": "Show note titles under the dots",
     "show_folders": "Folders",
     "show_folders_hint": "Show each folder as a hub linked to its notes",
+    "tree_layout": "Tree view",
+    "tree_layout_hint": "Line up folders, subfolders and notes from left to right, with straight links",
     "separate_groups": "Separate groups",
     "separate_groups_hint": "Lay out each group of linked notes apart from the others",
     "reset_layout": "Reset layout",
@@ -4139,6 +4141,8 @@
     "drag_hint": "Ctrl + drag moves a dot independently of its links",
     "folder_filter_all": "All folders",
     "folder_filter_hint": "Show only the notes of one folder",
+    "folder_modal_title": "Choose a folder",
+    "folder_modal_empty": "No matching folder.",
     "stats": "{{notes}} notes · {{links}} links",
     "search": {
       "placeholder": "Find a note..."

@@ -4507,6 +4507,8 @@
     "show_labels_hint": "Mostrar los títulos de las notas bajo los puntos",
     "show_folders": "Carpetas",
     "show_folders_hint": "Mostrar cada carpeta como un nodo central enlazado a sus notas",
+    "tree_layout": "Vista de árbol",
+    "tree_layout_hint": "Alinear carpetas, subcarpetas y notas de izquierda a derecha, con enlaces rectos",
     "separate_groups": "Separar grupos",
     "separate_groups_hint": "Colocar cada grupo de notas enlazadas separado de los demás",
     "reset_layout": "Restablecer disposición",
@@ -4514,6 +4516,8 @@
     "drag_hint": "Ctrl + arrastrar mueve un punto independientemente de sus enlaces",
     "folder_filter_all": "Todas las carpetas",
     "folder_filter_hint": "Mostrar solo las notas de una carpeta",
+    "folder_modal_title": "Elegir una carpeta",
+    "folder_modal_empty": "Ninguna carpeta coincide.",
     "stats": "{{notes}} notas · {{links}} enlaces",
     "search": {
       "placeholder": "Buscar una nota..."

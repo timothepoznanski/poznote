@@ -41,9 +41,11 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					autocomplete="off"
 				>
 			</div>
-			<select id="graphFolderFilter" class="graph-folder-select initially-hidden" title="<?php echo t_h('graph.folder_filter_hint', [], 'Show only the notes of one folder'); ?>">
-				<option value=""><?php echo t_h('graph.folder_filter_all', [], 'All folders'); ?></option>
-			</select>
+			<button type="button" id="graphFolderFilterBtn" class="graph-reset-btn graph-folder-btn initially-hidden" aria-haspopup="dialog" title="<?php echo t_h('graph.folder_filter_hint', [], 'Show only the notes of one folder'); ?>">
+				<i class="lucide lucide-folder"></i>
+				<span id="graphFolderFilterLabel"><?php echo t_h('graph.folder_filter_all', [], 'All folders'); ?></span>
+				<i class="lucide lucide-chevron-down"></i>
+			</button>
 			<div class="graph-options">
 				<label class="graph-orphans-toggle" title="<?php echo t_h('graph.show_orphans_hint', [], 'Show notes that have no links'); ?>">
 					<input type="checkbox" id="graphShowOrphans" checked>
@@ -57,6 +59,10 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<input type="checkbox" id="graphShowFolders">
 					<span><?php echo t_h('graph.show_folders', [], 'Folders'); ?></span>
 				</label>
+				<button id="graphTreeLayout" class="graph-reset-btn initially-hidden" aria-pressed="false" title="<?php echo t_h('graph.tree_layout_hint', [], 'Line up folders, subfolders and notes from left to right, with straight links'); ?>">
+					<i class="lucide lucide-folder-tree"></i>
+					<span><?php echo t_h('graph.tree_layout', [], 'Tree view'); ?></span>
+				</button>
 				<button id="graphSeparateGroups" class="graph-reset-btn initially-hidden" title="<?php echo t_h('graph.separate_groups_hint', [], 'Lay out each group of linked notes apart from the others'); ?>">
 					<i class="lucide lucide-boxes"></i>
 					<span><?php echo t_h('graph.separate_groups', [], 'Separate groups'); ?></span>
@@ -84,6 +90,22 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			</div>
 			<svg id="graphSvg" role="img" aria-label="<?php echo t_h('graph.title', [], 'Note graph'); ?>"></svg>
 			<div class="graph-tooltip initially-hidden" id="graphTooltip" data-txt-links="<?php echo t_h('graph.tooltip.links', [], '{{count}} links'); ?>" data-txt-folder="<?php echo t_h('graph.tooltip.folder_notes', [], 'Folder · {{count}} notes'); ?>"></div>
+		</div>
+	</div>
+
+	<!-- Folder filter: pick the folder the graph is narrowed to -->
+	<div id="graphFolderModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="graphFolderModalTitle">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 id="graphFolderModalTitle"><?php echo t_h('graph.folder_modal_title', [], 'Choose a folder'); ?></h3>
+			</div>
+			<div class="modal-body">
+				<input type="text" id="graphFolderSearch" class="graph-folder-search" placeholder="<?php echo t_h('notes_manager.filter_folders', [], 'Filter folders...'); ?>" autocomplete="off">
+				<div id="graphFolderList" class="graph-folder-list" data-txt-empty="<?php echo t_h('graph.folder_modal_empty', [], 'No matching folder.'); ?>"></div>
+			</div>
+			<div class="modal-buttons">
+				<button type="button" id="graphFolderModalClose" class="btn-cancel"><?php echo t_h('common.close', [], 'Close'); ?></button>
+			</div>
 		</div>
 	</div>
 

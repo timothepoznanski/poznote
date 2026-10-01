@@ -4611,6 +4611,8 @@
     "show_labels_hint": "Afficher les titres des notes sous les points",
     "show_folders": "Dossiers",
     "show_folders_hint": "Afficher chaque dossier comme un point central relié à ses notes",
+    "tree_layout": "Vue en arbre",
+    "tree_layout_hint": "Aligner dossiers, sous-dossiers et notes de gauche à droite, avec des liens droits",
     "separate_groups": "Séparer les groupes",
     "separate_groups_hint": "Disposer chaque groupe de notes liées à l'écart des autres",
     "reset_layout": "Réinitialiser la disposition",
@@ -4618,6 +4620,8 @@
     "drag_hint": "Ctrl + glisser déplace un point indépendamment de ses liens",
     "folder_filter_all": "Tous les dossiers",
     "folder_filter_hint": "Afficher uniquement les notes d'un dossier",
+    "folder_modal_title": "Choisir un dossier",
+    "folder_modal_empty": "Aucun dossier ne correspond.",
     "stats": "{{notes}} notes · {{links}} liens",
     "search": {
       "placeholder": "Rechercher une note..."

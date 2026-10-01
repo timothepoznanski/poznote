@@ -4506,6 +4506,8 @@
     "show_labels_hint": "Notiztitel unter den Punkten anzeigen",
     "show_folders": "Ordner",
     "show_folders_hint": "Jeden Ordner als Knotenpunkt anzeigen, der mit seinen Notizen verbunden ist",
+    "tree_layout": "Baumansicht",
+    "tree_layout_hint": "Ordner, Unterordner und Notizen von links nach rechts ausrichten, mit geraden Verbindungen",
     "separate_groups": "Gruppen trennen",
     "separate_groups_hint": "Jede Gruppe verknüpfter Notizen getrennt von den anderen anordnen",
     "reset_layout": "Anordnung zurücksetzen",
@@ -4513,6 +4515,8 @@
     "drag_hint": "Strg + Ziehen bewegt einen Punkt unabhängig von seinen Verknüpfungen",
     "folder_filter_all": "Alle Ordner",
     "folder_filter_hint": "Nur die Notizen eines Ordners anzeigen",
+    "folder_modal_title": "Ordner auswählen",
+    "folder_modal_empty": "Kein passender Ordner.",
     "stats": "{{notes}} Notizen · {{links}} Verknüpfungen",
     "search": {
       "placeholder": "Notiz suchen..."
