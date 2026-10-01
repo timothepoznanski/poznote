@@ -140,10 +140,10 @@ html[data-theme='dark'] .folder-header.folder-drop-after::after {
        a modest 6px above separates it from the section before.
        Between two bare folder rows the margins collapse through the
        padding-less .folder-header, so the gap is max(6, 4), not 10. */
-    padding: 3px 6px;
+    padding: 5px 8px;
     margin: 6px 0 4px;
     cursor: pointer;
-    border-radius: var(--pz-radius-lg);
+    border-radius: var(--pz-radius);
     background-color: transparent;
     transition: background-color 0.2s;
     user-select: none;

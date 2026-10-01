@@ -472,9 +472,9 @@ a.links_arbo_left:active {
     vertical-align: top;
     text-decoration: none;
     color: var(--pz-text);
-    padding: 3px 6px 3px 0px;
+    padding: 5px 8px 5px 8px;
     /* Réduction du padding vertical (6px → 3px) */
-    border-radius: var(--pz-radius-lg);
+    border-radius: var(--pz-radius);
     font-size: 14px;
     line-height: 1.2;
     font-weight: var(--pz-weight-normal);
