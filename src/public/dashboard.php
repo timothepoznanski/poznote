@@ -856,7 +856,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				<div class="modal-buttons">
 					<?php // workspaces.php is refused on an account that is not one's own ?>
 					<?php if ((!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())): ?>
-					<button type="button" class="dashboard-scope-manage-btn" onclick="window.location.href='workspaces.php'"><i class="lucide lucide-layers"></i> <?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?></button>
+					<button type="button" class="dashboard-scope-manage-btn" onclick="window.location.href='workspaces.php'" title="<?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?>" aria-label="<?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?>"><i class="lucide lucide-layers"></i> <span class="dashboard-scope-manage-label"><?php echo t_h('dashboard.scope.manage_workspaces', [], 'Manage workspaces'); ?></span></button>
 					<?php endif; ?>
 					<button type="button" class="btn-cancel" data-action="close-workspace-switcher-modal"><?php echo t_h('common.close'); ?></button>
 					<button type="button" class="btn-primary" id="dashboardScopeApplyBtn" disabled><?php echo t_h('common.apply', [], 'Apply'); ?></button>
