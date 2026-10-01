@@ -4506,6 +4506,8 @@
     "show_labels_hint": "Notiztitel unter den Punkten anzeigen",
     "show_folders": "Ordner",
     "show_folders_hint": "Jeden Ordner als Knotenpunkt anzeigen, der mit seinen Notizen verbunden ist",
+    "separate_groups": "Gruppen trennen",
+    "separate_groups_hint": "Jede Gruppe verknüpfter Notizen getrennt von den anderen anordnen",
     "reset_layout": "Anordnung zurücksetzen",
     "reset_layout_hint": "Gespeicherte Positionen verwerfen und den Graphen automatisch neu anordnen",
     "drag_hint": "Strg + Ziehen bewegt einen Punkt unabhängig von seinen Verknüpfungen",

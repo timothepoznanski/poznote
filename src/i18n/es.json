@@ -4507,6 +4507,8 @@
     "show_labels_hint": "Mostrar los títulos de las notas bajo los puntos",
     "show_folders": "Carpetas",
     "show_folders_hint": "Mostrar cada carpeta como un nodo central enlazado a sus notas",
+    "separate_groups": "Separar grupos",
+    "separate_groups_hint": "Colocar cada grupo de notas enlazadas separado de los demás",
     "reset_layout": "Restablecer disposición",
     "reset_layout_hint": "Olvidar las posiciones guardadas y reorganizar el grafo automáticamente",
     "drag_hint": "Ctrl + arrastrar mueve un punto independientemente de sus enlaces",

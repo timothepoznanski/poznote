@@ -57,6 +57,10 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<input type="checkbox" id="graphShowFolders">
 					<span><?php echo t_h('graph.show_folders', [], 'Folders'); ?></span>
 				</label>
+				<button id="graphSeparateGroups" class="graph-reset-btn initially-hidden" title="<?php echo t_h('graph.separate_groups_hint', [], 'Lay out each group of linked notes apart from the others'); ?>">
+					<i class="lucide lucide-boxes"></i>
+					<span><?php echo t_h('graph.separate_groups', [], 'Separate groups'); ?></span>
+				</button>
 				<button id="graphResetLayout" class="graph-reset-btn initially-hidden" title="<?php echo t_h('graph.reset_layout_hint', [], 'Forget the saved positions and rearrange the graph automatically'); ?>">
 					<i class="lucide lucide-rotate-ccw"></i>
 					<span><?php echo t_h('graph.reset_layout', [], 'Reset layout'); ?></span>

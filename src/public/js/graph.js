@@ -52,6 +52,8 @@
     var running = false;
     var SPRING_LENGTH = 90;
     var HUB_GAP = 40;          // room left between the wheels of two folder hubs
+    var GROUP_GAP = 70;        // room left between two groups laid out by "Separate groups"
+    var LONE_SPACING = 50;     // distance between two unlinked notes in the block they form there
     var SPRING_STRENGTH = 0.5;
     var CHARGE = 1500;
     var GRAVITY = 0.04;
@@ -360,6 +362,7 @@
 
         assignComponents();
         restorePinnedPositions();
+        updateSeparateButton();
 
         renderSvg();
         applySearch();
@@ -464,6 +467,112 @@
         if (!btn) { return; }
         var anyPinned = nodes.some(function (node) { return node.pinned; });
         btn.classList.toggle('initially-hidden', !anyPinned);
+    }
+
+    // Lays the connected groups out side by side in rows, the ones on screen
+    // first. A group moves as one block, so its own arrangement is kept, and
+    // is pinned where it lands, exactly as if it had been dragged there:
+    // "Reset layout" undoes it. The notes linked to nothing are not a group
+    // each: they stay together, as one block of dots placed last.
+    function separateGroups() {
+        // Groups are packed by their extent: let a running simulation settle
+        while (alpha > 0.005) {
+            simulate();
+            alpha *= 0.985;
+        }
+
+        var byComponent = {};
+        var groups = [];
+        nodes.forEach(function (node) {
+            var group = byComponent[node.component];
+            if (!group) {
+                group = { nodes: [], minX: Infinity, minY: Infinity, maxX: -Infinity, maxY: -Infinity, visible: false };
+                byComponent[node.component] = group;
+                groups.push(group);
+            }
+            group.nodes.push(node);
+            group.minX = Math.min(group.minX, node.x);
+            group.minY = Math.min(group.minY, node.y);
+            group.maxX = Math.max(group.maxX, node.x);
+            group.maxY = Math.max(group.maxY, node.y);
+            if (node.visible) { group.visible = true; }
+        });
+        if (groups.length < 2) { return; }
+
+        var lone = groups.filter(function (group) { return group.nodes.length === 1; });
+        if (lone.length > 1) {
+            groups = groups.filter(function (group) { return group.nodes.length > 1; });
+            lone.sort(function (a, b) { return b.visible - a.visible; });
+            var columns = Math.ceil(Math.sqrt(lone.length * width / Math.max(1, height)));
+            var block = { nodes: [], minX: 0, minY: 0, maxX: 0, maxY: 0, visible: lone[0].visible, last: true };
+            lone.forEach(function (group, i) {
+                var node = group.nodes[0];
+                node.x = (i % columns) * LONE_SPACING;
+                node.y = Math.floor(i / columns) * LONE_SPACING;
+                block.nodes.push(node);
+                block.maxX = Math.max(block.maxX, node.x);
+                block.maxY = Math.max(block.maxY, node.y);
+            });
+            groups.push(block);
+        }
+
+        // Tallest first, so that a row holds groups of similar height
+        var area = 0;
+        var widest = 0;
+        groups.forEach(function (group) {
+            group.w = group.maxX - group.minX + GROUP_GAP;
+            group.h = group.maxY - group.minY + GROUP_GAP;
+            area += group.w * group.h;
+            widest = Math.max(widest, group.w);
+        });
+        groups.sort(function (a, b) {
+            return (b.visible - a.visible) || ((a.last ? 1 : 0) - (b.last ? 1 : 0)) || (b.h - a.h) || (b.w - a.w);
+        });
+
+        // Rows as wide as the canvas is, relative to its height
+        var rowWidth = Math.max(widest, Math.sqrt(area * width / Math.max(1, height)));
+        var rows = [];
+        var row = null;
+        groups.forEach(function (group) {
+            if (!row || row.w + group.w > rowWidth) {
+                row = { groups: [], w: 0, h: 0 };
+                rows.push(row);
+            }
+            row.groups.push(group);
+            row.w += group.w;
+            row.h = Math.max(row.h, group.h);
+        });
+
+        var y = 0;
+        rows.forEach(function (current) {
+            var x = 0;
+            current.groups.forEach(function (group) {
+                var dx = x + GROUP_GAP / 2 - group.minX;
+                var dy = y + (current.h - group.h + GROUP_GAP) / 2 - group.minY;
+                group.nodes.forEach(function (node) {
+                    node.x += dx;
+                    node.y += dy;
+                    node.vx = 0;
+                    node.vy = 0;
+                    node.pinned = true;
+                });
+                x += group.w;
+            });
+            y += current.h;
+        });
+
+        savePinnedPositions();
+        updateResetButton();
+        draw();
+        userInteracted = false;
+        fitView();
+    }
+
+    function updateSeparateButton() {
+        var btn = document.getElementById('graphSeparateGroups');
+        if (!btn) { return; }
+        var several = nodes.some(function (node) { return node.component > 0; });
+        btn.classList.toggle('initially-hidden', !several);
     }
 
     /* --------------------------------------------------------------------- */
@@ -1104,12 +1213,21 @@
                 showOrphans = orphansToggle.checked;
                 savePref(PREF_SHOW_ORPHANS, showOrphans);
                 updateVisibility();
+                // Notes coming back may sit outside the current view
+                if (!userInteracted) {
+                    fitView();
+                }
             });
         }
 
         var resetLayoutBtn = document.getElementById('graphResetLayout');
         if (resetLayoutBtn) {
             resetLayoutBtn.addEventListener('click', resetLayout);
+        }
+
+        var separateBtn = document.getElementById('graphSeparateGroups');
+        if (separateBtn) {
+            separateBtn.addEventListener('click', separateGroups);
         }
 
         var labelsToggle = document.getElementById('graphShowLabels');
