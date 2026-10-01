@@ -684,9 +684,10 @@ function wireTagsListScroll(list) {
         // Pinch-zoom and sideways trackpad gestures keep their own behaviour.
         if (e.ctrlKey || Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return;
         const max = list.scrollWidth - list.clientWidth;
-        if (max <= 0) return;
-        // At either end the wheel goes back to scrolling the page.
-        if ((e.deltaY < 0 && list.scrollLeft <= 0) || (e.deltaY > 0 && list.scrollLeft >= max - 1)) return;
+        // Same threshold as the chevrons: a strip that fits leaves the wheel to the page.
+        if (max <= 1) return;
+        // An overflowing strip keeps the wheel, even at either end: running out
+        // of tags must not start scrolling the note underneath (#1539).
         e.preventDefault();
         list.scrollLeft += e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
     }, { passive: false });
