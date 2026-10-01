@@ -299,10 +299,6 @@ body.graph-page {
 
 /* Folder hubs: a ring in the folder color (graph.js sets it as the node's
    color), tied to its notes by lighter lines than the links between notes. */
-.graph-node.is-folder {
-    cursor: grab;
-}
-
 .graph-node.is-folder > circle {
     fill: var(--pz-surface);
     stroke: currentColor;
@@ -341,10 +337,6 @@ body.graph-page {
 
 .tree-layout .graph-edge-folder {
     stroke-dasharray: none;
-}
-
-.tree-layout .graph-node.is-folder {
-    cursor: inherit;
 }
 
 /* Crowded graphs: labels only on zoom, hover or search */

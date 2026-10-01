@@ -1698,8 +1698,7 @@
                 }
                 releaseDrag();
                 if (clicked) {
-                    // A folder hub has no page of its own to open
-                    if (!clicked.isFolder) { openNote(clicked); }
+                    openNode(clicked);
                 } else if (moved && treeMode) {
                     saveTreeOffsets();
                 } else if (moved) {
@@ -1711,7 +1710,7 @@
             if (tapNode) {
                 var tapped = !cancelled && panStart &&
                     Math.abs(e.clientX - panStart.x) + Math.abs(e.clientY - panStart.y) < 5;
-                if (tapped && !tapNode.isFolder) { openNote(tapNode); }
+                if (tapped) { openNode(tapNode); }
                 tapNode = null;
             }
             panStart = null;
@@ -1724,8 +1723,14 @@
     /* Hover, tooltip, navigation                                              */
     /* --------------------------------------------------------------------- */
 
-    function openNote(node) {
+    // A click opens the note, or for a folder hub its Kanban board, as a
+    // row of the Folders page does
+    function openNode(node) {
         var workspace = getPageWorkspace();
+        if (node.isFolder) {
+            window.location.href = buildNoteNavigationUrl('', workspace, { kanban: node.id.slice(1) });
+            return;
+        }
         window.location.href = buildNoteNavigationUrl(node.id, workspace);
     }
 
