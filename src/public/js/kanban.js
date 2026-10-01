@@ -1062,7 +1062,85 @@
         return parseKanbanJsonResponse(response);
     }
 
-    async function toggleKanbanTaskFromCard(checkbox) {
+    // Tasks of a card as its preview shows them (the preview carries no due
+    // dates: the due badge is only recomputed from saved tasks)
+    function readKanbanPreviewTasks(preview) {
+        return Array.from(preview.querySelectorAll('.kanban-task-preview-item')).map((item) => {
+            const box = item.querySelector('.kanban-task-checkbox');
+            const text = item.querySelector('.kanban-task-preview-text');
+            return {
+                id: box ? (box.dataset.taskId || '') : '',
+                text: text ? text.textContent : '',
+                completed: item.classList.contains('completed'),
+                important: item.classList.contains('important')
+            };
+        });
+    }
+
+    // One read-modify-write of the tasklist note behind a card. Resolves to
+    // the saved tasks.
+    async function saveKanbanTaskToggle(taskNoteId, taskId, taskIndex, completed) {
+        const noteResponse = await fetch(`/api/v1/notes/${encodeURIComponent(taskNoteId)}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            credentials: 'same-origin'
+        });
+
+        // Read the body first: the API answers 4xx with a JSON error and that
+        // message is more useful than the status code alone.
+        const noteData = await noteResponse.json().catch(function () { return {}; });
+
+        if (!noteResponse.ok) throw new Error(noteData.error || noteData.message || 'HTTP error: ' + noteResponse.status);
+        if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
+            throw new Error('Invalid tasklist note response');
+        }
+
+        let tasks = JSON.parse(noteData.note.content || '[]');
+        if (!Array.isArray(tasks)) throw new Error('Invalid tasklist content');
+
+        const targetIndex = getTaskByIdOrIndex(tasks, taskId, Number.isNaN(taskIndex) ? -1 : taskIndex);
+        if (targetIndex === -1) throw new Error('Task not found');
+
+        const toggledTask = tasks[targetIndex];
+        toggledTask.completed = completed;
+        tasks = reorderKanbanTasksAfterToggle(tasks, toggledTask);
+
+        let updateResult = await patchKanbanTasklistContent(taskNoteId, tasks, '');
+        if (updateResult.status === 423) {
+            const editorSessionId = getKanbanEditorSessionId();
+            if (editorSessionId) {
+                updateResult = await patchKanbanTasklistContent(taskNoteId, tasks, editorSessionId);
+            }
+        }
+
+        const updateData = updateResult.data || {};
+        if (!updateResult.ok) {
+            throw new Error(updateData.error || ('HTTP error: ' + updateResult.status));
+        }
+
+        if (!updateData || !updateData.success) {
+            throw new Error(updateData?.error || 'Unable to update task');
+        }
+
+        if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+            window.setNeedsAutoPush(true);
+        }
+
+        return tasks;
+    }
+
+    // Per card preview being saved: the saves still running, their queue and
+    // the last saved tasks, which the preview returns to once they are done
+    const kanbanToggleStates = new WeakMap();
+
+    // The toggle shows right away and saves in the background: the save is
+    // two requests, long enough on a phone for the box to look stuck. Saves
+    // of one card run one after the other, each a read-modify-write, so two
+    // quick toggles cannot overwrite each other.
+    function toggleKanbanTaskFromCard(checkbox) {
 
         const preview = checkbox.closest('.kanban-tasklist-preview');
         const card = checkbox.closest('.kanban-card');
@@ -1071,77 +1149,54 @@
         const taskIndex = Number.parseInt(checkbox.dataset.taskIndex || '', 10);
         const completed = checkbox.checked;
 
-        if (!taskNoteId) {
+        if (!preview || !taskNoteId) {
             checkbox.checked = !completed;
             showError('Unable to update task');
             return;
         }
 
-        checkbox.disabled = true;
-        if (preview) preview.classList.add('is-saving');
+        const shown = readKanbanPreviewTasks(preview);
 
-        try {
-            const noteResponse = await fetch(`/api/v1/notes/${encodeURIComponent(taskNoteId)}`, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                credentials: 'same-origin'
-            });
-
-            // Read the body first: the API answers 4xx with a JSON error and that
-
-            // message is more useful than the status code alone.
-
-            const noteData = await noteResponse.json().catch(function () { return {}; });
-
-            if (!noteResponse.ok) throw new Error(noteData.error || noteData.message || 'HTTP error: ' + noteResponse.status);
-            if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
-                throw new Error('Invalid tasklist note response');
-            }
-
-            let tasks = JSON.parse(noteData.note.content || '[]');
-            if (!Array.isArray(tasks)) throw new Error('Invalid tasklist content');
-
-            const targetIndex = getTaskByIdOrIndex(tasks, taskId, Number.isNaN(taskIndex) ? -1 : taskIndex);
-            if (targetIndex === -1) throw new Error('Task not found');
-
-            const toggledTask = tasks[targetIndex];
-            toggledTask.completed = completed;
-            tasks = reorderKanbanTasksAfterToggle(tasks, toggledTask);
-
-            let updateResult = await patchKanbanTasklistContent(taskNoteId, tasks, '');
-            if (updateResult.status === 423) {
-                const editorSessionId = getKanbanEditorSessionId();
-                if (editorSessionId) {
-                    updateResult = await patchKanbanTasklistContent(taskNoteId, tasks, editorSessionId);
-                }
-            }
-
-            const updateData = updateResult.data || {};
-            if (!updateResult.ok) {
-                throw new Error(updateData.error || ('HTTP error: ' + updateResult.status));
-            }
-
-            if (!updateData || !updateData.success) {
-                throw new Error(updateData?.error || 'Unable to update task');
-            }
-
-            if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
-                window.setNeedsAutoPush(true);
-            }
-
-            renderKanbanTaskPreview(preview, tasks);
-            updateKanbanCardDueBadge(card, tasks);
-            if (preview) preview.classList.remove('is-saving');
-        } catch (error) {
-            console.error('Kanban task toggle error:', error);
-            checkbox.checked = !completed;
-            checkbox.disabled = false;
-            if (preview) preview.classList.remove('is-saving');
-            showError(error?.message || 'Unable to update task');
+        let state = kanbanToggleStates.get(preview);
+        if (!state) {
+            state = { pending: 0, failures: 0, saved: shown.map((task) => Object.assign({}, task)), fromServer: false, queue: Promise.resolve() };
+            kanbanToggleStates.set(preview, state);
         }
+        state.pending++;
+
+        const item = checkbox.closest('.kanban-task-preview-item');
+        const toggled = shown[Array.from(preview.querySelectorAll('.kanban-task-preview-item')).indexOf(item)];
+        if (toggled) {
+            toggled.completed = completed;
+            renderKanbanTaskPreview(preview, reorderKanbanTasksAfterToggle(shown, toggled));
+        }
+
+        // A failed save puts the preview back on the saved tasks at once. The
+        // toggles queued behind it were aimed at a list the preview no longer
+        // shows: they are dropped rather than risk the wrong task.
+        const failuresBefore = state.failures;
+        state.queue = state.queue
+            .then(() => {
+                if (state.failures !== failuresBefore) return null;
+                return saveKanbanTaskToggle(taskNoteId, taskId, taskIndex, completed);
+            })
+            .then((tasks) => {
+                if (!tasks) return;
+                state.saved = tasks;
+                state.fromServer = true;
+            }, (error) => {
+                console.error('Kanban task toggle error:', error);
+                state.failures++;
+                renderKanbanTaskPreview(preview, state.saved);
+                showError(error?.message || 'Unable to update task');
+            })
+            .then(() => {
+                state.pending--;
+                if (state.pending > 0) return;
+                kanbanToggleStates.delete(preview);
+                renderKanbanTaskPreview(preview, state.saved);
+                if (state.fromServer) updateKanbanCardDueBadge(card, state.saved);
+            });
     }
 
     /**

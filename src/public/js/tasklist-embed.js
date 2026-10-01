@@ -209,10 +209,26 @@
         }
     }
 
-    // Read-modify-write of the source list: `mutate(tasks)` returns the new
-    // task array (or null to leave the list untouched). Every embed of that
-    // list on the page is re-rendered from the saved state afterwards.
-    async function mutateTaskList(noteId, mutate) {
+    // Per source list: the last saved state (`note`, `tasks`), what its
+    // widgets show (`shown`, ahead of `tasks` while a change is being saved),
+    // the number of saves still running and their queue
+    var listStates = {};
+
+    function listState(noteId) {
+        var key = String(noteId);
+        if (!listStates[key]) {
+            listStates[key] = { note: null, tasks: [], shown: [], pending: 0, failed: false, queue: Promise.resolve() };
+        }
+        return listStates[key];
+    }
+
+    function sameTasks(a, b) {
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    // One read-modify-write of the source list. Resolves to the note and the
+    // saved tasks, or null when `mutate` left the list untouched.
+    async function saveMutation(noteId, mutate) {
         var note = await fetchTaskListNote(noteId);
         if (!note) throw new Error('tasklist embed: target unavailable');
 
@@ -227,8 +243,60 @@
             window.invalidateNoteDomCache(noteId);
         }
 
-        refreshEmbedsForNote(noteId);
-        return tasks;
+        return { note: note, tasks: tasks };
+    }
+
+    // Change the source list: `mutate(tasks)` returns the new task array (or
+    // null to leave the list untouched). Saves of one list run one after the
+    // other, each a read-modify-write, so two quick changes cannot overwrite
+    // each other. With `optimistic`, the change is applied to the widgets
+    // right away and saved in the background (two requests, long enough on a
+    // phone for a checkbox to look stuck); `mutate` then runs twice, on the
+    // shown tasks and on the freshly read ones. Once the last save is done,
+    // every embed of that list is re-rendered from the saved state if it
+    // shows anything else (a failed save, a list changed elsewhere).
+    function mutateTaskList(noteId, mutate, optimistic) {
+        var state = listState(noteId);
+        state.pending++;
+
+        if (optimistic && state.note) {
+            try {
+                var shown = mutate(state.shown.map(function (task) { return Object.assign({}, task); }));
+                if (shown) {
+                    state.shown = shown;
+                    renderEmbedsForNote(noteId, state.note, shown);
+                }
+            } catch (e) {
+                console.debug('tasklist-embed: mutateTaskList() failed:', e);
+            }
+        }
+
+        var run = state.queue.then(function () { return saveMutation(noteId, mutate); });
+
+        // Settled before the caller's own handlers run, so an error line it
+        // adds lands on the re-rendered widget
+        var settle = function (saved, failed) {
+            if (saved) {
+                state.note = saved.note;
+                state.tasks = saved.tasks;
+            }
+            if (failed) state.failed = true;
+            state.pending--;
+            if (state.pending > 0 || !state.note) return;
+
+            var hadFailure = state.failed;
+            state.failed = false;
+            if (hadFailure || !sameTasks(state.shown, state.tasks)) {
+                state.shown = state.tasks;
+                renderEmbedsForNote(noteId, state.note, state.tasks);
+            }
+            if (hadFailure) {
+                embedsForNote(noteId).forEach(function (embed) { showEmbedError(embed); });
+            }
+        };
+        state.queue = run.then(function (saved) { settle(saved, false); }, function () { settle(null, true); });
+
+        return run.then(function (saved) { return saved ? saved.tasks : null; });
     }
 
     // Completing or deleting a task cancels its pending reminder
@@ -294,7 +362,16 @@
                 renderUnavailable(embed);
                 return;
             }
-            renderWidget(embed, note, parseTasks(note.content));
+            var tasks = parseTasks(note.content);
+            var state = listState(noteId);
+            // A change still being saved stays on screen; the save queue
+            // re-renders from the saved state when it is done
+            if (state.pending === 0) {
+                state.tasks = tasks;
+                state.shown = tasks;
+            }
+            state.note = note;
+            renderWidget(embed, note, state.shown);
         } catch (e) {
             // Network error: keep the fallback link untouched
             console.debug('tasklist-embed: hydrateEmbed() failed:', e);
@@ -608,21 +685,20 @@
 
     async function toggleEmbedTask(embed, noteId, task, checkbox) {
         var newCompleted = checkbox.checked;
-        checkbox.disabled = true;
 
         var clearReminder = false;
         try {
+            // Shown right away; the widgets fall back to the saved state if
+            // the save fails
             await mutateTaskList(noteId, function (tasks) {
                 var target = requireTask(tasks, task.id);
                 target.completed = newCompleted;
                 clearReminder = newCompleted && !!target.dueReminder;
                 if (clearReminder) target.dueReminder = false;
                 return reorderAfterToggle(tasks, target);
-            });
+            }, true);
             if (clearReminder) cancelTaskReminder(noteId, task.id);
         } catch (e) {
-            checkbox.checked = !newCompleted;
-            checkbox.disabled = false;
             showEmbedError(embed);
         }
     }
@@ -712,11 +788,15 @@
         });
     }
 
-    function refreshEmbedsForNote(noteId) {
-        document.querySelectorAll('.tasklist-embed[data-task-embed="' + String(noteId) + '"]')
-            .forEach(function (embed) {
-                hydrateEmbed(embed);
-            });
+    function embedsForNote(noteId) {
+        return Array.prototype.slice.call(
+            document.querySelectorAll('.tasklist-embed[data-task-embed="' + String(noteId) + '"]'));
+    }
+
+    function renderEmbedsForNote(noteId, note, tasks) {
+        embedsForNote(noteId).forEach(function (embed) {
+            renderWidget(embed, note, tasks);
+        });
     }
 
     // ===== Task list picker modal (for the slash command) =====
