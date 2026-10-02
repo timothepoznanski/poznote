@@ -448,6 +448,13 @@
         });
     }
 
+    // Folder names cannot hold a slash, so the last segment of a stored
+    // path is the folder itself
+    function lastFolderName(folder) {
+        var segments = String(folder || '').split('/');
+        return segments[segments.length - 1].trim();
+    }
+
     function buildNoteUrl(noteId) {
         return 'index.php?note=' + noteId
             + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
@@ -567,11 +574,19 @@
             link.textContent = note.heading || config.txtUntitled;
             header.appendChild(link);
 
-            if (note.folder) {
+            // The folder the note sits in, not the path that leads to it. The
+            // name stays on one line and ellipsizes (css/tasks-page.css), so
+            // the full name goes in the tooltip.
+            var folderName = lastFolderName(note.folder);
+            if (folderName) {
                 var badge = document.createElement('span');
                 badge.className = 'folder-badge';
-                badge.innerHTML = '<i class="lucide lucide-folder"></i> ';
-                badge.appendChild(document.createTextNode(note.folder));
+                badge.title = folderName;
+                badge.innerHTML = '<i class="lucide lucide-folder"></i>';
+                var badgeName = document.createElement('span');
+                badgeName.className = 'folder-badge-name';
+                badgeName.textContent = folderName;
+                badge.appendChild(badgeName);
                 header.appendChild(badge);
             }
 

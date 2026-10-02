@@ -371,15 +371,34 @@ body.tasks-page {
     text-decoration: underline;
 }
 
+/* The folder name never wraps: the badge takes the room the title leaves, up
+   to its own width, and ellipsizes below that. It starts from 72px and only
+   grows, so a long title shrinks instead of squeezing it out, while
+   max-content keeps a short name at its natural width. */
 .folder-badge {
     display: inline-flex;
     align-items: center;
     gap: 5px;
+    flex: 1 0 72px;
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: max-content;
     font-size: 11px;
     color: var(--pz-text-muted);
     background-color: var(--pz-surface-hover);
     padding: 2px 8px;
     border-radius: var(--pz-radius-sm);
+    white-space: nowrap;
+}
+
+.folder-badge i {
+    flex-shrink: 0;
+}
+
+.folder-badge-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Groups built from the checklist items of a regular note (as opposed to a
