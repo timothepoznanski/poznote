@@ -4843,7 +4843,11 @@
     "expand_all": "Expandir todo",
     "view_list": "Vista de lista",
     "view_calendar": "Vista de calendario",
-    "calendar_no_tasks": "No hay tareas en este día."
+    "calendar_no_tasks": "No hay tareas en este día.",
+    "hide_list": "Ocultar en esta página",
+    "unhide_list": "Volver a mostrar en esta página",
+    "show_hidden": "Mostrar las listas ocultas",
+    "empty_hidden": "Todas las listas están ocultas."
   },
   "s3_settings": {
     "title": "Almacenamiento S3 de adjuntos",

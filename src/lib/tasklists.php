@@ -353,3 +353,41 @@ function resolveTasklistStoredContent($primaryContent, $fallbackContent = '') {
 
     return (string) ($fallbackContent !== '' ? $fallbackContent : $primaryContent);
 }
+
+/**
+ * Note ids the user left out of the Tasks page (the eye button of a group
+ * header in js/tasks-page.js), as stored in the tasks_page_hidden_notes
+ * setting: a JSON array of note ids, tasklist notes and notes holding
+ * checkboxes alike.
+ *
+ * @param mixed $value Stored or submitted value (JSON string or array).
+ * @return int[]|null Distinct positive ids in their order, null when the
+ *                    value is not a list of ids.
+ */
+function poznoteParseTasksPageHiddenNotes($value) {
+    if (is_string($value)) {
+        $value = trim($value);
+        if ($value === '') {
+            return [];
+        }
+        $value = json_decode($value, true);
+    } elseif ($value === null) {
+        return [];
+    }
+    if (!is_array($value) || !array_is_list($value)) {
+        return null;
+    }
+
+    $ids = [];
+    foreach ($value as $entry) {
+        if (is_string($entry) && ctype_digit($entry)) {
+            $entry = (int) $entry;
+        }
+        if (!is_int($entry) || $entry <= 0) {
+            return null;
+        }
+        $ids[$entry] = true;
+    }
+
+    return array_keys($ids);
+}

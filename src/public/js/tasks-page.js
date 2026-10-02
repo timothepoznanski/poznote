@@ -10,6 +10,11 @@
             txtProgress: body.getAttribute('data-txt-progress') || '{{completed}} of {{total}} tasks completed',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No notes match your search.',
             txtEmptyFiltered: body.getAttribute('data-txt-empty-filtered') || 'No tasks match this filter.',
+            txtEmptyHidden: body.getAttribute('data-txt-empty-hidden') || 'Every list is hidden.',
+            txtHideList: body.getAttribute('data-txt-hide-list') || 'Hide from this page',
+            txtUnhideList: body.getAttribute('data-txt-unhide-list') || 'Show on this page again',
+            txtShowHidden: body.getAttribute('data-txt-show-hidden') || 'Show hidden lists',
+            canHideNotes: body.getAttribute('data-can-hide-notes') === '1',
             txtCollapse: body.getAttribute('data-txt-collapse') || 'Collapse',
             txtExpand: body.getAttribute('data-txt-expand') || 'Expand',
             txtCollapseAll: body.getAttribute('data-txt-collapse-all') || 'Collapse all',
@@ -173,11 +178,102 @@
         }
     }
 
-    // Groups currently taken into account (counts, progress, lists)
-    function getActiveNotes() {
+    // Groups the user left out of the page with the eye button of their
+    // header, a tasklist note or the checkboxes of a note alike. The ids live
+    // in a setting of the account rather than in the browser, so a list
+    // hidden on one device stays hidden on the others. tasks.php hands over
+    // the stored list.
+    var HIDDEN_NOTES_SETTING = 'tasks_page_hidden_notes';
+
+    function loadHiddenNoteIds() {
+        try {
+            var parsed = JSON.parse(document.body.getAttribute('data-hidden-notes') || '[]');
+            return new Set(Array.isArray(parsed) ? parsed.map(String) : []);
+        } catch (e) {
+            return new Set();
+        }
+    }
+
+    var hiddenNoteIds = loadHiddenNoteIds();
+
+    // "Show hidden lists": brings the hidden groups back for this visit,
+    // dimmed, which is where they are shown again for good
+    var showHiddenNotes = false;
+
+    function isHiddenNote(note) {
+        return hiddenNoteIds.has(String(note.id));
+    }
+
+    // Groups of the sources the page displays, hidden ones included
+    function getSourceNotes() {
         return showNoteChecklists ? taskNotes : taskNotes.filter(function (note) {
             return !isChecklistNote(note);
         });
+    }
+
+    // Groups currently taken into account (counts, progress, lists)
+    function getActiveNotes() {
+        var notes = getSourceNotes();
+        return showHiddenNotes ? notes : notes.filter(function (note) {
+            return !isHiddenNote(note);
+        });
+    }
+
+    function countHiddenNotes() {
+        return getSourceNotes().filter(isHiddenNote).length;
+    }
+
+    // The whole list goes back on every change, one request at a time, each
+    // one sending the list as it stands when its turn comes
+    var hiddenNotesSaveQueue = Promise.resolve();
+
+    function saveHiddenNoteIds() {
+        var run = hiddenNotesSaveQueue.then(function () {
+            return fetch('api/v1/settings/' + HIDDEN_NOTES_SETTING, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ value: JSON.stringify(Array.from(hiddenNoteIds).map(Number)) })
+            })
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    if (!data || !data.success) throw new Error(config.txtError);
+                });
+        });
+        hiddenNotesSaveQueue = run.catch(function () {});
+        return run;
+    }
+
+    // The group leaves (or comes back) right away and returns to where it
+    // was if the save fails
+    function setNoteHidden(note, hidden) {
+        var id = String(note.id);
+        if (hidden) hiddenNoteIds.add(id);
+        else hiddenNoteIds.delete(id);
+        render();
+
+        saveHiddenNoteIds().catch(function (e) {
+            console.debug('tasks-page: setNoteHidden() failed:', e);
+            if (hidden) hiddenNoteIds.delete(id);
+            else hiddenNoteIds.add(id);
+            render();
+        });
+    }
+
+    // The option is always there, greyed out while nothing is hidden;
+    // otherwise its label counts the hidden groups
+    function syncShowHiddenOption() {
+        var option = document.getElementById('tasksShowHiddenOption');
+        var input = document.getElementById('tasksShowHidden');
+        var label = document.getElementById('tasksShowHiddenLabel');
+        if (!option || !input) return;
+
+        var count = countHiddenNotes();
+        if (count === 0) showHiddenNotes = false;
+        option.classList.toggle('disabled', count === 0);
+        input.disabled = count === 0;
+        input.checked = showHiddenNotes;
+        if (label) label.textContent = config.txtShowHidden + (count > 0 ? ' (' + count + ')' : '');
     }
 
     // Same per-tab editor session identity as note-edit-lock.js, so saving
@@ -501,6 +597,9 @@
     }
 
     function render() {
+        // First: it unticks "Show hidden lists" once nothing is hidden any
+        // more, which the counts below depend on
+        syncShowHiddenOption();
         updateProgress();
         syncViewUi();
 
@@ -533,6 +632,9 @@
 
         if (groups.length === 0) {
             var msg = filterText ? config.txtNoFilterResults : config.txtEmptyFiltered;
+            if (!filterText && filterMode === 'all' && countHiddenNotes() > 0) {
+                msg = config.txtEmptyHidden;
+            }
             container.innerHTML = '<div class="empty-message"><p></p></div>';
             container.querySelector('p').textContent = msg;
             return;
@@ -541,9 +643,11 @@
         groups.forEach(function (group) {
             var note = group.note;
             var isCollapsed = collapsedNoteIds.has(String(note.id));
+            // Only reached with "Show hidden lists" on
+            var isHidden = isHiddenNote(note);
 
             var section = document.createElement('section');
-            section.className = 'tasks-note-group' + (isCollapsed ? ' collapsed' : '');
+            section.className = 'tasks-note-group' + (isCollapsed ? ' collapsed' : '') + (isHidden ? ' hidden-note' : '');
 
             var header = document.createElement('div');
             header.className = 'tasks-note-header';
@@ -621,6 +725,21 @@
             count.className = 'tasks-note-count';
             count.textContent = done + ' / ' + note.tasks.length;
             header.appendChild(count);
+
+            // Takes the group off the page, or puts it back once the hidden
+            // ones are displayed again
+            if (config.canHideNotes) {
+                var hideBtn = document.createElement('button');
+                hideBtn.type = 'button';
+                hideBtn.className = 'tasks-note-hide-btn';
+                hideBtn.title = isHidden ? config.txtUnhideList : config.txtHideList;
+                hideBtn.setAttribute('aria-label', hideBtn.title);
+                hideBtn.innerHTML = '<i class="lucide ' + (isHidden ? 'lucide-eye' : 'lucide-eye-off') + '"></i>';
+                hideBtn.addEventListener('click', function () {
+                    setNoteHidden(note, !isHidden);
+                });
+                header.appendChild(hideBtn);
+            }
 
             section.appendChild(header);
 
@@ -1474,6 +1593,14 @@
                 if (mode === viewMode) return;
                 viewMode = mode;
                 saveViewMode();
+                render();
+            });
+        }
+
+        var showHiddenToggle = document.getElementById('tasksShowHidden');
+        if (showHiddenToggle) {
+            showHiddenToggle.addEventListener('change', function () {
+                showHiddenNotes = showHiddenToggle.checked;
                 render();
             });
         }

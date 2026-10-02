@@ -4509,7 +4509,11 @@
     "expand_all": "Expand all",
     "view_list": "List view",
     "view_calendar": "Calendar view",
-    "calendar_no_tasks": "No tasks on this day."
+    "calendar_no_tasks": "No tasks on this day.",
+    "hide_list": "Hide from this page",
+    "unhide_list": "Show on this page again",
+    "show_hidden": "Show hidden lists",
+    "empty_hidden": "Every list is hidden."
   },
   "s3_settings": {
     "title": "S3 Attachment Storage",

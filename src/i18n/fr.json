@@ -4947,7 +4947,11 @@
     "expand_all": "Tout déplier",
     "view_list": "Vue liste",
     "view_calendar": "Vue calendrier",
-    "calendar_no_tasks": "Aucune tâche ce jour-là."
+    "calendar_no_tasks": "Aucune tâche ce jour-là.",
+    "hide_list": "Masquer sur cette page",
+    "unhide_list": "Réafficher sur cette page",
+    "show_hidden": "Afficher les listes masquées",
+    "empty_hidden": "Toutes les listes sont masquées."
   },
   "s3_settings": {
     "title": "Stockage S3 des pièces jointes",

@@ -288,6 +288,31 @@ class SettingsController {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
+        // Notes left out of the Tasks page (js/tasks-page.js). The page sends
+        // the whole list back on every change, so this is also where the ids
+        // of notes that no longer exist drop out of it.
+        if ($key === 'tasks_page_hidden_notes') {
+            require_once __DIR__ . '/../../../lib/tasklists.php';
+            $ids = poznoteParseTasksPageHiddenNotes($value);
+            if ($ids === null) {
+                throw new InvalidArgumentException('value must be a JSON array of note ids', 400);
+            }
+            if (count($ids) > 5000) {
+                throw new InvalidArgumentException('too many note ids', 400);
+            }
+            $existing = [];
+            foreach (array_chunk($ids, 500) as $chunk) {
+                $stmt = $this->con->prepare('SELECT id FROM entries WHERE id IN (' . implode(',', array_fill(0, count($chunk), '?')) . ')');
+                $stmt->execute($chunk);
+                foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $id) {
+                    $existing[(int) $id] = true;
+                }
+            }
+            return json_encode(array_values(array_filter($ids, static function (int $id) use ($existing): bool {
+                return isset($existing[$id]);
+            })));
+        }
+
         if ($key === 'welcome_setup') {
             $normalized = trim((string) $value);
             if (!in_array($normalized, ['pending', 'done'], true)) {

@@ -632,7 +632,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Usage:** Manage tasks and projects with interactive checklists.
 *   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list. A progress bar shows the completion of each list.
 *   **Task Options:** Each task can have a due date with an optional time, a reminder notification that fires at the due time, and an important flag, and can be moved to another list.
-*   **Tasks Page:** A dedicated Tasks page, opened from the left icon rail, gathers in one place every task of your task lists and, optionally, the checkboxes sitting inside ordinary notes. It offers status filters (to do, important, overdue, with due date, completed), a text filter, and a calendar view of the tasks that carry a due date.
+*   **Tasks Page:** A dedicated Tasks page, opened from the left icon rail, gathers in one place every task of your task lists and, optionally, the checkboxes sitting inside ordinary notes. It offers status filters (to do, important, overdue, with due date, completed), a text filter, and a calendar view of the tasks that carry a due date. A task list, or the checkboxes of a note, can be hidden from the page with the eye button of its header and brought back with **Show hidden lists**. The choice is saved in your account, so it follows you from one device to the next.
 *   **Public Collaboration:** Task lists can be shared via a public URL. If edit permissions are granted, external collaborators can check items off the list without needing a Poznote account.
 </details>
 

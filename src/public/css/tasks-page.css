@@ -23,12 +23,14 @@ body.tasks-page {
 
 /* Progress section. On desktop the title, progress bar and label share one
    row (the header wrapper is flattened with display: contents); the mobile
-   media query restores the stacked layout. */
+   media query restores the stacked layout. With two options at its end, the
+   row wraps rather than overflows in a narrow window. */
 .tasks-progress-section {
     max-width: 900px;
     margin: 0 auto 25px auto;
     align-items: center;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 8px 16px;
 }
 
 /* :not() keeps the initially-hidden utility (display: none) in charge until
@@ -60,6 +62,7 @@ body.tasks-page {
     overflow: hidden;
     order: 2;
     flex: 1;
+    min-width: 80px;
 }
 
 .tasks-progress-fill {
@@ -71,7 +74,9 @@ body.tasks-page {
 }
 
 /* "Display tasks in notes" toggle, right of the progress label: shows or
-   hides the groups built from the checklists of regular notes */
+   hides the groups built from the checklists of regular notes. "Show hidden
+   lists" follows it, greyed out until a group is hidden (the eye button of a
+   group header). */
 .tasks-progress-option {
     display: inline-flex;
     align-items: center;
@@ -85,12 +90,21 @@ body.tasks-page {
     user-select: none;
 }
 
+.tasks-progress-option.disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
 .tasks-progress-option input {
     width: 14px;
     height: 14px;
     margin: 0;
     cursor: pointer;
     accent-color: var(--pz-accent);
+}
+
+.tasks-progress-option.disabled input {
+    cursor: default;
 }
 
 /* Filter bar. On desktop the filter input sits on the same row, to the right
@@ -325,7 +339,10 @@ body.tasks-page {
     border-bottom: none;
 }
 
-.tasks-note-toggle {
+/* Two buttons frame the header: the chevron folds the group, the eye that
+   closes the row takes it off the page (js/tasks-page.js) */
+.tasks-note-toggle,
+.tasks-note-hide-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -341,8 +358,20 @@ body.tasks-page {
     flex-shrink: 0;
 }
 
-.tasks-note-toggle:hover {
+.tasks-note-toggle:hover,
+.tasks-note-hide-btn:hover {
     color: var(--pz-accent-text);
+}
+
+/* A hidden group brought back by "Show hidden lists": dashed and dimmed, so
+   it reads as set aside. Its eye stays at full strength, it is the way back. */
+.tasks-note-group.hidden-note {
+    border-style: dashed;
+}
+
+.tasks-note-group.hidden-note .tasks-note-header > :not(.tasks-note-hide-btn),
+.tasks-note-group.hidden-note .tasks-note-list {
+    opacity: 0.55;
 }
 
 .tasks-note-toggle i {
@@ -1082,6 +1111,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
 
     .tasks-progress-option {
         margin-top: 10px;
+        margin-right: 16px;
     }
 
     .btn {
@@ -1166,11 +1196,13 @@ html[data-theme='dark'] .tasks-note-header {
     border-bottom-color: var(--pz-border);
 }
 
-html[data-theme='dark'] .tasks-note-toggle {
+html[data-theme='dark'] .tasks-note-toggle,
+html[data-theme='dark'] .tasks-note-hide-btn {
     color: var(--pz-text);
 }
 
-html[data-theme='dark'] .tasks-note-toggle:hover {
+html[data-theme='dark'] .tasks-note-toggle:hover,
+html[data-theme='dark'] .tasks-note-hide-btn:hover {
     color: var(--pz-accent-text);
 }
 

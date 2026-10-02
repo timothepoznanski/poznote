@@ -4842,7 +4842,11 @@
     "expand_all": "Alle ausklappen",
     "view_list": "Listenansicht",
     "view_calendar": "Kalenderansicht",
-    "calendar_no_tasks": "Keine Aufgaben an diesem Tag."
+    "calendar_no_tasks": "Keine Aufgaben an diesem Tag.",
+    "hide_list": "Auf dieser Seite ausblenden",
+    "unhide_list": "Auf dieser Seite wieder anzeigen",
+    "show_hidden": "Ausgeblendete Listen anzeigen",
+    "empty_hidden": "Alle Listen sind ausgeblendet."
   },
   "s3_settings": {
     "title": "S3-Speicher für Anhänge",

@@ -4939,7 +4939,11 @@
     "expand_all": "全部展开",
     "view_list": "列表视图",
     "view_calendar": "日历视图",
-    "calendar_no_tasks": "这一天没有任务。"
+    "calendar_no_tasks": "这一天没有任务。",
+    "hide_list": "在此页面隐藏",
+    "unhide_list": "在此页面重新显示",
+    "show_hidden": "显示已隐藏的列表",
+    "empty_hidden": "所有列表均已隐藏。"
   },
   "s3_settings": {
     "title": "S3 附件存储",
