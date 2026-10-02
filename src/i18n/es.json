@@ -1252,6 +1252,9 @@
       "tags": "Etiquetas:",
       "favorite": "Favorito:",
       "attachments": "Adjuntos:",
+      "characters": "Caracteres:",
+      "words": "Palabras:",
+      "lines": "Líneas:",
       "note_id": "ID de la nota:",
       "full_path": "Ruta completa:",
       "created_by": "Creado por:",
@@ -1421,7 +1424,12 @@
       "mobile_editor_bar_hint": "Barra que aparece sobre el teclado en pantalla mientras se edita una nota en un teléfono o una tableta.",
       "mobile_editor_bar_show": "Mostrar la barra",
       "sidebar_hint": "Columna del árbol de notas, entre la barra de iconos y la nota.",
-      "icon_rail_hint": "Columna estrecha de iconos a la izquierda de cada página."
+      "icon_rail_hint": "Columna estrecha de iconos a la izquierda de cada página.",
+      "note_updated_date": "Mostrar fecha de modificación de la nota",
+      "note_stats_characters": "Mostrar número de caracteres",
+      "note_stats_words": "Mostrar número de palabras",
+      "note_stats_lines": "Mostrar número de líneas",
+      "note_info_icon": "Mostrar icono de información bajo el título de la nota"
     },
     "icon_sidebar_order": {
       "title": "Diseño de la barra de iconos",
@@ -2350,7 +2358,23 @@
       "new_note": "Nueva nota",
       "new_note_numbered": "Nueva nota ({{number}})",
       "title_placeholder": "¿Título?",
-      "untitled": "Sin título"
+      "untitled": "Sin título",
+      "created_on": "Creada el {{date}}",
+      "modified_on": "Modificada el {{date}}",
+      "stats": {
+        "characters": {
+          "one": "{{count}} carácter",
+          "other": "{{count}} caracteres"
+        },
+        "words": {
+          "one": "{{count}} palabra",
+          "other": "{{count}} palabras"
+        },
+        "lines": {
+          "one": "{{count}} línea",
+          "other": "{{count}} líneas"
+        }
+      }
     },
     "editor": {
       "placeholder_desktop": "Ingresa texto, usa / o el clic derecho para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",

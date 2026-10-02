@@ -1254,6 +1254,9 @@
       "tags": "Tags :",
       "favorite": "Favori :",
       "attachments": "Pièces jointes :",
+      "characters": "Caractères :",
+      "words": "Mots :",
+      "lines": "Lignes :",
       "note_id": "ID de la note :",
       "full_path": "Chemin complet :"
     },
@@ -1421,7 +1424,12 @@
       "mobile_editor_bar_hint": "Barre affichée au-dessus du clavier virtuel pendant l’édition d’une note sur téléphone ou tablette.",
       "mobile_editor_bar_show": "Afficher la barre",
       "sidebar_hint": "Colonne de l'arborescence des notes, entre le rail d'icônes et la note.",
-      "icon_rail_hint": "Colonne étroite d'icônes tout à gauche de chaque page."
+      "icon_rail_hint": "Colonne étroite d'icônes tout à gauche de chaque page.",
+      "note_updated_date": "Afficher la date de modification",
+      "note_stats_characters": "Afficher le nombre de caractères",
+      "note_stats_words": "Afficher le nombre de mots",
+      "note_stats_lines": "Afficher le nombre de lignes",
+      "note_info_icon": "Afficher l'icône d'information sous le titre de la note"
     },
     "icon_sidebar_order": {
       "title": "Disposition de la barre d'icônes",
@@ -2352,7 +2360,23 @@
       "new_note": "Nouvelle note",
       "new_note_numbered": "Nouvelle note ({{number}})",
       "title_placeholder": "Titre ?",
-      "untitled": "Sans titre"
+      "untitled": "Sans titre",
+      "created_on": "Créée le {{date}}",
+      "modified_on": "Modifiée le {{date}}",
+      "stats": {
+        "characters": {
+          "one": "{{count}} caractère",
+          "other": "{{count}} caractères"
+        },
+        "words": {
+          "one": "{{count}} mot",
+          "other": "{{count}} mots"
+        },
+        "lines": {
+          "one": "{{count}} ligne",
+          "other": "{{count}} lignes"
+        }
+      }
     },
     "editor": {
       "placeholder_desktop": "Saisissez du texte, utilisez / ou le clic droit pour ouvrir le menu des commandes, collez des images ou glissez-déposez une image à l’emplacement du curseur.",

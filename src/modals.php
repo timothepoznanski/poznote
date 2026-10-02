@@ -829,9 +829,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 </div>
 
 <!-- Note information: what the old info.php page showed, opened from the
-     "..." menu at the bottom-right (js/note-info-modal.js). Every value is
+     "..." menu at the bottom-right (js/note-info-modal.js). The values are
      filled from api_note_info.php, which formats them in the user's language,
-     timezone and date format; the labels below are the only fixed text. -->
+     timezone and date format, except the three counts, which the browser
+     works out; the labels below are the only fixed text. -->
 <?php
 $pzNoteInfoRows = [
     'title' => t_h('info.labels.note_title', [], 'Note title:'),
@@ -844,6 +845,11 @@ $pzNoteInfoRows = [
     'tags' => t_h('info.labels.tags', [], 'Tags:'),
     'favorite' => t_h('info.labels.favorite', [], 'Favorite:'),
     'attachments' => t_h('info.labels.attachments', [], 'Attachments:'),
+    // Counted in the browser from the note on screen (js/note-stats.js), so
+    // they match the line under the note title and include unsaved edits
+    'characters' => t_h('info.labels.characters', [], 'Characters:'),
+    'words' => t_h('info.labels.words', [], 'Words:'),
+    'lines' => t_h('info.labels.lines', [], 'Lines:'),
     'note_id' => t_h('info.labels.note_id', [], 'Note ID:'),
     'full_path' => t_h('info.labels.full_path', [], 'Full Path:'),
 ];

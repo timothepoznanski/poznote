@@ -650,6 +650,9 @@
       "tags": "Tags:",
       "favorite": "Favorite:",
       "attachments": "Attachments:",
+      "characters": "Characters:",
+      "words": "Words:",
+      "lines": "Lines:",
       "note_id": "Note ID:",
       "full_path": "Full Path:"
     },
@@ -924,7 +927,12 @@
       "mobile_editor_bar_hint": "Bar shown above the on-screen keyboard while a note is being edited on a phone or tablet.",
       "mobile_editor_bar_show": "Show the bar",
       "sidebar_hint": "Column of the notes tree, between the icon rail and the note.",
-      "icon_rail_hint": "Narrow column of icons on the far left of every page."
+      "icon_rail_hint": "Narrow column of icons on the far left of every page.",
+      "note_updated_date": "Show modification date",
+      "note_stats_characters": "Show character count",
+      "note_stats_words": "Show word count",
+      "note_stats_lines": "Show line count",
+      "note_info_icon": "Show information icon under the note title"
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar layout",
@@ -1849,7 +1857,23 @@
       "new_note": "New note",
       "new_note_numbered": "New note ({{number}})",
       "title_placeholder": "Title ?",
-      "untitled": "Untitled"
+      "untitled": "Untitled",
+      "created_on": "Created {{date}}",
+      "modified_on": "Modified {{date}}",
+      "stats": {
+        "characters": {
+          "one": "{{count}} character",
+          "other": "{{count}} characters"
+        },
+        "words": {
+          "one": "{{count}} word",
+          "other": "{{count}} words"
+        },
+        "lines": {
+          "one": "{{count}} line",
+          "other": "{{count}} lines"
+        }
+      }
     },
     "editor": {
       "placeholder_desktop": "Enter text, use / or right-click for command menu, paste images or drop an image at cursor.",

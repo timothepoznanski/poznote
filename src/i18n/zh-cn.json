@@ -1250,6 +1250,9 @@
       "tags": "标签:",
       "favorite": "收藏:",
       "attachments": "附件:",
+      "characters": "字符:",
+      "words": "字词:",
+      "lines": "行:",
       "note_id": "笔记 ID:",
       "full_path": "完整路径:",
       "created_by": "创建者：",
@@ -1419,7 +1422,12 @@
       "mobile_editor_bar_hint": "在手机或平板上编辑笔记时显示在屏幕键盘上方的工具栏。",
       "mobile_editor_bar_show": "显示编辑栏",
       "sidebar_hint": "笔记树所在的栏，位于图标栏和笔记之间。",
-      "icon_rail_hint": "每个页面最左侧的窄图标栏。"
+      "icon_rail_hint": "每个页面最左侧的窄图标栏。",
+      "note_updated_date": "显示笔记修改日期",
+      "note_stats_characters": "显示字符数",
+      "note_stats_words": "显示字数",
+      "note_stats_lines": "显示行数",
+      "note_info_icon": "在笔记标题下显示信息图标"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏布局",
@@ -2348,7 +2356,20 @@
       "new_note": "新笔记",
       "new_note_numbered": "新笔记 ({{number}})",
       "title_placeholder": "标题？",
-      "untitled": "无标题"
+      "untitled": "无标题",
+      "created_on": "创建于 {{date}}",
+      "modified_on": "修改于 {{date}}",
+      "stats": {
+        "characters": {
+          "other": "{{count}} 个字符"
+        },
+        "words": {
+          "other": "{{count}} 个字词"
+        },
+        "lines": {
+          "other": "{{count}} 行"
+        }
+      }
     },
     "editor": {
       "placeholder_desktop": "输入文本，使用 / 或右键打开命令菜单，粘贴图片或在光标处拖放图片。",

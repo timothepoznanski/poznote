@@ -46,6 +46,21 @@
                 }
                 $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
 
+                // Labels of the note statistics (js/note-stats.js), one per plural
+                // form the language has: Intl.PluralRules picks the form, and a
+                // language without "few" or "many" simply does not define them.
+                $note_stats_labels = [];
+                foreach (['characters', 'words', 'lines'] as $stats_unit) {
+                    foreach (['one', 'few', 'many', 'other'] as $plural_form) {
+                        $stats_label = t('index.note.stats.' . $stats_unit . '.' . $plural_form, [], '');
+                        if ($stats_label !== '') {
+                            $note_stats_labels[$stats_unit][$plural_form] = $stats_label;
+                        }
+                    }
+                }
+                $note_stats_labels_json = json_encode($note_stats_labels, JSON_UNESCAPED_UNICODE);
+                if ($note_stats_labels_json === false) $note_stats_labels_json = '{}';
+
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
                     // A key is an integer: it goes into ids, attributes and file
@@ -563,8 +578,17 @@
                         $noteIconColor = !empty($row['icon_color']) ? (string)$row['icon_color'] : '';
                         $titleNoteIcon = renderEditableNoteIcon($row['id'], $heading, $noteIconRaw, $noteIconColor, 'note-title-icon', $note_type);
                     }
-                    echo '<h4 class="note-title-heading">'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/></h4>';
-                    // Subline: creation date and location (visible when enabled in settings)
+                    echo '<h4 class="note-title-heading">'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/>';
+                    // Subline: a small line of metadata under the title, inside
+                    // the heading so that it starts where the title text does,
+                    // past the note icon (css/notes/subline.css). The dates,
+                    // then the size of the note (characters, words, lines),
+                    // filled in by js/note-stats.js, then an icon that opens
+                    // the note information. Each entry has its own checkbox
+                    // in the "Element visibility" modal
+                    // (panel:note-created-date, panel:note-updated-date,
+                    // panel:note-stats-characters, panel:note-stats-words,
+                    // panel:note-stats-lines, panel:note-info-icon).
                     $created_display = '';
                     if (!empty($created_clean)) {
                         $created_display = formatUtcDateTimeForDisplay($created_clean, 'd/m/Y H:i');
@@ -572,15 +596,44 @@
                     if ($created_display === '' && !empty($final_created)) {
                         $created_display = $final_created;
                     }
-                
-                    $has_created = !empty($created_display) && $show_note_created_setting;
-
-                    // Show the subline if created date setting is enabled
-                    if ($show_note_created_setting && $has_created) {
-                        echo '<div class="note-subline">';
-                        echo '<span class="note-sub-created">' . htmlspecialchars($created_display, ENT_QUOTES) . '</span>';
-                        echo '</div>';
+                    $updated_display = '';
+                    if (!empty($updated_clean)) {
+                        $updated_display = formatUtcDateTimeForDisplay($updated_clean, 'd/m/Y H:i');
                     }
+                    if ($updated_display === '' && !empty($final_updated)) {
+                        $updated_display = $final_updated;
+                    }
+
+                    if ($show_note_created_setting) {
+                        // The label of the modification date goes along as a
+                        // template: js/note-stats.js rewrites the date after
+                        // each save.
+                        $updated_label = t('index.note.modified_on', [], 'Modified {{date}}');
+                        echo '<span class="note-subline">';
+                        echo '<span class="note-sub-dates">';
+                        if ($created_display !== '') {
+                            echo '<span class="note-sub-created">' . t_h('index.note.created_on', ['date' => $created_display], 'Created {{date}}') . '</span>';
+                        }
+                        if ($updated_display !== '') {
+                            echo '<span class="note-sub-updated" id="noteUpdated' . $row['id'] . '" data-label="' . htmlspecialchars($updated_label, ENT_QUOTES) . '">' . htmlspecialchars(str_replace('{{date}}', $updated_display, $updated_label), ENT_QUOTES) . '</span>';
+                        }
+                        echo '</span>';
+                        echo '<span class="note-sub-stats" id="noteStats' . $row['id'] . '" data-note-id="' . $row['id'] . '" data-labels="' . htmlspecialchars($note_stats_labels_json, ENT_QUOTES) . '">';
+                        // One empty entry per figure, there from the start so
+                        // that each can be hidden on its own; the spaces keep
+                        // a copy of the line readable
+                        echo '<span class="note-sub-stat note-sub-stat-characters" data-stat="characters"></span>';
+                        echo ' <span class="note-sub-stat note-sub-stat-words" data-stat="words"></span>';
+                        echo ' <span class="note-sub-stat note-sub-stat-lines" data-stat="lines"></span>';
+                        echo '</span>';
+                        // Last entry: opens the note information dialog
+                        // (#noteInfoModal, js/note-info-modal.js), like the
+                        // Information entry of the "..." menu
+                        $info_label = t_h('common.information', [], 'Information');
+                        echo '<span class="note-sub-info"><button type="button" class="note-sub-info-btn" data-action="show-note-info" data-note-id="' . $row['id'] . '" title="' . $info_label . '" aria-label="' . $info_label . '"><i class="lucide lucide-info"></i></button></span>';
+                        echo '</span>';
+                    }
+                    echo '</h4>';
                     
                     // Note content with font size style
                     $data_attr = '';

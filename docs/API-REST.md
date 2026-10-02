@@ -436,7 +436,7 @@ curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
 
 **Optimistic concurrency:**
 
-`GET /notes/{id}` returns a `version` token (also sent as an `ETag` header). Pass it back in the PATCH body as `if_version`, or as an `If-Match` header. If the note was modified since that version, the write is rejected with a `409` response that includes the current `version`, `updated`, `heading` and `content`, so you can merge your change into the latest content and retry in a single round trip. Without `if_version`, writes behave as before (last write wins). A successful PATCH returns the new `version` token, which lets you chain conditional writes without re-reading the note.
+`GET /notes/{id}` returns a `version` token (also sent as an `ETag` header). Pass it back in the PATCH body as `if_version`, or as an `If-Match` header. If the note was modified since that version, the write is rejected with a `409` response that includes the current `version`, `updated`, `heading` and `content`, so you can merge your change into the latest content and retry in a single round trip. Without `if_version`, writes behave as before (last write wins). A successful PATCH returns the new `version` token, which lets you chain conditional writes without re-reading the note. It also returns `updated`, the modification time in UTC, and `updated_display`, the same time in the account's timezone and date format.
 
 ```bash
 curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \

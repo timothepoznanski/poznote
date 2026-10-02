@@ -451,7 +451,17 @@
                 } else if (id === 'note-actions-toggle') {
                     rules.push('.note-actions-toggle { display: none !important; }');
                 } else if (id === 'note-created-date') {
-                    rules.push('.note-subline { display: none !important; }');
+                    rules.push('.note-sub-created { display: none !important; }');
+                } else if (id === 'note-updated-date') {
+                    rules.push('.note-sub-updated { display: none !important; }');
+                } else if (id === 'note-stats-characters') {
+                    rules.push('.note-sub-stat-characters { display: none !important; }');
+                } else if (id === 'note-stats-words') {
+                    rules.push('.note-sub-stat-words { display: none !important; }');
+                } else if (id === 'note-stats-lines') {
+                    rules.push('.note-sub-stat-lines { display: none !important; }');
+                } else if (id === 'note-info-icon') {
+                    rules.push('.note-sub-info { display: none !important; }');
                 } else if (id === 'note-icons') {
                     rules.push('.note-icon { display: none !important; }');
                 } else if (id === 'favorites-folder') {

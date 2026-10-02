@@ -375,6 +375,10 @@ function saveNoteToServer(options) {
                 if (data.note && data.note.version && typeof window.setLiveNoteContentVersion === 'function') {
                     window.setLiveNoteContentVersion(noteid, data.note.version);
                 }
+                // Modification date under the title (js/note-stats.js)
+                if (data.note && data.note.updated_display && typeof window.setNoteModifiedDate === 'function') {
+                    window.setNoteModifiedDate(noteid, data.note.updated_display);
+                }
                 // Attachments copied into the note by this save (content pasted
                 // from another note or account): swap their addresses before
                 // the saved state is recorded (js/attachment-adoption.js).

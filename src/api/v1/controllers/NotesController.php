@@ -1548,6 +1548,10 @@ class NotesController {
                         'id' => $noteId,
                         'heading' => $heading,
                         'updated' => $now_utc,
+                        // The same time in the account's timezone and date
+                        // format, for the line under the note title
+                        // (js/note-stats.js)
+                        'updated_display' => formatUtcDateTimeForDisplay($now_utc, 'd/m/Y H:i'),
                         'version' => $newVersion
                     ]
                 ];

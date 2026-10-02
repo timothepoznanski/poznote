@@ -485,10 +485,23 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // titles back the strip reserved for it (css/tabs.css).
                 $rules[] = '.note-actions-toggle { display: none !important; }';
             } elseif ($id === 'note-created-date') {
-                // Creation date under the note title. Overrides
-                // body.show-note-created in css/notes/subline.css, which the
-                // note_display.php markup still sets.
-                $rules[] = '.note-subline { display: none !important; }';
+                // Creation date, on the line under the note title
+                // (css/notes/subline.css)
+                $rules[] = '.note-sub-created { display: none !important; }';
+            } elseif ($id === 'note-updated-date') {
+                // Modification date, next to it
+                $rules[] = '.note-sub-updated { display: none !important; }';
+            } elseif ($id === 'note-stats-characters') {
+                // Characters, words and lines of the note, on the same line
+                // (js/note-stats.js), one key each
+                $rules[] = '.note-sub-stat-characters { display: none !important; }';
+            } elseif ($id === 'note-stats-words') {
+                $rules[] = '.note-sub-stat-words { display: none !important; }';
+            } elseif ($id === 'note-stats-lines') {
+                $rules[] = '.note-sub-stat-lines { display: none !important; }';
+            } elseif ($id === 'note-info-icon') {
+                // Information icon that closes that line
+                $rules[] = '.note-sub-info { display: none !important; }';
             } elseif ($id === 'note-icons') {
                 // Icon before the note title, in the sidebar list and in the
                 // note header. Both are rendered by renderEditableNoteIcon(),

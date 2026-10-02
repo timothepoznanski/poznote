@@ -1252,6 +1252,9 @@
       "tags": "Etiquetas:",
       "favorite": "Favorito:",
       "attachments": "Anexos:",
+      "characters": "Caracteres:",
+      "words": "Palavras:",
+      "lines": "Linhas:",
       "note_id": "ID da Nota:",
       "full_path": "Caminho Completo:",
       "created_by": "Criado por:",
@@ -1421,7 +1424,12 @@
       "mobile_editor_bar_hint": "Barra exibida acima do teclado virtual durante a edição de uma nota num telemóvel ou tablet.",
       "mobile_editor_bar_show": "Mostrar a barra",
       "sidebar_hint": "Coluna da árvore de notas, entre a barra de ícones e a nota.",
-      "icon_rail_hint": "Coluna estreita de ícones à esquerda de cada página."
+      "icon_rail_hint": "Coluna estreita de ícones à esquerda de cada página.",
+      "note_updated_date": "Mostrar Data de Modificação da Nota",
+      "note_stats_characters": "Mostrar número de caracteres",
+      "note_stats_words": "Mostrar número de palavras",
+      "note_stats_lines": "Mostrar número de linhas",
+      "note_info_icon": "Mostrar ícone de informação sob o título da nota"
     },
     "icon_sidebar_order": {
       "title": "Layout da barra de ícones",
@@ -2350,7 +2358,23 @@
       "new_note": "Nova nota",
       "new_note_numbered": "Nova nota ({{number}})",
       "title_placeholder": "Título ?",
-      "untitled": "Sem título"
+      "untitled": "Sem título",
+      "created_on": "Criada em {{date}}",
+      "modified_on": "Modificada em {{date}}",
+      "stats": {
+        "characters": {
+          "one": "{{count}} caractere",
+          "other": "{{count}} caracteres"
+        },
+        "words": {
+          "one": "{{count}} palavra",
+          "other": "{{count}} palavras"
+        },
+        "lines": {
+          "one": "{{count}} linha",
+          "other": "{{count}} linhas"
+        }
+      }
     },
     "editor": {
       "placeholder_desktop": "Insira texto, use / ou o clique com o botão direito para abrir o menu de comandos, cole imagens ou arraste e solte uma imagem no cursor.",

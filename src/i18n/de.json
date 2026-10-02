@@ -1252,6 +1252,9 @@
       "tags": "Tags:",
       "favorite": "Favorit:",
       "attachments": "Anhänge:",
+      "characters": "Zeichen:",
+      "words": "Wörter:",
+      "lines": "Zeilen:",
       "note_id": "Notiz-ID:",
       "full_path": "Vollständiger Pfad:",
       "created_by": "Erstellt von:",
@@ -1421,7 +1424,12 @@
       "mobile_editor_bar_hint": "Leiste über der Bildschirmtastatur, während eine Notiz auf einem Smartphone oder Tablet bearbeitet wird.",
       "mobile_editor_bar_show": "Leiste anzeigen",
       "sidebar_hint": "Spalte mit dem Notizbaum, zwischen der Symbolleiste und der Notiz.",
-      "icon_rail_hint": "Schmale Symbolspalte ganz links auf jeder Seite."
+      "icon_rail_hint": "Schmale Symbolspalte ganz links auf jeder Seite.",
+      "note_updated_date": "Änderungsdatum der Notiz anzeigen",
+      "note_stats_characters": "Zeichenanzahl anzeigen",
+      "note_stats_words": "Wortanzahl anzeigen",
+      "note_stats_lines": "Zeilenanzahl anzeigen",
+      "note_info_icon": "Informationssymbol unter dem Notiztitel anzeigen"
     },
     "icon_sidebar_order": {
       "title": "Layout der Icon-Seitenleiste",
@@ -2350,7 +2358,23 @@
       "new_note": "Neue Notiz",
       "new_note_numbered": "Neue Notiz ({{number}})",
       "title_placeholder": "Titel ?",
-      "untitled": "Ohne Titel"
+      "untitled": "Ohne Titel",
+      "created_on": "Erstellt am {{date}}",
+      "modified_on": "Geändert am {{date}}",
+      "stats": {
+        "characters": {
+          "one": "{{count}} Zeichen",
+          "other": "{{count}} Zeichen"
+        },
+        "words": {
+          "one": "{{count}} Wort",
+          "other": "{{count}} Wörter"
+        },
+        "lines": {
+          "one": "{{count}} Zeile",
+          "other": "{{count}} Zeilen"
+        }
+      }
     },
     "editor": {
       "placeholder_desktop": "Text eingeben, / oder Rechtsklick verwenden, um das Befehlsmenü zu öffnen, Bilder einfügen oder ein Bild am Cursor ablegen.",
