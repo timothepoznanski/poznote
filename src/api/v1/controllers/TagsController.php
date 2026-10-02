@@ -161,7 +161,7 @@ class TagsController {
                     $tags = array_values(array_unique($tags));
                     $newTagsStr = implode(', ', $tags);
                     $updateStmt = $this->con->prepare(
-                        "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ?"
+                        "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?"
                     );
                     $updateStmt->execute([$newTagsStr, $row['id']]);
                     $updated++;
@@ -210,7 +210,7 @@ class TagsController {
 
                 $newTagsStr = implode(', ', array_values($tags));
                 $updateStmt = $this->con->prepare(
-                    "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP WHERE id = ?"
+                    "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?"
                 );
                 $updateStmt->execute([$newTagsStr, $row['id']]);
                 $updated++;

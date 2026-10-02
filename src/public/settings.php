@@ -133,6 +133,7 @@ $settingsPageUserKeys = [
     'diary_date_format',
     'toolbar_mode',
     'timezone',
+    'workspace_activity_emails',
     'date_time_format',
     'hidden_ui_elements',
     'icon_sidebar_order',
@@ -305,6 +306,18 @@ if ($isAdmin) {
         $active_webhooks_count = 0;
     }
 }
+
+// Shared workspace emails (WorkspaceActivityEmailService): offered only when
+// the instance sends email at all, and greyed out for an account that has no
+// address to send them to.
+$workspaceActivityEmailsAvailable = false;
+try {
+    require_once __DIR__ . '/../ReminderEmailService.php';
+    $workspaceActivityEmailsAvailable = !empty((new ReminderEmailService())->getSmtpConfig()['enabled']);
+} catch (Throwable $e) {
+    error_log('settings: cannot read the SMTP configuration: ' . $e->getMessage());
+}
+$workspaceActivityEmailsNoAddress = !filter_var(trim((string)($currentUser['email'] ?? '')), FILTER_VALIDATE_EMAIL);
 
 // User webhooks are personal to each account; tenant isolation can block
 // them for non-admin users.
@@ -560,6 +573,30 @@ if ($canUseUserWebhooks) {
                     </div>
                 </div>
             </div>
+
+            <?php if ($workspaceActivityEmailsAvailable): ?>
+            <div class="settings-group-title"><?php echo t_h('settings.groups.notifications', [], 'Notifications'); ?></div>
+            <div class="settings-group">
+
+                <!-- Shared workspace emails: off, as the changes happen, or a
+                     daily or weekly summary (WorkspaceActivityEmailService) -->
+                <div class="home-card settings-inline-card<?php echo $workspaceActivityEmailsNoAddress ? ' home-card-disabled' : ''; ?>" id="workspace-activity-emails-card"<?php echo $workspaceActivityEmailsNoAddress ? ' aria-disabled="true"' : ''; ?>>
+                    <span class="setting-help" data-tooltip="<?php echo $workspaceActivityEmailsNoAddress
+                        ? t_h('settings.card_help.workspace_activity_emails_no_address', [], 'Add an email address to your profile to receive these emails.')
+                        : t_h('settings.card_help.workspace_activity_emails', [], 'Receive an email when someone else changes a note in a workspace you share, or in one shared with you. It lists the notes created, edited and deleted, never their content, and is sent to the email address of your profile.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-mail"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="workspace-activity-emails-select"><?php echo t_h('display.cards.workspace_activity_emails', [], 'Shared workspace emails'); ?></label>
+                        <select id="workspace-activity-emails-select" class="settings-inline-control settings-inline-select" data-control="workspace-activity-emails-select"<?php echo $workspaceActivityEmailsNoAddress ? ' disabled' : ''; ?>>
+                            <option value="off"><?php echo t_h('modals.workspace_activity_emails.options.off', [], 'Off'); ?></option>
+                            <option value="instant"><?php echo t_h('modals.workspace_activity_emails.options.instant', [], 'As changes happen'); ?></option>
+                            <option value="daily"><?php echo t_h('modals.workspace_activity_emails.options.daily', [], 'Daily summary'); ?></option>
+                            <option value="weekly"><?php echo t_h('modals.workspace_activity_emails.options.weekly', [], 'Weekly summary'); ?></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.storage', [], 'Storage'); ?></div>
             <div class="settings-group">

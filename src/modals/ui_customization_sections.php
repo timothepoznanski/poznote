@@ -60,6 +60,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:date-time-format-card" checked><span><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspace-activity-emails-card" checked><span><?php echo t_h('display.cards.workspace_activity_emails', [], 'Shared workspace emails'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:snapshots-card" checked><span><?php echo t_h('display.cards.snapshots', [], 'Snapshots'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:offline-notes-card" checked><span><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></span></label>

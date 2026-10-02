@@ -668,6 +668,38 @@ function getWorkspacesSharedWithUser(int $granteeUserId): array {
 }
 
 /**
+ * Every share of the instance whose owner and grantee are both active: rows
+ * of owner_user_id, workspace_name, grantee_user_id. Read by the shared
+ * workspace emails (WorkspaceActivityEmailService), which need the members
+ * of each workspace rather than the shares of one account.
+ */
+function listActiveWorkspaceShares(): array {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->query("
+            SELECT s.owner_user_id, s.workspace_name, s.grantee_user_id
+            FROM workspace_shares s
+            INNER JOIN users o ON o.id = s.owner_user_id
+            INNER JOIN users g ON g.id = s.grantee_user_id
+            WHERE o.active = 1 AND g.active = 1
+            ORDER BY s.owner_user_id, s.workspace_name COLLATE NOCASE, s.grantee_user_id
+        ");
+        $rows = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $rows[] = [
+                'owner_user_id' => (int)$row['owner_user_id'],
+                'workspace_name' => (string)$row['workspace_name'],
+                'grantee_user_id' => (int)$row['grantee_user_id'],
+            ];
+        }
+        return $rows;
+    } catch (Exception $e) {
+        error_log("Failed to list active workspace shares: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
  * True when the owner shares the named workspace with the grantee and both
  * accounts are active.
  */

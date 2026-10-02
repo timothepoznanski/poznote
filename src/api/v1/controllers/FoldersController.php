@@ -2231,9 +2231,9 @@ class FoldersController {
         // Move notes. "No folder" in another workspace is that workspace's root.
         $movedCount = 0;
         if ($targetFolderId === 0) {
-            $updateStmt = $this->db->prepare("UPDATE entries SET folder_id = NULL, folder = NULL, workspace = ?, updated = CURRENT_TIMESTAMP WHERE id = ?");
+            $updateStmt = $this->db->prepare("UPDATE entries SET folder_id = NULL, folder = NULL, workspace = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?");
         } else {
-            $updateStmt = $this->db->prepare("UPDATE entries SET folder_id = ?, folder = ?, workspace = ?, updated = CURRENT_TIMESTAMP WHERE id = ?");
+            $updateStmt = $this->db->prepare("UPDATE entries SET folder_id = ?, folder = ?, workspace = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?");
         }
         
         foreach ($notes as $note) {
@@ -2491,11 +2491,11 @@ class FoldersController {
         // display_order is reset: positions only mean something among the
         // siblings they were numbered with (see reorderNote)
         if ($workspace) {
-            $query = "UPDATE entries SET folder = ?, folder_id = ?, workspace = ?, display_order = 0, updated = datetime('now') WHERE id = ?";
+            $query = "UPDATE entries SET folder = ?, folder_id = ?, workspace = ?, display_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $success = $stmt->execute([$targetFolder, $targetFolderId, $workspace, $noteId]);
         } else {
-            $query = "UPDATE entries SET folder = ?, folder_id = ?, display_order = 0, updated = datetime('now') WHERE id = ?";
+            $query = "UPDATE entries SET folder = ?, folder_id = ?, display_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $success = $stmt->execute([$targetFolder, $targetFolderId, $noteId]);
         }
@@ -3054,7 +3054,7 @@ class FoldersController {
         }
         
         // Move to root (display_order reset, see reorderNote)
-        $query = "UPDATE entries SET folder = NULL, folder_id = NULL, display_order = 0, updated = datetime('now') WHERE id = ?";
+        $query = "UPDATE entries SET folder = NULL, folder_id = NULL, display_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
         $stmt = $this->db->prepare($query);
         $success = $stmt->execute([$noteId]);
         
@@ -3215,7 +3215,7 @@ class FoldersController {
                 // Changing folder is an edit, like moveNoteToFolder; a pure
                 // reorder leaves 'updated' alone so date-based views keep
                 // their meaning.
-                $updateDragged = $this->db->prepare("UPDATE entries SET folder = ?, folder_id = ?, display_order = ?, updated = datetime('now') WHERE id = ?");
+                $updateDragged = $this->db->prepare("UPDATE entries SET folder = ?, folder_id = ?, display_order = ?, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?");
             } else {
                 $updateDragged = $this->db->prepare('UPDATE entries SET display_order = ? WHERE id = ?');
             }

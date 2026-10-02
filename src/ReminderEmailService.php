@@ -471,7 +471,11 @@ class ReminderEmailService {
         return rtrim($baseUrl, '/') . '/index.php?' . http_build_query($params);
     }
 
-    private function formatUserDateTime(string $utcDatetime, array $settings): string {
+    /**
+     * A UTC 'Y-m-d H:i:s' date as its reader displays dates: $settings holds
+     * that account's timezone, date_time_format and language.
+     */
+    public function formatUserDateTime(string $utcDatetime, array $settings): string {
         if ($utcDatetime === '') {
             return '';
         }

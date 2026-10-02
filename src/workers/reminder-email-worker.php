@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../ReminderEmailService.php';
 require_once __DIR__ . '/../ReminderWebhookService.php';
+require_once __DIR__ . '/../WorkspaceActivityEmailService.php';
 
 const REMINDER_EMAIL_WORKER_INTERVAL_SECONDS = 60;
 
@@ -55,6 +56,28 @@ do {
         }
     } catch (Throwable $e) {
         poznoteReminderWorkerLog('webhook fatal: ' . $e->getMessage());
+    }
+
+    // Shared workspace emails ride on the same minute tick: "instant" needs
+    // it, and a daily or weekly summary only checks whether its slot passed.
+    try {
+        $activityService = new WorkspaceActivityEmailService();
+        $activityResult = $activityService->processDue();
+
+        if (!empty($activityResult['errors']) || (int)$activityResult['sent'] > 0 || (int)$activityResult['failed'] > 0) {
+            poznoteReminderWorkerLog(
+                'workspace activity enabled=' . ($activityResult['enabled'] ? '1' : '0')
+                . ' sent=' . (int)$activityResult['sent']
+                . ' failed=' . (int)$activityResult['failed']
+                . ' users_checked=' . (int)$activityResult['users_checked']
+                . ' skipped_users=' . (int)$activityResult['skipped_users']
+            );
+            foreach (array_slice($activityResult['errors'] ?? [], 0, 10) as $error) {
+                poznoteReminderWorkerLog('workspace activity error: ' . $error);
+            }
+        }
+    } catch (Throwable $e) {
+        poznoteReminderWorkerLog('workspace activity fatal: ' . $e->getMessage());
     }
 
     if ($runOnce) {

@@ -549,7 +549,9 @@
       "snapshots": "Escolha quantos instantâneos automáticos diários e quantos instantâneos de segurança (antes de uma edição por IA ou MCP) são guardados por nota.",
       "stt": "Configure o servidor de reconhecimento de voz usado para ditar notas e transcrever anexos de áudio.",
       "sidebar_offline_marks": "Mostra um pequeno ponto ao lado das notas disponíveis offline neste navegador.",
-      "format_toolbar_mode": "Num computador, escolha onde aparecem os botões de formatação quando seleciona texto numa nota: na barra de ferramentas da nota, no lugar das ações da nota, ou num menu flutuante acima da seleção, que deixa a barra de ferramentas da nota como está."
+      "format_toolbar_mode": "Num computador, escolha onde aparecem os botões de formatação quando seleciona texto numa nota: na barra de ferramentas da nota, no lugar das ações da nota, ou num menu flutuante acima da seleção, que deixa a barra de ferramentas da nota como está.",
+      "workspace_activity_emails": "Receba um e-mail quando outra pessoa alterar uma nota em um espaço de trabalho que você compartilha ou em um compartilhado com você. Ele lista as notas criadas, editadas e excluídas, nunca o conteúdo delas, e é enviado para o endereço de e-mail do seu perfil.",
+      "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -589,7 +591,8 @@
       "language_region": "Idioma e região",
       "storage": "Armazenamento",
       "layout": "Layout",
-      "organization": "Organização"
+      "organization": "Organização",
+      "notifications": "Notificações"
     },
     "sections": {
       "account_display": "Conta e Exibição",
@@ -884,7 +887,8 @@
       "snapshots": "Instantâneos",
       "show_note_icons": "Mostrar ícones das notas",
       "sidebar_offline_marks": "Mostrar o ponto offline",
-      "format_toolbar_mode": "Barra de formatação"
+      "format_toolbar_mode": "Barra de formatação",
+      "workspace_activity_emails": "E-mails de espaços compartilhados"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -1868,6 +1872,14 @@
       "success_one": "1 nota recebeu as etiquetas",
       "success_other": "{{count}} notas receberam as etiquetas",
       "title": "Adicionar etiquetas a todas as notas"
+    },
+    "workspace_activity_emails": {
+      "options": {
+        "off": "Desativado",
+        "instant": "Conforme as alterações",
+        "daily": "Resumo diário",
+        "weekly": "Resumo semanal"
+      }
     }
   },
   "notes_list": {
@@ -4823,6 +4835,21 @@
     "manage_link": "Gerir utilizadores: {{url}}",
     "manage_button": "Gerir utilizadores",
     "footer": "Recebe este e-mail porque as notificações de novos utilizadores estão ativadas na sua conta de administrador."
+  },
+  "workspace_activity_email": {
+    "subject_one": "Alterações no espaço compartilhado {{workspace}}",
+    "subject_many": "Alterações em {{count}} espaços compartilhados",
+    "heading": "Atividade dos espaços compartilhados",
+    "intro": "Alterações feitas por outras pessoas desde {{date}}.",
+    "shared_by": "Compartilhado por {{user}}",
+    "shared_by_you": "Compartilhado por você",
+    "created_by": "Criada por {{user}}",
+    "edited_by": "Editada por {{user}}",
+    "deleted_by": "Excluída por {{user}}",
+    "untitled_note": "Nota sem título",
+    "more": "e mais {{count}}",
+    "footer": "Você recebe este e-mail porque os e-mails de espaços compartilhados estão ativados nas suas configurações do Poznote.",
+    "settings_link": "Abrir as configurações"
   },
   "tasks_page": {
     "title": "Tarefas",

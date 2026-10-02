@@ -235,6 +235,15 @@ function getAuthenticatedUserId() {
     return $_SESSION['login_user_id'] ?? ($_SESSION['user_id'] ?? null);
 }
 
+/**
+ * Who a write to a note is recorded as (entries.updated_by_user_id): the
+ * person signed in, not the account whose notes they have open. 0 when
+ * nobody is, which readers of the column take as "the owner".
+ */
+function getWriteActorUserId(): int {
+    return (int)(getAuthenticatedUserId() ?? ($_SESSION['user_id'] ?? 0));
+}
+
 function setAuthenticatedIdentity(array $authUser, ?string $authMethod = null): void {
     $authUserId = (int)($authUser['id'] ?? 0);
     if ($authUserId <= 0) {
@@ -794,7 +803,7 @@ function enforceSharedWorkspaceScopeAccess(): void {
 
     // Leaving the scope, or reading another account the login may open, is
     // not an action on the owner's workspace.
-    if (in_array($baseName, ['switch_account.php', 'account_tree.php', 'logout.php'], true)) {
+    if (in_array($baseName, ['switch_account.php', 'open_shared.php', 'account_tree.php', 'logout.php'], true)) {
         return;
     }
 

@@ -548,7 +548,9 @@
       "snapshots": "选择每条笔记保留多少个每日自动快照，以及多少个安全快照（AI 或 MCP 编辑前）。",
       "stt": "配置用于听写笔记和转录音频附件的语音识别服务器。",
       "sidebar_offline_marks": "在此浏览器中可离线使用的笔记旁显示一个小圆点。",
-      "format_toolbar_mode": "在电脑上，选择在笔记中选中文本时格式按钮显示的位置：在笔记工具栏中替代笔记操作，或在所选内容上方的浮动菜单中，笔记工具栏保持不变。"
+      "format_toolbar_mode": "在电脑上，选择在笔记中选中文本时格式按钮显示的位置：在笔记工具栏中替代笔记操作，或在所选内容上方的浮动菜单中，笔记工具栏保持不变。",
+      "workspace_activity_emails": "当其他人更改了您共享的工作区或与您共享的工作区中的笔记时，接收邮件通知。邮件会列出新建、修改和删除的笔记，但不包含笔记内容，并发送到您个人资料中的邮箱地址。",
+      "workspace_activity_emails_no_address": "请在个人资料中添加邮箱地址以接收这些邮件。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -588,7 +590,8 @@
       "language_region": "语言与地区",
       "storage": "存储",
       "layout": "布局",
-      "organization": "整理"
+      "organization": "整理",
+      "notifications": "通知"
     },
     "sections": {
       "account_display": "账户与显示",
@@ -883,7 +886,8 @@
       "snapshots": "快照",
       "show_note_icons": "显示笔记图标",
       "sidebar_offline_marks": "显示离线圆点",
-      "format_toolbar_mode": "格式工具栏"
+      "format_toolbar_mode": "格式工具栏",
+      "workspace_activity_emails": "共享工作区邮件"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -1866,6 +1870,14 @@
       "success_one": "已为 1 条笔记添加标签",
       "success_other": "已为 {{count}} 条笔记添加标签",
       "title": "为所有笔记添加标签"
+    },
+    "workspace_activity_emails": {
+      "options": {
+        "off": "关闭",
+        "instant": "有更改时",
+        "daily": "每日摘要",
+        "weekly": "每周摘要"
+      }
     }
   },
   "notes_list": {
@@ -4919,6 +4931,21 @@
     "manage_link": "管理用户：{{url}}",
     "manage_button": "管理用户",
     "footer": "您收到此邮件是因为您的管理员账户已启用新用户通知。"
+  },
+  "workspace_activity_email": {
+    "subject_one": "共享工作区 {{workspace}} 有更改",
+    "subject_many": "{{count}} 个共享工作区有更改",
+    "heading": "共享工作区动态",
+    "intro": "自 {{date}} 以来其他人所做的更改。",
+    "shared_by": "由 {{user}} 共享",
+    "shared_by_you": "由您共享",
+    "created_by": "由 {{user}} 创建",
+    "edited_by": "由 {{user}} 修改",
+    "deleted_by": "由 {{user}} 删除",
+    "untitled_note": "无标题笔记",
+    "more": "另有 {{count}} 项",
+    "footer": "您收到此邮件是因为您在 Poznote 设置中开启了共享工作区邮件。",
+    "settings_link": "打开设置"
   },
   "tasks_page": {
     "title": "任务",

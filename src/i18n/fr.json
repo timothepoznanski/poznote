@@ -548,7 +548,9 @@
       "snapshots": "Choisissez combien de snapshots automatiques quotidiens et combien de snapshots de sécurité (avant une modification IA ou MCP) sont conservés par note.",
       "stt": "Configurer le serveur de reconnaissance vocale utilisé pour dicter des notes et transcrire les pièces jointes audio.",
       "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur.",
-      "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle."
+      "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle.",
+      "workspace_activity_emails": "Recevez un email quand quelqu'un d'autre modifie une note dans un espace de travail que vous partagez, ou dans un espace partagé avec vous. Il liste les notes créées, modifiées et supprimées, jamais leur contenu, et il est envoyé à l'adresse email de votre profil.",
+      "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -588,7 +590,8 @@
       "language_region": "Langue et région",
       "storage": "Stockage",
       "layout": "Mise en page",
-      "organization": "Organisation"
+      "organization": "Organisation",
+      "notifications": "Notifications"
     },
     "sections": {
       "account_display": "Compte & Affichage",
@@ -884,7 +887,8 @@
       "slash_menu_trigger_mobile": "Raccourci du menu de commandes (mobile)",
       "snapshots": "Snapshots",
       "sidebar_offline_marks": "Afficher le point hors ligne",
-      "format_toolbar_mode": "Barre de mise en forme"
+      "format_toolbar_mode": "Barre de mise en forme",
+      "workspace_activity_emails": "Emails des espaces partagés"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -1874,6 +1878,14 @@
       "success_one": "1 note étiquetée",
       "success_other": "{{count}} notes étiquetées",
       "title": "Étiqueter toutes les notes"
+    },
+    "workspace_activity_emails": {
+      "options": {
+        "off": "Désactivé",
+        "instant": "Au fil des modifications",
+        "daily": "Résumé quotidien",
+        "weekly": "Résumé hebdomadaire"
+      }
     }
   },
   "notes_list": {
@@ -4927,6 +4939,21 @@
     "manage_link": "Gérer les utilisateurs : {{url}}",
     "manage_button": "Gérer les utilisateurs",
     "footer": "Vous recevez cet e-mail car les notifications de nouvel utilisateur sont activées pour votre compte administrateur."
+  },
+  "workspace_activity_email": {
+    "subject_one": "Modifications dans l'espace partagé {{workspace}}",
+    "subject_many": "Modifications dans {{count}} espaces partagés",
+    "heading": "Activité des espaces partagés",
+    "intro": "Modifications faites par les autres depuis le {{date}}.",
+    "shared_by": "Partagé par {{user}}",
+    "shared_by_you": "Partagé par vous",
+    "created_by": "Créée par {{user}}",
+    "edited_by": "Modifiée par {{user}}",
+    "deleted_by": "Supprimée par {{user}}",
+    "untitled_note": "Note sans titre",
+    "more": "et {{count}} de plus",
+    "footer": "Vous recevez cet email parce que les emails des espaces partagés sont activés dans vos paramètres Poznote.",
+    "settings_link": "Ouvrir les paramètres"
   },
   "tasks_page": {
     "title": "Tâches",

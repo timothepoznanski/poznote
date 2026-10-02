@@ -288,6 +288,16 @@ class SettingsController {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
+        // Shared workspace emails (WorkspaceActivityEmailService)
+        if ($key === 'workspace_activity_emails') {
+            require_once __DIR__ . '/../../../lib/workspace-activity.php';
+            $normalized = strtolower(trim((string) $value));
+            if (!in_array($normalized, POZNOTE_WORKSPACE_ACTIVITY_FREQUENCIES, true)) {
+                throw new InvalidArgumentException('invalid shared workspace email frequency', 400);
+            }
+            return $normalized;
+        }
+
         // Notes left out of the Tasks page (js/tasks-page.js). The page sends
         // the whole list back on every change, so this is also where the ids
         // of notes that no longer exist drop out of it.
