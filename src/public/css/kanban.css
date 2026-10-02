@@ -887,10 +887,13 @@
 }
 
 @media (min-width: 801px) {
+    /* The board scrolls itself: no gutter reserved for a note scrollbar
+       (css/layout.css), it would leave an empty strip on the right. */
     body.kanban-active #right_col {
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        scrollbar-gutter: auto;
     }
 
     body.kanban-active .kanban-inline-view {

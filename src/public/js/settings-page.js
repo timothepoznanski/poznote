@@ -133,7 +133,8 @@
             'spellcheck_html_notes',
             'slash_menu_trigger',
             'slash_menu_trigger_mobile',
-            'format_toolbar_mode'
+            'format_toolbar_mode',
+            'note_scrollbar'
         ];
 
         if (document.getElementById('login-display-input')) {
@@ -665,6 +666,14 @@
                 return value === 'floating' ? 'floating' : 'toolbar';
             }),
             save: saveSettingValue('format_toolbar_mode')
+        });
+
+        // A body class on index.php (note-scrollbar-none), css/layout.css
+        initInlineControl('note-scrollbar-select', {
+            load: loadSettingValue('note_scrollbar', function (value) {
+                return value === 'none' ? 'none' : 'thin';
+            }),
+            save: saveSettingValue('note_scrollbar')
         });
 
         initInlineControl('tasklist-insert-order-select', {

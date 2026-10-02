@@ -226,7 +226,8 @@
       "sidebar_offline_marks": "Show a small dot next to the notes available offline in this browser.",
       "format_toolbar_mode": "On a computer, choose where the formatting buttons show when you select text in a note: in the note toolbar, in place of the note actions, or in a menu floating above the selection, which leaves the note toolbar as it is.",
       "workspace_activity_emails": "Receive an email when someone else changes a note in a workspace you share, or in one shared with you. It lists the notes created, edited and deleted, never their content, and is sent to the email address of your profile. As changes happen: a few minutes after the last change. Daily summary: at 8:00. Weekly summary: on Monday at 8:00, in your timezone.",
-      "workspace_activity_emails_no_address": "Add an email address to your profile to receive these emails."
+      "workspace_activity_emails_no_address": "Add an email address to your profile to receive these emails.",
+      "note_scrollbar": "On a computer, choose whether a note shows a thin scrollbar or none."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -519,7 +520,8 @@
       "snapshots": "Snapshots",
       "sidebar_offline_marks": "Show offline dot",
       "format_toolbar_mode": "Formatting toolbar",
-      "workspace_activity_emails": "Shared workspace emails"
+      "workspace_activity_emails": "Shared workspace emails",
+      "note_scrollbar": "Note scrollbar"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -536,7 +538,9 @@
         "slash": "Slash command only"
       },
       "format_toolbar_mode_toolbar": "In the note toolbar",
-      "format_toolbar_mode_floating": "Floating above the selection"
+      "format_toolbar_mode_floating": "Floating above the selection",
+      "note_scrollbar_thin": "Thin",
+      "note_scrollbar_none": "Hidden"
     },
     "alerts": {
       "error_saving_preference": "Error saving preference"

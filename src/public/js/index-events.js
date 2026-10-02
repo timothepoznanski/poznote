@@ -234,13 +234,86 @@
         });
     }
 
-    function getNoteScrollState(targets) {
+    // What counts as content when deciding whether a note fits on screen. The
+    // CodeMirror editor counts as one block: it renders the lines off screen
+    // as empty gaps.
+    var NOTE_CONTENT_TAGS = /^(IMG|SVG|CANVAS|IFRAME|VIDEO|AUDIO|HR|INPUT|BUTTON|TEXTAREA|SELECT|TABLE|OBJECT|EMBED)$/;
+    var NOTE_CONTENT_SCAN_LIMIT = 3000;
+
+    /**
+     * Whether #right_col overflows by empty room only: the last thing there is
+     * to see (text, an image, a diagram, the editor...) is inside the column,
+     * and what scrolls is blank lines and bottom margins, like the empty line
+     * under an Excalidraw diagram (#1544). The note then shows no scrollbar
+     * (body.note-col-fits, css/layout.css) and no arrows; the wheel still
+     * scrolls those few pixels.
+     */
+    // Out of the flow (the copy / line-number / delete buttons a code block
+    // carries at its top right, but appended after it): where it is drawn
+    // says nothing about how far down the note goes.
+    function isOutOfNoteFlow(element, inner) {
+        for (var el = element; el && el !== inner; el = el.parentElement) {
+            var position = getComputedStyle(el).position;
+            if (position === 'absolute' || position === 'fixed') return true;
+        }
+        return false;
+    }
+
+    function noteColumnContentFits(rightCol) {
+        if (!rightCol || rightCol.scrollHeight - rightCol.clientHeight <= 2) return false;
+        var inner = rightCol.querySelector('.innernote');
+        if (!inner || !inner.lastChild) return false;
+
+        var last = inner;
+        while (last.lastChild) last = last.lastChild;
+        var walker = document.createTreeWalker(inner, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT);
+        walker.currentNode = last;
+
+        var bottom = null;
+        for (var node = last, seen = 0; node && node !== inner; node = walker.previousNode()) {
+            if (++seen > NOTE_CONTENT_SCAN_LIMIT) return false;
+            var element = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            if (!element || element.closest('.note-scroll-edge-controls')) continue;
+
+            var editor = element.closest('.cm-editor');
+            if (editor) {
+                bottom = editor.getBoundingClientRect().bottom;
+                break;
+            }
+
+            var rects = null;
+            if (node.nodeType === Node.TEXT_NODE) {
+                if (!/[^\s\u200B\uFEFF]/.test(node.data) || isOutOfNoteFlow(element, inner)) continue;
+                var range = document.createRange();
+                range.selectNodeContents(node);
+                rects = range.getClientRects();
+            } else if (NOTE_CONTENT_TAGS.test(node.tagName.toUpperCase())) {
+                if (isOutOfNoteFlow(node, inner)) continue;
+                rects = node.getClientRects();
+            } else {
+                continue;
+            }
+
+            for (var i = 0; i < rects.length; i++) {
+                if (rects[i].height > 0) bottom = Math.max(bottom === null ? -Infinity : bottom, rects[i].bottom);
+            }
+            if (bottom !== null) break;
+        }
+
+        if (bottom === null) return false;
+        // Measured from the top of the note, not from where it is scrolled to:
+        // at the bottom of a long note the last line is on screen too.
+        var contentBottom = bottom - rightCol.getBoundingClientRect().top + rightCol.scrollTop;
+        return contentBottom <= rightCol.clientHeight + 1;
+    }
+
+    function getNoteScrollState(targets, skip) {
         var threshold = 2;
         var canScrollUp = false;
         var canScrollDown = false;
 
         targets.forEach(function (target) {
-            if (!target) return;
+            if (!target || target === skip) return;
 
             var maxTop = Math.max(0, target.scrollHeight - target.clientHeight);
             if (maxTop <= threshold) return;
@@ -256,10 +329,14 @@
     }
 
     function updateNoteScrollButtons() {
+        var rightCol = document.getElementById('right_col');
+        var colFits = noteColumnContentFits(rightCol);
+        document.body.classList.toggle('note-col-fits', colFits);
+
         document.querySelectorAll('#right_col .note-scroll-edge-controls').forEach(function (controls) {
             var topButton = controls.querySelector('.note-scroll-top-btn');
             var bottomButton = controls.querySelector('.note-scroll-bottom-btn');
-            var state = getNoteScrollState(getNoteScrollTargets(controls));
+            var state = getNoteScrollState(getNoteScrollTargets(controls), colFits ? rightCol : null);
 
             if (noteScrollLockEdge === 'bottom') {
                 state.canScrollUp = false;
@@ -270,6 +347,61 @@
             if (topButton) topButton.hidden = !state.canScrollUp;
             if (bottomButton) bottomButton.hidden = !state.canScrollDown;
         });
+
+        updateNoteScrollbarClearance(colFits);
+    }
+
+    // Room left between the controls and the bar's box; its 10px gutter
+    // already paints the thumb 2px in from each edge (css/layout.css).
+    var NOTE_SCROLLBAR_GAP = 4;
+    var NOTE_SCROLLBAR_BESIDE_MIN_GAP = 6;
+    var noteScrollbarClearance = 0;
+
+    /**
+     * The fixed controls on the right (the arrows above, and .pz-edge-stack
+     * over them) step aside for the scrollbar nearest the right edge (#1544):
+     * the note's own, or in the split view the right pane's, whose place
+     * depends on the window and the pane ratio. They stay beside it when
+     * there is room, else move to its left; a short note, a hidden bar
+     * (note_scrollbar = none) or the kanban leave them where they are.
+     * Written to --pz-docked-note-scrollbar, which css/notes/noteentry.css
+     * and css/ui-customization-panel.css add to their right offset.
+     */
+    function updateNoteScrollbarClearance(colFits) {
+        var rightCol = document.getElementById('right_col');
+        var controls = rightCol ? rightCol.querySelector('.note-scroll-edge-controls') : null;
+        var offset = 0;
+
+        if (controls && window.matchMedia('(min-width: 801px)').matches) {
+            var bar = null;
+
+            [rightCol].concat(getNoteScrollTargets(controls)).forEach(function (el) {
+                if (!el || el.scrollHeight - el.clientHeight <= 2) return;
+                if (el === rightCol && colFits) return; // its bar is not shown
+                var style = getComputedStyle(el);
+                if (!/^(auto|scroll)$/.test(style.overflowY)) return;
+                var borderLeft = parseFloat(style.borderLeftWidth) || 0;
+                var borderRight = parseFloat(style.borderRightWidth) || 0;
+                var width = el.offsetWidth - el.clientWidth - borderLeft - borderRight;
+                if (width <= 0) return; // hidden, or drawn over the content
+                var right = el.getBoundingClientRect().right - borderRight;
+                if (!bar || right > bar.right) bar = { left: right - width, right: right };
+            });
+
+            if (bar) {
+                // Where the controls' right edge sits with no clearance
+                var home = window.innerWidth - (parseFloat(getComputedStyle(controls).right) - noteScrollbarClearance);
+                var size = parseFloat(getComputedStyle(controls).width) || 32;
+                if (home - size < bar.right + NOTE_SCROLLBAR_BESIDE_MIN_GAP) {
+                    offset = Math.max(0, Math.ceil(home - (bar.left - NOTE_SCROLLBAR_GAP)));
+                }
+            }
+        }
+
+        if (offset !== noteScrollbarClearance) {
+            noteScrollbarClearance = offset;
+            document.body.style.setProperty('--pz-docked-note-scrollbar', offset + 'px');
+        }
     }
 
     function scheduleUpdateNoteScrollButtons() {
@@ -317,8 +449,24 @@
 
         window.addEventListener('resize', scheduleUpdateNoteScrollButtons);
 
+        // Size changes that fire no scroll: the split view opening, images and
+        // diagrams rendering, the outline docking (updateNoteScrollbarClearance)
+        var resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(scheduleUpdateNoteScrollButtons) : null;
+        function observeNoteBoxes() {
+            if (!resizeObserver || !rightCol) return;
+            resizeObserver.disconnect();
+            resizeObserver.observe(rightCol);
+            rightCol.querySelectorAll('.noteentry').forEach(function (entry) {
+                resizeObserver.observe(entry);
+            });
+        }
+        observeNoteBoxes();
+
         if (rightCol && typeof MutationObserver !== 'undefined') {
-            new MutationObserver(scheduleUpdateNoteScrollButtons).observe(rightCol, {
+            new MutationObserver(function () {
+                observeNoteBoxes();
+                scheduleUpdateNoteScrollButtons();
+            }).observe(rightCol, {
                 childList: true
             });
         }

@@ -549,7 +549,8 @@
       "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur.",
       "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle.",
       "workspace_activity_emails": "Recevez un email quand quelqu'un d'autre modifie une note dans un espace de travail que vous partagez, ou dans un espace partagé avec vous. Il liste les notes créées, modifiées et supprimées, jamais leur contenu, et il est envoyé à l'adresse email de votre profil. Au fil des modifications : quelques minutes après la dernière modification. Résumé quotidien : à 8 h. Résumé hebdomadaire : le lundi à 8 h, dans votre fuseau horaire.",
-      "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails."
+      "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails.",
+      "note_scrollbar": "Sur ordinateur, choisissez si une note affiche une barre de défilement fine ou aucune."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -878,7 +879,8 @@
       "snapshots": "Snapshots",
       "sidebar_offline_marks": "Afficher le point hors ligne",
       "format_toolbar_mode": "Barre de mise en forme",
-      "workspace_activity_emails": "Emails des espaces partagés"
+      "workspace_activity_emails": "Emails des espaces partagés",
+      "note_scrollbar": "Barre de défilement des notes"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -895,7 +897,9 @@
       "slash_menu_alt_slash": "Alt + /",
       "slash_menu_slash": "/",
       "format_toolbar_mode_toolbar": "Dans la barre d'outils de la note",
-      "format_toolbar_mode_floating": "Flottante au-dessus de la sélection"
+      "format_toolbar_mode_floating": "Flottante au-dessus de la sélection",
+      "note_scrollbar_thin": "Fine",
+      "note_scrollbar_none": "Masquée"
     },
     "alerts": {
       "error_saving_preference": "Erreur lors de l’enregistrement de la préférence"

@@ -85,7 +85,7 @@ p.code-block-placeholder-after[data-ph]:empty:before {
    note is exactly where getting back to the top by hand is the most work. */
 .note-scroll-edge-controls {
     position: fixed;
-    right: calc(10px + var(--pz-docked-outline, 0px) + var(--pz-docked-ai-chat, 0px) + var(--pz-docked-ui-custom, 0px));
+    right: calc(10px + var(--pz-docked-note-scrollbar, 0px) + var(--pz-docked-outline, 0px) + var(--pz-docked-ai-chat, 0px) + var(--pz-docked-ui-custom, 0px));
     bottom: 10px;
     z-index: 30;
     display: flex;
@@ -161,6 +161,15 @@ p.code-block-placeholder-after[data-ph]:empty:before {
 
     body.ui-custom-panel-open {
         --pz-docked-ui-custom: var(--ui-custom-panel-width, 360px);
+    }
+
+    /* --pz-docked-note-scrollbar, the room left for the note's scrollbar
+       (#1544), is measured and written on <body> by
+       updateNoteScrollbarClearance() in js/index-events.js: the bar moves
+       with the split pane ratio and the window, and is absent on a short
+       note. */
+    body {
+        --pz-docked-note-scrollbar: 0px;
     }
 }
 
