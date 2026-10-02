@@ -28,7 +28,7 @@ Quando você pede explicitamente, ele também pode agir sobre suas notas:
 - **escrever**: criar uma nota, renomear uma nota ou reescrever o conteúdo dela;
 - **organizar**: adicionar ou remover tags, listar, criar e renomear pastas, mover notas entre elas, marcar notas e pastas como favoritas;
 - **datas**: definir ou remover um lembrete em uma nota (único ou recorrente); o assistente conhece a data e a hora atuais no seu fuso horário, então "me lembre na próxima segunda às 9h" funciona;
-- **tarefas**: adicionar, marcar, desmarcar, renomear ou remover as tarefas de uma nota do tipo lista de tarefas, incluindo prazos e lembretes, e marcar ou desmarcar uma caixa de seleção dentro de uma nota comum, sem reescrever o resto dela;
+- **tarefas**: adicionar, marcar, desmarcar, renomear ou remover as tarefas de uma nota do tipo lista de tarefas e suas subtarefas, incluindo os prazos e lembretes das tarefas, e marcar ou desmarcar uma caixa de seleção dentro de uma nota comum, sem reescrever o resto dela;
 - **excluir**: mover para a lixeira uma nota, ou uma pasta com suas subpastas e todas as notas delas. Tudo pode ser restaurado na página Lixeira: o assistente não tem como excluir nada definitivamente, nem ferramenta para esvaziar a lixeira.
 
 A nota que você tem aberta faz parte do contexto: diga "melhore a formatação desta nota" ou "adicione uma conclusão aqui" e o assistente trabalha nela, sem precisar de id nem de título. Ele lê a última versão salva pelo editor, e "esta nota" acompanha você se abrir outra nota durante a conversa. Citar outra nota na sua pergunta continua tendo prioridade. No Painel nenhuma nota fica aberta, então, ali, indique a nota a que você se refere.

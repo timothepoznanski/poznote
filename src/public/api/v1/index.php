@@ -328,6 +328,19 @@ $router->delete('/notes/{id}/tasks/{taskId}', function($params) use ($tasksContr
     $tasksController->deleteForNote($params['id'], $params['taskId']);
 });
 
+// Subtasks of one task
+$router->post('/notes/{id}/tasks/{taskId}/subtasks', function($params) use ($tasksController) {
+    $tasksController->createSubtask($params['id'], $params['taskId']);
+});
+
+$router->patch('/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}', function($params) use ($tasksController) {
+    $tasksController->updateSubtask($params['id'], $params['taskId'], $params['subtaskId']);
+});
+
+$router->delete('/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}', function($params) use ($tasksController) {
+    $tasksController->deleteSubtask($params['id'], $params['taskId'], $params['subtaskId']);
+});
+
 // List notes with attachments
 $router->get('/notes/with-attachments', function($params) use ($notesController) {
     $notesController->listWithAttachments();

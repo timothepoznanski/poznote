@@ -1139,7 +1139,8 @@ def list_tasks(note_id: int, user_id: Optional[int] = None) -> str:
     """List the tasks of a tasklist note, with their IDs, due dates and flags
 
     Use this to get a task's ID before calling update_task, complete_task or
-    delete_task.
+    delete_task. A task that has subtasks carries them in "subtasks", each with
+    the ID that update_subtask and delete_subtask take.
 
     Args:
         note_id: ID of the tasklist note
@@ -1489,6 +1490,146 @@ def delete_task(note_id: int, task_id: str, user_id: Optional[int] = None) -> st
         "success": success,
         "message": f"Task {task_id} deleted" if success else f"Task {task_id} not found in note {note_id}",
     }, ensure_ascii=False)
+
+
+@mcp.tool()
+def add_subtask(
+    note_id: int,
+    task_id: str,
+    text: str,
+    completed: Optional[bool] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Add a subtask under one task of a tasklist note
+
+    Subtasks go one level deep: a subtask cannot have subtasks of its own. It
+    carries a text and a done flag only, with no due date, reminder or important
+    flag, and ticking it never completes its task. list_tasks returns them in
+    the "subtasks" array of their task.
+
+    Args:
+        note_id: ID of the tasklist note
+        task_id: ID of the parent task (from list_tasks)
+        text: Subtask text
+        completed: Whether the subtask is already done (default: False)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    if not text or not str(text).strip():
+        return json.dumps({"error": "text is required"}, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.add_subtask(
+            note_id=note_id,
+            task_id=str(task_id),
+            text=str(text).strip(),
+            completed=completed,
+            user_id=user_id,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result:
+        return json.dumps({"error": f"Task {task_id} not found in note {note_id}"}, ensure_ascii=False)
+
+    return json.dumps({
+        "success": True,
+        "message": f"Subtask added to task {task_id}",
+        "note_id": note_id,
+        "task_id": str(task_id),
+        "subtask": result.get("subtask"),
+        "subtasks": result.get("subtasks", []),
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def update_subtask(
+    note_id: int,
+    task_id: str,
+    subtask_id: str,
+    text: Optional[str] = None,
+    completed: Optional[bool] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Rename a subtask, or mark it done or not done. Only provided fields change.
+
+    The task it belongs to is left as it is: completing every subtask does not
+    complete the task, use complete_task for that.
+
+    Args:
+        note_id: ID of the tasklist note
+        task_id: ID of the parent task (from list_tasks)
+        subtask_id: ID of the subtask (from the "subtasks" of that task)
+        text: New subtask text
+        completed: Whether the subtask is done
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    fields: dict = {}
+    if text is not None:
+        fields["text"] = text
+    if completed is not None:
+        fields["completed"] = completed
+
+    if not fields:
+        return json.dumps({"error": "Nothing to update. Provide text or completed."}, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.update_subtask(note_id, str(task_id), str(subtask_id), fields, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result:
+        return json.dumps(
+            {"error": f"Subtask {subtask_id} not found in task {task_id} of note {note_id}"},
+            ensure_ascii=False,
+        )
+
+    return json.dumps({
+        "success": True,
+        "message": f"Subtask {subtask_id} updated",
+        "note_id": note_id,
+        "task_id": str(task_id),
+        "subtask": result.get("subtask"),
+        "subtasks": result.get("subtasks", []),
+    }, indent=2, ensure_ascii=False)
+
+
+@mcp.tool()
+def delete_subtask(note_id: int, task_id: str, subtask_id: str, user_id: Optional[int] = None) -> str:
+    """Delete one subtask of a task
+
+    Args:
+        note_id: ID of the tasklist note
+        task_id: ID of the parent task (from list_tasks)
+        subtask_id: ID of the subtask (from the "subtasks" of that task)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        result = client.delete_subtask(note_id, str(task_id), str(subtask_id), user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result:
+        return json.dumps(
+            {"error": f"Subtask {subtask_id} not found in task {task_id} of note {note_id}"},
+            ensure_ascii=False,
+        )
+
+    return json.dumps({
+        "success": True,
+        "message": f"Subtask {subtask_id} deleted",
+        "note_id": note_id,
+        "task_id": str(task_id),
+        "subtasks": result.get("subtasks", []),
+    }, indent=2, ensure_ascii=False)
 
 
 @mcp.tool()

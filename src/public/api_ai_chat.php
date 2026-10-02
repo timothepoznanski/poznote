@@ -607,6 +607,57 @@ $aiTools = [
     [
         'type' => 'function',
         'function' => [
+            'name' => 'add_subtask',
+            'description' => 'Add a subtask under one task of a task list note. Subtasks go one level deep and carry a text and a done flag only (no due date, reminder or important flag). Call it once per subtask; several calls in one turn are fine.',
+            'parameters' => [
+                'type' => 'object',
+                'properties' => [
+                    'note_id' => ['type' => 'integer', 'description' => 'The task list note id'],
+                    'task' => ['type' => 'string', 'description' => 'The parent task: its id (from get_note) or its text'],
+                    'text' => ['type' => 'string', 'description' => 'The subtask text'],
+                    'completed' => ['type' => 'boolean', 'description' => 'true when the subtask is already done (default false)'],
+                ],
+                'required' => ['note_id', 'task', 'text'],
+            ],
+        ],
+    ],
+    [
+        'type' => 'function',
+        'function' => [
+            'name' => 'update_subtask',
+            'description' => 'Check, uncheck or rename one subtask of a task. Only the fields given change, and the task itself is left as it is: checking every subtask does not check the task.',
+            'parameters' => [
+                'type' => 'object',
+                'properties' => [
+                    'note_id' => ['type' => 'integer', 'description' => 'The task list note id'],
+                    'task' => ['type' => 'string', 'description' => 'The parent task: its id (from get_note) or its text'],
+                    'subtask' => ['type' => 'string', 'description' => 'The subtask: its id (from get_note) or its text'],
+                    'completed' => ['type' => 'boolean', 'description' => 'true to check the subtask, false to uncheck it'],
+                    'text' => ['type' => 'string', 'description' => 'New subtask text'],
+                ],
+                'required' => ['note_id', 'task', 'subtask'],
+            ],
+        ],
+    ],
+    [
+        'type' => 'function',
+        'function' => [
+            'name' => 'delete_subtask',
+            'description' => 'Remove one subtask from a task. Use it only when the user asks to remove or delete that subtask; to mark it done, use update_subtask.',
+            'parameters' => [
+                'type' => 'object',
+                'properties' => [
+                    'note_id' => ['type' => 'integer', 'description' => 'The task list note id'],
+                    'task' => ['type' => 'string', 'description' => 'The parent task: its id (from get_note) or its text'],
+                    'subtask' => ['type' => 'string', 'description' => 'The subtask: its id (from get_note) or its text'],
+                ],
+                'required' => ['note_id', 'task', 'subtask'],
+            ],
+        ],
+    ],
+    [
+        'type' => 'function',
+        'function' => [
             'name' => 'set_checklist_item',
             'description' => 'Check or uncheck one checkbox of a regular (markdown or rich-text) note without rewriting it. get_note lists the items with their index. For task list notes use update_task.',
             'parameters' => [
@@ -637,7 +688,8 @@ $system = 'You are the AI assistant built into Poznote, a personal note-taking a
     . 'You also have editing tools: rename_note, update_note_content and create_note for the content, '
     . 'and organizing tools for everything around it: update_note_tags, move_note_to_folder, '
     . 'create_folder, rename_folder, set_note_favorite, set_folder_favorite, set_note_reminder, '
-    . 'remove_note_reminder, add_task, update_task, delete_task (tasks of task list notes) and '
+    . 'remove_note_reminder, add_task, update_task, delete_task (tasks of task list notes), '
+    . 'add_subtask, update_subtask, delete_subtask (the subtasks of one of those tasks) and '
     . 'set_checklist_item (a checkbox inside a regular note). '
     . 'When the user asks you to change a note in any way (rewrite, refactor, reformat, improve, '
     . 'shorten, expand, translate, fix, correct, clean up, add or remove something, rename it, '
@@ -657,7 +709,8 @@ $system = 'You are the AI assistant built into Poznote, a personal note-taking a
     . 'set_checklist_item, to change tags use update_note_tags, and keep update_note_content for '
     . 'changes to the text itself. update_note_content replaces the whole note: read it first and '
     . 'preserve everything the user did not ask to change. It does not work on task list notes: '
-    . 'use add_task, update_task and delete_task for those. '
+    . 'use add_task, update_task and delete_task for those, and the subtask tools for the '
+    . 'subtasks of a task. '
     . 'Deleting means moving to the trash: delete_note sends a note there, delete_folder sends a '
     . 'folder, its subfolders and all their notes there. The user can restore anything from the '
     . 'Trash page; nothing you do is permanent, and there is no tool to empty the trash. '

@@ -382,6 +382,9 @@ Poznote MCP 服务器提供以下工具：
 - `update_task`：更新单个任务（文本、截止日期、提醒、重要标记）
 - `complete_task`：将任务标记为已完成，或重新打开
 - `delete_task`：从任务列表笔记中删除单个任务
+- `add_subtask`：为任务列表笔记中的某个任务添加子任务
+- `update_subtask`：重命名子任务，或将其标记为已完成或未完成
+- `delete_subtask`：删除任务的单个子任务
 
 ### 整理
 - `create_folder`：创建新文件夹

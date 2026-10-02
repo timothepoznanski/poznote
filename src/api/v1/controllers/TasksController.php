@@ -325,6 +325,160 @@ class TasksController
     }
 
     /**
+     * POST /api/v1/notes/{id}/tasks/{taskId}/subtasks
+     *
+     * Append a subtask to a task.
+     *
+     * Body (JSON):
+     *   - text: subtask label (required)
+     *   - completed: boolean (optional, default false)
+     */
+    public function createSubtask(string $id, string $taskId): void
+    {
+        $this->writeSubtasks($id, $taskId, true, function (array $subtasks, array $input): ?array {
+            $text = isset($input['text']) && is_scalar($input['text']) ? trim((string) $input['text']) : '';
+            if ($text === '') {
+                $this->sendError(400, 'text is required');
+                return null;
+            }
+
+            $taken = [];
+            foreach ($subtasks as $subtask) {
+                $taken[tasklistIdToString($subtask['id'])] = true;
+            }
+            $subtask = [
+                'id'        => generateTasklistSubtaskId($taken),
+                'text'      => $text,
+                'completed' => array_key_exists('completed', $input)
+                    && filter_var($input['completed'], FILTER_VALIDATE_BOOLEAN),
+            ];
+            $subtasks[] = $subtask;
+
+            return [$subtasks, ['subtask' => $subtask]];
+        });
+    }
+
+    /**
+     * PATCH /api/v1/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}
+     *
+     * Rename a subtask, tick or untick it. Only the provided fields change, and
+     * the completion of its task is never touched.
+     */
+    public function updateSubtask(string $id, string $taskId, string $subtaskId): void
+    {
+        $this->writeSubtasks($id, $taskId, true, function (array $subtasks, array $input) use ($subtaskId): ?array {
+            $key = findTasklistSubtaskKey($subtasks, $subtaskId);
+            if ($key === null) {
+                $this->sendError(404, 'Subtask not found');
+                return null;
+            }
+            if (!array_key_exists('text', $input) && !array_key_exists('completed', $input)) {
+                $this->sendError(400, 'text or completed is required');
+                return null;
+            }
+
+            if (array_key_exists('text', $input)) {
+                if (!is_scalar($input['text']) || trim((string) $input['text']) === '') {
+                    $this->sendError(400, 'text cannot be empty');
+                    return null;
+                }
+                $subtasks[$key]['text'] = trim((string) $input['text']);
+            }
+            if (array_key_exists('completed', $input)) {
+                $subtasks[$key]['completed'] = (bool) filter_var($input['completed'], FILTER_VALIDATE_BOOLEAN);
+            }
+
+            return [$subtasks, ['subtask' => $this->subtaskView($subtasks[$key])]];
+        });
+    }
+
+    /**
+     * DELETE /api/v1/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}
+     */
+    public function deleteSubtask(string $id, string $taskId, string $subtaskId): void
+    {
+        $this->writeSubtasks($id, $taskId, false, function (array $subtasks) use ($subtaskId): ?array {
+            $key = findTasklistSubtaskKey($subtasks, $subtaskId);
+            if ($key === null) {
+                $this->sendError(404, 'Subtask not found');
+                return null;
+            }
+            array_splice($subtasks, (int) $key, 1);
+
+            return [$subtasks, ['subtask_id' => $subtaskId]];
+        });
+    }
+
+    /**
+     * Frame shared by the subtask writes: load the note and the task, hand the
+     * task's stored subtasks (each with an id) to $change and store the list it
+     * returns. Subtasks live inside their task, so nothing is regrouped and no
+     * reminder moves.
+     *
+     * @param callable(array, array): ?array $change Receives the subtasks and
+     *        the request body, returns [subtasks, fields to add to the response],
+     *        or null once it has sent an error.
+     */
+    private function writeSubtasks(string $id, string $taskId, bool $readsBody, callable $change): void
+    {
+        $note = $this->loadTasklistNote($id);
+        if ($note === null) {
+            return;
+        }
+
+        $input = [];
+        if ($readsBody) {
+            $input = $this->readJsonBody();
+            if ($input === null) {
+                return;
+            }
+        }
+
+        $tasks = $this->decodeRawTasks($note);
+        $index = $this->findTaskIndex($tasks, $taskId);
+        if ($index === null) {
+            $this->sendError(404, 'Task not found');
+            return;
+        }
+
+        $stored = $tasks[$index]['subtasks'] ?? [];
+        $result = $change(ensureTasklistSubtaskIds(is_array($stored) ? $stored : []), $input);
+        if ($result === null) {
+            return;
+        }
+        [$subtasks, $response] = $result;
+
+        // A task without subtasks carries no `subtasks` key, as in the interface.
+        if ($subtasks === []) {
+            unset($tasks[$index]['subtasks']);
+        } else {
+            $tasks[$index]['subtasks'] = $subtasks;
+        }
+
+        if (!$this->persistTasks($note['id'], $tasks)) {
+            return;
+        }
+
+        $this->sendSuccess(array_merge(
+            ['note_id' => $note['id'], 'task_id' => $this->taskIdToString($tasks[$index]['id'])],
+            $response,
+            ['subtasks' => getTasklistSubtasks($tasks[$index])]
+        ));
+    }
+
+    /**
+     * What a response shows of one stored subtask.
+     */
+    private function subtaskView(array $subtask): array
+    {
+        return [
+            'id'        => $subtask['id'] ?? null,
+            'text'      => is_scalar($subtask['text'] ?? null) ? (string) $subtask['text'] : '',
+            'completed' => !empty($subtask['completed']),
+        ];
+    }
+
+    /**
      * Load a non-trashed tasklist note, or emit the matching error response.
      * Returns null when the caller should stop (response already sent).
      */

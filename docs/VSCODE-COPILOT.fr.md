@@ -355,6 +355,9 @@ Le serveur MCP de Poznote fournit les outils suivants, que VS Code Copilot peut 
 - `update_task` : mettre à jour une tâche (texte, date d'échéance, rappel, indicateur important)
 - `complete_task` : marquer une tâche comme terminée, ou la rouvrir
 - `delete_task` : supprimer une tâche d'une liste de tâches
+- `add_subtask` : ajouter une sous-tâche à une tâche d'une liste de tâches
+- `update_subtask` : renommer une sous-tâche, la cocher ou la décocher
+- `delete_subtask` : supprimer une sous-tâche d'une tâche
 
 ### Organisation
 - `create_folder` : créer un dossier

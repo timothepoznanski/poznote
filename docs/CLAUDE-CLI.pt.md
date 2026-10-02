@@ -382,6 +382,9 @@ O servidor MCP do Poznote oferece as seguintes ferramentas:
 - `update_task`: atualiza uma tarefa (texto, prazo, lembrete, marcador de importante)
 - `complete_task`: marca uma tarefa como concluída ou a reabre
 - `delete_task`: exclui uma tarefa de uma nota do tipo lista de tarefas
+- `add_subtask`: adiciona uma subtarefa a uma tarefa de uma nota do tipo lista de tarefas
+- `update_subtask`: renomeia uma subtarefa, ou a marca como concluída ou pendente
+- `delete_subtask`: exclui uma subtarefa de uma tarefa
 
 ### Organização
 - `create_folder`: cria uma nova pasta

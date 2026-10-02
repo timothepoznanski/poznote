@@ -91,6 +91,9 @@ TOOL_CALLS = [
     ("update_task", {"note_id": 1, "task_id": "1.5", "text": "Buy oat milk"}),
     ("complete_task", {"note_id": 1, "task_id": "1.5"}),
     ("delete_task", {"note_id": 1, "task_id": "1.5"}),
+    ("add_subtask", {"note_id": 1, "task_id": "1.5", "text": "Oat"}),
+    ("update_subtask", {"note_id": 1, "task_id": "1.5", "subtask_id": "2.5", "completed": True}),
+    ("delete_subtask", {"note_id": 1, "task_id": "1.5", "subtask_id": "2.5"}),
 ]
 
 # Exception types to test
@@ -132,6 +135,7 @@ class TestToolErrorHandling:
                 "delete_backup", "list_shared",
                 "get_reminder", "set_reminder", "remove_reminder",
                 "list_tasks", "add_task", "update_task", "delete_task",
+                "add_subtask", "update_subtask", "delete_subtask",
             ]
         })
 
