@@ -4553,6 +4553,9 @@
     "folder_modal_title": "Elegir una carpeta",
     "folder_modal_empty": "Ninguna carpeta coincide.",
     "stats": "{{notes}} notas · {{links}} enlaces",
+    "limit_notice": "Las {{count}} notas modificadas más recientemente de {{total}}",
+    "show_all": "Mostrar todo",
+    "show_all_hint": "Cargar todas las notas del espacio de trabajo",
     "search": {
       "placeholder": "Buscar una nota..."
     },

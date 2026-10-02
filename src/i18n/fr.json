@@ -4657,6 +4657,9 @@
     "folder_modal_title": "Choisir un dossier",
     "folder_modal_empty": "Aucun dossier ne correspond.",
     "stats": "{{notes}} notes · {{links}} liens",
+    "limit_notice": "Les {{count}} notes modifiées le plus récemment sur {{total}}",
+    "show_all": "Tout afficher",
+    "show_all_hint": "Charger toutes les notes de l'espace de travail",
     "search": {
       "placeholder": "Rechercher une note..."
     },

@@ -4649,6 +4649,9 @@
     "folder_modal_title": "选择文件夹",
     "folder_modal_empty": "没有匹配的文件夹。",
     "stats": "{{notes}} 篇笔记 · {{links}} 个链接",
+    "limit_notice": "最近修改的 {{count}} 条笔记，共 {{total}} 条",
+    "show_all": "显示全部",
+    "show_all_hint": "加载工作区的所有笔记",
     "search": {
       "placeholder": "查找笔记..."
     },

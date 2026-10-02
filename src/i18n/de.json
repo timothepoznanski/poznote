@@ -4552,6 +4552,9 @@
     "folder_modal_title": "Ordner auswählen",
     "folder_modal_empty": "Kein passender Ordner.",
     "stats": "{{notes}} Notizen · {{links}} Verknüpfungen",
+    "limit_notice": "Die {{count}} zuletzt geänderten Notizen von {{total}}",
+    "show_all": "Alle anzeigen",
+    "show_all_hint": "Alle Notizen des Arbeitsbereichs laden",
     "search": {
       "placeholder": "Notiz suchen..."
     },

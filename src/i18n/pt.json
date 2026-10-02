@@ -4553,6 +4553,9 @@
     "folder_modal_title": "Escolher uma pasta",
     "folder_modal_empty": "Nenhuma pasta correspondente.",
     "stats": "{{notes}} notas · {{links}} links",
+    "limit_notice": "As {{count}} notas modificadas mais recentemente de {{total}}",
+    "show_all": "Mostrar tudo",
+    "show_all_hint": "Carregar todas as notas do espaço de trabalho",
     "search": {
       "placeholder": "Procurar uma nota..."
     },

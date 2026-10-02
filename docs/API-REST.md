@@ -1801,6 +1801,9 @@ A node or a folder whose icon was customised carries it: `icon` is the Lucide cl
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `workspace` | string | Filter by workspace |
+| `limit` | integer | Keep only that many notes, the most recently modified ones. Links to a note left out are dropped, and `folders` covers the notes kept. Omit it, or pass `0`, for every note |
+
+`total` is the number of notes the graph holds without a limit, so `total` greater than the length of `nodes` means some were left out.
 
 **Response:**
 
@@ -1815,7 +1818,8 @@ A node or a folder whose icon was customised carries it: `icon` is the Lucide cl
   ],
   "folders": [
     { "id": 7, "name": "Work", "parent_id": null, "icon": null, "icon_color": null }
-  ]
+  ],
+  "total": 1
 }
 ```
 

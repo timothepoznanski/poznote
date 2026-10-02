@@ -4185,6 +4185,9 @@
     "folder_modal_title": "Выбрать папку",
     "folder_modal_empty": "Подходящих папок нет.",
     "stats": "{{notes}} заметок · {{links}} связей",
+    "limit_notice": "Последние изменённые заметки: {{count}} из {{total}}",
+    "show_all": "Показать все",
+    "show_all_hint": "Загрузить все заметки рабочего пространства",
     "search": {
       "placeholder": "Найти заметку..."
     },

@@ -68,6 +68,7 @@
     var HEAD_STEPS = 4;        // fit: the view is pushed below the controls a quarter of their height at a time
     var HEAD_MARGIN = 24;      // fit: room kept between the controls and the nearest dot
     var LABEL_REACH = 70;      // fit: how far a note title is taken to run on each side of its dot
+    var OPENING_LIMIT = 100;   // the page opens on that many notes, the ones modified last
     var SPRING_STRENGTH = 0.5;
     var CHARGE = 1500;
     var GRAVITY = 0.04;
@@ -139,19 +140,29 @@
         return String(id).charAt(0) === 'f';
     }
 
+    // The graph opens on the notes modified last: whether some are left out
+    function isTruncated() {
+        return !!rawData && rawData.total > rawData.nodes.length;
+    }
+
+    // What was saved for a node outlives its absence from the screen: a
+    // folder while the hubs are hidden, anything while notes are left out
+    function keptOffScreen(id) {
+        if (nodeById[id]) { return false; }
+        return isTruncated() || (isFolderId(id) && !hubsShown());
+    }
+
     function savePinnedPositions() {
         var positions = {};
         var any = false;
-        if (!hubsShown()) {
-            // The hubs are not on screen: keep where they were dropped
-            var saved = loadSavedPositions();
-            Object.keys(saved).forEach(function (id) {
-                if (isFolderId(id)) {
-                    positions[id] = saved[id];
-                    any = true;
-                }
-            });
-        }
+        // Not on screen: keep where they were dropped
+        var saved = loadSavedPositions();
+        Object.keys(saved).forEach(function (id) {
+            if (keptOffScreen(id)) {
+                positions[id] = saved[id];
+                any = true;
+            }
+        });
         nodes.forEach(function (node) {
             if (node.pinned) {
                 positions[node.id] = [Math.round(node.x * 10) / 10, Math.round(node.y * 10) / 10];
@@ -209,16 +220,14 @@
     function saveTreeOffsets() {
         var offsets = {};
         var any = false;
-        if (!hubsShown()) {
-            // The folders are not on screen: keep how far they were taken
-            var saved = loadTreeOffsets();
-            Object.keys(saved).forEach(function (id) {
-                if (isFolderId(id)) {
-                    offsets[id] = saved[id];
-                    any = true;
-                }
-            });
-        }
+        // Not on screen: keep how far they were taken
+        var saved = loadTreeOffsets();
+        Object.keys(saved).forEach(function (id) {
+            if (keptOffScreen(id)) {
+                offsets[id] = saved[id];
+                any = true;
+            }
+        });
         nodes.forEach(function (node) {
             if (node.treeDx || node.treeDy) {
                 offsets[node.id] = [Math.round(node.treeDx * 10) / 10, Math.round(node.treeDy * 10) / 10];
@@ -238,17 +247,21 @@
     /* Data loading                                                            */
     /* --------------------------------------------------------------------- */
 
-    function buildGraphUrl() {
-        var url = '/api/v1/graph';
+    // limit: how many notes to ask for, the ones modified last; 0 for all
+    function buildGraphUrl(limit) {
+        var query = [];
         var workspace = getPageWorkspace();
         if (workspace) {
-            url += '?workspace=' + encodeURIComponent(workspace);
+            query.push('workspace=' + encodeURIComponent(workspace));
         }
-        return url;
+        if (limit) {
+            query.push('limit=' + limit);
+        }
+        return '/api/v1/graph' + (query.length ? '?' + query.join('&') : '');
     }
 
-    function loadGraph() {
-        fetch(buildGraphUrl(), {
+    function fetchGraph(limit) {
+        return fetch(buildGraphUrl(limit), {
             method: 'GET',
             credentials: 'same-origin',
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -257,24 +270,68 @@
             return response.ok ? response.json() : null;
         })
         .then(function (data) {
+            return data && data.success && data.nodes ? data : null;
+        });
+    }
+
+    function loadGraph() {
+        fetchGraph(OPENING_LIMIT)
+        .then(function (data) {
             document.getElementById('graphLoading').classList.add('initially-hidden');
-            if (!data || !data.success || !data.nodes || data.nodes.length === 0) {
+            if (!data || data.nodes.length === 0) {
                 document.getElementById('graphEmpty').classList.remove('initially-hidden');
                 return;
             }
-            rawData = data;
-            initFoldersToggle(data.folders || []);
-            initIconsToggle(data);
-            initTreeToggle(data.folders || []);
-            populateFolderFilter(folderNamesOf(data.nodes));
-            buildGraph(false);
-            fitView();
-            initLabelDefault();
-            startSimulation(1);
+            showGraph(data);
         })
         .catch(function () {
             document.getElementById('graphLoading').classList.add('initially-hidden');
             document.getElementById('graphEmpty').classList.remove('initially-hidden');
+        });
+    }
+
+    // Draws a /api/v1/graph response: the one the page opens on, then the
+    // whole workspace once "Show all" was asked for
+    function showGraph(data) {
+        rawData = data;
+        initFoldersToggle(data.folders || []);
+        initIconsToggle(data);
+        initTreeToggle(data.folders || []);
+        populateFolderFilter(folderNamesOf(data.nodes));
+        updateLimitNotice();
+        buildGraph(false);
+        userInteracted = false;
+        fitView();
+        initLabelDefault();
+        startSimulation(1);
+    }
+
+    // "The 100 most recently modified notes out of 1234", with the button
+    // that brings the others: shown while notes are left out
+    function updateLimitNotice() {
+        var notice = document.getElementById('graphLimit');
+        var text = document.getElementById('graphLimitText');
+        if (!notice || !text) { return; }
+        notice.classList.toggle('initially-hidden', !isTruncated());
+        if (!isTruncated()) { return; }
+        text.textContent = (text.getAttribute('data-txt') || '{{count}} / {{total}}')
+            .replace('{{count}}', String(rawData.nodes.length))
+            .replace('{{total}}', String(rawData.total));
+    }
+
+    function showAllNotes() {
+        var btn = document.getElementById('graphShowAll');
+        btn.disabled = true;
+        fetchGraph(0)
+        .then(function (data) {
+            btn.disabled = false;
+            if (data && data.nodes.length) {
+                showGraph(data);
+            }
+        })
+        .catch(function () {
+            // The graph on screen stays; the button can be pressed again
+            btn.disabled = false;
         });
     }
 
@@ -555,12 +612,22 @@
         });
     }
 
+    // The controls below come with the data: each is set up once, by the
+    // first response that has something for it (the notes the page opens on
+    // may have no folder or no custom icon, and the whole workspace some)
+    var iconsToggleReady = false;
+    var foldersToggleReady = false;
+    var treeToggleReady = false;
+    var folderFilterReady = false;
+    var folderFilterNames = [];
+
     // The box is offered once something was customised; unticked, every
     // node is back to its dot.
     function initIconsToggle(data) {
         var toggle = document.getElementById('graphShowIcons');
         var customised = function (raw) { return !!raw.icon; };
-        if (!toggle || !(data.nodes.some(customised) || (data.folders || []).some(customised))) { return; }
+        if (!toggle || iconsToggleReady || !(data.nodes.some(customised) || (data.folders || []).some(customised))) { return; }
+        iconsToggleReady = true;
         showIcons = readPref(PREF_SHOW_ICONS) !== false;
         toggle.checked = showIcons;
         toggle.parentNode.classList.remove('initially-hidden');
@@ -580,7 +647,8 @@
 
     function initFoldersToggle(rawFolders) {
         var toggle = document.getElementById('graphShowFolders');
-        if (!toggle || rawFolders.length === 0) { return; }
+        if (!toggle || foldersToggleReady || rawFolders.length === 0) { return; }
+        foldersToggleReady = true;
         // One choice per view: the network starts without its folders, the
         // tree with them
         showFolders = readPref(PREF_SHOW_FOLDERS) === true;
@@ -612,7 +680,8 @@
 
     function initTreeToggle(rawFolders) {
         var btn = document.getElementById('graphViewToggle');
-        if (!btn || rawFolders.length === 0) { return; }
+        if (!btn || treeToggleReady || rawFolders.length === 0) { return; }
+        treeToggleReady = true;
         treeMode = readPref(PREF_TREE_LAYOUT) === true;
         btn.classList.remove('initially-hidden');
         syncTreeUi();
@@ -871,6 +940,9 @@
         var list = document.getElementById('graphFolderList');
         var closeBtn = document.getElementById('graphFolderModalClose');
         if (!btn || !modal || !search || !list || folderNames.length === 0) { return; }
+        folderFilterNames = folderNames;
+        if (folderFilterReady) { return; }
+        folderFilterReady = true;
         var allLabel = btn.getAttribute('data-txt-all') || '';
         var hint = btn.title;
 
@@ -919,7 +991,7 @@
             if (term === '' || allLabel.toLowerCase().indexOf(term) !== -1) {
                 list.appendChild(buildOption('', allLabel, 'lucide-layers'));
             }
-            folderNames.forEach(function (name) {
+            folderFilterNames.forEach(function (name) {
                 if (term === '' || name.toLowerCase().indexOf(term) !== -1) {
                     list.appendChild(buildOption(name, name, 'lucide-folder'));
                 }
@@ -1493,6 +1565,14 @@
         };
     }
 
+    // Height taken at the bottom of the canvas by the notice of the notes
+    // left out, which the fitted graph stays clear of
+    function footRoom() {
+        var notice = document.getElementById('graphLimit');
+        if (!notice || notice.classList.contains('initially-hidden')) { return 0; }
+        return svg.getBoundingClientRect().bottom - notice.getBoundingClientRect().top;
+    }
+
     // Whether the current view puts a dot, or its title, behind the controls
     function behindControls(box, margin) {
         // A title runs to the right of its dot in the tree, under it otherwise
@@ -1522,8 +1602,9 @@
         var graphH = Math.max(1, maxY - minY + pad * 2);
 
         // Fits the graph into the canvas, less a band of that height at its top
+        var foot = footRoom();
         function place(top) {
-            var tall = Math.max(1, height - top);
+            var tall = Math.max(1, height - top - foot);
             if (treeMode) {
                 // The titles run to the right of the last column. A tree too
                 // big for the canvas is not shrunk until it fits: it stays
@@ -2045,6 +2126,11 @@
         var separateBtn = document.getElementById('graphSeparateGroups');
         if (separateBtn) {
             separateBtn.addEventListener('click', separateGroups);
+        }
+
+        var showAllBtn = document.getElementById('graphShowAll');
+        if (showAllBtn) {
+            showAllBtn.addEventListener('click', showAllNotes);
         }
 
         var labelsToggle = document.getElementById('graphShowLabels');

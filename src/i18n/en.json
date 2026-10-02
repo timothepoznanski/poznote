@@ -4178,6 +4178,9 @@
     "folder_modal_title": "Choose a folder",
     "folder_modal_empty": "No matching folder.",
     "stats": "{{notes}} notes · {{links}} links",
+    "limit_notice": "The {{count}} most recently modified notes out of {{total}}",
+    "show_all": "Show all",
+    "show_all_hint": "Load every note of the workspace",
     "search": {
       "placeholder": "Find a note..."
     },

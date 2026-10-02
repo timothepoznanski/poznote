@@ -97,6 +97,11 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			</div>
 			<svg id="graphSvg" role="img" aria-label="<?php echo t_h('graph.title', [], 'Note graph'); ?>"></svg>
 			<div class="graph-tooltip initially-hidden" id="graphTooltip" data-txt-links="<?php echo t_h('graph.tooltip.links', [], '{{count}} links'); ?>" data-txt-folder="<?php echo t_h('graph.tooltip.folder_notes', [], 'Folder · {{count}} notes'); ?>"></div>
+			<!-- The page opens on the notes modified last: how many are shown, and the button for the rest -->
+			<div class="graph-limit initially-hidden" id="graphLimit">
+				<span id="graphLimitText" data-txt="<?php echo t_h('graph.limit_notice', [], 'The {{count}} most recently modified notes out of {{total}}'); ?>"></span>
+				<button type="button" id="graphShowAll" class="graph-reset-btn" title="<?php echo t_h('graph.show_all_hint', [], 'Load every note of the workspace'); ?>"><?php echo t_h('graph.show_all', [], 'Show all'); ?></button>
+			</div>
 		</div>
 	</div>
 
