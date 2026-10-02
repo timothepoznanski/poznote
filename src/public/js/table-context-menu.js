@@ -286,7 +286,7 @@
         for (let i = 0; i < numCols; i++) {
             const cell = document.createElement('td');
             cell.style.cssText = 'border: 1px solid #ddd; padding: 8px; min-width: 50px;';
-            cell.innerHTML = '&nbsp;';
+            cell.innerHTML = '<br>';
             // Same alignment and width as the column it lands in
             if (window.pzTableColumns) window.pzTableColumns.copyColumnFormat(referenceCells[i], cell);
             newRow.appendChild(cell);
@@ -308,7 +308,7 @@
             const referenceCell = cells[index];
             const newCell = document.createElement(referenceCell.tagName);
             newCell.style.cssText = 'border: 1px solid #ddd; padding: 8px; min-width: 50px;';
-            newCell.innerHTML = '&nbsp;';
+            newCell.innerHTML = '<br>';
 
             // A sized column shares its width with the new one, so the
             // other columns keep theirs

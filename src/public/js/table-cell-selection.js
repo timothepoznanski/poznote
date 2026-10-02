@@ -70,7 +70,7 @@
         return String(str || '').replace(/\s*[\r\n]+\s*/g, ' ');
     }
 
-    /** True when the cell only holds placeholder whitespace (e.g. &nbsp;). */
+    /** True when the cell only holds its placeholder (<br>, or &nbsp; in older tables). */
     function cellIsEmpty(cell) {
         return cell.textContent.replace(/\u00a0/g, ' ').trim() === '' && !cell.querySelector('img');
     }
@@ -78,9 +78,45 @@
     function makeCell() {
         var cell = document.createElement('td');
         cell.style.cssText = 'border: 1px solid #ddd; padding: 8px; min-width: 50px;';
-        cell.innerHTML = '&nbsp;';
+        cell.innerHTML = '<br>';
         return cell;
     }
+
+    // \u2500\u2500\u2500 Empty cell placeholder \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+    //
+    // An empty cell needs something to keep the height of a line. That used to
+    // be a &nbsp;, a real character: the caret landed beside it and whatever
+    // was typed came with a space. Cells are now emptied to a <br>, and a cell
+    // still holding the old placeholder is switched over when the caret enters
+    // it. Only on entering: a space typed into an empty cell reads the same.
+
+    var caretCell = null; // cell the caret was last seen in
+
+    function holdsOldPlaceholder(cell) {
+        var only = cell.childNodes.length === 1 ? cell.firstChild : null;
+        return !!only && only.nodeType === 3 && only.data === '\u00a0';
+    }
+
+    function refreshEnteredCell() {
+        var sel = window.getSelection();
+        var info = sel && sel.isCollapsed ? getCaretCellInfo() : null;
+        var cell = info ? info.cell : null;
+        var entered = cell && cell !== caretCell;
+        caretCell = cell;
+        if (!entered || !holdsOldPlaceholder(cell)) return;
+
+        cell.innerHTML = '<br>';
+        var range = document.createRange();
+        range.setStart(cell, 0);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    document.addEventListener('selectionchange', function () {
+        // A click may be the start of a drag: wait for the button to come up
+        if (!mouseIsDown) refreshEnteredCell();
+    });
 
     // ─── Cell selection (mouse drag) ─────────────────────────────────────────
 
@@ -163,6 +199,7 @@
             anchorCell = null;
             selectionTable = null;
         }
+        refreshEnteredCell();
     });
 
     // ─── Copy / cut / delete of the selected cells ───────────────────────────
@@ -237,7 +274,7 @@
     }
 
     function clearSelectedCellContents(note) {
-        selectedCells.forEach(function (cell) { cell.innerHTML = '&nbsp;'; });
+        selectedCells.forEach(function (cell) { cell.innerHTML = '<br>'; });
         triggerSave(note || (selectionTable ? selectionTable.closest('.noteentry') : null));
     }
 
@@ -664,14 +701,16 @@
 
     function setCellValue(cell, value, useHtml) {
         if (useHtml && value.html !== null && !BLOCK_TAG_REGEX.test(value.html)) {
-            cell.innerHTML = collapseNewlines(value.html).trim() || '&nbsp;';
+            var inline = collapseNewlines(value.html).trim();
+            // A copied empty cell of an older table carries its &nbsp;
+            cell.innerHTML = /^(?:&nbsp;|\s)*$/.test(inline) ? '<br>' : inline;
             return;
         }
         var text = (value.text || '').replace(/\u00a0/g, ' ').replace(/\s*[\r\n]+\s*/g, ' ').trim();
         if (text) {
             cell.textContent = text;
         } else {
-            cell.innerHTML = '&nbsp;';
+            cell.innerHTML = '<br>';
         }
     }
 
