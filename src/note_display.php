@@ -48,6 +48,10 @@
 
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
+                    // A key is an integer: it goes into ids, attributes and file
+                    // names below, whatever the column of a restored database holds.
+                    $row['id'] = (int)$row['id'];
+
                     if (function_exists('ensureAutomaticSnapshotForOpenedNote')) {
                         ensureAutomaticSnapshotForOpenedNote($con, (int)$row['id']);
                     }
@@ -91,6 +95,7 @@
                         : '';
                 
                     $note_type = $row['type'] ?? 'note';
+                    $note_type_attr = htmlspecialchars((string)$note_type, ENT_QUOTES);
                     
                     $filename = getEntryFilename($row["id"], $note_type);
                     $title = $row['heading'];
@@ -112,7 +117,13 @@
                         if (is_readable($filename)) {
                             $entryfinal = file_get_contents($filename);
                         } else {
-                            $entryfinal = $row['entry'] ?? '';
+                            // No file: the database copy stands in. It is not
+                            // guaranteed to have been through the sanitizer the
+                            // way a saved file is (markdown is escaped below).
+                            $entryfinal = (string)($row['entry'] ?? '');
+                            if ($note_type !== 'markdown' && $entryfinal !== '') {
+                                $entryfinal = sanitizeHtml($entryfinal);
+                            }
                         }
                         $tasklist_json = '';
                     }
@@ -325,7 +336,7 @@
                     }
                     
                     // Download button
-                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type.'"><i class="lucide lucide-download"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type_attr.'"><i class="lucide lucide-download"></i></button>';
 
                     if ($note_type === 'markdown') {
                         echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="html" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to rich text').'"><i class="lucide lucide-refresh-cw-alt"></i></button>';
@@ -399,7 +410,7 @@
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="archive-note" data-note-id="'.$row['id'].'" data-note-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'"><i class="lucide lucide-archive"></i> '.t_h('archive.menu_item', [], 'Archive note').'</button>';
                     }
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="lucide lucide-download"></i> '.t_h('common.download', [], 'Download').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="print-note" data-note-id="'.$row['id'].'" data-note-type="'.$note_type.'"><i class="lucide lucide-printer"></i> '.t_h('common.print', [], 'Print').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="print-note" data-note-id="'.$row['id'].'" data-note-type="'.$note_type_attr.'"><i class="lucide lucide-printer"></i> '.t_h('common.print', [], 'Print').'</button>';
 
                     // Convert button (only for markdown and note types, with appropriate icon)
                     if ($note_type === 'markdown') {
@@ -589,6 +600,14 @@
                         $data_attr .= ' data-markdown-content="'.$markdown_content.'"';
                         // Start with the raw markdown displayed
                         $display_content = htmlspecialchars($entryfinal, ENT_NOQUOTES);
+                    } elseif ($note_type === 'tasklist' && is_array(json_decode((string)$entryfinal, true))) {
+                        // The list is built by tasklist-core.js from data-tasklist-json
+                        // above. The JSON itself is data, not markup: written into the
+                        // page, the text of a task would be parsed as HTML. (A list from
+                        // before the JSON format is markup, sanitized when it was saved,
+                        // and still goes through the branch below: the script reads the
+                        // tasks back from it.)
+                        $display_content = '';
                     } else {
                         // For all other notes (HTML, Excalidraw), use the file content directly
                         $display_content = $entryfinal;
@@ -627,7 +646,7 @@
 
                     $linked_note_id_attr = '';
                     if (isset($row['linked_note_id']) && $row['linked_note_id']) {
-                        $linked_note_id_attr = ' data-linked-note-id="'.$row['linked_note_id'].'"';
+                        $linked_note_id_attr = ' data-linked-note-id="'.(int)$row['linked_note_id'].'"';
                     }
                     if ($attachment_previews_in_note_setting && !$attachments_at_bottom_setting) {
                         echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');
@@ -635,7 +654,7 @@
                     $spellcheck_enabled = poznoteSettingEnabled($settings['spellcheck_html_notes'], false);
                     $spellcheck_attr = ($note_type === 'note' && $spellcheck_enabled) ? 'true' : 'false';
                     $lang_attr = ($note_type === 'note' && $spellcheck_enabled) ? ' lang="'.htmlspecialchars(getUserLanguage(), ENT_QUOTES).'"' : '';
-                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="'.$spellcheck_attr.'"'.$lang_attr.' id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="'.$spellcheck_attr.'"'.$lang_attr.' id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type_attr.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
                     if ($attachments_at_bottom_setting) {
                         if ($attachment_previews_in_note_setting) {
                             echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');

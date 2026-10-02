@@ -287,6 +287,11 @@ function setupLinkClickHandling() {
         var href = e.target.href;
         if (handleInternalNoteLink(href)) return;
 
+        // A link that would run in this page instead of going somewhere is
+        // not followed (the sanitizers do not let one through; this is the
+        // last place it could be acted on)
+        if (/^\s*(?:javascript|vbscript|data):/i.test(String(href))) return;
+
         // External link - open in new tab
         window.open(href, '_blank');
     });

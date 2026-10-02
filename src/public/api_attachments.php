@@ -426,11 +426,11 @@ function handleDownload() {
                     }
 
                     // Set headers for file download/viewing
-                    $file_type = $attachment['file_type'] ?? 'application/octet-stream';
+                    $inlineContentType = poznoteAttachmentInlineContentType($attachment, false);
 
                     // Sanitize filename for Content-Disposition header
                     $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
-                    $isInlineView = strpos($file_type, 'application/pdf') !== false || strpos($file_type, 'image/') !== false;
+                    $isInlineView = $inlineContentType !== null;
                     $stat = $storage->statForHeaders($attachment);
                     sendLegacyAttachmentCacheHeaders($stat, $attachment, !$isInlineView);
 
@@ -438,7 +438,7 @@ function handleDownload() {
 
                     // For PDFs and images, allow inline viewing
                     if ($isInlineView) {
-                        header('Content-Type: ' . $file_type);
+                        header('Content-Type: ' . $inlineContentType);
                         header('Content-Disposition: inline; filename="' . $safeFilename . '"');
                         if (poznoteAttachmentIsSvg($attachment)) {
                             poznoteSendSvgAttachmentSecurityHeaders();

@@ -504,7 +504,9 @@ class MiniCalendar {
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
-        return div.innerHTML;
+        // innerHTML escapes & < >, which is enough for text; the result is
+        // also written inside quoted attributes, so the quotes go too.
+        return div.innerHTML.replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
     /**
@@ -513,7 +515,7 @@ class MiniCalendar {
     renderNotesListHtml(notes) {
         return notes.length > 0
             ? notes.map(note => `
-                <button type="button" class="calendar-note-item" data-note-id="${note.id}" data-note-title="${this.escapeHtml(note.title || 'Untitled')}">
+                <button type="button" class="calendar-note-item" data-note-id="${this.escapeHtml(String(note.id))}" data-note-title="${this.escapeHtml(note.title || 'Untitled')}">
                     <span class="calendar-note-title">${this.escapeHtml(note.title || 'Untitled')}</span>
                 </button>
             `).join('')

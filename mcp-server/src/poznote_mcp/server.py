@@ -30,6 +30,7 @@ import atexit
 import base64
 import binascii
 import hmac
+import ipaddress
 import json
 import logging
 import os
@@ -38,10 +39,12 @@ import socket
 import sys
 import time
 from typing import Optional, Union
+from urllib.parse import urlsplit
 
 import httpx
 from fastmcp import FastMCP
 from fastmcp.server.auth import AccessToken, TokenVerifier
+from starlette.middleware import Middleware
 
 from .client import PoznoteClient
 
@@ -171,6 +174,74 @@ def _is_loopback_host(host: str) -> bool:
     if value.startswith("[") and value.endswith("]"):
         value = value[1:-1]
     return value == "localhost" or value == "::1" or value.startswith("127.")
+
+
+def _origin_allowed_without_token(origin: str) -> bool:
+    """True when a request carrying this Origin header may be served while no
+    bearer token protects the endpoint.
+
+    A program (an MCP client, a script, another container) sends no Origin at
+    all: only a browser does, on behalf of the web page that issued the
+    request. Without a token, the one thing standing between a page the user
+    happens to visit and this server is the browser's same-origin rule, and
+    DNS rebinding defeats it: the page's own hostname is re-pointed at
+    127.0.0.1, so its requests become same-origin while still reaching this
+    port. Such a request always names the page's http(s) origin, which is not
+    this machine, and that is what gets refused. Origins that are not a web
+    address (desktop applications, "null") are left alone.
+    """
+    try:
+        parsed = urlsplit((origin or "").strip())
+        scheme = (parsed.scheme or "").lower()
+        hostname = (parsed.hostname or "").lower().rstrip(".")
+    except ValueError:
+        return False
+    if scheme not in ("http", "https"):
+        return True
+    # Stricter than _is_loopback_host(), which is about the address the server
+    # binds: a name is the user's to choose here, and "127.0.0.1.example.com"
+    # is somebody's domain.
+    if hostname == "localhost" or hostname.endswith(".localhost"):
+        return True
+    try:
+        return ipaddress.ip_address(hostname).is_loopback
+    except ValueError:
+        return False
+
+
+class LocalOriginGuard:
+    """ASGI middleware applying _origin_allowed_without_token to every request.
+
+    Only installed when inbound authentication is off: with a token, a page
+    that does not know it gets a 401 whatever its origin.
+    """
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            for name, value in scope.get("headers") or []:
+                if name == b"origin" and not _origin_allowed_without_token(value.decode("latin-1")):
+                    body = (
+                        b"Forbidden Origin: without " + AUTH_TOKEN_ENV.encode("ascii")
+                        + b", this server only answers web pages served from this machine."
+                    )
+                    await send({
+                        "type": "http.response.start",
+                        "status": 403,
+                        "headers": [
+                            (b"content-type", b"text/plain; charset=utf-8"),
+                            (b"content-length", str(len(body)).encode("ascii")),
+                        ],
+                    })
+                    await send({"type": "http.response.body", "body": body})
+                    return
+        await self.app(scope, receive, send)
+
+
+def _build_http_middleware(token: str | None) -> list[Middleware]:
+    return [] if token else [Middleware(LocalOriginGuard)]
 
 
 def _load_inbound_auth_token(env_value: str | None = None) -> str | None:
@@ -2969,6 +3040,7 @@ def main():
             port=port,
             stateless_http=True,
             show_banner=False,
+            middleware=_build_http_middleware(_inbound_auth_token),
         )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")

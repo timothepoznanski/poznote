@@ -54,3 +54,22 @@ function aiUpstreamRetryDelaySeconds(int $attemptsMade): int
 {
     return max(1, min($attemptsMade, 5));
 }
+
+/**
+ * True when two server URLs are the same one, give or take surrounding
+ * whitespace and a trailing slash.
+ *
+ * The connection test of the AI and speech-to-text settings sends a stored
+ * API key along when the form still shows the mask. That is right for the
+ * owner of the configuration, who may be trying another URL with the key
+ * already saved. For anyone else, and for a request that names no
+ * configuration at all, the stored key only ever travels to the server it is
+ * stored with: this is the comparison that decides it.
+ */
+function aiUpstreamSameServer(string $a, string $b): bool
+{
+    $a = rtrim(trim($a), '/');
+    $b = rtrim(trim($b), '/');
+
+    return $a !== '' && $a === $b;
+}

@@ -297,7 +297,10 @@ class FoldersController {
             return null;
         }
 
-        $icon = trim($icon);
+        // An icon is a list of CSS class names ("lucide lucide-folder",
+        // "devicon-php-plain colored"): nothing else belongs in it, and it is
+        // written into class attributes.
+        $icon = trim((string)preg_replace('/[^A-Za-z0-9 _-]+/', '', $icon));
         if ($icon === '') {
             return null;
         }

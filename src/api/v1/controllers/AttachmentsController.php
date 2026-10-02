@@ -451,7 +451,7 @@ class AttachmentsController {
                             }
 
                             // Set headers for file download/viewing
-                            $file_type = $attachment['file_type'] ?? 'application/octet-stream';
+                            $inlineContentType = poznoteAttachmentInlineContentType($attachment);
 
                             // Sanitize filename for Content-Disposition header
                             $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
@@ -467,11 +467,9 @@ class AttachmentsController {
                             } elseif ($inlineTextContentType !== null) {
                                 header('Content-Type: ' . $inlineTextContentType);
                                 header('Content-Disposition: inline; filename="' . $safeFilename . '"');
-                            } elseif (strpos($file_type, 'application/pdf') !== false ||
-                                strpos($file_type, 'image/') !== false ||
-                                strpos($file_type, 'video/') !== false ||
-                                strpos($file_type, 'audio/') !== false) {
-                                header('Content-Type: ' . $file_type);
+                            } elseif ($inlineContentType !== null) {
+                                // PDF, image, video or audio
+                                header('Content-Type: ' . $inlineContentType);
                                 header('Content-Disposition: inline; filename="' . $safeFilename . '"');
                                 if (poznoteAttachmentIsSvg($attachment)) {
                                     poznoteSendSvgAttachmentSecurityHeaders();

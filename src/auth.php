@@ -828,6 +828,10 @@ function enforceSharedWorkspaceScopeAccess(): void {
  * an API call or in a parameter, must belong to the shared workspace. The
  * lists of parameter names cover the API controllers and the api_*.php
  * scripts; an id that matches nothing is left to the handler's own 404.
+ *
+ * The check and the handler must read the same request: see
+ * lib/workspace-scope.php for how the ids are found, and why one that is not
+ * a plain number gets the request refused.
  */
 function enforceSharedWorkspaceScopeOnRequest(array $scope): void {
     $workspaceName = $scope['workspace'];
@@ -841,7 +845,7 @@ function enforceSharedWorkspaceScopeOnRequest(array $scope): void {
     if (preg_match('#/api/v1/(workspaces|settings)(/|$|\?)#', $uri) && !$isRead) {
         denyAccountAccessResponse('This workspace is shared with you: its settings belong to its owner', 403);
     }
-    if (preg_match('#/api/v1/(shared|backups|git-sync|admin|trash)(/|$|\?)#', $uri)) {
+    if (preg_match('#/api/v1/(shared|backups|git-sync|github-sync|admin|trash)(/|$|\?)#', $uri)) {
         denyAccountAccessResponse('This endpoint is not available in a shared workspace', 403);
     }
     // Publishing a note or a folder on the public web is the owner's call, and
@@ -850,10 +854,12 @@ function enforceSharedWorkspaceScopeOnRequest(array $scope): void {
         denyAccountAccessResponse('Public links are managed by the workspace owner', 403);
     }
 
+    // The controllers decode the body as JSON without looking at the
+    // Content-Type header, so neither does this check.
     $body = [];
-    $contentType = (string)($_SERVER['CONTENT_TYPE'] ?? '');
-    if (strpos($contentType, 'application/json') !== false) {
-        $decoded = json_decode((string)file_get_contents('php://input'), true);
+    $rawBody = (string)file_get_contents('php://input');
+    if ($rawBody !== '') {
+        $decoded = json_decode($rawBody, true);
         if (is_array($decoded)) {
             $body = $decoded;
         }
@@ -879,46 +885,19 @@ function enforceSharedWorkspaceScopeOnRequest(array $scope): void {
     $_GET['workspace'] = $workspaceName;
     $_REQUEST['workspace'] = $workspaceName;
 
-    $noteIds = [];
-    $folderIds = [];
-    if (preg_match('#/api/v1/notes/(\d+)#', $uri, $m)) {
-        $noteIds[] = (int)$m[1];
+    require_once __DIR__ . '/lib/workspace-scope.php';
+    $ids = poznoteScopeRequestIds(
+        (string)parse_url($uri, PHP_URL_PATH),
+        $_GET,
+        $_POST,
+        $body,
+        basename((string)($_SERVER['SCRIPT_NAME'] ?? ''))
+    );
+    if ($ids === null) {
+        denyAccountAccessResponse('This request carries a note or folder identifier that is not a plain number', 400);
     }
-    if (preg_match('#/api/v1/folders/(\d+)#', $uri, $m)) {
-        $folderIds[] = (int)$m[1];
-    }
-    if (preg_match('#/api/v1/trash/(\d+)#', $uri, $m)) {
-        $noteIds[] = (int)$m[1];
-    }
-
-    $collect = static function (array $source, array $keys, array &$into): void {
-        foreach ($keys as $key) {
-            if (!isset($source[$key])) {
-                continue;
-            }
-            $values = $source[$key];
-            if (is_string($values) && strpos($values, ',') !== false) {
-                $values = explode(',', $values);
-            }
-            foreach ((array)$values as $value) {
-                if (is_scalar($value) && ctype_digit(trim((string)$value)) && (int)$value > 0) {
-                    $into[] = (int)$value;
-                }
-            }
-        }
-    };
-    $noteKeys = ['note_id', 'noteId', 'note_ids', 'target_note_id', 'linked_note_id', 'source_note_id', 'original_note_id', 'note', 'select_linked_note'];
-    $folderKeys = ['folder_id', 'folderId', 'folder_ids', 'parent_id', 'parent_folder_id', 'source_folder_id', 'new_parent_id', 'new_parent_folder_id', 'target_folder_id', 'destination_folder_id', 'kanban', 'diary'];
-    foreach ([$_GET, $_POST, $body] as $source) {
-        $collect($source, $noteKeys, $noteIds);
-        $collect($source, $folderKeys, $folderIds);
-    }
-    // The single-note export scripts name the note "id".
-    if (in_array(basename((string)($_SERVER['SCRIPT_NAME'] ?? '')), ['api_export_note.php', 'api_download_note.php'], true)) {
-        $collect($_GET, ['id'], $noteIds);
-    }
-    $noteIds = array_values(array_unique($noteIds));
-    $folderIds = array_values(array_unique($folderIds));
+    $noteIds = $ids['notes'];
+    $folderIds = $ids['folders'];
     if (empty($noteIds) && empty($folderIds)) {
         return;
     }

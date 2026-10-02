@@ -165,3 +165,34 @@ test('a markdown image counts as a reference too', function () {
     $content = "Before\n\n![shot](/api/v1/notes/12/attachments/abc123)\n";
     assertTrue(poznotePlanAttachmentMove(['id' => 'abc123'], $content, false)['keep_in_source']);
 });
+
+// The Content-Type of an inline response is decided from the stored record,
+// and the record also comes back from backups and Git repositories as whatever
+// they hold: only an exact, passive type may be shown in the page's origin.
+test('images, PDF, audio and video are shown inline with their exact type', function () {
+    foreach (['image/png', 'image/jpeg', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon', 'application/pdf', 'audio/mpeg', 'audio/x-m4a', 'video/mp4', 'video/quicktime'] as $type) {
+        assertSame($type, poznoteAttachmentInlineContentType(['file_type' => $type]), $type);
+    }
+    assertSame('image/png', poznoteAttachmentInlineContentType(['file_type' => 'image/png; charset=binary']), 'parameters are dropped');
+    assertSame('image/png', poznoteAttachmentInlineContentType(['file_type' => ' IMAGE/PNG ']), 'case and whitespace');
+});
+
+test('the legacy endpoint keeps audio and video as downloads', function () {
+    assertSame(null, poznoteAttachmentInlineContentType(['file_type' => 'audio/mpeg'], false));
+    assertSame(null, poznoteAttachmentInlineContentType(['file_type' => 'video/mp4'], false));
+    assertSame('image/png', poznoteAttachmentInlineContentType(['file_type' => 'image/png'], false));
+    assertSame('application/pdf', poznoteAttachmentInlineContentType(['file_type' => 'application/pdf'], false));
+});
+
+test('anything else is a download, whatever the stored type mentions', function () {
+    $downloads = [
+        '', 'text/html', 'text/plain', 'application/octet-stream', 'application/zip', 'application/xhtml+xml',
+        'text/html; x=image/', 'text/html;image/png', 'text/html; charset=utf-8; a="image/png"',
+        'application/pdf2', 'x-application/pdf', 'image', 'image/', '/png', 'image/png/extra', 'image /png',
+        "image/png\ntext/html", 'multipart/x-mixed-replace; boundary=image/',
+    ];
+    foreach ($downloads as $type) {
+        assertSame(null, poznoteAttachmentInlineContentType(['file_type' => $type]), var_export($type, true));
+    }
+    assertSame(null, poznoteAttachmentInlineContentType([]), 'no stored type');
+});

@@ -121,15 +121,24 @@ if ($action === 'test') {
     // configuration being edited ('scope'), not to the one the chat resolves
     // to: that one ignores a personal configuration until it is enabled with a
     // model, and on the admin page it may be the admin's own personal key.
+    //
+    // A stored key follows the caller to the URL they typed only when the
+    // configuration is theirs to edit: their own personal one, or the
+    // instance one for an administrator. In every other case (an account
+    // opened on someone else's behalf, a workspace shared with the caller, a
+    // request naming no configuration) it goes to the server it is stored
+    // with and nowhere else.
     $testKey = trim((string)($_POST['api_key'] ?? ''));
     if ($testKey === '') {
         $testScope = (string)($_POST['scope'] ?? '');
         if ($testScope === 'user' && poznoteAiUserKeysAllowed()) {
-            $testKey = poznoteAiUserConfig($con)['api_key'];
+            $userConfig = poznoteAiUserConfig($con);
+            $ownsConfig = !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
+            $testKey = ($ownsConfig || aiUpstreamSameServer($testUrl, (string)$userConfig['url'])) ? $userConfig['api_key'] : '';
         } elseif ($testScope === 'instance' && isCurrentUserAdmin()) {
             $testKey = poznoteAiInstanceConfig()['api_key'];
         } else {
-            $testKey = $aiApiKey;
+            $testKey = aiUpstreamSameServer($testUrl, (string)$aiUrl) ? $aiApiKey : '';
         }
     }
     $headers = array_merge(['Accept: application/json'], aiChatAuthHeaders($testUrl, $testKey));

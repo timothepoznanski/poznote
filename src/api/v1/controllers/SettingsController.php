@@ -45,8 +45,23 @@ class SettingsController {
         'smtp_reminder_cutoff_at',
     ];
     
+    /**
+     * Per-user settings that hold a credential (a Git token, a personal AI or
+     * speech-to-text API key), stored encrypted under the instance key by the
+     * page that owns them (git_sync.php, ai_settings_user.php,
+     * stt_settings_user.php). This API never hands them out, like
+     * smtp_password: reads are open to someone borrowing the account or
+     * working in a workspace shared with them, and a stored value copied into
+     * another account would be decrypted there.
+     */
+    private const SECRET_SETTINGS = ['git_token', 'ai_user_api_key', 'stt_user_api_key'];
+
     public function __construct($con) {
         $this->con = $con;
+    }
+
+    private function isSecretSetting(string $key): bool {
+        return in_array($key, self::SECRET_SETTINGS, true);
     }
 
     private function isGlobalSetting(string $key): bool {
@@ -539,6 +554,9 @@ class SettingsController {
         if ($keys === null) {
             $stmt = $this->con->query('SELECT key, value FROM settings');
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                if ($this->isSecretSetting((string)$row['key'])) {
+                    continue;
+                }
                 $settings[$row['key']] = $row['value'];
             }
             return $settings;
@@ -556,6 +574,9 @@ class SettingsController {
         $stmt = $this->con->prepare("SELECT key, value FROM settings WHERE key IN ($placeholders)");
         $stmt->execute($keys);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($this->isSecretSetting((string)$row['key'])) {
+                continue;
+            }
             $settings[$row['key']] = $row['value'];
         }
 
@@ -680,7 +701,7 @@ class SettingsController {
                 $stmt = $this->con->prepare('SELECT value FROM settings WHERE key = ?');
                 $stmt->execute([$key]);
                 $value = $stmt->fetchColumn();
-                if ($value === false) {
+                if ($value === false || $this->isSecretSetting($key)) {
                     $value = '';
                 }
             }
@@ -719,6 +740,14 @@ class SettingsController {
             $this->requireActiveAccountOwner();
 
             $value = $this->normalizeSettingValue($key, $value);
+
+            // A credential arrives here in clear, as it always could. What
+            // this route does not take is a value that is already in the
+            // stored, encrypted form: that is how one account's secret would
+            // be replayed into another.
+            if ($this->isSecretSetting($key) && strncmp(ltrim($value), 'enc1:', 5) === 0) {
+                throw new InvalidArgumentException('this setting cannot be written in its stored form, use its settings page', 400);
+            }
 
             // For global settings, use setGlobalSetting function
             if ($this->isGlobalSetting($key)) {

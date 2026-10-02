@@ -429,10 +429,30 @@ class RemindersController {
         return true;
     }
 
+    /**
+     * The workspace a session opened on a shared workspace is confined to,
+     * null for everyone else. The /reminders routes carry a notification id
+     * (or none at all), which the scope check on note and folder ids in
+     * auth.php never sees, so they apply the workspace themselves.
+     */
+    private function sharedWorkspaceScope(): ?string {
+        return function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+    }
+
     /** Same, for the notification rows the /reminders/{id} routes address. */
     private function requireNotification(int $notificationId): bool {
-        $stmt = $this->con->prepare("SELECT id FROM notifications WHERE id = ?");
-        $stmt->execute([$notificationId]);
+        $scopeWorkspace = $this->sharedWorkspaceScope();
+        if ($scopeWorkspace !== null) {
+            $stmt = $this->con->prepare("
+                SELECT n.id FROM notifications n
+                JOIN entries e ON e.id = n.note_id
+                WHERE n.id = ? AND e.workspace = ?
+            ");
+            $stmt->execute([$notificationId, $scopeWorkspace]);
+        } else {
+            $stmt = $this->con->prepare("SELECT id FROM notifications WHERE id = ?");
+            $stmt->execute([$notificationId]);
+        }
         if (!$stmt->fetchColumn()) {
             $this->sendError(404, 'Notification not found');
             return false;
@@ -517,6 +537,13 @@ class RemindersController {
         try {
             $now = gmdate('Y-m-d H:i:s');
 
+            // "All" stops at the workspace for a session confined to one
+            $scopeWorkspace = $this->sharedWorkspaceScope();
+            $scoped = $scopeWorkspace !== null;
+            $params = $scoped ? [$now, $scopeWorkspace] : [$now];
+            $entryScope = $scoped ? 'AND e.workspace = ?' : '';
+            $notificationScope = $scoped ? 'AND n.note_id IN (SELECT id FROM entries WHERE workspace = ?)' : '';
+
             // Collect due recurring notifications before dismissing them
             $recurringStmt = $this->con->prepare("
                 SELECT n.note_id, n.message, COALESCE(n.email_enabled, 1) AS email_enabled,
@@ -526,8 +553,9 @@ class RemindersController {
                 WHERE n.dismissed = 0 AND n.trigger_at <= ?
                   AND (n.task_id IS NULL OR n.task_id = '')
                   AND e.reminder_recurrence IS NOT NULL AND e.reminder_recurrence != ''
+                  $entryScope
             ");
-            $recurringStmt->execute([$now]);
+            $recurringStmt->execute($params);
             $recurring = $recurringStmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Same collection for due recurring task reminders
@@ -538,14 +566,16 @@ class RemindersController {
                 WHERE n.dismissed = 0 AND n.trigger_at <= ?
                   AND n.task_id IS NOT NULL AND n.task_id != ''
                   AND n.recurrence IS NOT NULL AND n.recurrence != ''
+                  $notificationScope
             ");
-            $recurringTasksStmt->execute([$now]);
+            $recurringTasksStmt->execute($params);
             $recurringTasks = $recurringTasksStmt->fetchAll(PDO::FETCH_ASSOC);
 
             $this->con->prepare("
                 UPDATE notifications SET dismissed = 1
                 WHERE dismissed = 0 AND trigger_at <= ?
-            ")->execute([$now]);
+                  " . ($scoped ? 'AND note_id IN (SELECT id FROM entries WHERE workspace = ?)' : '') . "
+            ")->execute($params);
 
             // Schedule the next occurrence of each recurring reminder
             foreach ($recurring as $info) {
@@ -560,7 +590,8 @@ class RemindersController {
                 UPDATE entries SET reminder_at = NULL
                 WHERE reminder_at IS NOT NULL
                   AND reminder_at <= ?
-            ")->execute([$now]);
+                  " . ($scoped ? 'AND workspace = ?' : '') . "
+            ")->execute($params);
 
             $this->sendSuccess([]);
         } catch (Exception $e) {

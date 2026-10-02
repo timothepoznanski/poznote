@@ -495,7 +495,9 @@ function getFileExtensionForType($type) {
  */
 function getEntryFilename($id, $type) {
     $extension = getFileExtensionForType($type);
-    return getEntriesPath() . '/' . $id . $extension;
+    // The id is a row key, never a path fragment: whatever a restored or
+    // imported row holds in that column, the file stays in the entries folder.
+    return getEntriesPath() . '/' . (int)$id . $extension;
 }
 
 /**

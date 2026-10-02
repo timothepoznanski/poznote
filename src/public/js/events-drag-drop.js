@@ -1096,7 +1096,9 @@ function handleFolderDragStart(e) {
     // Create a custom drag image
     var dragImage = document.createElement('div');
     dragImage.className = 'tree-drag-ghost';
-    dragImage.innerHTML = '<i class="lucide lucide-folder"></i> ' + (folderName || 'Folder');
+    dragImage.innerHTML = '<i class="lucide lucide-folder"></i> ';
+    // The name is text, not markup
+    dragImage.appendChild(document.createTextNode(folderName || 'Folder'));
     document.body.appendChild(dragImage);
 
     try {

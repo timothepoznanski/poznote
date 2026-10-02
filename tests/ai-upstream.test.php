@@ -37,3 +37,17 @@ test('the pause grows with the attempts and stays short', function () {
 test('three attempts in total, so two retries', function () {
     assertSame(3, AI_UPSTREAM_MAX_ATTEMPTS);
 });
+
+// The connection test sends a stored API key along when the form shows the
+// mask. Outside the owner's own settings page, that key may only go to the
+// server it is stored with.
+test('a stored key follows a URL only when it is the stored server', function () {
+    assertTrue(aiUpstreamSameServer('https://api.example.com/v1', 'https://api.example.com/v1'));
+    assertTrue(aiUpstreamSameServer(' https://api.example.com/v1/ ', 'https://api.example.com/v1'), 'whitespace and a trailing slash');
+    assertFalse(aiUpstreamSameServer('https://other.example.net/v1', 'https://api.example.com/v1'), 'another host');
+    assertFalse(aiUpstreamSameServer('https://api.example.com/v1/extra', 'https://api.example.com/v1'), 'another path');
+    assertFalse(aiUpstreamSameServer('http://api.example.com/v1', 'https://api.example.com/v1'), 'another scheme');
+    assertFalse(aiUpstreamSameServer('https://API.example.com/v1', 'https://api.example.com/v1'), 'compared as written');
+    assertFalse(aiUpstreamSameServer('', ''), 'nothing configured is not a match');
+    assertFalse(aiUpstreamSameServer('https://api.example.com/v1', ''), 'no stored server');
+});

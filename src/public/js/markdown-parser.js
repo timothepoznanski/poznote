@@ -300,6 +300,89 @@ function _mdTryParseInternalNoteId(url) {
     return id ? parseInt(id, 10) : null;
 }
 
+/**
+ * A link target the preview may turn into a real link.
+ *
+ * Everything is allowed (relative links, mailto:, obsidian://, ...) except the
+ * schemes that run in this page instead of going somewhere. The browser
+ * ignores control characters and spaces before a URL, and a tab or a line
+ * break inside the scheme, so they are removed before looking at it.
+ */
+function _mdIsSafeLinkUrl(url) {
+    var compact = String(url).replace(/[\u0000-\u0020\u007f]+/g, '').toLowerCase();
+    return !/^(?:javascript|vbscript|data):/.test(compact);
+}
+
+/**
+ * Escape text for an element or a quoted attribute, leaving the character
+ * references the author wrote (&amp;, &nbsp;, &#169;) as they are: they stand
+ * for a character, never for markup.
+ */
+function _mdEscapeInlineText(text) {
+    return String(text)
+        .replace(/&(?!(?:#x[0-9a-f]+|#\d+|[a-z][a-z0-9]*);)/gi, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+/**
+ * The text of a [text](url) link as HTML.
+ *
+ * A link is taken out of the stream before anything is escaped, so its text
+ * is escaped here. The inline tags the rest of a note may use (a coloured
+ * <span style="...">, <u>, <br>) keep working inside it; any other markup is
+ * shown as the text it is.
+ */
+function _mdRenderLinkText(linkText) {
+    var tagRegex = /<span\s+style="([^"]+)">|<\/span>|<br\s*\/?>|<u(?=[\s/>])([^>]*)>|<\/u>/gi;
+    var html = '';
+    var open = [];
+    var last = 0;
+    var match;
+
+    linkText = String(linkText);
+    while ((match = tagRegex.exec(linkText)) !== null) {
+        html += _mdEscapeInlineText(linkText.slice(last, match.index));
+        last = tagRegex.lastIndex;
+
+        var tag = match[0].toLowerCase();
+        if (tag.indexOf('<span') === 0) {
+            html += '<span style="' + _mdEscapeHtml(match[1]) + '">';
+            open.push('span');
+        } else if (tag.indexOf('<br') === 0) {
+            html += '<br>';
+        } else if (tag.indexOf('<u') === 0) {
+            html += '<u' + _mdSanitizePassthroughTagAttrs('u', match[2] || '') + '>';
+            open.push('u');
+        } else {
+            // A closing tag only closes what this text opened
+            var name = tag === '</span>' ? 'span' : 'u';
+            if (open.length && open[open.length - 1] === name) {
+                open.pop();
+                html += '</' + name + '>';
+            } else {
+                html += _mdEscapeInlineText(match[0]);
+            }
+        }
+    }
+    html += _mdEscapeInlineText(linkText.slice(last));
+    while (open.length) {
+        html += '</' + open.pop() + '>';
+    }
+
+    return html;
+}
+
+/**
+ * For a URL taken from text that is already HTML-escaped (& < >) and about to
+ * be written inside a quoted attribute: the quotes are what is left to escape.
+ */
+function _mdEscapeAttributeQuotes(value) {
+    return String(value).replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
 function _mdIsPlainCodeBlockLanguage(language) {
     const normalizedLanguage = language ? language.trim().toLowerCase() : '';
     return normalizedLanguage === 'normal' || normalizedLanguage === 'code';
@@ -1048,22 +1131,33 @@ function parseMarkdown(text) {
 
     // Protect links [text](url "title")
     text = text.replace(/\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/g, function (match, linkText, url, title) {
+        // The browser decodes character references in an attribute: decode
+        // them first, so that the URL checked here is the one it would follow,
+        // then write it fully escaped so that nothing is left to decode.
+        url = _mdDecodeHtmlEntities(url);
+
+        // A link the preview must not follow stays what the author typed:
+        // text, escaped with the rest below.
+        if (!_mdIsSafeLinkUrl(url)) {
+            return match;
+        }
+
         let placeholder = '\x00PLNK' + protectedIndex + '\x00';
         let linkTag;
+
+        // The link is protected from the escaping below, so its three parts
+        // are made safe here.
+        const safeUrl = escapeHtml(url);
+        const safeText = _mdRenderLinkText(linkText);
+        const titleAttr = title ? ' title="' + _mdEscapeInlineText(title) + '"' : '';
 
         const internalNoteId = _mdTryParseInternalNoteId(url);
         if (internalNoteId) {
             // Internal note link: keep navigation in-app (handled by note-reference.js)
             // Do not force target=_blank.
-            if (title) {
-                linkTag = '<a href="' + url + '" class="note-internal-link" data-note-id="' + internalNoteId + '" data-note-reference="true" title="' + title + '">' + linkText + '</a>';
-            } else {
-                linkTag = '<a href="' + url + '" class="note-internal-link" data-note-id="' + internalNoteId + '" data-note-reference="true">' + linkText + '</a>';
-            }
-        } else if (title) {
-            linkTag = '<a href="' + url + '" title="' + title + '" target="_blank" rel="noopener">' + linkText + '</a>';
+            linkTag = '<a href="' + safeUrl + '" class="note-internal-link" data-note-id="' + internalNoteId + '" data-note-reference="true"' + titleAttr + '>' + safeText + '</a>';
         } else {
-            linkTag = '<a href="' + url + '" target="_blank" rel="noopener">' + linkText + '</a>';
+            linkTag = '<a href="' + safeUrl + '"' + titleAttr + ' target="_blank" rel="noopener">' + safeText + '</a>';
         }
         protectedElements[protectedIndex] = linkTag;
         protectedIndex++;
@@ -1299,7 +1393,7 @@ function parseMarkdown(text) {
                     url = url.slice(0, -1);
                 }
                 if (!url) return match;
-                return prefix + '<a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>' + trailing;
+                return prefix + '<a href="' + _mdEscapeAttributeQuotes(url) + '" target="_blank" rel="noopener">' + url + '</a>' + trailing;
             });
         }
 
@@ -1314,7 +1408,9 @@ function parseMarkdown(text) {
         });
 
         // Handle angle bracket URLs <https://example.com>
-        text = text.replace(/&lt;(https?:\/\/[^>]+)&gt;/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+        text = text.replace(/&lt;(https?:\/\/[^>]+)&gt;/g, function (match, url) {
+            return '<a href="' + _mdEscapeAttributeQuotes(url) + '" target="_blank" rel="noopener">' + url + '</a>';
+        });
 
         // Bold and italic
         text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');

@@ -4,6 +4,7 @@ Poznote API Client - HTTP client for communicating with Poznote REST API
 
 import httpx
 from typing import Optional
+from urllib.parse import quote
 import os
 import logging
 
@@ -14,6 +15,20 @@ DEFAULT_TIMEOUT = 30.0
 # Extended timeout for heavy operations (backup/restore/git sync)
 HEAVY_TIMEOUT = 120.0
 DEFAULT_SERVICE_TOKEN_FILE = "/var/www/html/data/.mcp_token"
+
+
+def _path_segment(value) -> str:
+    """One value as one segment of a request path.
+
+    Names, keys and ids handed to a tool end up in the URL of an API call. A
+    slash, a question mark or a dot-segment in one of them would turn the call
+    into a request for another route, so every such value is percent-encoded
+    whole, and the two that encoding cannot neutralise are refused.
+    """
+    text = str(value)
+    if text in ("", ".", ".."):
+        raise ValueError(f"Invalid identifier: {text!r}")
+    return quote(text, safe="")
 
 
 class PoznoteClient:
@@ -684,20 +699,20 @@ class PoznoteClient:
             filename: Name of the backup file to restore
             user_id: User profile ID to access (optional, overrides default)
         """
-        response = self.client.post(f"/backups/{filename}/restore", headers=self._headers_for_user(user_id), timeout=HEAVY_TIMEOUT)
+        response = self.client.post(f"/backups/{_path_segment(filename)}/restore", headers=self._headers_for_user(user_id), timeout=HEAVY_TIMEOUT)
         response.raise_for_status()
         return response.json()
 
     def get_setting(self, key: str, user_id: str | int | None = None) -> dict:
         """Get a specific application setting"""
-        response = self.client.get(f"/settings/{key}", headers=self._headers_for_user(user_id))
+        response = self.client.get(f"/settings/{_path_segment(key)}", headers=self._headers_for_user(user_id))
         response.raise_for_status()
         return response.json()
 
     def update_setting(self, key: str, value: str, user_id: str | int | None = None) -> dict:
         """Update a specific application setting"""
         payload = {"value": value}
-        response = self.client.put(f"/settings/{key}", json=payload, headers=self._headers_for_user(user_id))
+        response = self.client.put(f"/settings/{_path_segment(key)}", json=payload, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         return response.json()
 
@@ -818,7 +833,7 @@ class PoznoteClient:
     def rename_workspace(self, current_name: str, new_name: str, user_id: str | int | None = None) -> dict | None:
         """Rename an existing workspace"""
         payload = {"new_name": new_name}
-        response = self.client.patch(f"/workspaces/{current_name}", json=payload, headers=self._headers_for_user(user_id))
+        response = self.client.patch(f"/workspaces/{_path_segment(current_name)}", json=payload, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         if data.get("success"):
@@ -827,14 +842,14 @@ class PoznoteClient:
 
     def delete_workspace(self, name: str, user_id: str | int | None = None) -> bool:
         """Delete a workspace (cannot delete the last one)"""
-        response = self.client.delete(f"/workspaces/{name}", headers=self._headers_for_user(user_id))
+        response = self.client.delete(f"/workspaces/{_path_segment(name)}", headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         return data.get("success", False)
 
     def delete_backup(self, filename: str) -> bool:
         """Delete a backup file"""
-        response = self.client.delete(f"/backups/{filename}")
+        response = self.client.delete(f"/backups/{_path_segment(filename)}")
         response.raise_for_status()
         data = response.json()
         return data.get("success", False)
@@ -980,7 +995,7 @@ class PoznoteClient:
         ``due_at: None`` to clear a due date (a value distinct from omitting it).
         """
         response = self.client.patch(
-            f"/notes/{note_id}/tasks/{task_id}",
+            f"/notes/{note_id}/tasks/{_path_segment(task_id)}",
             json=fields,
             headers=self._headers_for_user(user_id),
         )
@@ -995,7 +1010,7 @@ class PoznoteClient:
     def delete_task(self, note_id: int, task_id: str, user_id: str | int | None = None) -> bool:
         """Delete one task of a tasklist note"""
         response = self.client.delete(
-            f"/notes/{note_id}/tasks/{task_id}",
+            f"/notes/{note_id}/tasks/{_path_segment(task_id)}",
             headers=self._headers_for_user(user_id),
         )
         if response.status_code == 404:
@@ -1017,7 +1032,7 @@ class PoznoteClient:
             payload["completed"] = completed
 
         response = self.client.post(
-            f"/notes/{note_id}/tasks/{task_id}/subtasks",
+            f"/notes/{note_id}/tasks/{_path_segment(task_id)}/subtasks",
             json=payload,
             headers=self._headers_for_user(user_id),
         )
@@ -1039,7 +1054,7 @@ class PoznoteClient:
     ) -> dict | None:
         """Rename, tick or untick one subtask"""
         response = self.client.patch(
-            f"/notes/{note_id}/tasks/{task_id}/subtasks/{subtask_id}",
+            f"/notes/{note_id}/tasks/{_path_segment(task_id)}/subtasks/{_path_segment(subtask_id)}",
             json=fields,
             headers=self._headers_for_user(user_id),
         )
@@ -1060,7 +1075,7 @@ class PoznoteClient:
     ) -> dict | None:
         """Delete one subtask"""
         response = self.client.delete(
-            f"/notes/{note_id}/tasks/{task_id}/subtasks/{subtask_id}",
+            f"/notes/{note_id}/tasks/{_path_segment(task_id)}/subtasks/{_path_segment(subtask_id)}",
             headers=self._headers_for_user(user_id),
         )
         if response.status_code == 404:
