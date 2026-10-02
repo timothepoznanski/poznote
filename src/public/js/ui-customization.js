@@ -316,8 +316,9 @@
     // css/settings.css).
     function syncSettingsGroupTitles() {
         document.querySelectorAll('.settings-group').forEach(function (group) {
-            // The storage figures of My Account are a block, not cards
-            var hasVisibleCard = Array.prototype.some.call(group.querySelectorAll('.home-card, .settings-storage-summary'), isVisibleElement);
+            // The storage figures of My Account and the workspace list are
+            // blocks, not cards
+            var hasVisibleCard = Array.prototype.some.call(group.querySelectorAll('.home-card, .settings-storage-summary, .settings-workspaces-list'), isVisibleElement);
             group.classList.toggle('settings-group-empty', !hasVisibleCard);
         });
         document.querySelectorAll('.settings-group-title').forEach(function (title) {

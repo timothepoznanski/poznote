@@ -470,7 +470,6 @@
   "settings": {
     "card_help": {
       "tenant_isolation": "SaaS-Modus: Wählen Sie, welche Funktionen für Benutzer ohne Administratorrechte blockiert werden, etwa das Entdecken der anderen Konten der Instanz oder das Registrieren persönlicher Webhooks. Für Familien- oder Teaminstanzen alles abgewählt lassen.",
-      "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
       "password_note_sso_only": "Die Passwort-Anmeldung ist auf dieser Instanz deaktiviert.",
@@ -550,7 +549,7 @@
       "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden.",
       "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind.",
       "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt.",
-      "workspace_activity_emails": "Erhalten Sie eine E-Mail, wenn jemand anderes eine Notiz in einem Arbeitsbereich ändert, den Sie teilen oder der mit Ihnen geteilt wird. Sie listet die erstellten, bearbeiteten und gelöschten Notizen auf, nie deren Inhalt, und geht an die E-Mail-Adresse Ihres Profils.",
+      "workspace_activity_emails": "Erhalten Sie eine E-Mail, wenn jemand anderes eine Notiz in einem Arbeitsbereich ändert, den Sie teilen oder der mit Ihnen geteilt wird. Sie listet die erstellten, bearbeiteten und gelöschten Notizen auf, nie deren Inhalt, und geht an die E-Mail-Adresse Ihres Profils. Bei Änderungen: einige Minuten nach der letzten Änderung. Tägliche Zusammenfassung: um 8:00 Uhr. Wöchentliche Zusammenfassung: montags um 8:00 Uhr, in Ihrer Zeitzone.",
       "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten."
     },
     "card_notes": {
@@ -564,6 +563,7 @@
     "categories": {
       "pinned": "Angepinnt",
       "account": "Mein Konto",
+      "workspaces": "Arbeitsbereiche",
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
@@ -591,8 +591,7 @@
       "language_region": "Sprache und Region",
       "storage": "Speicher",
       "layout": "Layout",
-      "organization": "Organisation",
-      "notifications": "Benachrichtigungen"
+      "preferences": "Präferenzen"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -615,7 +614,6 @@
     },
     "cards": {
       "tenant_isolation": "Mandantentrennung",
-      "workspaces": "Arbeitsbereiche",
       "backup_export": "Sicherung / Export",
       "restore_import": "Wiederherstellen / Importieren",
       "git_sync": "Git-Synchronisierung",
@@ -705,7 +703,6 @@
         "placeholder": "Arbeitsbereichsnamen eingeben"
       },
       "existing": {
-        "title": "Vorhandene Arbeitsbereiche",
         "empty": "Keine Arbeitsbereiche definiert."
       }
     },
@@ -725,10 +722,7 @@
       "description_1": "Wählen Sie aus, welcher Arbeitsbereich beim Starten von Poznote geöffnet wird.",
       "description_2": "Wählen Sie \"{{last}}\" aus, um immer den Arbeitsbereich zu öffnen, in dem Sie zuletzt gearbeitet haben.",
       "last_opened": "Zuletzt geöffneter Arbeitsbereich (alle Geräte)",
-      "last_opened_device": "Zuletzt geöffneter Arbeitsbereich auf diesem Gerät",
-      "save_button": "Speichern",
-      "status_set_to": "✓ Startup-Arbeitsbereich gesetzt auf: {{workspace}}",
-      "error_saving": "Fehler beim Speichern des Startup-Arbeitsbereichs"
+      "last_opened_device": "Zuletzt geöffneter Arbeitsbereich auf diesem Gerät"
     },
     "validation": {
       "enter_name": "Arbeitsbereichsnamen eingeben",
@@ -761,8 +755,6 @@
     },
     "errors": {
       "already_exists": "Ein Arbeitsbereich mit diesem Namen existiert bereits",
-      "name_empty": "Arbeitsbereichsname darf nicht leer sein",
-      "invalid_name": "Ungültiger Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_required": "Arbeitsbereichsname erforderlich",
       "cannot_delete_default": "Startup-Arbeitsbereich kann nicht gelöscht werden",
       "not_found": "Arbeitsbereich nicht gefunden",
@@ -775,8 +767,6 @@
       "no_workspace_selected": "Kein Arbeitsbereich ausgewählt"
     },
     "messages": {
-      "creating": "Arbeitsbereich wird erstellt...",
-      "created": "Arbeitsbereich erstellt",
       "deleted_all": "Arbeitsbereich gelöscht und alle zugehörigen Notizen, Ordner und Anhänge entfernt",
       "renamed": "Arbeitsbereich in allen Notizen und Labels umbenannt",
       "notes_moved_to": "Notizen verschoben nach {{target}}"
@@ -816,7 +806,7 @@
       "action": "Tags",
       "modal_title": "Tags des Arbeitsbereichs",
       "placeholder": "Tags, durch Kommas getrennt (optional, z. B. schule, psycho)",
-      "help": "Tags gruppieren Arbeitsbereiche im Dashboard: Wähle dort einen Tag, um alle Arbeitsbereiche mit diesem Tag zu sehen.",
+      "help": "Mit Tags lassen sich Arbeitsbereiche im Dashboard gruppieren.",
       "saved": "Tags aktualisiert",
       "save_error": "Die Tags konnten nicht aktualisiert werden",
       "empty": "Noch keine Tags."

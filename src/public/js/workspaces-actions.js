@@ -1,7 +1,7 @@
 // Workspace action handlers.
 // 
-// Rename, tags, colour, select and delete, driven from the workspace menu and from
-// workspaces.php.
+// Rename, tags, colour, select and delete, driven from the workspace list of
+// Settings > Workspaces (workspaces_section.php) and posted to workspaces.php.
 
 // ========== WORKSPACE ACTION HANDLERS ==========
 // Event handlers for rename, select, delete, and move operations
@@ -482,11 +482,6 @@ function handleDeleteButtonClick(e) {
                             }
                         }
 
-                        // Update the default workspace dropdown if needed
-                        if (typeof window.loadDefaultWorkspaceSetting === 'function') {
-                            window.loadDefaultWorkspaceSetting();
-                        }
-
                         // Reload page to show updated workspace list
                         setTimeout(function () {
                             window.location.reload();
@@ -496,7 +491,7 @@ function handleDeleteButtonClick(e) {
                         confirmBtn.disabled = false; // re-enable on error
                     }
                 })
-                .catch(function () {
+                .catch(function (err) {
                     confirmBtn.disabled = false;
                     console.error('Error deleting workspace:', err);
                     showAjaxAlert(wsTr('workspaces.alerts.delete_error', {}, 'Error deleting workspace'), 'danger');

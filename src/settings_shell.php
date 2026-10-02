@@ -17,6 +17,13 @@
  */
 
 /**
+ * Key of the Workspaces section, named by the links that lead to the
+ * workspace list from outside settings.php (the workspace menus, the
+ * dashboard, workspaces.php).
+ */
+const POZNOTE_SETTINGS_WORKSPACES_SECTION = 'settings-workspaces-section-grid';
+
+/**
  * The sections of settings.php, in page order. The key is the id of the
  * section's card grid, which is also what the list, the #hash deep links and
  * the saved choice use.
@@ -27,6 +34,7 @@ function poznoteSettingsSections(): array
     $sections = [
         ['key' => 'settings-pinned-section-grid', 'icon' => 'lucide-pin', 'label' => t('settings.categories.pinned', [], 'Pinned')],
         ['key' => 'settings-account-section-grid', 'icon' => 'lucide-user', 'label' => t('settings.categories.account', [], 'My Account')],
+        ['key' => POZNOTE_SETTINGS_WORKSPACES_SECTION, 'icon' => 'lucide-layers', 'label' => t('settings.categories.workspaces', [], 'Workspaces')],
         ['key' => 'settings-actions-section-grid', 'icon' => 'lucide-zap', 'label' => t('settings.categories.actions', [], 'Actions')],
         ['key' => 'settings-display-section-grid', 'icon' => 'lucide-monitor', 'label' => t('settings.categories.display', [], 'Display')],
         ['key' => 'settings-ui-customization-section-grid', 'icon' => 'lucide-eye-off', 'label' => t('settings.categories.ui_customization', [], 'Element visibility')],

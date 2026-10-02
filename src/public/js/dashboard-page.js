@@ -2206,7 +2206,7 @@
                     html += '</div>';
                 } else {
                     html += '<p class="dashboard-scope-empty">' + esc(txt.noTags || 'No workspace has tags yet.') +
-                        ' <a href="workspaces.php">' + esc(txt.manageWorkspaces || 'Manage workspaces') + '</a></p>';
+                        ' <a href="settings.php#section=settings-workspaces-section-grid">' + esc(txt.manageWorkspaces || 'Manage workspaces') + '</a></p>';
                 }
 
                 // Workspaces: a checklist in the picker list style, with a

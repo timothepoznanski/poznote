@@ -469,7 +469,6 @@
   "settings": {
     "card_help": {
       "tenant_isolation": "SaaS 模式：选择对非管理员用户屏蔽哪些功能，例如发现实例中的其他账户或注册个人 webhook。家庭或团队实例请保持全部不勾选。",
-      "workspaces": "将笔记整理到独立的工作区，每个工作区有自己的文件夹和笔记。",
       "my_profile": "查看和编辑您的个人资料信息。",
       "change_password": "更改用于登录的密码。",
       "password_note_sso_only": "此实例已禁用密码登录。",
@@ -549,7 +548,7 @@
       "stt": "配置用于听写笔记和转录音频附件的语音识别服务器。",
       "sidebar_offline_marks": "在此浏览器中可离线使用的笔记旁显示一个小圆点。",
       "format_toolbar_mode": "在电脑上，选择在笔记中选中文本时格式按钮显示的位置：在笔记工具栏中替代笔记操作，或在所选内容上方的浮动菜单中，笔记工具栏保持不变。",
-      "workspace_activity_emails": "当其他人更改了您共享的工作区或与您共享的工作区中的笔记时，接收邮件通知。邮件会列出新建、修改和删除的笔记，但不包含笔记内容，并发送到您个人资料中的邮箱地址。",
+      "workspace_activity_emails": "当其他人更改了您共享的工作区或与您共享的工作区中的笔记时，接收邮件通知。邮件会列出新建、修改和删除的笔记，但不包含笔记内容，并发送到您个人资料中的邮箱地址。有更改时：在最后一次更改后几分钟发送。每日摘要：8:00 发送。每周摘要：每周一 8:00 发送，以您的时区为准。",
       "workspace_activity_emails_no_address": "请在个人资料中添加邮箱地址以接收这些邮件。"
     },
     "card_notes": {
@@ -563,6 +562,7 @@
     "categories": {
       "pinned": "已固定",
       "account": "我的账户",
+      "workspaces": "工作区",
       "actions": "操作",
       "admin_tools": "管理工具",
       "display": "显示",
@@ -590,8 +590,7 @@
       "language_region": "语言与地区",
       "storage": "存储",
       "layout": "布局",
-      "organization": "整理",
-      "notifications": "通知"
+      "preferences": "偏好设置"
     },
     "sections": {
       "account_display": "账户与显示",
@@ -614,7 +613,6 @@
     },
     "cards": {
       "tenant_isolation": "租户隔离",
-      "workspaces": "工作区",
       "user_management": "用户管理",
       "backup_export": "备份 / 导出",
       "restore_import": "还原 / 导入",
@@ -704,7 +702,6 @@
         "placeholder": "输入工作区名称"
       },
       "existing": {
-        "title": "现有工作区",
         "empty": "未定义工作区。"
       }
     },
@@ -724,10 +721,7 @@
       "description_1": "选择启动 Poznote 时打开的工作区。",
       "description_2": "选择 \"{{last}}\" 以始终打开您上次使用的工作区。",
       "last_opened": "上次打开的工作区（所有设备）",
-      "last_opened_device": "在此设备上上次打开的工作区",
-      "save_button": "保存",
-      "status_set_to": "✓ 启动工作区已设置为: {{workspace}}",
-      "error_saving": "保存启动工作区出错"
+      "last_opened_device": "在此设备上上次打开的工作区"
     },
     "validation": {
       "enter_name": "输入工作区名称",
@@ -760,8 +754,6 @@
     },
     "errors": {
       "already_exists": "同名工作区已存在",
-      "name_empty": "工作区名称不能为空",
-      "invalid_name": "工作区名称无效。仅限使用字母、数字、连字符和下划线（无空格）。",
       "name_required": "需要工作区名称",
       "cannot_delete_default": "无法删除启动工作区",
       "not_found": "未找到工作区",
@@ -774,8 +766,6 @@
       "no_workspace_selected": "未选择工作区"
     },
     "messages": {
-      "creating": "正在创建工作区...",
-      "created": "工作区已创建",
       "deleted_all": "工作区已删除，所有关联的笔记、文件夹和附件已被移除",
       "renamed": "笔记和标签中的工作区已重命名",
       "notes_moved_to": "笔记已移动到 {{target}}"
@@ -815,7 +805,7 @@
       "action": "标签",
       "modal_title": "工作区标签",
       "placeholder": "标签，用逗号分隔（可选，例如：学校, 心理）",
-      "help": "标签用于在仪表盘中对工作区分组：在仪表盘选择一个标签，即可查看所有带该标签的工作区。",
+      "help": "使用标签在仪表盘中对工作区分组。",
       "saved": "标签已更新",
       "save_error": "无法更新标签",
       "empty": "还没有标签。"

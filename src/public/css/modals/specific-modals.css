@@ -1219,3 +1219,19 @@
         flex: 0 1 auto;
     }
 }
+
+/* Creation dialog of a workspace (modals.php): the tags field and its hint
+   under the name. The hint belongs to the field: it sits close under it
+   (the 15px that .modal-content input leaves under a field would set it
+   apart) and keeps its distance from the buttons instead. */
+.modal-content .create-workspace-tags input {
+    margin-bottom: 0;
+}
+
+.create-workspace-tags-help {
+    display: block;
+    margin: 6px 0 22px;
+    color: var(--pz-text-muted);
+    font-size: 12px;
+    line-height: 1.4;
+}

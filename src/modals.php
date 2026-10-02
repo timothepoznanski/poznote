@@ -582,14 +582,18 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 </div>
 
 <!-- Create workspace modal, opened from the sidebar workspace menu and from
-     the create (+) menu on index.php. Creating a workspace is a single field,
-     so it does not warrant a trip to workspaces.php; that page stays the place
-     to rename, move, share and delete. -->
+     the create (+) menu on index.php: a name and, optionally, its tags
+     (js/workspaces-create.js). Settings > Workspaces is the place to rename,
+     move, share and delete. -->
 <div id="createWorkspaceModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('workspaces.sections.create.title', [], 'Create a new workspace'); ?></h3>
         <div class="form-group">
             <input id="createWorkspaceInput" type="text" autocomplete="off" placeholder="<?php echo t_h('workspaces.sections.create.placeholder', [], 'Enter workspace name'); ?>" />
+        </div>
+        <div class="form-group create-workspace-tags">
+            <input id="createWorkspaceTagsInput" type="text" autocomplete="off" placeholder="<?php echo t_h('workspaces.tags.placeholder', [], 'Tags, comma separated (optional, e.g. school, psycho)'); ?>" aria-describedby="createWorkspaceTagsHelp" />
+            <small id="createWorkspaceTagsHelp" class="create-workspace-tags-help"><?php echo t_h('workspaces.tags.help', [], 'Use tags to group workspaces on the dashboard.'); ?></small>
         </div>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="createWorkspaceModal"><?php echo t_h('common.cancel'); ?></button>
@@ -599,7 +603,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Move notes modal (for workspaces.php) -->
+<!-- Move notes modal (Settings > Workspaces, workspaces_section.php) -->
 <div id="moveNotesModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.move_notes_title', [], 'Move notes from'); ?> "<span id="moveSourceName"></span>"</h3>
@@ -615,7 +619,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Rename modal (for workspaces.php) -->
+<!-- Rename modal (Settings > Workspaces) -->
 <div id="renameModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.rename_title', [], 'Rename workspace'); ?> <span id="renameSource"></span></h3>
@@ -630,12 +634,12 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Workspace tags modal (for workspaces.php): same list as the note
+<!-- Workspace tags modal (Settings > Workspaces): same list as the note
      "Manage tags" modal (css/notes/tags.css), saved as a whole on Save -->
 <div id="workspaceTagsModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('workspaces.tags.modal_title', [], 'Workspace tags'); ?> <span id="workspaceTagsSource"></span></h3>
-        <p class="ws-tags-help"><?php echo t_h('workspaces.tags.help', [], 'Tags group workspaces on the dashboard: pick a tag there to see every workspace carrying it.'); ?></p>
+        <p class="ws-tags-help"><?php echo t_h('workspaces.tags.help', [], 'Use tags to group workspaces on the dashboard.'); ?></p>
         <div class="modal-body">
             <div id="workspaceTagsList" class="tags-modal-list"></div>
             <div class="tags-modal-input-wrapper">
@@ -649,7 +653,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Workspace color modal (for workspaces.php): one swatch per entry of the
+<!-- Workspace color modal (Settings > Workspaces): one swatch per entry of the
      note color palette (Settings > Note colors) plus a custom color. The dot
      marks the workspace's notes and folders on multi-workspace dashboard
      views (css/workspaces.css, handleWorkspaceColorButtonClick in
@@ -680,7 +684,7 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Delete confirmation modal (for workspaces.php) -->
+<!-- Delete confirmation modal (Settings > Workspaces) -->
 <div id="deleteModal" class="modal initially-hidden">
     <div class="modal-content">
         <h3><?php echo t_h('modals.workspaces.delete_title', [], 'Confirm delete workspace'); ?> "<span id="deleteWorkspaceName"></span>"</h3>

@@ -134,6 +134,7 @@ $settingsPageUserKeys = [
     'toolbar_mode',
     'timezone',
     'workspace_activity_emails',
+    'default_workspace',
     'date_time_format',
     'hidden_ui_elements',
     'icon_sidebar_order',
@@ -271,15 +272,9 @@ if ($isAdmin) {
     }
 }
 
-// Count workspaces (badge of the Workspaces card)
-$workspaces_count = 0;
-try {
-    if (isset($con)) {
-        $workspaces_count = (int)$con->query('SELECT COUNT(*) FROM workspaces')->fetchColumn();
-    }
-} catch (Exception $e) {
-    error_log('settings: cannot count workspaces: ' . $e->getMessage());
-}
+// The Workspaces section: the list and what its scripts read from <body>
+require_once __DIR__ . '/../workspaces_section.php';
+$workspacesSection = poznoteWorkspacesSectionData($con);
 
 // Count users (for admin)
 $users_count = 0;
@@ -385,7 +380,7 @@ if ($canUseUserWebhooks) {
       data-txt-not-defined="<?php echo t_h('common.not_defined'); ?>"
       data-txt-saved="<?php echo t_h('common.saved'); ?>"
       data-txt-error="<?php echo t_h('common.error'); ?>"
-    data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
+    data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"<?php echo poznoteWorkspacesSectionBodyAttributes($workspacesSection); ?>>
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
     <div class="home-container settings-with-nav settings-shell">
 
@@ -574,30 +569,6 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <?php if ($workspaceActivityEmailsAvailable): ?>
-            <div class="settings-group-title"><?php echo t_h('settings.groups.notifications', [], 'Notifications'); ?></div>
-            <div class="settings-group">
-
-                <!-- Shared workspace emails: off, as the changes happen, or a
-                     daily or weekly summary (WorkspaceActivityEmailService) -->
-                <div class="home-card settings-inline-card<?php echo $workspaceActivityEmailsNoAddress ? ' home-card-disabled' : ''; ?>" id="workspace-activity-emails-card"<?php echo $workspaceActivityEmailsNoAddress ? ' aria-disabled="true"' : ''; ?>>
-                    <span class="setting-help" data-tooltip="<?php echo $workspaceActivityEmailsNoAddress
-                        ? t_h('settings.card_help.workspace_activity_emails_no_address', [], 'Add an email address to your profile to receive these emails.')
-                        : t_h('settings.card_help.workspace_activity_emails', [], 'Receive an email when someone else changes a note in a workspace you share, or in one shared with you. It lists the notes created, edited and deleted, never their content, and is sent to the email address of your profile.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon"><i class="lucide lucide-mail"></i></div>
-                    <div class="home-card-content">
-                        <label class="home-card-title" for="workspace-activity-emails-select"><?php echo t_h('display.cards.workspace_activity_emails', [], 'Shared workspace emails'); ?></label>
-                        <select id="workspace-activity-emails-select" class="settings-inline-control settings-inline-select" data-control="workspace-activity-emails-select"<?php echo $workspaceActivityEmailsNoAddress ? ' disabled' : ''; ?>>
-                            <option value="off"><?php echo t_h('modals.workspace_activity_emails.options.off', [], 'Off'); ?></option>
-                            <option value="instant"><?php echo t_h('modals.workspace_activity_emails.options.instant', [], 'As changes happen'); ?></option>
-                            <option value="daily"><?php echo t_h('modals.workspace_activity_emails.options.daily', [], 'Daily summary'); ?></option>
-                            <option value="weekly"><?php echo t_h('modals.workspace_activity_emails.options.weekly', [], 'Weekly summary'); ?></option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <?php endif; ?>
-
             <div class="settings-group-title"><?php echo t_h('settings.groups.storage', [], 'Storage'); ?></div>
             <div class="settings-group">
                 <!-- Storage used by this account, at the bottom of the section
@@ -614,29 +585,60 @@ if ($canUseUserWebhooks) {
             </div>
         </div>
 
+        <!-- WORKSPACES CATEGORY: the list of workspaces with its actions
+             (workspaces_section.php, formerly the page workspaces.php), then
+             the settings that concern them. -->
+        <h2 class="settings-category-title" id="settings-workspaces-section-title"><?php echo t_h('settings.categories.workspaces', [], 'Workspaces'); ?></h2>
+        <div class="home-grid settings-grouped" id="<?php echo POZNOTE_SETTINGS_WORKSPACES_SECTION; ?>">
+
+            <!-- The list, with no group title of its own: it is the section -->
+            <div class="settings-group">
+<?php poznoteRenderWorkspacesList($workspacesSection); ?>
+            </div>
+
+            <div class="settings-group-title"><?php echo t_h('settings.groups.preferences', [], 'Preferences'); ?></div>
+            <div class="settings-group">
+
+                <!-- Default workspace: the one Poznote opens on -->
+                <div class="home-card settings-inline-card settings-card-stacks" id="default-workspace-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-layers"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="default-workspace-select"><?php echo t_h('workspaces.default.title', [], 'Default Workspace'); ?></label>
+                        <select id="default-workspace-select" class="settings-inline-control settings-inline-select" data-control="default-workspace-select">
+<?php poznoteRenderDefaultWorkspaceOptions($workspacesSection); ?>
+                        </select>
+                    </div>
+                </div>
+
+                <?php if ($workspaceActivityEmailsAvailable): ?>
+                <!-- Shared workspace emails: off, as the changes happen, or a
+                     daily or weekly summary (WorkspaceActivityEmailService) -->
+                <div class="home-card settings-inline-card settings-card-stacks<?php echo $workspaceActivityEmailsNoAddress ? ' home-card-disabled' : ''; ?>" id="workspace-activity-emails-card"<?php echo $workspaceActivityEmailsNoAddress ? ' aria-disabled="true"' : ''; ?>>
+                    <span class="setting-help" data-tooltip="<?php echo $workspaceActivityEmailsNoAddress
+                        ? t_h('settings.card_help.workspace_activity_emails_no_address', [], 'Add an email address to your profile to receive these emails.')
+                        : t_h('settings.card_help.workspace_activity_emails', [], 'Receive an email when someone else changes a note in a workspace you share, or in one shared with you. It lists the notes created, edited and deleted, never their content, and is sent to the email address of your profile. As changes happen: a few minutes after the last change. Daily summary: at 8:00. Weekly summary: on Monday at 8:00, in your timezone.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-mail"></i></div>
+                    <div class="home-card-content">
+                        <label class="home-card-title" for="workspace-activity-emails-select"><?php echo t_h('display.cards.workspace_activity_emails', [], 'Shared workspace emails'); ?></label>
+                        <select id="workspace-activity-emails-select" class="settings-inline-control settings-inline-select" data-control="workspace-activity-emails-select"<?php echo $workspaceActivityEmailsNoAddress ? ' disabled' : ''; ?>>
+                            <option value="off"><?php echo t_h('modals.workspace_activity_emails.options.off', [], 'Off'); ?></option>
+                            <option value="instant"><?php echo t_h('modals.workspace_activity_emails.options.instant', [], 'As changes happen'); ?></option>
+                            <option value="daily"><?php echo t_h('modals.workspace_activity_emails.options.daily', [], 'Daily summary'); ?></option>
+                            <option value="weekly"><?php echo t_h('modals.workspace_activity_emails.options.weekly', [], 'Weekly summary'); ?></option>
+                        </select>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <!-- ACTIONS CATEGORY: what leaves the notes or reaches them from
              outside (backups, sync, integrations, apps). Snapshots and
              Offline notes came from the former "Other" section: both decide
              which copies of the notes are kept, and where. -->
         <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
         <div class="home-grid settings-grouped" id="settings-actions-section-grid">
-
-            <div class="settings-group-title"><?php echo t_h('settings.groups.organization', [], 'Organization'); ?></div>
-            <div class="settings-group">
-
-                <!-- Workspaces: an <a> card like Backup / Export, so the
-                     workspace the page is scoped to follows the link -->
-                <a href="workspaces.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="workspaces-card" title="<?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?>">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.workspaces', [], 'Organize your notes into separate workspaces, each with its own folders and notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon">
-                        <i class="lucide lucide-layers"></i>
-                    </div>
-                    <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span>
-                        <span id="workspaces-count-badge" class="setting-status enabled"><?php echo (int)$workspaces_count; ?></span>
-                    </div>
-                </a>
-            </div>
 
             <div class="settings-group-title"><?php echo t_h('settings.groups.backup_sync', [], 'Backups & sync'); ?></div>
             <div class="settings-group">
@@ -1775,6 +1777,7 @@ if ($canUseUserWebhooks) {
     ?>
 
     <?php include __DIR__ . '/../modals.php'; ?>
+    <?php poznoteRenderWorkspaceInfoModal(); ?>
     <script type="application/json" id="page-config-data"><?php
         echo json_encode($settingsPageConfig, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     ?></script>
@@ -1797,6 +1800,15 @@ if ($canUseUserWebhooks) {
     <script src="<?php echo poznoteAsset('js/background-settings.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/copy-code-on-focus.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
+    <!-- The Workspaces section (workspaces_section.php): its menus, its
+         dialogs and the creation dialog -->
+    <script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-core.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-create.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-share.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-actions.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspaces-page.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/workspace-background.js'); ?>"></script>
     <script>
     // Factory palette, used by the "Reset to defaults" action in the editor.
     window.NOTE_COLOR_DEFAULT_PALETTE = <?php echo json_encode(getDefaultNoteColorPalette(), JSON_UNESCAPED_UNICODE); ?>;

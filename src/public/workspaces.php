@@ -1,4 +1,13 @@
 <?php
+/**
+ * Actions of the workspace list: delete, rename, tags, color, order, move
+ * notes, share and unshare, posted by js/workspaces-*.js and answered in
+ * JSON. Creating a workspace is POST /api/v1/workspaces.
+ *
+ * The list itself is the Workspaces section of settings.php
+ * (workspaces_section.php): this file used to be the page that displayed
+ * it, and a link to it still lands on that section.
+ */
 require_once __DIR__ . '/../auth.php';
 requireAuth();
 requireActiveAccountOwner();
@@ -6,7 +15,6 @@ requireActiveAccountOwner();
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../functions.php';
-require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/../settings_shell.php';
 requireSettingsPassword();
 
@@ -17,8 +25,6 @@ $pageWorkspace = trim(getWorkspaceFilter());
 $con->exec("CREATE TABLE IF NOT EXISTS workspaces (name TEXT PRIMARY KEY)");
 
 $message = '';
-$error = '';
-$clearSelectedWorkspace = false;
 
 // Detect AJAX/JSON request (used throughout the file)
 $isAjax = false;
@@ -28,7 +34,7 @@ if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQ
     $isAjax = true;
 }
 
-// Handle create/delete actions
+// Handle the actions of the list
 if ($_POST) {
     try {
         if (!function_exists('sanitizeWorkspaceShareAllowedUsers')) {
@@ -58,34 +64,7 @@ if ($_POST) {
             }
         }
 
-        if (isset($_POST['action']) && $_POST['action'] === 'create') {
-            $name = trim($_POST['name'] ?? '');
-            if ($name === '') throw new Exception(t('workspaces.errors.name_empty', [], 'Workspace name cannot be empty', $currentLang));
-            // validate allowed characters: letters (including accented), digits, space, hyphen, underscore
-            if (!preg_match('/^[\p{L}0-9 _-]+$/u', $name)) throw new Exception(t('workspaces.errors.invalid_name', [], 'Invalid workspace name. Letters, numbers, spaces, dash and underscore are allowed.', $currentLang));
-            $tags = poznoteParseWorkspaceTags($_POST['tags'] ?? '');
-            $stmt = $con->prepare('INSERT OR IGNORE INTO workspaces (name, tags) VALUES (?, ?)');
-            $stmt->execute([$name, poznoteSerializeWorkspaceTags($tags)]);
-
-            // OR IGNORE makes a duplicate name a silent no-op, so only log when
-            // a row was actually inserted. A new workspace starts unshared
-            // (users/db_master.php).
-            if ($stmt->rowCount() > 0) {
-                require_once __DIR__ . '/../users/db_master.php';
-                forgetStaleWorkspaceShares((int)$_SESSION['user_id'], $name);
-                require_once __DIR__ . '/../ActivityLog.php';
-                logActivity(ACTIVITY_WORKSPACE_CREATED, ['workspace' => $name]);
-            }
-
-            $message = t('workspaces.messages.created', [], 'Workspace created', $currentLang);
-            
-            // If this was an AJAX create, return JSON response immediately
-            if (!empty($isAjax)) {
-                header('Content-Type: application/json');
-                echo json_encode(['success' => true, 'message' => $message, 'name' => $name]);
-                exit;
-            }
-        } elseif (isset($_POST['action']) && $_POST['action'] === 'delete') {
+        if (isset($_POST['action']) && $_POST['action'] === 'delete') {
             $name = trim($_POST['name'] ?? '');
             if ($name === '') throw new Exception(t('workspaces.errors.name_required', [], 'Workspace name required', $currentLang));
 
@@ -294,8 +273,6 @@ if ($_POST) {
                 echo json_encode(['success' => true, 'message' => $message]);
                 exit;
             }
-            // If this was a non-AJAX delete, instruct client to clear selected workspace (so UI doesn't keep showing deleted workspace)
-            $clearSelectedWorkspace = true;
         } elseif (isset($_POST['action']) && $_POST['action'] === 'set_tags') {
             // Replace the tag list of a workspace (tags group workspaces on
             // the dashboard scope selector)
@@ -693,7 +670,6 @@ if ($_POST) {
             }
         }
     } catch (Exception $e) {
-        $error = $e->getMessage();
         if (!empty($isAjax)) {
             header('Content-Type: application/json');
             echo json_encode(['success' => false, 'error' => $e->getMessage()]);
@@ -702,316 +678,19 @@ if ($_POST) {
     }
 }
 
-// Read existing workspaces and who each one is shared with (master.db
-// workspace_shares, see users/db_master.php).
-require_once __DIR__ . '/../users/db_master.php';
-$sharedUserIdsByWorkspace = getWorkspaceShareGranteesByWorkspace((int)$_SESSION['user_id']);
-$workspaces = [];
-$workspaceRows = [];
-$stmt = $con->query('SELECT name, tags, color FROM workspaces ORDER BY ' . poznoteWorkspaceOrderBy($con));
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    $workspaceName = $row['name'];
-    $workspaceRows[] = [
-        'name' => $workspaceName,
-        'tags' => poznoteParseWorkspaceTags($row['tags'] ?? ''),
-        'color' => (string)($row['color'] ?? ''),
-        'color_hex' => ($row['color'] ?? '') !== '' ? resolveNoteColorHex((string)$row['color']) : '',
-        'shared_user_ids' => $sharedUserIdsByWorkspace[$workspaceName] ?? [],
-    ];
-    $workspaces[] = $workspaceName;
+// Anything else is a page request (an old link, a bookmark, a form posted
+// without the scripts): the list is in Settings. ?new=1 was the way to the
+// creation field, the section opens the creation dialog instead.
+$location = 'settings.php';
+$query = [];
+if ($pageWorkspace !== '' && $pageWorkspace !== '__last_opened__') {
+    $query['workspace'] = $pageWorkspace;
 }
-
-$sharedUsernamesById = [];
-try {
-    $masterUsers = getMasterConnection()->query('SELECT id, username FROM users')->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($masterUsers as $masterUser) {
-        $sharedUsernamesById[(int)$masterUser['id']] = (string)$masterUser['username'];
-    }
-} catch (Exception $e) {
-    // Sharing details remain usable even if the master user database is unavailable.
-    error_log('workspaces: cannot list usernames: ' . $e->getMessage());
+if (($_GET['new'] ?? '') === '1') {
+    $query['open'] = 'new-workspace';
 }
-
-// Count notes per workspace, excluding trashed notes.
-$workspace_counts = [];
-try {
-    $countSql = "SELECT workspace, COUNT(*) as cnt FROM entries WHERE trash = 0 AND workspace IS NOT NULL GROUP BY workspace";
-    $countStmt = $con->query($countSql);
-    while ($r = $countStmt->fetch(PDO::FETCH_ASSOC)) {
-        $workspace_counts[$r['workspace']] = (int)$r['cnt'];
-    }
-} catch (Exception $e) {
-    // If entries table does not exist or query fails, default to empty counts
-    $workspace_counts = [];
+if ($query !== []) {
+    $location .= '?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
 }
-
-$workspace_folder_counts = [];
-try {
-    $folderCountStmt = $con->query('SELECT workspace, COUNT(*) as cnt FROM folders WHERE workspace IS NOT NULL GROUP BY workspace');
-    while ($r = $folderCountStmt->fetch(PDO::FETCH_ASSOC)) {
-        $workspace_folder_counts[$r['workspace']] = (int)$r['cnt'];
-    }
-} catch (Exception $e) {
-    $workspace_folder_counts = [];
-}
-
-?>
-<!DOCTYPE html>
-<html lang="<?php echo htmlspecialchars($currentLang); ?>">
-<head>
-    <title><?php echo getPageTitle(); ?></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark light">
-    <?php 
-    // getAppVersion() reads version.txt through an absolute path. Reading it
-    // relatively broke when the entry points moved into src/public/: the file
-    // stayed one level up, so this fell back to time() and changed the asset
-    // URL on every single page load.
-    $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
-    ?>
-    <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
-    <script src="js/globals.js?v=<?php echo $cache_v; ?>"></script>
-    <?php poznoteRenderStylesheets('workspaces'); ?>
-</head>
-<body class="has-icon-sidebar" data-workspaces="<?php echo htmlspecialchars(json_encode($workspaces, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-      data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
-    data-current-user-id="<?php echo (int)($_SESSION['user_id'] ?? 0); ?>"
-      data-txt-last-opened="<?php echo htmlspecialchars(t('workspaces.default.last_opened', [], 'Last workspace opened (all devices)', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-      data-txt-last-opened-device="<?php echo htmlspecialchars(t('workspaces.default.last_opened_device', [], 'Last workspace opened on this device', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-enable-btn="<?php echo htmlspecialchars(t('workspaces.share.actions.enable', [], 'Share', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-edit-btn="<?php echo htmlspecialchars(t('workspaces.share.actions.edit', [], 'Edit share', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-disable-btn="<?php echo htmlspecialchars(t('workspaces.share.actions.disable', [], 'Unshare', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-users-loading="<?php echo htmlspecialchars(t('workspaces.share.options.users_loading', [], 'Loading users...', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-no-users="<?php echo htmlspecialchars(t('workspaces.share.options.no_users_found', [], 'No other users found', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-share-cancel="<?php echo htmlspecialchars(t('common.cancel', [], 'Cancel', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-workspace-info-not-shared="<?php echo htmlspecialchars(t('workspaces.share.status.not_shared', [], 'Not shared', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-yes="<?php echo htmlspecialchars(t('common.yes', [], 'Yes', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-no="<?php echo htmlspecialchars(t('common.no', [], 'No', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-txt-none="<?php echo htmlspecialchars(t('common.none', [], 'None', $currentLang), ENT_QUOTES, 'UTF-8'); ?>"
-    data-can-share="<?php echo poznoteCanTargetOtherUsers() ? '1' : '0'; ?>"
-      <?php if (!empty($clearSelectedWorkspace) && !$isAjax): ?>
-      data-clear-workspace="<?php echo htmlspecialchars(json_encode($workspaces[0] ?? ''), ENT_QUOTES, 'UTF-8'); ?>"
-      <?php endif; ?>>
-    <?php include __DIR__ . '/../icon_sidebar.php'; ?>
-    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('settings.cards.workspaces', [], 'Workspaces')]); ?>
-    <div class="settings-container">
-
-
-        <!-- Top alert area: used for both server-side and client-side messages -->
-        <div id="topAlert" class="<?php echo ($message || $error) ? '' : 'initially-hidden'; ?> alert-with-margin <?php echo $message ? 'alert alert-success' : ($error ? 'alert alert-danger' : ''); ?>">
-            <?php if ($message): ?>
-                <?php echo htmlspecialchars($message); ?>
-            <?php elseif ($error): ?>
-                <?php echo htmlspecialchars($error); ?>
-            <?php endif; ?>
-        </div>
-
-        <div class="settings-section">
-            <h3><?php echo t_h('workspaces.sections.create.title', [], 'Create a new workspace', $currentLang); ?></h3>
-            <form id="create-workspace-form">
-                <div class="ws-create-row">
-                    <div class="form-group">
-                        <input id="workspace-name" name="name" type="text" placeholder="<?php echo t_h('workspaces.sections.create.placeholder', [], 'Enter workspace name', $currentLang); ?>" />
-                    </div>
-                    <div class="form-group">
-                        <input id="workspace-tags" name="tags" type="text" autocomplete="off" placeholder="<?php echo t_h('workspaces.tags.placeholder', [], 'Tags, comma separated (optional, e.g. school, psycho)', $currentLang); ?>" />
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="createWorkspaceBtn"> <?php echo t_h('common.create', [], 'Create', $currentLang); ?></button>
-                </div>
-                <small class="ws-tags-help"><?php echo t_h('workspaces.tags.help', [], 'Tags group workspaces on the dashboard: pick a tag there to see every workspace carrying it.', $currentLang); ?></small>
-            </form>
-        </div>
-
-        <div class="settings-section">
-            <h3><?php echo t_h('workspaces.sections.existing.title', [], 'Existing workspaces', $currentLang); ?></h3>
-            <div class="workspace-list">
-                <?php if (empty($workspaces)): ?>
-                    <div><?php echo t_h('workspaces.sections.existing.empty', [], 'No workspaces defined.', $currentLang); ?></div>
-                <?php else: ?>
-                    <?php
-                        // Dragging only means something with another row to
-                        // drag past, so a single workspace gets no handle.
-                        $showWorkspaceOrder = count($workspaceRows) > 1;
-                        $dragHandleLabel = t_h('workspaces.order.handle', [], 'Drag to reorder', $currentLang);
-                    ?>
-                    <?php if (count($workspaceRows) > 1): ?>
-                    <!-- Filters the rows below by name and tag (js/workspaces-page.js) -->
-                    <div class="home-search-wrapper ws-filter">
-                        <i class="lucide lucide-search home-search-icon"></i>
-                        <input type="text" id="workspace-filter-input" class="home-search-input" autocomplete="off" placeholder="<?php echo t_h('workspaces.filter.placeholder', [], 'Filter by name or tag...', $currentLang); ?>" aria-label="<?php echo t_h('workspaces.filter.placeholder', [], 'Filter by name or tag...', $currentLang); ?>">
-                        <button type="button" id="workspace-filter-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search', $currentLang); ?>" title="<?php echo t_h('search.clear', [], 'Clear search', $currentLang); ?>">
-                            <i class="lucide lucide-x"></i>
-                        </button>
-                    </div>
-                    <?php endif; ?>
-                    <ul>
-                        <?php foreach ($workspaceRows as $workspaceRow): ?>
-                                <?php
-                                $ws = $workspaceRow['name'];
-                                $sharedUserIds = $workspaceRow['shared_user_ids'] ?? [];
-                                $workspaceShared = !empty($sharedUserIds);
-                                $ws_display = htmlspecialchars($ws);
-                            ?>
-                            <li class="ws-row" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>">
-                                <?php if ($showWorkspaceOrder): ?>
-                                <div class="ws-col ws-col-order">
-                                    <!-- A button rather than a plain span: the
-                                         handle is also the keyboard way in, with
-                                         the up and down arrow keys. -->
-                                    <button type="button" class="ws-drag-handle" title="<?php echo $dragHandleLabel; ?>" aria-label="<?php echo $dragHandleLabel; ?>">
-                                        <i class="lucide lucide-grip-vertical"></i>
-                                    </button>
-                                </div>
-                                <?php endif; ?>
-                                <?php
-                                    $cnt = isset($workspace_counts[$ws]) ? (int)$workspace_counts[$ws] : 0;
-                                    $folderCount = isset($workspace_folder_counts[$ws]) ? (int)$workspace_folder_counts[$ws] : 0;
-                                    $wsTags = $workspaceRow['tags'] ?? [];
-                                    $sharedWith = [];
-                                    foreach ($sharedUserIds as $sharedUserId) {
-                                        $sharedWith[] = $sharedUsernamesById[(int)$sharedUserId] ?? ('User #' . (int)$sharedUserId);
-                                    }
-                                ?>
-                                <div class="ws-col ws-col-name">
-                                    <div class="ws-name-block">
-                                        <div class="ws-name-row">
-                                            <?php if (!empty($workspaceRow['color_hex'])): ?>
-                                                <span class="ws-color-dot" style="background-color: <?php echo htmlspecialchars($workspaceRow['color_hex'], ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo t_h('workspaces.color.action', [], 'Color', $currentLang); ?>"></span>
-                                            <?php endif; ?>
-                                            <a class="workspace-name-item workspace-name-link" href="index.php?workspace=<?php echo rawurlencode($ws); ?>" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo t_h('workspaces.actions.select', [], 'Select', $currentLang); ?>"><?php echo $ws_display; ?></a>
-                                            <?php if (!empty($wsTags)): ?>
-                                                <div class="ws-tags-row">
-                                                    <?php foreach ($wsTags as $wsTag): ?>
-                                                        <span class="ws-tag-chip"><i class="lucide lucide-tag"></i><?php echo htmlspecialchars($wsTag, ENT_QUOTES, 'UTF-8'); ?></span>
-                                                    <?php endforeach; ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php
-                                    $shareLabel = $workspaceShared
-                                        ? t_h('workspaces.share.actions.edit', [], 'Edit share', $currentLang)
-                                        : t_h('workspaces.share.actions.enable', [], 'Share', $currentLang);
-                                    $renameLabel = t_h('common.rename', [], 'Rename', $currentLang);
-                                    $tagsLabel = t_h('workspaces.tags.action', [], 'Tags', $currentLang);
-                                    $colorLabel = t_h('workspaces.color.action', [], 'Color', $currentLang);
-                                    $backgroundLabel = t_h('workspaces.actions.background', [], 'Background', $currentLang);
-                                    $moveLabel = t_h('workspaces.actions.move_notes', [], 'Move notes', $currentLang);
-                                    $deleteLabel = t_h('common.delete', [], 'Delete', $currentLang);
-                                    $infoLabel = t_h('common.information', [], 'Information');
-                                    $actionsMenuLabel = t_h('workspaces.actions.menu', [], 'Workspace actions', $currentLang);
-                                ?>
-                                <div class="ws-col ws-col-actions">
-                                    <div class="ws-icon-actions">
-                                        <?php if (poznoteCanTargetOtherUsers()): ?>
-                                        <button type="button"
-                                                class="ws-icon-btn btn-share-toggle<?php echo $workspaceShared ? ' is-shared' : ''; ?>"
-                                                data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"
-                                                data-shared="<?php echo $workspaceShared ? '1' : '0'; ?>"
-                                                data-allowed-users="<?php echo htmlspecialchars(json_encode(array_values($sharedUserIds), JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-shared-with="<?php echo htmlspecialchars(json_encode($sharedWith, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-                                                title="<?php echo $shareLabel; ?>" aria-label="<?php echo $shareLabel; ?>">
-                                            <i class="lucide lucide-share-2"></i><span class="ws-icon-btn-text"><?php echo $shareLabel; ?></span>
-                                        </button>
-                                        <?php endif; ?>
-                                    </div>
-                                    <!-- Every other action sits behind the "..." button, as labelled
-                                         rows (js/workspaces-page.js opens and closes it). -->
-                                    <button type="button" class="ws-actions-toggle" aria-haspopup="true" aria-expanded="false" title="<?php echo $actionsMenuLabel; ?>" aria-label="<?php echo $actionsMenuLabel; ?>">
-                                        <i class="lucide lucide-more-horizontal"></i>
-                                    </button>
-                                    <div class="ws-actions-menu">
-                                        <button type="button" class="ws-icon-btn workspace-rename-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $renameLabel; ?>" aria-label="<?php echo $renameLabel; ?>">
-                                            <i class="lucide lucide-pencil"></i><span class="ws-icon-btn-text"><?php echo $renameLabel; ?></span>
-                                        </button>
-                                        <button type="button" class="ws-icon-btn workspace-tags-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-tags="<?php echo htmlspecialchars(implode(', ', $workspaceRow['tags'] ?? []), ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $tagsLabel; ?>" aria-label="<?php echo $tagsLabel; ?>">
-                                            <i class="lucide lucide-tag"></i><span class="ws-icon-btn-text"><?php echo $tagsLabel; ?></span>
-                                        </button>
-                                        <button type="button" class="ws-icon-btn workspace-color-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" data-color="<?php echo htmlspecialchars($workspaceRow['color'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $colorLabel; ?>" aria-label="<?php echo $colorLabel; ?>">
-                                            <i class="lucide lucide-palette"></i><span class="ws-icon-btn-text"><?php echo $colorLabel; ?></span>
-                                        </button>
-                                        <button type="button" class="ws-icon-btn workspace-background-action" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $backgroundLabel; ?>" aria-label="<?php echo $backgroundLabel; ?>">
-                                            <i class="lucide lucide-image"></i><span class="ws-icon-btn-text"><?php echo $backgroundLabel; ?></span>
-                                        </button>
-                                        <button type="button" class="ws-icon-btn btn-move" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $moveLabel; ?>" aria-label="<?php echo $moveLabel; ?>" <?php echo ($cnt === 0 || count($workspaces) <= 1) ? 'disabled' : ''; ?>>
-                                            <i class="lucide lucide-folder-output"></i><span class="ws-icon-btn-text"><?php echo $moveLabel; ?></span>
-                                        </button>
-                                        <button type="button" class="ws-icon-btn workspace-info-action"
-                                                data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>"
-                                                data-notes-count="<?php echo $cnt; ?>"
-                                                data-folders-count="<?php echo $folderCount; ?>"
-                                                data-tags="<?php echo htmlspecialchars(json_encode($wsTags, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-                                                data-shared="<?php echo $workspaceShared ? '1' : '0'; ?>"
-                                                data-shared-with="<?php echo htmlspecialchars(json_encode($sharedWith, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP), ENT_QUOTES, 'UTF-8'); ?>"
-                                                title="<?php echo $infoLabel; ?>" aria-label="<?php echo $infoLabel; ?>">
-                                            <i class="lucide lucide-info"></i><span class="ws-icon-btn-text"><?php echo $infoLabel; ?></span>
-                                        </button>
-                                        <?php if (count($workspaces) > 1): ?>
-                                            <button type="button" class="ws-icon-btn ws-icon-btn-danger btn-delete" data-ws="<?php echo htmlspecialchars($ws, ENT_QUOTES); ?>" title="<?php echo $deleteLabel; ?>" aria-label="<?php echo $deleteLabel; ?>">
-                                                <i class="lucide lucide-trash-2"></i><span class="ws-icon-btn-text"><?php echo $deleteLabel; ?></span>
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                    <p class="ws-filter-empty" id="workspace-filter-empty" hidden><?php echo t_h('workspaces.filter.no_results', [], 'No workspace matches this filter.', $currentLang); ?></p>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- Default Workspace Setting -->
-        <div class="settings-section">
-            <h3><?php echo t_h('workspaces.default.title', [], 'Default Workspace', $currentLang); ?></h3>
-            <p>
-                <?php echo t_h('workspaces.default.description_1', [], 'Choose which workspace opens when you start Poznote.', $currentLang); ?>
-            </p>
-            <div class="default-workspace-row">
-                <select id="defaultWorkspaceSelect" class="default-workspace-select">
-                    <option value=""><?php echo t_h('common.loading', [], 'Loading...', $currentLang); ?></option>
-                </select>
-                <button type="button" class="btn btn-primary" id="saveDefaultWorkspaceBtn"> <?php echo t_h('workspaces.default.save_button', [], 'Save Default', $currentLang); ?></button>
-            </div>
-            <div id="defaultWorkspaceStatus" class="default-workspace-status"></div>
-        </div>
-
-    <div id="ajaxAlert" class="initially-hidden alert-with-margin"></div>
-    <div class="section-bottom-spacer"></div>
-    </div>
-    <?php poznoteSettingsShellClose(); ?>
-
-    <div id="workspaceInfoModal" class="modal initially-hidden">
-        <div class="modal-content workspace-info-modal-content">
-            <h3><i class="lucide lucide-info"></i> <span id="workspaceInfoTitle"></span></h3>
-            <dl class="workspace-info-list">
-                <div><dt><?php echo t_h('workspaces.info.notes', [], 'Notes'); ?></dt><dd id="workspaceInfoNotes"></dd></div>
-                <div><dt><?php echo t_h('workspaces.info.folders', [], 'Folders'); ?></dt><dd id="workspaceInfoFolders"></dd></div>
-                <div><dt><?php echo t_h('workspaces.info.tags', [], 'Tags'); ?></dt><dd id="workspaceInfoTags"></dd></div>
-                <div><dt><?php echo t_h('workspaces.info.shared', [], 'Shared'); ?></dt><dd id="workspaceInfoShared"></dd></div>
-                <div><dt><?php echo t_h('workspaces.info.shared_with', [], 'Shared with'); ?></dt><dd id="workspaceInfoSharedWith"></dd></div>
-            </dl>
-            <div class="modal-buttons">
-                <button type="button" class="btn-cancel" data-action="close-workspace-info-modal"><?php echo t_h('common.close', [], 'Close'); ?></button>
-            </div>
-        </div>
-    </div>
-
-    <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
-    <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
-    <script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
-    <script src="js/workspaces-core.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-core.js') ?: time(); ?>"></script>
-    <script src="js/workspaces-create.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-create.js') ?: time(); ?>"></script>
-    <script src="js/workspaces-share.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-share.js') ?: time(); ?>"></script>
-    <script src="js/workspaces-actions.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-actions.js') ?: time(); ?>"></script>
-    <script src="js/workspaces-page.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/workspaces-page.js') ?: time(); ?>"></script>
-    <script src="<?php echo poznoteAsset('js/workspace-background.js'); ?>"></script>
-    <script src="<?php echo poznoteAsset('js/modals-events.js'); ?>"></script>
-    
-    <?php include __DIR__ . '/../modals.php'; ?>
-    
-    <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
-</body>
-</html>
+header('Location: ' . $location . '#section=' . POZNOTE_SETTINGS_WORKSPACES_SECTION, true, 303);
+exit;

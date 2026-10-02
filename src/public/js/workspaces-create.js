@@ -4,9 +4,10 @@
 // and name-validation utilities the other workspace modules use.
 
 // ========== CREATE WORKSPACE MODAL ==========
-// A workspace is just a name, so it is created in place rather than by sending
-// the user to workspaces.php. That page is still the fallback on any page that
-// does not include modals.php.
+// A workspace is a name and, optionally, tags: it is created in place, from
+// the workspace menu and the create (+) menu. A page that does not include
+// modals.php falls back to Settings > Workspaces, which opens the dialog on
+// arrival (workspaces.php?new=1 redirects there).
 
 function showCreateWorkspaceError(message) {
     var box = document.getElementById('createWorkspaceError');
@@ -24,19 +25,24 @@ function openCreateWorkspaceModal() {
         return;
     }
 
+    var tagsInput = document.getElementById('createWorkspaceTagsInput');
+
     input.value = '';
+    if (tagsInput) tagsInput.value = '';
     confirmBtn.disabled = false;
     showCreateWorkspaceError('');
     modal.style.display = 'flex';
     input.focus();
 
     confirmBtn.onclick = submitCreateWorkspaceModal;
-    input.onkeydown = function (event) {
+    var submitOnEnter = function (event) {
         if (event.key === 'Enter') {
             event.preventDefault();
             submitCreateWorkspaceModal();
         }
     };
+    input.onkeydown = submitOnEnter;
+    if (tagsInput) tagsInput.onkeydown = submitOnEnter;
 }
 
 function submitCreateWorkspaceModal() {
@@ -61,11 +67,19 @@ function submitCreateWorkspaceModal() {
     showCreateWorkspaceError('');
     if (confirmBtn) confirmBtn.disabled = true;
 
+    // Tags are optional, typed as a comma-separated list: the API takes the
+    // string as it is and drops the empty and repeated ones
+    var tagsInput = document.getElementById('createWorkspaceTagsInput');
+    var payload = { name: name };
+    if (tagsInput && tagsInput.value.trim() !== '') {
+        payload.tags = tagsInput.value.trim();
+    }
+
     fetch('/api/v1/workspaces', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         credentials: 'same-origin',
-        body: JSON.stringify({ name: name })
+        body: JSON.stringify(payload)
     })
         .then(function (response) {
             return response.json().catch(function () { return {}; }).then(function (data) {
@@ -86,7 +100,11 @@ function submitCreateWorkspaceModal() {
                 // works where the note sidebar is rendered (index.php); the
                 // create menu also lives on pages without it.
                 var created = result.data.name || name;
-                if (document.getElementById('left_col')) {
+                if (document.getElementById('settings-workspaces-list')) {
+                    // Created on Settings > Workspaces (the fallback
+                    // above): stay there, the new row is the confirmation
+                    window.location.reload();
+                } else if (document.getElementById('left_col')) {
                     switchToWorkspace(created);
                 } else {
                     window.location.href = 'index.php?workspace=' + encodeURIComponent(created);

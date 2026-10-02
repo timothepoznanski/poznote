@@ -441,6 +441,10 @@ function poznoteCssManifest(): array
             'css/home/dark-mode.css',
             'css/home/responsive.css',
             'css/settings.css',
+            // The Workspaces section: the list and its dialogs
+            // (workspaces_section.php), the tag rows of its tags dialog
+            'css/workspaces-list.css',
+            'css/notes/tags.css',
             '@modals',
             'css/modals/ui-customization.css',
             'css/ui-customization-panel.css',
@@ -532,24 +536,6 @@ function poznoteCssManifest(): array
             '@components',
             'css/welcome.css',
             '@theme',
-        ],
-        'workspaces' => [
-            'css/lucide.css',
-            '@components',
-            'css/workspaces.css',
-            'css/modals/base.css',
-            'css/notes/tags.css',
-            'css/modals/specific-modals.css',
-            'css/modals/attachments.css',
-            'css/modals/share-modal.css',
-            'css/modals/alerts-utilities.css',
-            'css/modals/responsive.css',
-            'css/background-image.css',
-            'css/modal-alerts.css',
-            '@settings-shell',
-            '@theme',
-            'css/workspaces-inline.css',
-            '@icon-sidebar',
         ],
     ];
 }
