@@ -180,6 +180,90 @@ function getTasklistSubtasks($task): array {
 }
 
 /**
+ * A subtask or task id the way it appears in the stored JSON. Ids are JS
+ * floats such as 1786657214842.3545, which a plain string cast would round
+ * through the `precision` setting.
+ *
+ * @param mixed $id Stored id.
+ */
+function tasklistIdToString($id): string {
+    if (is_float($id)) {
+        return (string) json_encode($id);
+    }
+    return is_scalar($id) ? (string) $id : '';
+}
+
+/**
+ * Give every stored subtask of a task a numeric id that is unique in the task,
+ * the way normalizeSubtasks() does in js/tasklist-subtasks.js. For the write
+ * paths that address a subtask by id: a list written whole through the notes
+ * endpoint may carry none. Ids already usable are left as stored, entries
+ * that are not objects are dropped as normalizeTasklistSubtasks() does.
+ *
+ * @param array<int|string, mixed> $subtasks Stored `subtasks` array.
+ * @return array<int, array<string, mixed>>
+ */
+function ensureTasklistSubtaskIds(array $subtasks): array {
+    $subtasks = array_values(array_filter($subtasks, 'is_array'));
+
+    $seen = [];
+    foreach ($subtasks as $subtask) {
+        if (isset($subtask['id']) && is_numeric($subtask['id'])) {
+            $seen[tasklistIdToString($subtask['id'])] = true;
+        }
+    }
+
+    $kept = [];
+    foreach ($subtasks as $key => $subtask) {
+        $id = $subtask['id'] ?? null;
+        $idKey = is_numeric($id) ? tasklistIdToString($id) : '';
+        if ($idKey === '' || isset($kept[$idKey])) {
+            $subtasks[$key]['id'] = generateTasklistSubtaskId($seen);
+            $idKey = tasklistIdToString($subtasks[$key]['id']);
+            $seen[$idKey] = true;
+        }
+        $kept[$idKey] = true;
+    }
+
+    return $subtasks;
+}
+
+/**
+ * A subtask id in the frontend's format (float timestamp) that is not a key
+ * of $taken.
+ *
+ * @param array<string, bool> $taken Ids in use, as tasklistIdToString() renders them.
+ * @return float
+ */
+function generateTasklistSubtaskId(array $taken) {
+    do {
+        $candidate = round(microtime(true) * 1000) + (mt_rand(1, 999999) / 1000000);
+    } while (isset($taken[tasklistIdToString($candidate)]));
+
+    return $candidate;
+}
+
+/**
+ * Position, in the stored `subtasks` array of a task, of the subtask whose id
+ * is $subtaskId, compared as strings so 1.5 and "1.5" match. Null when none.
+ *
+ * @param array<int|string, mixed> $subtasks Stored `subtasks` array.
+ * @return int|string|null
+ */
+function findTasklistSubtaskKey(array $subtasks, string $subtaskId) {
+    $needle = trim($subtaskId);
+    if ($needle === '') {
+        return null;
+    }
+    foreach ($subtasks as $key => $subtask) {
+        if (is_array($subtask) && isset($subtask['id']) && tasklistIdToString($subtask['id']) === $needle) {
+            return $key;
+        }
+    }
+    return null;
+}
+
+/**
  * Position, in the stored `subtasks` array of a task, of the subtask that
  * getTasklistSubtasks() lists at $displayIndex: what a page that rendered the
  * list sends back to designate one of them. Null when there is none.

@@ -41,6 +41,19 @@ def _fake_client():
     client.add_task.return_value = {"id": 2.5, "text": "Buy bread", "completed": False}
     client.update_task.return_value = {"id": 1.5, "text": "Buy milk", "completed": True}
     client.delete_task.return_value = True
+    client.add_subtask.return_value = {
+        "note_id": 100,
+        "task_id": "1.5",
+        "subtask": {"id": 3.5, "text": "Oat", "completed": False},
+        "subtasks": [{"id": 3.5, "text": "Oat", "completed": False}],
+    }
+    client.update_subtask.return_value = {
+        "note_id": 100,
+        "task_id": "1.5",
+        "subtask": {"id": 3.5, "text": "Oat", "completed": True},
+        "subtasks": [{"id": 3.5, "text": "Oat", "completed": True}],
+    }
+    client.delete_subtask.return_value = {"note_id": 100, "task_id": "1.5", "subtask_id": "3.5", "subtasks": []}
     return client
 
 
@@ -333,3 +346,89 @@ class TestTaskTools:
         result = json.loads(delete_task(note_id=100, task_id="1.5"))
 
         assert result["success"] is True
+
+    def test_add_subtask(self, client):
+        from poznote_mcp.server import add_subtask
+
+        result = json.loads(add_subtask(note_id=100, task_id=1.5, text="  Oat  "))
+
+        _, kwargs = client.add_subtask.call_args
+        assert kwargs["note_id"] == 100
+        assert kwargs["task_id"] == "1.5"
+        assert kwargs["text"] == "Oat"
+        assert kwargs["completed"] is None
+        assert result["success"] is True
+        assert result["subtask"]["id"] == 3.5
+        assert result["subtasks"] == [{"id": 3.5, "text": "Oat", "completed": False}]
+
+    def test_add_subtask_requires_text(self, client):
+        from poznote_mcp.server import add_subtask
+
+        result = json.loads(add_subtask(note_id=100, task_id="1.5", text="   "))
+
+        assert "error" in result
+        client.add_subtask.assert_not_called()
+
+    def test_add_subtask_missing_task(self, client):
+        from poznote_mcp.server import add_subtask
+
+        client.add_subtask.return_value = None
+        result = json.loads(add_subtask(note_id=100, task_id="9.9", text="x"))
+
+        assert "error" in result
+
+    def test_update_subtask_sends_only_given_fields(self, client):
+        from poznote_mcp.server import update_subtask
+
+        result = json.loads(update_subtask(note_id=100, task_id=1.5, subtask_id=3.5, completed=True))
+
+        args, _ = client.update_subtask.call_args
+        assert args[0] == 100
+        assert args[1] == "1.5"
+        assert args[2] == "3.5"
+        assert args[3] == {"completed": True}
+        assert result["subtask"]["completed"] is True
+
+    def test_update_subtask_can_untick(self, client):
+        """False is a value to send, not an argument left out."""
+        from poznote_mcp.server import update_subtask
+
+        update_subtask(note_id=100, task_id="1.5", subtask_id="3.5", completed=False)
+
+        args, _ = client.update_subtask.call_args
+        assert args[3] == {"completed": False}
+
+    def test_update_subtask_rejects_empty_change(self, client):
+        from poznote_mcp.server import update_subtask
+
+        result = json.loads(update_subtask(note_id=100, task_id="1.5", subtask_id="3.5"))
+
+        assert "error" in result
+        client.update_subtask.assert_not_called()
+
+    def test_update_subtask_missing_subtask(self, client):
+        from poznote_mcp.server import update_subtask
+
+        client.update_subtask.return_value = None
+        result = json.loads(update_subtask(note_id=100, task_id="1.5", subtask_id="9.9", text="x"))
+
+        assert "error" in result
+
+    def test_delete_subtask(self, client):
+        from poznote_mcp.server import delete_subtask
+
+        result = json.loads(delete_subtask(note_id=100, task_id="1.5", subtask_id=3.5))
+
+        args, _ = client.delete_subtask.call_args
+        assert args[1] == "1.5"
+        assert args[2] == "3.5"
+        assert result["success"] is True
+        assert result["subtasks"] == []
+
+    def test_delete_subtask_missing_subtask(self, client):
+        from poznote_mcp.server import delete_subtask
+
+        client.delete_subtask.return_value = None
+        result = json.loads(delete_subtask(note_id=100, task_id="1.5", subtask_id="9.9"))
+
+        assert "error" in result

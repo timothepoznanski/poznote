@@ -1003,6 +1003,74 @@ class PoznoteClient:
         response.raise_for_status()
         return response.json().get("success", False)
 
+    def add_subtask(
+        self,
+        note_id: int,
+        task_id: str,
+        text: str,
+        completed: bool | None = None,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Append a subtask to one task of a tasklist note"""
+        payload: dict = {"text": text}
+        if completed is not None:
+            payload["completed"] = completed
+
+        response = self.client.post(
+            f"/notes/{note_id}/tasks/{task_id}/subtasks",
+            json=payload,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
+    def update_subtask(
+        self,
+        note_id: int,
+        task_id: str,
+        subtask_id: str,
+        fields: dict,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Rename, tick or untick one subtask"""
+        response = self.client.patch(
+            f"/notes/{note_id}/tasks/{task_id}/subtasks/{subtask_id}",
+            json=fields,
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
+    def delete_subtask(
+        self,
+        note_id: int,
+        task_id: str,
+        subtask_id: str,
+        user_id: str | int | None = None,
+    ) -> dict | None:
+        """Delete one subtask"""
+        response = self.client.delete(
+            f"/notes/{note_id}/tasks/{task_id}/subtasks/{subtask_id}",
+            headers=self._headers_for_user(user_id),
+        )
+        if response.status_code == 404:
+            return None
+        response.raise_for_status()
+        data = response.json()
+        if data.get("success"):
+            return data
+        return None
+
     def list_all_tasks(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
         """Aggregate the tasks of every tasklist note, plus in-note checklists.
 

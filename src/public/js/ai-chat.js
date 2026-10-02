@@ -298,6 +298,15 @@
         } else if (name === 'delete_task') {
             label = t('ai_chat.tool_task_delete', {}, 'Removing task "{{task}}"')
                 .replace('{{task}}', args.task || '?');
+        } else if (name === 'add_subtask') {
+            label = t('ai_chat.tool_subtask_add', {}, 'Adding subtask: {{text}}')
+                .replace('{{text}}', args.text || '');
+        } else if (name === 'update_subtask') {
+            label = t('ai_chat.tool_subtask_update', {}, 'Updating subtask "{{subtask}}"')
+                .replace('{{subtask}}', args.subtask || '?');
+        } else if (name === 'delete_subtask') {
+            label = t('ai_chat.tool_subtask_delete', {}, 'Removing subtask "{{subtask}}"')
+                .replace('{{subtask}}', args.subtask || '?');
         } else if (name === 'set_checklist_item') {
             label = t('ai_chat.tool_checklist', {}, 'Updating a checkbox of note #{{id}}')
                 .replace('{{id}}', args.note_id || '?');
@@ -324,6 +333,9 @@
             add_task: 'lucide-plus-circle',
             update_task: 'lucide-check-square',
             delete_task: 'lucide-x-circle',
+            add_subtask: 'lucide-plus-circle',
+            update_subtask: 'lucide-check-square',
+            delete_subtask: 'lucide-x-circle',
             set_checklist_item: 'lucide-check-square'
         };
         var div = document.createElement('div');

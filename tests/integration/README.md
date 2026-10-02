@@ -18,7 +18,7 @@ with one of everything the API can address by id, each carrying a marker string
 unique to the run:
 
 > note, second note, tasklist note, trashed note, folder, sibling folder,
-> workspace, tag, task, attachment, snapshot, reminder, note share, folder
+> workspace, tag, task, subtask, attachment, snapshot, reminder, note share, folder
 > share, backup archive, a written setting
 
 The *stranger* then sends every route in the router with the owner's

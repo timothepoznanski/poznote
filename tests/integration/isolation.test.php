@@ -102,6 +102,9 @@ function routeTable(): array
         'POST /notes/{id}/tasks' => [OWNED, 'target' => ['id' => 'tasklist_note'], 'body' => ['text' => 'planted task']],
         'PATCH /notes/{id}/tasks/{taskId}' => [OWNED, 'target' => ['id' => 'tasklist_note'], 'body' => ['completed' => true]],
         'DELETE /notes/{id}/tasks/{taskId}' => [OWNED, 'target' => ['id' => 'tasklist_note']],
+        'POST /notes/{id}/tasks/{taskId}/subtasks' => [OWNED, 'target' => ['id' => 'tasklist_note'], 'body' => ['text' => 'planted subtask']],
+        'PATCH /notes/{id}/tasks/{taskId}/subtasks/{subtaskId}' => [OWNED, 'target' => ['id' => 'tasklist_note'], 'body' => ['completed' => true]],
+        'DELETE /notes/{id}/tasks/{taskId}/subtasks/{subtaskId}' => [OWNED, 'target' => ['id' => 'tasklist_note']],
 
         // --- Snapshots ---------------------------------------------------
         'POST /notes/{id}/snapshot' => [OWNED, 'query' => ['manual' => 1], 'body' => []],
@@ -276,6 +279,7 @@ function placeholderDefaults(): array
     return [
         '{noteId}' => 'note',
         '{taskId}' => 'task',
+        '{subtaskId}' => 'subtask',
         '{attachmentId}' => 'attachment',
         '{filename}' => 'backup',
         '{name}' => 'workspace',

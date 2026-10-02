@@ -382,6 +382,9 @@ Der Poznote MCP-Server stellt die folgenden Tools bereit:
 - `update_task`: Eine Aufgabe aktualisieren (Text, Fälligkeitsdatum, Erinnerung, Markierung als wichtig)
 - `complete_task`: Eine Aufgabe als erledigt markieren oder wieder öffnen
 - `delete_task`: Eine Aufgabe aus einer Aufgabenlisten-Notiz löschen
+- `add_subtask`: Eine Unteraufgabe zu einer Aufgabe einer Aufgabenlisten-Notiz hinzufügen
+- `update_subtask`: Eine Unteraufgabe umbenennen oder als erledigt oder offen markieren
+- `delete_subtask`: Eine Unteraufgabe einer Aufgabe löschen
 
 ### Organisation
 - `create_folder`: Einen neuen Ordner erstellen

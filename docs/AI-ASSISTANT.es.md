@@ -28,7 +28,7 @@ Cuando se lo pides explícitamente, también puede actuar sobre tus notas:
 - **escribir**: crear una nota, renombrarla o reescribir su contenido;
 - **organizar**: añadir o quitar etiquetas, listar, crear y renombrar carpetas, mover notas entre ellas, marcar notas y carpetas como favoritas;
 - **fechas**: poner o quitar un recordatorio en una nota (único o periódico); el asistente conoce la fecha y la hora actuales en tu zona horaria, así que "recuérdamelo el próximo lunes a las 9" funciona;
-- **tareas**: añadir, marcar, desmarcar, renombrar o eliminar las tareas de una nota de lista de tareas, incluidas sus fechas de vencimiento y recordatorios, y marcar o desmarcar una casilla dentro de una nota normal, sin reescribir el resto;
+- **tareas**: añadir, marcar, desmarcar, renombrar o eliminar las tareas de una nota de lista de tareas y sus subtareas, incluidas las fechas de vencimiento y los recordatorios de las tareas, y marcar o desmarcar una casilla dentro de una nota normal, sin reescribir el resto;
 - **eliminar**: mover a la papelera una nota, o una carpeta con sus subcarpetas y todas sus notas. Todo se puede restaurar desde la página Papelera: el asistente no tiene forma de eliminar nada definitivamente, ni ninguna herramienta para vaciar la papelera.
 
 La nota que tienes abierta forma parte del contexto: di "mejora el formato de esta nota" o "añade una conclusión aquí" y el asistente trabaja sobre ella, sin necesidad de indicar un id ni un título. Lee la última versión guardada por el editor, y "esta nota" te sigue si abres otra nota durante la conversación. Si nombras otra nota en tu pregunta, esa sigue teniendo prioridad. En el Panel no hay ninguna nota abierta, así que ahí debes nombrar la nota a la que te refieres.

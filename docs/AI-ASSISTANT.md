@@ -28,7 +28,7 @@ When you explicitly ask for it, it can also act on your notes:
 - **write**: create a note, rename one, or rewrite its content;
 - **organize**: add or remove tags, list, create and rename folders, move notes between them, mark notes and folders as favorites;
 - **dates**: set or remove a reminder on a note (one-time or repeating), with the current date and time in your timezone known to the assistant, so "remind me next Monday at 9" works;
-- **tasks**: add, check, uncheck, rename or remove the tasks of a task list note, including their due dates and reminders, and check or uncheck a checkbox inside a regular note, without rewriting the rest of it;
+- **tasks**: add, check, uncheck, rename or remove the tasks of a task list note and their subtasks, including the due dates and reminders of the tasks, and check or uncheck a checkbox inside a regular note, without rewriting the rest of it;
 - **delete**: move a note to the trash, or a folder with its subfolders and all their notes. Everything can be restored from the Trash page: the assistant has no way to delete anything for good, and no tool to empty the trash.
 
 The note you have open is part of the context: say "improve the formatting of this note" or "add a conclusion here" and the assistant works on it, no id or title needed. It reads the version last saved by the editor, and "this note" follows you if you open another note during the conversation. Naming another note in your question still takes precedence. On the dashboard no note is open, so name the note you mean there.

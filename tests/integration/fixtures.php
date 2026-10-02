@@ -118,6 +118,11 @@ final class Fixtures
         // against json_encode's shortest round-trip form, so re-encode it.
         $rawTaskId = $task->json['task']['id'] ?? '';
         $taskId = is_float($rawTaskId) ? json_encode($rawTaskId) : (string)$rawTaskId;
+        $subtask = $this->expect($api->post("/notes/$tasklistId/tasks/" . rawurlencode($taskId) . '/subtasks', [
+            'json' => ['text' => 'subtask-' . $marker],
+        ]), [200, 201], 'create subtask');
+        $rawSubtaskId = $subtask->json['subtask']['id'] ?? '';
+        $subtaskId = is_float($rawSubtaskId) ? json_encode($rawSubtaskId) : (string)$rawSubtaskId;
 
         $attachment = $this->expect($api->request('POST', "/notes/$noteId/attachments", [
             'upload' => ['name' => "att-$marker.txt", 'type' => 'text/plain', 'content' => "attached $marker"],
@@ -182,6 +187,7 @@ final class Fixtures
             'workspace' => $workspace,
             'tag' => 'tag' . strtolower($marker),
             'task' => $taskId,
+            'subtask' => $subtaskId,
             'attachment' => $attachmentId,
             'reminder' => $reminderId,
             'trashed_note' => $trashedId,

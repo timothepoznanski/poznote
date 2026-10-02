@@ -83,3 +83,37 @@ test('the static subtask markup escapes labels and stays invisible to the HTML i
 
     assertSame('', renderTasklistSubtasksHtml(['id' => 2, 'text' => 'none']));
 });
+
+test('a subtask id is found as the client holds it, float digits included', function () {
+    $subtasks = [
+        ['id' => 1786657214842.3545, 'text' => 'float'],
+        ['id' => '12', 'text' => 'string'],
+        ['text' => 'no id'],
+    ];
+
+    assertSame(0, findTasklistSubtaskKey($subtasks, '1786657214842.3545'));
+    assertSame(1, findTasklistSubtaskKey($subtasks, ' 12 '));
+    assertSame(null, findTasklistSubtaskKey($subtasks, '1786657214842.4'), 'a rounded id matches nothing');
+    assertSame(null, findTasklistSubtaskKey($subtasks, ''));
+});
+
+test('subtasks written without a usable id get one, the others keep theirs', function () {
+    $out = ensureTasklistSubtaskIds([
+        ['id' => 11, 'text' => 'kept'],
+        ['text' => 'no id'],
+        ['id' => 11, 'text' => 'duplicate'],
+        ['id' => 'abc', 'text' => 'not a number'],
+        'not a subtask',
+    ]);
+
+    assertSame(4, count($out), 'what is not an object is dropped');
+    assertSame(11, $out[0]['id']);
+
+    $ids = [];
+    foreach ($out as $subtask) {
+        assertTrue(is_int($subtask['id']) || is_float($subtask['id']));
+        $ids[tasklistIdToString($subtask['id'])] = true;
+    }
+    assertSame(4, count($ids), 'ids are unique in the task');
+    assertSame('duplicate', $out[2]['text']);
+});

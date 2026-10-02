@@ -393,17 +393,47 @@ components:
           description: >
             Subtasks of the task, one level deep. Only present when the task
             has some. The per-task endpoints return them and keep them on
-            every write; to add, rename or remove one, send the full array
-            of the note through PATCH /notes/{id}.
+            every write; the subtask endpoints add, rename, tick or remove
+            one at a time.
           items:
-            type: object
-            properties:
-              id:
-                type: number
-              text:
-                type: string
-              completed:
-                type: boolean
+            $ref: '#/components/schemas/Subtask'
+
+    Subtask:
+      type: object
+      description: >
+        One checkable item under a task. It has no due date, reminder or
+        important flag, and ticking it does not complete its task.
+      properties:
+        id:
+          type: number
+          description: >
+            Unique inside the task. Null on a subtask that was written
+            through PATCH /notes/{id} without one; it gets an id the next
+            time a subtask endpoint writes to its task.
+          nullable: true
+          example: 1754820000456.78
+        text:
+          type: string
+        completed:
+          type: boolean
+
+    SubtaskWriteResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        note_id:
+          type: integer
+        task_id:
+          type: string
+        subtask:
+          $ref: '#/components/schemas/Subtask'
+        subtasks:
+          type: array
+          description: Every subtask of the task after the write.
+          items:
+            $ref: '#/components/schemas/Subtask'
 
     Error:
       type: object
@@ -2155,6 +2185,195 @@ paths:
                     type: string
         '404':
           description: Note or task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notes/{id}/tasks/{taskId}/subtasks:
+    post:
+      tags: [Tasks]
+      summary: Add a subtask to a task
+      description: >
+        Appends one subtask to a task. Subtasks go one level deep and carry a
+        text and a completion flag only.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          description: Task id as it appears in the note content, e.g. "1754820000123.45".
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+                completed:
+                  type: boolean
+                  description: Whether the subtask starts out done.
+      responses:
+        '200':
+          description: The created subtask and the subtasks of the task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubtaskWriteResult'
+        '400':
+          description: Missing text, invalid body, or not a task list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Storage quota exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note or task not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '423':
+          description: The note is being edited by someone else
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /notes/{id}/tasks/{taskId}/subtasks/{subtaskId}:
+    patch:
+      tags: [Tasks]
+      summary: Update one subtask
+      description: >
+        Renames a subtask, ticks or unticks it; only the provided fields
+        change. The completion of its task is never touched.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          description: Task id as it appears in the note content, e.g. "1754820000123.45".
+          schema:
+            type: string
+        - name: subtaskId
+          in: path
+          required: true
+          description: Subtask id as the task's subtasks array gives it, e.g. "1754820000456.78".
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: At least one of the two fields is required.
+              properties:
+                text:
+                  type: string
+                completed:
+                  type: boolean
+      responses:
+        '200':
+          description: The updated subtask and the subtasks of the task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubtaskWriteResult'
+        '400':
+          description: Empty text, neither field given, invalid body, or not a task list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Note, task or subtask not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '423':
+          description: The note is being edited by someone else
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags: [Tasks]
+      summary: Delete one subtask
+      description: Removes a subtask from its task.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          description: Note ID of a tasklist note.
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          description: Task id as it appears in the note content, e.g. "1754820000123.45".
+          schema:
+            type: string
+        - name: subtaskId
+          in: path
+          required: true
+          description: Subtask id as the task's subtasks array gives it, e.g. "1754820000456.78".
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Subtask deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  note_id:
+                    type: integer
+                  task_id:
+                    type: string
+                  subtask_id:
+                    type: string
+                  subtasks:
+                    type: array
+                    description: The subtasks the task still has.
+                    items:
+                      $ref: '#/components/schemas/Subtask'
+        '404':
+          description: Note, task or subtask not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '423':
+          description: The note is being edited by someone else
           content:
             application/json:
               schema:

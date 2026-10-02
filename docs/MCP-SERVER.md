@@ -74,6 +74,9 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `update_task` — Update one task (text, due date, reminder, important flag)
 - `complete_task` — Mark a task as done, or reopen it
 - `delete_task` — Delete one task from a tasklist note
+- `add_subtask` — Add a subtask under a task of a tasklist note
+- `update_subtask` — Rename a subtask, or mark it done or not done
+- `delete_subtask` — Delete one subtask of a task
 - `create_folder` — Create a folder, by name or by path (`folder_path="Projects/2026/Q3"` makes the whole chain in one call), or a diary root with `is_diary=true`
 - `list_folders` — List all folders from a workspace, with their paths and diary flags
 - `list_workspaces` — List all available workspaces
@@ -131,7 +134,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 
 **Reminders and tasks.** `reminder_at` (on `create_note`/`update_note` and `set_reminder`) is an ISO datetime such as `2026-09-01T09:00:00+02:00`; include an offset, or the time is read as UTC. Task due dates (`due_at`) are different: they are local wall-clock values, `YYYY-MM-DD` or `YYYY-MM-DDTHH:MM` with no offset, resolved through the user's configured timezone, and a date without a time reminds at 09:00. Repeat intervals use `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y`, for example `30i`, `1d` or `2w`.
 
-The task tools address one task at a time: call `list_tasks` to get task IDs, then `add_task`, `update_task`, `complete_task` or `delete_task`. Each call carries only that task, so a client never reads a tasklist and sends a whole new array back, and two callers editing different tasks cannot overwrite each other. Poznote stores a note's tasks as a single JSON array, which the server rewrites on every call, so the work one call does still grows with the length of the list. Notifications stay in sync automatically, and completing or deleting a task retires its pending reminder.
+The task tools address one task at a time: call `list_tasks` to get task IDs, then `add_task`, `update_task`, `complete_task` or `delete_task`. Each call carries only that task, so a client never reads a tasklist and sends a whole new array back, and two callers editing different tasks cannot overwrite each other. Poznote stores a note's tasks as a single JSON array, which the server rewrites on every call, so the work one call does still grows with the length of the list. Notifications stay in sync automatically, and completing or deleting a task retires its pending reminder. A task can carry subtasks, one level deep: `list_tasks` returns them in the task's `subtasks` array with their own IDs, and `add_subtask`, `update_subtask` and `delete_subtask` change one at a time. A subtask has a text and a done flag only, and ticking it never completes its task.
 
 **Version history and undo.** Poznote takes a safety snapshot of a note right before the AI assistant or the MCP server rewrites it, so a bad `update_note` can be undone. `list_snapshots` shows the snapshots kept for a note, each with an `origin` that identifies those safety copies; `get_snapshot` reads one without touching the note, and `restore_snapshot` puts its content back. `restore_snapshot` overwrites the current content, so it requires a `snapshot_key` or a `date` rather than falling back to today's snapshot.
 
@@ -284,7 +287,7 @@ If you must route the MCP server through a network, protect it with:
 
 The MCP server connects to the Poznote REST API with an internal Bearer token stored in `data/.mcp_token`. Poznote creates this token automatically and the Docker Compose setup mounts `./data` read-only into the MCP container so the token never needs to live in `.env`.
 
-Because that token identifies the MCP server, Poznote takes a snapshot of a note right before a request carrying it changes the note's content or tasks (`update_note`, `add_task`, `update_task`, `complete_task`, `delete_task`). It shows as "Before MCP edit" in the note's Snapshots menu, so an AI rewrite that dropped content can be restored in one click. No snapshot is taken when the latest one already holds the same content, and the 20 most recent of them are kept per note, a number to raise in **Settings → Snapshots** (up to 200) when the MCP server does enough editing to roll through 20 in an afternoon.
+Because that token identifies the MCP server, Poznote takes a snapshot of a note right before a request carrying it changes the note's content or tasks (`update_note`, `add_task`, `update_task`, `complete_task`, `delete_task`, `add_subtask`, `update_subtask`, `delete_subtask`). It shows as "Before MCP edit" in the note's Snapshots menu, so an AI rewrite that dropped content can be restored in one click. No snapshot is taken when the latest one already holds the same content, and the 20 most recent of them are kept per note, a number to raise in **Settings → Snapshots** (up to 200) when the MCP server does enough editing to roll through 20 in an afternoon.
 
 ---
 

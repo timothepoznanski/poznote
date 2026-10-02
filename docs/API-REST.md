@@ -1150,7 +1150,7 @@ To manage a single task without rewriting the array, use the per-task endpoints 
 | `dueReminder` | boolean | Whether a reminder is scheduled for the due date |
 | `dueReminderEmail` | boolean | Whether that reminder also sends an email. Only present once configured; defaults to enabled otherwise |
 | `dueRecurrence` | string | Repeat interval of the reminder as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` (e.g. `1w` weekly). Only present when set. Dismissing the notification schedules the next one and advances `dueAt` by the same interval |
-| `subtasks` | array | Subtasks of the task, one level deep, each `{ "id": number, "text": string, "completed": boolean }`. Only present when the task has some. A subtask has no due date, reminder or important flag, and ticking it does not complete its task. The per-task endpoints return subtasks and keep them on every write; to add, rename or remove one, send the note's full array through `PATCH /notes/{id}` |
+| `subtasks` | array | Subtasks of the task, one level deep, each `{ "id": number, "text": string, "completed": boolean }`. Only present when the task has some. A subtask has no due date, reminder or important flag, and ticking it does not complete its task. The per-task endpoints return subtasks and keep them on every write; the subtask endpoints below add, rename, tick or remove one at a time |
 
 ### List All Tasks
 
@@ -1308,6 +1308,81 @@ Remove one task from a tasklist note, along with its pending reminder.
 ```bash
 curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/tasks/1754820000123.45
+```
+
+### Add A Subtask
+
+```
+POST /notes/{id}/tasks/{taskId}/subtasks
+```
+
+Append a subtask to a task. Subtasks go one level deep and carry a text and a completion flag only.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `text` | string | Yes | Subtask text |
+| `completed` | boolean | No | Whether the subtask starts out done |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "note_id": 123,
+  "task_id": "1754820000123.45",
+  "subtask": { "id": 1754820000456.78, "text": "Oat milk", "completed": false },
+  "subtasks": [
+    { "id": 1754820000456.78, "text": "Oat milk", "completed": false }
+  ]
+}
+```
+
+`subtask` is the one that was written and `subtasks` the full list of the task after the write. The three subtask endpoints share this shape.
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Oat milk"}' \
+  http://YOUR_SERVER/api/v1/notes/123/tasks/1754820000123.45/subtasks
+```
+
+### Update A Subtask
+
+```
+PATCH /notes/{id}/tasks/{taskId}/subtasks/{subtaskId}
+```
+
+Rename a subtask, tick or untick it. Only the provided fields change, at least one is required, and the completion of its task is never touched.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `text` | string | No | New subtask text |
+| `completed` | boolean | No | Whether the subtask is done |
+
+```bash
+curl -X PATCH -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"completed": true}' \
+  http://YOUR_SERVER/api/v1/notes/123/tasks/1754820000123.45/subtasks/1754820000456.78
+```
+
+A subtask written through `PATCH /notes/{id}` without an `id` is listed with `"id": null` and cannot be addressed here until it has one: any write through these endpoints gives an id to every subtask of the task that lacks one.
+
+### Delete A Subtask
+
+```
+DELETE /notes/{id}/tasks/{taskId}/subtasks/{subtaskId}
+```
+
+Remove one subtask from its task. The response carries `subtask_id` and the `subtasks` the task still has.
+
+```bash
+curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/tasks/1754820000123.45/subtasks/1754820000456.78
 ```
 
 ---
@@ -3816,6 +3891,9 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/tasks` | Add a task to a note |
 | `PATCH` | `/notes/{id}/tasks/{taskId}` | Update a task |
 | `DELETE` | `/notes/{id}/tasks/{taskId}` | Delete a task |
+| `POST` | `/notes/{id}/tasks/{taskId}/subtasks` | Add a subtask to a task |
+| `PATCH` | `/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}` | Update a subtask |
+| `DELETE` | `/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}` | Delete a subtask |
 
 ### Reminders
 | Method | Endpoint | Description |

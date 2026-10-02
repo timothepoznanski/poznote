@@ -143,7 +143,7 @@ function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
     }
     if ($tasks !== null) {
         $result['tasks'] = $tasks;
-        $result['hint'] = 'Task list note: change its tasks with add_task, update_task and delete_task (by task id or text), not with update_note_content.';
+        $result['hint'] = 'Task list note: change its tasks with add_task, update_task and delete_task (by task id or text), and the subtasks of a task with add_subtask, update_subtask and delete_subtask, not with update_note_content.';
     }
     if ($checklist !== null) {
         $result['checklist'] = $checklist;
@@ -487,14 +487,56 @@ function aiTaskView(array $task): array {
         $view['reminder'] = !empty($task['dueReminder']);
         if (!empty($task['dueRecurrence'])) $view['recurrence'] = (string)$task['dueRecurrence'];
     }
-    // Read-only for the model: subtasks are edited in the interface
+    // The id is what add_subtask, update_subtask and delete_subtask take; a
+    // subtask stored without one is addressed by its text
     $subtasks = getTasklistSubtasks($task);
     if ($subtasks !== []) {
         $view['subtasks'] = array_map(static function (array $subtask): array {
-            return ['text' => $subtask['text'], 'completed' => $subtask['completed']];
+            $id = aiTaskIdToString($subtask['id']);
+            return ($id !== '' ? ['id' => $id] : []) + ['text' => $subtask['text'], 'completed' => $subtask['completed']];
         }, $subtasks);
     }
     return $view;
+}
+
+/**
+ * What the subtask tools work on: the note, the position of the task the
+ * model refers to and that task's stored subtasks, each with an id.
+ * [note, task index, subtasks], or a JSON error string.
+ */
+function aiLoadTaskSubtasks(PDO $con, array $args, string $workspace) {
+    $noteId = intval($args['note_id'] ?? 0);
+    if ($noteId <= 0 || !isset($args['task'])) {
+        return json_encode(['error' => 'note_id and task are required']);
+    }
+    $note = aiLoadTasklist($con, $noteId, $workspace);
+    if (is_string($note)) return $note;
+    $index = aiFindTaskIndex($note['tasks'], $args['task']);
+    if ($index === null) {
+        return json_encode(['error' => 'No single task matches "' . (string)$args['task'] . '" in this note. Read the note with get_note and use the task id or its exact text.'], JSON_UNESCAPED_UNICODE);
+    }
+    $stored = $note['tasks'][$index]['subtasks'] ?? [];
+    return [$note, $index, ensureTasklistSubtaskIds(is_array($stored) ? $stored : [])];
+}
+
+/**
+ * Store the subtasks of one task and build the tool's reply. Subtasks live
+ * inside their task: nothing is regrouped and no reminder moves.
+ */
+function aiSaveTaskSubtasks(PDO $con, array $note, int $index, array $subtasks, $actorUserId, array $reply): string {
+    $tasks = $note['tasks'];
+    // A task without subtasks carries no `subtasks` key, as in the interface
+    if ($subtasks === []) {
+        unset($tasks[$index]['subtasks']);
+    } else {
+        $tasks[$index]['subtasks'] = $subtasks;
+    }
+    $error = aiPersistTasks($con, (int)$note['id'], $tasks, $actorUserId);
+    if ($error !== null) return $error;
+    return json_encode(
+        ['ok' => true, 'note_id' => (int)$note['id'], 'title' => (string)$note['heading']] + $reply + ['task' => aiTaskView($tasks[$index])],
+        JSON_UNESCAPED_UNICODE
+    );
 }
 
 /**
@@ -630,6 +672,9 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace)
         'add_task' => 'aiToolAddTask',
         'update_task' => 'aiToolUpdateTask',
         'delete_task' => 'aiToolDeleteTask',
+        'add_subtask' => 'aiToolAddSubtask',
+        'update_subtask' => 'aiToolUpdateSubtask',
+        'delete_subtask' => 'aiToolDeleteSubtask',
         'set_checklist_item' => 'aiToolSetChecklistItem',
     ];
 
@@ -1357,6 +1402,72 @@ function aiToolDeleteTask($con, array $args, $chatWorkspace, $actorUserId): stri
         aiDeleteTaskReminder($con, $noteId, aiTaskIdToString($removed['id']));
     }
     return json_encode(['ok' => true, 'note_id' => $noteId, 'title' => (string)$note['heading'], 'deleted_task' => aiTaskView($removed), 'remaining' => count($tasks)], JSON_UNESCAPED_UNICODE);
+}
+
+/** Tool `add_subtask`. */
+function aiToolAddSubtask($con, array $args, $chatWorkspace, $actorUserId): string
+{
+    $target = aiLoadTaskSubtasks($con, $args, (string)$chatWorkspace);
+    if (is_string($target)) return $target;
+    [$note, $index, $subtasks] = $target;
+    $text = trim((string)($args['text'] ?? ''));
+    if ($text === '') {
+        return json_encode(['error' => 'text is required']);
+    }
+    $taken = [];
+    foreach ($subtasks as $subtask) {
+        $taken[tasklistIdToString($subtask['id'])] = true;
+    }
+    $subtasks[] = [
+        'id' => generateTasklistSubtaskId($taken),
+        'text' => $text,
+        'completed' => filter_var($args['completed'] ?? false, FILTER_VALIDATE_BOOLEAN),
+    ];
+    return aiSaveTaskSubtasks($con, $note, $index, $subtasks, $actorUserId, ['added_subtask' => $text]);
+}
+
+/** Tool `update_subtask`. */
+function aiToolUpdateSubtask($con, array $args, $chatWorkspace, $actorUserId): string
+{
+    $target = aiLoadTaskSubtasks($con, $args, (string)$chatWorkspace);
+    if (is_string($target)) return $target;
+    [$note, $index, $subtasks] = $target;
+    $key = aiFindTaskIndex($subtasks, $args['subtask'] ?? '');
+    if ($key === null) {
+        return json_encode(['error' => 'No single subtask matches "' . (string)($args['subtask'] ?? '') . '" in this task. Read the note with get_note and use the subtask id or its exact text.'], JSON_UNESCAPED_UNICODE);
+    }
+    $changed = [];
+    if (array_key_exists('completed', $args)) {
+        $subtasks[$key]['completed'] = filter_var($args['completed'], FILTER_VALIDATE_BOOLEAN);
+        $changed[] = 'completed';
+    }
+    if (array_key_exists('text', $args)) {
+        $text = trim((string)$args['text']);
+        if ($text === '') {
+            return json_encode(['error' => 'text cannot be empty']);
+        }
+        $subtasks[$key]['text'] = $text;
+        $changed[] = 'text';
+    }
+    if (empty($changed)) {
+        return json_encode(['error' => 'Nothing to change: pass completed or text']);
+    }
+    return aiSaveTaskSubtasks($con, $note, $index, $subtasks, $actorUserId, ['changed' => $changed]);
+}
+
+/** Tool `delete_subtask`. */
+function aiToolDeleteSubtask($con, array $args, $chatWorkspace, $actorUserId): string
+{
+    $target = aiLoadTaskSubtasks($con, $args, (string)$chatWorkspace);
+    if (is_string($target)) return $target;
+    [$note, $index, $subtasks] = $target;
+    $key = aiFindTaskIndex($subtasks, $args['subtask'] ?? '');
+    if ($key === null) {
+        return json_encode(['error' => 'No single subtask matches "' . (string)($args['subtask'] ?? '') . '" in this task. Read the note with get_note and use the subtask id or its exact text.'], JSON_UNESCAPED_UNICODE);
+    }
+    $removed = (string)($subtasks[$key]['text'] ?? '');
+    array_splice($subtasks, $key, 1);
+    return aiSaveTaskSubtasks($con, $note, $index, $subtasks, $actorUserId, ['deleted_subtask' => $removed]);
 }
 
 /** Tool `set_checklist_item`. */
