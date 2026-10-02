@@ -968,6 +968,8 @@ function initTextSelectionHandlers() {
                     // lines or several items get the list-only one
                     var isListOnlySelection = !!listSelection && !listSelection.insideItemText;
                     var isButtonForSelection = function (button) {
+                        // The floating menu leaves search and replace to the note toolbar, still in place
+                        if (floatingMode && button.classList.contains('btn-search-replace-format')) return false;
                         if (isPlainCodeSelection && isPlainCodeBlockedButton(button)) return false;
                         // List-only selection: keep just the list conversion/toggle buttons
                         if (isListOnlySelection && !isListSelectionAllowedButton(button, listSelectionType)) return false;
