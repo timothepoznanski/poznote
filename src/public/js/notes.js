@@ -684,6 +684,28 @@ function deleteNote(noteId, options) {
  * @private
  */
 function sendNoteToTrash(noteId) {
+    saveBeforeTrash(noteId, function () { requestNoteTrash(noteId); });
+}
+
+/**
+ * Run proceed once what is still being typed in the note is saved: the trash
+ * takes no writes, so edits left for after the delete were lost with it.
+ * @param {string|number} noteId - The note about to be deleted
+ * @param {Function} proceed - Sends the delete
+ * @private
+ */
+function saveBeforeTrash(noteId, proceed) {
+    if (String(window.noteid) === String(noteId)
+        && typeof window.hasUnsavedChangesOnScreen === 'function' && window.hasUnsavedChangesOnScreen(noteId)
+        && typeof showSaveInProgressNotification === 'function') {
+        showSaveInProgressNotification(proceed);
+        return;
+    }
+    proceed();
+}
+
+/** @private */
+function requestNoteTrash(noteId) {
     const workspace = (typeof pageWorkspace !== 'undefined' && pageWorkspace) ? pageWorkspace : null;
 
     // Build query params for RESTful API
@@ -713,10 +735,7 @@ function sendNoteToTrash(noteId) {
                     window.setNeedsAutoPush(true);
                 }
                 
-                if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
-                    window.tabManager.closeTabByNoteId(noteId);
-                }
-                redirectToWorkspace();
+                leaveTrashedNotes([noteId].concat(linkedIdsForUndo));
                 return;
             }
 
@@ -729,6 +748,107 @@ function sendNoteToTrash(noteId) {
         .catch(function (error) {
             showNotificationPopup('Network error while deleting: ' + error.message, 'error');
         });
+}
+
+// How long the pane gets to move on from a trashed note before the page is
+// reloaded after all
+var TRASHED_NOTE_PANE_TIMEOUT_MS = 5000;
+
+/**
+ * Take trashed notes off the page without loading it again: their rows leave
+ * the tree, their tabs close (the pane follows to the neighbouring tab, or
+ * empties after the last one) and the tree is drawn again in place for its
+ * counts. A phone has no tabs for the pane to fall back on, and a page
+ * without the tree nothing to redraw: both keep the reload.
+ * @param {Array<string|number>} noteIds - Notes that just went to the trash
+ * @private
+ */
+function leaveTrashedNotes(noteIds) {
+    noteIds = noteIds.map(String).filter(function (id, index, all) {
+        return all.indexOf(id) === index;
+    });
+
+    var tabManager = (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function')
+        ? window.tabManager : null;
+    var inPlace = tabManager && window.innerWidth > 800
+        && document.getElementById('left_col')
+        && typeof window.refreshNotesListAfterFolderAction === 'function';
+
+    if (!inPlace) {
+        if (tabManager) {
+            noteIds.forEach(function (id) { tabManager.closeTabByNoteId(id); });
+        }
+        redirectToWorkspace();
+        return;
+    }
+
+    // In the pane, or still named by the URL the tree is fetched with
+    var isShown = function () {
+        var urlNoteId = new URLSearchParams(window.location.search).get('note');
+        return noteIds.some(function (id) {
+            return id === urlNoteId || !!document.getElementById('note' + id);
+        });
+    };
+
+    // Typed while the delete was on its way: too late to save, it stays as
+    // the note's draft and stops holding the pane back
+    var openNoteId = String(window.noteid);
+    if (noteIds.indexOf(openNoteId) !== -1
+        && typeof window.hasUnsavedChangesOnScreen === 'function' && window.hasUnsavedChangesOnScreen(openNoteId)) {
+        window.keepUnsavedChangesAsDraft(openNoteId);
+    }
+
+    removeNoteRowsFromTree(noteIds);
+
+    var paneFollows = false;
+    noteIds.forEach(function (id) {
+        if (tabManager.closeTabByNoteId(id, true)) paneFollows = true;
+    });
+
+    // On screen without a tab of its own: nothing will take its place
+    if (isShown() && !paneFollows) {
+        redirectToWorkspace();
+        return;
+    }
+
+    var waitedMs = 0;
+    (function redrawTreeOncePaneMovedOn() {
+        if (isShown() || window.isLoadingNote) {
+            if (waitedMs >= TRASHED_NOTE_PANE_TIMEOUT_MS) {
+                redirectToWorkspace();
+                return;
+            }
+            waitedMs += 50;
+            setTimeout(redrawTreeOncePaneMovedOn, 50);
+            return;
+        }
+
+        // The load that replaced a trashed note kept its DOM for a next visit
+        if (typeof window.invalidateNoteDomCache === 'function') {
+            noteIds.forEach(function (id) { window.invalidateNoteDomCache(id); });
+        }
+        window.refreshNotesListAfterFolderAction();
+    })();
+}
+
+/**
+ * Drop the rows of notes from the tree right away, shortcuts to them and
+ * twins in Favorites included, ahead of the redraw that brings the counts.
+ * @param {Array<string>} noteIds
+ * @private
+ */
+function removeNoteRowsFromTree(noteIds) {
+    document.querySelectorAll('#left_col .links_arbo_left[data-note-db-id]').forEach(function (link) {
+        if (noteIds.indexOf(link.getAttribute('data-note-db-id')) === -1
+            && noteIds.indexOf(link.getAttribute('data-linked-note-id')) === -1) {
+            return;
+        }
+        var item = link.closest('.note-list-item');
+        if (!item) return;
+        var spacer = item.nextElementSibling;
+        if (spacer && spacer.classList.contains('pxbetweennotes')) spacer.remove();
+        item.remove();
+    });
 }
 
 /**
@@ -1354,7 +1474,7 @@ function deleteLinkedNoteOnly(linkedNoteId) {
                 }
 
                 closeModal('deleteLinkedNoteModal');
-                redirectToWorkspace();
+                leaveTrashedNotes([linkedNoteId]);
                 return;
             }
 
@@ -1399,11 +1519,8 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
                     window.invalidateNoteDomCache(linkedNoteId);
                 }
 
-                if (window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
-                    window.tabManager.closeTabByNoteId(targetNoteId);
-                }
                 closeModal('deleteLinkedNoteModal');
-                redirectToWorkspace();
+                leaveTrashedNotes([targetNoteId, linkedNoteId].concat(linkedIdsForUndo));
             } else {
                 throw new Error(data.error || data.message || 'Unknown error');
             }
