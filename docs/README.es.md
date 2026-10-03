@@ -50,7 +50,7 @@ https://poznote.com/press.html
 
 Únete a la comunidad para hacer preguntas, compartir tus comentarios o seguir el desarrollo:
 
-https://discord.gg/AWhWWSEkJ
+https://discord.gg/fuEV6uqf4N
 
 ## Índice
 
@@ -480,7 +480,7 @@ docker compose pull
 docker compose up -d
 ```
 
-*   **Antes de cambiar:** una beta aún puede contener errores, así que haz primero una [copia de seguridad](#copia-de-seguridad--exportar). Los problemas se pueden informar en los [issues de GitHub](https://github.com/timothepoznanski/poznote/issues) o en [Discord](https://discord.gg/AWhWWSEkJ).
+*   **Antes de cambiar:** una beta aún puede contener errores, así que haz primero una [copia de seguridad](#copia-de-seguridad--exportar). Los problemas se pueden informar en los [issues de GitHub](https://github.com/timothepoznanski/poznote/issues) o en [Discord](https://discord.gg/fuEV6uqf4N).
 *   **Actualizaciones:** a partir de entonces, cada `docker compose pull` obtiene la beta más reciente, o la versión estable cuando se publique. El procedimiento de actualización anterior descarga un nuevo `docker-compose.yml` que vuelve a usar las etiquetas estables, así que cambia de nuevo las dos líneas `image` después de ese paso.
 *   **Volver a la versión estable:** como una beta puede modificar la base de datos, volver a una versión estable más antigua puede no funcionar. Espera a la siguiente versión estable, que incluye los cambios de la beta, y luego sigue el procedimiento de actualización anterior.
 
