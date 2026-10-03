@@ -240,14 +240,6 @@
     var NOTE_CONTENT_TAGS = /^(IMG|SVG|CANVAS|IFRAME|VIDEO|AUDIO|HR|INPUT|BUTTON|TEXTAREA|SELECT|TABLE|OBJECT|EMBED)$/;
     var NOTE_CONTENT_SCAN_LIMIT = 3000;
 
-    /**
-     * Whether #right_col overflows by empty room only: the last thing there is
-     * to see (text, an image, a diagram, the editor...) is inside the column,
-     * and what scrolls is blank lines and bottom margins, like the empty line
-     * under an Excalidraw diagram (#1544). The note then shows no scrollbar
-     * (body.note-col-fits, css/layout.css) and no arrows; the wheel still
-     * scrolls those few pixels.
-     */
     // Out of the flow (the copy / line-number / delete buttons a code block
     // carries at its top right, but appended after it): where it is drawn
     // says nothing about how far down the note goes.
@@ -259,8 +251,32 @@
         return false;
     }
 
+    // A note that scrolls by no more than this many of its lines shows no
+    // scrollbar either; the wheel still reaches the rest.
+    var NOTE_SLIGHT_OVERFLOW_LINES = 5;
+
+    function getNoteLineHeight(rightCol) {
+        var entry = rightCol.querySelector('.noteentry') || rightCol;
+        var style = getComputedStyle(entry);
+        // 'normal' is about 1.3 times the font size with Inter (19px at 15px)
+        return parseFloat(style.lineHeight) || (parseFloat(style.fontSize) || 15) * 1.3;
+    }
+
+    /**
+     * Whether #right_col needs no scrollbar although it overflows: it scrolls
+     * by a few lines at most (NOTE_SLIGHT_OVERFLOW_LINES), or by empty room
+     * only, the last thing there is to see (text, an image, a diagram, the
+     * editor...) being inside the column and what scrolls blank lines and
+     * bottom margins, like the empty line under an Excalidraw diagram
+     * (#1544). The note then shows no scrollbar (body.note-col-fits,
+     * css/layout.css) and no arrows; the wheel still scrolls those pixels.
+     */
     function noteColumnContentFits(rightCol) {
-        if (!rightCol || rightCol.scrollHeight - rightCol.clientHeight <= 2) return false;
+        if (!rightCol) return false;
+        var overflow = rightCol.scrollHeight - rightCol.clientHeight;
+        if (overflow <= 2 || !/^(auto|scroll)$/.test(getComputedStyle(rightCol).overflowY)) return false;
+        if (overflow <= NOTE_SLIGHT_OVERFLOW_LINES * getNoteLineHeight(rightCol)) return true;
+
         var inner = rightCol.querySelector('.innernote');
         if (!inner || !inner.lastChild) return false;
 

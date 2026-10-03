@@ -5085,6 +5085,7 @@
     },
     "save_note": "Guardar a nota",
     "snapshot": "Criar um snapshot da nota",
+    "search_replace": "Pesquisar e substituir na nota",
     "note_nav": "Nota anterior ou seguinte da pasta",
     "close": "Fechar um menu, um painel ou uma janela",
     "bold": "Negrito",

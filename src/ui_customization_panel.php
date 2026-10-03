@@ -52,6 +52,7 @@ $pzShortcutGroups = [
         'items' => [
             ['keys' => [['mod', 'S']], 'label' => t_h('keyboard_shortcuts.save_note', [], 'Save the note')],
             ['keys' => [['mod', 'alt', 'S']], 'label' => t_h('keyboard_shortcuts.snapshot', [], 'Take a snapshot of the note')],
+            ['keys' => [['mod', 'Shift', 'F']], 'label' => t_h('keyboard_shortcuts.search_replace', [], 'Search and replace in the note')],
             ['keys' => [['alt', '↑'], ['alt', '↓']], 'label' => t_h('keyboard_shortcuts.note_nav', [], 'Previous or next note in the folder')],
             ['keys' => [['Esc']], 'label' => t_h('keyboard_shortcuts.close', [], 'Close a menu, panel or window')],
             ['keys' => [['F11']], 'label' => t_h('keyboard_shortcuts.focus_mode', [], 'Turn focus mode on or off')],

@@ -4906,6 +4906,7 @@
     },
     "save_note": "Save the note",
     "snapshot": "Take a snapshot of the note",
+    "search_replace": "Search and replace in the note",
     "note_nav": "Previous or next note in the folder",
     "close": "Close a menu, panel or window",
     "bold": "Bold",
