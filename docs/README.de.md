@@ -50,7 +50,7 @@ https://poznote.com/press.html
 
 Treten Sie der Community bei, um Fragen zu stellen, Feedback zu geben oder die Entwicklung zu verfolgen:
 
-https://discord.gg/AWhWWSEkJ
+https://discord.gg/fuEV6uqf4N
 
 ## Inhaltsverzeichnis
 
@@ -480,7 +480,7 @@ docker compose pull
 docker compose up -d
 ```
 
-*   **Vor dem Wechsel:** Eine Beta kann noch Fehler enthalten, erstellen Sie daher zuerst ein [Backup](#sicherung--export). Probleme können in den [GitHub-Issues](https://github.com/timothepoznanski/poznote/issues) oder auf [Discord](https://discord.gg/AWhWWSEkJ) gemeldet werden.
+*   **Vor dem Wechsel:** Eine Beta kann noch Fehler enthalten, erstellen Sie daher zuerst ein [Backup](#sicherung--export). Probleme können in den [GitHub-Issues](https://github.com/timothepoznanski/poznote/issues) oder auf [Discord](https://discord.gg/fuEV6uqf4N) gemeldet werden.
 *   **Aktualisierungen:** Jedes `docker compose pull` holt danach die neueste Beta oder, sobald sie erschienen ist, die stabile Version. Die obige Anleitung zur Aktualisierung lädt eine neue `docker-compose.yml` herunter, die wieder die stabilen Tags verwendet, ändern Sie daher die beiden `image`-Zeilen nach diesem Schritt erneut.
 *   **Zurück zur stabilen Version:** Da eine Beta die Datenbank ändern kann, funktioniert die Rückkehr zu einer älteren stabilen Version möglicherweise nicht. Warten Sie auf die nächste stabile Version, die die Änderungen der Beta enthält, und folgen Sie dann der obigen Anleitung zur Aktualisierung.
 

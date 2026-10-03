@@ -50,7 +50,7 @@ https://poznote.com/press.html
 
 加入社区，提出问题、分享反馈或关注开发进展：
 
-https://discord.gg/AWhWWSEkJ
+https://discord.gg/fuEV6uqf4N
 
 ## 目录
 
@@ -480,7 +480,7 @@ docker compose pull
 docker compose up -d
 ```
 
-*   **切换之前：** 测试版可能仍有 bug，请先进行[备份](#备份--导出)。可以在 [GitHub issues](https://github.com/timothepoznanski/poznote/issues) 或 [Discord](https://discord.gg/AWhWWSEkJ) 上反馈问题。
+*   **切换之前：** 测试版可能仍有 bug，请先进行[备份](#备份--导出)。可以在 [GitHub issues](https://github.com/timothepoznanski/poznote/issues) 或 [Discord](https://discord.gg/fuEV6uqf4N) 上反馈问题。
 *   **更新：** 此后每次执行 `docker compose pull` 都会获取最新的测试版，稳定版发布后则获取稳定版。上面的更新步骤会下载新的 `docker-compose.yml`，其中重新使用稳定版标签，因此完成该步骤后需要再次修改这两行 `image`。
 *   **回到稳定版：** 测试版可能会修改数据库，因此回退到较旧的稳定版可能无法正常工作。请等待下一个稳定版发布（它包含测试版的全部更改），然后按照上面的更新步骤操作。
 

@@ -50,7 +50,7 @@ https://poznote.com/press.html
 
 Rejoignez la communauté pour poser vos questions, partager vos retours ou suivre le développement :
 
-https://discord.gg/AWhWWSEkJ
+https://discord.gg/fuEV6uqf4N
 
 ## Table des matières
 
@@ -480,7 +480,7 @@ docker compose pull
 docker compose up -d
 ```
 
-*   **Avant de passer en bêta :** une bêta peut encore contenir des bugs, faites donc d'abord une [sauvegarde](#sauvegarde--export). Les problèmes peuvent être signalés dans les [issues GitHub](https://github.com/timothepoznanski/poznote/issues) ou sur [Discord](https://discord.gg/AWhWWSEkJ).
+*   **Avant de passer en bêta :** une bêta peut encore contenir des bugs, faites donc d'abord une [sauvegarde](#sauvegarde--export). Les problèmes peuvent être signalés dans les [issues GitHub](https://github.com/timothepoznanski/poznote/issues) ou sur [Discord](https://discord.gg/fuEV6uqf4N).
 *   **Mises à jour :** chaque `docker compose pull` récupère ensuite la dernière bêta, ou la version stable une fois sortie. La procédure de mise à jour ci-dessus télécharge un nouveau `docker-compose.yml` qui utilise de nouveau les tags stables : modifiez donc à nouveau les deux lignes `image` après cette étape.
 *   **Retour à la version stable :** comme une bêta peut modifier la base de données, revenir à une version stable plus ancienne risque de ne pas fonctionner. Attendez la prochaine version stable, qui contient les changements de la bêta, puis suivez la procédure de mise à jour ci-dessus.
 
