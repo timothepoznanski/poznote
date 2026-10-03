@@ -92,8 +92,8 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
 .folder-actions-toggle,
 .note-actions-toggle,
 .note-actions-item {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
     padding: 0;
     cursor: pointer;
     color: var(--pz-text-muted);
