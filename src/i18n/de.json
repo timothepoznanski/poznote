@@ -5287,5 +5287,13 @@
       "no_folders": "Keine Ordner offline behalten.",
       "own_account_only": "Offline-Kopien werden nur für Ihr eigenes Konto behalten."
     }
+  },
+  "mermaid_zoom": {
+    "open": "Diagramm vergrößern",
+    "dialog": "Diagramm",
+    "zoom_in": "Vergrößern",
+    "zoom_out": "Verkleinern",
+    "fit": "An Bildschirm anpassen",
+    "actual_size": "Originalgröße"
   }
 }

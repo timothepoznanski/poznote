@@ -5288,5 +5288,13 @@
       "no_folders": "Nenhuma pasta mantida offline.",
       "own_account_only": "As cópias offline só são mantidas para a sua própria conta."
     }
+  },
+  "mermaid_zoom": {
+    "open": "Ampliar diagrama",
+    "dialog": "Diagrama",
+    "zoom_in": "Aumentar zoom",
+    "zoom_out": "Diminuir zoom",
+    "fit": "Ajustar à tela",
+    "actual_size": "Tamanho real"
   }
 }

@@ -5392,5 +5392,13 @@
       "no_folders": "Aucun dossier gardé hors ligne.",
       "own_account_only": "Les copies hors ligne ne sont gardées que pour votre propre compte."
     }
+  },
+  "mermaid_zoom": {
+    "open": "Agrandir le diagramme",
+    "dialog": "Diagramme",
+    "zoom_in": "Zoom avant",
+    "zoom_out": "Zoom arrière",
+    "fit": "Ajuster à l'écran",
+    "actual_size": "Taille réelle"
   }
 }

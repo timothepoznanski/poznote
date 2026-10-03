@@ -5109,5 +5109,13 @@
       "no_folders": "No folders kept offline.",
       "own_account_only": "Offline copies are only kept for your own account."
     }
+  },
+  "mermaid_zoom": {
+    "open": "Enlarge diagram",
+    "dialog": "Diagram",
+    "zoom_in": "Zoom in",
+    "zoom_out": "Zoom out",
+    "fit": "Fit to screen",
+    "actual_size": "Actual size"
   }
 }

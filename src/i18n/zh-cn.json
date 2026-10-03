@@ -5384,5 +5384,13 @@
       "no_folders": "没有离线保留的文件夹。",
       "own_account_only": "离线副本只为您自己的账户保留。"
     }
+  },
+  "mermaid_zoom": {
+    "open": "放大图表",
+    "dialog": "图表",
+    "zoom_in": "放大",
+    "zoom_out": "缩小",
+    "fit": "适应屏幕",
+    "actual_size": "实际大小"
   }
 }

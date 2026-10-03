@@ -5288,5 +5288,13 @@
       "no_folders": "Ninguna carpeta guardada sin conexión.",
       "own_account_only": "Las copias sin conexión solo se guardan para su propia cuenta."
     }
+  },
+  "mermaid_zoom": {
+    "open": "Ampliar diagrama",
+    "dialog": "Diagrama",
+    "zoom_in": "Acercar",
+    "zoom_out": "Alejar",
+    "fit": "Ajustar a la pantalla",
+    "actual_size": "Tamaño real"
   }
 }
