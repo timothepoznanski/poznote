@@ -256,6 +256,9 @@ function sanitizePublicNoteHtml(string $content): string {
         return true;
     };
 
+    // libxml stops reading at a NUL byte: one stray byte would cut the note short.
+    $content = str_replace("\0", '', $content);
+
     libxml_use_internal_errors(true);
     $dom = new DOMDocument();
     $dom->encoding = 'UTF-8';
