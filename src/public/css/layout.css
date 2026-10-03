@@ -198,9 +198,9 @@ body {
     box-sizing: border-box;
 }
 
-/* The note's scrollbar (#1544), set by note_scrollbar in Settings: thin by
-   default, or none (body.note-scrollbar-none, index.php). The markdown split panes share it,
-   they are the only other boxes that scroll a note. The gutter is reserved
+/* The note's scrollbar (#1544): thin, unless unticked in Element visibility
+   (panel:note-scrollbar, lib/ui-customization.php). The markdown split panes
+   share it, they are the only other boxes that scroll a note. The gutter is reserved
    on #right_col so a centred note does not shift sideways between a short
    note and a long one; the fixed controls on the right keep clear of it
    (--pz-docked-note-scrollbar, css/notes/noteentry.css).
@@ -209,7 +209,7 @@ body {
    is set, so those two are kept for Firefox. It is told apart by
    -moz-appearance: it calls selector(::-webkit-scrollbar) supported, any
    ::-webkit- pseudo-element parses there for compatibility.
-   Phones keep it hidden whatever the setting. */
+   Phones never show it. */
 @media (min-width: 801px) {
     #right_col {
         scrollbar-gutter: stable;
@@ -222,41 +222,41 @@ body {
         scrollbar-width: auto;
     }
 
-    :where(body:not(.note-scrollbar-none)) #right_col::-webkit-scrollbar,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar {
+    #right_col::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar {
         display: block;
         width: 10px;
         height: 10px;
     }
 
-    :where(body:not(.note-scrollbar-none)) #right_col::-webkit-scrollbar-track,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-track,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
+    #right_col::-webkit-scrollbar-track,
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-track,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
         background: transparent;
     }
 
     /* 10px to grab, 6px to see: the transparent border is not painted. */
-    :where(body:not(.note-scrollbar-none)) #right_col::-webkit-scrollbar-thumb,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-thumb,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
+    #right_col::-webkit-scrollbar-thumb,
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-thumb,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
         background: var(--pz-scrollbar);
         background-clip: padding-box;
         border: 2px solid transparent;
         border-radius: var(--pz-radius-pill);
     }
 
-    :where(body:not(.note-scrollbar-none)) #right_col::-webkit-scrollbar-thumb:hover,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-thumb:hover,
-    :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
+    #right_col::-webkit-scrollbar-thumb:hover,
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-thumb:hover,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
         background: var(--pz-scrollbar-hover);
         background-clip: padding-box;
     }
@@ -270,11 +270,11 @@ body {
     }
 
     @supports (-moz-appearance: none) {
-        :where(body:not(.note-scrollbar-none)) #right_col,
-        :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor-container,
-        :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-editor,
-        :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller,
-        :where(body:not(.note-scrollbar-none)) .noteentry.markdown-split-mode .markdown-preview {
+        #right_col,
+        .noteentry.markdown-split-mode .markdown-editor-container,
+        .noteentry.markdown-split-mode .markdown-editor,
+        .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller,
+        .noteentry.markdown-split-mode .markdown-preview {
             scrollbar-width: thin;
             scrollbar-color: var(--pz-scrollbar) transparent;
         }
@@ -282,24 +282,6 @@ body {
         body.note-col-fits #right_col {
             scrollbar-color: transparent transparent;
         }
-    }
-
-    body.note-scrollbar-none #right_col,
-    body.note-scrollbar-none .noteentry.markdown-split-mode .markdown-editor-container,
-    body.note-scrollbar-none .noteentry.markdown-split-mode .markdown-editor,
-    body.note-scrollbar-none .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller,
-    body.note-scrollbar-none .noteentry.markdown-split-mode .markdown-preview {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-        scrollbar-gutter: auto;
-    }
-
-    body.note-scrollbar-none #right_col::-webkit-scrollbar,
-    body.note-scrollbar-none .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar,
-    body.note-scrollbar-none .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar,
-    body.note-scrollbar-none .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar,
-    body.note-scrollbar-none .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar {
-        display: none;
     }
 }
 

@@ -143,7 +143,6 @@ $settingsPageUserKeys = [
     'slash_menu_trigger',
     'slash_menu_trigger_mobile',
     'format_toolbar_mode',
-    'note_scrollbar',
 ];
 
 foreach ($settingsPageUserKeys as $settingsPageKey) {
@@ -1000,21 +999,6 @@ if ($canUseUserWebhooks) {
                             <input type="range" id="note-width-range" class="settings-inline-control" data-control="note-width-range" min="10" max="100" step="5" value="100">
                             <output class="settings-inline-value" for="note-width-range"><?php echo t_h('modals.note_width.full_width', [], 'Full Width'); ?></output>
                         </span>
-                    </div>
-                </div>
-
-                <!-- Note scrollbar (note_scrollbar, issue 1544): thin by default
-                     or none, on a computer only (css/layout.css); phones never
-                     show it. -->
-                <div class="home-card settings-inline-card desktop-only" id="note-scrollbar-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_scrollbar', [], 'On a computer, choose whether a note shows a thin scrollbar or none.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon"><i class="lucide lucide-move-vertical"></i></div>
-                    <div class="home-card-content">
-                        <label class="home-card-title" for="note-scrollbar-select"><?php echo t_h('display.cards.note_scrollbar', [], 'Note scrollbar'); ?></label>
-                        <select id="note-scrollbar-select" class="settings-inline-control settings-inline-select" data-control="note-scrollbar-select">
-                            <option value="thin"><?php echo t_h('display.badges.note_scrollbar_thin', [], 'Thin'); ?></option>
-                            <option value="none"><?php echo t_h('display.badges.note_scrollbar_none', [], 'Hidden'); ?></option>
-                        </select>
                     </div>
                 </div>
 

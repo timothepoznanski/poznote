@@ -522,6 +522,12 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // The floating stack and the scroll arrows sit left of the
                 // outline column (css/notes/noteentry.css): give them the edge.
                 $rules[] = 'html { --pz-docked-outline: 0px !important; }';
+            } elseif ($id === 'note-scrollbar') {
+                // The note's thin scrollbar (css/layout.css, #1544), in the
+                // note column and the markdown split panes, gutter included.
+                // The fixed controls follow on their own (js/index-events.js).
+                $rules[] = '#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview) { scrollbar-width: none !important; scrollbar-gutter: auto !important; }';
+                $rules[] = ':is(#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview))::-webkit-scrollbar { display: none !important; }';
             } elseif ($id === 'tasklist-progress') {
                 $rules[] = '.tasklist-progress { display: none !important; }';
             } elseif ($id === 'preview-code-block-delete') {

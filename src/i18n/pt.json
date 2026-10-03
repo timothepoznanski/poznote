@@ -550,8 +550,7 @@
       "sidebar_offline_marks": "Mostra um pequeno ponto ao lado das notas disponíveis offline neste navegador.",
       "format_toolbar_mode": "Num computador, escolha onde aparecem os botões de formatação quando seleciona texto numa nota: na barra de ferramentas da nota, no lugar das ações da nota, ou num menu flutuante acima da seleção, que deixa a barra de ferramentas da nota como está.",
       "workspace_activity_emails": "Receba um e-mail quando outra pessoa alterar uma nota em um espaço de trabalho que você compartilha ou em um compartilhado com você. Ele lista as notas criadas, editadas e excluídas, nunca o conteúdo delas, e é enviado para o endereço de e-mail do seu perfil. Conforme as alterações: alguns minutos após a última alteração. Resumo diário: às 8:00. Resumo semanal: na segunda-feira às 8:00, no seu fuso horário.",
-      "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails.",
-      "note_scrollbar": "Num computador, escolha se uma nota mostra uma barra de rolagem fina ou nenhuma."
+      "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -879,8 +878,7 @@
       "show_note_icons": "Mostrar ícones das notas",
       "sidebar_offline_marks": "Mostrar o ponto offline",
       "format_toolbar_mode": "Barra de formatação",
-      "workspace_activity_emails": "E-mails de espaços compartilhados",
-      "note_scrollbar": "Barra de rolagem das notas"
+      "workspace_activity_emails": "E-mails de espaços compartilhados"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -897,9 +895,7 @@
       "code_block_font_size": "{{size}}px",
       "settings_font_size": "{{size}}px",
       "format_toolbar_mode_toolbar": "Na barra de ferramentas da nota",
-      "format_toolbar_mode_floating": "Flutuante acima da seleção",
-      "note_scrollbar_thin": "Fina",
-      "note_scrollbar_none": "Oculta"
+      "format_toolbar_mode_floating": "Flutuante acima da seleção"
     },
     "alerts": {
       "error_saving_preference": "Erro ao salvar preferência"
@@ -1427,7 +1423,8 @@
       "note_stats_characters": "Mostrar número de caracteres",
       "note_stats_words": "Mostrar número de palavras",
       "note_stats_lines": "Mostrar número de linhas",
-      "note_info_icon": "Mostrar ícone de informação sob o título da nota"
+      "note_info_icon": "Mostrar ícone de informação sob o título da nota",
+      "note_scrollbar": "Barra de rolagem das notas"
     },
     "icon_sidebar_order": {
       "title": "Layout da barra de ícones",

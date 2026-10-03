@@ -549,8 +549,7 @@
       "sidebar_offline_marks": "在此浏览器中可离线使用的笔记旁显示一个小圆点。",
       "format_toolbar_mode": "在电脑上，选择在笔记中选中文本时格式按钮显示的位置：在笔记工具栏中替代笔记操作，或在所选内容上方的浮动菜单中，笔记工具栏保持不变。",
       "workspace_activity_emails": "当其他人更改了您共享的工作区或与您共享的工作区中的笔记时，接收邮件通知。邮件会列出新建、修改和删除的笔记，但不包含笔记内容，并发送到您个人资料中的邮箱地址。有更改时：在最后一次更改后几分钟发送。每日摘要：8:00 发送。每周摘要：每周一 8:00 发送，以您的时区为准。",
-      "workspace_activity_emails_no_address": "请在个人资料中添加邮箱地址以接收这些邮件。",
-      "note_scrollbar": "在电脑上，选择笔记显示细滚动条还是不显示滚动条。"
+      "workspace_activity_emails_no_address": "请在个人资料中添加邮箱地址以接收这些邮件。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -878,8 +877,7 @@
       "show_note_icons": "显示笔记图标",
       "sidebar_offline_marks": "显示离线圆点",
       "format_toolbar_mode": "格式工具栏",
-      "workspace_activity_emails": "共享工作区邮件",
-      "note_scrollbar": "笔记滚动条"
+      "workspace_activity_emails": "共享工作区邮件"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -896,9 +894,7 @@
       "code_block_font_size": "{{size}}px",
       "settings_font_size": "{{size}}px",
       "format_toolbar_mode_toolbar": "在笔记工具栏中",
-      "format_toolbar_mode_floating": "浮动在所选内容上方",
-      "note_scrollbar_thin": "细",
-      "note_scrollbar_none": "隐藏"
+      "format_toolbar_mode_floating": "浮动在所选内容上方"
     },
     "alerts": {
       "error_saving_preference": "保存偏好设置出错"
@@ -1425,7 +1421,8 @@
       "note_stats_characters": "显示字符数",
       "note_stats_words": "显示字数",
       "note_stats_lines": "显示行数",
-      "note_info_icon": "在笔记标题下显示信息图标"
+      "note_info_icon": "在笔记标题下显示信息图标",
+      "note_scrollbar": "笔记滚动条"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏布局",

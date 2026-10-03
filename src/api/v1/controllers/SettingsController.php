@@ -284,14 +284,6 @@ class SettingsController {
             return $normalized;
         }
 
-        if ($key === 'note_scrollbar') {
-            $normalized = trim((string) $value);
-            if (!in_array($normalized, ['thin', 'none'], true)) {
-                throw new InvalidArgumentException('invalid note scrollbar', 400);
-            }
-            return $normalized;
-        }
-
         if ($key === 'allow_executable_attachments') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }

@@ -550,8 +550,7 @@
       "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind.",
       "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt.",
       "workspace_activity_emails": "Erhalten Sie eine E-Mail, wenn jemand anderes eine Notiz in einem Arbeitsbereich ändert, den Sie teilen oder der mit Ihnen geteilt wird. Sie listet die erstellten, bearbeiteten und gelöschten Notizen auf, nie deren Inhalt, und geht an die E-Mail-Adresse Ihres Profils. Bei Änderungen: einige Minuten nach der letzten Änderung. Tägliche Zusammenfassung: um 8:00 Uhr. Wöchentliche Zusammenfassung: montags um 8:00 Uhr, in Ihrer Zeitzone.",
-      "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten.",
-      "note_scrollbar": "Wählen Sie am Computer, ob eine Notiz eine schmale Bildlaufleiste oder keine anzeigt."
+      "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -879,8 +878,7 @@
       "show_note_icons": "Notizsymbole anzeigen",
       "sidebar_offline_marks": "Offline-Punkt anzeigen",
       "format_toolbar_mode": "Formatierungsleiste",
-      "workspace_activity_emails": "E-Mails zu geteilten Arbeitsbereichen",
-      "note_scrollbar": "Bildlaufleiste der Notizen"
+      "workspace_activity_emails": "E-Mails zu geteilten Arbeitsbereichen"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -897,9 +895,7 @@
       "code_block_font_size": "{{size}}px",
       "settings_font_size": "{{size}}px",
       "format_toolbar_mode_toolbar": "In der Notiz-Symbolleiste",
-      "format_toolbar_mode_floating": "Schwebend über der Auswahl",
-      "note_scrollbar_thin": "Schmal",
-      "note_scrollbar_none": "Ausgeblendet"
+      "format_toolbar_mode_floating": "Schwebend über der Auswahl"
     },
     "alerts": {
       "error_saving_preference": "Fehler beim Speichern der Einstellung"
@@ -1427,7 +1423,8 @@
       "note_stats_characters": "Zeichenanzahl anzeigen",
       "note_stats_words": "Wortanzahl anzeigen",
       "note_stats_lines": "Zeilenanzahl anzeigen",
-      "note_info_icon": "Informationssymbol unter dem Notiztitel anzeigen"
+      "note_info_icon": "Informationssymbol unter dem Notiztitel anzeigen",
+      "note_scrollbar": "Bildlaufleiste der Notizen"
     },
     "icon_sidebar_order": {
       "title": "Layout der Icon-Seitenleiste",

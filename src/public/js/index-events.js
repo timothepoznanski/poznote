@@ -379,7 +379,7 @@
      * the note's own, or in the split view the right pane's, whose place
      * depends on the window and the pane ratio. They stay beside it when
      * there is room, else move to its left; a short note, a hidden bar
-     * (note_scrollbar = none) or the kanban leave them where they are.
+     * (panel:note-scrollbar unticked) or the kanban leave them where they are.
      * Written to --pz-docked-note-scrollbar, which css/notes/noteentry.css
      * and css/ui-customization-panel.css add to their right offset.
      */
@@ -464,6 +464,8 @@
         }, true);
 
         window.addEventListener('resize', scheduleUpdateNoteScrollButtons);
+        // The bar ticked on or off in Element visibility (panel:note-scrollbar)
+        document.addEventListener('poznote-ui-customization-updated', scheduleUpdateNoteScrollButtons);
 
         // Size changes that fire no scroll: the split view opening, images and
         // diagrams rendering, the outline docking (updateNoteScrollbarClearance)

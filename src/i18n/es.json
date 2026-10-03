@@ -550,8 +550,7 @@
       "sidebar_offline_marks": "Muestra un pequeño punto junto a las notas disponibles sin conexión en este navegador.",
       "format_toolbar_mode": "En un ordenador, elija dónde aparecen los botones de formato al seleccionar texto en una nota: en la barra de herramientas de la nota, en lugar de las acciones de la nota, o en un menú flotante sobre la selección, que deja la barra de herramientas de la nota tal como está.",
       "workspace_activity_emails": "Recibe un correo cuando otra persona cambia una nota en un espacio de trabajo que compartes o en uno compartido contigo. Enumera las notas creadas, editadas y eliminadas, nunca su contenido, y se envía a la dirección de correo de tu perfil. A medida que hay cambios: unos minutos después del último cambio. Resumen diario: a las 8:00. Resumen semanal: el lunes a las 8:00, en tu zona horaria.",
-      "workspace_activity_emails_no_address": "Añade una dirección de correo a tu perfil para recibir estos correos.",
-      "note_scrollbar": "En un ordenador, elija si una nota muestra una barra de desplazamiento fina o ninguna."
+      "workspace_activity_emails_no_address": "Añade una dirección de correo a tu perfil para recibir estos correos."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -879,8 +878,7 @@
       "show_note_icons": "Mostrar iconos de las notas",
       "sidebar_offline_marks": "Mostrar el punto sin conexión",
       "format_toolbar_mode": "Barra de formato",
-      "workspace_activity_emails": "Correos de espacios compartidos",
-      "note_scrollbar": "Barra de desplazamiento de las notas"
+      "workspace_activity_emails": "Correos de espacios compartidos"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",
@@ -897,9 +895,7 @@
       "code_block_font_size": "{{size}}px",
       "settings_font_size": "{{size}}px",
       "format_toolbar_mode_toolbar": "En la barra de herramientas de la nota",
-      "format_toolbar_mode_floating": "Flotante sobre la selección",
-      "note_scrollbar_thin": "Fina",
-      "note_scrollbar_none": "Oculta"
+      "format_toolbar_mode_floating": "Flotante sobre la selección"
     },
     "alerts": {
       "error_saving_preference": "Error al guardar preferencia"
@@ -1427,7 +1423,8 @@
       "note_stats_characters": "Mostrar número de caracteres",
       "note_stats_words": "Mostrar número de palabras",
       "note_stats_lines": "Mostrar número de líneas",
-      "note_info_icon": "Mostrar icono de información bajo el título de la nota"
+      "note_info_icon": "Mostrar icono de información bajo el título de la nota",
+      "note_scrollbar": "Barra de desplazamiento de las notas"
     },
     "icon_sidebar_order": {
       "title": "Diseño de la barra de iconos",

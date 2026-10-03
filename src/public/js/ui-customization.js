@@ -476,6 +476,11 @@
                     // The floating stack and the scroll arrows sit left of the
                     // outline column (css/notes/noteentry.css): give them the edge.
                     rules.push('html { --pz-docked-outline: 0px !important; }');
+                } else if (id === 'note-scrollbar') {
+                    // The note's thin scrollbar (css/layout.css, #1544); see
+                    // lib/ui-customization.php.
+                    rules.push('#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview) { scrollbar-width: none !important; scrollbar-gutter: auto !important; }');
+                    rules.push(':is(#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview))::-webkit-scrollbar { display: none !important; }');
                 } else if (id === 'tasklist-progress') {
                     rules.push('.tasklist-progress { display: none !important; }');
                 } else if (id === 'preview-code-block-delete') {

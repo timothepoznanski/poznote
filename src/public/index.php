@@ -282,12 +282,11 @@ $settings = [
     'markdown_default_view_mode' => 'preview',
     'sidebar_offline_marks' => '1',
     'favorites_sort' => POZNOTE_FAVORITES_SORT_DEFAULT,
-    'favorites_icon_color' => '',
-    'note_scrollbar' => 'thin'
+    'favorites_icon_color' => ''
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color', 'note_scrollbar')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -468,11 +467,6 @@ if (poznoteSettingEnabled($settings['highlight_current_folder_tree'], false)) {
     if ($folder_tree_dim_level >= POZNOTE_FOLDER_TREE_DIM_MIN && $folder_tree_dim_level <= POZNOTE_FOLDER_TREE_DIM_MAX) {
         $folder_tree_dim_style = '--folder-tree-dim-opacity: ' . number_format((100 - $folder_tree_dim_level) / 100, 2, '.', '') . '; ';
     }
-}
-// The note's scrollbar on a computer (#1544): thin by default, drawn in
-// css/layout.css; this class hides it.
-if ($settings['note_scrollbar'] === 'none') {
-    $extra_body_classes .= ' note-scrollbar-none';
 }
 if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
     $extra_body_classes .= ' markdown-split-card-view';
