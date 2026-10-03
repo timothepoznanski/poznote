@@ -100,7 +100,6 @@ function handleEmptyQuoteBackspace(e, selection) {
 // ============================================================================
 
 var HEADING_BLOCK_SELECTOR = 'h1, h2, h3, h4, h5, h6';
-var HEADING_ANCHOR_NODE_SELECTOR = '.heading-anchor, [data-heading-anchor="true"]';
 // Blocks containing any of these are left to the browser's default merge logic
 var HEADING_MERGE_BLOCKING_SELECTOR = 'img, video, audio, iframe, table, pre, ul, ol, li, hr, details, blockquote, aside, ' +
     'h1, h2, h3, h4, h5, h6, .excalidraw-wrapper';
@@ -120,20 +119,12 @@ function isMergeableBlock(el) {
     return (isHeadingElement(el) || isPlainTextBlock(el)) && !el.querySelector(HEADING_MERGE_BLOCKING_SELECTOR);
 }
 
-function removeHeadingAnchorNodes(el) {
-    var anchors = el.querySelectorAll(HEADING_ANCHOR_NODE_SELECTOR);
-    for (var i = 0; i < anchors.length; i++) {
-        anchors[i].remove();
-    }
-}
-
 /**
- * True when the block holds no visible text (heading anchor icons ignored)
+ * True when the block holds no visible text
  */
 function isBlockVisuallyEmpty(el) {
     if (!el) return false;
     var clone = el.cloneNode(true);
-    removeHeadingAnchorNodes(clone);
     var text = (clone.textContent || '').replace(/[\s\u200B-\u200D\uFEFF\u00A0]/g, '');
     return text === '' && !clone.querySelector('img, video, audio, iframe, table, pre, ul, ol, hr, details, .excalidraw-wrapper');
 }
@@ -204,7 +195,6 @@ function placeCaretAtBlockEnd(block) {
  */
 function convertHeadingToPlainBlock(heading) {
     var block = document.createElement('div');
-    removeHeadingAnchorNodes(heading);
     while (heading.firstChild) {
         block.appendChild(heading.firstChild);
     }
@@ -223,9 +213,6 @@ function convertHeadingToPlainBlock(heading) {
  * paragraph becomes plain text.
  */
 function mergeBlockIntoPrevious(target, source) {
-    removeHeadingAnchorNodes(target);
-    removeHeadingAnchorNodes(source);
-
     if (isBlockVisuallyEmpty(target)) {
         target.innerHTML = '';
     }
@@ -266,7 +253,7 @@ function mergeBlockIntoPrevious(target, source) {
 /**
  * Handle Backspace/Delete when a heading is involved at the caret boundary.
  * The browser's native merge keeps an emptied heading alive (with its id, so
- * its section link) and wraps merged text in inline style spans, which is
+ * its outline entry) and wraps merged text in inline style spans, which is
  * how a paragraph pulled up into a deleted heading ended up as bold heading
  * text. This handler removes emptied headings outright and merges the
  * neighbouring blocks itself.

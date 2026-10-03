@@ -12,13 +12,7 @@ let currentOutlineHeadings = null;
 // Last extraction from a markdown note, see extractHeadings()
 let markdownOutlineCache = null;
 let hasInitializedOutlinePanel = false;
-let hasInitializedHeadingAnchorHandlers = false;
-let floatingHeadingAnchor = null;
-let floatingHeadingAnchorTarget = null;
-let floatingHeadingAnchorHideTimeout = null;
 const HEADING_SELECTOR = 'h1, h2, h3, h4, h5, h6';
-const HEADING_ANCHOR_SELECTOR = '.heading-anchor';
-const HEADING_ANCHOR_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12"><path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95l-1.25 1.25zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0z"/></svg>';
 const OUTLINE_PAGE_SCROLL_TOP_OFFSET = 100;
 const OUTLINE_SPLIT_PANE_SCROLL_TOP_OFFSET = 20;
 
@@ -372,7 +366,6 @@ function initOutlinePanel() {
     }
 
     hasInitializedOutlinePanel = true;
-    initHeadingAnchorInteractions();
 
     // Load saved width from localStorage
     const savedWidth = localStorage.getItem('outlineWidth');
@@ -546,82 +539,13 @@ function toggleOutline() {
     }
 }
 
-let _headingToastTimeout = null;
-
-function showHeadingCopiedToast() {
-    let toast = document.getElementById('heading-copy-toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'heading-copy-toast';
-        document.body.appendChild(toast);
-    }
-    const label = (typeof window.t === 'function')
-        ? window.t('common.link_copied', null, 'Link copied')
-        : 'Link copied';
-    toast.textContent = label;
-    toast.classList.remove('heading-copy-toast--hidden');
-    toast.classList.add('heading-copy-toast--visible');
-    clearTimeout(_headingToastTimeout);
-    _headingToastTimeout = setTimeout(function () {
-        toast.classList.remove('heading-copy-toast--visible');
-        toast.classList.add('heading-copy-toast--hidden');
-    }, 2000);
-}
-
-function stripRuntimeHeadingAnchorsFromElement(element) {
-    if (!element) return element;
-
-    var anchors = element.querySelectorAll(HEADING_ANCHOR_SELECTOR + ', [data-heading-anchor="true"]');
-    for (var i = 0; i < anchors.length; i++) {
-        anchors[i].remove();
-    }
-
-    return element;
-}
-
-function isHeadingInsideEditableHtmlNote(heading) {
-    if (!heading || !heading.closest) return false;
-
-    var editableNote = heading.closest('.noteentry[contenteditable="true"]');
-    return !!(editableNote && !heading.closest('.markdown-preview'));
-}
-
-function isActiveEditableHtmlHeading(heading) {
-    return !!(
-        heading &&
-        heading.matches &&
-        heading.matches(HEADING_SELECTOR) &&
-        document.contains(heading) &&
-        isHeadingInsideEditableHtmlNote(heading) &&
-        getHeadingTextContent(heading)
-    );
-}
-
 function slugifyHeadingText(text) {
     return (text || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
 }
 
 function getHeadingTextContent(heading) {
     if (!heading) return '';
-
-    // Runtime anchors only hold an SVG icon: without text of their own they
-    // change nothing, and cloning every heading on each outline update adds
-    // up on long notes
-    var anchors = heading.querySelectorAll(HEADING_ANCHOR_SELECTOR + ', [data-heading-anchor="true"]');
-    var anchorsHaveText = false;
-    for (var i = 0; i < anchors.length; i++) {
-        if (anchors[i].textContent) {
-            anchorsHaveText = true;
-            break;
-        }
-    }
-    if (!anchorsHaveText) {
-        return (heading.textContent || '').trim();
-    }
-
-    var clone = heading.cloneNode(true);
-    stripRuntimeHeadingAnchorsFromElement(clone);
-    return (clone.textContent || '').trim();
+    return (heading.textContent || '').trim();
 }
 
 function ensureHeadingId(heading, prefix) {
@@ -634,298 +558,6 @@ function ensureHeadingId(heading, prefix) {
     }
 
     return heading.id;
-}
-
-function getHeadingIndexWithinNote(heading) {
-    if (!heading || !heading.closest) return -1;
-
-    var noteElement = heading.closest('.noteentry, .public-note .content');
-    if (!noteElement) return -1;
-
-    var headings = noteElement.querySelectorAll(HEADING_SELECTOR);
-    for (var i = 0; i < headings.length; i++) {
-        if (headings[i] === heading) {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
-function getHeadingForAnchor(anchor) {
-    if (!anchor) return null;
-
-    if (anchor.classList.contains('heading-anchor--floating')) {
-        if (isActiveEditableHtmlHeading(anchor._headingElement)) {
-            return anchor._headingElement;
-        }
-
-        hideFloatingHeadingAnchor();
-        return null;
-    }
-
-    var heading = anchor.closest(HEADING_SELECTOR);
-    if (heading) return heading;
-
-    if (anchor._headingElement && document.contains(anchor._headingElement)) {
-        return anchor._headingElement;
-    }
-
-    var headingId = anchor.getAttribute('data-heading-id');
-    return headingId ? document.getElementById(headingId) : null;
-}
-
-function cleanupStaleHeadingAnchorLinks(element) {
-    if (!element) return;
-
-    if (floatingHeadingAnchorTarget && (!element.contains(floatingHeadingAnchorTarget) || !isActiveEditableHtmlHeading(floatingHeadingAnchorTarget))) {
-        hideFloatingHeadingAnchor();
-    }
-
-    var anchors = element.querySelectorAll(HEADING_ANCHOR_SELECTOR + ', [data-heading-anchor="true"]');
-    for (var i = 0; i < anchors.length; i++) {
-        var anchor = anchors[i];
-        var heading = anchor.closest(HEADING_SELECTOR);
-
-        if (!heading || isHeadingInsideEditableHtmlNote(heading) || !getHeadingTextContent(heading)) {
-            anchor.remove();
-        }
-    }
-}
-
-function cancelFloatingHeadingAnchorHide() {
-    clearTimeout(floatingHeadingAnchorHideTimeout);
-    floatingHeadingAnchorHideTimeout = null;
-}
-
-function hideFloatingHeadingAnchor() {
-    cancelFloatingHeadingAnchorHide();
-
-    if (floatingHeadingAnchor) {
-        floatingHeadingAnchor.hidden = true;
-        floatingHeadingAnchor._headingElement = null;
-        floatingHeadingAnchor.removeAttribute('data-heading-id');
-        floatingHeadingAnchor.removeAttribute('href');
-    }
-
-    floatingHeadingAnchorTarget = null;
-}
-
-function scheduleFloatingHeadingAnchorHide() {
-    cancelFloatingHeadingAnchorHide();
-    floatingHeadingAnchorHideTimeout = setTimeout(hideFloatingHeadingAnchor, 120);
-}
-
-function getHeadingTextEndRect(heading) {
-    if (!heading) return null;
-
-    var range = document.createRange();
-    range.selectNodeContents(heading);
-    var rects = range.getClientRects();
-    var lastRect = null;
-
-    for (var i = 0; i < rects.length; i++) {
-        if (rects[i].width > 0 || rects[i].height > 0) {
-            lastRect = rects[i];
-        }
-    }
-
-    if (range.detach) {
-        range.detach();
-    }
-
-    return lastRect || heading.getBoundingClientRect();
-}
-
-function createFloatingHeadingAnchor() {
-    if (floatingHeadingAnchor) {
-        return floatingHeadingAnchor;
-    }
-
-    floatingHeadingAnchor = document.createElement('a');
-    floatingHeadingAnchor.className = 'heading-anchor heading-anchor--floating';
-    floatingHeadingAnchor.innerHTML = HEADING_ANCHOR_SVG;
-    floatingHeadingAnchor.title = 'Copy section link';
-    floatingHeadingAnchor.hidden = true;
-    floatingHeadingAnchor.setAttribute('aria-hidden', 'true');
-    floatingHeadingAnchor.setAttribute('contenteditable', 'false');
-    floatingHeadingAnchor.setAttribute('draggable', 'false');
-    floatingHeadingAnchor.setAttribute('data-heading-anchor', 'true');
-    floatingHeadingAnchor.addEventListener('mouseenter', cancelFloatingHeadingAnchorHide);
-    floatingHeadingAnchor.addEventListener('mouseleave', scheduleFloatingHeadingAnchorHide);
-    document.body.appendChild(floatingHeadingAnchor);
-
-    return floatingHeadingAnchor;
-}
-
-function positionFloatingHeadingAnchor() {
-    if (!floatingHeadingAnchor || !floatingHeadingAnchorTarget || floatingHeadingAnchor.hidden) {
-        return;
-    }
-
-    if (!isActiveEditableHtmlHeading(floatingHeadingAnchorTarget)) {
-        hideFloatingHeadingAnchor();
-        return;
-    }
-
-    var rect = getHeadingTextEndRect(floatingHeadingAnchorTarget);
-    if (!rect || rect.bottom < 0 || rect.top > window.innerHeight || rect.right < 0 || rect.left > window.innerWidth) {
-        hideFloatingHeadingAnchor();
-        return;
-    }
-
-    var computedStyle = window.getComputedStyle(floatingHeadingAnchorTarget);
-    var left = window.scrollX + rect.right + 6;
-    var maxLeft = window.scrollX + window.innerWidth - 24;
-    floatingHeadingAnchor.style.left = Math.round(Math.min(left, maxLeft)) + 'px';
-    floatingHeadingAnchor.style.top = Math.round(window.scrollY + rect.top + (rect.height / 2)) + 'px';
-    floatingHeadingAnchor.style.color = computedStyle.color;
-}
-
-function showFloatingHeadingAnchor(heading) {
-    if (!heading || !isHeadingInsideEditableHtmlNote(heading)) return;
-
-    stripRuntimeHeadingAnchorsFromElement(heading);
-
-    var headingText = getHeadingTextContent(heading);
-    if (!headingText) return;
-
-    var headingIndex = getHeadingIndexWithinNote(heading);
-    var headingId = ensureHeadingId(heading, headingIndex >= 0 ? 'heading-' + headingIndex : 'heading');
-    if (!headingId) return;
-
-    var anchor = createFloatingHeadingAnchor();
-    floatingHeadingAnchorTarget = heading;
-    anchor._headingElement = heading;
-    anchor.href = '#' + headingId;
-    anchor.setAttribute('data-heading-id', headingId);
-    anchor.hidden = false;
-    cancelFloatingHeadingAnchorHide();
-    positionFloatingHeadingAnchor();
-}
-
-function handleEditableHtmlHeadingMouseOver(e) {
-    if (!e.target.closest) return;
-
-    var heading = e.target.closest(HEADING_SELECTOR);
-    if (!heading || !isHeadingInsideEditableHtmlNote(heading)) return;
-
-    if (e.relatedTarget && heading.contains(e.relatedTarget)) {
-        return;
-    }
-
-    showFloatingHeadingAnchor(heading);
-}
-
-function handleEditableHtmlHeadingMouseOut(e) {
-    if (!e.target.closest || !floatingHeadingAnchorTarget) return;
-
-    var heading = e.target.closest(HEADING_SELECTOR);
-    if (heading !== floatingHeadingAnchorTarget) return;
-
-    var relatedTarget = e.relatedTarget;
-    if (relatedTarget && (heading.contains(relatedTarget) || (floatingHeadingAnchor && floatingHeadingAnchor.contains(relatedTarget)))) {
-        return;
-    }
-
-    scheduleFloatingHeadingAnchorHide();
-}
-
-function initHeadingAnchorInteractions() {
-    if (hasInitializedHeadingAnchorHandlers) {
-        return;
-    }
-
-    hasInitializedHeadingAnchorHandlers = true;
-
-    document.addEventListener('mousedown', function (e) {
-        var anchor = e.target.closest(HEADING_ANCHOR_SELECTOR);
-        if (!anchor) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-    }, true);
-
-    document.addEventListener('click', function (e) {
-        var anchor = e.target.closest(HEADING_ANCHOR_SELECTOR);
-        if (!anchor) return;
-
-        var heading = getHeadingForAnchor(anchor);
-        if (!heading || !heading.id) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        var url = window.location.href.split('#')[0] + '#' + heading.id;
-        if (navigator.clipboard) {
-            navigator.clipboard.writeText(url).then(function () {
-                anchor.classList.add('heading-anchor--copied');
-                setTimeout(function () { anchor.classList.remove('heading-anchor--copied'); }, 2000);
-                showHeadingCopiedToast();
-            });
-        }
-    }, true);
-
-    document.addEventListener('mouseover', handleEditableHtmlHeadingMouseOver, true);
-    document.addEventListener('mouseout', handleEditableHtmlHeadingMouseOut, true);
-    document.addEventListener('input', function () {
-        positionFloatingHeadingAnchor();
-    }, true);
-    window.addEventListener('scroll', positionFloatingHeadingAnchor, true);
-    window.addEventListener('resize', positionFloatingHeadingAnchor);
-}
-
-/**
- * Add a GitHub-style anchor link icon to a heading element.
- * Shows a clickable '#' link on hover that copies the section URL to the clipboard.
- */
-function addHeadingAnchorLink(heading) {
-    if (!heading) return;
-
-    if (isHeadingInsideEditableHtmlNote(heading)) {
-        stripRuntimeHeadingAnchorsFromElement(heading);
-        return;
-    }
-
-    if (!heading.id) {
-        const headingText = getHeadingTextContent(heading);
-        if (!headingText) return;
-        heading.id = 'heading-' + slugifyHeadingText(headingText);
-    }
-
-    let anchor = heading.querySelector(HEADING_ANCHOR_SELECTOR);
-    if (!anchor) {
-        // Built completely before it goes in the page: in Chromium, writing
-        // contenteditable on an element already in the page forces a style
-        // and layout pass over the whole page, tens of ms on a long note, for
-        // every heading (a note with 265 headings froze for a minute)
-        anchor = document.createElement('a');
-        anchor.innerHTML = HEADING_ANCHOR_SVG;
-        applyHeadingAnchorAttributes(anchor, heading.id);
-        heading.appendChild(anchor);
-        return;
-    }
-
-    applyHeadingAnchorAttributes(anchor, heading.id);
-}
-
-// Writes only the attributes that differ: an anchor already in the page must
-// not get contenteditable written again (see addHeadingAnchorLink)
-function applyHeadingAnchorAttributes(anchor, headingId) {
-    const attributes = {
-        'class': 'heading-anchor',
-        'href': '#' + headingId,
-        'title': 'Copy section link',
-        'aria-hidden': 'true',
-        'contenteditable': 'false',
-        'draggable': 'false',
-        'data-heading-anchor': 'true'
-    };
-    Object.keys(attributes).forEach(name => {
-        if (anchor.getAttribute(name) !== attributes[name]) {
-            anchor.setAttribute(name, attributes[name]);
-        }
-    });
 }
 
 /**
@@ -948,8 +580,6 @@ function extractHeadings(noteElement) {
     const isSplitMode = noteElement.classList.contains('markdown-split-mode');
     const markdownContent = markdownEditor ? getMarkdownEditorContent(markdownEditor) : '';
 
-    // Read before cleanupStaleHeadingAnchorLinks() writes: reading layout
-    // (offsetParent) after a write forces a reflow
     let previewHeadingElements = [];
     let hasVisiblePreview = false;
     if (markdownContent && markdownPreview) {
@@ -969,8 +599,6 @@ function extractHeadings(noteElement) {
     }
     markdownOutlineCache = null;
 
-    cleanupStaleHeadingAnchorLinks(noteElement);
-
     const headings = [];
 
     // For markdown notes, always extract from source (works for all modes)
@@ -981,8 +609,7 @@ function extractHeadings(noteElement) {
 
             // Index preview headings once up front. Scanning every preview
             // heading (and reading layout via offsetParent) for each source
-            // heading is quadratic and interleaves DOM reads with the anchor
-            // writes below, forcing reflows on heading-rich notes.
+            // heading is quadratic on heading-rich notes.
             const previewHeadingsByText = new Map();
             if (markdownPreview) {
                 previewHeadingElements.forEach(h => {
@@ -1031,7 +658,6 @@ function extractHeadings(noteElement) {
                     if (sameTextHeadings && sameTextHeadings.length > 0) {
                         previewElement = sameTextHeadings.shift();
                         if (!previewElement.id) previewElement.id = id;
-                        addHeadingAnchorLink(previewElement);
                     }
 
                     headings.push({
@@ -1068,8 +694,6 @@ function extractHeadings(noteElement) {
         if (text) {
             // Add an ID to the heading if it doesn't have one (for navigation)
             ensureHeadingId(heading, `heading-${index}`);
-
-            addHeadingAnchorLink(heading);
 
             headings.push({
                 id: heading.id,
@@ -1510,9 +1134,7 @@ function observeNoteChanges() {
                     var cl = n.classList;
                     return cl && (cl.contains('search-highlight') ||
                                   cl.contains('tag-highlight') ||
-                                  cl.contains('input-highlight-overlay') ||
-                                  cl.contains('heading-anchor') ||
-                                  n.getAttribute('data-heading-anchor') === 'true');
+                                  cl.contains('input-highlight-overlay'));
                 }
                 return false;
             });
@@ -1576,8 +1198,6 @@ function refreshOutline() {
     currentOutlineSignature = null;
     updateOutlineForCurrentNote();
 }
-
-window.stripRuntimeHeadingAnchorsFromElement = stripRuntimeHeadingAnchorsFromElement;
 
 /**
  * Initialize touch/swipe support for mobile

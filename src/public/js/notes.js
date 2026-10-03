@@ -1025,12 +1025,6 @@ function stripSearchHighlights(element) {
         unwrapCodeBlockActionHost(codeBlockHosts[c]);
     }
 
-    var headingAnchors = clonedElement.querySelectorAll('.heading-anchor, [data-heading-anchor="true"]');
-
-    for (var h = 0; h < headingAnchors.length; h++) {
-        headingAnchors[h].remove();
-    }
-
     var highlights = clonedElement.querySelectorAll('.search-highlight');
 
     for (var i = 0; i < highlights.length; i++) {

@@ -14,35 +14,128 @@ function applyHtmlBlockStyle(style) {
       console.debug('toolbar-editor-utils: applyHtmlBlockStyle() failed:', e);
   }
 
-  // Strip heading-anchor links from the current block before formatBlock.
-  // The <a contenteditable="false"> inside a heading confuses the browser's
-  // formatBlock implementation: instead of replacing e.g. <h2> with <h1> in
-  // place it can create a second heading element, causing the outline to show
-  // duplicates until the page is refreshed.
-  var currentRange = sel.getRangeAt(0);
-  var anchorContainer = currentRange.commonAncestorContainer;
-  if (anchorContainer.nodeType === 3) anchorContainer = anchorContainer.parentNode;
-  var currentHeading = anchorContainer.closest ? anchorContainer.closest('h1,h2,h3,h4,h5,h6') : null;
-  if (currentHeading) {
-    var headingAnchors = currentHeading.querySelectorAll('.heading-anchor');
-    for (var a = 0; a < headingAnchors.length; a++) {
-      headingAnchors[a].remove();
-    }
-  }
-
   var formatTag = style === 'normal' ? 'div' : ('h' + style);
   var execValues = [formatTag, '<' + formatTag + '>'];
 
   for (var i = 0; i < execValues.length; i++) {
     try {
       if (document.execCommand('formatBlock', false, execValues[i])) {
-        return;
+        break;
       }
     } catch (e) {
         // Try the next formatBlock syntax
         console.debug('toolbar-editor-utils: applyHtmlBlockStyle() failed:', e);
     }
   }
+
+  if (style === 'normal') {
+    unwrapSelectedHtmlHeadings();
+  }
+}
+
+var HTML_HEADING_SELECTOR = 'h1, h2, h3, h4, h5, h6';
+
+function isHtmlHeadingBlockChild(node) {
+  return node.nodeType === 1 && /^(DIV|P|ASIDE|UL|OL|TABLE|PRE|BLOCKQUOTE|HR|DETAILS|H[1-6])$/.test(node.tagName);
+}
+
+// True when the selection covers the heading: a caret inside it, or a
+// selection holding some of its text (a triple click ends at the start of the
+// next block, which must stay as it is)
+function isHtmlHeadingSelected(range, heading) {
+  if (!range.intersectsNode(heading)) return false;
+  if (range.collapsed) return true;
+
+  var covered = document.createRange();
+  covered.selectNodeContents(heading);
+  if (range.compareBoundaryPoints(Range.START_TO_START, covered) > 0) {
+    covered.setStart(range.startContainer, range.startOffset);
+  }
+  if (range.compareBoundaryPoints(Range.END_TO_END, covered) < 0) {
+    covered.setEnd(range.endContainer, range.endOffset);
+  }
+  return covered.toString() !== '';
+}
+
+// Replaces a heading with plain blocks holding the same content. A heading
+// that wraps blocks of its own (<h2><aside>…</aside><div>…</div></h2>) hands
+// them to its parent, a run of loose text between them goes in a div.
+function replaceHtmlHeadingWithPlainBlocks(heading) {
+  var fragment = document.createDocumentFragment();
+  var run = null;
+
+  while (heading.firstChild) {
+    var child = heading.firstChild;
+    if (isHtmlHeadingBlockChild(child)) {
+      run = null;
+      fragment.appendChild(child);
+      continue;
+    }
+    if (!run) {
+      if (child.nodeType === 3 && !child.textContent.trim()) {
+        heading.removeChild(child);
+        continue;
+      }
+      run = document.createElement('div');
+      if (heading.style.textAlign) run.style.textAlign = heading.style.textAlign;
+      fragment.appendChild(run);
+    }
+    run.appendChild(child);
+  }
+
+  if (!fragment.firstChild) {
+    fragment.appendChild(document.createElement('div')).innerHTML = '<br>';
+  }
+  heading.parentNode.replaceChild(fragment, heading);
+}
+
+// Turns the headings still under the selection into normal text. formatBlock
+// leaves a heading alone when the selection sits in a block nested inside it
+// (<h2><div>text</div></h2>): the nearest block is a div already.
+function unwrapSelectedHtmlHeadings() {
+  var sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return false;
+
+  var range = sel.getRangeAt(0);
+  var editor = getEditorFromRange(range);
+  if (!editor || !editor.isContentEditable || editor.classList.contains('markdown-editor')) return false;
+
+  var headings = Array.prototype.filter.call(editor.querySelectorAll(HTML_HEADING_SELECTOR), function (heading) {
+    return isHtmlHeadingSelected(range, heading);
+  });
+  if (!headings.length) return false;
+
+  // Moving a node resets a selection that ends inside it
+  var saved = {
+    startContainer: range.startContainer, startOffset: range.startOffset,
+    endContainer: range.endContainer, endOffset: range.endOffset
+  };
+  var restorable = headings.indexOf(saved.startContainer) === -1 && headings.indexOf(saved.endContainer) === -1;
+
+  headings.forEach(function (heading) {
+    if (heading.parentNode) replaceHtmlHeadingWithPlainBlocks(heading);
+  });
+
+  if (restorable) {
+    try {
+      var restored = document.createRange();
+      restored.setStart(saved.startContainer, saved.startOffset);
+      restored.setEnd(saved.endContainer, saved.endOffset);
+      sel.removeAllRanges();
+      sel.addRange(restored);
+    } catch (e) {
+      console.debug('toolbar-editor-utils: unwrapSelectedHtmlHeadings() failed:', e);
+    }
+  }
+
+  editor.dispatchEvent(new Event('input', { bubbles: true }));
+  return true;
+}
+
+// Clear formatting: inline styles go, and a heading goes back to normal text
+function clearHtmlFormatting() {
+  document.execCommand('removeFormat');
+  unwrapSelectedHtmlHeadings();
 }
 
 // Aligns the paragraphs under the selection (left, center, right, justify),

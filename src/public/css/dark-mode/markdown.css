@@ -20,11 +20,6 @@ html[data-theme='dark'] .markdown-preview h6 {
     color: var(--pz-text);
 }
 
-/* Heading anchor links */
-html[data-theme='dark'] .heading-anchor {
-    color: var(--pz-text) !important;
-}
-
 html[data-theme='dark'] .markdown-preview h1,
 html[data-theme='dark'] .markdown-preview h2 {
     border-bottom-color: var(--pz-border);

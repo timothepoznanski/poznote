@@ -631,7 +631,7 @@
                 break;
             case 'exec-remove-format':
                 // For markdown, this doesn't make much sense, but we keep it
-                document.execCommand('removeFormat');
+                clearHtmlFormatting();
                 break;
 
             // Toolbar functions
