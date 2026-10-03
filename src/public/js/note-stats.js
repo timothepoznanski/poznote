@@ -240,6 +240,66 @@
         });
     }
 
+    /**
+     * With a mouse, pressing on the strip and moving drags it sideways: its
+     * text is not selectable (css/notes/subline.css). Touch and trackpads
+     * scroll it natively.
+     */
+    function wireSublineDrag(list) {
+        var startX = 0;
+        var startScroll = 0;
+        var dragging = false;
+
+        list.addEventListener('pointerdown', function (e) {
+            if (e.pointerType !== 'mouse' || e.button !== 0) {
+                return;
+            }
+            dragging = true;
+            startX = e.clientX;
+            startScroll = list.scrollLeft;
+            list.setPointerCapture(e.pointerId);
+        });
+        list.addEventListener('pointermove', function (e) {
+            if (dragging) {
+                list.scrollLeft = startScroll - (e.clientX - startX);
+            }
+        });
+        function stop() {
+            dragging = false;
+        }
+        list.addEventListener('pointerup', stop);
+        list.addEventListener('pointercancel', stop);
+        list.addEventListener('lostpointercapture', stop);
+    }
+
+    /**
+     * The entries of the line stay on one row, in a strip that scrolls
+     * sideways like the tags: the helpers of js/clickable-tags.js give it the
+     * wheel and the faded edges (no chevrons here). Wired once per line, then
+     * only told that its content may have changed width.
+     */
+    function syncSublineScroll(holder) {
+        var list = holder.closest('.note-subline-list');
+        if (!list || typeof window.wireTagsListScroll !== 'function') {
+            return;
+        }
+        if (list.getAttribute('data-scroll-wired') === '1') {
+            window.updateTagsListFade(list);
+            return;
+        }
+        list.setAttribute('data-scroll-wired', '1');
+        wireSublineDrag(list);
+        // The information icon follows the strip: when every entry of the
+        // strip is hidden ("Element visibility"), it opens the line and
+        // drops its dot (css/notes/subline.css)
+        if (typeof ResizeObserver === 'function') {
+            new ResizeObserver(function () {
+                list.parentElement.classList.toggle('no-entries', list.offsetWidth === 0);
+            }).observe(list);
+        }
+        window.wireTagsListScroll(list);
+    }
+
     function recount() {
         recountTimer = null;
         var holders = document.querySelectorAll('#right_col .note-sub-stats');
@@ -250,6 +310,7 @@
             if (entry) {
                 renderStats(holder, countText(noteTextOf(entry, noteId)));
             }
+            syncSublineScroll(holder);
         }
     }
 

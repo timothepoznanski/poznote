@@ -605,7 +605,11 @@
                         // template: js/note-stats.js rewrites the date after
                         // each save.
                         $updated_label = t('index.note.modified_on', [], 'Modified {{date}}');
+                        // The entries sit in a strip that stays on one row
+                        // and scrolls sideways when the column is too narrow
+                        // for them, like the tags (js/note-stats.js wires it)
                         echo '<span class="note-subline">';
+                        echo '<span class="note-subline-list">';
                         echo '<span class="note-sub-dates">';
                         if ($created_display !== '') {
                             echo '<span class="note-sub-created">' . t_h('index.note.created_on', ['date' => $created_display], 'Created {{date}}') . '</span>';
@@ -622,11 +626,14 @@
                         echo ' <span class="note-sub-stat note-sub-stat-words" data-stat="words"></span>';
                         echo ' <span class="note-sub-stat note-sub-stat-lines" data-stat="lines"></span>';
                         echo '</span>';
-                        // Last entry: opens the note information dialog
-                        // (#noteInfoModal, js/note-info-modal.js), like the
-                        // Information entry of the "..." menu
+                        echo '</span>';
+                        // Last entry, outside the strip so that it stays in
+                        // view however far the strip is scrolled: opens the
+                        // note information dialog (#noteInfoModal,
+                        // js/note-info-modal.js), like the Information entry
+                        // of the "..." menu
                         $info_label = t_h('common.information', [], 'Information');
-                        echo '<span class="note-sub-info"><button type="button" class="note-sub-info-btn" data-action="show-note-info" data-note-id="' . $row['id'] . '" title="' . $info_label . '" aria-label="' . $info_label . '"><i class="lucide lucide-info"></i></button></span>';
+                        echo ' <span class="note-sub-info"><button type="button" class="note-sub-info-btn" data-action="show-note-info" data-note-id="' . $row['id'] . '" title="' . $info_label . '" aria-label="' . $info_label . '"><i class="lucide lucide-info"></i></button></span>';
                         echo '</span>';
                     }
                     echo '</h4>';

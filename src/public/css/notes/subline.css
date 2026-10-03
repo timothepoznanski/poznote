@@ -8,15 +8,17 @@
  */
 
 /* One quiet line: small, muted, never competing with the title above it or
-   the text below. Its entries follow one another and wrap when the column is
-   too narrow for all of them. */
+   the text below. Its entries follow one another on a single row, in a strip
+   that scrolls sideways when the column is too narrow for all of them. */
 .note-subline {
     /* Width of the slot each entry opens with, the dot centred in it */
     --note-sub-dot-slot: 16px;
+    /* How far the line is pulled up into the space under the title */
+    --note-sub-pull: 14px;
 
     display: none;
-    flex-wrap: wrap;
-    align-items: baseline;
+    align-items: flex-start;
+    min-width: 0;
     font-size: 12px;
     font-weight: var(--pz-weight-normal);
     line-height: 1.5;
@@ -26,6 +28,46 @@
 /* When enabled via settings, show the subline */
 body.show-note-created .note-subline {
     display: flex;
+}
+
+/* The strip: one row that scrolls sideways (wheel, trackpad, swipe) with no
+   scrollbar, like the tags (.editable-tags-list, css/notes/tags.css).
+   js/note-stats.js wires it with the helpers of js/clickable-tags.js, which
+   set can-scroll-start / can-scroll-end on the line for each side that has
+   entries cut off: that edge fades. No chevrons here.
+   A scrolling box clips what leaves it, so the pull of the entries (see
+   below) is given room by a padding the margin takes back: with every entry
+   hidden the two cancel out and the strip still leaves nothing behind.
+   The mask also hides the dot slot the first entry opens with.
+   Its text cannot be selected: with a mouse, pressing on it and moving
+   drags the strip sideways instead. */
+.note-subline-list {
+    --tags-fade-start: 0px;
+    --tags-fade-end: 0px;
+    display: flex;
+    flex: 0 1 auto;
+    align-items: baseline;
+    min-width: 0;
+    margin-top: calc(-1 * var(--note-sub-pull));
+    padding-top: var(--note-sub-pull);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-user-select: none;
+    user-select: none;
+    mask-image: linear-gradient(to right, transparent var(--note-sub-dot-slot), currentColor calc(var(--note-sub-dot-slot) + var(--tags-fade-start)), currentColor calc(100% - var(--tags-fade-end)), transparent);
+}
+
+.note-subline-list::-webkit-scrollbar {
+    display: none;
+}
+
+.can-scroll-start > .note-subline-list {
+    --tags-fade-start: 24px;
+}
+
+.can-scroll-end > .note-subline-list {
+    --tags-fade-end: 24px;
 }
 
 /* The dates and the figures are entries of the line itself */
@@ -41,18 +83,25 @@ body.show-note-created .note-subline {
    line collapses and leaves nothing behind.
    Above, an entry is pulled up into the 20px the title leaves under itself
    (.css-title, css/notes/editor.css), so the line reads as part of the title
-   block. Below, it keeps the note text at a distance. When the line wraps,
-   the pull of the second row eats the space under the first: the two only
-   differ by 2px, which is the gap left between the rows.
+   block. Below, it keeps the note text at a distance.
    The figures are empty until js/note-stats.js fills them in and hold their
    place from the first paint. */
 .note-sub-created,
 .note-sub-updated,
 .note-sub-stat,
 .note-sub-info {
-    margin-top: -14px;
+    flex-shrink: 0;
+    margin-top: calc(-1 * var(--note-sub-pull));
     margin-bottom: 16px;
     white-space: nowrap;
+}
+
+/* The information icon stands after the strip, not in it: it stays in view
+   however far the strip is scrolled. With no entry left before it, it is the
+   first thing on the line and its dot goes (js/note-stats.js marks the line);
+   the slot stays, so the icon lands where the line starts. */
+.note-subline.no-entries > .note-sub-info::before {
+    visibility: hidden;
 }
 
 .note-sub-stat {
@@ -60,10 +109,9 @@ body.show-note-created .note-subline {
 }
 
 /* Every entry opens with a dot, the first one included: the line is shifted
-   left by the width of that slot and clipped there (see the heading rules
-   below), so the dot of whichever entry starts a row is cut off. That holds
-   whatever entries are hidden and wherever the line wraps, which no selector
-   could tell. */
+   left by the width of that slot (see the heading rules below) and the strip
+   masks it, so the dot of whichever entry comes first is cut off. That holds
+   whatever entries are hidden, which no selector could tell. */
 .note-sub-created::before,
 .note-sub-updated::before,
 .note-sub-stat::before,
@@ -110,9 +158,9 @@ body.show-note-created .note-subline {
     margin: 0 0 8px 0;
 }
 
-/* The heading is a two-column grid: the note icon, then the title with the
-   subline under it. The subline therefore starts where the title text does,
-   whatever the size of the icon, and at the edge when there is no icon. */
+/* The heading is a two-column grid: the note icon, then the title. The
+   subline runs under both, so it starts where the icon does, and where the
+   title does when there is no icon. */
 .innernote .note-title-heading {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
@@ -139,14 +187,19 @@ body.show-note-created .note-subline {
 }
 
 .innernote .note-title-heading .note-subline {
-    grid-column: 2;
-    /* The title field hangs 3px out of its column and pads its text by 2px,
-       which puts the title text 1px left of the column. The line sits 2px
-       right of that edge: the large bold title letters start further into
-       their box than the small ones here, so flush edges look shifted left.
+    grid-column: 1 / -1;
+    /* Without an icon the title is the first thing on its row: its field
+       hangs 3px out of the column and pads its text by 2px, which puts the
+       title text 1px left of the edge. The line sits 2px right of that: the
+       large bold title letters start further into their box than the small
+       ones here, so flush edges look shifted left.
        From there it is moved left by the dot slot its first entry opens
-       with, and that slot is clipped. The clip is open above (the entries
-       are pulled up out of the line's box) and to the right. */
+       with, which the strip masks. */
     margin-left: calc(1px - var(--note-sub-dot-slot));
-    clip-path: inset(-20px -100vw 0 var(--note-sub-dot-slot));
+}
+
+/* With an icon the line starts under it: the drawing of an icon stands a
+   little inside its box. */
+.innernote .note-title-heading .note-title-icon ~ .note-subline {
+    margin-left: calc(3px - var(--note-sub-dot-slot));
 }

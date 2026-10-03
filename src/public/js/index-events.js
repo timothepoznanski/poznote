@@ -1168,7 +1168,7 @@
         }
 
         // If the click is on an interactive element, ignore
-        if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row, summary, details')) {
+        if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row, .note-subline, summary, details')) {
             return;
         }
 
