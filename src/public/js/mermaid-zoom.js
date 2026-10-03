@@ -3,7 +3,8 @@
    diagram is shrunk to the width of the note and the browser zoom scales the
    whole app, so every rendered diagram gets an Enlarge button that opens it
    over the page with its own zoom and pan: wheel or pinch to zoom around the
-   pointer, drag to pan, +/-/0 and the arrow keys from the keyboard.
+   pointer, drag to pan, +/-/0 and the arrow keys from the keyboard. The
+   browser's Back button closes it and returns to the note.
 
    Renderers call window.poznoteMermaidZoom.decorate(nodes) once Mermaid has
    drawn the nodes (js/markdown-parser.js, js/public-note.js). A re-render
@@ -19,6 +20,8 @@
     var KEY_PAN = 60;
 
     var viewer = null;
+    var historyPushed = false; // a history entry of ours sits on top
+    var poppingSelf = false;   // we asked for the history.back() in close()
 
     function tl(key, fallback) {
         return window.t ? window.t(key, {}, fallback) : fallback;
@@ -297,8 +300,7 @@
 
     function open(node) {
         var source = node && renderedSvg(node);
-        if (!source) return;
-        if (viewer) close();
+        if (!source || viewer) return;
 
         var root = document.createElement('div');
         root.className = 'mermaid-viewer';
@@ -351,7 +353,7 @@
         zoomIn.addEventListener('click', function () { viewer.moved = true; zoomTo(viewer.scale * STEP); });
         level.addEventListener('click', function () { viewer.moved = true; actualSize(); });
         fitBtn.addEventListener('click', function () { viewer.moved = false; fit(); });
-        closeBtn.addEventListener('click', close);
+        closeBtn.addEventListener('click', function () { close(); });
 
         stage.addEventListener('wheel', function (e) { viewer.moved = true; onWheel(e); }, { passive: false });
         stage.addEventListener('pointerdown', function (e) { viewer.moved = true; onPointerDown(e); });
@@ -363,11 +365,19 @@
         window.addEventListener('resize', onResize);
         document.documentElement.classList.add('mermaid-viewer-open');
 
+        // An entry of our own on the same URL, so Back closes the viewer
+        // instead of leaving the note.
+        try {
+            history.pushState({ poznoteMermaidViewer: true }, '', window.location.href);
+            historyPushed = true;
+        } catch (e) { /* no history entry: Back keeps its usual meaning */ }
+
         fit();
         closeBtn.focus();
     }
 
-    function close() {
+    /** fromBack: the Back button already dropped our history entry. */
+    function close(fromBack) {
         if (!viewer) return;
         var v = viewer;
         viewer = null;
@@ -378,7 +388,33 @@
         if (v.returnFocus && document.contains(v.returnFocus) && typeof v.returnFocus.focus === 'function') {
             v.returnFocus.focus();
         }
+        if (fromBack !== true && historyPushed) {
+            // Closed from the viewer itself: drop the entry pushed in open().
+            poppingSelf = true;
+            try {
+                history.back();
+            } catch (e) {
+                poppingSelf = false;
+                historyPushed = false;
+            }
+        }
     }
+
+    // Registered while this file is parsed, ahead of the app's own popstate
+    // listeners, so the entry we own never reaches them (they would reload
+    // the note).
+    window.addEventListener('popstate', function (event) {
+        if (poppingSelf) {
+            poppingSelf = false;
+            historyPushed = false;
+            event.stopImmediatePropagation();
+            return;
+        }
+        if (!historyPushed) return;
+        historyPushed = false;
+        close(true);
+        event.stopImmediatePropagation();
+    });
 
     // Capture phase, so the click never reaches the note's own handlers.
     document.addEventListener('click', function (event) {
@@ -392,6 +428,6 @@
     window.poznoteMermaidZoom = {
         decorate: decorate,
         open: function (node) { open(node); },
-        close: close
+        close: function () { close(); }
     };
 })();

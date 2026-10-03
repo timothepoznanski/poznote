@@ -842,7 +842,12 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 }
 
 /* Enlarge button on a rendered diagram (js/mermaid-zoom.js, issue #1551).
-   Same quiet look as the code block buttons. */
+   Same quiet look as the code block buttons. The diagram keeps clear of the
+   button's column: a wide diagram fills the box and would run under it. */
+.mermaid.mermaid-zoomable {
+    padding-right: 36px;
+}
+
 .mermaid-zoom-btn {
     position: absolute;
     top: 4px;
