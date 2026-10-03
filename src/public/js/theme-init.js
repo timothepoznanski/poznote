@@ -49,6 +49,20 @@ window.__poznoteUserStorage = window.__poznoteUserStorage || (function () {
     };
 })();
 
+// Size of the icons of the icon rail (Settings > Icon sidebar icon scaling):
+// css/icon-sidebar.css multiplies the glyphs by --icon-rail-scale. Set here
+// because the rail is on every page and this file is the one they all load
+// before painting.
+window.__poznoteApplyIconRailScale = function () {
+    var scale = parseFloat(window.__poznoteUserStorage.getItem('icon_rail_scale') || '1');
+    if (!scale || scale === 1) {
+        document.documentElement.style.removeProperty('--icon-rail-scale');
+        return;
+    }
+    document.documentElement.style.setProperty('--icon-rail-scale', String(Math.min(2, Math.max(0.5, scale))));
+};
+window.__poznoteApplyIconRailScale();
+
 // The theme is a per-user display preference like the others, but the pages
 // that need it first are pre-auth: logout clears the poznote_uid cookie, so
 // login.php has no user to read the scoped key for and used to fall back to

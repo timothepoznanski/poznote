@@ -25,6 +25,8 @@ function applyIndexIconScale(scale) {
     }
     
     const s = parseFloat(scale);
+    // Boxes that hold a glyph grow with it but never shrink below their base size
+    const grow = Math.max(1, s);
     styleTag.innerHTML = `
         /* Sidebar: howto / home / settings / create */
         .sidebar-howto i,
@@ -57,8 +59,72 @@ function applyIndexIconScale(scale) {
         #left_col .other-account-row-note .lucide {
             font-size: ${0.85 * s}em !important;
         }
-        .innernote .note-title-heading .note-title-icon {
-            font-size: ${20 * s}px !important;
+
+        /* "Expand all folders" on the rule after Favorites: css/sidebar.css
+           sizes it through .notes-list-actions, which outranks the plain
+           .sidebar-folder-toggle rule above. */
+        .notes-list-actions .sidebar-folder-toggle i,
+        .notes-list-actions .sidebar-folder-toggle [class*="lucide-"] {
+            font-size: ${0.75 * s}em !important;
+        }
+        /* The same button at the end of the active account's row, where the
+           glyph box is pinned in px */
+        .current-account-header .sidebar-folder-toggle .lucide {
+            width: ${14 * s}px !important;
+            height: ${14 * s}px !important;
+        }
+
+        /* Three-dot toggles of the folder rows, of the note rows and of the
+           view options menu. The boxes only widen: a taller one would make
+           the row jump when the toggle appears on hover. */
+        #left_col .folder-actions-toggle [class*="lucide-"],
+        #left_col .note-actions-toggle [class*="lucide-"],
+        #left_col .note-actions-item [class*="lucide-"] {
+            font-size: ${0.85 * s}em !important;
+        }
+        #left_col .folder-actions-toggle,
+        #left_col .note-actions-toggle,
+        #left_col .note-actions-item {
+            width: ${22 * grow}px !important;
+        }
+        #left_col .notes-list-actions .folder-actions-toggle {
+            width: ${16 * grow}px !important;
+        }
+
+        /* Entries of the menus those toggles open, and of the create menu
+           that shares their look (css/folders/actions-menu.css: a 15px slot) */
+        .folder-actions-menu-item i,
+        .note-actions-menu-item i,
+        .create-menu-item i {
+            font-size: ${0.85 * s}em !important;
+            width: ${15 * s}px !important;
+        }
+
+        /* Search bar: scope toggles on the left, date filter and clear on the
+           right. The field makes room for them (css/searchbars.css: 34px
+           tall, 64px / 48px / 88px of padding at the default size). */
+        .searchbar-type-btn,
+        .searchbar-date-toggle i,
+        .searchbar-clear .clear-icon {
+            font-size: ${16 * s}px !important;
+        }
+        .searchbar-date-toggle,
+        .searchbar-clear {
+            width: ${14 + 16 * s}px !important;
+            height: ${14 + 16 * s}px !important;
+        }
+        .searchbar-input {
+            height: ${Math.max(34, 18 + 16 * s)}px !important;
+            padding-left: ${32 + 32 * s}px !important;
+        }
+        .searchbar-has-date-toggle .searchbar-input {
+            padding-right: ${32 + 16 * s}px !important;
+        }
+        .searchbar-has-date-toggle .searchbar-clear {
+            right: ${32 + 16 * s}px !important;
+        }
+        .searchbar-has-date-toggle.searchbar-has-clear .searchbar-input {
+            padding-right: ${56 + 32 * s}px !important;
         }
 
         /* Sidebar header: notifications bell. css/sidebar.css sizes it through
@@ -84,6 +150,15 @@ function applyIndexIconScale(scale) {
         }
         .toolbar-btn i, .toolbar-btn [class*="lucide-"] {
             font-size: ${0.75 * s}em !important;
+        }
+
+        /* Entries of the toolbar's menus: the three-dot menu and the "…" menu
+           of the buttons that do not fit (js/toolbar-overflow.js). css/menus.css
+           gives each icon a 16px slot in a 14px line. */
+        .mobile-toolbar-menu .dropdown-item i,
+        .toolbar-overflow-menu .dropdown-item i {
+            font-size: ${14 * s}px !important;
+            width: ${16 * s}px !important;
         }
     `;
 }

@@ -611,6 +611,21 @@
             }
         });
 
+        // Applied on every page by js/theme-init.js, and here at once: the
+        // rail is on screen next to the slider
+        initInlineControl('icon-rail-scale-range', {
+            load: function (done) { done(parseFloat(store.getItem('icon_rail_scale') || '1.0').toFixed(1)); },
+            format: function (value) { return parseFloat(value).toFixed(1) + 'x'; },
+            save: function (value, done) {
+                store.setItem('icon_rail_scale', parseFloat(value).toFixed(1));
+                if (typeof window.__poznoteApplyIconRailScale === 'function') {
+                    window.__poznoteApplyIconRailScale();
+                }
+                done(true);
+                reloadOpener();
+            }
+        });
+
         initInlineControl('note-width-range', {
             load: loadSettingValue('center_note_content', noteWidthSliderValue),
             format: noteWidthLabel,

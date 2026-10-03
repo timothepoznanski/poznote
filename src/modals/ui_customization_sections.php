@@ -58,6 +58,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-font-card" checked><span><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon-rail-scale-card" checked><span><?php echo t_h('display.cards.icon_rail_scale', [], 'Icon sidebar icon scaling'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:date-time-format-card" checked><span><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspace-activity-emails-card" checked><span><?php echo t_h('display.cards.workspace_activity_emails', [], 'Shared workspace emails'); ?></span></label>
