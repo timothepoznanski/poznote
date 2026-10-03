@@ -414,7 +414,16 @@ const POZNOTE_FOLDER_TREE_DIM_MIN = 10;
 const POZNOTE_FOLDER_TREE_DIM_MAX = 90;
 const POZNOTE_FOLDER_TREE_DIM_STEP = 5;
 
-const POZNOTE_SNAPSHOTS_DEFAULT_COUNT = 3;
+// Automatic revisions (snapshots) of a note. One is taken right before a
+// change is saved, at most every POZNOTE_SNAPSHOTS_AUTO_INTERVAL_SECONDS.
+// All of them are kept for POZNOTE_SNAPSHOTS_DENSE_HOURS, then one per day
+// for the snapshots_keep_count most recent days (the *_COUNT constants are
+// that number of days and its bounds); nothing outlives
+// POZNOTE_SNAPSHOTS_MAX_AGE_DAYS. The default equals the maximum age, so out
+// of the box only the expiry thins the daily ones.
+const POZNOTE_SNAPSHOTS_AUTO_INTERVAL_SECONDS = 600;
+const POZNOTE_SNAPSHOTS_DENSE_HOURS = 24;
+const POZNOTE_SNAPSHOTS_DEFAULT_COUNT = 30;
 const POZNOTE_SNAPSHOTS_MIN_COUNT = 1;
 const POZNOTE_SNAPSHOTS_MAX_COUNT = 30;
 const POZNOTE_SNAPSHOTS_MAX_AGE_DAYS = 30;

@@ -827,14 +827,14 @@
                 }
                 break;
             case 'show-snapshot':
-                if (noteId && typeof showSnapshotModal === 'function') {
+                if (noteId && typeof window.openNoteRevisions === 'function') {
                     // Close the toolbar menu
                     var toolbarEl = target.closest('.note-edit-toolbar');
                     if (toolbarEl) {
                         var menuEl = toolbarEl.querySelector('.mobile-toolbar-menu');
                         if (menuEl) menuEl.hidden = true;
                     }
-                    showSnapshotModal(noteId);
+                    window.openNoteRevisions(noteId);
                 }
                 break;
             case 'reveal-folder-in-tree':

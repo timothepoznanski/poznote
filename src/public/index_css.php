@@ -93,7 +93,6 @@ function poznoteGetIndexCssGroups(): array {
             'css/modals/share-modal.css',
             'css/modals/alerts-utilities.css',
             'css/modals/responsive.css',
-            'css/modals/snapshot.css',
             'css/modals/reminders.css',
             'css/tasks.css',
             'css/markdown.css',

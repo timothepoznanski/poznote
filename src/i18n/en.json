@@ -81,66 +81,25 @@
     "show_more_notes": "Show more ({{count}} remaining)"
   },
   "snapshot": {
-    "menu_item": "Snapshots",
-    "modal": {
-      "title": "Snapshots",
-      "description": "Created automatically on first open each day, the last {{count}} are kept. \"Take snapshot now\" or Ctrl + Alt + S adds a manual snapshot, and one is taken before the AI assistant or the MCP server changes a note. Every snapshot expires after {{days}} days.",
-      "loading": "Loading snapshot...",
-      "history": "History",
-      "markdown_preview": "Preview",
-      "markdown_source": "Source view",
-      "today": "Today",
-      "origin_ai": "Before AI edit",
-      "origin_mcp": "Before MCP edit",
-      "empty_title": "No snapshot available",
-      "empty_hint": "No snapshot for now, but you can create one manually right away.",
-      "new_note_empty_title": "No snapshot yet",
-      "new_note_empty_hint": "No snapshot for now, but you can create one manually right away.",
-      "empty_content": "(Empty content)",
-      "take_now": "Take snapshot now",
-      "copy_content": "Copy content",
-      "restore_state": "Restore this state",
-      "delete": "Delete this snapshot",
-      "keep_count_link_title": "Change how many automatic snapshots are kept"
-    },
-    "messages": {
-      "content_copied": "Content copied",
-      "created_now": "Snapshot added",
-      "deleted": "Snapshot deleted"
-    },
-    "errors": {
-      "restore_failed": "Failed to restore snapshot",
-      "create_failed": "Failed to take snapshot",
-      "copy_failed": "Copy failed",
-      "delete_failed": "Failed to delete snapshot"
-    },
-    "confirm": {
-      "title": "Confirmation",
-      "restore_message": "Restore the note to the snapshot state? Current changes will be lost.",
-      "restore_button": "Restore this state",
-      "take_now_message": "Create an additional snapshot with the current note content? Existing snapshots for today will be kept.",
-      "take_now_button": "Take snapshot now",
-      "delete_message": "Delete this snapshot?",
-      "delete_button": "Delete this snapshot"
-    },
+    "menu_item": "Revisions",
     "api": {
       "invalid_note_id": "Invalid note ID",
       "note_not_found": "Note not found",
-      "already_exists": "Snapshot already exists for today",
-      "create_directory_failed": "Failed to create snapshot directory",
-      "write_file_failed": "Failed to write snapshot file",
-      "create_failed": "Failed to create snapshot",
-      "skipped_empty_new_note": "No automatic snapshot yet because this new note is empty",
-      "not_found_today": "No snapshot found for today",
-      "read_failed": "Failed to read snapshot",
-      "retrieve_failed": "Failed to retrieve snapshot",
+      "already_exists": "A daily revision already exists for today",
+      "create_directory_failed": "Failed to create the revisions folder",
+      "write_file_failed": "Failed to write the revision file",
+      "create_failed": "Failed to save the revision",
+      "skipped_empty_new_note": "No daily revision yet because this new note is empty",
+      "not_found_today": "No revision found for today",
+      "read_failed": "Failed to read the revision",
+      "retrieve_failed": "Failed to retrieve the revision",
       "invalid_entries_path": "Invalid entries path",
-      "restore_note_file_failed": "Failed to restore note file",
-      "restore_success": "Note restored to snapshot state",
-      "restore_failed": "Failed to restore snapshot",
-      "not_found": "Snapshot not found",
-      "delete_failed": "Failed to delete snapshot",
-      "deleted": "Snapshot deleted"
+      "restore_note_file_failed": "Failed to restore the note file",
+      "restore_success": "Note restored to the revision",
+      "restore_failed": "Failed to restore the revision",
+      "not_found": "Revision not found",
+      "delete_failed": "Failed to delete the revision",
+      "deleted": "Revision deleted"
     }
   },
   "settings": {
@@ -221,7 +180,7 @@
       "s3_storage": "Store note attachments in an S3-compatible object storage instead of the local disk.",
       "s3_backup": "Upload complete backup archives to an S3-compatible bucket, manually or on a schedule.",
       "highlight_current_folder_tree": "Dim the notes and folders that sit outside the folder hierarchy you are working in, as much or as little as you like.",
-      "snapshots": "Choose how many automatic daily snapshots and how many safety snapshots (before an AI or MCP edit) are kept per note.",
+      "snapshots": "Choose for how many days one automatic revision per day is kept, and how many safety revisions (taken before an AI or MCP change) are kept per note.",
       "stt": "Configure the speech-to-text server used to dictate notes and transcribe audio attachments.",
       "sidebar_offline_marks": "Show a small dot next to the notes available offline in this browser.",
       "format_toolbar_mode": "On a computer, choose where the formatting buttons show when you select text in a note: in the note toolbar, in place of the note actions, or in a menu floating above the selection, which leaves the note toolbar as it is.",
@@ -516,7 +475,7 @@
       "spellcheck_html_notes": "Spell check",
       "slash_menu_trigger": "Command menu shortcut (computer)",
       "slash_menu_trigger_mobile": "Command menu shortcut (mobile)",
-      "snapshots": "Snapshots",
+      "snapshots": "Revisions",
       "sidebar_offline_marks": "Show offline dot",
       "format_toolbar_mode": "Formatting toolbar",
       "workspace_activity_emails": "Shared workspace emails"
@@ -1323,17 +1282,17 @@
       "rename_placeholder": "New note title"
     },
     "snapshots": {
-      "title": "Snapshots",
-      "description": "Number of automatic snapshots kept per note (one is taken per day when the note is first opened). Manual snapshots taken with \"Take snapshot now\" are not counted. Every snapshot expires after {{days}} days:",
-      "safety_description": "Number of safety snapshots kept per note. One is taken right before the AI assistant or the MCP server rewrites a note, and shows as \"Before AI edit\" or \"Before MCP edit\":",
+      "title": "Revisions",
+      "description": "An automatic revision is saved when a note changes, at most one every {{minutes}} minutes, and all of them are kept for {{hours}} hours. After that, one per day is kept, for this number of days. Revisions you save yourself are not counted. Every revision expires after {{days}} days:",
+      "safety_description": "Number of safety revisions kept per note. One is saved right before the AI assistant or the MCP server replaces the content of a note, and shows as \"Before AI edit\" or \"Before MCP edit\":",
       "options": {
-        "unit": "automatic snapshots",
-        "safety_unit": "safety snapshots"
+        "unit": "days, one automatic revision per day",
+        "safety_unit": "safety revisions"
       },
-      "badge": "{{count}} automatic per note",
-      "badge_with_safety": "{{count}} automatic, {{safety}} safety per note",
-      "warning_title": "Snapshots only store the note text. Attachments and images are never copied.",
-      "warning": "Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them is deleted or expires (after {{days}} days at most) or when the note is permanently deleted."
+      "badge": "{{count}} days per note",
+      "badge_with_safety": "{{count}} days, {{safety}} safety per note",
+      "warning_title": "Revisions only store the note text. Attachments and images are never copied.",
+      "warning": "Attachments and images are kept on disk even after you remove them from a note, as long as one of its revisions still contains them. They are only freed when the last revision containing them is deleted or expires (after {{days}} days at most) or when the note is permanently deleted."
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -4902,7 +4861,7 @@
       "tree_focus": "Active while the tree has the focus"
     },
     "save_note": "Save the note",
-    "snapshot": "Take a snapshot of the note",
+    "snapshot": "Save a revision of the note",
     "search_replace": "Search and replace in the note",
     "note_nav": "Previous or next note in the folder",
     "close": "Close a menu, panel or window",
@@ -5109,6 +5068,85 @@
       "no_folders": "No folders kept offline.",
       "own_account_only": "Offline copies are only kept for your own account."
     }
+  },
+  "revisions": {
+    "title": "Revisions",
+    "description": "A revision is saved automatically when you change a note, at most one every {{minutes}} minutes: it holds the note as it was just before the change. You can also save one yourself (Ctrl + Alt + S), and one is saved right before the AI assistant or the MCP server replaces the content. Automatic revisions are all kept for {{hours}} hours, then one per day for {{count}} days. Revisions expire after {{days}} days. Attachments are not versioned.",
+    "keep_count_link_title": "Change for how many days one revision per day is kept",
+    "history": "History",
+    "loading": "Loading...",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "kind": {
+      "auto": "Automatic",
+      "manual": "Manual",
+      "ai": "Before AI edit",
+      "mcp": "Before MCP edit"
+    },
+    "same_as_current": "Current",
+    "same_as_previous": "No change",
+    "same_as_previous_title": "Same content, title and tags as the revision before it",
+    "current_version": "Current version",
+    "previous_revision": "Previous revision",
+    "other_revisions": "Other revisions",
+    "tabs": {
+      "changes": "Changes",
+      "content": "Content"
+    },
+    "compare_with": "Compare with",
+    "layout": {
+      "label": "Layout",
+      "unified": "Unified",
+      "split": "Side by side"
+    },
+    "prev_change": "Previous change",
+    "next_change": "Next change",
+    "added_lines": "{{count}} lines added",
+    "removed_lines": "{{count}} lines removed",
+    "unchanged_lines": "{{count}} unchanged lines",
+    "unchanged_line": "1 unchanged line",
+    "no_differences": "No differences",
+    "no_differences_hint": "Both versions hold the same content, title and tags.",
+    "no_previous": "This is the oldest revision: there is nothing before it to compare with.",
+    "text_compare_hint": "Rich-text notes are compared on their text: a change of formatting alone does not show.",
+    "markdown_preview": "Preview",
+    "markdown_source": "Source",
+    "empty_content": "(Empty content)",
+    "empty_title": "No revision yet",
+    "empty_hint": "A revision is saved automatically when you change the note. You can also save one now.",
+    "actions": {
+      "menu": "Actions",
+      "new": "Save a revision",
+      "restore": "Restore this revision",
+      "copy": "Copy content",
+      "delete": "Delete this revision"
+    },
+    "messages": {
+      "created": "Revision saved",
+      "deleted": "Revision deleted",
+      "copied": "Content copied"
+    },
+    "errors": {
+      "load_failed": "Could not load the revisions",
+      "create_failed": "Could not save a revision",
+      "restore_failed": "Could not restore this revision",
+      "delete_failed": "Could not delete this revision",
+      "copy_failed": "Copy failed"
+    },
+    "confirm": {
+      "restore_title": "Restore this revision?",
+      "restore_message": "The note will take the content, the title and the tags of this revision. Its current state is replaced: save a revision first if you want to keep it.",
+      "restore_button": "Restore",
+      "delete_title": "Delete this revision?",
+      "delete_message": "This revision will be deleted for good.",
+      "delete_button": "Delete"
+    },
+    "meta": {
+      "title": "Title",
+      "tags": "Tags"
+    },
+    "same_content": "Same content",
+    "same_content_hint": "Only the title or the tags differ."
   },
   "mermaid_zoom": {
     "open": "Enlarge diagram",

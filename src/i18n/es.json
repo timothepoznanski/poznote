@@ -99,66 +99,25 @@
     "show_more_notes": "Mostrar más ({{count}} restantes)"
   },
   "snapshot": {
-    "menu_item": "Instantáneas",
-    "modal": {
-      "title": "Instantáneas",
-      "description": "Creadas automáticamente al abrir por primera vez cada día, se conservan las últimas {{count}}. «Tomar instantánea ahora» o Ctrl + Alt + S añade una instantánea manual, y se toma una antes de cada cambio hecho por el asistente de IA o el servidor MCP. Toda instantánea caduca a los {{days}} días.",
-      "loading": "Cargando instantánea...",
-      "history": "Historial",
-      "markdown_preview": "Vista previa",
-      "markdown_source": "Vista source",
-      "today": "Hoy",
-      "origin_ai": "Antes del cambio de la IA",
-      "origin_mcp": "Antes del cambio por MCP",
-      "empty_title": "No hay instantánea disponible",
-      "empty_hint": "No hay instantáneas por el momento, pero puedes crear una manualmente ahora mismo.",
-      "new_note_empty_title": "Aún no hay instantáneas",
-      "new_note_empty_hint": "No hay instantáneas por el momento, pero puedes crear una manualmente ahora mismo.",
-      "empty_content": "(Contenido vacío)",
-      "take_now": "Tomar instantánea ahora",
-      "copy_content": "Copiar contenido",
-      "restore_state": "Volver a este estado",
-      "delete": "Eliminar esta instantánea",
-      "keep_count_link_title": "Cambiar cuántas instantáneas automáticas se conservan"
-    },
-    "messages": {
-      "content_copied": "Contenido copiado",
-      "created_now": "Instantánea añadida",
-      "deleted": "Instantánea eliminada"
-    },
-    "errors": {
-      "restore_failed": "No se pudo restaurar la instantánea",
-      "create_failed": "No se pudo crear la instantánea",
-      "copy_failed": "No se pudo copiar",
-      "delete_failed": "No se pudo eliminar la instantánea"
-    },
-    "confirm": {
-      "title": "Confirmación",
-      "restore_message": "¿Restaurar la nota al estado de la instantánea? Los cambios actuales se perderán.",
-      "restore_button": "Volver a este estado",
-      "take_now_message": "¿Crear una instantánea adicional con el contenido actual de la nota? Las instantáneas que ya existen hoy se conservarán.",
-      "take_now_button": "Tomar instantánea ahora",
-      "delete_message": "¿Eliminar esta instantánea?",
-      "delete_button": "Eliminar esta instantánea"
-    },
+    "menu_item": "Revisiones",
     "api": {
       "invalid_note_id": "ID de nota no válido",
       "note_not_found": "Nota no encontrada",
-      "already_exists": "Ya existe una instantánea para hoy",
-      "create_directory_failed": "No se pudo crear la carpeta de instantáneas",
-      "write_file_failed": "No se pudo escribir el archivo de instantánea",
-      "create_failed": "No se pudo crear la instantánea",
-      "skipped_empty_new_note": "Aún no hay instantánea automática porque esta nota nueva está vacía",
-      "not_found_today": "No se encontró ninguna instantánea para hoy",
-      "read_failed": "No se pudo leer la instantánea",
-      "retrieve_failed": "No se pudo recuperar la instantánea",
+      "already_exists": "Ya existe una revisión diaria para hoy",
+      "create_directory_failed": "No se pudo crear la carpeta de revisiones",
+      "write_file_failed": "No se pudo escribir el archivo de la revisión",
+      "create_failed": "No se pudo guardar la revisión",
+      "skipped_empty_new_note": "Aún no hay revisión diaria porque esta nota nueva está vacía",
+      "not_found_today": "No se encontró ninguna revisión para hoy",
+      "read_failed": "No se pudo leer la revisión",
+      "retrieve_failed": "No se pudo obtener la revisión",
       "invalid_entries_path": "Ruta de notas no válida",
       "restore_note_file_failed": "No se pudo restaurar el archivo de la nota",
-      "restore_success": "La nota se restauró al estado de la instantánea",
-      "restore_failed": "No se pudo restaurar la instantánea",
-      "not_found": "Instantánea no encontrada",
-      "delete_failed": "No se pudo eliminar la instantánea",
-      "deleted": "Instantánea eliminada"
+      "restore_success": "La nota se ha restaurado a esta revisión",
+      "restore_failed": "No se pudo restaurar la revisión",
+      "not_found": "Revisión no encontrada",
+      "delete_failed": "No se pudo eliminar la revisión",
+      "deleted": "Revisión eliminada"
     }
   },
   "kanban": {
@@ -545,7 +504,7 @@
       "s3_storage": "Almacenar los adjuntos de las notas en un almacenamiento de objetos compatible con S3 en lugar del disco local.",
       "s3_backup": "Sube archivos de copia de seguridad completos a un bucket compatible con S3, manualmente o según una programación.",
       "highlight_current_folder_tree": "Atenuar, tanto como quieras, las notas y carpetas que están fuera de la jerarquía de carpetas en la que trabajas.",
-      "snapshots": "Elija cuántas instantáneas automáticas diarias y cuántas instantáneas de seguridad (antes de una edición de IA o MCP) se conservan por nota.",
+      "snapshots": "Elija durante cuántos días se conserva una revisión automática por día y cuántas revisiones de seguridad (tomadas antes de un cambio de IA o MCP) se conservan por nota.",
       "stt": "Configura el servidor de reconocimiento de voz que se usa para dictar notas y transcribir adjuntos de audio.",
       "sidebar_offline_marks": "Muestra un pequeño punto junto a las notas disponibles sin conexión en este navegador.",
       "format_toolbar_mode": "En un ordenador, elija dónde aparecen los botones de formato al seleccionar texto en una nota: en la barra de herramientas de la nota, en lugar de las acciones de la nota, o en un menú flotante sobre la selección, que deja la barra de herramientas de la nota tal como está.",
@@ -874,7 +833,7 @@
       "note_color_palette": "Colores de notas",
       "slash_menu_trigger": "Atajo del menú de comandos (ordenador)",
       "slash_menu_trigger_mobile": "Atajo del menú de comandos (móvil)",
-      "snapshots": "Instantáneas",
+      "snapshots": "Revisiones",
       "show_note_icons": "Mostrar iconos de las notas",
       "sidebar_offline_marks": "Mostrar el punto sin conexión",
       "format_toolbar_mode": "Barra de formato",
@@ -1818,17 +1777,17 @@
       "rename_placeholder": "Nuevo título de la nota"
     },
     "snapshots": {
-      "title": "Instantáneas",
-      "description": "Número de instantáneas automáticas conservadas por nota (se toma una cada día al abrir la nota por primera vez). Las instantáneas manuales tomadas con «Tomar instantánea ahora» no se cuentan. Toda instantánea caduca a los {{days}} días:",
-      "safety_description": "Número de instantáneas de seguridad conservadas por nota. Se toma una justo antes de que el asistente de IA o el servidor MCP reescriba una nota, y aparece como «Antes de la edición de IA» o «Antes de la edición MCP»:",
+      "title": "Revisiones",
+      "description": "Se guarda una revisión automática cuando una nota cambia, como máximo una cada {{minutes}} minutos, y todas se conservan durante {{hours}} horas. Después se conserva una por día, durante este número de días. Las revisiones que guarda usted mismo no se cuentan. Toda revisión caduca a los {{days}} días:",
+      "safety_description": "Número de revisiones de seguridad conservadas por nota. Se guarda una justo antes de que el asistente de IA o el servidor MCP reemplace el contenido de una nota, y aparece como «Antes de edición IA» o «Antes de edición MCP»:",
       "options": {
-        "unit": "instantáneas automáticas",
-        "safety_unit": "instantáneas de seguridad"
+        "unit": "días, una revisión automática por día",
+        "safety_unit": "revisiones de seguridad"
       },
-      "badge": "{{count}} automáticas por nota",
-      "badge_with_safety": "{{count}} automáticas, {{safety}} de seguridad por nota",
-      "warning_title": "Las instantáneas solo guardan el texto de la nota. Los archivos adjuntos y las imágenes nunca se copian.",
-      "warning": "Los archivos adjuntos y las imágenes se conservan en el disco incluso después de eliminarlos de una nota, mientras alguna de sus instantáneas todavía los contenga. Solo se liberan cuando la última instantánea que los contiene se elimina o caduca (como máximo a los {{days}} días) o cuando la nota se elimina definitivamente."
+      "badge": "{{count}} días por nota",
+      "badge_with_safety": "{{count}} días, {{safety}} de seguridad por nota",
+      "warning_title": "Las revisiones solo guardan el texto de la nota. Los adjuntos y las imágenes nunca se copian.",
+      "warning": "Los adjuntos y las imágenes se conservan en el disco incluso después de quitarlos de una nota, mientras alguna de sus revisiones los contenga. Solo se liberan cuando la última revisión que los contiene se elimina o caduca (como máximo a los {{days}} días) o cuando la nota se elimina definitivamente."
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -5081,7 +5040,7 @@
       "tree_focus": "Activo mientras el árbol tiene el foco"
     },
     "save_note": "Guardar la nota",
-    "snapshot": "Tomar una instantánea de la nota",
+    "snapshot": "Guardar una revisión de la nota",
     "search_replace": "Buscar y reemplazar en la nota",
     "note_nav": "Nota anterior o siguiente de la carpeta",
     "close": "Cerrar un menú, un panel o una ventana",
@@ -5288,6 +5247,85 @@
       "no_folders": "Ninguna carpeta guardada sin conexión.",
       "own_account_only": "Las copias sin conexión solo se guardan para su propia cuenta."
     }
+  },
+  "revisions": {
+    "title": "Revisiones",
+    "description": "Se guarda una revisión automáticamente cuando modifica una nota, como máximo una cada {{minutes}} minutos: contiene la nota tal como estaba justo antes del cambio. También puede guardar una usted mismo (Ctrl + Alt + S), y se guarda una justo antes de que el asistente de IA o el servidor MCP reemplace el contenido. Las revisiones automáticas se conservan todas durante {{hours}} horas, y después una por día durante {{count}} días. Las revisiones caducan a los {{days}} días. Los adjuntos no se versionan.",
+    "keep_count_link_title": "Cambiar durante cuántos días se conserva una revisión por día",
+    "history": "Historial",
+    "loading": "Cargando...",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "kind": {
+      "auto": "Automática",
+      "manual": "Manual",
+      "ai": "Antes de edición IA",
+      "mcp": "Antes de edición MCP"
+    },
+    "same_as_current": "Actual",
+    "same_as_previous": "Sin cambios",
+    "same_as_previous_title": "Mismo contenido, título y etiquetas que la revisión anterior",
+    "current_version": "Versión actual",
+    "previous_revision": "Revisión anterior",
+    "other_revisions": "Otras revisiones",
+    "tabs": {
+      "changes": "Cambios",
+      "content": "Contenido"
+    },
+    "compare_with": "Comparar con",
+    "layout": {
+      "label": "Disposición",
+      "unified": "Unificada",
+      "split": "En paralelo"
+    },
+    "prev_change": "Cambio anterior",
+    "next_change": "Cambio siguiente",
+    "added_lines": "{{count}} líneas añadidas",
+    "removed_lines": "{{count}} líneas eliminadas",
+    "unchanged_lines": "{{count}} líneas sin cambios",
+    "unchanged_line": "1 línea sin cambios",
+    "no_differences": "Sin diferencias",
+    "no_differences_hint": "Ambas versiones tienen el mismo contenido, el mismo título y las mismas etiquetas.",
+    "no_previous": "Esta es la revisión más antigua: no hay nada antes con qué compararla.",
+    "text_compare_hint": "Las notas de texto enriquecido se comparan por su texto: un simple cambio de formato no aparece.",
+    "markdown_preview": "Vista previa",
+    "markdown_source": "Código fuente",
+    "empty_content": "(Contenido vacío)",
+    "empty_title": "Aún no hay revisiones",
+    "empty_hint": "Se guarda una revisión automáticamente cuando modifica la nota. También puede guardar una ahora.",
+    "actions": {
+      "menu": "Acciones",
+      "new": "Guardar una revisión",
+      "restore": "Restaurar esta revisión",
+      "copy": "Copiar contenido",
+      "delete": "Eliminar esta revisión"
+    },
+    "messages": {
+      "created": "Revisión guardada",
+      "deleted": "Revisión eliminada",
+      "copied": "Contenido copiado"
+    },
+    "errors": {
+      "load_failed": "No se pudieron cargar las revisiones",
+      "create_failed": "No se pudo guardar una revisión",
+      "restore_failed": "No se pudo restaurar esta revisión",
+      "delete_failed": "No se pudo eliminar esta revisión",
+      "copy_failed": "Error al copiar"
+    },
+    "confirm": {
+      "restore_title": "¿Restaurar esta revisión?",
+      "restore_message": "La nota tomará el contenido, el título y las etiquetas de esta revisión. Su estado actual se reemplaza: guarde antes una revisión si quiere conservarlo.",
+      "restore_button": "Restaurar",
+      "delete_title": "¿Eliminar esta revisión?",
+      "delete_message": "Esta revisión se eliminará definitivamente.",
+      "delete_button": "Eliminar"
+    },
+    "meta": {
+      "title": "Título",
+      "tags": "Etiquetas"
+    },
+    "same_content": "Mismo contenido",
+    "same_content_hint": "Solo difieren el título o las etiquetas."
   },
   "mermaid_zoom": {
     "open": "Ampliar diagrama",

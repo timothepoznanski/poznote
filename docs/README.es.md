@@ -61,7 +61,7 @@ https://discord.gg/AWhWWSEkJ
 - [Autenticación](#autenticación)
 - [Contraseñas de aplicación](#contraseñas-de-aplicación)
 - [Tipos de notas](#tipos-de-notas)
-- [Instantáneas](#instantáneas)
+- [Revisiones](#revisiones)
 - [Personalización](#personalización)
 - [Multiusuario](#multiusuario)
 - [Registro de actividad](#registro-de-actividad)
@@ -665,19 +665,36 @@ Poznote admite dos formatos principales de notas, cada uno adaptado a una forma 
 *   **Formato:** las nuevas entradas se crean como notas de texto enriquecido o Markdown, según el ajuste «Formato de las entradas del diario» de **Configuración > Comportamiento**.
 </details>
 
-## Instantáneas
+## Revisiones
 
-Las instantáneas conservan versiones anteriores del contenido de una nota para que puedas volver a un estado previo desde el menú **Instantáneas** de la nota.
+Las revisiones conservan versiones anteriores del contenido de una nota, junto con su título y sus etiquetas, para que puedas compararlas con la nota actual y volver a un estado previo. El icono de historial de la barra de herramientas de la nota abre la página **Revisiones** de la nota.
 
 <details>
-<summary><strong>Cómo funcionan las instantáneas</strong></summary>
+<summary><strong>La página Revisiones</strong></summary>
 <br>
 
-*   **Automáticas:** se toma una instantánea la primera vez que se abre una nota cada día. Se conservan las 3 instantáneas automáticas más recientes por nota; este número puede cambiarse en **Configuración > Acciones > Instantáneas**.
-*   **Manuales:** «Tomar instantánea ahora» añade una instantánea en cualquier momento, y también **Ctrl + Alt + S** (Cmd + Alt + S en Mac) con una nota abierta. Las instantáneas manuales son ilimitadas y no cuentan para ese número.
-*   **Antes de una edición por IA:** se toma automáticamente una instantánea justo antes de que el [Asistente IA](#asistente-ia) o el [servidor MCP](#servidor-mcp) cambien el contenido de una nota, así una reescritura que sale mal se deshace con un clic. Estas instantáneas aparecen en el historial como «Antes del cambio de la IA» o «Antes del cambio por MCP», se omiten cuando la última instantánea ya contiene el mismo contenido, y se conservan las 20 más recientes por nota, un número que puedes cambiar en **Configuración → Instantáneas** (de 1 a 200) si tu instancia edita muchas notas mediante IA o MCP.
-*   **Caducidad:** todas las instantáneas, automáticas o manuales, se eliminan 30 días después de tomarse. Una instantánea también puede eliminarse a mano desde la ventana de Instantáneas.
-*   **Adjuntos e imágenes:** las instantáneas solo guardan el texto de la nota. Los adjuntos nunca se copian, así que un archivo al que hacen referencia varias instantáneas existe una sola vez en el disco. Un archivo quitado de una nota permanece en el disco, oculto en la nota, mientras alguna instantánea lo siga conteniendo, de modo que restaurar esa instantánea lo recupera. Se elimina definitivamente cuando caduca o se elimina la última instantánea que lo contiene, o cuando la nota se elimina de forma permanente. Por tanto, conservar más instantáneas nunca duplica archivos. Solo mantiene los archivos quitados durante más tiempo, 30 días como máximo.
+*   **Historial:** la columna izquierda lista las revisiones de la nota agrupadas por día, cada una con su tipo: Automática, Manual, Antes de edición IA o Antes de edición MCP. La insignia «Actual» marca las revisiones idénticas a la nota actual, y «Sin cambios» las idénticas a la revisión anterior. Ambas insignias exigen también el mismo título y las mismas etiquetas.
+*   **Contenido:** la página se abre en esta pestaña, que muestra la propia revisión seleccionada renderizada. Para las notas Markdown, un selector Vista previa/Código fuente se encuentra junto a las pestañas.
+*   **Cambios:** la segunda pestaña muestra una comparación línea por línea, con las palabras cambiadas resaltadas, frente a la versión actual, la revisión anterior o cualquier otra revisión. La comparación se muestra Unificada o En paralelo, las líneas sin cambios se pliegan (haz clic para desplegarlas), los botones de cambio anterior y siguiente saltan de un cambio a otro, y se indica el número de líneas añadidas y eliminadas. Las notas Markdown se comparan por su código fuente. Las notas de texto enriquecido se comparan por su texto, así que un simple cambio de formato no aparece. Encima de la comparación, la pestaña indica el cambio de título (antiguo → nuevo) y las etiquetas añadidas o quitadas entre las dos versiones comparadas.
+*   **Acciones:** el menú «Acciones» reúne «Restaurar esta revisión», «Guardar una revisión», «Copiar contenido» y «Eliminar esta revisión». «Guardar una revisión» guarda al momento el contenido actual, las demás entradas actúan sobre la revisión seleccionada.
+*   **Restauración:** una restauración devuelve a la nota el contenido, el título y las etiquetas de la revisión. El estado que reemplaza no se guarda: si te importa, guarda antes una revisión («Guardar una revisión» en el menú Acciones, o **Ctrl + Alt + S**). Un título restaurado sigue las reglas de renombrado: si otra nota de la misma carpeta ya tiene ese título, se añade un sufijo como «(1)». Una revisión guardada antes de que se registraran las etiquetas no contiene ninguna y deja intactas las etiquetas de la nota.
+
+</details>
+
+<details>
+<summary><strong>Cómo funcionan las revisiones</strong></summary>
+<br>
+
+*   **Automáticas:** Poznote guarda una revisión cuando una nota se modifica, no cuando se abre. Cada vez que se guarda un cambio en el contenido, el título o las etiquetas (el guardado automático del editor, una tarea marcada, un dibujo guardado, la API REST, una edición desde un enlace público compartido), Poznote conserva primero la nota tal como estaba justo antes de ese cambio, salvo que ya se haya tomado una revisión de esa nota en los últimos 10 minutos. Así, una revisión contiene siempre el estado anterior a un cambio, y una sesión de edición produce como máximo una revisión automática cada 10 minutos. Abrir o leer una nota nunca crea una revisión. No se guarda nada para una nota vacía, ni cuando la revisión más reciente ya contiene exactamente el contenido, el título y las etiquetas actuales, de modo que el historial no tiene duplicados. Estas revisiones aparecen como «Automática» en el historial, igual que las que las versiones anteriores de Poznote tomaban al abrir una nota: siguen las mismas reglas.
+*   **Ejemplo:** editas una nota de 9:00 a 9:35. El historial recibe revisiones hacia las 9:00 (la nota antes de que la tocaras), las 9:10, las 9:20 y las 9:30. Vuelves a las 14:00 y cambias una palabra: una revisión de las 14:00 conserva la nota tal como la dejaste a las 9:35.
+*   **A qué puedes volver:** el estado en el que dejas una nota al final de una sesión no se guarda como revisión en ese momento, porque es la propia nota. Lo captura el primer cambio de la sesión siguiente, por mucho más tarde que llegue. Así que siempre puedes volver a cómo estaba la nota antes de empezar a editarla hoy y, dentro de una sesión larga, a estados separados por unos 10 minutos como máximo. El estado más reciente es siempre la propia nota: compara cualquier revisión con «Versión actual» para ver qué ha cambiado desde entonces.
+*   **Cuánto tiempo se conservan las revisiones automáticas:** se conservan todas las revisiones automáticas de las últimas 24 horas. Pasadas 24 horas, solo se conserva la revisión automática más reciente de cada día, durante 30 días por defecto. Ese número de días puede cambiarse en **Configuración > Revisiones** (de 1 a 30). Si ya habías cambiado este ajuste en una versión anterior, en la que contaba revisiones, tu valor se conserva y ahora cuenta días.
+*   **Manuales:** «Guardar una revisión» añade una revisión en cualquier momento, y también **Ctrl + Alt + S** (Cmd + Alt + S en Mac) con una nota abierta. Las revisiones manuales son ilimitadas y nunca se reducen: solo desaparecen al caducar, a los 30 días.
+*   **Antes de una edición por IA:** se guarda automáticamente una revisión justo antes de que el [Asistente IA](#asistente-ia) o el [servidor MCP](#servidor-mcp) cambien el contenido de una nota, aunque se haya tomado una revisión automática menos de 10 minutos antes, así una reescritura que sale mal se deshace con un clic. Estas revisiones aparecen en el historial como «Antes de edición IA» o «Antes de edición MCP» y se omiten cuando la última revisión ya contiene el mismo contenido, el mismo título y las mismas etiquetas.
+*   **Revisiones de seguridad:** las revisiones «Antes de edición IA» y «Antes de edición MCP» comparten un mismo límite: se conservan las 20 más recientes por nota, un número que puedes cambiar en **Configuración → Revisiones** (de 1 a 200) si tu instancia edita muchas notas mediante IA o MCP.
+*   **Caducidad:** todas las revisiones, sean del tipo que sean, se eliminan 30 días después de guardarse. Una revisión también puede eliminarse a mano desde la página Revisiones.
+*   **Adjuntos e imágenes:** las revisiones guardan el texto, el título y las etiquetas de la nota, nunca sus archivos. Los adjuntos nunca se copian, así que un archivo al que hacen referencia varias revisiones existe una sola vez en el disco. Un archivo quitado de una nota permanece en el disco, oculto en la nota, mientras alguna revisión lo siga conteniendo, de modo que restaurar esa revisión lo recupera. Se elimina definitivamente cuando caduca o se elimina la última revisión que lo contiene, o cuando la nota se elimina de forma permanente. Por tanto, conservar más revisiones nunca duplica archivos. Solo mantiene los archivos quitados durante más tiempo, 30 días como máximo.
+*   **API y MCP:** la [API REST](API-REST.md#snapshots) y las herramientas del [servidor MCP](#servidor-mcp) siguen llamando «snapshots» a las revisiones (`/notes/{id}/snapshots`, `list_snapshots`, `get_snapshot`, `restore_snapshot`).
 
 </details>
 
@@ -708,7 +725,7 @@ En **Configuración > Comportamiento** puedes configurar:
 
 - **Orden de clasificación de notas:** elige cómo se ordenan las notas en la lista
 - **Filtro de antigüedad:** muestra solo las notas actualizadas en el número de días elegido
-- **Instantáneas:** cuántas instantáneas automáticas se conservan por nota
+- **Revisiones:** durante cuántos días se conservan las revisiones automáticas (una por día pasadas las últimas 24 horas) y cuántas revisiones de seguridad se conservan por nota
 - **Orden de inserción de tareas:** controla dónde se insertan las nuevas tareas
 - **Mostrar notas después de las carpetas:** muestra las notas sin carpeta debajo de la lista de carpetas
 - **Ajuste de línea en bloques de código:** activa o desactiva el ajuste de línea en los bloques de código
@@ -857,7 +874,7 @@ data/
     │   ├── database/poznote.db  # User's notes database
     │   ├── entries/             # User's note files (HTML/MD)
     │   ├── attachments/         # User's attachments
-    │   ├── snapshots/           # Earlier versions of the user's notes
+    │   ├── snapshots/           # Earlier versions of the user's notes (revisions)
     │   ├── backgrounds/         # Workspace background images
     │   └── backups/             # Backup archives prepared for download
     ├── 2/                       # User ID 2

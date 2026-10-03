@@ -61,7 +61,7 @@ https://discord.gg/AWhWWSEkJ
 - [Authentifizierung](#authentifizierung)
 - [App-Passwörter](#app-passwörter)
 - [Notiztypen](#notiztypen)
-- [Schnappschüsse](#schnappschüsse)
+- [Versionen](#versionen)
 - [Personalisierung](#personalisierung)
 - [Mehrbenutzerbetrieb](#mehrbenutzerbetrieb)
 - [Aktivitätsprotokoll](#aktivitätsprotokoll)
@@ -665,19 +665,36 @@ Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschied
 *   **Format:** Neue Einträge werden als Rich-Text- oder Markdown-Notizen angelegt, je nach der Einstellung „Format der Tagebucheinträge“ unter **Einstellungen > Verhalten**.
 </details>
 
-## Schnappschüsse
+## Versionen
 
-Schnappschüsse bewahren frühere Versionen des Inhalts einer Notiz auf, sodass Sie über das Menü **Schnappschüsse** der Notiz zu einem früheren Stand zurückkehren können.
+Versionen bewahren frühere Stände des Inhalts einer Notiz samt Titel und Tags auf, sodass Sie sie mit der aktuellen Notiz vergleichen und zu einem früheren Stand zurückkehren können. Das Verlaufssymbol in der Symbolleiste der Notiz öffnet die Seite **Versionen** der Notiz.
 
 <details>
-<summary><strong>So funktionieren Schnappschüsse</strong></summary>
+<summary><strong>Die Seite Versionen</strong></summary>
 <br>
 
-*   **Automatisch:** Beim ersten Öffnen einer Notiz an einem Tag wird ein Schnappschuss erstellt. Pro Notiz werden die 3 neuesten automatischen Schnappschüsse aufbewahrt; diese Anzahl lässt sich unter **Einstellungen > Aktionen > Schnappschüsse** ändern.
-*   **Manuell:** „Jetzt Schnappschuss erstellen“ fügt jederzeit einen Schnappschuss hinzu, ebenso **Strg + Alt + S** (Cmd + Alt + S auf dem Mac) bei geöffneter Notiz. Manuelle Schnappschüsse sind unbegrenzt und zählen nicht zu dieser Anzahl.
-*   **Vor einer KI-Änderung:** Unmittelbar bevor der [KI-Assistent](#ki-assistent) oder der [MCP-Server](#mcp-server) den Inhalt einer Notiz ändert, wird automatisch ein Schnappschuss erstellt, sodass sich eine misslungene Umformulierung mit einem Klick rückgängig machen lässt. Diese Schnappschüsse sind im Verlauf mit „Vor KI-Änderung“ oder „Vor MCP-Änderung“ gekennzeichnet und werden übersprungen, wenn der letzte Schnappschuss bereits denselben Inhalt enthält. Pro Notiz werden die 20 neuesten aufbewahrt, eine Anzahl, die Sie unter **Einstellungen → Schnappschüsse** ändern können (1 bis 200), falls auf Ihrer Instanz viele Notizen über KI oder MCP bearbeitet werden.
-*   **Ablauf:** Jeder Schnappschuss, ob automatisch oder manuell, wird 30 Tage nach seiner Erstellung gelöscht. Ein Schnappschuss kann auch von Hand im Dialog „Schnappschüsse“ gelöscht werden.
-*   **Anhänge und Bilder:** Schnappschüsse speichern nur den Text der Notiz. Anhänge werden nie kopiert, sodass eine Datei, auf die mehrere Schnappschüsse verweisen, nur einmal auf der Festplatte existiert. Eine aus einer Notiz entfernte Datei bleibt, für die Notiz unsichtbar, auf der Festplatte, solange noch ein Schnappschuss sie enthält, sodass sie beim Wiederherstellen dieses Schnappschusses zurückkehrt. Endgültig gelöscht wird sie, sobald der letzte Schnappschuss, der sie enthält, abläuft oder gelöscht wird, oder wenn die Notiz endgültig gelöscht wird. Mehr Schnappschüsse aufzubewahren dupliziert also nie Dateien. Entfernte Dateien bleiben lediglich länger erhalten, höchstens 30 Tage.
+*   **Verlauf:** Die linke Spalte listet die Versionen der Notiz nach Tagen gruppiert auf, jede mit ihrer Art: Automatisch, Manuell, Vor KI-Änderung oder Vor MCP-Änderung. Das Abzeichen „Aktuell“ kennzeichnet die Versionen, die mit der aktuellen Notiz identisch sind, „Unverändert“ die, die mit der Version davor identisch sind. Beide Abzeichen setzen auch denselben Titel und dieselben Tags voraus.
+*   **Inhalt:** Die Seite öffnet sich auf diesem Reiter, der die ausgewählte Version selbst gerendert anzeigt. Bei Markdown-Notizen sitzt ein Umschalter Vorschau/Quelltext neben den Reitern.
+*   **Änderungen:** Der zweite Reiter zeigt einen zeilenweisen Vergleich mit hervorgehobenen geänderten Wörtern, wahlweise gegenüber der aktuellen Version, der vorherigen Version oder einer beliebigen anderen Version. Der Vergleich wird Einspaltig oder Nebeneinander angezeigt, unveränderte Zeilen werden eingeklappt (per Klick aufklappbar), die Schaltflächen für die vorherige und nächste Änderung springen von einer Änderung zur nächsten, und die Anzahl der hinzugefügten und entfernten Zeilen wird angezeigt. Markdown-Notizen werden anhand ihres Quelltexts verglichen. Rich-Text-Notizen werden anhand ihres Textes verglichen, eine reine Formatierungsänderung ist also nicht zu sehen. Über dem Vergleich zeigt der Reiter die Titeländerung (alt → neu) sowie die Tags, die zwischen den beiden verglichenen Versionen hinzugefügt oder entfernt wurden.
+*   **Aktionen:** Das Menü „Aktionen“ enthält „Diese Version wiederherstellen“, „Version speichern“, „Inhalt kopieren“ und „Diese Version löschen“. „Version speichern“ speichert sofort den aktuellen Inhalt, die übrigen Einträge wirken auf die ausgewählte Version.
+*   **Wiederherstellen:** Eine Wiederherstellung gibt der Notiz den Inhalt, den Titel und die Tags der Version zurück. Der Stand, den sie ersetzt, wird nicht gespeichert: Ist er wichtig, speichern Sie vorher eine Version („Version speichern“ im Menü Aktionen oder **Strg + Alt + S**). Ein wiederhergestellter Titel folgt den Regeln für das Umbenennen: Trägt bereits eine andere Notiz im selben Ordner diesen Titel, wird ein Zusatz wie „(1)“ angehängt. Eine Version, die gespeichert wurde, bevor Tags erfasst wurden, enthält keine Tags und lässt die Tags der Notiz unverändert.
+
+</details>
+
+<details>
+<summary><strong>So funktionieren Versionen</strong></summary>
+<br>
+
+*   **Automatisch:** Poznote speichert eine Version, wenn eine Notiz geändert wird, nicht wenn sie geöffnet wird. Jedes Mal, wenn eine Änderung am Inhalt, am Titel oder an den Tags gespeichert wird (automatisches Speichern des Editors, abgehakte Aufgabe, gespeicherte Zeichnung, REST-API, Bearbeitung über einen öffentlichen Freigabelink), bewahrt Poznote zuerst die Notiz so auf, wie sie unmittelbar vor dieser Änderung war, es sei denn, in den letzten 10 Minuten wurde bereits eine Version dieser Notiz angelegt. Eine Version enthält also immer den Stand vor einer Änderung, und eine Bearbeitungssitzung erzeugt höchstens eine automatische Version alle 10 Minuten. Das Öffnen oder Lesen einer Notiz erzeugt nie eine Version. Für eine leere Notiz wird nichts gespeichert, ebenso wenig, wenn die neueste Version bereits genau den aktuellen Inhalt, Titel und die aktuellen Tags enthält: Der Verlauf enthält also keine Duplikate. Diese Versionen sind im Verlauf mit „Automatisch“ gekennzeichnet, ebenso wie die Versionen, die ältere Poznote-Versionen beim Öffnen einer Notiz angelegt haben: Für sie gelten dieselben Regeln.
+*   **Beispiel:** Sie bearbeiten eine Notiz von 9:00 bis 9:35 Uhr. Der Verlauf erhält Versionen von etwa 9:00 Uhr (die Notiz, bevor Sie sie angefasst haben), 9:10, 9:20 und 9:30 Uhr. Um 14:00 Uhr kommen Sie zurück und ändern ein Wort: Eine Version von 14:00 Uhr bewahrt die Notiz so auf, wie Sie sie um 9:35 Uhr verlassen haben.
+*   **Wohin Sie zurückkehren können:** Der Stand, in dem Sie eine Notiz am Ende einer Sitzung zurücklassen, wird in diesem Moment nicht als Version gespeichert, denn er ist die Notiz selbst. Er wird durch die erste Änderung der nächsten Sitzung festgehalten, wie viel später diese auch stattfindet. Sie können also immer zu dem Stand zurückkehren, den die Notiz hatte, bevor Sie heute mit dem Bearbeiten begonnen haben, und innerhalb einer langen Sitzung zu Ständen, die höchstens etwa 10 Minuten auseinanderliegen. Der neueste Stand ist immer die Notiz selbst: Vergleichen Sie eine beliebige Version mit „Aktuelle Version“, um zu sehen, was sich seitdem geändert hat.
+*   **Aufbewahrungsdauer automatischer Versionen:** Alle automatischen Versionen der letzten 24 Stunden werden aufbewahrt. Nach 24 Stunden bleibt nur die neueste automatische Version jedes Tages erhalten, standardmäßig 30 Tage lang. Diese Anzahl von Tagen lässt sich unter **Einstellungen > Versionen** ändern (1 bis 30). Falls Sie diese Einstellung bereits in einer älteren Version geändert hatten, in der sie Versionen zählte, bleibt Ihr Wert erhalten und zählt nun Tage.
+*   **Manuell:** „Version speichern“ fügt jederzeit eine Version hinzu, ebenso **Strg + Alt + S** (Cmd + Alt + S auf dem Mac) bei geöffneter Notiz. Manuelle Versionen sind unbegrenzt und werden nie ausgedünnt: Sie verschwinden erst, wenn sie nach 30 Tagen ablaufen.
+*   **Vor einer KI-Änderung:** Unmittelbar bevor der [KI-Assistent](#ki-assistent) oder der [MCP-Server](#mcp-server) den Inhalt einer Notiz ändert, wird automatisch eine Version gespeichert, auch wenn weniger als 10 Minuten zuvor bereits eine automatische Version angelegt wurde, sodass sich eine misslungene Umformulierung mit einem Klick rückgängig machen lässt. Diese Versionen sind im Verlauf mit „Vor KI-Änderung“ oder „Vor MCP-Änderung“ gekennzeichnet und werden übersprungen, wenn die letzte Version bereits denselben Inhalt, denselben Titel und dieselben Tags enthält.
+*   **Sicherheitsversionen:** Die Versionen „Vor KI-Änderung“ und „Vor MCP-Änderung“ teilen sich eine gemeinsame Grenze: Pro Notiz werden die 20 neuesten aufbewahrt, eine Anzahl, die Sie unter **Einstellungen → Versionen** ändern können (1 bis 200), falls auf Ihrer Instanz viele Notizen über KI oder MCP bearbeitet werden.
+*   **Ablauf:** Jede Version, gleich welcher Art, wird 30 Tage nach ihrer Erstellung gelöscht. Eine Version kann auch von Hand auf der Seite Versionen gelöscht werden.
+*   **Anhänge und Bilder:** Versionen speichern den Text, den Titel und die Tags der Notiz, nie ihre Dateien. Anhänge werden nie kopiert, sodass eine Datei, auf die mehrere Versionen verweisen, nur einmal auf der Festplatte existiert. Eine aus einer Notiz entfernte Datei bleibt, für die Notiz unsichtbar, auf der Festplatte, solange noch eine Version sie enthält, sodass sie beim Wiederherstellen dieser Version zurückkehrt. Endgültig gelöscht wird sie, sobald die letzte Version, die sie enthält, abläuft oder gelöscht wird, oder wenn die Notiz endgültig gelöscht wird. Mehr Versionen aufzubewahren dupliziert also nie Dateien. Entfernte Dateien bleiben lediglich länger erhalten, höchstens 30 Tage.
+*   **API und MCP:** Die [REST-API](API-REST.md#snapshots) und die Werkzeuge des [MCP-Servers](#mcp-server) nennen Versionen weiterhin „Snapshots“ (`/notes/{id}/snapshots`, `list_snapshots`, `get_snapshot`, `restore_snapshot`).
 
 </details>
 
@@ -708,7 +725,7 @@ Unter **Einstellungen > Verhalten** können Sie Folgendes konfigurieren:
 
 - **Notizen-Sortierreihenfolge:** festlegen, wie Notizen in der Liste sortiert werden
 - **Altersfilter für Notizen:** nur Notizen auflisten, die innerhalb der gewählten Anzahl von Tagen geändert wurden
-- **Schnappschüsse:** wie viele automatische Schnappschüsse pro Notiz aufbewahrt werden
+- **Versionen:** wie viele Tage automatische Versionen aufbewahrt werden (eine pro Tag jenseits der letzten 24 Stunden) und wie viele Sicherheitsversionen pro Notiz aufbewahrt werden
 - **Einfüge-Reihenfolge der Aufgaben:** festlegen, wo neue Aufgaben eingefügt werden
 - **Notizen nach Ordnern anzeigen:** Notizen ohne Ordner unterhalb der Ordnerliste anzeigen
 - **Codeblock-Zeilenumbruch:** den Zeilenumbruch in Codeblöcken ein- oder ausschalten
@@ -857,7 +874,7 @@ data/
     │   ├── database/poznote.db  # User's notes database
     │   ├── entries/             # User's note files (HTML/MD)
     │   ├── attachments/         # User's attachments
-    │   ├── snapshots/           # Earlier versions of the user's notes
+    │   ├── snapshots/           # Earlier versions of the user's notes (revisions)
     │   ├── backgrounds/         # Workspace background images
     │   └── backups/             # Backup archives prepared for download
     ├── 2/                       # User ID 2

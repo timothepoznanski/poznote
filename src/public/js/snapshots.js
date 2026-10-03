@@ -1,13 +1,15 @@
 /**
- * Snapshot system for Poznote
- * Creates daily snapshots of note content and allows viewing/restoring them.
+ * Revisions of the open note, from the notes page.
+ *
+ * Saves a revision on Ctrl + Alt + S and opens the Revisions page
+ * (revisions.php), which holds the history, the comparison and the restore.
+ * The automatic revisions are taken by the server when a change is saved
+ * (lib/snapshots.php), nothing here asks for them. The API calls revisions
+ * snapshots.
  */
 
 (function () {
     'use strict';
-
-    var pendingSnapshotCreates = Object.create(null);
-    var snapshotEmptyStateDefaults = null;
 
     function tr(key, fallback, vars) {
         if (typeof window.t === 'function') {
@@ -16,227 +18,8 @@
         return fallback;
     }
 
-    function getSnapshotUrl(noteId, query) {
-        var url = '/api/v1/notes/' + noteId + '/snapshot';
-        if (query) {
-            url += '?' + query;
-        }
-        return url;
-    }
-
-    function getSnapshotsListUrl(noteId) {
-        return '/api/v1/notes/' + noteId + '/snapshots';
-    }
-
-    function isDarkThemeActive() {
-        if (typeof window.getCurrentTheme === 'function') {
-            return window.getCurrentTheme() === 'dark';
-        }
-
-        return document.documentElement.getAttribute('data-theme') === 'dark' ||
-            document.body.classList.contains('dark-mode') ||
-            document.documentElement.classList.contains('theme-dark');
-    }
-
-    function syncSnapshotModalTheme(modal) {
-        if (!modal) return;
-
-        modal.classList.toggle('snapshot-modal-dark', isDarkThemeActive());
-    }
-
-    function normalizeSnapshotPreviewTheme(contentEl) {
-        if (!contentEl) return;
-
-        var isDark = isDarkThemeActive();
-        contentEl.classList.toggle('snapshot-content-preview-dark', isDark);
-
-        if (!isDark) {
-            contentEl.style.removeProperty('background');
-            contentEl.style.removeProperty('background-color');
-            contentEl.style.removeProperty('border-color');
-            contentEl.style.removeProperty('color');
-            return;
-        }
-
-        contentEl.style.setProperty('background', '#11161d', 'important');
-        contentEl.style.setProperty('border-color', 'rgba(255, 255, 255, 0.14)', 'important');
-        contentEl.style.setProperty('color', '#e6edf3', 'important');
-
-        contentEl.querySelectorAll('[style]').forEach(function (element) {
-            var tagName = element.tagName ? element.tagName.toLowerCase() : '';
-            if (tagName === 'img' || tagName === 'svg' || tagName === 'canvas' || tagName === 'video') return;
-
-            element.style.setProperty('background', 'transparent', 'important');
-            element.style.setProperty('background-color', 'transparent', 'important');
-            element.style.setProperty('color', 'inherit', 'important');
-        });
-    }
-
-    function getSnapshotMarkdownPreviewButton() {
-        return document.getElementById('snapshotMarkdownPreviewToggle');
-    }
-
-    function setSnapshotMarkdownPreviewButtonVisible(visible) {
-        var button = getSnapshotMarkdownPreviewButton();
-        if (!button) return;
-
-        button.hidden = !visible;
-    }
-
-    function updateSnapshotMarkdownPreviewButton(isPreview) {
-        var button = getSnapshotMarkdownPreviewButton();
-        if (!button) return;
-
-        var previewLabel = button.getAttribute('data-preview-label') || tr('snapshot.modal.markdown_preview', 'Preview');
-        var sourceLabel = button.getAttribute('data-source-label') || tr('snapshot.modal.markdown_source', 'Source view');
-        var label = isPreview ? sourceLabel : previewLabel;
-        var icon = isPreview ? 'lucide-file-code' : 'lucide-eye';
-
-        button.setAttribute('aria-pressed', isPreview ? 'true' : 'false');
-        button.innerHTML = '<i class="lucide ' + icon + '"></i><span>' + escapeHtml(label) + '</span>';
-    }
-
-    function renderMarkdownSnapshot(contentEl, content, noteId, mode) {
-        var isPreview = mode === 'preview';
-
-        contentEl.classList.toggle('markdown-preview', isPreview);
-        contentEl.classList.toggle('snapshot-markdown-source', !isPreview);
-        updateSnapshotMarkdownPreviewButton(isPreview);
-
-        if (isPreview) {
-            contentEl.style.whiteSpace = '';
-            contentEl.style.fontFamily = '';
-
-            if (typeof window.renderMarkdownPreview === 'function') {
-                window.renderMarkdownPreview(contentEl, content || '', noteId, {
-                    placeholder: contentEl.getAttribute('data-empty-text') || '',
-                    delay: 0
-                });
-                return;
-            }
-
-            if (typeof window.parseMarkdown === 'function') {
-                contentEl.innerHTML = content && content.trim() !== ''
-                    ? window.parseMarkdown(content)
-                    : '<div class="markdown-preview-placeholder">' + escapeHtml(contentEl.getAttribute('data-empty-text') || '') + '</div>';
-                return;
-            }
-        }
-
-        contentEl.textContent = content || '';
-        contentEl.style.whiteSpace = 'pre-wrap';
-        contentEl.style.fontFamily = 'monospace';
-    }
-
-    function renderSnapshotContent(contentEl, snapshot, noteId) {
-        var modal = document.getElementById('snapshotModal');
-        var content = snapshot.content || '';
-
-        contentEl.classList.remove('markdown-preview', 'snapshot-markdown-source');
-
-        if (snapshot.type === 'markdown') {
-            setSnapshotMarkdownPreviewButtonVisible(true);
-            var mode = modal && modal.dataset.snapshotMarkdownMode === 'source' ? 'source' : 'preview';
-            renderMarkdownSnapshot(contentEl, content, noteId, mode);
-        } else if (snapshot.type === 'tasklist') {
-            setSnapshotMarkdownPreviewButtonVisible(false);
-            if (modal) modal.dataset.snapshotMarkdownMode = 'source';
-
-            try {
-                var tasks = JSON.parse(content);
-                var html = '';
-                if (Array.isArray(tasks)) {
-                    tasks.forEach(function (task) {
-                        var checked = task.completed || task.checked || task.done ? '☑' : '☐';
-                        var text = task.text || task.content || '';
-                        html += '<div style="margin: 4px 0;">' + checked + ' ' + escapeHtml(text) + '</div>';
-                        // Subtasks, indented under their task
-                        (Array.isArray(task.subtasks) ? task.subtasks : []).forEach(function (subtask) {
-                            if (!subtask || !subtask.text) return;
-                            html += '<div style="margin: 2px 0 2px 24px;">' + (subtask.completed ? '☑' : '☐') + ' ' + escapeHtml(subtask.text) + '</div>';
-                        });
-                    });
-                }
-                contentEl.innerHTML = html || escapeHtml(content);
-            } catch (e) {
-                contentEl.textContent = content;
-            }
-            contentEl.style.whiteSpace = '';
-            contentEl.style.fontFamily = '';
-        } else {
-            setSnapshotMarkdownPreviewButtonVisible(false);
-            if (modal) modal.dataset.snapshotMarkdownMode = 'source';
-
-            contentEl.innerHTML = content;
-            contentEl.style.whiteSpace = '';
-            contentEl.style.fontFamily = '';
-        }
-
-        normalizeSnapshotPreviewTheme(contentEl);
-    }
-
-    function getAvailableSnapshots(snapshots) {
-        if (!Array.isArray(snapshots)) return [];
-
-        return snapshots.filter(function (snap) {
-            return snap && (snap.snapshot_key || snap.date) && snap.exists !== false && snap.available !== false && snap.has_snapshot !== false;
-        });
-    }
-
-    function getSnapshotEmptyStateDefaults(noSnapshotEl) {
-        if (!snapshotEmptyStateDefaults) {
-            var titleEl = noSnapshotEl.querySelector('.snapshot-state-title');
-            var hintEl = noSnapshotEl.querySelector('.snapshot-state-hint');
-            snapshotEmptyStateDefaults = {
-                title: titleEl ? titleEl.textContent : 'No snapshot available',
-                hint: hintEl ? hintEl.textContent : 'No snapshot for now, but you can create one manually right away.'
-            };
-        }
-
-        return snapshotEmptyStateDefaults;
-    }
-
-    function setSnapshotEmptyState(isEmptyNewNote) {
-        var noSnapshotEl = document.getElementById('snapshotNoData');
-        if (!noSnapshotEl) return;
-
-        var titleEl = noSnapshotEl.querySelector('.snapshot-state-title');
-        var hintEl = noSnapshotEl.querySelector('.snapshot-state-hint');
-        var defaults = getSnapshotEmptyStateDefaults(noSnapshotEl);
-
-        if (titleEl) {
-            titleEl.textContent = isEmptyNewNote
-                ? tr('snapshot.modal.new_note_empty_title', defaults.title)
-                : tr('snapshot.modal.empty_title', defaults.title);
-        }
-
-        if (hintEl) {
-            hintEl.textContent = isEmptyNewNote
-                ? tr('snapshot.modal.new_note_empty_hint', defaults.hint)
-                : tr('snapshot.modal.empty_hint', defaults.hint);
-        }
-    }
-
-    function rememberPendingSnapshotCreate(noteId, promise) {
-        var key = String(noteId);
-        pendingSnapshotCreates[key] = promise;
-
-        promise.finally(function () {
-            if (pendingSnapshotCreates[key] === promise) {
-                delete pendingSnapshotCreates[key];
-            }
-        });
-
-        return promise;
-    }
-
-    function waitForPendingSnapshotCreate(noteId) {
-        var pending = pendingSnapshotCreates[String(noteId)];
-        return pending ? pending.catch(function () { return null; }) : Promise.resolve();
-    }
-
     function requestSnapshotCreate(noteId, manual) {
-        return fetch(getSnapshotUrl(noteId, manual ? 'manual=1' : ''), {
+        return fetch('/api/v1/notes/' + noteId + '/snapshot' + (manual ? '?manual=1' : ''), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -246,348 +29,16 @@
             return response.json().catch(function () {
                 return {
                     success: response.ok,
-                    error: response.ok ? null : tr('snapshot.errors.create_failed', 'Failed to take snapshot')
+                    error: response.ok ? null : tr('revisions.errors.create_failed', 'Could not save a revision')
                 };
             });
         });
     }
 
     /**
-     * Create a snapshot for the given note ID (called on note load).
-     * Only creates one snapshot per note per day.
-     */
-    window.createNoteSnapshot = function (noteId) {
-        if (!noteId || noteId === -1 || noteId === 'search') return;
-
-        rememberPendingSnapshotCreate(noteId, requestSnapshotCreate(noteId, false)).catch(function (e) {
-            // Silently ignore - snapshots are best-effort
-            console.debug('snapshots: requestSnapshotCreate() failed:', e);
-        });
-    };
-
-    /**
-     * Show the snapshot modal for the current note.
-     * Loads the list of available snapshots and selects the most recent one.
-     */
-    window.showSnapshotModal = function (noteId) {
-
-        if (!noteId) {
-            noteId = window.noteid;
-        }
-        if (!noteId || noteId === -1 || noteId === 'search') return;
-
-        var modal = document.getElementById('snapshotModal');
-        var loadingEl = document.getElementById('snapshotLoading');
-        var noSnapshotEl = document.getElementById('snapshotNoData');
-        var snapshotBodyEl = document.getElementById('snapshotBody');
-        var dateListEl = document.getElementById('snapshotDateList');
-
-        if (!modal) return;
-
-        syncSnapshotModalTheme(modal);
-        setSnapshotEmptyState(false);
-
-        // Store current note id for restore
-        modal.dataset.noteId = noteId;
-        modal.dataset.selectedDate = '';
-        modal.dataset.selectedSnapshotKey = '';
-        modal.dataset.snapshotMarkdownMode = 'preview';
-        setSnapshotMarkdownPreviewButtonVisible(false);
-
-        // Show modal with loading state
-        modal.style.display = 'flex';
-        if (loadingEl) loadingEl.style.display = 'flex';
-        if (noSnapshotEl) noSnapshotEl.style.display = 'none';
-        if (snapshotBodyEl) snapshotBodyEl.style.display = 'none';
-        if (dateListEl) dateListEl.style.display = 'none';
-
-        waitForPendingSnapshotCreate(noteId)
-        .then(function () {
-            return fetch(getSnapshotsListUrl(noteId), {
-                method: 'GET',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            });
-        })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (loadingEl) loadingEl.style.display = 'none';
-
-            var snapshots = getAvailableSnapshots(data.snapshots);
-
-            if (!data.success || snapshots.length === 0) {
-                setSnapshotEmptyState(data && data.empty_new_note === true);
-                if (noSnapshotEl) noSnapshotEl.style.display = 'flex';
-                if (dateListEl) dateListEl.style.display = 'none';
-                return;
-            }
-
-            // Render date list
-            if (dateListEl) dateListEl.style.display = 'flex';
-            renderSnapshotDates(snapshots, noteId);
-
-            // Load the most recent snapshot
-            loadSnapshot(noteId, snapshots[0].snapshot_key || snapshots[0].date, snapshots[0].date);
-        })
-        .catch(function () {
-            if (loadingEl) loadingEl.style.display = 'none';
-            if (noSnapshotEl) noSnapshotEl.style.display = 'flex';
-        });
-    };
-
-    /**
-     * Render the list of available snapshot dates in the sidebar.
-     */
-    function renderSnapshotDates(snapshots, noteId) {
-        var container = document.getElementById('snapshotDates');
-        if (!container) return;
-
-        container.innerHTML = '';
-        var today = new Date().toISOString().slice(0, 10);
-
-        snapshots.forEach(function (snap) {
-            var snapshotKey = snap.snapshot_key || snap.key || snap.date;
-            var btn = document.createElement('button');
-            btn.className = 'snapshot-date-btn';
-            btn.dataset.snapshotKey = snapshotKey;
-            btn.dataset.date = snap.date;
-            btn.type = 'button';
-
-            var primaryLabel = snap.date;
-            if (snap.date === today) {
-                primaryLabel = tr('snapshot.modal.today', 'Today');
-            } else {
-                // Format as readable date (e.g. "Apr 17")
-                try {
-                    var d = new Date(snap.date + 'T00:00:00');
-                    primaryLabel = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-                } catch (e) {
-                    primaryLabel = snap.date;
-                }
-            }
-
-            var secondaryLabel = '';
-            if (snap.created_at) {
-                var createdParts = String(snap.created_at).trim().split(' ');
-                secondaryLabel = createdParts[createdParts.length - 1] || '';
-            }
-            // Safety snapshots taken before an automated rewrite say so
-            var originLabel = '';
-            if (snap.origin === 'ai') {
-                originLabel = tr('snapshot.modal.origin_ai', 'Before AI edit');
-            } else if (snap.origin === 'mcp') {
-                originLabel = tr('snapshot.modal.origin_mcp', 'Before MCP edit');
-            }
-            if (originLabel) {
-                secondaryLabel = secondaryLabel ? secondaryLabel + ' \u00b7 ' + originLabel : originLabel;
-            }
-
-            btn.innerHTML = '<i class="lucide lucide-calendar"></i>' +
-                '<span class="snapshot-date-labels">' +
-                    '<span class="snapshot-date-primary">' + escapeHtml(primaryLabel) + '</span>' +
-                    (secondaryLabel ? '<span class="snapshot-date-secondary">' + escapeHtml(secondaryLabel) + '</span>' : '') +
-                '</span>';
-
-            btn.addEventListener('click', function () {
-                loadSnapshot(noteId, snapshotKey, snap.date);
-            });
-
-            container.appendChild(btn);
-        });
-    }
-
-    /**
-     * Load and display the snapshot for a specific date.
-     */
-    function loadSnapshot(noteId, snapshotKey, date) {
-        var modal = document.getElementById('snapshotModal');
-        var contentEl = document.getElementById('snapshotContent');
-        var loadingEl = document.getElementById('snapshotLoading');
-        var noSnapshotEl = document.getElementById('snapshotNoData');
-        var snapshotBodyEl = document.getElementById('snapshotBody');
-        var snapshotDateEl = document.getElementById('snapshotDate');
-        var snapshotHeadingEl = document.getElementById('snapshotHeading');
-
-        if (!modal || !contentEl) return;
-
-        syncSnapshotModalTheme(modal);
-
-        snapshotKey = snapshotKey || date || '';
-        modal.dataset.selectedDate = date;
-        modal.dataset.selectedSnapshotKey = snapshotKey;
-
-        // Highlight selected date in the list
-        var allBtns = document.querySelectorAll('#snapshotDates .snapshot-date-btn');
-        allBtns.forEach(function (btn) {
-            btn.classList.toggle('active', btn.dataset.snapshotKey === snapshotKey);
-        });
-
-        // Show loading
-        if (loadingEl) loadingEl.style.display = 'flex';
-        if (snapshotBodyEl) snapshotBodyEl.style.display = 'none';
-
-        var query = snapshotKey
-            ? 'snapshot_key=' + encodeURIComponent(snapshotKey)
-            : 'date=' + encodeURIComponent(date);
-
-        fetch(getSnapshotUrl(noteId, query), {
-            method: 'GET',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        })
-        .then(function (response) { return response.json(); })
-        .then(function (data) {
-            if (loadingEl) loadingEl.style.display = 'none';
-
-            if (!data.success || !data.snapshot) {
-                if (noSnapshotEl) noSnapshotEl.style.display = 'flex';
-                return;
-            }
-
-            if (noSnapshotEl) noSnapshotEl.style.display = 'none';
-            if (snapshotBodyEl) snapshotBodyEl.style.display = 'flex';
-
-            var snapshot = data.snapshot;
-
-            if (snapshot.snapshot_key) {
-                modal.dataset.selectedSnapshotKey = snapshot.snapshot_key;
-            }
-            if (snapshot.date) {
-                modal.dataset.selectedDate = snapshot.date;
-            }
-
-            if (snapshotDateEl) {
-                snapshotDateEl.textContent = snapshot.date + (snapshot.created_at ? ' (' + snapshot.created_at + ')' : '');
-            }
-            if (snapshotHeadingEl) {
-                snapshotHeadingEl.textContent = snapshot.heading || '';
-            }
-
-            renderSnapshotContent(contentEl, snapshot, noteId);
-
-            // Store raw content for copy
-            modal.dataset.snapshotContent = snapshot.content || '';
-            modal.dataset.snapshotType = snapshot.type || 'note';
-        })
-        .catch(function () {
-            if (loadingEl) loadingEl.style.display = 'none';
-            if (noSnapshotEl) noSnapshotEl.style.display = 'flex';
-        });
-    }
-
-    window.toggleSnapshotMarkdownPreview = function () {
-        var modal = document.getElementById('snapshotModal');
-        var contentEl = document.getElementById('snapshotContent');
-        if (!modal || !contentEl || modal.dataset.snapshotType !== 'markdown') return;
-
-        modal.dataset.snapshotMarkdownMode = modal.dataset.snapshotMarkdownMode === 'preview' ? 'source' : 'preview';
-        renderSnapshotContent(contentEl, {
-            type: 'markdown',
-            content: modal.dataset.snapshotContent || ''
-        }, modal.dataset.noteId || window.noteid);
-    };
-
-    /**
-     * Copy snapshot content to clipboard
-     */
-    window.copySnapshotContent = function () {
-        var modal = document.getElementById('snapshotModal');
-        if (!modal) return;
-
-        var content = modal.dataset.snapshotContent || '';
-        var type = modal.dataset.snapshotType || 'note';
-
-        // Markdown copies its source. Other notes copy the text as rendered in
-        // the preview (innerText keeps the line breaks between blocks), and
-        // HTML notes also carry their markup so pasting into a note keeps
-        // the formatting.
-        var textContent = content;
-        var htmlContent = '';
-        if (type !== 'markdown') {
-            var contentEl = document.getElementById('snapshotContent');
-            textContent = contentEl ? contentEl.innerText : content;
-            if (type !== 'tasklist') {
-                htmlContent = content;
-            }
-        }
-
-        if (htmlContent && navigator.clipboard && navigator.clipboard.write && typeof window.ClipboardItem === 'function') {
-            navigator.clipboard.write([new window.ClipboardItem({
-                'text/html': new Blob([htmlContent], { type: 'text/html' }),
-                'text/plain': new Blob([textContent], { type: 'text/plain' })
-            })]).then(function () {
-                showSnapshotToast(tr('snapshot.messages.content_copied', 'Content copied'));
-            }).catch(function () {
-                fallbackCopy(textContent);
-            });
-        } else if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(textContent).then(function () {
-                showSnapshotToast(tr('snapshot.messages.content_copied', 'Content copied'));
-            }).catch(function () {
-                fallbackCopy(textContent);
-            });
-        } else {
-            fallbackCopy(textContent);
-        }
-    };
-
-    /**
-     * Create an additional snapshot immediately.
-     */
-    window.takeSnapshotNow = function () {
-
-        var modal = document.getElementById('snapshotModal');
-        var noteId = modal && modal.dataset.noteId ? modal.dataset.noteId : window.noteid;
-        var buttons = document.querySelectorAll('#snapshotModal .snapshot-take-btn');
-
-        if (!noteId || noteId === -1 || noteId === 'search') return;
-
-        var executeTakeSnapshot = function () {
-            buttons.forEach(function (button) {
-                button.disabled = true;
-            });
-
-            rememberPendingSnapshotCreate(noteId, requestSnapshotCreate(noteId, true))
-            .then(function (data) {
-                if (!data.success) {
-                    showSnapshotError(data.error || tr('snapshot.errors.create_failed', 'Failed to take snapshot'));
-                    return;
-                }
-
-                showSnapshotToast(tr('snapshot.messages.created_now', 'Snapshot added'));
-                showSnapshotModal(noteId);
-            })
-            .catch(function () {
-                showSnapshotError(tr('snapshot.errors.create_failed', 'Failed to take snapshot'));
-            })
-            .finally(function () {
-                buttons.forEach(function (button) {
-                    button.disabled = false;
-                });
-            });
-        };
-
-        if (typeof window.modalAlert !== 'undefined' && typeof window.modalAlert.confirm === 'function') {
-            window.modalAlert.confirm(
-                tr('snapshot.confirm.take_now_message', 'Create an additional snapshot with the current note content? Existing snapshots for today will be kept.'),
-                tr('snapshot.confirm.title', 'Confirmation'),
-                {
-                    modalClass: 'snapshot-restore-confirm',
-                    confirmButtonClass: 'snapshot-restore-confirm-button',
-                    confirmText: tr('snapshot.confirm.take_now_button', 'Take snapshot now')
-                }
-            ).then(function (confirmed) {
-                if (confirmed) {
-                    executeTakeSnapshot();
-                }
-            });
-        } else if (confirm(tr('snapshot.confirm.take_now_message', 'Create an additional snapshot with the current note content? Existing snapshots for today will be kept.'))) {
-            executeTakeSnapshot();
-        }
-    };
-
-    /**
      * Wait until the autosave of the current note has gone through, so a
-     * snapshot taken right after reflects what the user sees. Resolves
-     * anyway after a few seconds: the snapshot is best-effort.
+     * revision taken (or a comparison made) right after reflects what the
+     * user sees. Resolves anyway after a few seconds.
      */
     function waitForNoteSaved(noteId) {
         return new Promise(function (resolve) {
@@ -603,199 +54,63 @@
         });
     }
 
+    function saveOpenNote(noteId) {
+        if (typeof window.hasUnsavedChanges === 'function' && window.hasUnsavedChanges(noteId)
+            && typeof window.saveNoteImmediately === 'function') {
+            window.saveNoteImmediately();
+            return waitForNoteSaved(noteId);
+        }
+        return Promise.resolve();
+    }
+
     /**
-     * Take a manual snapshot of the open note without any confirmation
-     * (Ctrl + Alt + S). Saves pending edits first so the snapshot holds
-     * the content on screen, then shows a toast.
+     * Open the Revisions page of a note. Pending edits are saved first, so
+     * "Current version" there is what was on screen.
+     */
+    window.openNoteRevisions = function (noteId) {
+        if (!noteId) {
+            noteId = typeof window.getDisplayedNoteId === 'function' ? window.getDisplayedNoteId() : window.noteid;
+        }
+        if (!noteId || noteId === -1 || noteId === 'search') return;
+
+        var workspace = '';
+        if (typeof window.selectedWorkspace === 'string' && window.selectedWorkspace) {
+            workspace = window.selectedWorkspace;
+        } else if (typeof window.getSelectedWorkspace === 'function') {
+            workspace = window.getSelectedWorkspace() || '';
+        }
+        var url = 'revisions.php?note_id=' + encodeURIComponent(noteId)
+            + (workspace ? '&workspace=' + encodeURIComponent(workspace) : '');
+
+        saveOpenNote(noteId).then(function () {
+            window.location.href = url;
+        });
+    };
+
+    /**
+     * Save a revision of the open note without any confirmation
+     * (Ctrl + Alt + S). Saves pending edits first so the revision holds the
+     * content on screen, then shows a toast.
      */
     window.takeSnapshotShortcut = function () {
 
         var noteId = window.noteid;
         if (!noteId || noteId === -1 || noteId === 'search') return false;
 
-        var save = Promise.resolve();
-        if (typeof window.hasUnsavedChanges === 'function' && window.hasUnsavedChanges(noteId)
-            && typeof window.saveNoteImmediately === 'function') {
-            window.saveNoteImmediately();
-            save = waitForNoteSaved(noteId);
-        }
-
-        save.then(function () {
-            return rememberPendingSnapshotCreate(noteId, requestSnapshotCreate(noteId, true));
+        saveOpenNote(noteId).then(function () {
+            return requestSnapshotCreate(noteId, true);
         }).then(function (data) {
             if (!data || !data.success) {
-                showSnapshotError((data && data.error) || tr('snapshot.errors.create_failed', 'Failed to take snapshot'));
+                showSnapshotError((data && data.error) || tr('revisions.errors.create_failed', 'Could not save a revision'));
                 return;
             }
-            showSnapshotToast(tr('snapshot.messages.created_now', 'Snapshot added'));
-            // Refresh the list if the modal happens to be open on this note
-            var modal = document.getElementById('snapshotModal');
-            if (modal && modal.style.display !== 'none' && String(modal.dataset.noteId) === String(noteId)) {
-                showSnapshotModal(noteId);
-            }
+            showSnapshotToast(tr('revisions.messages.created', 'Revision saved'));
         }).catch(function () {
-            showSnapshotError(tr('snapshot.errors.create_failed', 'Failed to take snapshot'));
+            showSnapshotError(tr('revisions.errors.create_failed', 'Could not save a revision'));
         });
 
         return true;
     };
-
-    /**
-     * Restore note to snapshot state
-     */
-    window.restoreSnapshot = function () {
-
-        var modal = document.getElementById('snapshotModal');
-        if (!modal) return;
-
-        var noteId = modal.dataset.noteId;
-        if (!noteId) return;
-
-        var selectedSnapshotKey = modal.dataset.selectedSnapshotKey || '';
-        var selectedDate = modal.dataset.selectedDate || '';
-        var restoreQuery = selectedSnapshotKey
-            ? '?snapshot_key=' + encodeURIComponent(selectedSnapshotKey)
-            : selectedDate
-                ? '?date=' + encodeURIComponent(selectedDate)
-                : '';
-
-        var confirmRestore = function () {
-            fetch('/api/v1/notes/' + noteId + '/snapshot/restore' + restoreQuery, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(function (response) { return response.json(); })
-            .then(function (data) {
-                if (data.success) {
-                    closeSnapshotModal();
-                    // Reload the page to show restored content
-                    window.location.reload();
-                } else {
-                    showSnapshotError(data.error || tr('snapshot.errors.restore_failed', 'Failed to restore snapshot'));
-                }
-            })
-            .catch(function () {
-                showSnapshotError(tr('snapshot.errors.restore_failed', 'Failed to restore snapshot'));
-            });
-        };
-
-        // Use modal alert if available, otherwise use confirm
-        if (typeof window.modalAlert !== 'undefined' && typeof window.modalAlert.confirm === 'function') {
-            window.modalAlert.confirm(
-                tr('snapshot.confirm.restore_message', 'Restore the note to the snapshot state? Current changes will be lost.'),
-                tr('snapshot.confirm.title', 'Confirmation'),
-                {
-                    modalClass: 'snapshot-restore-confirm',
-                    confirmButtonClass: 'snapshot-restore-confirm-button',
-                    confirmText: tr('snapshot.confirm.restore_button', 'Restore this state')
-                }
-            ).then(function (confirmed) {
-                if (confirmed) {
-                    confirmRestore();
-                }
-            });
-        } else if (confirm(tr('snapshot.confirm.restore_message', 'Restore the note to the snapshot state? Current changes will be lost.'))) {
-            confirmRestore();
-        }
-    };
-
-    /**
-     * Delete the selected snapshot (manual or automatic).
-     */
-    window.deleteSnapshot = function () {
-
-        var modal = document.getElementById('snapshotModal');
-        if (!modal) return;
-
-        var noteId = modal.dataset.noteId;
-        var selectedSnapshotKey = modal.dataset.selectedSnapshotKey || '';
-        var selectedDate = modal.dataset.selectedDate || '';
-        if (!noteId || (!selectedSnapshotKey && !selectedDate)) return;
-
-        var deleteQuery = selectedSnapshotKey
-            ? '?snapshot_key=' + encodeURIComponent(selectedSnapshotKey)
-            : '?date=' + encodeURIComponent(selectedDate);
-
-        var confirmDelete = function () {
-            fetch(getSnapshotUrl(noteId, deleteQuery.slice(1)), {
-                method: 'DELETE',
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-            .then(function (response) { return response.json(); })
-            .then(function (data) {
-                if (data.success) {
-                    showSnapshotToast(tr('snapshot.messages.deleted', 'Snapshot deleted'));
-                    showSnapshotModal(noteId);
-                } else {
-                    showSnapshotError(data.error || tr('snapshot.errors.delete_failed', 'Failed to delete snapshot'));
-                }
-            })
-            .catch(function () {
-                showSnapshotError(tr('snapshot.errors.delete_failed', 'Failed to delete snapshot'));
-            });
-        };
-
-        var message = tr('snapshot.confirm.delete_message', 'Delete this snapshot?');
-        if (typeof window.modalAlert !== 'undefined' && typeof window.modalAlert.confirm === 'function') {
-            window.modalAlert.confirm(
-                message,
-                tr('snapshot.confirm.title', 'Confirmation'),
-                {
-                    modalClass: 'snapshot-restore-confirm',
-                    confirmButtonClass: 'snapshot-restore-confirm-button',
-                    confirmText: tr('snapshot.confirm.delete_button', 'Delete this snapshot')
-                }
-            ).then(function (confirmed) {
-                if (confirmed) {
-                    confirmDelete();
-                }
-            });
-        } else if (confirm(message)) {
-            confirmDelete();
-        }
-    };
-
-    /**
-     * The kept-count number in the description: close this modal and open
-     * the matching setting on the settings page.
-     */
-    window.openSnapshotsKeepCountSettings = function (event) {
-        if (event && typeof event.preventDefault === 'function') {
-            event.preventDefault();
-        }
-        closeSnapshotModal();
-        window.location.href = 'settings.php?open=snapshots#snapshots-card';
-        return false;
-    };
-
-    /**
-     * Close the snapshot modal
-     */
-    window.closeSnapshotModal = function () {
-        var modal = document.getElementById('snapshotModal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    };
-
-    function fallbackCopy(text) {
-        var textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        try {
-            document.execCommand('copy');
-            showSnapshotToast(tr('snapshot.messages.content_copied', 'Content copied'));
-        } catch (e) {
-            showSnapshotError(tr('snapshot.errors.copy_failed', 'Copy failed'));
-        }
-        document.body.removeChild(textarea);
-    }
 
     function ensureSnapshotToastContainer() {
         // Shared with the "Saved!" toast so both stack (issue 1508)
@@ -874,34 +189,5 @@
             console.debug('snapshots: showSnapshotError() failed:', e);
         }
     }
-
-    function escapeHtml(str) {
-        var div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-    }
-
-    // Close modal on backdrop click
-    var snapshotMouseDownTarget = null;
-    document.addEventListener('mousedown', function (e) {
-        snapshotMouseDownTarget = e.target;
-    });
-    document.addEventListener('click', function (e) {
-        var modal = document.getElementById('snapshotModal');
-        if (modal && e.target === modal && snapshotMouseDownTarget === modal) {
-            closeSnapshotModal();
-        }
-        snapshotMouseDownTarget = null;
-    });
-
-    // Close modal on Escape key
-    document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') {
-            var modal = document.getElementById('snapshotModal');
-            if (modal && modal.style.display !== 'none') {
-                closeSnapshotModal();
-            }
-        }
-    });
 
 })();

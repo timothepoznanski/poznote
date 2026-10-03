@@ -989,7 +989,7 @@
         });
     }
 
-    var SNAPSHOTS_DEFAULT_COUNT = 3;
+    var SNAPSHOTS_DEFAULT_COUNT = 30;
     var SNAPSHOTS_MAX_COUNT = 30;
     // Safety snapshots (before an AI or MCP edit) have their own, wider range:
     // an instance whose MCP server edits a lot rolls through 20 in an afternoon.
@@ -1017,7 +1017,7 @@
                 badge.textContent = tr(
                     'modals.snapshots.badge_with_safety',
                     { count: count, safety: safety },
-                    count + ' automatic, ' + safety + ' safety per note'
+                    count + ' days, ' + safety + ' safety per note'
                 );
                 badge.className = 'setting-status enabled';
             });
@@ -2811,7 +2811,7 @@
         }
 
 
-        // Deep link from the note's Snapshots modal: settings.php?open=snapshots
+        // Deep link from the kept-count number of the Revisions page: settings.php?open=snapshots
         if (new URLSearchParams(window.location.search || '').get('open') === 'snapshots') {
             openSnapshotsSettingsModal();
             if (window.history && typeof window.history.replaceState === 'function') {

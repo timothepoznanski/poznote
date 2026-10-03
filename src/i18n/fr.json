@@ -98,66 +98,25 @@
     "show_more_notes": "Afficher plus ({{count}} restantes)"
   },
   "snapshot": {
-    "menu_item": "Snapshots",
-    "modal": {
-      "title": "Snapshots",
-      "description": "Créés automatiquement à la première ouverture chaque jour, les {{count}} derniers sont conservés. « Prendre un snapshot maintenant » ou Ctrl + Alt + S ajoute un snapshot manuel, et un snapshot est pris avant toute modification par l'assistant IA ou le serveur MCP. Tout snapshot expire au bout de {{days}} jours.",
-      "loading": "Chargement du snapshot...",
-      "history": "Historique",
-      "markdown_preview": "Aperçu",
-      "markdown_source": "Vue source",
-      "today": "Aujourd'hui",
-      "origin_ai": "Avant modification par l'IA",
-      "origin_mcp": "Avant modification MCP",
-      "empty_title": "Aucun snapshot disponible",
-      "empty_hint": "Pas de snapshot pour le moment, mais vous pouvez en créer un manuellement dès à présent.",
-      "new_note_empty_title": "Pas encore de snapshot",
-      "new_note_empty_hint": "Pas de snapshot pour le moment, mais vous pouvez en créer un manuellement dès à présent.",
-      "empty_content": "(Contenu vide)",
-      "take_now": "Prendre un snapshot maintenant",
-      "copy_content": "Copier le contenu",
-      "restore_state": "Revenir à cet état",
-      "delete": "Supprimer ce snapshot",
-      "keep_count_link_title": "Modifier le nombre de snapshots automatiques conservés"
-    },
-    "messages": {
-      "content_copied": "Contenu copié",
-      "created_now": "Snapshot ajouté",
-      "deleted": "Snapshot supprimé"
-    },
-    "errors": {
-      "restore_failed": "Échec de la restauration du snapshot",
-      "create_failed": "Impossible de prendre le snapshot",
-      "copy_failed": "Copie impossible",
-      "delete_failed": "Échec de la suppression du snapshot"
-    },
-    "confirm": {
-      "title": "Confirmation",
-      "restore_message": "Restaurer la note à l'état du snapshot ? Les modifications actuelles seront perdues.",
-      "restore_button": "Revenir à cet état",
-      "take_now_message": "Créer un snapshot supplémentaire avec le contenu actuel de la note ? Les snapshots déjà pris aujourd'hui seront conservés.",
-      "take_now_button": "Prendre un snapshot maintenant",
-      "delete_message": "Supprimer ce snapshot ?",
-      "delete_button": "Supprimer ce snapshot"
-    },
+    "menu_item": "Révisions",
     "api": {
       "invalid_note_id": "ID de note invalide",
       "note_not_found": "Note introuvable",
-      "already_exists": "Un snapshot existe déjà pour aujourd'hui",
-      "create_directory_failed": "Impossible de créer le dossier des snapshots",
-      "write_file_failed": "Impossible d'écrire le fichier snapshot",
-      "create_failed": "Impossible de créer le snapshot",
-      "skipped_empty_new_note": "Aucun snapshot automatique pour le moment car cette nouvelle note est vide",
-      "not_found_today": "Aucun snapshot trouvé pour aujourd'hui",
-      "read_failed": "Impossible de lire le snapshot",
-      "retrieve_failed": "Impossible de récupérer le snapshot",
+      "already_exists": "Une révision quotidienne existe déjà pour aujourd'hui",
+      "create_directory_failed": "Impossible de créer le dossier des révisions",
+      "write_file_failed": "Impossible d'écrire le fichier de la révision",
+      "create_failed": "Impossible d'enregistrer la révision",
+      "skipped_empty_new_note": "Aucune révision quotidienne pour le moment car cette nouvelle note est vide",
+      "not_found_today": "Aucune révision trouvée pour aujourd'hui",
+      "read_failed": "Impossible de lire la révision",
+      "retrieve_failed": "Impossible de récupérer la révision",
       "invalid_entries_path": "Chemin des notes invalide",
       "restore_note_file_failed": "Impossible de restaurer le fichier de la note",
-      "restore_success": "La note a été restaurée à l'état du snapshot",
-      "restore_failed": "Impossible de restaurer le snapshot",
-      "not_found": "Snapshot introuvable",
-      "delete_failed": "Échec de la suppression du snapshot",
-      "deleted": "Snapshot supprimé"
+      "restore_success": "La note a été restaurée à cette révision",
+      "restore_failed": "Impossible de restaurer la révision",
+      "not_found": "Révision introuvable",
+      "delete_failed": "Échec de la suppression de la révision",
+      "deleted": "Révision supprimée"
     }
   },
   "kanban": {
@@ -544,7 +503,7 @@
       "s3_storage": "Stocker les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",
       "s3_backup": "Envoie des archives de sauvegarde complètes vers un bucket compatible S3, manuellement ou selon une planification.",
       "highlight_current_folder_tree": "Estomper, autant que vous le souhaitez, les notes et les dossiers situés en dehors de la hiérarchie de dossiers dans laquelle vous travaillez.",
-      "snapshots": "Choisissez combien de snapshots automatiques quotidiens et combien de snapshots de sécurité (avant une modification IA ou MCP) sont conservés par note.",
+      "snapshots": "Choisissez pendant combien de jours une révision automatique par jour est conservée, et combien de révisions de sécurité (prises avant une modification IA ou MCP) sont conservées par note.",
       "stt": "Configurer le serveur de reconnaissance vocale utilisé pour dicter des notes et transcrire les pièces jointes audio.",
       "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur.",
       "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle.",
@@ -875,7 +834,7 @@
       "spellcheck_html_notes": "Vérification orthographique",
       "slash_menu_trigger": "Raccourci du menu de commandes (ordinateur)",
       "slash_menu_trigger_mobile": "Raccourci du menu de commandes (mobile)",
-      "snapshots": "Snapshots",
+      "snapshots": "Révisions",
       "sidebar_offline_marks": "Afficher le point hors ligne",
       "format_toolbar_mode": "Barre de mise en forme",
       "workspace_activity_emails": "Emails des espaces partagés"
@@ -1824,17 +1783,17 @@
       "rename_placeholder": "Nouveau titre de la note"
     },
     "snapshots": {
-      "title": "Snapshots",
-      "description": "Nombre de snapshots automatiques conservés par note (un est pris chaque jour à la première ouverture de la note). Les snapshots manuels pris avec « Prendre un snapshot maintenant » ne sont pas comptés. Tout snapshot expire au bout de {{days}} jours :",
-      "safety_description": "Nombre de snapshots de sécurité conservés par note. Un est pris juste avant que l'assistant IA ou le serveur MCP ne réécrive une note, et apparaît sous « Avant modification IA » ou « Avant modification MCP » :",
+      "title": "Révisions",
+      "description": "Une révision automatique est enregistrée quand une note change, au plus une toutes les {{minutes}} minutes, et elles sont toutes conservées pendant {{hours}} heures. Ensuite, une par jour est conservée, pendant ce nombre de jours. Les révisions que vous enregistrez vous-même ne sont pas comptées. Toute révision expire au bout de {{days}} jours :",
+      "safety_description": "Nombre de révisions de sécurité conservées par note. Une est enregistrée juste avant que l'assistant IA ou le serveur MCP ne remplace le contenu d'une note, et apparaît sous « Avant modification IA » ou « Avant modification MCP » :",
       "options": {
-        "unit": "snapshots automatiques",
-        "safety_unit": "snapshots de sécurité"
+        "unit": "jours, une révision automatique par jour",
+        "safety_unit": "révisions de sécurité"
       },
-      "badge": "{{count}} automatiques par note",
-      "badge_with_safety": "{{count}} automatiques, {{safety}} de sécurité par note",
-      "warning_title": "Les snapshots ne stockent que le texte de la note. Les pièces jointes et les images ne sont jamais copiées.",
-      "warning": "Les pièces jointes et les images sont conservées sur le disque même après leur suppression de la note, tant qu'un de ses snapshots les contient encore. Elles ne sont libérées que lorsque le dernier snapshot qui les contient est supprimé ou expire (au plus tard après {{days}} jours) ou lorsque la note est définitivement supprimée."
+      "badge": "{{count}} jours par note",
+      "badge_with_safety": "{{count}} jours, {{safety}} de sécurité par note",
+      "warning_title": "Les révisions ne stockent que le texte de la note. Les pièces jointes et les images ne sont jamais copiées.",
+      "warning": "Les pièces jointes et les images sont conservées sur le disque même après leur suppression de la note, tant qu'une de ses révisions les contient encore. Elles ne sont libérées que lorsque la dernière révision qui les contient est supprimée ou expire (au plus tard après {{days}} jours) ou lorsque la note est définitivement supprimée."
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -5185,7 +5144,7 @@
       "tree_focus": "Actif quand l'arborescence a le focus"
     },
     "save_note": "Enregistrer la note",
-    "snapshot": "Prendre un instantané de la note",
+    "snapshot": "Enregistrer une révision de la note",
     "search_replace": "Rechercher et remplacer dans la note",
     "note_nav": "Note précédente ou suivante du dossier",
     "close": "Fermer un menu, un panneau ou une fenêtre",
@@ -5392,6 +5351,85 @@
       "no_folders": "Aucun dossier gardé hors ligne.",
       "own_account_only": "Les copies hors ligne ne sont gardées que pour votre propre compte."
     }
+  },
+  "revisions": {
+    "title": "Révisions",
+    "description": "Une révision est enregistrée automatiquement quand vous modifiez une note, au plus une toutes les {{minutes}} minutes : elle contient la note telle qu'elle était juste avant la modification. Vous pouvez aussi en enregistrer une vous-même (Ctrl + Alt + S), et une est enregistrée juste avant que l'assistant IA ou le serveur MCP ne remplace le contenu. Les révisions automatiques sont toutes conservées pendant {{hours}} heures, puis une par jour pendant {{count}} jours. Les révisions expirent au bout de {{days}} jours. Les pièces jointes ne sont pas versionnées.",
+    "keep_count_link_title": "Modifier le nombre de jours pendant lesquels une révision par jour est conservée",
+    "history": "Historique",
+    "loading": "Chargement...",
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "kind": {
+      "auto": "Automatique",
+      "manual": "Manuelle",
+      "ai": "Avant modification IA",
+      "mcp": "Avant modification MCP"
+    },
+    "same_as_current": "Actuelle",
+    "same_as_previous": "Inchangée",
+    "same_as_previous_title": "Même contenu, même titre et mêmes tags que la révision précédente",
+    "current_version": "Version actuelle",
+    "previous_revision": "Révision précédente",
+    "other_revisions": "Autres révisions",
+    "tabs": {
+      "changes": "Modifications",
+      "content": "Contenu"
+    },
+    "compare_with": "Comparer avec",
+    "layout": {
+      "label": "Disposition",
+      "unified": "Unifiée",
+      "split": "Côte à côte"
+    },
+    "prev_change": "Modification précédente",
+    "next_change": "Modification suivante",
+    "added_lines": "{{count}} lignes ajoutées",
+    "removed_lines": "{{count}} lignes supprimées",
+    "unchanged_lines": "{{count}} lignes inchangées",
+    "unchanged_line": "1 ligne inchangée",
+    "no_differences": "Aucune différence",
+    "no_differences_hint": "Les deux versions ont le même contenu, le même titre et les mêmes tags.",
+    "no_previous": "C'est la révision la plus ancienne : il n'y a rien avant elle à comparer.",
+    "text_compare_hint": "Les notes en texte enrichi sont comparées sur leur texte : un simple changement de mise en forme ne ressort pas.",
+    "markdown_preview": "Aperçu",
+    "markdown_source": "Source",
+    "empty_content": "(Contenu vide)",
+    "empty_title": "Aucune révision pour le moment",
+    "empty_hint": "Une révision est enregistrée automatiquement quand vous modifiez la note. Vous pouvez aussi en enregistrer une maintenant.",
+    "actions": {
+      "menu": "Actions",
+      "new": "Enregistrer une révision",
+      "restore": "Restaurer cette révision",
+      "copy": "Copier le contenu",
+      "delete": "Supprimer cette révision"
+    },
+    "messages": {
+      "created": "Révision enregistrée",
+      "deleted": "Révision supprimée",
+      "copied": "Contenu copié"
+    },
+    "errors": {
+      "load_failed": "Impossible de charger les révisions",
+      "create_failed": "Impossible d'enregistrer une révision",
+      "restore_failed": "Impossible de restaurer cette révision",
+      "delete_failed": "Impossible de supprimer cette révision",
+      "copy_failed": "Échec de la copie"
+    },
+    "confirm": {
+      "restore_title": "Restaurer cette révision ?",
+      "restore_message": "La note va reprendre le contenu, le titre et les tags de cette révision. Son état actuel est remplacé : enregistrez d'abord une révision si vous voulez le garder.",
+      "restore_button": "Restaurer",
+      "delete_title": "Supprimer cette révision ?",
+      "delete_message": "Cette révision sera supprimée définitivement.",
+      "delete_button": "Supprimer"
+    },
+    "meta": {
+      "title": "Titre",
+      "tags": "Tags"
+    },
+    "same_content": "Même contenu",
+    "same_content_hint": "Seuls le titre ou les tags diffèrent."
   },
   "mermaid_zoom": {
     "open": "Agrandir le diagramme",

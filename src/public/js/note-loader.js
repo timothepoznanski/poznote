@@ -61,10 +61,6 @@ function restoreNoteDomFromCache(url, noteId, options) {
         preserveRuntimeState: true
     });
 
-    if (typeof window.createNoteSnapshot === 'function') {
-        window.createNoteSnapshot(noteId);
-    }
-
     if (typeof options.onLoadingComplete === 'function') {
         options.onLoadingComplete();
     }
@@ -450,10 +446,6 @@ function loadNoteCommon(url, noteId, options) {
                                 }
 
                                 reinitializeNoteContent();
-
-                                if (typeof window.createNoteSnapshot === 'function') {
-                                    window.createNoteSnapshot(noteId);
-                                }
 
                                 // Post-content hook for caller-specific logic
                                 if (typeof options.onContentLoaded === 'function') {

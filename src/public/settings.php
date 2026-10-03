@@ -696,10 +696,10 @@ if ($canUseUserWebhooks) {
 
                 <!-- Snapshots -->
                 <div class="home-card" id="snapshots-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.snapshots', [], 'Choose how many automatic daily snapshots are kept per note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.snapshots', [], 'Choose for how many days one automatic revision per day is kept, and how many safety revisions (taken before an AI or MCP change) are kept per note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon"><i class="lucide lucide-history"></i></div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('display.cards.snapshots', [], 'Snapshots'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('display.cards.snapshots', [], 'Revisions'); ?></span>
                         <span id="snapshots-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>

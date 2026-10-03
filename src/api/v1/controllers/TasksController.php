@@ -761,6 +761,10 @@ class TasksController
         createDirectoryWithPermissions(dirname($filename));
         if (isApiServiceTokenRequest()) {
             poznoteCreateSafetySnapshot($this->con, $noteId, 'mcp');
+        } else {
+            // The task list before this change: its automatic revision, at
+            // most one every ten minutes
+            poznoteCreateAutomaticSnapshot($this->con, $noteId);
         }
         file_put_contents($filename, $content);
 

@@ -1386,6 +1386,14 @@ class NotesController {
                 }
             }
             
+            // The note as it stands, before whatever this request changes
+            // (content, title, tags): its automatic revision, at most one
+            // every ten minutes (lib/snapshots.php). A content change by the
+            // MCP server takes its own, labelled, snapshot further down.
+            if ($entry === null || !isApiServiceTokenRequest()) {
+                poznoteCreateAutomaticSnapshot($this->con, $noteId);
+            }
+
             // Update file content if provided
             $noteType = $note['type'] ?? 'note';
             if ($entry !== null) {
@@ -2202,6 +2210,9 @@ class NotesController {
             
             // Convert tags array to string
             $tags_string = $this->sanitizeTags($tags);
+
+            // Tags are part of a revision: keep the state they replace
+            poznoteCreateAutomaticSnapshot($this->con, $noteId);
             
             // Update tags
             if ($workspace) {
@@ -2279,6 +2290,9 @@ class NotesController {
                 $this->sendError(403, $quotaError);
                 return;
             }
+
+            // Same automatic revision as a regular save (update())
+            poznoteCreateAutomaticSnapshot($this->con, $noteId);
 
             $write_result = file_put_contents($filename, $content);
             if ($write_result === false) {

@@ -61,7 +61,7 @@ https://discord.gg/AWhWWSEkJ
 - [Authentification](#authentification)
 - [Mots de passe d'application](#mots-de-passe-dapplication)
 - [Types de notes](#types-de-notes)
-- [Snapshots](#snapshots)
+- [Révisions](#révisions)
 - [Personnalisation](#personnalisation)
 - [Multi-utilisateurs](#multi-utilisateurs)
 - [Journal d'activité](#journal-dactivité)
@@ -665,19 +665,36 @@ Poznote prend en charge deux formats de notes principaux, chacun adapté à une 
 *   **Format :** les nouvelles entrées sont créées en notes en texte enrichi ou Markdown, selon le réglage « Format des entrées de journal » dans **Paramètres > Comportement**.
 </details>
 
-## Snapshots
+## Révisions
 
-Les snapshots conservent les versions précédentes du contenu d'une note pour que vous puissiez revenir à un état antérieur depuis le menu **Snapshots** de la note.
+Les révisions conservent les versions précédentes du contenu d'une note, avec son titre et ses tags, pour que vous puissiez les comparer à la note actuelle et revenir à un état antérieur. L'icône d'historique de la barre d'outils de la note ouvre la page **Révisions** de la note.
 
 <details>
-<summary><strong>Fonctionnement des snapshots</strong></summary>
+<summary><strong>La page Révisions</strong></summary>
 <br>
 
-*   **Automatiques :** un snapshot est pris la première fois qu'une note est ouverte chaque jour. Les 3 snapshots automatiques les plus récents sont conservés par note ; ce nombre se modifie dans **Paramètres > Actions > Snapshots**.
-*   **Manuels :** « Prendre un snapshot maintenant » ajoute un snapshot à tout moment, tout comme **Ctrl + Alt + S** (Cmd + Alt + S sur Mac) lorsqu'une note est ouverte. Les snapshots manuels sont illimités et ne sont pas comptés dans ce nombre.
-*   **Avant une modification par l'IA :** un snapshot est pris automatiquement juste avant que l'[assistant IA](#assistant-ia) ou le [serveur MCP](#serveur-mcp) ne modifie le contenu d'une note : une réécriture qui tourne mal s'annule donc en un clic. Ces snapshots portent la mention « Avant modification par l'IA » ou « Avant modification MCP » dans l'historique, ne sont pas pris lorsque le dernier snapshot contient déjà le même contenu, et les 20 plus récents sont conservés par note, un nombre que vous pouvez modifier dans **Paramètres → Snapshots** (de 1 à 200) si votre instance modifie beaucoup de notes via l'IA ou MCP.
-*   **Expiration :** chaque snapshot, automatique ou manuel, est supprimé 30 jours après avoir été pris. Un snapshot peut aussi être supprimé à la main depuis la fenêtre Snapshots.
-*   **Pièces jointes et images :** les snapshots ne stockent que le texte de la note. Les pièces jointes ne sont jamais copiées : un fichier référencé par plusieurs snapshots n'existe qu'une fois sur le disque. Un fichier retiré d'une note reste sur le disque, masqué dans la note, tant qu'un snapshot le contient encore, si bien que restaurer ce snapshot le fait revenir. Il est supprimé définitivement dès que le dernier snapshot qui le contient expire ou est supprimé, ou lorsque la note est supprimée définitivement. Conserver davantage de snapshots ne duplique donc jamais de fichiers. Cela garde seulement les fichiers retirés plus longtemps, 30 jours au maximum.
+*   **Historique :** la colonne de gauche liste les révisions de la note regroupées par jour, chacune avec son type : Automatique, Manuelle, Avant modification IA ou Avant modification MCP. Le badge « Actuelle » signale les révisions identiques à la note actuelle, et « Inchangée » celles identiques à la révision qui les précède. Les deux badges exigent aussi le même titre et les mêmes tags.
+*   **Contenu :** la page s'ouvre sur cet onglet, qui affiche la révision sélectionnée elle-même, mise en forme. Pour les notes Markdown, un bouton Aperçu/Source se trouve à côté des onglets.
+*   **Modifications :** le second onglet affiche une comparaison ligne par ligne, avec les mots modifiés surlignés, par rapport à la version actuelle, à la révision précédente ou à n'importe quelle autre révision. La comparaison s'affiche en disposition Unifiée ou Côte à côte, les lignes inchangées sont repliées (cliquez pour les déplier), les boutons modification précédente et suivante passent d'un changement à l'autre, et le nombre de lignes ajoutées et supprimées est indiqué. Les notes Markdown sont comparées sur leur source. Les notes en texte enrichi sont comparées sur leur texte : un simple changement de mise en forme ne ressort donc pas. Au-dessus de la comparaison, l'onglet indique le changement de titre (ancien → nouveau) et les tags ajoutés ou retirés entre les deux versions comparées.
+*   **Actions :** le menu « Actions » regroupe « Restaurer cette révision », « Enregistrer une révision », « Copier le contenu » et « Supprimer cette révision ». « Enregistrer une révision » enregistre aussitôt le contenu actuel, les autres entrées portent sur la révision sélectionnée.
+*   **Restauration :** une restauration redonne à la note le contenu, le titre et les tags de la révision. L'état qu'elle remplace n'est pas enregistré : s'il compte, enregistrez d'abord une révision (« Enregistrer une révision » dans le menu Actions, ou **Ctrl + Alt + S**). Un titre restauré suit les règles de renommage : si une autre note du même dossier porte déjà ce titre, un suffixe comme « (1) » est ajouté. Une révision enregistrée avant que les tags ne soient conservés n'en contient pas et laisse les tags de la note inchangés.
+
+</details>
+
+<details>
+<summary><strong>Fonctionnement des révisions</strong></summary>
+<br>
+
+*   **Automatiques :** Poznote enregistre une révision lorsqu'une note est modifiée, pas lorsqu'elle est ouverte. Chaque fois qu'une modification du contenu, du titre ou des tags est enregistrée (sauvegarde automatique de l'éditeur, tâche cochée, dessin enregistré, API REST, modification depuis un lien de partage public), Poznote conserve d'abord la note telle qu'elle était juste avant cette modification, sauf si une révision de cette note a déjà été prise au cours des 10 dernières minutes. Une révision contient donc toujours l'état d'avant une modification, et une session d'édition produit au plus une révision automatique toutes les 10 minutes. Ouvrir ou lire une note ne crée jamais de révision. Rien n'est enregistré pour une note vide, ni lorsque la révision la plus récente contient déjà exactement le contenu, le titre et les tags actuels : l'historique ne contient donc pas de doublons. Ces révisions portent la mention « Automatique » dans l'historique, tout comme celles que les anciennes versions de Poznote prenaient à l'ouverture d'une note : elles suivent les mêmes règles.
+*   **Exemple :** vous modifiez une note de 9h00 à 9h35. L'historique reçoit des révisions vers 9h00 (la note avant que vous n'y touchiez), 9h10, 9h20 et 9h30. Vous revenez à 14h00 et changez un mot : une révision de 14h00 conserve la note telle que vous l'aviez laissée à 9h35.
+*   **Ce que vous pouvez retrouver :** l'état dans lequel vous laissez une note à la fin d'une session n'est pas enregistré comme révision à ce moment-là, puisque c'est la note elle-même. Il est capturé par la première modification de la session suivante, aussi tardive soit-elle. Vous pouvez donc toujours revenir à la note telle qu'elle était avant de commencer à la modifier aujourd'hui et, au cours d'une longue session, à des états espacés d'environ 10 minutes au plus. L'état le plus récent est toujours la note elle-même : comparez n'importe quelle révision à « Version actuelle » pour voir ce qui a changé depuis.
+*   **Durée de conservation des révisions automatiques :** toutes les révisions automatiques des dernières 24 heures sont conservées. Au-delà de 24 heures, seule la révision automatique la plus récente de chaque jour est conservée, pendant 30 jours par défaut. Ce nombre de jours se modifie dans **Paramètres > Révisions** (de 1 à 30). Si vous aviez déjà modifié ce réglage dans une version antérieure, où il comptait des révisions, votre valeur est conservée et compte désormais des jours.
+*   **Manuelles :** « Enregistrer une révision » ajoute une révision à tout moment, tout comme **Ctrl + Alt + S** (Cmd + Alt + S sur Mac) lorsqu'une note est ouverte. Les révisions manuelles sont illimitées et ne sont jamais éclaircies : elles ne disparaissent qu'à leur expiration, au bout de 30 jours.
+*   **Avant une modification par l'IA :** une révision est enregistrée automatiquement juste avant que l'[assistant IA](#assistant-ia) ou le [serveur MCP](#serveur-mcp) ne modifie le contenu d'une note, même si une révision automatique a été prise moins de 10 minutes plus tôt : une réécriture qui tourne mal s'annule donc en un clic. Ces révisions portent la mention « Avant modification IA » ou « Avant modification MCP » dans l'historique et ne sont pas enregistrées lorsque la dernière révision contient déjà le même contenu, le même titre et les mêmes tags.
+*   **Révisions de sécurité :** les révisions « Avant modification IA » et « Avant modification MCP » partagent une même limite : les 20 plus récentes sont conservées par note, un nombre que vous pouvez modifier dans **Paramètres → Révisions** (de 1 à 200) si votre instance modifie beaucoup de notes via l'IA ou MCP.
+*   **Expiration :** chaque révision, quel que soit son type, est supprimée 30 jours après avoir été enregistrée. Une révision peut aussi être supprimée à la main depuis la page Révisions.
+*   **Pièces jointes et images :** les révisions stockent le texte, le titre et les tags de la note, jamais ses fichiers. Les pièces jointes ne sont jamais copiées : un fichier référencé par plusieurs révisions n'existe qu'une fois sur le disque. Un fichier retiré d'une note reste sur le disque, masqué dans la note, tant qu'une révision le contient encore, si bien que restaurer cette révision le fait revenir. Il est supprimé définitivement dès que la dernière révision qui le contient expire ou est supprimée, ou lorsque la note est supprimée définitivement. Conserver davantage de révisions ne duplique donc jamais de fichiers. Cela garde seulement les fichiers retirés plus longtemps, 30 jours au maximum.
+*   **API et MCP :** l'[API REST](API-REST.md#snapshots) et les outils du [serveur MCP](#serveur-mcp) appellent toujours les révisions « snapshots » (`/notes/{id}/snapshots`, `list_snapshots`, `get_snapshot`, `restore_snapshot`).
 
 </details>
 
@@ -708,7 +725,7 @@ Dans **Paramètres > Comportement**, vous pouvez configurer :
 
 - **Tri des notes :** choisissez l'ordre des notes dans la liste
 - **Filtre d’ancienneté :** n'affichez que les notes modifiées au cours du nombre de jours choisi
-- **Snapshots :** le nombre de snapshots automatiques conservés par note
+- **Révisions :** le nombre de jours pendant lesquels les révisions automatiques sont conservées (une par jour au-delà des dernières 24 heures) et le nombre de révisions de sécurité conservées par note
 - **Ordre d'insertion des tâches :** définissez où les nouvelles tâches sont insérées
 - **Afficher les notes après les dossiers :** affichez les notes sans dossier sous la liste des dossiers
 - **Retour à la ligne des blocs de code :** activez ou désactivez le retour à la ligne automatique dans les blocs de code
@@ -857,7 +874,7 @@ data/
     │   ├── database/poznote.db  # User's notes database
     │   ├── entries/             # User's note files (HTML/MD)
     │   ├── attachments/         # User's attachments
-    │   ├── snapshots/           # Earlier versions of the user's notes
+    │   ├── snapshots/           # Earlier versions of the user's notes (revisions)
     │   ├── backgrounds/         # Workspace background images
     │   └── backups/             # Backup archives prepared for download
     ├── 2/                       # User ID 2

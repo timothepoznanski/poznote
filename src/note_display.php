@@ -67,10 +67,6 @@
                     // names below, whatever the column of a restored database holds.
                     $row['id'] = (int)$row['id'];
 
-                    if (function_exists('ensureAutomaticSnapshotForOpenedNote')) {
-                        ensureAutomaticSnapshotForOpenedNote($con, (int)$row['id']);
-                    }
-
                     // Check if note is shared
                     $is_shared = false;
                     if ($stmt_shared) {
@@ -363,7 +359,7 @@
                         echo '<button type="button" class="toolbar-btn btn-search-replace note-action-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-search"></i></button>';
                     }
 
-                    echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Snapshots').'"><i class="lucide lucide-history"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Revisions').'"><i class="lucide lucide-history"></i></button>';
 
                     // The note width and the split view are set from the "..."
                     // menu of the floating stack (ui_customization_panel.php),
@@ -434,7 +430,7 @@
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="lucide lucide-refresh-cw-alt"></i> '.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'</button>';
                     }
 
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Snapshot').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Revisions').'</button>';
                     echo '</div>';
                     echo '</div>';
                 

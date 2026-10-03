@@ -99,66 +99,25 @@
     "show_more_notes": "Mehr anzeigen (noch {{count}})"
   },
   "snapshot": {
-    "menu_item": "Schnappschüsse",
-    "modal": {
-      "title": "Schnappschüsse",
-      "description": "Automatisch beim ersten Öffnen jeden Tag erstellt, die letzten {{count}} werden behalten. „Jetzt Schnappschuss erstellen“ oder Strg + Alt + S fügt einen manuellen Schnappschuss hinzu, und vor jeder Änderung durch den KI-Assistenten oder den MCP-Server wird einer erstellt. Jeder Schnappschuss läuft nach {{days}} Tagen ab.",
-      "loading": "Schnappschuss wird geladen...",
-      "history": "Verlauf",
-      "markdown_preview": "Vorschau",
-      "markdown_source": "Quellansicht",
-      "today": "Heute",
-      "origin_ai": "Vor KI-Änderung",
-      "origin_mcp": "Vor MCP-Änderung",
-      "empty_title": "Kein Schnappschuss verfügbar",
-      "empty_hint": "Im Moment gibt es keinen Schnappschuss, aber du kannst jetzt manuell einen erstellen.",
-      "new_note_empty_title": "Noch kein Schnappschuss",
-      "new_note_empty_hint": "Im Moment gibt es keinen Schnappschuss, aber du kannst jetzt manuell einen erstellen.",
-      "empty_content": "(Leerer Inhalt)",
-      "take_now": "Jetzt Schnappschuss erstellen",
-      "copy_content": "Inhalt kopieren",
-      "restore_state": "Zu diesem Zustand zurückkehren",
-      "delete": "Diesen Schnappschuss löschen",
-      "keep_count_link_title": "Anzahl der behaltenen automatischen Schnappschüsse ändern"
-    },
-    "messages": {
-      "content_copied": "Inhalt kopiert",
-      "created_now": "Schnappschuss hinzugefügt",
-      "deleted": "Schnappschuss gelöscht"
-    },
-    "errors": {
-      "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden",
-      "create_failed": "Schnappschuss konnte nicht erstellt werden",
-      "copy_failed": "Kopieren fehlgeschlagen",
-      "delete_failed": "Schnappschuss konnte nicht gelöscht werden"
-    },
-    "confirm": {
-      "title": "Bestätigung",
-      "restore_message": "Die Notiz auf den Stand des Schnappschusses zurücksetzen? Aktuelle Änderungen gehen verloren.",
-      "restore_button": "Zu diesem Zustand zurückkehren",
-      "take_now_message": "Einen zusätzlichen Schnappschuss mit dem aktuellen Notizinhalt erstellen? Bereits vorhandene Schnappschüsse von heute bleiben erhalten.",
-      "take_now_button": "Jetzt Schnappschuss erstellen",
-      "delete_message": "Diesen Schnappschuss löschen?",
-      "delete_button": "Diesen Schnappschuss löschen"
-    },
+    "menu_item": "Versionen",
     "api": {
       "invalid_note_id": "Ungültige Notiz-ID",
       "note_not_found": "Notiz nicht gefunden",
-      "already_exists": "Für heute existiert bereits ein Schnappschuss",
-      "create_directory_failed": "Schnappschuss-Ordner konnte nicht erstellt werden",
-      "write_file_failed": "Schnappschuss-Datei konnte nicht geschrieben werden",
-      "create_failed": "Schnappschuss konnte nicht erstellt werden",
-      "skipped_empty_new_note": "Noch kein automatischer Schnappschuss, weil diese neue Notiz leer ist",
-      "not_found_today": "Für heute wurde kein Schnappschuss gefunden",
-      "read_failed": "Schnappschuss konnte nicht gelesen werden",
-      "retrieve_failed": "Schnappschuss konnte nicht abgerufen werden",
+      "already_exists": "Für heute existiert bereits eine tägliche Version",
+      "create_directory_failed": "Versionsordner konnte nicht erstellt werden",
+      "write_file_failed": "Versionsdatei konnte nicht geschrieben werden",
+      "create_failed": "Version konnte nicht gespeichert werden",
+      "skipped_empty_new_note": "Noch keine tägliche Version, weil diese neue Notiz leer ist",
+      "not_found_today": "Für heute wurde keine Version gefunden",
+      "read_failed": "Version konnte nicht gelesen werden",
+      "retrieve_failed": "Version konnte nicht abgerufen werden",
       "invalid_entries_path": "Ungültiger Notizpfad",
       "restore_note_file_failed": "Notizdatei konnte nicht wiederhergestellt werden",
-      "restore_success": "Die Notiz wurde auf den Stand des Schnappschusses zurückgesetzt",
-      "restore_failed": "Schnappschuss konnte nicht wiederhergestellt werden",
-      "not_found": "Schnappschuss nicht gefunden",
-      "delete_failed": "Schnappschuss konnte nicht gelöscht werden",
-      "deleted": "Schnappschuss gelöscht"
+      "restore_success": "Die Notiz wurde auf diese Version zurückgesetzt",
+      "restore_failed": "Version konnte nicht wiederhergestellt werden",
+      "not_found": "Version nicht gefunden",
+      "delete_failed": "Version konnte nicht gelöscht werden",
+      "deleted": "Version gelöscht"
     }
   },
   "kanban": {
@@ -545,7 +504,7 @@
       "s3_storage": "Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte speichern.",
       "s3_backup": "Lädt vollständige Sicherungsarchive in einen S3-kompatiblen Bucket hoch, manuell oder nach Zeitplan.",
       "highlight_current_folder_tree": "Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie arbeiten, so stark abschwächen, wie Sie möchten.",
-      "snapshots": "Wählen Sie, wie viele automatische tägliche Schnappschüsse und wie viele Sicherheits-Schnappschüsse (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden.",
+      "snapshots": "Wählen Sie, für wie viele Tage eine automatische Version pro Tag aufbewahrt wird und wie viele Sicherheitsversionen (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden.",
       "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden.",
       "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind.",
       "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt.",
@@ -874,7 +833,7 @@
       "note_color_palette": "Notizfarben",
       "slash_menu_trigger": "Tastenkürzel für das Befehlsmenü (Computer)",
       "slash_menu_trigger_mobile": "Tastenkürzel für das Befehlsmenü (Mobilgerät)",
-      "snapshots": "Schnappschüsse",
+      "snapshots": "Versionen",
       "show_note_icons": "Notizsymbole anzeigen",
       "sidebar_offline_marks": "Offline-Punkt anzeigen",
       "format_toolbar_mode": "Formatierungsleiste",
@@ -1818,17 +1777,17 @@
       "rename_placeholder": "Neuer Notiztitel"
     },
     "snapshots": {
-      "title": "Schnappschüsse",
-      "description": "Anzahl der automatischen Schnappschüsse pro Notiz (einer wird täglich beim ersten Öffnen der Notiz erstellt). Manuelle Schnappschüsse über „Jetzt Schnappschuss erstellen“ zählen nicht mit. Jeder Schnappschuss läuft nach {{days}} Tagen ab:",
-      "safety_description": "Anzahl der Sicherheits-Schnappschüsse pro Notiz. Einer wird unmittelbar erstellt, bevor der KI-Assistent oder der MCP-Server eine Notiz überschreibt, und erscheint als „Vor KI-Änderung“ oder „Vor MCP-Änderung“:",
+      "title": "Versionen",
+      "description": "Eine automatische Version wird gespeichert, wenn sich eine Notiz ändert, höchstens eine alle {{minutes}} Minuten, und alle bleiben {{hours}} Stunden lang erhalten. Danach wird eine pro Tag aufbewahrt, für diese Anzahl von Tagen. Selbst gespeicherte Versionen zählen nicht mit. Jede Version läuft nach {{days}} Tagen ab:",
+      "safety_description": "Anzahl der Sicherheitsversionen pro Notiz. Eine wird unmittelbar gespeichert, bevor der KI-Assistent oder der MCP-Server den Inhalt einer Notiz ersetzt, und erscheint als „Vor KI-Änderung“ oder „Vor MCP-Änderung“:",
       "options": {
-        "unit": "automatische Schnappschüsse",
-        "safety_unit": "Sicherheits-Schnappschüsse"
+        "unit": "Tage, eine automatische Version pro Tag",
+        "safety_unit": "Sicherheitsversionen"
       },
-      "badge": "{{count}} automatische pro Notiz",
-      "badge_with_safety": "{{count}} automatische, {{safety}} Sicherheits- pro Notiz",
-      "warning_title": "Schnappschüsse speichern nur den Text der Notiz. Anhänge und Bilder werden nie kopiert.",
-      "warning": "Anhänge und Bilder bleiben auch nach dem Entfernen aus einer Notiz auf der Festplatte, solange einer ihrer Schnappschüsse sie noch enthält. Sie werden erst freigegeben, wenn der letzte Schnappschuss, der sie enthält, gelöscht wird oder abläuft (spätestens nach {{days}} Tagen) oder die Notiz endgültig gelöscht wird."
+      "badge": "{{count}} Tage pro Notiz",
+      "badge_with_safety": "{{count}} Tage, {{safety}} Sicherheits- pro Notiz",
+      "warning_title": "Versionen speichern nur den Text der Notiz. Anhänge und Bilder werden nie kopiert.",
+      "warning": "Anhänge und Bilder bleiben auch nach dem Entfernen aus einer Notiz auf der Festplatte, solange eine ihrer Versionen sie noch enthält. Sie werden erst freigegeben, wenn die letzte Version, die sie enthält, gelöscht wird oder abläuft (spätestens nach {{days}} Tagen) oder die Notiz endgültig gelöscht wird."
     },
     "api_rest": {
       "github_option": "GitHub",
@@ -5080,7 +5039,7 @@
       "tree_focus": "Aktiv, solange der Baum den Fokus hat"
     },
     "save_note": "Notiz speichern",
-    "snapshot": "Snapshot der Notiz erstellen",
+    "snapshot": "Version der Notiz speichern",
     "search_replace": "In der Notiz suchen und ersetzen",
     "note_nav": "Vorherige oder nächste Notiz im Ordner",
     "close": "Menü, Seitenleiste oder Fenster schließen",
@@ -5287,6 +5246,85 @@
       "no_folders": "Keine Ordner offline behalten.",
       "own_account_only": "Offline-Kopien werden nur für Ihr eigenes Konto behalten."
     }
+  },
+  "revisions": {
+    "title": "Versionen",
+    "description": "Eine Version wird automatisch gespeichert, wenn Sie eine Notiz ändern, höchstens eine alle {{minutes}} Minuten: Sie enthält die Notiz so, wie sie unmittelbar vor der Änderung war. Sie können auch selbst eine speichern (Strg + Alt + S), und eine wird gespeichert, unmittelbar bevor der KI-Assistent oder der MCP-Server den Inhalt ersetzt. Automatische Versionen bleiben {{hours}} Stunden lang alle erhalten, danach eine pro Tag für {{count}} Tage. Versionen laufen nach {{days}} Tagen ab. Anhänge werden nicht versioniert.",
+    "keep_count_link_title": "Ändern, für wie viele Tage eine Version pro Tag aufbewahrt wird",
+    "history": "Verlauf",
+    "loading": "Wird geladen...",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "kind": {
+      "auto": "Automatisch",
+      "manual": "Manuell",
+      "ai": "Vor KI-Änderung",
+      "mcp": "Vor MCP-Änderung"
+    },
+    "same_as_current": "Aktuell",
+    "same_as_previous": "Unverändert",
+    "same_as_previous_title": "Gleicher Inhalt, gleicher Titel und gleiche Tags wie die Version davor",
+    "current_version": "Aktuelle Version",
+    "previous_revision": "Vorherige Version",
+    "other_revisions": "Andere Versionen",
+    "tabs": {
+      "changes": "Änderungen",
+      "content": "Inhalt"
+    },
+    "compare_with": "Vergleichen mit",
+    "layout": {
+      "label": "Darstellung",
+      "unified": "Einspaltig",
+      "split": "Nebeneinander"
+    },
+    "prev_change": "Vorherige Änderung",
+    "next_change": "Nächste Änderung",
+    "added_lines": "{{count}} Zeilen hinzugefügt",
+    "removed_lines": "{{count}} Zeilen entfernt",
+    "unchanged_lines": "{{count}} unveränderte Zeilen",
+    "unchanged_line": "1 unveränderte Zeile",
+    "no_differences": "Keine Unterschiede",
+    "no_differences_hint": "Beide Versionen haben denselben Inhalt, denselben Titel und dieselben Tags.",
+    "no_previous": "Dies ist die älteste Version: Davor gibt es nichts zum Vergleichen.",
+    "text_compare_hint": "Rich-Text-Notizen werden anhand ihres Textes verglichen: Eine reine Formatierungsänderung ist nicht zu sehen.",
+    "markdown_preview": "Vorschau",
+    "markdown_source": "Quelltext",
+    "empty_content": "(Leerer Inhalt)",
+    "empty_title": "Noch keine Version",
+    "empty_hint": "Eine Version wird automatisch gespeichert, wenn Sie die Notiz ändern. Sie können auch jetzt eine speichern.",
+    "actions": {
+      "menu": "Aktionen",
+      "new": "Version speichern",
+      "restore": "Diese Version wiederherstellen",
+      "copy": "Inhalt kopieren",
+      "delete": "Diese Version löschen"
+    },
+    "messages": {
+      "created": "Version gespeichert",
+      "deleted": "Version gelöscht",
+      "copied": "Inhalt kopiert"
+    },
+    "errors": {
+      "load_failed": "Die Versionen konnten nicht geladen werden",
+      "create_failed": "Version konnte nicht gespeichert werden",
+      "restore_failed": "Diese Version konnte nicht wiederhergestellt werden",
+      "delete_failed": "Diese Version konnte nicht gelöscht werden",
+      "copy_failed": "Kopieren fehlgeschlagen"
+    },
+    "confirm": {
+      "restore_title": "Diese Version wiederherstellen?",
+      "restore_message": "Die Notiz erhält den Inhalt, den Titel und die Tags dieser Version. Ihr aktueller Stand wird ersetzt: Speichern Sie zuvor eine Version, wenn Sie ihn behalten möchten.",
+      "restore_button": "Wiederherstellen",
+      "delete_title": "Diese Version löschen?",
+      "delete_message": "Diese Version wird endgültig gelöscht.",
+      "delete_button": "Löschen"
+    },
+    "meta": {
+      "title": "Titel",
+      "tags": "Tags"
+    },
+    "same_content": "Gleicher Inhalt",
+    "same_content_hint": "Nur der Titel oder die Tags unterscheiden sich."
   },
   "mermaid_zoom": {
     "open": "Diagramm vergrößern",

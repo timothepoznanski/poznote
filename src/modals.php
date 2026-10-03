@@ -1065,19 +1065,19 @@ $pzNoteInfoRows = [
 <!-- Snapshots settings modal -->
 <div id="snapshotsSettingsModal" class="modal">
     <div class="modal-content">
-        <h3><?php echo t_h('modals.snapshots.title', [], 'Snapshots'); ?></h3>
+        <h3><?php echo t_h('modals.snapshots.title', [], 'Revisions'); ?></h3>
         <div class="modal-body">
-            <p><?php echo t_h('modals.snapshots.description', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Number of automatic snapshots kept per note (one is taken per day when the note is first opened). Manual snapshots taken with "Take snapshot now" are not counted. Every snapshot expires after {{days}} days:'); ?></p>
+            <p><?php echo t_h('modals.snapshots.description', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS, 'minutes' => (int) round(POZNOTE_SNAPSHOTS_AUTO_INTERVAL_SECONDS / 60), 'hours' => POZNOTE_SNAPSHOTS_DENSE_HOURS], 'An automatic revision is saved when a note changes, at most one every {{minutes}} minutes, and all of them are kept for {{hours}} hours. After that, one per day is kept, for this number of days. Revisions you save yourself are not counted. Every revision expires after {{days}} days:'); ?></p>
             <div class="radio-options">
-                <label><input type="number" id="snapshotsKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.unit', [], 'automatic snapshots'); ?></label>
+                <label><input type="number" id="snapshotsKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.unit', [], 'days, one automatic revision per day'); ?></label>
             </div>
-            <p><?php echo t_h('modals.snapshots.safety_description', [], 'Number of safety snapshots kept per note. One is taken right before the AI assistant or the MCP server rewrites a note, and shows as "Before AI edit" or "Before MCP edit":'); ?></p>
+            <p><?php echo t_h('modals.snapshots.safety_description', [], 'Number of safety revisions kept per note. One is saved right before the AI assistant or the MCP server replaces the content of a note, and shows as "Before AI edit" or "Before MCP edit":'); ?></p>
             <div class="radio-options">
-                <label><input type="number" id="snapshotsSafetyKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_SAFETY_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.safety_unit', [], 'safety snapshots'); ?></label>
+                <label><input type="number" id="snapshotsSafetyKeepCountInput" min="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MIN_COUNT; ?>" max="<?php echo POZNOTE_SNAPSHOTS_SAFETY_MAX_COUNT; ?>" step="1" value="<?php echo POZNOTE_SNAPSHOTS_SAFETY_DEFAULT_COUNT; ?>" style="width:80px; margin:0; padding:4px 8px;"> <?php echo t_h('modals.snapshots.options.safety_unit', [], 'safety revisions'); ?></label>
             </div>
             <div class="delete-warning-box">
-                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'Snapshots only store the note text. Attachments and images are never copied.'); ?></p>
-                <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its snapshots still contains them. They are only freed when the last snapshot containing them is deleted or expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>
+                <p class="delete-warning"><?php echo t_h('modals.snapshots.warning_title', [], 'Revisions only store the note text. Attachments and images are never copied.'); ?></p>
+                <p class="delete-warning-recovery"><?php echo t_h('modals.snapshots.warning', ['days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], 'Attachments and images are kept on disk even after you remove them from a note, as long as one of its revisions still contains them. They are only freed when the last revision containing them is deleted or expires (after {{days}} days at most) or when the note is permanently deleted.'); ?></p>
             </div>
         </div>
         <div class="modal-buttons">
@@ -1522,74 +1522,6 @@ $iconSidebarOrderDividerRow = static function (): string {
         <div class="modal-buttons">
             <button type="button" class="btn-danger initially-hidden" id="dismissAllBtn" data-action="dismiss-all-notifications"><?php echo t_h('reminder.dismiss_all', [], 'Delete all'); ?></button>
             <button type="button" class="btn-cancel" data-action="close-notifications-modal"><?php echo t_h('common.close'); ?></button>
-        </div>
-    </div>
-</div>
-
-<!-- Snapshot Modal -->
-<div id="snapshotModal" class="modal" style="display:none;">
-    <div class="modal-content snapshot-modal-content">
-        <div class="snapshot-modal-header">
-            <div class="snapshot-modal-header-copy">
-                <div class="snapshot-modal-title-row">
-                    <h3><i class="lucide lucide-history"></i> <?php echo t_h('snapshot.modal.title', [], 'Snapshots'); ?></h3>
-                </div>
-                <?php
-                // The kept count links to its setting: the number is injected
-                // after escaping so the surrounding translated text stays safe.
-                $snapshotModalDescription = t_h('snapshot.modal.description', ['count' => '%%COUNT%%', 'days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS], "Created automatically on first open each day, the last {{count}} are kept. \"Take snapshot now\" or Ctrl + Alt + S adds a manual snapshot, and one is taken before the AI assistant or the MCP server changes a note. Every snapshot expires after {{days}} days.");
-                $snapshotKeepCountLink = '<a href="settings.php?open=snapshots#snapshots-card" class="snapshot-keep-count-link" onclick="return openSnapshotsKeepCountSettings(event)" title="' . t_h('snapshot.modal.keep_count_link_title', [], 'Change how many automatic snapshots are kept') . '">' . getSnapshotsKeepCount() . '</a>';
-                ?>
-                <p class="snapshot-modal-description"><?php echo str_replace('%%COUNT%%', $snapshotKeepCountLink, $snapshotModalDescription); ?></p>
-            </div>
-        </div>
-
-        <div class="snapshot-modal-body">
-            <div id="snapshotDateList" class="snapshot-date-list">
-                <div class="snapshot-date-list-header"><?php echo t_h('snapshot.modal.history', [], 'History'); ?></div>
-                <div id="snapshotDates" class="snapshot-dates"></div>
-            </div>
-
-            <div class="snapshot-main-panel">
-                <div id="snapshotLoading" class="snapshot-state">
-                    <div><i class="lucide lucide-loader-2 snapshot-spinner"></i></div>
-                    <p><?php echo t_h('snapshot.modal.loading', [], 'Loading snapshot...'); ?></p>
-                </div>
-
-                <div id="snapshotNoData" class="snapshot-state" style="display:none;">
-                    <div><i class="lucide lucide-alert-circle"></i></div>
-                    <p class="snapshot-state-title"><?php echo t_h('snapshot.modal.empty_title', [], 'No snapshot available'); ?></p>
-                    <p class="snapshot-state-hint"><?php echo t_h('snapshot.modal.empty_hint', [], 'A snapshot is created automatically when the note is first opened during the day. You can also add extra snapshots manually at any time.'); ?></p>
-                    <div class="modal-buttons" style="margin-top:20px;">
-                        <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></button>
-                        <button type="button" class="btn-cancel" onclick="closeSnapshotModal()"><?php echo t_h('common.close'); ?></button>
-                    </div>
-                </div>
-
-                <div id="snapshotBody" style="display:none;">
-                    <div class="snapshot-meta">
-                        <div class="snapshot-meta-item snapshot-meta-date">
-                            <i class="lucide lucide-calendar"></i>
-                            <span id="snapshotDate"></span>
-                        </div>
-                        <div class="snapshot-meta-item snapshot-meta-title">
-                            <i class="lucide lucide-file-text"></i>
-                            <span id="snapshotHeading"></span>
-                        </div>
-                    </div>
-                    <div class="snapshot-content-wrapper">
-                        <div id="snapshotContent" class="snapshot-content-preview" data-empty-text="<?php echo t_h('snapshot.modal.empty_content', [], '(Empty content)'); ?>"></div>
-                    </div>
-                    <div class="modal-buttons snapshot-modal-actions">
-                        <button type="button" id="snapshotMarkdownPreviewToggle" class="btn-cancel snapshot-markdown-preview-btn" onclick="toggleSnapshotMarkdownPreview()" hidden data-preview-label="<?php echo t_h('snapshot.modal.markdown_preview', [], 'Preview'); ?>" data-source-label="<?php echo t_h('snapshot.modal.markdown_source', [], 'Source view'); ?>"><?php echo t_h('snapshot.modal.markdown_preview', [], 'Preview'); ?></button>
-                        <button type="button" class="btn-cancel snapshot-copy-btn" onclick="copySnapshotContent()"><i class="lucide lucide-copy"></i><span><?php echo t_h('snapshot.modal.copy_content', [], 'Copy content'); ?></span></button>
-                        <button type="button" class="btn-danger snapshot-delete-btn" onclick="deleteSnapshot()"><i class="lucide lucide-trash-2"></i><span><?php echo t_h('snapshot.modal.delete', [], 'Delete this snapshot'); ?></span></button>
-                        <button type="button" class="btn-cancel snapshot-take-btn" onclick="takeSnapshotNow()"><i class="lucide lucide-camera"></i><span><?php echo t_h('snapshot.modal.take_now', [], 'Take snapshot now'); ?></span></button>
-                        <button type="button" class="btn-primary snapshot-restore-btn" onclick="restoreSnapshot()"><i class="lucide lucide-rotate-ccw"></i><span><?php echo t_h('snapshot.modal.restore_state', [], 'Restore this state'); ?></span></button>
-                        <button type="button" class="btn-cancel snapshot-close-btn" onclick="closeSnapshotModal()"><i class="lucide lucide-x"></i><span><?php echo t_h('common.close'); ?></span></button>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
