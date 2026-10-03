@@ -20,6 +20,7 @@
     position: relative;
     display: flex !important;
     align-items: center !important;
+    padding-left: 14px !important;
     transition: padding-left 0.2s;
 }
 
