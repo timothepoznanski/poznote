@@ -143,7 +143,7 @@ html[data-theme='dark'] .folder-header.folder-drop-after::after {
     padding: 3px 6px;
     margin: 6px 0 4px;
     cursor: pointer;
-    border-radius: var(--pz-radius-lg);
+    border-radius: var(--pz-radius);
     background-color: transparent;
     transition: background-color 0.2s;
     user-select: none;
