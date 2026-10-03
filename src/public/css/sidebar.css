@@ -203,6 +203,8 @@
 .notes-list-actions .folder-actions-toggle {
     flex: 0 0 auto;
     width: 16px;
+    /* The row toggles below are 22px wide: 3px puts the dots on their axis */
+    margin-right: 3px;
     border: none;
     background-color: transparent;
     font: inherit;
