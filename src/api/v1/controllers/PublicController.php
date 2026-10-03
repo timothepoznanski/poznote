@@ -282,15 +282,6 @@ class PublicController {
             return;
         }
 
-        // Best-effort daily snapshot of the pre-edit content (same protection
-        // the app applies on authenticated edits), so a public editor cannot
-        // silently destroy the owner's text.
-        try {
-            require_once __DIR__ . '/SnapshotsController.php';
-            (new SnapshotsController($this->con))->createSnapshotForNote($noteId, false);
-        } catch (Throwable $e) {
-            error_log('Public edit snapshot failed: ' . $e->getMessage());
-        }
 
         $this->saveNote($noteId, $type, $content);
         $this->sendSuccess(['success' => true]);
@@ -729,6 +720,11 @@ class PublicController {
         } elseif ($type === 'markdown') {
             $content = (string)sanitizeMarkdownContent($content);
         }
+
+        // Automatic snapshot of the content this write replaces, at most one
+        // every ten minutes (same protection the app applies on authenticated
+        // edits), so a public editor cannot silently destroy the owner's text.
+        poznoteCreateAutomaticSnapshot($this->con, $noteId);
 
         $filename = getEntryFilename($noteId, $type);
         $entriesDir = dirname($filename);

@@ -61,7 +61,7 @@ https://discord.gg/AWhWWSEkJ
 - [Authentication](#authentication)
 - [App Passwords](#app-passwords)
 - [Note types](#note-types)
-- [Snapshots](#snapshots)
+- [Revisions](#revisions)
 - [Personalization](#personalization)
 - [Multi-users](#multi-users)
 - [Activity Log](#activity-log)
@@ -665,19 +665,36 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Format:** New entries are created as rich text or Markdown notes, depending on the "Diary entry format" setting under **Settings > Behavior**.
 </details>
 
-## Snapshots
+## Revisions
 
-Snapshots keep earlier versions of a note's content so you can go back to a previous state from the note's **Snapshots** menu.
+Revisions keep earlier versions of a note's content, along with its title and tags, so you can compare them with the current note and go back to a previous state. The history icon in the note toolbar opens the note's **Revisions** page.
 
 <details>
-<summary><strong>How snapshots work</strong></summary>
+<summary><strong>The Revisions page</strong></summary>
 <br>
 
-*   **Automatic:** a snapshot is taken the first time a note is opened each day. The 3 most recent automatic snapshots are kept per note; this number can be changed under **Settings > Actions > Snapshots**.
-*   **Manual:** "Take snapshot now" adds a snapshot at any time, and so does **Ctrl + Alt + S** (Cmd + Alt + S on Mac) while a note is open. Manual snapshots are unlimited and do not count toward that number.
-*   **Before an AI edit:** a snapshot is taken automatically right before the [AI assistant](#ai-assistant) or the [MCP server](#mcp-server) changes the content of a note, so a rewrite that goes wrong is one click away from being undone. These snapshots are labeled "Before AI edit" or "Before MCP edit" in the history, are skipped when the latest snapshot already holds the same content, and the 20 most recent ones are kept per note, a number you can change in **Settings → Snapshots** (1 to 200) if your instance edits a lot of notes through AI or MCP.
-*   **Expiry:** every snapshot, automatic or manual, is deleted 30 days after it was taken. A snapshot can also be deleted by hand from the Snapshots modal.
-*   **Attachments and images:** snapshots only store the note text. Attachments are never copied, so a file referenced by several snapshots exists once on disk. A file removed from a note stays on disk, hidden from the note, as long as a snapshot still contains it, so restoring that snapshot brings it back. It is deleted for good once the last snapshot containing it expires or is deleted, or when the note is permanently deleted. Keeping more snapshots therefore never duplicates files. It only keeps removed files around for longer, 30 days at most.
+*   **History:** the left column lists the note's revisions grouped by day, each one labeled Automatic, Manual, Before AI edit or Before MCP edit. A "Current" badge marks the revisions identical to the current note, and "No change" those identical to the revision before them. Both badges also require the same title and tags.
+*   **Content:** the page opens on this tab, which shows the selected revision itself, rendered. For Markdown notes, a Preview/Source switch sits next to the tabs.
+*   **Changes:** the second tab shows a line-by-line diff, with the changed words highlighted, against the current version, the previous revision or any other revision. The diff is shown Unified or Side by side, unchanged lines are folded (click to expand them), the previous and next change buttons jump from one change to the next, and the added and removed lines are counted. Markdown notes are compared on their source. Rich-text notes are compared on their text, so a change of formatting alone does not show. Above the diff, the tab shows the title change (old → new) and the tags added or removed between the two compared versions.
+*   **Actions:** the "Actions" menu holds "Restore this revision", "Save a revision", "Copy content" and "Delete this revision". "Save a revision" saves the current content right away, the other entries act on the selected revision.
+*   **Restoring:** a restore gives the note back the content, the title and the tags of the revision. The state it replaces is not saved: if it matters, save a revision first ("Save a revision" in the Actions menu, or **Ctrl + Alt + S**). A restored title follows the rename rules: if another note of the same folder already has that title, a suffix such as "(1)" is added. A revision saved before tags were recorded has no tags and leaves the note's tags untouched.
+
+</details>
+
+<details>
+<summary><strong>How revisions work</strong></summary>
+<br>
+
+*   **Automatic:** Poznote saves a revision when a note is modified, not when it is opened. Each time a change to the note's content, title or tags is saved (the editor's autosave, a task ticked, a drawing saved, the REST API, an edit from a public share link), Poznote first keeps the note as it was just before that change, unless a revision of that note was already taken in the last 10 minutes. A revision therefore always holds the state before a change, and an editing session produces at most one automatic revision every 10 minutes. Opening or reading a note never creates a revision. Nothing is saved for an empty note, nor when the newest revision already holds exactly the current content, title and tags, so the history has no duplicates. These revisions are labeled "Automatic" in the history, and so are the revisions that older versions of Poznote took when a note was opened: they follow the same rules.
+*   **Example:** you edit a note from 9:00 to 9:35. The history gets revisions at about 9:00 (the note before you touched it), 9:10, 9:20 and 9:30. You come back at 14:00 and change one word: a 14:00 revision keeps the note as you left it at 9:35.
+*   **What you can go back to:** the state you leave a note in at the end of a session is not saved as a revision at that moment, because it is the note itself. It is captured by the first change of the next session, however much later that is. So you can always return to how the note was before you started editing today, and, within a long session, to states at most about 10 minutes apart. The latest state is always the note itself: compare any revision with "Current version" to see what has changed since.
+*   **How long automatic revisions are kept:** every automatic revision of the last 24 hours is kept. Beyond 24 hours, only the most recent automatic revision of each day is kept, for 30 days by default. This number of days can be changed under **Settings > Revisions** (1 to 30). If you had already changed this setting in an older version, where it counted revisions, your value is kept and now counts days.
+*   **Manual:** "Save a revision" adds a revision at any time, and so does **Ctrl + Alt + S** (Cmd + Alt + S on Mac) while a note is open. Manual revisions are unlimited and never thinned out: they only go away when they expire, after 30 days.
+*   **Before an AI edit:** a revision is saved automatically right before the [AI assistant](#ai-assistant) or the [MCP server](#mcp-server) changes the content of a note, even when an automatic revision was taken less than 10 minutes earlier, so a rewrite that goes wrong is one click away from being undone. These revisions are labeled "Before AI edit" or "Before MCP edit" in the history and are skipped when the latest revision already holds the same content, title and tags.
+*   **Safety revisions:** the "Before AI edit" and "Before MCP edit" revisions share one limit: the 20 most recent are kept per note, a number you can change in **Settings → Revisions** (1 to 200) if your instance edits a lot of notes through AI or MCP.
+*   **Expiry:** every revision, whatever its kind, is deleted 30 days after it was saved. A revision can also be deleted by hand from the Revisions page.
+*   **Attachments and images:** revisions store the note's text, title and tags, never its files. Attachments are never copied, so a file referenced by several revisions exists once on disk. A file removed from a note stays on disk, hidden from the note, as long as a revision still contains it, so restoring that revision brings it back. It is deleted for good once the last revision containing it expires or is deleted, or when the note is permanently deleted. Keeping more revisions therefore never duplicates files. It only keeps removed files around for longer, 30 days at most.
+*   **API and MCP:** the [REST API](docs/API-REST.md#snapshots) and the [MCP server](#mcp-server) tools still call revisions "snapshots" (`/notes/{id}/snapshots`, `list_snapshots`, `get_snapshot`, `restore_snapshot`).
 
 </details>
 
@@ -708,7 +725,7 @@ Under **Settings > Behavior**, you can configure:
 
 - **Note sorting:** choose how notes are ordered in the list
 - **Note age filter:** only list the notes updated within the chosen number of days
-- **Snapshots:** how many automatic snapshots are kept per note
+- **Revisions:** for how many days automatic revisions are kept (one per day beyond the last 24 hours) and how many safety revisions are kept per note
 - **Task list insert order:** control where new tasks are inserted
 - **Show notes after folders:** list notes without folders below the folder list
 - **Code block word wrap:** enable or disable word wrap in code blocks
@@ -857,7 +874,7 @@ data/
     │   ├── database/poznote.db  # User's notes database
     │   ├── entries/             # User's note files (HTML/MD)
     │   ├── attachments/         # User's attachments
-    │   ├── snapshots/           # Earlier versions of the user's notes
+    │   ├── snapshots/           # Earlier versions of the user's notes (revisions)
     │   ├── backgrounds/         # Workspace background images
     │   └── backups/             # Backup archives prepared for download
     ├── 2/                       # User ID 2

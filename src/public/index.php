@@ -1067,14 +1067,6 @@ window.NOTIFICATIONS_TXT = {
 <?php if ($note && is_numeric($note)): ?>
 <!-- Data for draft check (used by index-events.js) -->
 <script type="application/json" id="current-note-data"><?php echo json_encode(['noteId' => (string)$note]); ?></script>
-<!-- Create daily snapshot on note load -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof createNoteSnapshot === 'function') {
-        createNoteSnapshot(<?php echo (int)$note; ?>);
-    }
-});
-</script>
 <?php endif; ?>
 
 

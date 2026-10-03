@@ -32,6 +32,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/modal-alerts.js',
         'js/color-palette.js',
         'js/mermaid-theme.js',
+        'js/mermaid-zoom.js',
         'js/toolbar-popups.js',
         'js/toolbar-overflow.js',
         'js/toolbar-editor-utils.js',

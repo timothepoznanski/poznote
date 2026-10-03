@@ -357,41 +357,6 @@ body.slash-menu-cursor-hidden * {
     position: relative;
 }
 
-.markdown-preview .heading-anchor {
-    opacity: 0;
-    margin-left: 0.35em;
-    padding: 0 0.2em;
-    color: inherit;
-    text-decoration: none;
-    transition: opacity 0.15s;
-    display: inline-flex;
-    align-items: center;
-    line-height: 1;
-    vertical-align: middle;
-    font-size: inherit;
-    cursor: pointer;
-}
-
-.markdown-preview h1:hover .heading-anchor,
-.markdown-preview h2:hover .heading-anchor,
-.markdown-preview h3:hover .heading-anchor,
-.markdown-preview h4:hover .heading-anchor,
-.markdown-preview h5:hover .heading-anchor,
-.markdown-preview h6:hover .heading-anchor {
-    opacity: 0.5;
-}
-
-.markdown-preview .heading-anchor:hover {
-    opacity: 1;
-}
-
-.markdown-preview .heading-anchor svg {
-    fill: currentColor;
-    vertical-align: middle;
-    width: 0.8em;
-    height: 0.8em;
-}
-
 .markdown-preview p {
     margin: 0 0 1em 0;
 }
@@ -833,11 +798,156 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
 /* Mermaid diagrams. The box sits on the page ground in every theme: the diagram
    colours are mixed into this background (js/mermaid-theme.js). */
 .mermaid {
+    position: relative;
     margin: 1em 0;
     text-align: center;
     background-color: var(--pz-bg);
     padding: 10px;
     border-radius: var(--pz-radius-sm);
+}
+
+/* Enlarge button on a rendered diagram (js/mermaid-zoom.js, issue #1551).
+   Same quiet look as the code block buttons. The diagram keeps clear of the
+   button's column: a wide diagram fills the box and would run under it. */
+.mermaid.mermaid-zoomable {
+    padding-right: 36px;
+}
+
+.mermaid-zoom-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    color: var(--pz-text-subtle);
+    opacity: 0.55;
+    cursor: pointer;
+}
+
+.mermaid-zoom-btn:hover {
+    opacity: 1;
+    color: var(--pz-text-strong);
+}
+
+.mermaid-zoom-btn:focus-visible {
+    opacity: 1;
+    outline: 2px solid var(--pz-accent-text);
+    outline-offset: -2px;
+}
+
+.mermaid-zoom-btn .lucide {
+    font-size: 14px;
+}
+
+@media print {
+    .mermaid-zoom-btn {
+        display: none;
+    }
+}
+
+/* Full-screen diagram viewer. The diagram's colours are mixed into --pz-bg,
+   so the viewer keeps that ground. */
+html.mermaid-viewer-open {
+    overflow: hidden;
+}
+
+.mermaid-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 10040;
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
+}
+
+.mermaid-viewer-stage {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.mermaid-viewer-stage.is-panning {
+    cursor: grabbing;
+}
+
+.mermaid-viewer-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.mermaid-viewer-canvas svg {
+    display: block;
+}
+
+.mermaid-viewer-toolbar {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 4px;
+    background-color: var(--pz-surface);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.12);
+}
+
+.mermaid-viewer-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 6px;
+    margin: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    color: var(--pz-text-secondary);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.mermaid-viewer-btn:hover:not(:disabled) {
+    background-color: var(--pz-surface-hover);
+    color: var(--pz-text-strong);
+}
+
+.mermaid-viewer-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.mermaid-viewer-btn:focus-visible {
+    outline: 2px solid var(--pz-accent-text);
+    outline-offset: -2px;
+}
+
+.mermaid-viewer-btn .lucide {
+    font-size: 16px;
+}
+
+.mermaid-viewer-level {
+    min-width: 52px;
+    font-variant-numeric: tabular-nums;
+}
+
+.mermaid-viewer-close {
+    margin-left: 4px;
 }
 
 /* Math equations styling */

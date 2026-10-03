@@ -136,7 +136,7 @@ MCP 服务器充当 AI 助手与您的 Poznote 实例之间的桥梁。
 
 任务工具一次只处理一个任务：先调用 `list_tasks` 获取任务 ID，再调用 `add_task`、`update_task`、`complete_task` 或 `delete_task`。每次调用只携带该任务，因此客户端永远不需要读取整个任务列表再发回一个全新的数组，两个调用方编辑不同任务时也不会互相覆盖。Poznote 将笔记的任务存储为一个 JSON 数组，服务器每次调用都会重写它，因此单次调用的工作量仍会随列表长度增长。通知会自动保持同步，完成或删除任务时会撤销其待发送的提醒。任务可以包含子任务，且仅限一层：`list_tasks` 会在任务的 `subtasks` 数组中返回它们及其各自的 ID，`add_subtask`、`update_subtask` 和 `delete_subtask` 每次修改其中一个。子任务只有文本和完成状态，勾选子任务不会使其所属任务完成。
 
-**版本历史与撤销。** 在 AI 助手或 MCP 服务器改写笔记之前，Poznote 会先为该笔记创建一个安全快照，因此一次失误的 `update_note` 是可以撤销的。`list_snapshots` 列出为某条笔记保留的快照，每个快照都带有标识这类安全副本的 `origin`；`get_snapshot` 在不改动笔记的情况下读取其中一个，`restore_snapshot` 则把它的内容写回去。`restore_snapshot` 会覆盖当前内容，因此必须提供 `snapshot_key` 或 `date`，而不会退回到当天的快照。
+**版本历史与撤销。** 在 AI 助手或 MCP 服务器改写笔记之前，Poznote 会先为该笔记创建一个安全快照，因此一次失误的 `update_note` 是可以撤销的。`list_snapshots` 列出为某条笔记保留的快照，每个快照都带有标识这类安全副本的 `origin`（`ai` 或 `mcp`）；`get_snapshot` 在不改动笔记的情况下读取其中一个，`restore_snapshot` 则把它的内容写回去。`restore_snapshot` 会覆盖当前内容，因此必须提供 `snapshot_key` 或 `date`，而不会退回到当天的快照。它不会事先保存这些内容：被替换的内容会丢失，除非已有快照包含它。Poznote 界面将快照称为修订版本：用户在笔记的**修订版本**页面中浏览和比较它们，因此有关修订版本或版本历史的请求对应的就是这些工具。
 
 **跨笔记视图。** `list_all_tasks` 回答整个工作区“还有什么要做”，而 `list_tasks` 只覆盖单条笔记。它返回两类条目，通过 `source` 区分：任务列表笔记中的任务，其 ID 可配合 `update_task` 和 `delete_task` 使用；以及写在普通笔记里的复选框，其 ID 只是笔记中的位置，无法这样使用。`list_reminders` 返回已经触发且未被忽略的通知，API 最多返回 50 条。它并不是未来事项的视图：Poznote 没有列出未来提醒的接口，这些提醒需要用 `get_reminder` 逐条笔记读取。
 
@@ -287,7 +287,7 @@ ssh -L 8045:127.0.0.1:8045 user@your-server
 
 MCP 服务器使用存储在 `data/.mcp_token` 中的内部 Bearer 令牌连接 Poznote REST API。Poznote 会自动创建该令牌，Docker Compose 配置会将 `./data` 以只读方式挂载到 MCP 容器中，因此令牌永远不需要放在 `.env` 里。
 
-由于该令牌标识的是 MCP 服务器，当携带它的请求要修改笔记内容或任务（`update_note`、`add_task`、`update_task`、`complete_task`、`delete_task`、`add_subtask`、`update_subtask`、`delete_subtask`）时，Poznote 会在修改前为笔记创建快照。快照在笔记的快照菜单中显示为“MCP 修改前”，因此如果 AI 重写时丢失了内容，一键即可恢复。如果最新的快照已包含相同内容，则不会再创建快照；每条笔记保留最近 20 个此类快照，如果 MCP 服务器的编辑量大到一个下午就能用完 20 个，可以在**设置 → 快照**中调高这个数量（最多 200）。
+由于该令牌标识的是 MCP 服务器，当携带它的请求要修改笔记内容或任务（`update_note`、`add_task`、`update_task`、`complete_task`、`delete_task`、`add_subtask`、`update_subtask`、`delete_subtask`）时，Poznote 会在修改前为笔记创建快照。快照在笔记的**修订版本**页面中显示为“MCP 编辑前”，因此如果 AI 重写时丢失了内容，一键即可恢复。如果最新的快照已包含相同内容，则不会再创建快照；每条笔记保留最近 20 个安全快照（AI 编辑前和 MCP 编辑前），如果 MCP 服务器的编辑量大到一个下午就能用完 20 个，可以在**设置 → 修订版本**中调高这个数量（最多 200）。
 
 ---
 

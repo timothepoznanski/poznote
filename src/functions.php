@@ -414,7 +414,16 @@ const POZNOTE_FOLDER_TREE_DIM_MIN = 10;
 const POZNOTE_FOLDER_TREE_DIM_MAX = 90;
 const POZNOTE_FOLDER_TREE_DIM_STEP = 5;
 
-const POZNOTE_SNAPSHOTS_DEFAULT_COUNT = 3;
+// Automatic revisions (snapshots) of a note. One is taken right before a
+// change is saved, at most every POZNOTE_SNAPSHOTS_AUTO_INTERVAL_SECONDS.
+// All of them are kept for POZNOTE_SNAPSHOTS_DENSE_HOURS, then one per day
+// for the snapshots_keep_count most recent days (the *_COUNT constants are
+// that number of days and its bounds); nothing outlives
+// POZNOTE_SNAPSHOTS_MAX_AGE_DAYS. The default equals the maximum age, so out
+// of the box only the expiry thins the daily ones.
+const POZNOTE_SNAPSHOTS_AUTO_INTERVAL_SECONDS = 600;
+const POZNOTE_SNAPSHOTS_DENSE_HOURS = 24;
+const POZNOTE_SNAPSHOTS_DEFAULT_COUNT = 30;
 const POZNOTE_SNAPSHOTS_MIN_COUNT = 1;
 const POZNOTE_SNAPSHOTS_MAX_COUNT = 30;
 const POZNOTE_SNAPSHOTS_MAX_AGE_DAYS = 30;
@@ -797,7 +806,8 @@ function requireSettingsPassword() {
  * Render the view controls used by the dashboard and diary boards, next to
  * the filter bar. $prefix namespaces the localStorage keys so each page
  * remembers its own settings. A single toggle cycles through the views
- * (grid small/medium/large/wide, then list), driven by board-view-menu.js.
+ * (grid small/medium/large/wide, then list), and a second one lets each grid
+ * card take the height of its own content, both driven by board-view-menu.js.
  * There is no column setting: the grid fits as many cards of the chosen size
  * as the width allows, like Google Keep.
  */
@@ -814,6 +824,11 @@ function renderBoardViewMenu(string $prefix) {
             '<i class="lucide lucide-grid"></i>' .
             '<i class="lucide lucide-layout-list"></i>' .
             '<span class="board-view-size-letter"></span>' .
+        '</button>' .
+        '<button type="button" id="' . $idPrefix . 'ViewFullHeightBtn" class="board-view-btn board-view-full-height-toggle" aria-pressed="false"' .
+            ' title="' . t_h('dashboard.view.full_height', [], 'Full-height cards') . '"' .
+            ' aria-label="' . t_h('dashboard.view.full_height', [], 'Full-height cards') . '">' .
+            '<i class="lucide lucide-move-vertical"></i>' .
         '</button>' .
     '</div>';
 }

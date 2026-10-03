@@ -847,7 +847,17 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                 'saveFailed' => t('public.edit.save_failed', [], 'Failed to save changes'),
                 'discardConfirm' => t('public.edit.discard_confirm', [], 'Discard your changes?'),
                 'editLocked' => t('public.edit.locked', [], 'Someone else is currently editing this note. Please try again later.'),
-                'lockLost' => t('public.edit.lock_lost', [], 'Someone else is now editing this note. Your latest changes cannot be saved.')
+                'lockLost' => t('public.edit.lock_lost', [], 'Someone else is now editing this note. Your latest changes cannot be saved.'),
+                // Looked up by key through the window.t shim below.
+                'strings' => [
+                    'common.close' => t('common.close', [], 'Close'),
+                    'mermaid_zoom.open' => t('mermaid_zoom.open', [], 'Enlarge diagram'),
+                    'mermaid_zoom.dialog' => t('mermaid_zoom.dialog', [], 'Diagram'),
+                    'mermaid_zoom.zoom_in' => t('mermaid_zoom.zoom_in', [], 'Zoom in'),
+                    'mermaid_zoom.zoom_out' => t('mermaid_zoom.zoom_out', [], 'Zoom out'),
+                    'mermaid_zoom.fit' => t('mermaid_zoom.fit', [], 'Fit to screen'),
+                    'mermaid_zoom.actual_size' => t('mermaid_zoom.actual_size', [], 'Actual size')
+                ]
             ]
         ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
     ?></script>
@@ -861,6 +871,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                     window.t = function(key, vars, fallback) {
                         if (key === 'common.confirm') return config.i18n.confirm;
                         if (key === 'common.cancel') return config.i18n.cancel;
+                        if (config.i18n.strings && Object.prototype.hasOwnProperty.call(config.i18n.strings, key)) return config.i18n.strings[key];
                         return fallback || key;
                     };
                 }
@@ -992,6 +1003,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 <script src="<?php echo poznoteAsset('js/math-renderer.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/outline-panel.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/mermaid-theme.js'); ?>"></script>
+<script src="<?php echo poznoteAsset('js/mermaid-zoom.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/public-note.js'); ?>"></script>
 <?php if ($noteBodyEditable): ?>
 <script src="<?php echo poznoteAsset('js/shortcut-key.js'); ?>"></script>

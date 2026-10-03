@@ -2390,7 +2390,7 @@ def get_folder_share_status(folder_id: int, user_id: Optional[int] = None) -> st
 
 
 # =============================================================================
-# SNAPSHOTS - Note version history
+# SNAPSHOTS - Note version history ("Revisions" in the Poznote interface)
 # =============================================================================
 
 _SNAPSHOT_DATE_RE = r"\d{4}-\d{2}-\d{2}"
@@ -2405,15 +2405,20 @@ _SNAPSHOT_KEY_HINT = "snapshot_key must be a key returned by list_snapshots (YYY
 def list_snapshots(note_id: int, user_id: Optional[int] = None) -> str:
     """List the saved earlier versions (snapshots) of a note
 
-    Poznote snapshots a note automatically on first open of a day, and takes an
-    extra safety snapshot right BEFORE the AI assistant or this MCP server
-    rewrites it. So after a bad update_note, the previous content is still
+    The Poznote interface calls these "revisions" (the note's Revisions page):
+    when the user talks about revisions or version history, this is the tool.
+
+    Poznote snapshots a note automatically right before a change to it is
+    saved (at most one every ten minutes; all kept for 24 hours, then one per
+    day), and takes an extra safety snapshot right BEFORE the AI assistant or
+    this MCP server rewrites it. So after a bad update_note, the previous content is still
     here: look for the most recent entry whose "origin" is "mcp" or "ai" and
     pass its "snapshot_key" to get_snapshot or restore_snapshot.
 
     Each entry carries snapshot_key (how to address it), date, heading, type,
-    manual, origin and created_at. Old snapshots expire, so this is a safety
-    net, not a full history.
+    manual, origin ("ai", "mcp" or empty), tags, created_at, content_hash
+    and size; entries with the same content_hash hold the same content. Old
+    snapshots expire, so this is a safety net, not a full history.
 
     Args:
         note_id: ID of the note

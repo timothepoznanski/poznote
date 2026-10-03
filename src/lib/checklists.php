@@ -56,7 +56,7 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true) {
                 foreach (getTasklistSubtasks($item) as $subtask) {
                     $taskSearch[] = $subtask['text'];
                 }
-                if (count($tasks) < 4) {
+                if (count($tasks) < 10) {
                     $tasks[] = ['text' => $label, 'done' => !empty($item['completed'])];
                 }
             }

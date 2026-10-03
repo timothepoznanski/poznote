@@ -303,6 +303,10 @@ if ($note_id > 0) {
         $html_content = $new_excalidraw_html;
     }
     
+    // The drawing before this save: its automatic revision, at most one
+    // every ten minutes
+    poznoteCreateAutomaticSnapshot($con, $note_id);
+
     // Write HTML content to file
     if (file_put_contents($noteFilename, $html_content) === false) {
         error_log("Failed to write HTML file for Excalidraw note ID $note_id");
@@ -586,6 +590,10 @@ function saveEmbeddedDiagram() {
         }
         
         $content_to_save = $is_markdown_note ? sanitizeMarkdownContent($html_content) : $html_content;
+
+        // The note before this save: its automatic revision, at most one
+        // every ten minutes
+        poznoteCreateAutomaticSnapshot($con, $note_id);
 
         // Save the updated note content
         if (file_put_contents($content_file, $content_to_save) === false) {

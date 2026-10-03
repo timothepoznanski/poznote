@@ -67,10 +67,6 @@
                     // names below, whatever the column of a restored database holds.
                     $row['id'] = (int)$row['id'];
 
-                    if (function_exists('ensureAutomaticSnapshotForOpenedNote')) {
-                        ensureAutomaticSnapshotForOpenedNote($con, (int)$row['id']);
-                    }
-
                     // Check if note is shared
                     $is_shared = false;
                     if ($stmt_shared) {
@@ -363,7 +359,7 @@
                         echo '<button type="button" class="toolbar-btn btn-search-replace note-action-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-search"></i></button>';
                     }
 
-                    echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Snapshots').'"><i class="lucide lucide-history"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Revisions').'"><i class="lucide lucide-history"></i></button>';
 
                     // The note width and the split view are set from the "..."
                     // menu of the floating stack (ui_customization_panel.php),
@@ -434,7 +430,7 @@
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="lucide lucide-refresh-cw-alt"></i> '.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'</button>';
                     }
 
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Snapshot').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Revisions').'</button>';
                     echo '</div>';
                     echo '</div>';
                 
@@ -609,7 +605,11 @@
                         // template: js/note-stats.js rewrites the date after
                         // each save.
                         $updated_label = t('index.note.modified_on', [], 'Modified {{date}}');
+                        // The entries sit in a strip that stays on one row
+                        // and scrolls sideways when the column is too narrow
+                        // for them, like the tags (js/note-stats.js wires it)
                         echo '<span class="note-subline">';
+                        echo '<span class="note-subline-list">';
                         echo '<span class="note-sub-dates">';
                         if ($created_display !== '') {
                             echo '<span class="note-sub-created">' . t_h('index.note.created_on', ['date' => $created_display], 'Created {{date}}') . '</span>';
@@ -626,11 +626,14 @@
                         echo ' <span class="note-sub-stat note-sub-stat-words" data-stat="words"></span>';
                         echo ' <span class="note-sub-stat note-sub-stat-lines" data-stat="lines"></span>';
                         echo '</span>';
-                        // Last entry: opens the note information dialog
-                        // (#noteInfoModal, js/note-info-modal.js), like the
-                        // Information entry of the "..." menu
+                        echo '</span>';
+                        // Last entry, outside the strip so that it stays in
+                        // view however far the strip is scrolled: opens the
+                        // note information dialog (#noteInfoModal,
+                        // js/note-info-modal.js), like the Information entry
+                        // of the "..." menu
                         $info_label = t_h('common.information', [], 'Information');
-                        echo '<span class="note-sub-info"><button type="button" class="note-sub-info-btn" data-action="show-note-info" data-note-id="' . $row['id'] . '" title="' . $info_label . '" aria-label="' . $info_label . '"><i class="lucide lucide-info"></i></button></span>';
+                        echo ' <span class="note-sub-info"><button type="button" class="note-sub-info-btn" data-action="show-note-info" data-note-id="' . $row['id'] . '" title="' . $info_label . '" aria-label="' . $info_label . '"><i class="lucide lucide-info"></i></button></span>';
                         echo '</span>';
                     }
                     echo '</h4>';

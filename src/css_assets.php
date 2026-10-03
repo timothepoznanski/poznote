@@ -387,6 +387,23 @@ function poznoteCssManifest(): array
             'css/syntax-highlight.css',
             'js/katex/katex.min.css',
         ],
+        'revisions' => [
+            'css/lucide.css',
+            '@components',
+            'css/fonts.css',
+            'css/modal-alerts.css',
+            // A revision shows the way the note does: the editor's content
+            // rules (paragraph spacing, headings, lists, checklists, code)
+            'css/notes/noteentry.css',
+            'css/checklists.css',
+            'css/code-blocks.css',
+            '@theme',
+            // Preview of a Markdown revision, as on the public note page
+            'css/markdown.css',
+            'css/syntax-highlight.css',
+            'css/revisions.css',
+            '@icon-sidebar',
+        ],
         'restore_import' => [
             'css/lucide.css',
             '@components',

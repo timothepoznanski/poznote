@@ -18,6 +18,13 @@
 // so the parser body reads as the block grammar. The prefix matters: index_js.php
 // concatenates every js/*.js into one scope.
 
+// Enlarge button on each rendered diagram (js/mermaid-zoom.js, issue #1551).
+function _mdDecorateMermaidForZoom(nodes) {
+    if (window.poznoteMermaidZoom) {
+        window.poznoteMermaidZoom.decorate(nodes);
+    }
+}
+
 function initMermaid(retryCount) {
     retryCount = retryCount || 0;
     if (typeof mermaid === 'undefined') {
@@ -229,6 +236,7 @@ function initMermaid(retryCount) {
                             console.debug('markdown-parser: fallbackSource() failed:', eSetTheme1);
                         }
                     }
+                    _mdDecorateMermaidForZoom(validNodes);
                 });
             }).catch(function (e1) {
                 console.error('Mermaid rendering failed', e1);
@@ -245,6 +253,7 @@ function initMermaid(retryCount) {
                         console.debug('markdown-parser: fallbackSource() failed:', eSetTheme2);
                     }
                 }
+                _mdDecorateMermaidForZoom(nodesToRender);
             });
         }
     } catch (e) {
@@ -263,6 +272,7 @@ function initMermaid(retryCount) {
                     console.debug('markdown-parser: fallbackSource() failed:', eSetTheme3);
                 }
             }
+            _mdDecorateMermaidForZoom(nodesToRender);
         } catch (e2) {
             console.error('Mermaid initialization failed', e2);
         }

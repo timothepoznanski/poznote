@@ -25,8 +25,9 @@ function poznoteClampSnapshotsKeepCount($value, int $min, int $max, int $default
 }
 
 /**
- * How many automatic (daily) snapshots are kept per note (user setting,
- * default 3). Manual snapshots are not limited.
+ * For how many days one automatic snapshot per day is kept, beyond the
+ * POZNOTE_SNAPSHOTS_DENSE_HOURS during which all of them are (user setting
+ * snapshots_keep_count). Manual snapshots are not limited.
  */
 function getSnapshotsKeepCount() {
     return poznoteClampSnapshotsKeepCount(
@@ -297,6 +298,40 @@ function poznoteCreateSafetySnapshot(PDO $con, $noteId, string $origin): bool {
         return !empty($result['created']);
     } catch (Throwable $e) {
         error_log('Safety snapshot (' . $origin . ') failed for note ' . $noteId . ': ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Take the automatic revision of a note right before a change to its
+ * content, title or tags is saved, whoever saves it (the editor, the API, a
+ * task, a drawing). At most one every POZNOTE_SNAPSHOTS_AUTO_INTERVAL_SECONDS
+ * per note, and none when the newest snapshot already holds the current
+ * state: see SnapshotsController::createAutomaticSnapshot(). Best-effort and
+ * cheap (the usual answer is "too soon", from one directory listing): a
+ * failure is logged and never blocks the save. One attempt per note per
+ * request. Returns true when a snapshot was written.
+ */
+function poznoteCreateAutomaticSnapshot(PDO $con, $noteId): bool {
+    static $done = [];
+
+    $noteId = (int) $noteId;
+    if ($noteId <= 0 || isset($done[$noteId])) {
+        return false;
+    }
+    $done[$noteId] = true;
+
+    try {
+        require_once __DIR__ . '/../api/v1/controllers/SnapshotsController.php';
+        $controller = new SnapshotsController($con);
+        $result = $controller->createAutomaticSnapshot($noteId);
+        if (empty($result['success'])) {
+            error_log('Automatic snapshot failed for note ' . $noteId . ': ' . ($result['error'] ?? 'unknown error'));
+            return false;
+        }
+        return !empty($result['created']);
+    } catch (Throwable $e) {
+        error_log('Automatic snapshot failed for note ' . $noteId . ': ' . $e->getMessage());
         return false;
     }
 }

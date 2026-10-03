@@ -864,7 +864,7 @@ function aiToolUpdateNoteContent($con, array $args, $chatWorkspace, $actorUserId
             $content = aiRestoreInlineImages($content, $stored);
         }
     }
-    // The previous version stays one click away in the Snapshots modal
+    // The previous version stays one click away on the Revisions page
     $snapshotTaken = poznoteCreateSafetySnapshot($con, $noteId, 'ai');
     createDirectoryWithPermissions(dirname($filename));
     if (file_put_contents($filename, $content) === false) {
@@ -874,7 +874,7 @@ function aiToolUpdateNoteContent($con, array $args, $chatWorkspace, $actorUserId
         ->execute([$content, gmdate('Y-m-d H:i:s'), $actorUserId, $noteId]);
     $result = ['ok' => true, 'note_id' => $noteId, 'title' => $note['heading']];
     if ($snapshotTaken) {
-        $result['previous_version'] = 'saved as a snapshot before this change (Snapshots menu of the note)';
+        $result['previous_version'] = 'saved as a revision before this change (Revisions page of the note)';
     }
     return json_encode($result, JSON_UNESCAPED_UNICODE);
 }
@@ -1027,6 +1027,8 @@ function aiToolUpdateNoteTags($con, array $args, $chatWorkspace, $actorUserId): 
         $drop = array_map('mb_strtolower', aiParseTags($args['remove']));
         $tags = array_values(array_filter($tags, fn($t) => !in_array(mb_strtolower($t), $drop, true)));
     }
+    // Tags are part of a revision: keep the state they replace
+    poznoteCreateAutomaticSnapshot($con, $noteId);
     $con->prepare('UPDATE entries SET tags = ?, updated = ?, updated_by_user_id = ? WHERE id = ?')
         ->execute([implode(', ', $tags), gmdate('Y-m-d H:i:s'), $actorUserId, $noteId]);
     return json_encode(['ok' => true, 'note_id' => $noteId, 'title' => (string)$note['heading'], 'previous_tags' => $previous, 'tags' => $tags], JSON_UNESCAPED_UNICODE);

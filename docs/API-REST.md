@@ -1032,9 +1032,13 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 
 ## Snapshots
 
-Snapshots preserve daily versions of a note's content. One automatic snapshot is taken per day; the most recent automatic snapshots are kept per note, 3 by default (user setting `snapshots_keep_count`, 1 to 30, also available from Settings > Snapshots). Manual snapshots can be added on demand without limit and do not count toward that number. Every snapshot, automatic or manual, expires 30 days after it was taken.
+Snapshots preserve earlier versions of a note's content, together with its title and tags (attachments are not versioned: files are never copied). The Poznote interface calls them "revisions" and shows them on the note's Revisions page, where they can be compared with the current note or with each other and restored; the API and the MCP tools keep the snapshot name.
 
-A manual snapshot is also taken automatically right before the built-in AI assistant or the MCP server (requests authenticated with the MCP service token) changes the content or tasks of a note, unless the note is empty or the newest snapshot already holds the same content; the 20 most recent of them are kept per note, a number the `snapshots_safety_keep_count` setting changes (1 to 200). Such snapshots carry an `origin` field in the list and get responses, `"ai"` or `"mcp"`; user-made snapshots have an empty `origin`.
+An automatic snapshot is taken when a note is modified, never when it is read: before a change to the content, title or tags is saved, Poznote stores the note as it was just before that change, unless a snapshot of that note was already taken in the last 10 minutes. A snapshot therefore always holds the state before a change, and a note gets at most one automatic snapshot per 10 minutes. Every write path does this: the web editor's autosave, `PATCH /notes/{id}`, the tasks endpoints, the Excalidraw save and edits made from a public share link. Nothing is stored for an empty note, nor when the newest snapshot already holds the same content, title and tags.
+
+Every automatic snapshot of the last 24 hours is kept. Beyond 24 hours, only the most recent automatic snapshot of each day is kept, for 30 days by default: that number of days is the user setting `snapshots_keep_count` (1 to 30, also available from Settings > Revisions). The setting used to be a number of snapshots and defaulted to 3; a value an account had already chosen is kept and now counts days. Manual snapshots can be added on demand without limit and are never thinned. Every snapshot, automatic or manual, expires 30 days after it was taken.
+
+A manual snapshot is also taken automatically right before the built-in AI assistant or the MCP server (requests authenticated with the MCP service token) changes the content or tasks of a note, whatever the 10-minute interval, unless the note is empty or the newest snapshot already holds the same content, title and tags; the 20 most recent of these safety snapshots are kept per note, a number the `snapshots_safety_keep_count` setting changes (1 to 200). Such snapshots carry an `origin` field in the list and get responses, `"ai"` or `"mcp"` (shown as "Before AI edit" and "Before MCP edit" in the interface); user-made snapshots have an empty `origin`.
 
 An attachment or image deleted from a note is kept on disk (hidden from the note) as long as a snapshot still references it, so restoring that snapshot brings it back. The file is removed for good once no snapshot references it any more (the last one expired or was purged), or when the note is permanently deleted.
 
@@ -1044,7 +1048,7 @@ An attachment or image deleted from a note is kept on disk (hidden from the note
 POST /notes/{id}/snapshot
 ```
 
-Create a snapshot for a note. Without parameters, creates/updates today's automatic snapshot.
+Create a snapshot for a note. Without parameters, creates the dated snapshot of the day (key `YYYY-MM-DD`) if none exists yet: this form is kept for compatibility, the web app no longer calls it, since automatic snapshots are now taken when a change is saved. With `manual=1`, adds a manual snapshot.
 
 **Query Parameters:**
 
@@ -1063,7 +1067,37 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 GET /notes/{id}/snapshots
 ```
 
-List available snapshots for a note.
+List available snapshots for a note, newest first.
+
+Each entry carries `snapshot_key`, `date`, `heading`, `tags` (the note's tags at that time as a `, `-separated string, or `null` for a snapshot taken before tags were recorded), `type`, `manual`, `origin` (`"ai"`, `"mcp"` or empty) and `created_at`, plus `content_hash` (SHA-1 of the snapshot content) and `size` (content length in bytes). The response also carries `current_hash`, the SHA-1 of the note's current content: a snapshot whose `content_hash` equals it holds the same content as the note, and two snapshots with the same `content_hash` hold the same content, without downloading either. `current_heading` and `current_tags` give the note's current title and tags, to compare with each entry's `heading` and `tags`.
+
+Automatic snapshots have `manual: false` and a key of the form `YYYY-MM-DD--<suffix>`; the ones taken once a day by older versions have the bare date `YYYY-MM-DD` as their key and follow the same retention.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "empty_new_note": false,
+  "current_hash": "3f786850e387550fdab836ed7e6dc881de23001b",
+  "current_heading": "Meeting notes (final)",
+  "current_tags": "work, meetings, 2026",
+  "snapshots": [
+    {
+      "snapshot_key": "2026-07-01--143022123-a1b2",
+      "date": "2026-07-01",
+      "heading": "Meeting notes",
+      "tags": "work, meetings",
+      "type": "markdown",
+      "manual": true,
+      "origin": "mcp",
+      "created_at": "2026-07-01 14:30:22",
+      "content_hash": "89e6c98d92887913cadf06b2adb97f26cde4849b",
+      "size": 1824
+    }
+  ]
+}
+```
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
@@ -1076,7 +1110,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 GET /notes/{id}/snapshot
 ```
 
-Get a snapshot's content.
+Get a snapshot's content. The snapshot object also carries `heading` and `tags`, the note's title and tags when the snapshot was taken (`tags` is a `, `-separated string, or `null` for a snapshot taken before tags were recorded).
 
 **Query Parameters:**
 
@@ -1084,6 +1118,7 @@ Get a snapshot's content.
 |-----------|------|-------------|
 | `snapshot_key` | string | Snapshot key from the list endpoint |
 | `date` | date | Snapshot date (`YYYY-MM-DD`, defaults to today) |
+| `render` | boolean | If `1`, a Markdown snapshot also comes with an `html` field holding its content rendered to HTML (ignored for other note types) |
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
@@ -1096,7 +1131,9 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 POST /notes/{id}/snapshot/restore
 ```
 
-Restore a note to a snapshot state.
+Restore a note to a snapshot state. Only the content is replaced, unless `meta=1` asks for the title and tags too.
+
+The restore takes no snapshot of the state it replaces, which is lost unless a snapshot already holds it: to keep it, [create a manual snapshot](#create-snapshot) first. The response carries `heading` and `tags`, the restored values when `meta=1` changed them, `null` otherwise.
 
 **Query Parameters:**
 
@@ -1104,10 +1141,22 @@ Restore a note to a snapshot state.
 |-----------|------|-------------|
 | `snapshot_key` | string | Snapshot key from the list endpoint |
 | `date` | date | Snapshot date (`YYYY-MM-DD`, defaults to today) |
+| `meta` | boolean | If `1`, also restore the title and tags recorded in the snapshot. The title is made unique within its folder if needed (a suffix such as `(1)` is added), and a snapshot without recorded tags leaves the note's tags as they are |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
-  "http://YOUR_SERVER/api/v1/notes/123/snapshot/restore?date=2026-07-01"
+  "http://YOUR_SERVER/api/v1/notes/123/snapshot/restore?date=2026-07-01&meta=1"
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Note restored to the revision",
+  "heading": "Meeting notes",
+  "tags": "work, meetings"
+}
 ```
 
 ### Delete Snapshot

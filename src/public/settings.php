@@ -696,10 +696,10 @@ if ($canUseUserWebhooks) {
 
                 <!-- Snapshots -->
                 <div class="home-card" id="snapshots-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.snapshots', [], 'Choose how many automatic daily snapshots are kept per note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.snapshots', [], 'Choose for how many days one automatic revision per day is kept, and how many safety revisions (taken before an AI or MCP change) are kept per note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon"><i class="lucide lucide-history"></i></div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('display.cards.snapshots', [], 'Snapshots'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('display.cards.snapshots', [], 'Revisions'); ?></span>
                         <span id="snapshots-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
@@ -896,6 +896,21 @@ if ($canUseUserWebhooks) {
                     <span class="settings-inline-range">
                         <input type="range" id="index-icon-scale-range" class="settings-inline-control" data-control="index-icon-scale-range" min="0.5" max="2.0" step="0.1" value="1.0">
                         <output class="settings-inline-value" for="index-icon-scale-range">1.0x</output>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Icon sidebar icon scale: the same slider for the rail on the far left -->
+            <div class="home-card settings-inline-card" id="icon-rail-scale-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.icon_rail_scale', [], 'Adjust the size of the icons in the icon sidebar.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-maximize-2"></i>
+                </div>
+                <div class="home-card-content">
+                    <label class="home-card-title" for="icon-rail-scale-range"><?php echo t_h('display.cards.icon_rail_scale', [], 'Icon sidebar icon scaling'); ?></label>
+                    <span class="settings-inline-range">
+                        <input type="range" id="icon-rail-scale-range" class="settings-inline-control" data-control="icon-rail-scale-range" min="0.5" max="2.0" step="0.1" value="1.0">
+                        <output class="settings-inline-value" for="icon-rail-scale-range">1.0x</output>
                     </span>
                 </div>
             </div>

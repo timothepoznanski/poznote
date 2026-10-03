@@ -282,9 +282,12 @@
     pointer-events: none;
 }
 
+/* --icon-rail-scale is the "Icon sidebar icon scaling" preference
+   (js/theme-init.js), 0.5 to 2: the largest glyph is 32px, inside the 40px
+   (36px at the bottom) button, so the rail keeps its layout. */
 .icon-sidebar-btn .lucide {
-    width: 16px;
-    height: 16px;
+    width: calc(16px * var(--icon-rail-scale, 1));
+    height: calc(16px * var(--icon-rail-scale, 1));
 }
 
 /* A colour the user picked for one button (right-click on it, see

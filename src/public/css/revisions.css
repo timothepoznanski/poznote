@@ -1,0 +1,1023 @@
+/**
+ * Revisions page (revisions.php): the history of a note on the left, the
+ * selected revision on the right with its changes or its content.
+ * Colours come from the tokens only, so the three themes need no rule here.
+ */
+
+body.revisions-page {
+    /* Diff washes, mixed into the page ground so they hold in every theme */
+    --rev-del-bg: color-mix(in srgb, var(--pz-danger) 11%, var(--pz-bg));
+    --rev-del-word: color-mix(in srgb, var(--pz-danger) 30%, var(--pz-bg));
+    --rev-ins-bg: color-mix(in srgb, var(--pz-success) 12%, var(--pz-bg));
+    --rev-ins-word: color-mix(in srgb, var(--pz-success) 32%, var(--pz-bg));
+    --rev-del-text: var(--pz-danger-text);
+    --rev-ins-text: var(--pz-success-text);
+    margin-top: 0;
+    margin-bottom: 0;
+    background: var(--pz-surface);
+    color: var(--pz-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+}
+
+.revisions-shell {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    max-width: 1440px;
+    height: 100vh;
+    height: 100dvh;
+    margin: 0 auto;
+    padding: 18px 24px 20px;
+}
+
+/* ---- Header ---- */
+
+.revisions-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+}
+
+.revisions-heading {
+    grid-column: 2;
+    min-width: 0;
+    text-align: center;
+}
+
+.revisions-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 22px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
+}
+
+.revisions-title .lucide {
+    width: 22px;
+    height: 22px;
+    color: var(--pz-accent-text);
+}
+
+.revisions-description {
+    max-width: 860px;
+    margin: 10px auto 16px;
+    color: var(--pz-text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: center;
+}
+
+.revisions-nowrap {
+    white-space: nowrap;
+}
+
+.revisions-keep-count-link {
+    color: var(--pz-accent-text);
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
+}
+
+.revisions-keep-count-link:hover {
+    color: var(--pz-accent-text-hover);
+    text-decoration-style: solid;
+}
+
+/* ---- Buttons ---- */
+
+.revisions-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 34px;
+    padding: 0 14px;
+    border: 1px solid transparent;
+    border-radius: var(--pz-radius);
+    background: transparent;
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: var(--pz-weight-medium);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.revisions-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.revisions-btn .lucide {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.revisions-btn-secondary {
+    border-color: var(--pz-border-strong);
+    background: var(--pz-bg);
+}
+
+.revisions-btn-secondary:hover:not(:disabled) {
+    background: var(--pz-surface-hover);
+}
+
+.revisions-btn-secondary .lucide {
+    color: var(--pz-accent-text);
+}
+
+.revisions-btn-icon {
+    width: 34px;
+    padding: 0;
+    color: var(--pz-text-muted);
+}
+
+.revisions-btn-icon:hover:not(:disabled) {
+    background: var(--pz-surface-hover);
+    color: var(--pz-text);
+}
+
+/* ---- Thin scrollbars ---- */
+
+/* The standard properties (Firefox, Chromium 121+), and the WebKit
+   pseudo-elements for Safari, which Chromium ignores once the standard
+   ones are set */
+html:has(> body.revisions-page),
+.revisions-list,
+.revisions-body,
+.revisions-content pre {
+    scrollbar-width: thin;
+    scrollbar-color: var(--pz-scrollbar) transparent;
+}
+
+html:has(> body.revisions-page)::-webkit-scrollbar,
+.revisions-list::-webkit-scrollbar,
+.revisions-body::-webkit-scrollbar,
+.revisions-content pre::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+html:has(> body.revisions-page)::-webkit-scrollbar-track,
+.revisions-list::-webkit-scrollbar-track,
+.revisions-body::-webkit-scrollbar-track,
+.revisions-content pre::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+html:has(> body.revisions-page)::-webkit-scrollbar-thumb,
+.revisions-list::-webkit-scrollbar-thumb,
+.revisions-body::-webkit-scrollbar-thumb,
+.revisions-content pre::-webkit-scrollbar-thumb {
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-scrollbar);
+}
+
+html:has(> body.revisions-page)::-webkit-scrollbar-thumb:hover,
+.revisions-list::-webkit-scrollbar-thumb:hover,
+.revisions-body::-webkit-scrollbar-thumb:hover,
+.revisions-content pre::-webkit-scrollbar-thumb:hover {
+    background: var(--pz-scrollbar-hover);
+}
+
+/* ---- Two columns ---- */
+
+.revisions-layout {
+    display: grid;
+    flex: 1;
+    grid-template-columns: 270px minmax(0, 1fr);
+    gap: 16px;
+    min-height: 0;
+}
+
+.revisions-sidebar,
+.revisions-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    overflow: hidden;
+}
+
+.revisions-sidebar-title {
+    padding: 14px 16px 6px;
+    color: var(--pz-text-muted);
+    font-size: 11px;
+    font-weight: var(--pz-weight-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+/* ---- History list ---- */
+
+.revisions-list {
+    flex: 1;
+    min-height: 0;
+    padding: 0 8px 12px;
+    overflow-y: auto;
+    outline: none;
+}
+
+.revisions-day {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 10px 8px 4px;
+    background: var(--pz-bg);
+    color: var(--pz-text-secondary);
+    font-size: 12px;
+    font-weight: var(--pz-weight-semibold);
+}
+
+.revisions-day:first-letter {
+    text-transform: uppercase;
+}
+
+.revisions-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 1px 0;
+    padding: 7px 8px;
+    border: none;
+    border-radius: var(--pz-radius);
+    background: transparent;
+    color: var(--pz-text);
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.revisions-item:hover {
+    background: var(--pz-surface-hover);
+}
+
+.revisions-item[aria-selected="true"] {
+    background: var(--pz-accent-soft);
+}
+
+.revisions-list:focus-visible .revisions-item[aria-selected="true"] {
+    box-shadow: inset 0 0 0 2px var(--pz-accent);
+}
+
+.revisions-item-icon {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--pz-radius-circle);
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-muted);
+}
+
+.revisions-item-icon .lucide {
+    width: 14px;
+    height: 14px;
+}
+
+.revisions-item-text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+.revisions-item-time {
+    font-size: 13px;
+    font-weight: var(--pz-weight-medium);
+    font-variant-numeric: tabular-nums;
+}
+
+.revisions-item-kind {
+    overflow: hidden;
+    color: var(--pz-text-muted);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.revisions-badge {
+    flex-shrink: 0;
+    padding: 1px 7px;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-muted);
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.revisions-badge-current {
+    background: var(--pz-success-soft);
+    color: var(--pz-success-text);
+}
+
+/* Kind colours of the icon disc in the history */
+.revisions-kind-ai .revisions-item-icon {
+    background: var(--pz-color-purple-soft);
+    color: var(--pz-color-purple);
+}
+
+.revisions-kind-mcp .revisions-item-icon {
+    background: var(--pz-color-teal-soft);
+    color: var(--pz-color-teal);
+}
+
+/* ---- Selected revision ---- */
+
+.revisions-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.revisions-panel[hidden] {
+    display: none;
+}
+
+.revisions-panel-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 16px;
+    padding: 14px 18px 12px;
+    border-bottom: 1px solid var(--pz-border-light);
+}
+
+.revisions-selected {
+    min-width: 0;
+}
+
+.revisions-selected-title {
+    margin: 0;
+    color: var(--pz-text);
+    font-size: 20px;
+    font-weight: var(--pz-weight-semibold);
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+}
+
+
+.revisions-panel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 10px;
+}
+
+.revisions-segmented[hidden] {
+    display: none;
+}
+
+/* ---- Actions menu ---- */
+
+.revisions-menu-wrap {
+    position: relative;
+}
+
+#revisionsActionsBtn .lucide {
+    width: 15px;
+    height: 15px;
+    color: var(--pz-text-muted);
+}
+
+.revisions-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    z-index: 20;
+    min-width: 230px;
+    padding: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    box-shadow: 0 10px 28px rgba(var(--pz-shadow-rgb), 0.16);
+}
+
+.revisions-menu[hidden] {
+    display: none;
+}
+
+.revisions-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-radius: var(--pz-radius);
+    background: transparent;
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 13px;
+    text-align: left;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.revisions-menu-item .lucide {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    color: var(--pz-text-muted);
+}
+
+.revisions-menu-item:hover:not(:disabled),
+.revisions-menu-item:focus-visible {
+    background: var(--pz-surface-hover);
+    outline: none;
+}
+
+.revisions-menu-item:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.revisions-menu-danger,
+.revisions-menu-danger .lucide {
+    color: var(--pz-danger-text);
+}
+
+.revisions-menu-danger:hover:not(:disabled),
+.revisions-menu-danger:focus-visible {
+    background: var(--pz-danger-soft);
+}
+
+.revisions-menu-separator {
+    height: 1px;
+    margin: 4px 6px;
+    background: var(--pz-border-light);
+}
+
+.revisions-empty-new {
+    margin-top: 18px;
+}
+
+/* ---- Toolbar: tabs + options ---- */
+
+.revisions-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px 16px;
+    padding: 10px 18px;
+}
+
+.revisions-toolbar[hidden] {
+    display: none;
+}
+
+.revisions-toolbar [hidden] {
+    display: none !important;
+}
+
+.revisions-tabs,
+.revisions-segmented {
+    display: inline-flex;
+    padding: 3px;
+    border-radius: var(--pz-radius);
+    background: var(--pz-surface-sunken);
+}
+
+.revisions-tab,
+.revisions-segmented button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 28px;
+    padding: 0 12px;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: var(--pz-weight-medium);
+    cursor: pointer;
+}
+
+.revisions-tab:hover,
+.revisions-segmented button:hover {
+    color: var(--pz-text);
+}
+
+.revisions-tab.active,
+.revisions-segmented button.active {
+    background: var(--pz-bg);
+    box-shadow: 0 1px 2px rgba(var(--pz-shadow-rgb), 0.12);
+    color: var(--pz-text);
+}
+
+.revisions-segmented .lucide {
+    width: 15px;
+    height: 15px;
+}
+
+.revisions-toolbar-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+}
+
+.revisions-compare {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--pz-text-muted);
+    font-size: 13px;
+}
+
+.revisions-compare select {
+    max-width: 280px;
+    height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 13px;
+}
+
+/* ---- Diff summary bar ---- */
+
+.revisions-diff-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 18px;
+    padding: 8px 4px 8px 12px;
+    border: 1px solid var(--pz-border);
+    border-bottom: none;
+    border-radius: var(--pz-radius) var(--pz-radius) 0 0;
+    background: var(--pz-surface);
+    font-size: 13px;
+}
+
+.revisions-diff-bar[hidden] {
+    display: none;
+}
+
+.revisions-diff-direction {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    min-width: 0;
+}
+
+.revisions-diff-direction .lucide {
+    width: 14px;
+    height: 14px;
+    color: var(--pz-text-subtle);
+}
+
+.revisions-side {
+    color: var(--pz-text);
+    font-weight: var(--pz-weight-medium);
+}
+
+.revisions-diff-stats {
+    display: flex;
+    gap: 8px;
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--pz-weight-semibold);
+}
+
+.revisions-stat-ins {
+    color: var(--rev-ins-text);
+}
+
+.revisions-stat-del {
+    color: var(--rev-del-text);
+}
+
+.revisions-diff-nav {
+    display: flex;
+}
+
+.revisions-diff-nav .revisions-btn-icon {
+    width: 30px;
+    height: 30px;
+}
+
+/* ---- Body: diff or content ---- */
+
+.revisions-body {
+    flex: 1;
+    min-height: 0;
+    margin: 0 18px 18px;
+    overflow: auto;
+    border: 1px solid var(--pz-border);
+    border-radius: 0 0 var(--pz-radius) var(--pz-radius);
+}
+
+/* The content sits straight in the panel, not in a box of its own */
+.revisions-panel[data-view="content"] .revisions-body {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+}
+
+.revisions-hint {
+    margin: 0;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--pz-border-light);
+    background: var(--pz-surface);
+    color: var(--pz-text-muted);
+    font-size: 12px;
+}
+
+/* Title and tags that changed between the two versions, above the lines */
+.revisions-meta-changes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--pz-border-light);
+    font-size: 13px;
+}
+
+.revisions-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+}
+
+.revisions-meta-row .lucide {
+    width: 14px;
+    height: 14px;
+    color: var(--pz-text-subtle);
+}
+
+.revisions-meta-label {
+    min-width: 56px;
+    color: var(--pz-text-muted);
+    font-weight: var(--pz-weight-medium);
+}
+
+.revisions-meta-old,
+.revisions-meta-new {
+    padding: 1px 8px;
+    border-radius: var(--pz-radius-sm);
+    overflow-wrap: anywhere;
+}
+
+.revisions-meta-old {
+    background: var(--rev-del-bg);
+    color: var(--rev-del-text);
+}
+
+.revisions-meta-new {
+    background: var(--rev-ins-bg);
+    color: var(--rev-ins-text);
+}
+
+.revisions-diff {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.revisions-diff-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+    font-size: 12.5px;
+}
+
+.revisions-col-ln {
+    width: 48px;
+}
+
+.revisions-col-sign {
+    width: 22px;
+}
+
+.revisions-diff td {
+    padding: 0 10px;
+    vertical-align: top;
+}
+
+.revisions-ln {
+    padding-right: 8px !important;
+    border-right: 1px solid var(--pz-border-light);
+    color: var(--pz-text-subtle);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    text-align: right;
+    user-select: none;
+    font-variant-numeric: tabular-nums;
+}
+
+.revisions-sign {
+    padding: 0 !important;
+    color: var(--pz-text-subtle);
+    text-align: center;
+    user-select: none;
+}
+
+.revisions-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Keep an empty line one line tall */
+.revisions-text-blank::after {
+    content: '\200b';
+}
+
+.revisions-diff-split .revisions-text + .revisions-ln {
+    border-left: 1px solid var(--pz-border);
+}
+
+/* Removed / added: whole row in the unified layout, each cell in the split */
+.revisions-row.revisions-del td,
+.revisions-diff-split td.revisions-del {
+    background: var(--rev-del-bg);
+}
+
+.revisions-row.revisions-ins td,
+.revisions-diff-split td.revisions-ins {
+    background: var(--rev-ins-bg);
+}
+
+.revisions-row.revisions-del .revisions-sign {
+    color: var(--rev-del-text);
+}
+
+.revisions-row.revisions-ins .revisions-sign {
+    color: var(--rev-ins-text);
+}
+
+.revisions-filler {
+    background: repeating-linear-gradient(-45deg, transparent 0 5px, var(--pz-border-light) 5px 6px);
+}
+
+.revisions-word-del {
+    border-radius: var(--pz-radius-sm);
+    background: var(--rev-del-word);
+    text-decoration: line-through;
+    text-decoration-color: color-mix(in srgb, var(--pz-danger) 55%, transparent);
+}
+
+.revisions-word-ins {
+    border-radius: var(--pz-radius-sm);
+    background: var(--rev-ins-word);
+}
+
+.revisions-change-start td {
+    scroll-margin-top: 12px;
+}
+
+@keyframes revisions-flash {
+    from { box-shadow: inset 3px 0 0 var(--pz-accent); }
+    to { box-shadow: inset 3px 0 0 transparent; }
+}
+
+.revisions-flash td:first-child {
+    animation: revisions-flash 1.2s ease-out;
+}
+
+/* Folded unchanged lines */
+.revisions-gap td {
+    padding: 0;
+}
+
+.revisions-gap-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 4px 10px;
+    border: none;
+    border-top: 1px solid var(--pz-border-light);
+    border-bottom: 1px solid var(--pz-border-light);
+    background: var(--pz-surface);
+    color: var(--pz-text-muted);
+    font-family: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.revisions-gap-btn:hover {
+    background: var(--pz-accent-soft);
+    color: var(--pz-accent-text);
+}
+
+.revisions-gap-btn .lucide {
+    width: 13px;
+    height: 13px;
+}
+
+/* Content view */
+.revisions-content {
+    /* .noteentry is width: 100%: keep the padding inside it */
+    box-sizing: border-box;
+    padding: 14px 18px 20px;
+    font-size: var(--note-font-size, 15px);
+    overflow-wrap: break-word;
+}
+
+.revisions-content img {
+    max-width: 100%;
+    height: auto;
+}
+
+.revisions-content pre {
+    overflow-x: auto;
+}
+
+.revisions-content-source {
+    margin: 0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+}
+
+.revisions-content-empty {
+    color: var(--pz-text-subtle);
+    font-style: italic;
+}
+
+.revisions-task {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 3px 0;
+}
+
+.revisions-subtask {
+    padding-left: 28px;
+}
+
+.revisions-task-box .lucide {
+    width: 16px;
+    height: 16px;
+    margin-top: 4px;
+    color: var(--pz-text-muted);
+}
+
+.revisions-task-done {
+    color: var(--pz-text-muted);
+    text-decoration: line-through;
+}
+
+/* ---- Loading / empty states ---- */
+
+.revisions-state {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    color: var(--pz-text-muted);
+    text-align: center;
+}
+
+.revisions-state[hidden] {
+    display: none;
+}
+
+.revisions-state > .lucide {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.revisions-state p {
+    margin: 0;
+}
+
+.revisions-state-title {
+    color: var(--pz-text);
+    font-size: 15px;
+    font-weight: var(--pz-weight-semibold);
+}
+
+.revisions-state-hint {
+    max-width: 380px;
+    margin-top: 6px !important;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.revisions-state-inline {
+    padding: 40px 24px;
+}
+
+@keyframes revisions-spin {
+    to { transform: rotate(360deg); }
+}
+
+.revisions-spinner {
+    animation: revisions-spin 1s linear infinite;
+}
+
+/* ---- Toasts ---- */
+
+.revisions-toasts {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.revisions-toast {
+    padding: 10px 16px;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-accent);
+    box-shadow: 0 10px 24px rgba(var(--pz-shadow-rgb), 0.18);
+    color: var(--pz-text-inverse);
+    font-size: 14px;
+    font-weight: var(--pz-weight-semibold);
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.revisions-toast-out {
+    opacity: 0;
+    transform: translateY(-6px);
+}
+
+/* ---- Narrow windows: one column, the page scrolls ---- */
+
+@media (max-width: 900px) {
+    .revisions-shell {
+        height: auto;
+        min-height: 100vh;
+        padding: 12px 12px 20px;
+    }
+
+    .revisions-header {
+        grid-template-columns: auto 1fr auto;
+        gap: 10px;
+    }
+
+    .revisions-title {
+        font-size: 18px;
+    }
+
+    .revisions-description {
+        margin: 8px 0 12px;
+        font-size: 12px;
+    }
+
+    .revisions-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .revisions-sidebar {
+        max-height: 240px;
+    }
+
+    .revisions-main {
+        overflow: visible;
+    }
+
+    .revisions-body {
+        overflow: visible;
+        margin: 0 12px 12px;
+    }
+
+    .revisions-diff-bar {
+        margin: 0 12px;
+    }
+
+    .revisions-panel-head,
+    .revisions-toolbar {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* Side by side needs width: the layout switch goes, unified is used */
+    .revisions-segmented:has([data-layout]) {
+        display: none;
+    }
+
+    .revisions-content {
+        padding: 12px;
+    }
+}

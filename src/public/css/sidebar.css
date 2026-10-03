@@ -203,6 +203,8 @@
 .notes-list-actions .folder-actions-toggle {
     flex: 0 0 auto;
     width: 16px;
+    /* The row toggles below are 22px wide: 3px puts the dots on their axis */
+    margin-right: 3px;
     border: none;
     background-color: transparent;
     font: inherit;
@@ -404,9 +406,9 @@
     font-size: 16px;
 }
 
-/* Sized in px like the arrows: the icon-scale preference
-   (js/index-icon-scale-settings.js) restates the glyph's font-size with
-   !important, and the other rows do not follow that preference. */
+/* Sized in px like the arrows. The icon-scale preference
+   (js/index-icon-scale-settings.js) restates this box along with the glyph's
+   font-size; the arrows of the other rows do not follow that preference. */
 .current-account-header .sidebar-folder-toggle .lucide {
     width: 14px;
     height: 14px;

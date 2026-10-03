@@ -551,10 +551,6 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 .diary-journal-body h3 { font-size: 1.15em; }
 .diary-journal-body :is(h4, h5, h6) { font-size: 1em; }
 
-.diary-journal-body .heading-anchor {
-    display: none;
-}
-
 .diary-journal-body a {
     color: var(--pz-accent-text);
     text-decoration: none;

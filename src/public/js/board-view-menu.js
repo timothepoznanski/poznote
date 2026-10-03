@@ -4,11 +4,15 @@
  *   list, showing the grid icon plus the size letter in grid layout and the
  *   list icon in list layout (wide: the width beyond large at the medium
  *   height)
- * Settings persist in localStorage (separate ViewLayout / ViewSize keys, so
- * older stored preferences keep working), namespaced by the controls'
- * data-view-prefix so each page keeps its own preferences. Size and layout
- * are applied as view-size-* / view-layout-* classes on .dashboard-container;
- * all visual differences live in dashboard.css.
+ * - a full-height toggle: in grid layout each card takes the height of its
+ *   own content instead of being cut at the row height, and the cards pack
+ *   under one another like a masonry wall (see watchCardHeights)
+ * Settings persist in localStorage (separate ViewLayout / ViewSize /
+ * ViewFullHeight keys, so older stored preferences keep working), namespaced
+ * by the controls' data-view-prefix so each page keeps its own preferences.
+ * Size, layout and full height are applied as view-size-* / view-layout-* /
+ * view-full-height classes on .dashboard-container; all visual differences
+ * live in dashboard.css.
  *
  * There is no column setting, like Google Keep: --dash-col-max (on the same
  * element) is the number of cards of the current size (--dash-col-min wide)
@@ -22,12 +26,73 @@
     var LAYOUTS = ['grid', 'list'];
     // The single toggle walks through every view: the four grid sizes, then list.
     var VIEWS = ['small', 'medium', 'large', 'wide', 'list'];
+    // Height of the grid rows in full-height mode (grid-auto-rows in
+    // dashboard.css): a card spans as many of them as its content needs.
+    var MASONRY_ROW = 2;
+
+    /**
+     * Full-height cards. The grid rows are MASONRY_ROW px tall with no row
+     * gap, and every card spans the rows its own height (plus the gap) takes:
+     * the grid's auto-placement then drops each card into the first free
+     * slot, so a short card no longer waits for its tall neighbour. The cards
+     * keep their natural height (align-items: start), which a ResizeObserver
+     * reports whenever a card is added, re-wrapped by a new width or edited.
+     */
+    function watchCardHeights(container) {
+        if (typeof ResizeObserver !== 'function' || typeof MutationObserver !== 'function') {
+            return { set: function () {} };
+        }
+        var active = false;
+
+        var sizes = new ResizeObserver(function (entries) {
+            var gaps = new Map();
+            entries.forEach(function (entry) {
+                var card = entry.target;
+                var grid = card.parentElement;
+                if (!active || !grid || !card.isConnected) return;
+                if (!gaps.has(grid)) gaps.set(grid, parseFloat(getComputedStyle(grid).columnGap) || 0);
+                var box = entry.borderBoxSize && entry.borderBoxSize[0];
+                var height = box ? box.blockSize : card.getBoundingClientRect().height;
+                card.style.gridRowEnd = height > 0
+                    ? 'span ' + Math.ceil((height + gaps.get(grid)) / MASONRY_ROW)
+                    : '';
+            });
+        });
+
+        function cards() {
+            return container.querySelectorAll('.dashboard-grid-container > .dash-card');
+        }
+
+        // observe() on a card already watched is a no-op
+        function observeCards() {
+            cards().forEach(function (card) { sizes.observe(card); });
+        }
+
+        var additions = new MutationObserver(observeCards);
+
+        return {
+            set: function (on) {
+                if (on === active) return;
+                active = on;
+                if (on) {
+                    observeCards();
+                    additions.observe(container, { childList: true, subtree: true });
+                } else {
+                    additions.disconnect();
+                    sizes.disconnect();
+                    cards().forEach(function (card) { card.style.gridRowEnd = ''; });
+                }
+            }
+        };
+    }
 
     function initControls(root) {
         var prefix = root.getAttribute('data-view-prefix') || 'board';
         var viewBtn = root.querySelector('.board-view-layout-toggle');
+        var fullHeightBtn = root.querySelector('.board-view-full-height-toggle');
         var container = document.querySelector('.dashboard-container');
         if (!viewBtn || !container) return;
+        var cardHeights = watchCardHeights(container);
 
         function readSetting(key, allowed, fallback) {
             var value = null;
@@ -37,6 +102,7 @@
 
         var size = readSetting('ViewSize', SIZES, 'medium');
         var layout = readSetting('ViewLayout', LAYOUTS, 'grid');
+        var fullHeight = readSetting('ViewFullHeight', ['0', '1'], '0') === '1';
 
         // As many cards as fit side by side: N cards take N widths plus N-1
         // gaps. The width and gap come from the view-size-* rules of
@@ -60,6 +126,14 @@
             LAYOUTS.forEach(function (l) {
                 container.classList.toggle('view-layout-' + l, l === layout);
             });
+            // List rows are one line each: full height only acts on the grid
+            container.classList.toggle('view-full-height', fullHeight);
+            cardHeights.set(fullHeight && layout === 'grid');
+            if (fullHeightBtn) {
+                fullHeightBtn.classList.toggle('active', fullHeight);
+                fullHeightBtn.setAttribute('aria-pressed', fullHeight ? 'true' : 'false');
+                fullHeightBtn.disabled = layout === 'list';
+            }
             // is-list swaps the toggle icon (CSS)
             root.classList.toggle('is-list', layout === 'list');
             var sizeLabel = viewBtn.getAttribute('data-label-' + size) || size;
@@ -97,6 +171,16 @@
             // A new size is a new card width, so a new column count
             fitColumns();
         });
+
+        if (fullHeightBtn) {
+            fullHeightBtn.addEventListener('click', function () {
+                fullHeight = !fullHeight;
+                try {
+                    localStorage.setItem(prefix + 'ViewFullHeight', fullHeight ? '1' : '0');
+                } catch (e) { /* storage unavailable */ }
+                apply();
+            });
+        }
     }
 
     // The pages load this script below the controls and before the one that

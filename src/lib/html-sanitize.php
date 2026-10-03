@@ -336,8 +336,8 @@ function sanitizeHtml($html) {
     
     $xpath = new DOMXPath($dom);
 
-    // Heading anchors are runtime UI controls added by the outline panel.
-    // They must never be persisted as note content.
+    // Heading anchors were runtime UI controls the outline panel used to
+    // add. A page loaded before their removal can still send them.
     $runtimeHeadingAnchors = $xpath->query('//a[contains(concat(" ", normalize-space(@class), " "), " heading-anchor ") or @data-heading-anchor="true"]');
     foreach ($runtimeHeadingAnchors as $anchor) {
         if ($anchor->parentNode) {

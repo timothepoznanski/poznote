@@ -3358,7 +3358,7 @@
                 { id: 'italic', icon: 'lucide-italic', label: t('slash_menu.italic', null, 'Italic'), action: () => document.execCommand('italic') },
                 underline,
                 { id: 'strikethrough', icon: 'lucide-strikethrough', label: t('slash_menu.strikethrough', null, 'Strikethrough'), action: () => document.execCommand('strikeThrough') },
-                { id: 'remove-format', icon: 'lucide-eraser', label: t('editor.toolbar.clear_formatting', null, 'Clear formatting'), action: () => document.execCommand('removeFormat') }
+                { id: 'remove-format', icon: 'lucide-eraser', label: t('editor.toolbar.clear_formatting', null, 'Clear formatting'), action: () => (typeof window.clearHtmlFormatting === 'function' ? window.clearHtmlFormatting() : document.execCommand('removeFormat')) }
             ];
 
         const color = isMarkdown

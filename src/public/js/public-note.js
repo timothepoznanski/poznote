@@ -262,6 +262,13 @@
             '</code></pre>';
     }
 
+    // Enlarge button on each rendered diagram (js/mermaid-zoom.js, issue #1551).
+    function decorateMermaidForZoom(nodes) {
+        if (window.poznoteMermaidZoom) {
+            window.poznoteMermaidZoom.decorate(nodes);
+        }
+    }
+
     function initializeMermaid() {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
@@ -338,6 +345,8 @@
                     return mermaid.run({
                         nodes: validNodes,
                         suppressErrors: true
+                    }).then(function () {
+                        decorateMermaidForZoom(validNodes);
                     });
                 }).catch(function (e1) {
                     console.error('Mermaid rendering failed', e1);
@@ -346,12 +355,15 @@
                 mermaid.run({
                     nodes: document.querySelectorAll('.mermaid'),
                     suppressErrors: true
+                }).then(function () {
+                    decorateMermaidForZoom();
                 });
             }
         } catch (e) {
             try {
                 mermaid.initialize(getMermaidConfig(isDark));
                 mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+                decorateMermaidForZoom();
             } catch (e2) {
                 console.error('Mermaid initialization failed', e2);
             }

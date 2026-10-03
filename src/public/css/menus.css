@@ -84,6 +84,7 @@
     z-index: 1000;
     display: none;
     margin-top: 4px;
+    padding: 4px 0;
 }
 
 .workspace-menu-item {

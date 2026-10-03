@@ -97,7 +97,7 @@ body.folder-actions-always-visible .folder-toggle .folder-actions i {
     padding: 0;
     cursor: pointer;
     color: var(--pz-text-muted);
-    border-radius: var(--pz-radius-sm);
+    border-radius: var(--pz-radius);
     transition: all 0.15s ease;
     align-items: center;
     justify-content: center;

@@ -159,16 +159,6 @@ html[data-theme='dark'] .note-creation-loading-dialog {
     background: var(--pz-accent-hover);
 }
 
-.alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
-.alert-modal-button.primary.snapshot-restore-confirm-button {
-    background: var(--pz-accent);
-}
-
-.alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
-.alert-modal-button.primary.snapshot-restore-confirm-button:hover {
-    background: var(--pz-accent-hover);
-}
-
 .alert-modal-button.secondary {
     background: var(--pz-neutral);
     color: var(--pz-text-inverse);
@@ -265,20 +255,6 @@ html[data-theme='dark'] .alert-modal-button.secondary,
 html[data-theme='dark'] .alert-modal-button.secondary:hover,
 .dark-mode .alert-modal-button.secondary:hover {
     background-color: var(--pz-surface-sunken);
-}
-
-html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
-html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-button,
-.dark-mode .alert-modal.snapshot-restore-confirm .alert-modal-button.primary,
-.dark-mode .alert-modal-button.primary.snapshot-restore-confirm-button {
-    background-color: var(--pz-accent);
-}
-
-html[data-theme='dark'] .alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
-html[data-theme='dark'] .alert-modal-button.primary.snapshot-restore-confirm-button:hover,
-.dark-mode .alert-modal.snapshot-restore-confirm .alert-modal-button.primary:hover,
-.dark-mode .alert-modal-button.primary.snapshot-restore-confirm-button:hover {
-    background-color: var(--pz-accent-hover);
 }
 
 /* Responsive */

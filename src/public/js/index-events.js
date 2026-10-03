@@ -631,7 +631,7 @@
                 break;
             case 'exec-remove-format':
                 // For markdown, this doesn't make much sense, but we keep it
-                document.execCommand('removeFormat');
+                clearHtmlFormatting();
                 break;
 
             // Toolbar functions
@@ -827,14 +827,14 @@
                 }
                 break;
             case 'show-snapshot':
-                if (noteId && typeof showSnapshotModal === 'function') {
+                if (noteId && typeof window.openNoteRevisions === 'function') {
                     // Close the toolbar menu
                     var toolbarEl = target.closest('.note-edit-toolbar');
                     if (toolbarEl) {
                         var menuEl = toolbarEl.querySelector('.mobile-toolbar-menu');
                         if (menuEl) menuEl.hidden = true;
                     }
-                    showSnapshotModal(noteId);
+                    window.openNoteRevisions(noteId);
                 }
                 break;
             case 'reveal-folder-in-tree':
@@ -1168,7 +1168,7 @@
         }
 
         // If the click is on an interactive element, ignore
-        if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row, summary, details')) {
+        if (e.target.closest('button, a, input, textarea, select, [contenteditable="true"], .search-replace-bar, .mobile-toolbar-menu, .note-edit-toolbar, .note-tags-row, .note-subline, summary, details')) {
             return;
         }
 

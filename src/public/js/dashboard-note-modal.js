@@ -439,7 +439,7 @@
         var tasks = [];
         parseTasks(content).forEach(function (task) {
             var label = String(task.text || '').trim();
-            if (label && tasks.length < 4) tasks.push({ text: label, done: !!task.completed });
+            if (label && tasks.length < 10) tasks.push({ text: label, done: !!task.completed });
         });
         return { text: '', tasks: tasks, image: null };
     }
