@@ -442,10 +442,15 @@ function parseMarkdown($text) {
         return $matches[1] . $placeholder;
     }, $text);
 
+    // Markdown source of each inline placeholder, so a task line can be handed
+    // back as editable text (data-text) instead of leaking the NUL markers.
+    $placeholderSources = [];
+
     $protectedInlineCode = [];
     $inlineCodeIndex = 0;
-    $text = preg_replace_callback('/(?<!\\\\)`([^`\n]+?)(?<!\\\\)`/', function($matches) use (&$protectedInlineCode, &$inlineCodeIndex) {
+    $text = preg_replace_callback('/(?<!\\\\)`([^`\n]+?)(?<!\\\\)`/', function($matches) use (&$protectedInlineCode, &$inlineCodeIndex, &$placeholderSources) {
         $placeholder = "\x00RAWCODE" . $inlineCodeIndex . "\x00";
+        $placeholderSources[$placeholder] = $matches[0];
         $protectedInlineCode[$inlineCodeIndex] = $matches[1];
         $inlineCodeIndex++;
         return $placeholder;
@@ -470,9 +475,10 @@ function parseMarkdown($text) {
     // Only match $ if not preceded by \ or $ (to allow escaping and avoid matching $$)
     // and if not followed by a space (opening) and content doesn't end with a space (closing)
     // also ensures it's not followed by a digit to avoid matching currency like $10 and $20
-    $text = preg_replace_callback('/(?<![\\\\$])\$(?!\\$)([^\s$](?:[^$]*?[^\s$])?)\$(?!\\d)/', function($matches) use (&$protectedMathInline, &$mathInlineIndex) {
+    $text = preg_replace_callback('/(?<![\\\\$])\$(?!\\$)([^\s$](?:[^$]*?[^\s$])?)\$(?!\\d)/', function($matches) use (&$protectedMathInline, &$mathInlineIndex, &$placeholderSources) {
         $math = trim($matches[1]);
         $placeholder = "\x00MATHINLINE" . $mathInlineIndex . "\x00";
+        $placeholderSources[$placeholder] = $matches[0];
         $protectedMathInline[$mathInlineIndex] = $math;
         $mathInlineIndex++;
         return $placeholder;
@@ -487,7 +493,7 @@ function parseMarkdown($text) {
     $protectedIndex = 0;
     
     // Protect images first: ![alt](url "title") with optional {.img-with-border width=320} attributes
-    $text = preg_replace_callback('/!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)(?:\{((?=[^}]*(?:\.img-with-border(?:-no-padding)?(?=\s|})|\bwidth\s*=))[^}]*)\})?/', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $text = preg_replace_callback('/!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)(?:\{((?=[^}]*(?:\.img-with-border(?:-no-padding)?(?=\s|})|\bwidth\s*=))[^}]*)\})?/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
         $alt = $matches[1];
         $url = $matches[2];
         $title = isset($matches[3]) ? $matches[3] : '';
@@ -498,12 +504,13 @@ function parseMarkdown($text) {
             return $matches[0];
         }
         $protectedElements[$protectedIndex] = $imgTag;
+        $placeholderSources[$placeholder] = $matches[0];
         $protectedIndex++;
         return $placeholder;
     }, $text);
     
     // Protect links [text](url "title")
-    $text = preg_replace_callback('/\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $text = preg_replace_callback('/\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
         $linkText = $matches[1];
         $url = $matches[2];
         $title = isset($matches[3]) ? $matches[3] : '';
@@ -518,6 +525,7 @@ function parseMarkdown($text) {
             $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . htmlspecialchars($linkText, ENT_QUOTES, 'UTF-8') . '</a>';
         }
         $protectedElements[$protectedIndex] = $linkTag;
+        $placeholderSources[$placeholder] = $matches[0];
         $protectedIndex++;
         return $placeholder;
     }, $text);
@@ -576,10 +584,11 @@ function parseMarkdown($text) {
     }, $text);
 
     // Protect details, summary, br, and underline tags
-    $text = preg_replace_callback('/<(details|summary|br|u)(?=[\s\/>])([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $text = preg_replace_callback('/<(details|summary|br|u)(?=[\s\/>])([^>]*)>/i', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
         $tag = strtolower($matches[1]);
         $attrs = $matches[2];
         $placeholder = "\x00PTAG" . $protectedIndex . "\x00";
+        $placeholderSources[$placeholder] = $matches[0];
         if ($tag === 'br') {
             $protectedElements[$protectedIndex] = '<br>';
         } else {
@@ -591,9 +600,10 @@ function parseMarkdown($text) {
         return $placeholder;
     }, $text);
 
-    $text = preg_replace_callback('/<\/(details|summary|u)>/i', function($matches) use (&$protectedElements, &$protectedIndex) {
+    $text = preg_replace_callback('/<\/(details|summary|u)>/i', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
         $tag = $matches[1];
         $placeholder = "\x00PTAG" . $protectedIndex . "\x00";
+        $placeholderSources[$placeholder] = $matches[0];
         $protectedElements[$protectedIndex] = '</' . $tag . '>';
         $protectedIndex++;
         return $placeholder;
@@ -1073,8 +1083,22 @@ function parseMarkdown($text) {
         // checkbox, not a bullet whose text is "[ ]" (issue #1386).
         $taskListLinePattern = '/^(\s*)[\*\-\+]\s+\[([ xX])\](?:\s+(.*))?$/';
 
+        // Helper: the Markdown a task line was written with, for its data-text.
+        // Placeholders go back to their source (a link source may itself hold a
+        // code placeholder, hence the loop); whatever is left is dropped, since
+        // a NUL byte in the markup truncates the page in DOMDocument.
+        $taskSourceText = function($content) use (&$placeholderSources) {
+            $source = htmlspecialchars_decode($content, ENT_QUOTES);
+            for ($pass = 0; $pass < 5 && strpos($source, "\x00") !== false; $pass++) {
+                $restored = strtr($source, $placeholderSources);
+                if ($restored === $source) break;
+                $source = $restored;
+            }
+            return preg_replace('/\x00(?!MDESC\d+\x00)[A-Z]+\d+\x00/', '', $source);
+        };
+
         // Helper: Parse nested lists (supports task lists, ordered, and unordered)
-        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList, $taskListLinePattern) {
+        $parseNestedList = function($startIndex, $isTaskList = false) use (&$lines, $applyInlineStyles, &$parseNestedList, $taskListLinePattern, $taskSourceText) {
             $listItems = [];
             $currentIndex = $startIndex;
             $baseIndent = null;
@@ -1229,7 +1253,7 @@ function parseMarkdown($text) {
                     if ($isTaskList) {
                         $isChecked = strtolower($matches[2]) === 'x';
                         $checkbox = '<input type="checkbox" class="markdown-task-checkbox" data-line="' . $currentIndex . '" ' . ($isChecked ? 'checked ' : '') . '>';
-                        $itemHtml = '<li class="task-list-item" data-line="' . $currentIndex . '">' . $checkbox . ' <span class="task-text" data-text="' . htmlspecialchars($content, ENT_QUOTES) . '">' . $applyInlineStyles($content) . '</span>';
+                        $itemHtml = '<li class="task-list-item" data-line="' . $currentIndex . '">' . $checkbox . ' <span class="task-text" data-text="' . htmlspecialchars($taskSourceText($content), ENT_QUOTES, 'UTF-8') . '">' . $applyInlineStyles($content) . '</span>';
                     } else {
                         $itemHtml = '<li data-line="' . $currentIndex . '">' . $applyInlineStyles($content);
                     }

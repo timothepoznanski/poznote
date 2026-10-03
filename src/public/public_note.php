@@ -765,8 +765,9 @@ if ($noteType === 'tasklist' && $taskAccessMode === 'full') {
     );
 }
 
-// Markdown with tasklist: add-task input (only when the share allows task editing)
-if ($noteType === 'markdown' && in_array($taskAccessMode, ['full', 'edit'], true) && strpos($content, 'class="task-list"') !== false) {
+// Markdown with tasklist: add-task input, on shares that let visitors manage
+// tasks only. An edit share has no use for it: the whole note is editable.
+if ($noteType === 'markdown' && $taskAccessMode === 'full' && strpos($content, 'class="task-list"') !== false) {
     $content .= '<div class="public-markdown-task-add-container" style="margin-top: 20px; padding: 10px; border-top: 1px solid #eee;">'
         . str_replace('%INPUT_CLASS%', 'public-markdown-task-add-input', $publicTaskAddFormHtml)
         . '</div>';
