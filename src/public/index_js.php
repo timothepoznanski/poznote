@@ -171,6 +171,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/ui-customization-panel.js',
         'js/toolbar-icon-colors.js',
         'js/note-info-modal.js',
+        'js/note-stats.js',
         'js/paste-markdown-modal.js',
         'js/insert-markdown-modal.js',
         'js/speech-to-text.js',

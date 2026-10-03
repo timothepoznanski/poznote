@@ -315,24 +315,23 @@ function initializeMarkdownNote(noteId) {
 
     // Only treat as corrupted if we have ESCAPED HTML (not real elements)
     if (hasEscapedEditor && hasEscapedPreview) {
-        // Create a temporary element to safely decode the escaped HTML
-        var tempDiv = document.createElement('div');
-        tempDiv.innerHTML = htmlContent;
+        // The note's text is the escaped markup of a saved editor, something
+        // like '<div class="markdown-editor">...</div>'
+        var decodedHtml = noteEntry.textContent || '';
 
-        // The browser's innerHTML parsing of escaped HTML will put the escaped string as text content
-        var decodedHtml = tempDiv.textContent || tempDiv.innerText || '';
-
-        // Now decodedHtml is something like '<div class="markdown-editor">...</div>'
-        // We can parse THIS as HTML to extract the content correctly
-        tempDiv.innerHTML = decodedHtml;
-        var recreatedEditor = tempDiv.querySelector('.markdown-editor');
+        // Parse THIS as HTML to extract the content correctly, in a document
+        // of its own: nothing in it is fetched or run there, whereas an
+        // element of this page, even detached, loads its images and fires
+        // their handlers as soon as it gets the markup.
+        var recoveryDoc = new DOMParser().parseFromString(decodedHtml, 'text/html');
+        var recreatedEditor = recoveryDoc.querySelector('.markdown-editor');
 
         if (recreatedEditor) {
             // Use our robust normalization function which preserves line breaks
             markdownContent = normalizeContentEditableText(recreatedEditor);
         } else {
             // Fallback: if we couldn't find the editor div, just use textContent
-            markdownContent = tempDiv.textContent || '';
+            markdownContent = recoveryDoc.documentElement ? (recoveryDoc.documentElement.textContent || '') : '';
         }
 
         // Clear the corrupted HTML and restore clean content

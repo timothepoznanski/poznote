@@ -467,13 +467,8 @@ function insertTable(rows, cols) {
   for (let r = 0; r < rows; r++) {
     tableHTML += '<tr>';
     for (let c = 0; c < cols; c++) {
-      tableHTML += '<td style="border: 1px solid #ddd; padding: 8px; min-width: 50px;">';
-      if (r === 0 && c === 0) {
-        tableHTML += '&nbsp;'; // Non-breaking space for first cell
-      } else {
-        tableHTML += '&nbsp;';
-      }
-      tableHTML += '</td>';
+      // A <br> keeps the height of a line without putting a character in the cell
+      tableHTML += '<td style="border: 1px solid #ddd; padding: 8px; min-width: 50px;"><br></td>';
     }
     tableHTML += '</tr>';
   }

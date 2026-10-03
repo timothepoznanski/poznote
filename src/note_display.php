@@ -46,8 +46,27 @@
                 }
                 $checkExistingLink = $con->prepare("SELECT id FROM entries WHERE linked_note_id = ? AND trash = 0 LIMIT 1");
 
+                // Labels of the note statistics (js/note-stats.js), one per plural
+                // form the language has: Intl.PluralRules picks the form, and a
+                // language without "few" or "many" simply does not define them.
+                $note_stats_labels = [];
+                foreach (['characters', 'words', 'lines'] as $stats_unit) {
+                    foreach (['one', 'few', 'many', 'other'] as $plural_form) {
+                        $stats_label = t('index.note.stats.' . $stats_unit . '.' . $plural_form, [], '');
+                        if ($stats_label !== '') {
+                            $note_stats_labels[$stats_unit][$plural_form] = $stats_label;
+                        }
+                    }
+                }
+                $note_stats_labels_json = json_encode($note_stats_labels, JSON_UNESCAPED_UNICODE);
+                if ($note_stats_labels_json === false) $note_stats_labels_json = '{}';
+
                 while($row = $res_right->fetch(PDO::FETCH_ASSOC))
                 {
+                    // A key is an integer: it goes into ids, attributes and file
+                    // names below, whatever the column of a restored database holds.
+                    $row['id'] = (int)$row['id'];
+
                     if (function_exists('ensureAutomaticSnapshotForOpenedNote')) {
                         ensureAutomaticSnapshotForOpenedNote($con, (int)$row['id']);
                     }
@@ -91,6 +110,7 @@
                         : '';
                 
                     $note_type = $row['type'] ?? 'note';
+                    $note_type_attr = htmlspecialchars((string)$note_type, ENT_QUOTES);
                     
                     $filename = getEntryFilename($row["id"], $note_type);
                     $title = $row['heading'];
@@ -112,7 +132,13 @@
                         if (is_readable($filename)) {
                             $entryfinal = file_get_contents($filename);
                         } else {
-                            $entryfinal = $row['entry'] ?? '';
+                            // No file: the database copy stands in. It is not
+                            // guaranteed to have been through the sanitizer the
+                            // way a saved file is (markdown is escaped below).
+                            $entryfinal = (string)($row['entry'] ?? '');
+                            if ($note_type !== 'markdown' && $entryfinal !== '') {
+                                $entryfinal = sanitizeHtml($entryfinal);
+                            }
                         }
                         $tasklist_json = '';
                     }
@@ -325,7 +351,7 @@
                     }
                     
                     // Download button
-                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type.'"><i class="lucide lucide-download"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type_attr.'"><i class="lucide lucide-download"></i></button>';
 
                     if ($note_type === 'markdown') {
                         echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="html" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to rich text').'"><i class="lucide lucide-refresh-cw-alt"></i></button>';
@@ -399,7 +425,7 @@
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="archive-note" data-note-id="'.$row['id'].'" data-note-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'"><i class="lucide lucide-archive"></i> '.t_h('archive.menu_item', [], 'Archive note').'</button>';
                     }
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-download"><i class="lucide lucide-download"></i> '.t_h('common.download', [], 'Download').'</button>';
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="print-note" data-note-id="'.$row['id'].'" data-note-type="'.$note_type.'"><i class="lucide lucide-printer"></i> '.t_h('common.print', [], 'Print').'</button>';
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="print-note" data-note-id="'.$row['id'].'" data-note-type="'.$note_type_attr.'"><i class="lucide lucide-printer"></i> '.t_h('common.print', [], 'Print').'</button>';
 
                     // Convert button (only for markdown and note types, with appropriate icon)
                     if ($note_type === 'markdown') {
@@ -552,8 +578,17 @@
                         $noteIconColor = !empty($row['icon_color']) ? (string)$row['icon_color'] : '';
                         $titleNoteIcon = renderEditableNoteIcon($row['id'], $heading, $noteIconRaw, $noteIconColor, 'note-title-icon', $note_type);
                     }
-                    echo '<h4 class="note-title-heading">'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/></h4>';
-                    // Subline: creation date and location (visible when enabled in settings)
+                    echo '<h4 class="note-title-heading">'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/>';
+                    // Subline: a small line of metadata under the title, inside
+                    // the heading so that it starts where the title text does,
+                    // past the note icon (css/notes/subline.css). The dates,
+                    // then the size of the note (characters, words, lines),
+                    // filled in by js/note-stats.js, then an icon that opens
+                    // the note information. Each entry has its own checkbox
+                    // in the "Element visibility" modal
+                    // (panel:note-created-date, panel:note-updated-date,
+                    // panel:note-stats-characters, panel:note-stats-words,
+                    // panel:note-stats-lines, panel:note-info-icon).
                     $created_display = '';
                     if (!empty($created_clean)) {
                         $created_display = formatUtcDateTimeForDisplay($created_clean, 'd/m/Y H:i');
@@ -561,15 +596,44 @@
                     if ($created_display === '' && !empty($final_created)) {
                         $created_display = $final_created;
                     }
-                
-                    $has_created = !empty($created_display) && $show_note_created_setting;
-
-                    // Show the subline if created date setting is enabled
-                    if ($show_note_created_setting && $has_created) {
-                        echo '<div class="note-subline">';
-                        echo '<span class="note-sub-created">' . htmlspecialchars($created_display, ENT_QUOTES) . '</span>';
-                        echo '</div>';
+                    $updated_display = '';
+                    if (!empty($updated_clean)) {
+                        $updated_display = formatUtcDateTimeForDisplay($updated_clean, 'd/m/Y H:i');
                     }
+                    if ($updated_display === '' && !empty($final_updated)) {
+                        $updated_display = $final_updated;
+                    }
+
+                    if ($show_note_created_setting) {
+                        // The label of the modification date goes along as a
+                        // template: js/note-stats.js rewrites the date after
+                        // each save.
+                        $updated_label = t('index.note.modified_on', [], 'Modified {{date}}');
+                        echo '<span class="note-subline">';
+                        echo '<span class="note-sub-dates">';
+                        if ($created_display !== '') {
+                            echo '<span class="note-sub-created">' . t_h('index.note.created_on', ['date' => $created_display], 'Created {{date}}') . '</span>';
+                        }
+                        if ($updated_display !== '') {
+                            echo '<span class="note-sub-updated" id="noteUpdated' . $row['id'] . '" data-label="' . htmlspecialchars($updated_label, ENT_QUOTES) . '">' . htmlspecialchars(str_replace('{{date}}', $updated_display, $updated_label), ENT_QUOTES) . '</span>';
+                        }
+                        echo '</span>';
+                        echo '<span class="note-sub-stats" id="noteStats' . $row['id'] . '" data-note-id="' . $row['id'] . '" data-labels="' . htmlspecialchars($note_stats_labels_json, ENT_QUOTES) . '">';
+                        // One empty entry per figure, there from the start so
+                        // that each can be hidden on its own; the spaces keep
+                        // a copy of the line readable
+                        echo '<span class="note-sub-stat note-sub-stat-characters" data-stat="characters"></span>';
+                        echo ' <span class="note-sub-stat note-sub-stat-words" data-stat="words"></span>';
+                        echo ' <span class="note-sub-stat note-sub-stat-lines" data-stat="lines"></span>';
+                        echo '</span>';
+                        // Last entry: opens the note information dialog
+                        // (#noteInfoModal, js/note-info-modal.js), like the
+                        // Information entry of the "..." menu
+                        $info_label = t_h('common.information', [], 'Information');
+                        echo '<span class="note-sub-info"><button type="button" class="note-sub-info-btn" data-action="show-note-info" data-note-id="' . $row['id'] . '" title="' . $info_label . '" aria-label="' . $info_label . '"><i class="lucide lucide-info"></i></button></span>';
+                        echo '</span>';
+                    }
+                    echo '</h4>';
                     
                     // Note content with font size style
                     $data_attr = '';
@@ -589,6 +653,14 @@
                         $data_attr .= ' data-markdown-content="'.$markdown_content.'"';
                         // Start with the raw markdown displayed
                         $display_content = htmlspecialchars($entryfinal, ENT_NOQUOTES);
+                    } elseif ($note_type === 'tasklist' && is_array(json_decode((string)$entryfinal, true))) {
+                        // The list is built by tasklist-core.js from data-tasklist-json
+                        // above. The JSON itself is data, not markup: written into the
+                        // page, the text of a task would be parsed as HTML. (A list from
+                        // before the JSON format is markup, sanitized when it was saved,
+                        // and still goes through the branch below: the script reads the
+                        // tasks back from it.)
+                        $display_content = '';
                     } else {
                         // For all other notes (HTML, Excalidraw), use the file content directly
                         $display_content = $entryfinal;
@@ -627,7 +699,7 @@
 
                     $linked_note_id_attr = '';
                     if (isset($row['linked_note_id']) && $row['linked_note_id']) {
-                        $linked_note_id_attr = ' data-linked-note-id="'.$row['linked_note_id'].'"';
+                        $linked_note_id_attr = ' data-linked-note-id="'.(int)$row['linked_note_id'].'"';
                     }
                     if ($attachment_previews_in_note_setting && !$attachments_at_bottom_setting) {
                         echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');
@@ -635,7 +707,7 @@
                     $spellcheck_enabled = poznoteSettingEnabled($settings['spellcheck_html_notes'], false);
                     $spellcheck_attr = ($note_type === 'note' && $spellcheck_enabled) ? 'true' : 'false';
                     $lang_attr = ($note_type === 'note' && $spellcheck_enabled) ? ' lang="'.htmlspecialchars(getUserLanguage(), ENT_QUOTES).'"' : '';
-                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="'.$spellcheck_attr.'"'.$lang_attr.' id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
+                    echo '<div class="noteentry" autocomplete="off" autocapitalize="off" spellcheck="'.$spellcheck_attr.'"'.$lang_attr.' id="entry'.$row['id'].'" data-note-id="'.$row['id'].'" data-note-heading="'.htmlspecialchars($row['heading'] ?? '', ENT_QUOTES).'"'.$placeholder_attr.' contenteditable="'.$entry_editable.'" data-note-type="'.$note_type_attr.'"'.$data_attr.$excalidraw_attr.$linked_note_id_attr.'>'.$display_content.'</div>';
                     if ($attachments_at_bottom_setting) {
                         if ($attachment_previews_in_note_setting) {
                             echo poznoteRenderAttachmentPreviews($row['id'], $row['attachments'] ?? '', $workspace_filter, $entryfinal ?? '');

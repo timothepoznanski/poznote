@@ -124,6 +124,8 @@
             'diary_date_format',
             'toolbar_mode',
             'timezone',
+            'workspace_activity_emails',
+            'default_workspace',
             'date_time_format',
             'hidden_ui_elements',
             'icon_sidebar_order',
@@ -623,6 +625,23 @@
                     done
                 );
             }
+        });
+
+        // Default workspace (Workspaces section): the options are the
+        // workspaces of the account, after the two "last opened" choices
+        initInlineControl('default-workspace-select', {
+            load: loadSettingValue('default_workspace', function (value) { return value || '__last_opened__'; }),
+            save: saveSettingValue('default_workspace')
+        });
+
+        // Shared workspace emails: 'off' until chosen. The row is absent
+        // when the instance sends no email.
+        initInlineControl('workspace-activity-emails-select', {
+            load: loadSettingValue('workspace_activity_emails', function (value) {
+                value = String(value === null || value === undefined ? '' : value).trim();
+                return ['instant', 'daily', 'weekly'].indexOf(value) !== -1 ? value : 'off';
+            }),
+            save: saveSettingValue('workspace_activity_emails')
         });
 
         initInlineControl('markdown-default-view-mode-select', {

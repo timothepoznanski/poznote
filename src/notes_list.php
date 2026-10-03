@@ -373,7 +373,7 @@ function renderFavoriteFolderItems($favorite_folders, $workspace_filter) {
 
         echo "<div class='note-list-item favorite-folder-item'>";
         echo "<a class='links_arbo_left note-in-folder favorite-folder-link' href='" . htmlspecialchars($link, ENT_QUOTES) . "' data-folder-id='" . (int)$favFolder['id'] . "' data-folder='" . htmlspecialchars($favName, ENT_QUOTES) . "'>";
-        echo "<span class='note-title'><i class='$customIcon favorite-folder-icon'$iconStyle></i>" . htmlspecialchars($favName, ENT_QUOTES) . "</span>";
+        echo "<span class='note-title'><i class='" . htmlspecialchars((string)$customIcon, ENT_QUOTES, 'UTF-8') . " favorite-folder-icon'$iconStyle></i>" . htmlspecialchars($favName, ENT_QUOTES) . "</span>";
         echo "</a>";
         echo "</div>";
         echo "<div class='pxbetweennotes'></div>";
@@ -441,7 +441,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
                 $folderClass .= ' folder-tree-branch';
             }
         }
-        $folderDomId = 'folder-' . $folderId;
+        // Escaped once here: it only goes into attributes below
+        $folderDomId = 'folder-' . htmlspecialchars((string)$folderId, ENT_QUOTES, 'UTF-8');
         
         // Determine if this folder should be open
         $should_be_open = shouldFolderBeOpen($con, $folderData, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes);
@@ -473,7 +474,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         echo "<div class='$folderClass' data-folder-id='" . (int)$folderId . "' data-folder='$htmlFolderName' data-folder-key='folder_" . (int)$folderId . "' data-action='select-folder'>";
         // Make the entire folder toggle area clickable to open/close the folder
         // draggable is set here to avoid capturing note drag events from folder-content
-        echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderId' data-folder='$folderName'$draggableAttr>";
+        echo "<div class='folder-toggle' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='" . htmlspecialchars((string)$folderId, ENT_QUOTES, 'UTF-8') . "' data-folder='$htmlFolderName'$draggableAttr>";
         
         // Use an empty star icon for the Favorites pseudo-folder
         if ($folderName === 'Favorites') {
@@ -488,7 +489,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $iconStyle = $customIconColorCss !== '' ? " style='color: " . htmlspecialchars($customIconColorCss, ENT_QUOTES) . " !important;'" : "";
             $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
 
-            echo "<i class='$chevron_icon folder-icon folder-list-click-action' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-folder-icon-picker' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . $changeIconTitle . "'$iconStyle></i>";
+            echo "<i class='" . htmlspecialchars((string)$chevron_icon, ENT_QUOTES, 'UTF-8') . " folder-icon folder-list-click-action' data-custom-icon='" . ($customIcon ? 'true' : 'false') . "'$iconColorAttr data-action='open-folder-icon-picker' data-folder-id='" . htmlspecialchars((string)$folderId, ENT_QUOTES, 'UTF-8') . "' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "' title='" . $changeIconTitle . "'$iconStyle></i>";
         }
         
         // Workspace-aware folder handling in UI

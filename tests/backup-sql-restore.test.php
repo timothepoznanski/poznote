@@ -182,3 +182,74 @@ test('a statement slipped in after the validation pass is still refused', functi
         }
     });
 });
+
+/** Restore a dump into a throwaway database and hand the connection over. */
+function restoreDumpForTest(string $sql, callable $body): void
+{
+    withTempFile($sql, function ($sqlPath) use ($body) {
+        $dbPath = tempnam(sys_get_temp_dir(), 'poznote-test-db-');
+        @unlink($dbPath);
+        try {
+            $executed = poznoteExecuteBackupSqlFile($dbPath, $sqlPath);
+            assertTrue($executed['success'], $executed['error']);
+            $con = new PDO('sqlite:' . $dbPath);
+            $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $body($con);
+            $con = null;
+        } finally {
+            @unlink($dbPath);
+        }
+    });
+}
+
+test('a genuine dump comes out of the key check untouched', function () {
+    // The shapes a real backup holds: integer keys, references that are an
+    // integer, NULL, or the empty string older versions could leave behind.
+    $sql = "CREATE TABLE \"folders\" (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, parent_id INTEGER DEFAULT NULL);\n"
+        . "INSERT INTO \"folders\" (\"id\", \"name\", \"parent_id\") VALUES (1, 'Work', NULL);\n"
+        . "INSERT INTO \"folders\" (\"id\", \"name\", \"parent_id\") VALUES ('2', 'Sub', '1');\n"
+        . "CREATE TABLE \"entries\" (id INTEGER PRIMARY KEY AUTOINCREMENT, heading TEXT, folder_id INTEGER, linked_note_id INTEGER);\n"
+        . "INSERT INTO \"entries\" (\"id\", \"heading\", \"folder_id\", \"linked_note_id\") VALUES (1, 'a', 2, NULL);\n"
+        . "INSERT INTO \"entries\" (\"id\", \"heading\", \"folder_id\", \"linked_note_id\") VALUES (2, 'b', '', 1);\n"
+        . "INSERT INTO \"entries\" (\"id\", \"heading\", \"folder_id\", \"linked_note_id\") VALUES ('3', 'c', NULL, '1');\n"
+        . "CREATE TABLE \"shared_notes\" (id INTEGER PRIMARY KEY AUTOINCREMENT, note_id INTEGER NOT NULL, token TEXT);\n"
+        . "INSERT INTO \"shared_notes\" (\"id\", \"note_id\", \"token\") VALUES (1, 2, 'abc');\n"
+        . "CREATE TABLE \"settings\" (key TEXT PRIMARY KEY, value TEXT);\n"
+        . "INSERT INTO \"settings\" (\"key\", \"value\") VALUES ('language', 'fr');\n";
+    restoreDumpForTest($sql, function (PDO $con) {
+        assertSame([[1, null], [2, 1]], $con->query('SELECT id, parent_id FROM folders ORDER BY id')->fetchAll(PDO::FETCH_NUM));
+        assertSame(
+            [[1, 2, null], [2, '', 1], [3, null, 1]],
+            $con->query('SELECT id, folder_id, linked_note_id FROM entries ORDER BY id')->fetchAll(PDO::FETCH_NUM)
+        );
+        assertSame(1, (int)$con->query('SELECT COUNT(*) FROM shared_notes')->fetchColumn());
+        assertSame('fr', $con->query("SELECT value FROM settings WHERE key = 'language'")->fetchColumn());
+    });
+});
+
+test('a row whose key is not an integer does not survive the restore', function () {
+    // The dump declares its own columns, so it can turn a key into free text.
+    // The application builds file names and markup from these keys.
+    $sql = "CREATE TABLE \"entries\" (id TEXT, heading TEXT, folder_id INTEGER, linked_note_id INTEGER);\n"
+        . "INSERT INTO \"entries\" (\"id\", \"heading\") VALUES ('some/where', 'text key');\n"
+        . "INSERT INTO \"entries\" (\"id\", \"heading\") VALUES ('7', 'digits kept as text');\n"
+        . "CREATE TABLE \"folders\" (id INTEGER PRIMARY KEY, name TEXT, parent_id INTEGER);\n"
+        . "INSERT INTO \"folders\" (\"id\", \"name\", \"parent_id\") VALUES (1, 'kept', 'not-a-folder');\n"
+        . "CREATE TABLE \"shared_notes\" (id INTEGER PRIMARY KEY, note_id INTEGER NOT NULL, token TEXT);\n"
+        . "INSERT INTO \"shared_notes\" (\"id\", \"note_id\", \"token\") VALUES (1, 'some/where', 'abc');\n"
+        . "INSERT INTO \"shared_notes\" (\"id\", \"note_id\", \"token\") VALUES (2, 5, 'def');\n"
+        . "CREATE TABLE \"notifications\" (id INTEGER PRIMARY KEY, note_id INTEGER, message TEXT);\n"
+        . "INSERT INTO \"notifications\" (\"id\", \"note_id\", \"message\") VALUES (1, 'x/y', 'kept, reference cleared');\n";
+    restoreDumpForTest($sql, function (PDO $con) {
+        assertSame(0, (int)$con->query('SELECT COUNT(*) FROM entries')->fetchColumn(), 'entries with a text key');
+        assertSame([[1, null]], $con->query('SELECT id, parent_id FROM folders')->fetchAll(PDO::FETCH_NUM), 'folder kept, parent cleared');
+        assertSame([[2, 5]], $con->query('SELECT id, note_id FROM shared_notes')->fetchAll(PDO::FETCH_NUM), 'share with no real target dropped');
+        assertSame([[1, null]], $con->query('SELECT id, note_id FROM notifications')->fetchAll(PDO::FETCH_NUM));
+    });
+});
+
+test('a database without the usual tables is not a problem for the key check', function () {
+    restoreDumpForTest("CREATE TABLE \"other\" (a TEXT);\nINSERT INTO \"other\" (\"a\") VALUES ('x');\n", function (PDO $con) {
+        assertSame('x', $con->query('SELECT a FROM other')->fetchColumn());
+    });
+});

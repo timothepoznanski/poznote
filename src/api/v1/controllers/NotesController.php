@@ -989,7 +989,24 @@ class NotesController {
         
         $entry = $input['content'] ?? $input['entry'] ?? '';
         $entrycontent = $input['entrycontent'] ?? $entry;
-        $type = isset($input['type']) ? trim($input['type']) : 'note';
+        $type = isset($input['type']) && is_string($input['type']) ? trim($input['type']) : 'note';
+        if ($type === '') {
+            $type = 'note';
+        }
+        // The type ends up in markup (data-note-type) and picks the renderer:
+        // it is a short identifier, whichever one the client knows about.
+        if (!preg_match('/^[A-Za-z0-9_-]{1,32}$/', $type)) {
+            $this->sendError(400, 'Invalid note type');
+            return;
+        }
+        // The database copy of the content is what the app displays while the
+        // note has no file yet, so it goes through the same sanitization as
+        // the file written below.
+        $entrycontent = is_scalar($entrycontent) ? (string)$entrycontent : '';
+        $entrycontentIsEntry = is_scalar($entry) && $entrycontent === (string)$entry;
+        if ($entrycontent !== '') {
+            $entrycontent = $this->sanitizeContentForType($type, $entrycontent);
+        }
         $linked_note_id = isset($input['linked_note_id']) ? (int)$input['linked_note_id'] : null;
         
         try {
@@ -1104,20 +1121,10 @@ class NotesController {
                 createDirectoryWithPermissions($entriesDir);
                 
                 if (!empty($entry)) {
-                    // Sanitize content to prevent stored XSS. Fail closed: only
-                    // markdown and a *valid* JSON tasklist payload (rendered with
-                    // htmlspecialchars) skip HTML sanitization. Everything else —
-                    // including excalidraw, an unknown type, or a tasklist whose
-                    // content is not valid JSON — is sanitized as HTML, because a
-                    // syntactically valid JSON string can still embed markup.
-                    if ($type === 'markdown') {
-                        $contentToSave = sanitizeMarkdownContent($entry);
-                    } elseif ($type === 'tasklist'
-                        && $this->isStructuredJsonPayload($entry)) {
-                        $contentToSave = $entry;
-                    } else {
-                        $contentToSave = sanitizeHtml($entry);
-                    }
+                    // Sanitized to prevent stored XSS, see sanitizeContentForType()
+                    $contentToSave = $entrycontentIsEntry
+                        ? $entrycontent
+                        : $this->sanitizeContentForType($type, (string)$entry);
 
                     $contentToSave = $this->adoptForeignAttachments((int)$id, (string)$type, (string)$contentToSave);
 
@@ -1541,6 +1548,10 @@ class NotesController {
                         'id' => $noteId,
                         'heading' => $heading,
                         'updated' => $now_utc,
+                        // The same time in the account's timezone and date
+                        // format, for the line under the note title
+                        // (js/note-stats.js)
+                        'updated_display' => formatUtcDateTimeForDisplay($now_utc, 'd/m/Y H:i'),
                         'version' => $newVersion
                     ]
                 ];
@@ -2252,9 +2263,9 @@ class NotesController {
                 return;
             }
 
-            if ($noteType === 'note' && $content !== '') {
-                $content = sanitizeHtml($content);
-            }
+            // Same rule as create() and update(): whatever is not markdown
+            // or a task list is displayed as HTML, an Excalidraw note included.
+            $content = $this->sanitizeContentForType((string)$noteType, (string)$content);
             $content = $this->adoptForeignAttachments($noteId, (string)$noteType, (string)$content);
             
             // Write file
@@ -3184,6 +3195,26 @@ class NotesController {
      * @param string $content Raw note content to validate.
      * @return bool True only when $content decodes to a JSON array/object.
      */
+    /**
+     * Content as it may be stored for a note of this type. Fail closed: only
+     * markdown (its own sanitizer, the text is escaped on display) and a
+     * *valid* JSON task list (rendered with htmlspecialchars) skip the HTML
+     * sanitizer. Everything else, including Excalidraw, an unknown type, or a
+     * task list whose content is not valid JSON, is displayed as HTML and is
+     * sanitized as such, because a syntactically valid JSON string can still
+     * embed markup.
+     */
+    private function sanitizeContentForType(string $type, string $content): string {
+        if ($type === 'markdown') {
+            return sanitizeMarkdownContent($content);
+        }
+        if ($type === 'tasklist' && $this->isStructuredJsonPayload($content)) {
+            return $content;
+        }
+
+        return sanitizeHtml($content);
+    }
+
     private function isStructuredJsonPayload(string $content): bool {
         $trimmed = trim($content);
         if ($trimmed === '') {

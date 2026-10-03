@@ -405,6 +405,37 @@ body.graph-page {
     color: var(--pz-text-muted);
 }
 
+/* Notes left out -------------------------------------------------------- */
+
+/* The page opens on the notes modified last: a line at the bottom of the
+   canvas says how many of them are shown, beside the button that brings the
+   others. Centered by its margins, so it has the whole width to fit its text. */
+.graph-limit {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 14px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    width: fit-content;
+    max-width: calc(100% - 24px);
+    margin: 0 auto;
+    padding: 5px 5px 5px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+    font-size: 13px;
+    color: var(--pz-text-secondary);
+}
+
+.graph-limit .graph-reset-btn {
+    flex-shrink: 0;
+    height: 28px;
+}
+
 /* Loading / empty states ------------------------------------------------ */
 
 .graph-loading,
@@ -461,6 +492,7 @@ html[data-theme='dark'] .graph-search-input:focus {
 }
 
 html[data-theme='dark'] .graph-orphans-toggle,
+html[data-theme='dark'] .graph-limit,
 html[data-theme='dark'] .graph-loading,
 html[data-theme='dark'] .graph-empty {
     color: var(--pz-text-muted);

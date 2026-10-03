@@ -316,8 +316,9 @@
     // css/settings.css).
     function syncSettingsGroupTitles() {
         document.querySelectorAll('.settings-group').forEach(function (group) {
-            // The storage figures of My Account are a block, not cards
-            var hasVisibleCard = Array.prototype.some.call(group.querySelectorAll('.home-card, .settings-storage-summary'), isVisibleElement);
+            // The storage figures of My Account and the workspace list are
+            // blocks, not cards
+            var hasVisibleCard = Array.prototype.some.call(group.querySelectorAll('.home-card, .settings-storage-summary, .settings-workspaces-list'), isVisibleElement);
             group.classList.toggle('settings-group-empty', !hasVisibleCard);
         });
         document.querySelectorAll('.settings-group-title').forEach(function (title) {
@@ -451,7 +452,17 @@
                 } else if (id === 'note-actions-toggle') {
                     rules.push('.note-actions-toggle { display: none !important; }');
                 } else if (id === 'note-created-date') {
-                    rules.push('.note-subline { display: none !important; }');
+                    rules.push('.note-sub-created { display: none !important; }');
+                } else if (id === 'note-updated-date') {
+                    rules.push('.note-sub-updated { display: none !important; }');
+                } else if (id === 'note-stats-characters') {
+                    rules.push('.note-sub-stat-characters { display: none !important; }');
+                } else if (id === 'note-stats-words') {
+                    rules.push('.note-sub-stat-words { display: none !important; }');
+                } else if (id === 'note-stats-lines') {
+                    rules.push('.note-sub-stat-lines { display: none !important; }');
+                } else if (id === 'note-info-icon') {
+                    rules.push('.note-sub-info { display: none !important; }');
                 } else if (id === 'note-icons') {
                     rules.push('.note-icon { display: none !important; }');
                 } else if (id === 'favorites-folder') {
@@ -465,6 +476,11 @@
                     // The floating stack and the scroll arrows sit left of the
                     // outline column (css/notes/noteentry.css): give them the edge.
                     rules.push('html { --pz-docked-outline: 0px !important; }');
+                } else if (id === 'note-scrollbar') {
+                    // The note's thin scrollbar (css/layout.css, #1544); see
+                    // lib/ui-customization.php.
+                    rules.push('#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview) { scrollbar-width: none !important; scrollbar-gutter: auto !important; }');
+                    rules.push(':is(#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview))::-webkit-scrollbar { display: none !important; }');
                 } else if (id === 'tasklist-progress') {
                     rules.push('.tasklist-progress { display: none !important; }');
                 } else if (id === 'preview-code-block-delete') {

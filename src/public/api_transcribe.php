@@ -31,6 +31,7 @@ require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../stt_config.php';
+require_once __DIR__ . '/../lib/ai-upstream.php';
 
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
@@ -153,15 +154,20 @@ if ($action === 'test') {
     // The settings pages only post the key when the user typed one; a field
     // still showing the mask posts nothing. Fall back to the stored key of the
     // configuration being edited ('scope'), not to the resolved one.
+    // A stored key follows the caller to the URL they typed only when the
+    // configuration is theirs to edit; otherwise it goes to the server it is
+    // stored with and nowhere else (same rule as api_ai_chat.php).
     $testKey = trim((string)($_POST['api_key'] ?? ''));
     if ($testKey === '') {
         $testScope = (string)($_POST['scope'] ?? '');
         if ($testScope === 'user' && poznoteSttUserKeysAllowed()) {
-            $testKey = poznoteSttUserConfig($con)['api_key'];
+            $userConfig = poznoteSttUserConfig($con);
+            $ownsConfig = !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
+            $testKey = ($ownsConfig || aiUpstreamSameServer($testUrl, (string)$userConfig['url'])) ? (string)$userConfig['api_key'] : '';
         } elseif ($testScope === 'instance' && isCurrentUserAdmin()) {
             $testKey = poznoteSttInstanceConfig()['api_key'];
         } else {
-            $testKey = (string)$sttConfig['api_key'];
+            $testKey = aiUpstreamSameServer($testUrl, (string)$sttConfig['url']) ? (string)$sttConfig['api_key'] : '';
         }
     }
 

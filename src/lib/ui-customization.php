@@ -485,10 +485,23 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // titles back the strip reserved for it (css/tabs.css).
                 $rules[] = '.note-actions-toggle { display: none !important; }';
             } elseif ($id === 'note-created-date') {
-                // Creation date under the note title. Overrides
-                // body.show-note-created in css/notes/subline.css, which the
-                // note_display.php markup still sets.
-                $rules[] = '.note-subline { display: none !important; }';
+                // Creation date, on the line under the note title
+                // (css/notes/subline.css)
+                $rules[] = '.note-sub-created { display: none !important; }';
+            } elseif ($id === 'note-updated-date') {
+                // Modification date, next to it
+                $rules[] = '.note-sub-updated { display: none !important; }';
+            } elseif ($id === 'note-stats-characters') {
+                // Characters, words and lines of the note, on the same line
+                // (js/note-stats.js), one key each
+                $rules[] = '.note-sub-stat-characters { display: none !important; }';
+            } elseif ($id === 'note-stats-words') {
+                $rules[] = '.note-sub-stat-words { display: none !important; }';
+            } elseif ($id === 'note-stats-lines') {
+                $rules[] = '.note-sub-stat-lines { display: none !important; }';
+            } elseif ($id === 'note-info-icon') {
+                // Information icon that closes that line
+                $rules[] = '.note-sub-info { display: none !important; }';
             } elseif ($id === 'note-icons') {
                 // Icon before the note title, in the sidebar list and in the
                 // note header. Both are rendered by renderEditableNoteIcon(),
@@ -509,6 +522,12 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // The floating stack and the scroll arrows sit left of the
                 // outline column (css/notes/noteentry.css): give them the edge.
                 $rules[] = 'html { --pz-docked-outline: 0px !important; }';
+            } elseif ($id === 'note-scrollbar') {
+                // The note's thin scrollbar (css/layout.css, #1544), in the
+                // note column and the markdown split panes, gutter included.
+                // The fixed controls follow on their own (js/index-events.js).
+                $rules[] = '#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview) { scrollbar-width: none !important; scrollbar-gutter: auto !important; }';
+                $rules[] = ':is(#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview))::-webkit-scrollbar { display: none !important; }';
             } elseif ($id === 'tasklist-progress') {
                 $rules[] = '.tasklist-progress { display: none !important; }';
             } elseif ($id === 'preview-code-block-delete') {

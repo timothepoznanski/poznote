@@ -117,3 +117,21 @@ test('subtasks written without a usable id get one, the others keep theirs', fun
     assertSame(4, count($ids), 'ids are unique in the task');
     assertSame('duplicate', $out[2]['text']);
 });
+
+test('the notes hidden from the Tasks page read as a list of distinct ids', function () {
+    assertSame([12, 7], poznoteParseTasksPageHiddenNotes('[12, "7", 12]'));
+    assertSame([3], poznoteParseTasksPageHiddenNotes([3]));
+    assertSame([], poznoteParseTasksPageHiddenNotes(''));
+    assertSame([], poznoteParseTasksPageHiddenNotes(null));
+    assertSame([], poznoteParseTasksPageHiddenNotes('[]'));
+});
+
+test('anything else than a list of note ids is refused', function () {
+    assertSame(null, poznoteParseTasksPageHiddenNotes('pas du json'));
+    assertSame(null, poznoteParseTasksPageHiddenNotes('{"a":1}'));
+    assertSame(null, poznoteParseTasksPageHiddenNotes('[0]'));
+    assertSame(null, poznoteParseTasksPageHiddenNotes('[-4]'));
+    assertSame(null, poznoteParseTasksPageHiddenNotes('["1 OR 1=1"]'));
+    assertSame(null, poznoteParseTasksPageHiddenNotes('[1.5]'));
+    assertSame(null, poznoteParseTasksPageHiddenNotes(12));
+});

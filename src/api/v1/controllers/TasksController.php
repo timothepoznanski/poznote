@@ -764,7 +764,7 @@ class TasksController
         }
         file_put_contents($filename, $content);
 
-        $stmt = $this->con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ?");
+        $stmt = $this->con->prepare("UPDATE entries SET entry = ?, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?");
         $stmt->execute([$content, $noteId]);
 
         return true;

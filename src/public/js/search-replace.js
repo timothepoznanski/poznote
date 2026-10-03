@@ -230,6 +230,8 @@
         state.matches = [];
         state.currentIndex = -1;
         state.replaceVisible = false;
+        // Where Esc puts the caret back when no match is active
+        state.returnOffsets = captureNoteTextSelection(noteId);
 
         // Reset UI
         const searchInput = document.getElementById('searchInput' + noteId);
@@ -273,6 +275,139 @@
             }
         }, 100);
     };
+
+    /**
+     * Ctrl+Shift+F / Cmd+Shift+F (js/keyboard-shortcuts.js, discussion #1548): open the
+     * current note's bar, or put the focus back in its search field when already open.
+     * Returns false when the current note has no bar, so the browser keeps the keys.
+     */
+    window.openSearchReplaceShortcut = function () {
+        // window.noteid is only set once the note was focused: after a page load it is
+        // still -1, so fall back to the note on screen (js/events-auto-save.js)
+        let noteId = window.noteid;
+        if (!noteId || noteId === -1 || noteId === 'search' || !getSearchBar(noteId)) {
+            noteId = typeof window.getDisplayedNoteId === 'function' ? window.getDisplayedNoteId() : null;
+        }
+        if (!noteId) return false;
+
+        const bar = getSearchBar(noteId);
+        if (!bar) return false;
+
+        if (window.getComputedStyle(bar).display === 'none') {
+            window.openSearchReplaceModal(String(noteId));
+        } else {
+            const searchInput = document.getElementById('searchInput' + noteId);
+            if (searchInput) {
+                searchInput.focus();
+                searchInput.select();
+            }
+        }
+        return true;
+    };
+
+    /**
+     * Character offset of a DOM position within root's text, so a place in the note
+     * survives the highlight spans being unwrapped (the text itself is unchanged).
+     */
+    function getTextOffset(root, container, offset) {
+        const range = document.createRange();
+        range.setStart(root, 0);
+        range.setEnd(container, offset);
+        return range.toString().length;
+    }
+
+    function rangeFromTextOffsets(root, start, end) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const range = document.createRange();
+        let pos = 0;
+        let startSet = false;
+        let node;
+        let lastNode = null;
+        while ((node = walker.nextNode())) {
+            const length = node.data.length;
+            // Strict: a start on a node boundary goes into the next node, so a match
+            // in <b> starts inside the <b> and typing over it keeps the bold
+            if (!startSet && start < pos + length) {
+                range.setStart(node, start - pos);
+                startSet = true;
+            }
+            if (startSet && end <= pos + length) {
+                range.setEnd(node, end - pos);
+                return range;
+            }
+            pos += length;
+            lastNode = node;
+        }
+        // A caret at the very end of the text
+        if (!startSet && lastNode && start === pos && end === pos) {
+            range.setStart(lastNode, lastNode.data.length);
+            return range;
+        }
+        return null;
+    }
+
+    /**
+     * The selection inside the note's searched content, as text offsets, or null.
+     * CodeMirror keeps its own selection, so this only matters for the other roots.
+     */
+    function captureNoteTextSelection(noteId) {
+        const root = getSearchContentRoot(noteId);
+        const selection = window.getSelection();
+        if (!root || !selection || selection.rangeCount === 0) return null;
+
+        const range = selection.getRangeAt(0);
+        if (!root.contains(range.startContainer) || !root.contains(range.endContainer)) return null;
+
+        return {
+            start: getTextOffset(root, range.startContainer, range.startOffset),
+            end: getTextOffset(root, range.endContainer, range.endOffset)
+        };
+    }
+
+    /**
+     * Esc in the bar: close it and give the keyboard back to the note, with the current
+     * match selected, or else the caret where it was before the bar opened.
+     */
+    function closeSearchBarToNote(noteId) {
+        const state = getNoteState(noteId);
+        const activeMatch = state.currentIndex >= 0 ? state.matches[state.currentIndex] : null;
+
+        const cmEditor = getActiveCodeMirrorEditor(noteId);
+        const cmApi = window.PoznoteMarkdownCodeMirror;
+        if (cmEditor && cmApi) {
+            closeSearchBar(noteId);
+            if (activeMatch && activeMatch.isCodeMirrorMatch) {
+                cmApi.setSelection(cmEditor, activeMatch.from, activeMatch.to);
+            } else {
+                cmApi.focus(cmEditor);
+            }
+            return;
+        }
+
+        const root = getSearchContentRoot(noteId);
+        let offsets = state.returnOffsets || null;
+        if (root && activeMatch && activeMatch.nodeType === 1 && root.contains(activeMatch)) {
+            const start = getTextOffset(root, activeMatch, 0);
+            offsets = { start, end: start + activeMatch.textContent.length };
+        }
+
+        closeSearchBar(noteId);
+        if (!root) return;
+
+        // A read-only note or the Markdown preview takes no focus, the match is still
+        // selected so the page shows where the search stopped.
+        if (root.isContentEditable) {
+            root.focus({ preventScroll: true });
+        } else if (document.activeElement && document.activeElement.closest('.search-replace-bar')) {
+            document.activeElement.blur();
+        }
+        const range = offsets ? rangeFromTextOffsets(root, offsets.start, offsets.end) : null;
+        const selection = window.getSelection();
+        if (range && selection) {
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+    }
 
     /**
      * Recompute the markdown split pane height (no-op outside split mode) so the panes
@@ -1010,7 +1145,8 @@
             searchInput.addEventListener('input', () => findMatches(noteId));
             searchInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
-                    closeSearchBar(noteId);
+                    e.preventDefault();
+                    closeSearchBarToNote(noteId);
                 } else if (e.key === 'Enter') {
                     e.preventDefault();
                     if (e.shiftKey) {
@@ -1030,7 +1166,8 @@
                     e.preventDefault();
                     replaceOne(noteId);
                 } else if (e.key === 'Escape') {
-                    closeSearchBar(noteId);
+                    e.preventDefault();
+                    closeSearchBarToNote(noteId);
                 }
             });
         }

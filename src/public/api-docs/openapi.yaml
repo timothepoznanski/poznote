@@ -1204,7 +1204,9 @@ paths:
         (note, markdown and tasklist types) and one edge per link between two
         notes. `folders` lists the folders holding at least one of those notes,
         directly or through a subfolder. A node or a folder whose icon was
-        customised carries it in `icon` and `icon_color`.
+        customised carries it in `icon` and `icon_color`. With `limit` the
+        graph is cut down to the most recently modified notes, and `total`
+        tells how many notes it holds without a limit.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
         - name: workspace
@@ -1213,6 +1215,13 @@ paths:
           description: Restrict the graph to one workspace.
           schema:
             type: string
+        - name: limit
+          in: query
+          required: false
+          description: Keep only that many notes, the most recently modified ones. Links to a note left out are dropped. Omit it, or pass 0, for every note.
+          schema:
+            type: integer
+            minimum: 0
       responses:
         '200':
           description: Nodes and edges of the note graph
@@ -1224,6 +1233,9 @@ paths:
                   success:
                     type: boolean
                     example: true
+                  total:
+                    type: integer
+                    description: Number of notes in the graph without a limit; greater than the length of `nodes` when some were left out
                   nodes:
                     type: array
                     items:

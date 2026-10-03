@@ -4,6 +4,12 @@ require_once __DIR__ . '/../page_bootstrap.php';
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
 
+// Groups the user left out of this page (their eye button, js/tasks-page.js).
+// Settings are written by the account's owner only, so someone working in a
+// borrowed account sees the owner's choice and gets no button to change it.
+$hiddenTaskNotes = poznoteParseTasksPageHiddenNotes(getSetting('tasks_page_hidden_notes', '[]')) ?? [];
+$canHideTaskNotes = isActiveAccountOwnedByAuthenticatedUser();
+
 // getAppVersion() reads version.txt through an absolute path. Reading it
 // relatively broke when the entry points moved into src/public/: the file
 // stayed one level up, so this fell back to time() and changed the asset
@@ -27,11 +33,17 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 <body class="tasks-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
       data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>"
+      data-hidden-notes="<?php echo htmlspecialchars((string) json_encode($hiddenTaskNotes), ENT_QUOTES, 'UTF-8'); ?>"
+      data-can-hide-notes="<?php echo $canHideTaskNotes ? '1' : '0'; ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
       data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
       data-txt-progress="<?php echo t_h('tasks_page.progress', [], '{{completed}} of {{total}} tasks completed'); ?>"
       data-txt-no-filter-results="<?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?>"
       data-txt-empty-filtered="<?php echo t_h('tasks_page.empty_filtered', [], 'No tasks match this filter.'); ?>"
+      data-txt-empty-hidden="<?php echo t_h('tasks_page.empty_hidden', [], 'Every list is hidden.'); ?>"
+      data-txt-hide-list="<?php echo t_h('tasks_page.hide_list', [], 'Hide from this page'); ?>"
+      data-txt-unhide-list="<?php echo t_h('tasks_page.unhide_list', [], 'Show on this page again'); ?>"
+      data-txt-show-hidden="<?php echo t_h('tasks_page.show_hidden', [], 'Show hidden lists'); ?>"
       data-txt-collapse="<?php echo t_h('tasks_page.collapse', [], 'Collapse'); ?>"
       data-txt-expand="<?php echo t_h('tasks_page.expand', [], 'Expand'); ?>"
       data-txt-collapse-all="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>"
@@ -57,6 +69,11 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			<label class="tasks-progress-option" for="tasksShowNoteChecklists" title="<?php echo t_h('tasks_page.note_badge_title', [], 'Checklist items of a note'); ?>">
 				<input type="checkbox" id="tasksShowNoteChecklists" checked>
 				<span><?php echo t_h('tasks_page.show_note_checklists', [], 'Display tasks in notes'); ?></span>
+			</label>
+			<?php // Greyed out until a group is hidden; the label then gets their count (js/tasks-page.js) ?>
+			<label class="tasks-progress-option disabled" id="tasksShowHiddenOption" for="tasksShowHidden">
+				<input type="checkbox" id="tasksShowHidden" disabled>
+				<span id="tasksShowHiddenLabel"><?php echo t_h('tasks_page.show_hidden', [], 'Show hidden lists'); ?></span>
 			</label>
 		</div>
 

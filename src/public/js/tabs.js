@@ -1798,17 +1798,23 @@
 
     /**
      * Close all tabs associated with a specific note ID.
-     * Used when a note is deleted or archived; the caller then reloads the
-     * page, so the pane is not emptied (nor the gone note saved) here.
+     * Used when a note is deleted or archived. A caller that reloads the page
+     * afterwards leaves the pane alone, so it is not emptied (nor the gone
+     * note saved) here; with updatePane nothing is reloaded and the pane
+     * follows, to the neighbouring tab or empty after the last one.
+     * @returns {boolean} True when the active tab was one of them
      */
-    function closeTabByNoteId(noteId) {
+    function closeTabByNoteId(noteId, updatePane) {
         noteId = String(noteId);
+        var closedActive = false;
         // Iterate backwards to avoid index shifting issues
         for (var i = tabs.length - 1; i >= 0; i--) {
             if (_isNoteTab(tabs[i]) && tabs[i].noteId === noteId) {
-                closeTab(tabs[i].id, true, true); // force close even if pinned, keep the pane
+                if (tabs[i].id === activeTabId) closedActive = true;
+                closeTab(tabs[i].id, true, !updatePane); // force close even if pinned
             }
         }
+        return closedActive;
     }
 
     /**

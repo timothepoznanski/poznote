@@ -1010,7 +1010,7 @@ class SnapshotsController {
             }
             
             // Also update the database entry column
-            $stmt = $this->con->prepare("UPDATE entries SET entry = ?, updated = datetime('now') WHERE id = ?");
+            $stmt = $this->con->prepare("UPDATE entries SET entry = ?, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?");
             $stmt->execute([$snapshotContent, $noteId]);
 
             $this->revealAttachmentsReferencedBy($noteId, $note['attachments'] ?? '', $snapshotContent);

@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/../page_bootstrap.php';
+// For the preview of a trashed Markdown note
+require_once __DIR__ . '/../markdown_parser.php';
+require_once __DIR__ . '/../public_helpers.php';
 
 /**
  * Convert plain-text URLs into safe HTML anchors
@@ -231,7 +234,7 @@ $trashOrderBy = $trashSort === 'created'
             $hasNotes = false;
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $hasNotes = true;
-                $id = $row['id'];
+                $id = (int)$row['id'];
                 $filename = getEntryFilename($id, $row['type'] ?? 'note');
                 $entryfinal = file_exists($filename) ? file_get_contents($filename) : '';
                 $heading = $row['heading'];
@@ -263,6 +266,12 @@ $trashOrderBy = $trashSort === 'created'
                         // If JSON parse fails, escape raw content
                         $displayContent = htmlspecialchars($entryfinal, ENT_QUOTES);
                     }
+                } elseif (($row['type'] ?? 'note') === 'markdown' && $entryfinal !== '') {
+                    // The file of a Markdown note is its source, not markup:
+                    // printed as is, any HTML written in it (inside a code
+                    // sample too) would be live in this page. Rendered the
+                    // way the diary journal and the public pages do it.
+                    $displayContent = sanitizePublicNoteHtml((string)parseMarkdown($entryfinal));
                 }
 
                 echo '<div id="note' . $id . '" class="trash-notecard">'

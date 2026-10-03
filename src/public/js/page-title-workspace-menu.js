@@ -2,7 +2,7 @@
  * Workspace menu behind the "(workspace)" suffix of the secondary pages' title
  * (poznoteRenderPageTitleWorkspace() in functions.php): the suffix is a button
  * whose chevron opens a menu listing every workspace as a plain link to this
- * same page, plus a shortcut to workspaces.php.
+ * same page, plus a shortcut to Settings > Workspaces.
  *
  * The menu is rendered inside the <h1> and moved under <body> here, so that no
  * ancestor with overflow, transform or contain can clip it or re-anchor its

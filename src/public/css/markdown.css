@@ -1081,14 +1081,17 @@ body:not(.markdown-split-card-view) .noteentry.markdown-split-mode .markdown-edi
     touch-action: none;
 }
 
-/* Drag target, wider than the line it moves */
+/* Drag target, wider than the line it moves. Lopsided on purpose: the left
+   pane's scrollbar runs along the seam (css/layout.css, #1544), so the target
+   only shares its unpainted 2px edge and takes the rest from the right pane's
+   padding. */
 .noteentry.markdown-split-mode > .markdown-split-resizer::before {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
-    left: -6px;
-    right: -6px;
+    left: -2px;
+    right: -10px;
     z-index: 3;
 }
 
@@ -1175,62 +1178,20 @@ body.markdown-split-preview-left:not(.markdown-split-card-view) .noteentry.markd
     padding: 10px 10px 44px 20px;
 }
 
-/* Scrollbar styling for split view columns */
-.noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar,
-.noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar,
-.noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar {
-    width: 0;
-    display: none;
-}
+/* Split panes: their scrollbar is drawn in css/layout.css with the note's
+   own (#1544); phones keep it hidden. */
+@media (max-width: 800px) {
+    .noteentry.markdown-split-mode .markdown-editor-container,
+    .noteentry.markdown-split-mode .markdown-editor,
+    .noteentry.markdown-split-mode .markdown-preview {
+        scrollbar-width: none;
+    }
 
-.noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
-.noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
-.noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
-    display: none;
-}
-
-.noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
-.noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
-.noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
-    display: none;
-}
-
-.noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
-.noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
-.noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
-    display: none;
-}
-
-/* Dark mode scrollbar for split view */
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
-    display: none;
-}
-
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
-    display: none;
-}
-
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
-    display: none;
-}
-
-/* Firefox scrollbar styling for split view */
-.noteentry.markdown-split-mode .markdown-editor-container,
-.noteentry.markdown-split-mode .markdown-editor,
-.noteentry.markdown-split-mode .markdown-preview {
-    scrollbar-width: none;
-}
-
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor-container,
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor,
-html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-preview {
-    scrollbar-width: none;
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 /* Marker pointing at the line the reader was on, shown briefly after

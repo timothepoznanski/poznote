@@ -196,12 +196,104 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     box-sizing: border-box;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
 }
 
-#right_col::-webkit-scrollbar {
-    display: none;
+/* The note's scrollbar (#1544): thin, unless unticked in Element visibility
+   (panel:note-scrollbar, lib/ui-customization.php). The markdown split panes
+   share it, they are the only other boxes that scroll a note. The gutter is reserved
+   on #right_col so a centred note does not shift sideways between a short
+   note and a long one; the fixed controls on the right keep clear of it
+   (--pz-docked-note-scrollbar, css/notes/noteentry.css).
+   The thin bar: Chromium and Safari read the ::-webkit-scrollbar
+   pseudo-elements, which Chromium drops as soon as scrollbar-width or -color
+   is set, so those two are kept for Firefox. It is told apart by
+   -moz-appearance: it calls selector(::-webkit-scrollbar) supported, any
+   ::-webkit- pseudo-element parses there for compatibility.
+   Phones never show it. */
+@media (min-width: 801px) {
+    #right_col {
+        scrollbar-gutter: stable;
+    }
+
+    /* Undoes the hiding of css/markdown.css, which keeps every other
+       CodeMirror scroller bare: Chromium skips the pseudo-elements below
+       while scrollbar-width is not auto. */
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller {
+        scrollbar-width: auto;
+    }
+
+    #right_col::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar {
+        display: block;
+        width: 10px;
+        height: 10px;
+    }
+
+    #right_col::-webkit-scrollbar-track,
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-track,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-track,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    /* 10px to grab, 6px to see: the transparent border is not painted. */
+    #right_col::-webkit-scrollbar-thumb,
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb,
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-thumb,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb {
+        background: var(--pz-scrollbar);
+        background-clip: padding-box;
+        border: 2px solid transparent;
+        border-radius: var(--pz-radius-pill);
+    }
+
+    #right_col::-webkit-scrollbar-thumb:hover,
+    .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb:hover,
+    .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-thumb:hover,
+    .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-thumb:hover,
+    .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-thumb:hover {
+        background: var(--pz-scrollbar-hover);
+        background-clip: padding-box;
+    }
+
+    /* A note whose content all shows, with only blank lines or bottom
+       margins below it, keeps its gutter but no visible bar
+       (body.note-col-fits, noteColumnContentFits in js/index-events.js). */
+    body.note-col-fits #right_col::-webkit-scrollbar-thumb,
+    body.note-col-fits #right_col::-webkit-scrollbar-thumb:hover {
+        background: transparent;
+    }
+
+    @supports (-moz-appearance: none) {
+        #right_col,
+        .noteentry.markdown-split-mode .markdown-editor-container,
+        .noteentry.markdown-split-mode .markdown-editor,
+        .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller,
+        .noteentry.markdown-split-mode .markdown-preview {
+            scrollbar-width: thin;
+            scrollbar-color: var(--pz-scrollbar) transparent;
+        }
+
+        body.note-col-fits #right_col {
+            scrollbar-color: transparent transparent;
+        }
+    }
+}
+
+@media (max-width: 800px) {
+    #right_col {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    #right_col::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 /* Toggle sidebar and collapsed state */

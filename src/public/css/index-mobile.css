@@ -715,13 +715,28 @@ a.links_arbo_left::-webkit-scrollbar,
     flex-wrap: wrap;
 }
 
+/* The folder name stays on one line: it ellipsizes at the edge of the row */
 .folder-wrapper {
     flex-basis: 100%;
+    max-width: 100%;
+    min-width: 0;
     margin-bottom: 8px;
 }
 
 .folder_name {
     margin-right: 0;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Task list notes: the breadcrumb keeps its last folder only, the parent
+   folders and their separators are dropped */
+.innernote[data-tasklist-note="true"] .folder-breadcrumb > .folder-path-segment:not(:last-child),
+.innernote[data-tasklist-note="true"] .folder-breadcrumb > .folder-path-separator {
+    display: none;
 }
 
 /* Mobile placeholder for editable content */

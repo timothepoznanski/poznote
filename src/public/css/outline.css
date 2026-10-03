@@ -182,13 +182,15 @@
     border-left: 1px solid var(--pz-border);
 }
 
-/* Extend hover area for easier button access */
+/* Extend hover area for easier button access. It reaches into the outline,
+   not the note: the note's scrollbar runs along the seam (css/layout.css,
+   #1544) and must stay grabbable, only its unpainted 2px edge is shared. */
 .outline-resize-handle::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -8px;
-    right: -8px;
+    left: -2px;
+    right: -14px;
     bottom: 0;
     z-index: 1;
 }

@@ -108,6 +108,38 @@ function poznoteAttachmentIsImage(array $attachment) {
     return in_array(poznoteAttachmentExtension($attachment), ['avif', 'bmp', 'gif', 'heic', 'heif', 'ico', 'jpg', 'jpeg', 'png', 'svg', 'webp'], true);
 }
 
+/**
+ * The Content-Type an attachment may be shown inline with, or null when it
+ * must be sent as a download.
+ *
+ * The type stored with the attachment came out of finfo at upload, but the
+ * record also travels through backups and Git repositories and comes back as
+ * whatever those hold. So it is never echoed: only its essence counts
+ * ("image/png" out of "image/png; charset=binary"), it must be a well-formed
+ * type/subtype, and it must be one of the passive families a browser renders
+ * without running anything. Anything else is a download.
+ *
+ * @param bool $withMedia also allow audio and video (the API endpoint does,
+ *        the legacy one never did)
+ */
+function poznoteAttachmentInlineContentType(array $attachment, bool $withMedia = true): ?string {
+    $essence = strtolower(trim(explode(';', (string)($attachment['file_type'] ?? ''), 2)[0]));
+    if (!preg_match('#\A[a-z0-9][a-z0-9.+-]*/[a-z0-9][a-z0-9.+-]*\z#', $essence)) {
+        return null;
+    }
+
+    if ($essence === 'application/pdf') {
+        return $essence;
+    }
+
+    $family = substr($essence, 0, (int)strpos($essence, '/'));
+    if ($family === 'image' || ($withMedia && ($family === 'video' || $family === 'audio'))) {
+        return $essence;
+    }
+
+    return null;
+}
+
 function poznoteAttachmentIsSvg(array $attachment) {
     if (strpos(poznoteAttachmentMimeType($attachment), 'svg') !== false) {
         return true;

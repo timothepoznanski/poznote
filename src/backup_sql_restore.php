@@ -145,10 +145,85 @@ function poznoteExecuteBackupSqlFile($dbPath, $sqlFile) {
     }
 
     try {
-        return poznoteExecuteBackupSql($dbPath, poznoteBackupSqlStreamStatements($handle), true);
+        $executed = poznoteExecuteBackupSql($dbPath, poznoteBackupSqlStreamStatements($handle), true);
     } finally {
         fclose($handle);
     }
+
+    if ($executed['success']) {
+        poznoteBackupSqlEnforceIntegerKeys($dbPath);
+    }
+
+    return $executed;
+}
+
+/**
+ * Remove from a restored database what no Poznote database can hold: a row
+ * whose key is not an integer, or a reference to a note or a folder that is
+ * not one.
+ *
+ * The dump brings its own CREATE TABLE statements, so it also decides the type
+ * of every column. The application builds file names and markup from these
+ * keys and expects integers there, which is what "id INTEGER PRIMARY KEY"
+ * guarantees in every database Poznote ever created; a dump written by hand
+ * can declare the column otherwise. A genuine backup has nothing to lose here.
+ *
+ * @param string $dbPath Path of the SQLite database that was just restored
+ * @return int Number of rows removed or cleared
+ */
+function poznoteBackupSqlEnforceIntegerKeys($dbPath) {
+    // table => reference columns, and what happens to a row whose reference is
+    // not an integer: 'null' clears the reference, 'delete' drops the row
+    // (a share with no target is nothing).
+    $tables = [
+        'entries' => ['linked_note_id' => 'null', 'folder_id' => 'null'],
+        'folders' => ['parent_id' => 'null'],
+        'workspaces' => [],
+        'shared_notes' => ['note_id' => 'delete'],
+        'shared_folders' => ['folder_id' => 'delete'],
+        'notifications' => ['note_id' => 'null'],
+    ];
+
+    $changed = 0;
+    try {
+        $con = new PDO('sqlite:' . $dbPath);
+        $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $con->exec('PRAGMA busy_timeout = 5000');
+
+        foreach ($tables as $table => $references) {
+            $columns = array_column($con->query('PRAGMA table_info("' . $table . '")')->fetchAll(PDO::FETCH_ASSOC), 'name');
+            if ($columns === []) {
+                continue;
+            }
+            if (in_array('id', $columns, true)) {
+                $changed += (int)$con->exec('DELETE FROM "' . $table . '" WHERE typeof("id") != \'integer\'');
+            }
+            foreach ($references as $column => $action) {
+                if (!in_array($column, $columns, true)) {
+                    continue;
+                }
+                // An empty string is left alone: older versions may have
+                // written one where "no folder" was meant.
+                $notAnInteger = 'typeof("' . $column . '") IN (\'text\', \'blob\') AND "' . $column . '" != \'\'';
+                $changed += (int)$con->exec($action === 'delete'
+                    ? 'DELETE FROM "' . $table . '" WHERE ' . $notAnInteger
+                    : 'UPDATE "' . $table . '" SET "' . $column . '" = NULL WHERE ' . $notAnInteger);
+            }
+        }
+        $con = null;
+    } catch (Throwable $e) {
+        // The restore itself succeeded, and the readers cast these values
+        // anyway: this pass is a second line of defence, not a reason to
+        // report a restored backup as failed.
+        error_log('backup_sql_restore: poznoteBackupSqlEnforceIntegerKeys() failed: ' . $e->getMessage());
+        return $changed;
+    }
+
+    if ($changed > 0) {
+        error_log('backup_sql_restore: ' . $changed . ' restored row(s) with a non-integer key or reference were removed or cleared');
+    }
+
+    return $changed;
 }
 
 /**

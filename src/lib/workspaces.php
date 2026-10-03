@@ -179,7 +179,7 @@ function getWorkspaceFilter() {
  * tells two visits apart. The chip carries the workspace colour (a layers
  * glyph when it has none), the name and a chevron: a button whose chevron opens a menu
  * listing every workspace as a link to this same page (page.php?workspace=X),
- * plus a shortcut to workspaces.php, so the page can be re-scoped in place.
+ * plus a shortcut to Settings > Workspaces, so the page can be re-scoped in place.
  * js/page-title-workspace-menu.js (loaded by icon_sidebar.php) opens and
  * positions the menu; it is rendered here rather than fetched so it needs no
  * i18n runtime, which half of these pages never load.
@@ -313,7 +313,7 @@ function poznoteRenderPageTitleWorkspace($workspace = null, array $options = [])
             . '<span class="poznote-page-title-workspace-item-name">' . $esc($item['label'] ?? '') . '</span>'
             . '</button>';
     }
-    $html .= '<a class="poznote-page-title-workspace-item poznote-page-title-workspace-item-manage" role="menuitem" href="workspaces.php">'
+    $html .= '<a class="poznote-page-title-workspace-item poznote-page-title-workspace-item-manage" role="menuitem" href="settings.php#section=settings-workspaces-section-grid">'
         . '<i class="lucide lucide-layers" aria-hidden="true"></i>'
         . '<span class="poznote-page-title-workspace-item-name">' . $esc(t('page_title.manage_workspaces', [], 'Manage workspaces')) . '</span>'
         . '</a>'

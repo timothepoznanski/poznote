@@ -470,7 +470,6 @@
   "settings": {
     "card_help": {
       "tenant_isolation": "Modo SaaS: elija qué capacidades se bloquean para los usuarios no administradores, como descubrir las demás cuentas de la instancia o registrar webhooks personales. Deje todo sin marcar en una instancia familiar o de equipo.",
-      "workspaces": "Organiza tus notas en espacios de trabajo separados, cada uno con sus carpetas y notas.",
       "my_profile": "Consulta y edita la información de tu perfil.",
       "change_password": "Cambia la contraseña utilizada para iniciar sesión.",
       "password_note_sso_only": "El inicio de sesión con contraseña está desactivado en esta instancia.",
@@ -549,7 +548,9 @@
       "snapshots": "Elija cuántas instantáneas automáticas diarias y cuántas instantáneas de seguridad (antes de una edición de IA o MCP) se conservan por nota.",
       "stt": "Configura el servidor de reconocimiento de voz que se usa para dictar notas y transcribir adjuntos de audio.",
       "sidebar_offline_marks": "Muestra un pequeño punto junto a las notas disponibles sin conexión en este navegador.",
-      "format_toolbar_mode": "En un ordenador, elija dónde aparecen los botones de formato al seleccionar texto en una nota: en la barra de herramientas de la nota, en lugar de las acciones de la nota, o en un menú flotante sobre la selección, que deja la barra de herramientas de la nota tal como está."
+      "format_toolbar_mode": "En un ordenador, elija dónde aparecen los botones de formato al seleccionar texto en una nota: en la barra de herramientas de la nota, en lugar de las acciones de la nota, o en un menú flotante sobre la selección, que deja la barra de herramientas de la nota tal como está.",
+      "workspace_activity_emails": "Recibe un correo cuando otra persona cambia una nota en un espacio de trabajo que compartes o en uno compartido contigo. Enumera las notas creadas, editadas y eliminadas, nunca su contenido, y se envía a la dirección de correo de tu perfil. A medida que hay cambios: unos minutos después del último cambio. Resumen diario: a las 8:00. Resumen semanal: el lunes a las 8:00, en tu zona horaria.",
+      "workspace_activity_emails_no_address": "Añade una dirección de correo a tu perfil para recibir estos correos."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -562,6 +563,7 @@
     "categories": {
       "pinned": "Fijados",
       "account": "Mi cuenta",
+      "workspaces": "Espacios de trabajo",
       "actions": "Acciones",
       "admin_tools": "Herramientas de administración",
       "display": "Pantalla",
@@ -589,7 +591,7 @@
       "language_region": "Idioma y región",
       "storage": "Almacenamiento",
       "layout": "Diseño",
-      "organization": "Organización"
+      "preferences": "Preferencias"
     },
     "sections": {
       "account_display": "Cuenta y Visualización",
@@ -612,7 +614,6 @@
     },
     "cards": {
       "tenant_isolation": "Aislamiento de cuentas",
-      "workspaces": "Espacios de trabajo",
       "backup_export": "Copia de seguridad / Exportar",
       "restore_import": "Restaurar / Importar",
       "git_sync": "Sincronización Git",
@@ -702,7 +703,6 @@
         "placeholder": "Ingresa el nombre del espacio de trabajo"
       },
       "existing": {
-        "title": "Espacios de trabajo existentes",
         "empty": "No hay espacios de trabajo definidos."
       }
     },
@@ -722,10 +722,7 @@
       "description_1": "Elige qué espacio de trabajo se abre al iniciar Poznote.",
       "description_2": "Selecciona \"{{last}}\" para siempre abrir el espacio de trabajo que estabas usando anteriormente.",
       "last_opened": "Último espacio de trabajo abierto (todos los dispositivos)",
-      "last_opened_device": "Último espacio de trabajo abierto en este dispositivo",
-      "save_button": "Guardar",
-      "status_set_to": "✓ Espacio de trabajo de inicio establecido en: {{workspace}}",
-      "error_saving": "Error al guardar el espacio de trabajo de inicio"
+      "last_opened_device": "Último espacio de trabajo abierto en este dispositivo"
     },
     "validation": {
       "enter_name": "Ingresa un nombre de espacio de trabajo",
@@ -758,8 +755,6 @@
     },
     "errors": {
       "already_exists": "Ya existe un espacio de trabajo con este nombre",
-      "name_empty": "El nombre del espacio de trabajo no puede estar vacío",
-      "invalid_name": "Nombre de espacio de trabajo inválido. Usa solo letras, números, guión y guion bajo (sin espacios).",
       "name_required": "Nombre de espacio de trabajo requerido",
       "cannot_delete_default": "No se puede eliminar el espacio de trabajo de inicio",
       "not_found": "Espacio de trabajo no encontrado",
@@ -772,8 +767,6 @@
       "no_workspace_selected": "No hay ningún espacio de trabajo seleccionado"
     },
     "messages": {
-      "creating": "Creando espacio de trabajo...",
-      "created": "Espacio de trabajo creado",
       "deleted_all": "Espacio de trabajo eliminado y todas las notas, carpetas y adjuntos asociados eliminados",
       "renamed": "Espacio de trabajo renombrado en notas y etiquetas",
       "notes_moved_to": "Notas movidas a {{target}}"
@@ -813,7 +806,7 @@
       "action": "Etiquetas",
       "modal_title": "Etiquetas del espacio de trabajo",
       "placeholder": "Etiquetas separadas por comas (opcional, p. ej. escuela, psico)",
-      "help": "Las etiquetas agrupan espacios de trabajo en el panel: elige allí una etiqueta para ver todos los espacios que la llevan.",
+      "help": "Usa etiquetas para agrupar espacios de trabajo en el panel.",
       "saved": "Etiquetas actualizadas",
       "save_error": "No se pudieron actualizar las etiquetas",
       "empty": "Todavía no hay etiquetas."
@@ -884,7 +877,8 @@
       "snapshots": "Instantáneas",
       "show_note_icons": "Mostrar iconos de las notas",
       "sidebar_offline_marks": "Mostrar el punto sin conexión",
-      "format_toolbar_mode": "Barra de formato"
+      "format_toolbar_mode": "Barra de formato",
+      "workspace_activity_emails": "Correos de espacios compartidos"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",
@@ -1252,6 +1246,9 @@
       "tags": "Etiquetas:",
       "favorite": "Favorito:",
       "attachments": "Adjuntos:",
+      "characters": "Caracteres:",
+      "words": "Palabras:",
+      "lines": "Líneas:",
       "note_id": "ID de la nota:",
       "full_path": "Ruta completa:",
       "created_by": "Creado por:",
@@ -1421,7 +1418,13 @@
       "mobile_editor_bar_hint": "Barra que aparece sobre el teclado en pantalla mientras se edita una nota en un teléfono o una tableta.",
       "mobile_editor_bar_show": "Mostrar la barra",
       "sidebar_hint": "Columna del árbol de notas, entre la barra de iconos y la nota.",
-      "icon_rail_hint": "Columna estrecha de iconos a la izquierda de cada página."
+      "icon_rail_hint": "Columna estrecha de iconos a la izquierda de cada página.",
+      "note_updated_date": "Mostrar fecha de modificación de la nota",
+      "note_stats_characters": "Mostrar número de caracteres",
+      "note_stats_words": "Mostrar número de palabras",
+      "note_stats_lines": "Mostrar número de líneas",
+      "note_info_icon": "Mostrar icono de información bajo el título de la nota",
+      "note_scrollbar": "Barra de desplazamiento de las notas"
     },
     "icon_sidebar_order": {
       "title": "Diseño de la barra de iconos",
@@ -1860,6 +1863,14 @@
       "success_one": "1 nota etiquetada",
       "success_other": "{{count}} notas etiquetadas",
       "title": "Etiquetar todas las notas"
+    },
+    "workspace_activity_emails": {
+      "options": {
+        "off": "Desactivado",
+        "instant": "A medida que hay cambios",
+        "daily": "Resumen diario",
+        "weekly": "Resumen semanal"
+      }
     }
   },
   "notes_list": {
@@ -2350,7 +2361,23 @@
       "new_note": "Nueva nota",
       "new_note_numbered": "Nueva nota ({{number}})",
       "title_placeholder": "¿Título?",
-      "untitled": "Sin título"
+      "untitled": "Sin título",
+      "created_on": "Creada el {{date}}",
+      "modified_on": "Modificada el {{date}}",
+      "stats": {
+        "characters": {
+          "one": "{{count}} carácter",
+          "other": "{{count}} caracteres"
+        },
+        "words": {
+          "one": "{{count}} palabra",
+          "other": "{{count}} palabras"
+        },
+        "lines": {
+          "one": "{{count}} línea",
+          "other": "{{count}} líneas"
+        }
+      }
     },
     "editor": {
       "placeholder_desktop": "Ingresa texto, usa / o el clic derecho para abrir el menú de comandos, pega imágenes o arrastra y suelta una imagen en el cursor.",
@@ -4529,6 +4556,9 @@
     "folder_modal_title": "Elegir una carpeta",
     "folder_modal_empty": "Ninguna carpeta coincide.",
     "stats": "{{notes}} notas · {{links}} enlaces",
+    "limit_notice": "Las {{count}} notas modificadas más recientemente de {{total}}",
+    "show_all": "Mostrar todo",
+    "show_all_hint": "Cargar todas las notas del espacio de trabajo",
     "search": {
       "placeholder": "Buscar una nota..."
     },
@@ -4797,6 +4827,21 @@
     "manage_button": "Gestionar usuarios",
     "footer": "Recibe este correo porque las notificaciones de nuevos usuarios están activadas en su cuenta de administrador."
   },
+  "workspace_activity_email": {
+    "subject_one": "Cambios en el espacio compartido {{workspace}}",
+    "subject_many": "Cambios en {{count}} espacios compartidos",
+    "heading": "Actividad de los espacios compartidos",
+    "intro": "Cambios hechos por otras personas desde el {{date}}.",
+    "shared_by": "Compartido por {{user}}",
+    "shared_by_you": "Compartido por ti",
+    "created_by": "Creada por {{user}}",
+    "edited_by": "Editada por {{user}}",
+    "deleted_by": "Eliminada por {{user}}",
+    "untitled_note": "Nota sin título",
+    "more": "y {{count}} más",
+    "footer": "Recibes este correo porque los correos de espacios compartidos están activados en tu configuración de Poznote.",
+    "settings_link": "Abrir la configuración"
+  },
   "tasks_page": {
     "title": "Tareas",
     "progress": "{{completed}} de {{total}} tareas completadas",
@@ -4819,7 +4864,11 @@
     "expand_all": "Expandir todo",
     "view_list": "Vista de lista",
     "view_calendar": "Vista de calendario",
-    "calendar_no_tasks": "No hay tareas en este día."
+    "calendar_no_tasks": "No hay tareas en este día.",
+    "hide_list": "Ocultar en esta página",
+    "unhide_list": "Volver a mostrar en esta página",
+    "show_hidden": "Mostrar las listas ocultas",
+    "empty_hidden": "Todas las listas están ocultas."
   },
   "s3_settings": {
     "title": "Almacenamiento S3 de adjuntos",
@@ -5033,6 +5082,7 @@
     },
     "save_note": "Guardar la nota",
     "snapshot": "Tomar una instantánea de la nota",
+    "search_replace": "Buscar y reemplazar en la nota",
     "note_nav": "Nota anterior o siguiente de la carpeta",
     "close": "Cerrar un menú, un panel o una ventana",
     "bold": "Negrita",

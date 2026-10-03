@@ -470,7 +470,6 @@
   "settings": {
     "card_help": {
       "tenant_isolation": "SaaS-Modus: Wählen Sie, welche Funktionen für Benutzer ohne Administratorrechte blockiert werden, etwa das Entdecken der anderen Konten der Instanz oder das Registrieren persönlicher Webhooks. Für Familien- oder Teaminstanzen alles abgewählt lassen.",
-      "workspaces": "Organisieren Sie Ihre Notizen in getrennten Arbeitsbereichen mit eigenen Ordnern und Notizen.",
       "my_profile": "Profilinformationen ansehen und bearbeiten.",
       "change_password": "Ändern Sie das Passwort für die Anmeldung.",
       "password_note_sso_only": "Die Passwort-Anmeldung ist auf dieser Instanz deaktiviert.",
@@ -549,7 +548,9 @@
       "snapshots": "Wählen Sie, wie viele automatische tägliche Schnappschüsse und wie viele Sicherheits-Schnappschüsse (vor einer KI- oder MCP-Änderung) pro Notiz aufbewahrt werden.",
       "stt": "Den Spracherkennungsserver konfigurieren, mit dem Notizen diktiert und Audioanhänge transkribiert werden.",
       "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind.",
-      "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt."
+      "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt.",
+      "workspace_activity_emails": "Erhalten Sie eine E-Mail, wenn jemand anderes eine Notiz in einem Arbeitsbereich ändert, den Sie teilen oder der mit Ihnen geteilt wird. Sie listet die erstellten, bearbeiteten und gelöschten Notizen auf, nie deren Inhalt, und geht an die E-Mail-Adresse Ihres Profils. Bei Änderungen: einige Minuten nach der letzten Änderung. Tägliche Zusammenfassung: um 8:00 Uhr. Wöchentliche Zusammenfassung: montags um 8:00 Uhr, in Ihrer Zeitzone.",
+      "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -562,6 +563,7 @@
     "categories": {
       "pinned": "Angepinnt",
       "account": "Mein Konto",
+      "workspaces": "Arbeitsbereiche",
       "actions": "Aktionen",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
@@ -589,7 +591,7 @@
       "language_region": "Sprache und Region",
       "storage": "Speicher",
       "layout": "Layout",
-      "organization": "Organisation"
+      "preferences": "Präferenzen"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -612,7 +614,6 @@
     },
     "cards": {
       "tenant_isolation": "Mandantentrennung",
-      "workspaces": "Arbeitsbereiche",
       "backup_export": "Sicherung / Export",
       "restore_import": "Wiederherstellen / Importieren",
       "git_sync": "Git-Synchronisierung",
@@ -702,7 +703,6 @@
         "placeholder": "Arbeitsbereichsnamen eingeben"
       },
       "existing": {
-        "title": "Vorhandene Arbeitsbereiche",
         "empty": "Keine Arbeitsbereiche definiert."
       }
     },
@@ -722,10 +722,7 @@
       "description_1": "Wählen Sie aus, welcher Arbeitsbereich beim Starten von Poznote geöffnet wird.",
       "description_2": "Wählen Sie \"{{last}}\" aus, um immer den Arbeitsbereich zu öffnen, in dem Sie zuletzt gearbeitet haben.",
       "last_opened": "Zuletzt geöffneter Arbeitsbereich (alle Geräte)",
-      "last_opened_device": "Zuletzt geöffneter Arbeitsbereich auf diesem Gerät",
-      "save_button": "Speichern",
-      "status_set_to": "✓ Startup-Arbeitsbereich gesetzt auf: {{workspace}}",
-      "error_saving": "Fehler beim Speichern des Startup-Arbeitsbereichs"
+      "last_opened_device": "Zuletzt geöffneter Arbeitsbereich auf diesem Gerät"
     },
     "validation": {
       "enter_name": "Arbeitsbereichsnamen eingeben",
@@ -758,8 +755,6 @@
     },
     "errors": {
       "already_exists": "Ein Arbeitsbereich mit diesem Namen existiert bereits",
-      "name_empty": "Arbeitsbereichsname darf nicht leer sein",
-      "invalid_name": "Ungültiger Arbeitsbereichsname. Verwenden Sie nur Buchstaben, Zahlen, Bindestrich und Unterstrich (keine Leerzeichen).",
       "name_required": "Arbeitsbereichsname erforderlich",
       "cannot_delete_default": "Startup-Arbeitsbereich kann nicht gelöscht werden",
       "not_found": "Arbeitsbereich nicht gefunden",
@@ -772,8 +767,6 @@
       "no_workspace_selected": "Kein Arbeitsbereich ausgewählt"
     },
     "messages": {
-      "creating": "Arbeitsbereich wird erstellt...",
-      "created": "Arbeitsbereich erstellt",
       "deleted_all": "Arbeitsbereich gelöscht und alle zugehörigen Notizen, Ordner und Anhänge entfernt",
       "renamed": "Arbeitsbereich in allen Notizen und Labels umbenannt",
       "notes_moved_to": "Notizen verschoben nach {{target}}"
@@ -813,7 +806,7 @@
       "action": "Tags",
       "modal_title": "Tags des Arbeitsbereichs",
       "placeholder": "Tags, durch Kommas getrennt (optional, z. B. schule, psycho)",
-      "help": "Tags gruppieren Arbeitsbereiche im Dashboard: Wähle dort einen Tag, um alle Arbeitsbereiche mit diesem Tag zu sehen.",
+      "help": "Mit Tags lassen sich Arbeitsbereiche im Dashboard gruppieren.",
       "saved": "Tags aktualisiert",
       "save_error": "Die Tags konnten nicht aktualisiert werden",
       "empty": "Noch keine Tags."
@@ -884,7 +877,8 @@
       "snapshots": "Schnappschüsse",
       "show_note_icons": "Notizsymbole anzeigen",
       "sidebar_offline_marks": "Offline-Punkt anzeigen",
-      "format_toolbar_mode": "Formatierungsleiste"
+      "format_toolbar_mode": "Formatierungsleiste",
+      "workspace_activity_emails": "E-Mails zu geteilten Arbeitsbereichen"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -1252,6 +1246,9 @@
       "tags": "Tags:",
       "favorite": "Favorit:",
       "attachments": "Anhänge:",
+      "characters": "Zeichen:",
+      "words": "Wörter:",
+      "lines": "Zeilen:",
       "note_id": "Notiz-ID:",
       "full_path": "Vollständiger Pfad:",
       "created_by": "Erstellt von:",
@@ -1421,7 +1418,13 @@
       "mobile_editor_bar_hint": "Leiste über der Bildschirmtastatur, während eine Notiz auf einem Smartphone oder Tablet bearbeitet wird.",
       "mobile_editor_bar_show": "Leiste anzeigen",
       "sidebar_hint": "Spalte mit dem Notizbaum, zwischen der Symbolleiste und der Notiz.",
-      "icon_rail_hint": "Schmale Symbolspalte ganz links auf jeder Seite."
+      "icon_rail_hint": "Schmale Symbolspalte ganz links auf jeder Seite.",
+      "note_updated_date": "Änderungsdatum der Notiz anzeigen",
+      "note_stats_characters": "Zeichenanzahl anzeigen",
+      "note_stats_words": "Wortanzahl anzeigen",
+      "note_stats_lines": "Zeilenanzahl anzeigen",
+      "note_info_icon": "Informationssymbol unter dem Notiztitel anzeigen",
+      "note_scrollbar": "Bildlaufleiste der Notizen"
     },
     "icon_sidebar_order": {
       "title": "Layout der Icon-Seitenleiste",
@@ -1860,6 +1863,14 @@
       "success_one": "1 Notiz getaggt",
       "success_other": "{{count}} Notizen getaggt",
       "title": "Alle Notizen taggen"
+    },
+    "workspace_activity_emails": {
+      "options": {
+        "off": "Aus",
+        "instant": "Bei Änderungen",
+        "daily": "Tägliche Zusammenfassung",
+        "weekly": "Wöchentliche Zusammenfassung"
+      }
     }
   },
   "notes_list": {
@@ -2350,7 +2361,23 @@
       "new_note": "Neue Notiz",
       "new_note_numbered": "Neue Notiz ({{number}})",
       "title_placeholder": "Titel ?",
-      "untitled": "Ohne Titel"
+      "untitled": "Ohne Titel",
+      "created_on": "Erstellt am {{date}}",
+      "modified_on": "Geändert am {{date}}",
+      "stats": {
+        "characters": {
+          "one": "{{count}} Zeichen",
+          "other": "{{count}} Zeichen"
+        },
+        "words": {
+          "one": "{{count}} Wort",
+          "other": "{{count}} Wörter"
+        },
+        "lines": {
+          "one": "{{count}} Zeile",
+          "other": "{{count}} Zeilen"
+        }
+      }
     },
     "editor": {
       "placeholder_desktop": "Text eingeben, / oder Rechtsklick verwenden, um das Befehlsmenü zu öffnen, Bilder einfügen oder ein Bild am Cursor ablegen.",
@@ -4528,6 +4555,9 @@
     "folder_modal_title": "Ordner auswählen",
     "folder_modal_empty": "Kein passender Ordner.",
     "stats": "{{notes}} Notizen · {{links}} Verknüpfungen",
+    "limit_notice": "Die {{count}} zuletzt geänderten Notizen von {{total}}",
+    "show_all": "Alle anzeigen",
+    "show_all_hint": "Alle Notizen des Arbeitsbereichs laden",
     "search": {
       "placeholder": "Notiz suchen..."
     },
@@ -4796,6 +4826,21 @@
     "manage_button": "Benutzer verwalten",
     "footer": "Sie erhalten diese E-Mail, weil Benachrichtigungen über neue Benutzer für Ihr Administratorkonto aktiviert sind."
   },
+  "workspace_activity_email": {
+    "subject_one": "Änderungen im geteilten Arbeitsbereich {{workspace}}",
+    "subject_many": "Änderungen in {{count}} geteilten Arbeitsbereichen",
+    "heading": "Aktivität in geteilten Arbeitsbereichen",
+    "intro": "Änderungen anderer seit {{date}}.",
+    "shared_by": "Geteilt von {{user}}",
+    "shared_by_you": "Von Ihnen geteilt",
+    "created_by": "Erstellt von {{user}}",
+    "edited_by": "Bearbeitet von {{user}}",
+    "deleted_by": "Gelöscht von {{user}}",
+    "untitled_note": "Unbenannte Notiz",
+    "more": "und {{count}} weitere",
+    "footer": "Sie erhalten diese E-Mail, weil E-Mails zu geteilten Arbeitsbereichen in Ihren Poznote-Einstellungen aktiviert sind.",
+    "settings_link": "Einstellungen öffnen"
+  },
   "tasks_page": {
     "title": "Aufgaben",
     "progress": "{{completed}} von {{total}} Aufgaben erledigt",
@@ -4818,7 +4863,11 @@
     "expand_all": "Alle ausklappen",
     "view_list": "Listenansicht",
     "view_calendar": "Kalenderansicht",
-    "calendar_no_tasks": "Keine Aufgaben an diesem Tag."
+    "calendar_no_tasks": "Keine Aufgaben an diesem Tag.",
+    "hide_list": "Auf dieser Seite ausblenden",
+    "unhide_list": "Auf dieser Seite wieder anzeigen",
+    "show_hidden": "Ausgeblendete Listen anzeigen",
+    "empty_hidden": "Alle Listen sind ausgeblendet."
   },
   "s3_settings": {
     "title": "S3-Speicher für Anhänge",
@@ -5032,6 +5081,7 @@
     },
     "save_note": "Notiz speichern",
     "snapshot": "Snapshot der Notiz erstellen",
+    "search_replace": "In der Notiz suchen und ersetzen",
     "note_nav": "Vorherige oder nächste Notiz im Ordner",
     "close": "Menü, Seitenleiste oder Fenster schließen",
     "bold": "Fett",

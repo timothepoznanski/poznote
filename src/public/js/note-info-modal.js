@@ -9,6 +9,10 @@
  * so this module only puts strings where the markup says they go. The rows
  * keep the values of the previous note while the request is in flight, which
  * is why they are cleared first.
+ *
+ * The exception is the three counts (characters, words, lines): they come
+ * from js/note-stats.js, which counts the note on screen, so the dialog shows
+ * the same figures as the line under the note title.
  */
 (function () {
     'use strict';
@@ -57,6 +61,19 @@
         }
     }
 
+    /** The counts of the note on screen, added to what the server sent */
+    function withNoteStats(info, noteId) {
+        var stats = (typeof window.getNoteStats === 'function') ? window.getNoteStats(noteId) : null;
+        var notAvailable = (typeof window.t === 'function')
+            ? window.t('common.not_available', null, 'Not available')
+            : 'Not available';
+
+        ['characters', 'words', 'lines'].forEach(function (unit) {
+            info[unit] = stats ? stats.formatted[unit] : notAvailable;
+        });
+        return info;
+    }
+
     function showNoteInfoModal(noteId) {
         var modal = getModal();
         if (!modal || !noteId) return;
@@ -96,7 +113,7 @@
                 if (!result.ok || !result.data || !result.data.success) {
                     throw new Error((result.data && result.data.message) || 'Request failed');
                 }
-                fillValues(modal, result.data.info || {});
+                fillValues(modal, withNoteStats(result.data.info || {}, noteId));
             })
             .catch(function (error) {
                 if (error && error.name === 'AbortError') return;

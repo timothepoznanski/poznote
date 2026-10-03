@@ -16,6 +16,9 @@
  *
  * A note or a folder whose icon was customised in the sidebar carries that
  * icon, which the view draws in place of the dot.
+ *
+ * The view opens on the most recently modified notes only (?limit=), so a
+ * large workspace does not read every note file before anything shows.
  */
 require_once __DIR__ . '/../../../note_loader.php';
 
@@ -38,7 +41,8 @@ class GraphController
      *
      * Returns every non-trash note of the workspace as a node, plus one edge
      * per (source, target) pair of linked notes, and the folders those notes
-     * sit in.
+     * sit in. With ?limit=N the graph is cut down to the N notes modified
+     * last; `total` tells how many notes the workspace holds.
      */
     public function index(): void
     {
@@ -48,7 +52,13 @@ class GraphController
                 $workspace = trim($_GET['workspace']);
             }
 
-            $sql = "SELECT id, heading, type, folder, folder_id, favorite, icon, icon_color
+            $limit = 0; // 0 = every note
+            if (isset($_GET['limit']) && is_scalar($_GET['limit'])) {
+                $limit = max(0, (int) $_GET['limit']);
+            }
+
+            $sql = "SELECT id, heading, type, folder, folder_id, favorite, icon, icon_color,
+                           COALESCE(updated, created) AS modified
                       FROM entries
                      WHERE trash = 0
                        AND type IN ('note', 'markdown', 'tasklist')";
@@ -64,10 +74,25 @@ class GraphController
 
             $folderRows = $this->loadFolders($workspace);
 
-            // --- Build nodes and lookup tables
-            $nodes      = [];
-            $idSet      = [];
+            // --- Wiki-links resolve against every note of the workspace, so
+            // a title leads to the same note whatever the limit
             $headingMap = []; // lowercased heading => note id (first wins)
+            foreach ($rows as $row) {
+                $heading = (string) ($row['heading'] ?? '');
+                if ($heading !== '') {
+                    $key = mb_strtolower($heading);
+                    if (!isset($headingMap[$key])) {
+                        $headingMap[$key] = (int) $row['id'];
+                    }
+                }
+            }
+
+            $total = count($rows);
+            $rows  = $this->mostRecent($rows, $limit);
+
+            // --- Build nodes and lookup tables
+            $nodes = [];
+            $idSet = [];
 
             foreach ($rows as $row) {
                 $id      = (int) $row['id'];
@@ -93,12 +118,6 @@ class GraphController
                 ] + $this->customIcon($row, defaultNoteIconForType($row['type']));
 
                 $idSet[$id] = true;
-                if ($heading !== '') {
-                    $key = mb_strtolower($heading);
-                    if (!isset($headingMap[$key])) {
-                        $headingMap[$key] = $id;
-                    }
-                }
             }
 
             // --- Scan each note's content file for links to other notes
@@ -147,7 +166,7 @@ class GraphController
 
                 foreach (array_keys($targets) as $targetId) {
                     // Skip self-links and links to notes outside the node set
-                    // (trashed, other workspace, linked-type notes)
+                    // (trashed, other workspace, linked-type notes, beyond the limit)
                     if ($targetId === $sourceId || !isset($idSet[$targetId])) {
                         continue;
                     }
@@ -164,6 +183,7 @@ class GraphController
                 'nodes'   => $nodes,
                 'edges'   => $edges,
                 'folders' => $this->foldersHoldingNotes($folderRows, $nodes),
+                'total'   => $total,
             ]);
 
         } catch (Exception $e) {
@@ -174,6 +194,36 @@ class GraphController
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * The $limit rows modified last, in the order they came in; every row
+     * when there is no limit or fewer rows than that.
+     *
+     * @param array<int, array<string, mixed>> $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function mostRecent(array $rows, int $limit): array
+    {
+        if ($limit <= 0 || count($rows) <= $limit) {
+            return $rows;
+        }
+
+        $byDate = $rows;
+        usort($byDate, static function (array $a, array $b): int {
+            // Same second (an import, a restore): the newer note first
+            return strcmp((string) ($b['modified'] ?? ''), (string) ($a['modified'] ?? ''))
+                ?: ((int) $b['id'] <=> (int) $a['id']);
+        });
+
+        $kept = [];
+        foreach (array_slice($byDate, 0, $limit) as $row) {
+            $kept[(int) $row['id']] = true;
+        }
+
+        return array_values(array_filter($rows, static function (array $row) use ($kept): bool {
+            return isset($kept[(int) $row['id']]);
+        }));
+    }
 
     /**
      * Folders of the workspace, keyed by id.

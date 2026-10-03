@@ -40,7 +40,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:two-factor-card" checked><span><?php echo t_h('settings.cards.two_factor', [], 'Two-factor authentication'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:app-passwords-card" checked><span><?php echo t_h('settings.cards.app_passwords', [], 'App passwords'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:delete-account-card" checked><span><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspaces-card" checked><span><?php echo t_h('settings.cards.workspaces', [], 'Workspaces'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:default-workspace-card" checked><span><?php echo t_h('workspaces.default.title', [], 'Default Workspace'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-card" checked><span><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backup-export-card" checked><span><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:restore-import-card" checked><span><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span></label>
@@ -60,6 +60,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:timezone-card" checked><span><?php echo t_h('display.cards.timezone', [], 'Timezone'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:date-time-format-card" checked><span><?php echo t_h('display.cards.date_time_format', [], 'Date & time format'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:workspace-activity-emails-card" checked><span><?php echo t_h('display.cards.workspace_activity_emails', [], 'Shared workspace emails'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-age-filter-card" checked><span><?php echo t_h('display.cards.note_age_filter', [], 'Note age filter'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:snapshots-card" checked><span><?php echo t_h('display.cards.snapshots', [], 'Snapshots'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:offline-notes-card" checked><span><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></span></label>
@@ -286,9 +287,15 @@
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
 <div class="ui-custom-items">
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-scrollbar" checked><span><?php echo t_h('modals.ui_customization.note_scrollbar', [], 'Note scrollbar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:preview-code-block-delete" checked><span><?php echo t_h('modals.ui_customization.preview_code_block_delete', [], 'Delete button on code blocks, in markdown preview'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-created-date" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-updated-date" checked><span><?php echo t_h('modals.ui_customization.note_updated_date', [], 'Show modification date'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-stats-characters" checked><span><?php echo t_h('modals.ui_customization.note_stats_characters', [], 'Show character count'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-stats-words" checked><span><?php echo t_h('modals.ui_customization.note_stats_words', [], 'Show word count'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-stats-lines" checked><span><?php echo t_h('modals.ui_customization.note_stats_lines', [], 'Show line count'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-info-icon" checked><span><?php echo t_h('modals.ui_customization.note_info_icon', [], 'Show information icon under the note title'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-icons" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard"><input type="checkbox" data-ui-key="card:edgeAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeFocusModeBtn" checked><span><?php echo t_h('focus_mode.button', [], 'Focus mode'); ?></span></label>

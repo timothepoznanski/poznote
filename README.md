@@ -632,7 +632,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Usage:** Manage tasks and projects with interactive checklists.
 *   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list. A progress bar shows the completion of each list.
 *   **Task Options:** Each task can have a due date with an optional time, a reminder notification that fires at the due time, and an important flag, and can be moved to another list.
-*   **Tasks Page:** A dedicated Tasks page, opened from the left icon rail, gathers in one place every task of your task lists and, optionally, the checkboxes sitting inside ordinary notes. It offers status filters (to do, important, overdue, with due date, completed), a text filter, and a calendar view of the tasks that carry a due date.
+*   **Tasks Page:** A dedicated Tasks page, opened from the left icon rail, gathers in one place every task of your task lists and, optionally, the checkboxes sitting inside ordinary notes. It offers status filters (to do, important, overdue, with due date, completed), a text filter, and a calendar view of the tasks that carry a due date. A task list, or the checkboxes of a note, can be hidden from the page with the eye button of its header and brought back with **Show hidden lists**. The choice is saved in your account, so it follows you from one device to the next.
 *   **Public Collaboration:** Task lists can be shared via a public URL. If edit permissions are granted, external collaborators can check items off the list without needing a Poznote account.
 </details>
 
@@ -725,7 +725,7 @@ The theme is not a card here: the button at the bottom of the left icon rail wal
 <summary><strong>Workspace Background Image</strong></summary>
 <br>
 
-You can set a background image per workspace: open the **Workspaces** page and use the **Background** action of the workspace to upload an image and adjust its opacity, so each workspace gets its own visual identity.
+You can set a background image per workspace: open **Settings > Workspaces** and use the **Background** action of the workspace to upload an image and adjust its opacity, so each workspace gets its own visual identity.
 
 </details>
 
@@ -838,7 +838,7 @@ Override the tokens on `:root` for light and on `:root[data-theme='dark']` for d
 Poznote is multi-user: each profile has its own notes, workspaces, tags, folders, attachments and settings, and signs in with its own username or email address and password.
 
 - **User management**: administrators create, disable and manage profiles from **Settings > Admin Tools > User Management**, and can give a user access to another user's account without transferring its ownership.
-- **Sharing**: notes and folders can be shared with other users of the instance, read-only or editable, or publicly through dedicated links. An entire workspace can be shared with other users of the instance, who find it in their workspace menu and edit it alongside its owner. When several users can access the same note, only one edits it at a time and the others see who holds the lock.
+- **Sharing**: notes and folders can be shared with other users of the instance, read-only or editable, or publicly through dedicated links. An entire workspace can be shared with other users of the instance, who find it in their workspace menu and edit it alongside its owner. When the instance sends email (SMTP), each member can turn on **Settings > Workspaces > Shared workspace emails** to receive the list of notes the others created, edited or deleted there, a few minutes after the changes happen, or as a summary sent every day at 8:00 or every Monday at 8:00 (in the member's timezone). When several users can access the same note, only one edits it at a time and the others see who holds the lock.
 - **Editing the same note**: one person edits at a time. When a note is locked, the read-only banner offers to **take over**: the previous editor's screen turns read-only and their unsaved changes stay in their browser, offered again once the note is free. An open note picks up changes made elsewhere within a few seconds. For a **Markdown** note with unsaved edits on both sides, the two sets of changes are merged automatically when they touch different lines, and a banner lets you choose when they overlap. Rich-text notes are never merged, you choose which version to keep. Keep scripts and other code in fenced code blocks (```` ``` ````): raw HTML outside a code block is sanitized on save, which can make an otherwise clean merge look like a conflict.
 - **Tenant isolation (SaaS mode)**: administrators can stop non-admin users from discovering the other accounts of the instance, sharing with them, or registering personal webhooks. Leave everything unchecked for a family or team instance.
 
