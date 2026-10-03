@@ -4434,7 +4434,8 @@
       "size_wide": "Anchas",
       "layout": "Disposición",
       "layout_grid": "Cuadrícula",
-      "layout_list": "Lista"
+      "layout_list": "Lista",
+      "full_height": "Tarjetas a altura completa"
     },
     "scope": {
       "title": "Ámbito",

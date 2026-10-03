@@ -4434,7 +4434,8 @@
       "size_wide": "Largos",
       "layout": "Disposição",
       "layout_grid": "Grelha",
-      "layout_list": "Lista"
+      "layout_list": "Lista",
+      "full_height": "Cartões em altura completa"
     },
     "scope": {
       "title": "Escopo",

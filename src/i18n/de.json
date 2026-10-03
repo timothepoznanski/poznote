@@ -4433,7 +4433,8 @@
       "size_wide": "Breit",
       "layout": "Anordnung",
       "layout_grid": "Raster",
-      "layout_list": "Liste"
+      "layout_list": "Liste",
+      "full_height": "Karten in voller Höhe"
     },
     "scope": {
       "title": "Bereich",

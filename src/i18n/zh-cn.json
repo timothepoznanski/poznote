@@ -4530,7 +4530,8 @@
       "size_wide": "宽",
       "layout": "布局",
       "layout_grid": "网格",
-      "layout_list": "列表"
+      "layout_list": "列表",
+      "full_height": "卡片显示完整高度"
     },
     "scope": {
       "title": "范围",

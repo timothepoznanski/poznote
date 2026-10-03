@@ -4061,7 +4061,8 @@
       "size_wide": "Wide",
       "layout": "Layout",
       "layout_grid": "Grid",
-      "layout_list": "List"
+      "layout_list": "List",
+      "full_height": "Full-height cards"
     },
     "scope": {
       "title": "Scope",

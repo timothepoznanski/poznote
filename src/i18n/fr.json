@@ -4538,7 +4538,8 @@
       "size_wide": "Larges",
       "layout": "Disposition",
       "layout_grid": "Grille",
-      "layout_list": "Liste"
+      "layout_list": "Liste",
+      "full_height": "Cartes en pleine hauteur"
     },
     "scope": {
       "title": "Périmètre",

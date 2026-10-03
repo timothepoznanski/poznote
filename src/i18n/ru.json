@@ -4068,7 +4068,8 @@
       "size_wide": "Широкие",
       "layout": "Компоновка",
       "layout_grid": "Сетка",
-      "layout_list": "Список"
+      "layout_list": "Список",
+      "full_height": "Карточки в полную высоту"
     },
     "scope": {
       "title": "Охват",

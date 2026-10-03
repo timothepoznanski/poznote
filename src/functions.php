@@ -806,7 +806,8 @@ function requireSettingsPassword() {
  * Render the view controls used by the dashboard and diary boards, next to
  * the filter bar. $prefix namespaces the localStorage keys so each page
  * remembers its own settings. A single toggle cycles through the views
- * (grid small/medium/large/wide, then list), driven by board-view-menu.js.
+ * (grid small/medium/large/wide, then list), and a second one lets each grid
+ * card take the height of its own content, both driven by board-view-menu.js.
  * There is no column setting: the grid fits as many cards of the chosen size
  * as the width allows, like Google Keep.
  */
@@ -823,6 +824,11 @@ function renderBoardViewMenu(string $prefix) {
             '<i class="lucide lucide-grid"></i>' .
             '<i class="lucide lucide-layout-list"></i>' .
             '<span class="board-view-size-letter"></span>' .
+        '</button>' .
+        '<button type="button" id="' . $idPrefix . 'ViewFullHeightBtn" class="board-view-btn board-view-full-height-toggle" aria-pressed="false"' .
+            ' title="' . t_h('dashboard.view.full_height', [], 'Full-height cards') . '"' .
+            ' aria-label="' . t_h('dashboard.view.full_height', [], 'Full-height cards') . '">' .
+            '<i class="lucide lucide-move-vertical"></i>' .
         '</button>' .
     '</div>';
 }
