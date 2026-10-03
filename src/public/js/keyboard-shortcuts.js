@@ -2,8 +2,9 @@
  * Global keyboard shortcuts
  * - Ctrl+S / Cmd+S: save the current note
  * - Ctrl+Alt+S / Cmd+Alt+S: take a snapshot of the current note
+ * - Ctrl+Shift+F / Cmd+Shift+F: open the note's search and replace bar
  * - Alt+ArrowUp / Alt+ArrowDown: switch between notes in the current folder
- * All three are always on; the former opt-in settings were removed.
+ * All are always on; the former opt-in settings were removed.
  */
 
 (function () {
@@ -115,6 +116,16 @@
             if (typeof window.saveNoteImmediately === 'function') {
                 // The toast only once the server confirmed the save
                 window.saveNoteImmediately({ onSaved: showSavedToast });
+            }
+            return;
+        }
+
+        // Ctrl+Shift+F / Cmd+Shift+F opens the note's search and replace bar
+        // (#1548). Ctrl+F stays the browser's own find.
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey && key === 'f') {
+            if (typeof window.openSearchReplaceShortcut !== 'function') return;
+            if (window.openSearchReplaceShortcut()) {
+                e.preventDefault();
             }
             return;
         }
