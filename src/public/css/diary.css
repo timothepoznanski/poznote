@@ -749,6 +749,32 @@ body.markdown-colored .diary-journal-markdown h6 {
     color: var(--mdc-h6);
 }
 
+/* Heading lines of a card's excerpt (board view), levels from
+   buildNoteCardPreview() */
+body.markdown-colored .board-card-excerpt .board-card-h1 {
+    color: var(--mdc-h1);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h2 {
+    color: var(--mdc-h2);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h3 {
+    color: var(--mdc-h3);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h4 {
+    color: var(--mdc-h4);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h5 {
+    color: var(--mdc-h5);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h6 {
+    color: var(--mdc-h6);
+}
+
 body.markdown-colored .diary-journal-markdown pre {
     background: color-mix(in srgb, var(--mdc-codeblock) 8%, var(--pz-surface));
 }

@@ -12,3 +12,45 @@ test('markdown checklist items are read with their state', function () {
 test('text that is not a checklist yields no items', function () {
     assertSame([], extractMarkdownChecklistItems("juste un paragraphe\n\net un autre"));
 });
+
+// buildNoteCardPreview() reads the note's file: point it at a temp one.
+if (!function_exists('getEntryFilename')) {
+    function getEntryFilename($id, $type) {
+        return sys_get_temp_dir() . '/poznote-test-entry-' . (int)$id . '.txt';
+    }
+}
+
+function cardPreviewOf(string $content, string $type, bool $withSearch = true): array {
+    $file = getEntryFilename(987654, $type);
+    file_put_contents($file, $content);
+    try {
+        return buildNoteCardPreview(987654, $type, $withSearch);
+    } finally {
+        @unlink($file);
+    }
+}
+
+test('a markdown card excerpt gives the heading level of each line', function () {
+    foreach ([true, false] as $withSearch) {
+        $preview = cardPreviewOf("# Title\n\nSome **text**\n\n### Sub part\n- item", 'markdown', $withSearch);
+        assertSame("Title\nSome text\nSub part\n- item", $preview['text']);
+        assertSame([1, 0, 3, 0], $preview['headings']);
+    }
+    assertSame('Title Some text Sub part - item', cardPreviewOf("# Title\n\nSome **text**\n\n### Sub part\n- item", 'markdown')['search']);
+});
+
+test('a heading emptied by the excerpt takes no line', function () {
+    $preview = cardPreviewOf("## ![photo](attachments/1.png)\ntext\n## Next", 'markdown');
+    assertSame("text\nNext", $preview['text']);
+    assertSame([0, 2], $preview['headings']);
+});
+
+test('heading levels stop where the excerpt is cut', function () {
+    $preview = cardPreviewOf("# One\n" . str_repeat('word ', 60) . "\n## Two", 'markdown');
+    assertSame([1, 0], $preview['headings']);
+});
+
+test('an excerpt without a heading has no levels', function () {
+    assertSame(null, cardPreviewOf("plain\n#tag and # in a line", 'markdown')['headings']);
+    assertSame(null, cardPreviewOf('<h1>Title</h1><p>text</p>', 'note')['headings']);
+});

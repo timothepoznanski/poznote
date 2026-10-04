@@ -84,6 +84,9 @@ function diaryBuildNoteData(array $note, string $pageWorkspace): array {
         // newtab=1 tells tabs.js to open the note as a new internal tab (see js/tabs.js).
         'url'       => 'index.php?note=' . $noteId . '&newtab=1' . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
         'text'      => $preview['text'],
+        // Heading level of each line of the excerpt (markdown), for the
+        // "Colored markdown" tints of the cards
+        'headings'  => $preview['headings'] ?? null,
         'tasks'     => $preview['tasks'],
         'image'     => $preview['image'] ?? null,
         'tags'      => $tags,

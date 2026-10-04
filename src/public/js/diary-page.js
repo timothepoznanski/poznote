@@ -84,7 +84,13 @@
         } else if (note.text) {
             // The preview keeps the note's line breaks; render them as <br>
             // (line-clamp handles <br> correctly, unlike white-space: pre-line)
-            content = '<div class="board-card-excerpt">' + esc(note.text).replace(/\n/g, '<br>') + '</div>';
+            // A markdown heading line carries its level, tinted by the
+            // "Colored markdown" setting like the note (css/diary.css)
+            var headings = note.headings || [];
+            content = '<div class="board-card-excerpt">' + note.text.split('\n').map(function (line, index) {
+                var level = headings[index];
+                return level ? '<span class="board-card-heading board-card-h' + level + '">' + esc(line) + '</span>' : esc(line);
+            }).join('<br>') + '</div>';
         }
 
         // First image of the note as a thumbnail next to the excerpt. It
@@ -463,6 +469,8 @@
         }
         text = text.replace(/\s+/g, ' ').trim();
         note.text = text.length > 300 ? text.slice(0, 300) : text;
+        // One line from here on: the levels of the old excerpt no longer apply
+        note.headings = null;
         note.search = normalizeSearchText(note.heading + ' ' + (note.tags || []).join(' ') + ' ' + text);
     }
 
