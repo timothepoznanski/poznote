@@ -4746,7 +4746,8 @@
       "errors": {
         "failed_to_load": "Ошибка: не удалось загрузить Excalidraw. Обновите страницу.",
         "initializing_prefix": "Ошибка инициализации Excalidraw: {{error}}",
-        "save_failed": "Не удалось сохранить"
+        "save_failed": "Не удалось сохранить",
+        "save_timeout": "Сервер не ответил вовремя. Ваша диаграмма по-прежнему открыта здесь, попробуйте сохранить ещё раз."
       },
       "loading": "Загрузка Excalidraw Poznote...",
       "titles": {

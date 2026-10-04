@@ -264,7 +264,8 @@
       "errors": {
         "failed_to_load": "Erreur : impossible de charger Excalidraw. Veuillez rafraîchir la page.",
         "initializing_prefix": "Erreur lors de l’initialisation d’Excalidraw : {{error}}",
-        "save_failed": "Échec de l’enregistrement"
+        "save_failed": "Échec de l’enregistrement",
+        "save_timeout": "Le serveur n’a pas répondu à temps. Votre diagramme est toujours ouvert ici, essayez d’enregistrer à nouveau."
       }
     },
     "messages": {

@@ -82,17 +82,15 @@ if ($note_id > 0) {
         } else {
             // Full note mode: extract from excalidraw-data div or legacy database (always in .html files)
             require_once __DIR__ . '/../functions.php';
+            require_once __DIR__ . '/../lib/excalidraw-note-html.php';
             $html_file = getEntriesPath() . '/' . $note_id . '.html';
             if (file_exists($html_file)) {
                 $html_content = file_get_contents($html_file);
-                // Extract JSON from the hidden excalidraw-data div
-                if (preg_match('/<div class="excalidraw-data"[^>]*>(.*?)<\/div>/s', $html_content, $matches)) {
-                    $extracted_json = $matches[1];
-                    // Decode HTML entities
-                    $extracted_json = html_entity_decode($extracted_json, ENT_QUOTES | ENT_HTML5);
-                    // Trim whitespace
-                    $extracted_json = trim($extracted_json);
-                    
+                // Extract JSON from the hidden excalidraw-data div, without a
+                // regex across it: a diagram holding a photo runs past what
+                // PCRE can backtrack over (issue #1567)
+                $extracted_json = poznoteReadExcalidrawNoteData((string)$html_content);
+                if ($extracted_json !== null) {
                     // Validate JSON before using it
                     if (!empty($extracted_json) && $extracted_json !== '{}') {
                         $json_test = json_decode($extracted_json, true);
@@ -108,25 +106,16 @@ if ($note_id > 0) {
                         $existing_data = null;
                     }
                 } else {
-                    // No excalidraw-data div found in HTML, try database as fallback
-                    if ($entry_content && strpos($entry_content, '<div class="excalidraw-container"') === false) {
-                        // Legacy system: entry field contains direct JSON data
-                        $existing_data = $entry_content;
-                        if ($excalidraw_debug) error_log("Using legacy JSON from database for note $note_id");
-                    } else {
-                        if ($excalidraw_debug) error_log("No excalidraw-data div found in HTML and no legacy JSON in database for note $note_id");
-                        $existing_data = null;
-                    }
+                    // No excalidraw-data div found in HTML, try database as
+                    // fallback: the note's HTML, or the diagram JSON itself
+                    // on a note last saved by an older version
+                    $existing_data = poznoteExcalidrawDataFromEntry($entry_content);
+                    if ($excalidraw_debug) error_log(($existing_data !== null ? "Using database content" : "No excalidraw-data div found in HTML and no diagram in database") . " for note $note_id");
                 }
             } else {
                 // HTML file doesn't exist, use database content as fallback
-                if ($entry_content && strpos($entry_content, '<div class="excalidraw-container"') === false) {
-                    $existing_data = $entry_content;
-                    if ($excalidraw_debug) error_log("HTML file not found, using database content for note $note_id");
-                } else {
-                    if ($excalidraw_debug) error_log("HTML file not found and database content is HTML for note $note_id");
-                    $existing_data = null;
-                }
+                $existing_data = poznoteExcalidrawDataFromEntry($entry_content);
+                if ($excalidraw_debug) error_log("HTML file not found, " . ($existing_data !== null ? "using database content" : "and no diagram in database") . " for note $note_id");
             }
         }
         
@@ -205,7 +194,8 @@ if ($note_id > 0) {
                 'failedToLoad' => t('excalidraw.editor.errors.failed_to_load', [], 'Error: Failed to load Excalidraw. Please refresh the page.'),
                 'initErrorTemplate' => t('excalidraw.editor.errors.initializing_prefix', ['error' => '{{error}}'], 'Error initializing Excalidraw: {{error}}'),
                 'errorTemplate' => t('excalidraw.editor.alerts.error_prefix', ['error' => '{{error}}'], 'Error: {{error}}'),
-                'saveFailed' => t('excalidraw.editor.errors.save_failed', [], 'Save failed')
+                'saveFailed' => t('excalidraw.editor.errors.save_failed', [], 'Save failed'),
+                'saveTimeout' => t('excalidraw.editor.errors.save_timeout', [], 'The server did not answer in time. Your diagram is still open here, try saving again.')
             ]
         ];
         echo json_encode($excalidrawConfig);

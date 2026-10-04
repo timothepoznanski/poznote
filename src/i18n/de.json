@@ -265,7 +265,8 @@
       "errors": {
         "failed_to_load": "Fehler: Excalidraw konnte nicht geladen werden. Bitte laden Sie die Seite neu.",
         "initializing_prefix": "Fehler beim Initialisieren von Excalidraw: {{error}}",
-        "save_failed": "Speichern fehlgeschlagen"
+        "save_failed": "Speichern fehlgeschlagen",
+        "save_timeout": "Der Server hat nicht rechtzeitig geantwortet. Ihr Diagramm ist hier weiterhin geöffnet, versuchen Sie erneut zu speichern."
       }
     },
     "messages": {

@@ -104,7 +104,18 @@ function removeImageMenu(menu) {
 function buildImageMenuHTML(img) {
     // Check if this is an Excalidraw image
     const isExcalidraw = img.getAttribute('data-is-excalidraw') === 'true';
-    const excalidrawNoteId = img.getAttribute('data-excalidraw-note-id');
+    // A standalone diagram carries the id of its note; one embedded in a
+    // note does not, and gets its own Edit entry further down. The id opened
+    // is that of the note the diagram is shown in, not the one frozen in the
+    // markup: an imported or duplicated note still carries the id of the
+    // note it came from, and Edit would open that one, and save into it.
+    let excalidrawNoteId = img.getAttribute('data-excalidraw-note-id');
+    if (excalidrawNoteId) {
+        const hostEntry = img.closest('.noteentry[data-note-id]');
+        if (hostEntry && !hostEntry.hasAttribute('data-linked-note-id')) {
+            excalidrawNoteId = hostEntry.getAttribute('data-note-id');
+        }
+    }
 
     // Also check if this image is inside an Excalidraw container
     const excalidrawContainer = img.closest('.excalidraw-container');

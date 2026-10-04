@@ -793,6 +793,11 @@ array_unshift($messages, ['role' => 'system', 'content' => $system]);
 // Streaming chat loop with tool calling
 // ---------------------------------------------------------------------------
 
+// Nothing below writes to the session, and an answer can stream for
+// minutes: holding PHP's session lock that long made every other request of
+// this browser wait, an Excalidraw save among them (issue #1567).
+session_write_close();
+
 set_time_limit(0);
 // Keep running after the browser disconnects so the streaming loop can shut
 // down cleanly: with ignore_user_abort(false), PHP kills the script from

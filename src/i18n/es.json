@@ -265,7 +265,8 @@
       "errors": {
         "failed_to_load": "Error: Falló al cargar Excalidraw. Por favor refresca la página.",
         "initializing_prefix": "Error al inicializar Excalidraw: {{error}}",
-        "save_failed": "Guardado fallido"
+        "save_failed": "Guardado fallido",
+        "save_timeout": "El servidor no respondió a tiempo. Su diagrama sigue abierto aquí, intente guardar de nuevo."
       }
     },
     "messages": {

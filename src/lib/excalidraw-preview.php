@@ -67,18 +67,33 @@ function poznoteIsAcceptableExcalidrawPreviewSvg(string $svg): bool
         return false;
     }
 
-    if (preg_match('/<\s*(script|foreignObject|iframe|embed|object)\b/i', $svg)) {
+    // The checks below read the markup, not the payloads: an embedded photo
+    // or font is one base64 run that can reach megabytes, long enough for
+    // the handler check to exhaust PCRE's backtracking (issue #1567). Base64
+    // holds no "<", quote or "=" before its padding, so nothing it could hide
+    // is lost by cutting it out.
+    $markup = preg_replace('/;base64,[A-Za-z0-9+\/]++=*+/', ';base64,', $svg);
+    if ($markup === null) {
         return false;
     }
-    // Event handler attributes. Text content is entity-escaped in the
-    // serialized SVG, so a raw "<" only ever opens a real tag here.
-    if (preg_match('/<[^>]*\son[a-z]+\s*=/i', $svg)) {
-        return false;
-    }
-    // Excalidraw only references its embedded images (data:) and its own
-    // <symbol> definitions (#).
-    if (preg_match('/\b(?:xlink:)?href\s*=\s*["\'](?!data:image\/|#)/i', $svg)) {
-        return false;
+
+    $refusals = [
+        '/<\s*(script|foreignObject|iframe|embed|object)\b/i',
+        // Event handler attributes. Text content is entity-escaped in the
+        // serialized SVG, so a raw "<" only ever opens a real tag here.
+        // Possessive, so a tag is read once whatever the size of a drawing's
+        // path data, and quoted values are stepped over whole, so a ">"
+        // inside one does not end the tag early and hide what follows.
+        '/<(?:[^>\s"\']++|"[^"]*+"|\'[^\']*+\'|\s(?!on[a-z]+\s*=))*+\son[a-z]+\s*=/i',
+        // Excalidraw only references its embedded images (data:) and its own
+        // <symbol> definitions (#).
+        '/\b(?:xlink:)?href\s*=\s*["\'](?!data:image\/|#)/i',
+    ];
+    foreach ($refusals as $pattern) {
+        // false is a regex that gave up, which proves nothing either way
+        if (preg_match($pattern, $markup) !== 0) {
+            return false;
+        }
     }
 
     return true;

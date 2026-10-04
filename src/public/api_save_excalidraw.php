@@ -8,6 +8,13 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../lib/excalidraw-preview.php';
+require_once __DIR__ . '/../lib/excalidraw-note-html.php';
+
+// Everything below only reads the session. A save carries megabytes when
+// the diagram holds a photo and may wait on attachment storage (S3), and
+// PHP's session lock would make every other request of this browser wait
+// for it (issue #1567).
+session_write_close();
 
 // Check that the request is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -58,6 +65,33 @@ function excalidrawReadPreviewSvg(): ?string {
     return $svg;
 }
 
+/**
+ * The attachment list without the previews a save replaces. A preview that a
+ * revision of the note still shows stays on disk, hidden from the note
+ * (snapshot_only), so that restoring the revision brings its image back
+ * instead of a broken one; poznotePruneSnapshotOnlyAttachments() deletes it
+ * once no revision references it any more.
+ */
+function excalidrawRetirePreviews(int $note_id, array $attachments, array $oldIds): array {
+    $snapshotContents = null;
+    $kept = [];
+    foreach ($attachments as $attachment) {
+        if (!is_array($attachment) || !isset($attachment['id']) || !in_array($attachment['id'], $oldIds, true)) {
+            $kept[] = $attachment;
+            continue;
+        }
+        $snapshotContents = $snapshotContents ?? poznoteReadNoteSnapshotContents($note_id);
+        if (poznoteAttachmentIsReferencedInSnapshots($note_id, $attachment, $snapshotContents)) {
+            $attachment['snapshot_only'] = true;
+            $kept[] = $attachment;
+        } else {
+            // Delete the old file (local disk or S3 bucket)
+            poznoteDeleteAttachmentFile($attachment['filename'] ?? '');
+        }
+    }
+    return $kept;
+}
+
 if ($action === 'save_embedded_diagram') {
     // Handle embedded diagram save
     saveEmbeddedDiagram();
@@ -103,6 +137,7 @@ if ($image_data !== null) {
 }
 
 // If note_id is 0, we need to create a new note
+$is_new_note = ($note_id === 0);
 if ($note_id === 0) {
     $quotaError = poznoteCheckNoteQuota($con)
         ?? poznoteCheckStorageQuota(strlen((string)$diagram_data));
@@ -160,9 +195,10 @@ if ($note_id === 0) {
     // Update existing note. The heading is deliberately left untouched: the
     // editor has no title field, and the posted heading is only meaningful
     // when creating the note (it may also have been de-duplicated by
-    // generateUniqueTitle at creation time).
-    $stmt = $con->prepare('UPDATE entries SET entry = ?, updated = datetime("now"), updated_by_user_id = ? WHERE id = ? AND workspace = ? AND trash = 0');
-    if (!$stmt->execute([$diagram_data, $actor_user_id, $note_id, $workspace])) {
+    // generateUniqueTitle at creation time). The entry column is written
+    // further down, once the note's HTML is known.
+    $stmt = $con->prepare('UPDATE entries SET updated = datetime("now"), updated_by_user_id = ? WHERE id = ? AND workspace = ? AND trash = 0');
+    if (!$stmt->execute([$actor_user_id, $note_id, $workspace])) {
         http_response_code(500);
         echo json_encode(['success' => false, 'message' => 'Error updating note']);
         exit;
@@ -183,11 +219,15 @@ if ($note_id > 0) {
     
     // Check if file exists to preserve existing content
     $existing_content = '';
+    $existing_diagrams = [];
     $existing_img_classes = '';
     $existing_img_style = '';
     if (file_exists($noteFilename)) {
-        $existing_content = file_get_contents($noteFilename);
-        
+        $existing_content = (string)file_get_contents($noteFilename);
+        // The diagram this save replaces, plus any copy an older save
+        // appended instead of replacing (issue #1567)
+        $existing_diagrams = poznoteFindExcalidrawNoteDiagrams($existing_content);
+
         // Extract existing image classes and style to preserve border settings
         if (preg_match('/<img[^>]+class="([^"]*)"[^>]*\/?>/', $existing_content, $class_matches)) {
             $existing_img_classes = $class_matches[1];
@@ -206,26 +246,16 @@ if ($note_id > 0) {
         $existingAttachments = $noteData && $noteData['attachments'] ? json_decode($noteData['attachments'], true) : [];
         if (!is_array($existingAttachments)) $existingAttachments = [];
         
-        // Find and remove old Excalidraw preview image
-        $oldAttachmentId = null;
-
-        // Extract old attachment ID from existing HTML
-        if (!empty($existing_content) && preg_match('/<img[^>]+src="\/api\/v1\/notes\/' . preg_quote($note_id, '/') . '\/attachments\/([a-zA-Z0-9._-]+)"[^>]*data-is-excalidraw="true"/', $existing_content, $matches)) {
-            $oldAttachmentId = $matches[1];
-        }
-
-        // Remove old attachment if found
-        if ($oldAttachmentId) {
-            $updatedAttachments = [];
-            foreach ($existingAttachments as $attachment) {
-                if (isset($attachment['id']) && $attachment['id'] === $oldAttachmentId) {
-                    // Delete the old file (local disk or S3 bucket)
-                    poznoteDeleteAttachmentFile($attachment['filename'] ?? '');
-                } else {
-                    $updatedAttachments[] = $attachment;
-                }
-            }
-            $existingAttachments = $updatedAttachments;
+        // Remove the preview images of the diagrams being replaced. The
+        // drawing before this save gets its automatic revision first (at
+        // most one every ten minutes), so that the preview it shows is
+        // known to be still needed.
+        $oldAttachmentIds = $existing_diagrams
+            ? poznoteExcalidrawNoteDiagramAttachmentIds($existing_content, $existing_diagrams, (int)$note_id)
+            : [];
+        if ($oldAttachmentIds) {
+            poznoteCreateAutomaticSnapshot($con, $note_id);
+            $existingAttachments = excalidrawRetirePreviews((int)$note_id, $existingAttachments, $oldAttachmentIds);
         }
 
         // Save the new preview as attachment
@@ -283,33 +313,33 @@ if ($note_id > 0) {
         $new_excalidraw_html .= '</div>';
     }
     
-    // If we have existing content, replace just the Excalidraw part
+    // If we have existing content, replace just the Excalidraw part, keeping
+    // whatever text the note has around it
     if (!empty($existing_content)) {
-        // Use regex to replace the existing excalidraw-container, including surrounding placeholders if they exist
-        $pattern_with_placeholders = '/(<p class="excalidraw-placeholder"[^>]*><\/p>)?\s*<div class="excalidraw-container"[^>]*>.*?<\/div>\s*(<p class="excalidraw-placeholder"[^>]*><\/p>)?/s';
-        
-        if (preg_match($pattern_with_placeholders, $existing_content, $matches, PREG_OFFSET_CAPTURE)) {
-            // Found existing container, replace without placeholders
-            $match_start = $matches[0][1];
-            $match_end = $match_start + strlen($matches[0][0]);
-            
-            $html_content = substr($existing_content, 0, $match_start) . $new_excalidraw_html . substr($existing_content, $match_end);
-        } else {
-            // No existing Excalidraw container found, append without placeholders
-            $html_content = $existing_content . $new_excalidraw_html;
-        }
+        $html_content = poznoteReplaceExcalidrawNoteDiagram($existing_content, $new_excalidraw_html, $existing_diagrams);
     } else {
         // New file, use the Excalidraw content without placeholders
         $html_content = $new_excalidraw_html;
     }
     
     // The drawing before this save: its automatic revision, at most one
-    // every ten minutes
-    poznoteCreateAutomaticSnapshot($con, $note_id);
+    // every ten minutes. A note created by this save has no "before": its
+    // revision used to hold the bare diagram JSON of the entry column, and
+    // restoring it turned the note into that JSON.
+    if (!$is_new_note) {
+        poznoteCreateAutomaticSnapshot($con, $note_id);
+    }
 
     // Write HTML content to file
     if (file_put_contents($noteFilename, $html_content) === false) {
         error_log("Failed to write HTML file for Excalidraw note ID $note_id");
+    } else {
+        // The entry column is what search reads, and it holds the note's HTML
+        // like after any other save. It used to get the diagram JSON alone,
+        // so text written around the diagram stopped being found until the
+        // note page saved it again.
+        $entryStmt = $con->prepare('UPDATE entries SET entry = ? WHERE id = ? AND workspace = ? AND trash = 0');
+        $entryStmt->execute([$html_content, $note_id, $workspace]);
     }
 }
 
@@ -398,18 +428,12 @@ function saveEmbeddedDiagram() {
                 $oldAttachmentId = $matches[1];
             }
 
-            // Remove old attachment if found
+            // Remove old attachment if found. The note before this save
+            // gets its automatic revision first, so that the preview it
+            // shows is known to be still needed.
             if ($oldAttachmentId) {
-                $updatedAttachments = [];
-                foreach ($existingAttachments as $attachment) {
-                    if (isset($attachment['id']) && $attachment['id'] === $oldAttachmentId) {
-                        // Delete the old file (local disk or S3 bucket)
-                        poznoteDeleteAttachmentFile($attachment['filename'] ?? '');
-                    } else {
-                        $updatedAttachments[] = $attachment;
-                    }
-                }
-                $existingAttachments = $updatedAttachments;
+                poznoteCreateAutomaticSnapshot($con, $note_id);
+                $existingAttachments = excalidrawRetirePreviews((int)$note_id, $existingAttachments, [$oldAttachmentId]);
             }
 
             // Save the new preview as attachment
