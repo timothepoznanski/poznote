@@ -3,6 +3,7 @@
  * - Ctrl+S / Cmd+S: save the current note
  * - Ctrl+Alt+S / Cmd+Alt+S: take a snapshot of the current note
  * - Ctrl+Shift+F / Cmd+Shift+F: open the note's search and replace bar
+ *   (plain Ctrl+F / Cmd+F does the same from the Markdown editor)
  * - Alt+ArrowUp / Alt+ArrowDown: switch between notes in the current folder
  * All are always on; the former opt-in settings were removed.
  */
@@ -15,6 +16,10 @@
     function isTextEditingContext(target) {
         return !!(target && target.closest &&
             target.closest('input, textarea, select, [contenteditable="true"], .CodeMirror, .cm-editor'));
+    }
+
+    function isMarkdownEditorTarget(target) {
+        return !!(target && target.closest && target.closest('.markdown-editor .cm-editor'));
     }
 
     function getVisibleNoteLinks() {
@@ -121,8 +126,12 @@
         }
 
         // Ctrl+Shift+F / Cmd+Shift+F opens the note's search and replace bar
-        // (#1548). Ctrl+F stays the browser's own find.
-        if ((e.ctrlKey || e.metaKey) && e.shiftKey && !e.altKey && key === 'f') {
+        // (#1548). Ctrl+F stays the browser's own find, except with the caret
+        // in the Markdown editor: CodeMirror only keeps the lines around the
+        // viewport in the DOM, so the browser finds nothing further down a
+        // long note (#1549). Ctrl+F again from the bar reaches the browser's.
+        if ((e.ctrlKey || e.metaKey) && !e.altKey && key === 'f'
+            && (e.shiftKey || isMarkdownEditorTarget(e.target))) {
             if (typeof window.openSearchReplaceShortcut !== 'function') return;
             if (window.openSearchReplaceShortcut()) {
                 e.preventDefault();
