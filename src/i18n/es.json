@@ -1134,9 +1134,6 @@
       "huge": "Enorme",
       "giant": "Gigante"
     },
-    "emoji": {
-      "hint_windows": "En Windows, presiona Win + ; para abrir el selector de emoji"
-    },
     "table_picker": {
       "title": "Insertar tabla",
       "rows_placeholder": "Filas",

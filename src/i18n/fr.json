@@ -1125,9 +1125,6 @@
       "huge": "Énorme",
       "giant": "Géante"
     },
-    "emoji": {
-      "hint_windows": "Sur Windows, appuyez sur Win + ; pour ouvrir le sélecteur d’emojis"
-    },
     "table_picker": {
       "title": "Insérer un tableau",
       "rows_placeholder": "Lignes",

@@ -1901,9 +1901,6 @@
       "huge": "Огромный",
       "giant": "Гигантский"
     },
-    "emoji": {
-      "hint_windows": "В Windows нажмите Win + ;, чтобы открыть панель эмодзи"
-    },
     "table_picker": {
       "title": "Вставить таблицу",
       "rows_placeholder": "Строки",

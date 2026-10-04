@@ -44,6 +44,16 @@ function toggleEmojiPicker() {
     window.savedActiveInput = null;
   }
 
+  // CodeMirror keeps its own caret, the DOM range above does not survive a blur
+  window.savedEmojiCodeMirror = getEmojiCodeMirrorCaret();
+
+  // On a phone the keyboard would cover the picker: the caret is saved above,
+  // so the field can lose focus until an emoji is picked.
+  if (isMobileDevice() && document.activeElement && document.activeElement !== document.body
+    && typeof document.activeElement.blur === 'function') {
+    document.activeElement.blur();
+  }
+
   // Create emoji popup
   const picker = document.createElement('div');
   picker.className = 'emoji-picker';
@@ -52,9 +62,7 @@ function toggleEmojiPicker() {
   const emojis = ['😀', '😃', '😄', '😁', '😊', '😉', '🙃', '😍', '😘', '😎', '🤔', '😅', '😂', '😐', '🙄', '😒', '🫩', '🙁', '😢', '😭', '😡', '👍', '👎', '👉', '👌', '✌️', '👏', '🙌', '👋', '🤝', '🙏', '✊', '👊', '❤️', '➜', '🚧', '✅', '🟩', '🟪', '☑️', '❌', '✔️', '❗', '❓', '⭐', '🔥', '💯', '🎯', '📌', '🚀', '💡', '🔔', '⚡', '🌟', '💎', '📱', '💻', '📧', '📁', '📄', '📝', '🔍', '🔑', '⚙️', '🛠️', '📊', '📈', '⚠️', '🚩', '🟢', '🔴', '🔵', '☀️', '🌙', '☕', '🍕', '🎂', '🍎', '🌱', '🌸', '🐱', '🐶', '🎵', '🎨'];
 
   // Create picker content
-  const defaultHint = '💡 On Windows, press <kbd>Win</kbd> + <kbd>;</kbd> to open native emoji picker';
-  let content = '<div class="emoji-hint">' + tr('editor.emoji.hint_windows', defaultHint) + '</div>';
-  content += '<div class="emoji-category">';
+  let content = '<div class="emoji-category">';
   content += '<div class="emoji-grid">';
 
   emojis.forEach(emoji => {
@@ -151,6 +159,21 @@ function toggleEmojiPicker() {
   });
 }
 
+// Caret of the markdown editor holding the selection, or null outside one
+function getEmojiCodeMirrorCaret() {
+  const api = window.PoznoteMarkdownCodeMirror;
+  const sel = window.getSelection();
+  if (!api || typeof api.isCodeMirrorEditor !== 'function' || typeof api.getSelectionOffsets !== 'function'
+    || typeof api.replaceRange !== 'function' || !sel || !sel.rangeCount) return null;
+
+  let node = sel.getRangeAt(0).commonAncestorContainer;
+  while (node && !(node.nodeType === 1 && api.isCodeMirrorEditor(node))) node = node.parentNode;
+  if (!node) return null;
+
+  const offsets = api.getSelectionOffsets(node);
+  return offsets ? { host: node, start: offsets.start, end: offsets.end } : null;
+}
+
 function insertEmoji(emoji) {
   // Restore selection saved when opening the picker.
   const sel = window.getSelection();
@@ -180,6 +203,16 @@ function insertEmoji(emoji) {
     }
   } catch (e) {
       console.debug('toolbar-emoji: focusTarget() failed:', e);
+  }
+
+  // Markdown editor: insert at the caret saved when the picker opened
+  const cmCaret = window.savedEmojiCodeMirror;
+  window.savedEmojiCodeMirror = null;
+  if (cmCaret && !window.savedActiveInput && window.PoznoteMarkdownCodeMirror
+    && window.PoznoteMarkdownCodeMirror.isCodeMirrorEditor(cmCaret.host)) {
+    window.PoznoteMarkdownCodeMirror.replaceRange(cmCaret.host, cmCaret.start, cmCaret.end, emoji);
+    window.savedRanges.emoji = null;
+    return;
   }
 
   // Handle input insertion (title and task fields)

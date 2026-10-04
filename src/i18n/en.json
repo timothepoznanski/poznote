@@ -1895,9 +1895,6 @@
       "huge": "Huge",
       "giant": "Giant"
     },
-    "emoji": {
-      "hint_windows": "On Windows, press Win + ; to open the emoji picker"
-    },
     "table_picker": {
       "title": "Insert table",
       "rows_placeholder": "Rows",

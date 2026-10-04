@@ -5454,9 +5454,6 @@
         // Title inputs and task inputs
         if (target.tagName === 'INPUT'
             && (target.classList.contains('css-title') || target.classList.contains('task-input'))) {
-            const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
-            if (target.classList.contains('css-title') && isMobileViewport) return false;
-
             const start = target.selectionStart;
             const end = target.selectionEnd;
             target.value = target.value.slice(0, start) + '/' + target.value.slice(end);
@@ -5809,16 +5806,7 @@
             // to avoid intercepting literal '/' characters (e.g. file paths) during task editing.
             const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
             const isTaskInput = target.tagName === 'INPUT' && target.classList.contains('task-input');
-            const isMobileViewport = window.matchMedia && window.matchMedia('(max-width: 800px)').matches;
-
             if (isTitleInput || isTaskInput) {
-                if (isTitleInput && isMobileViewport) {
-                    if (slashMenuElement && savedEditableElement === target) {
-                        hideSlashMenu();
-                    }
-                    return;
-                }
-
                 const value = target.value;
                 const pos = target.selectionStart;
 

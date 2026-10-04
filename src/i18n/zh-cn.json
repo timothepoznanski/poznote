@@ -1132,9 +1132,6 @@
       "huge": "超大",
       "giant": "巨大"
     },
-    "emoji": {
-      "hint_windows": "在 Windows 上，按 Win + ; 打开表情符号选择器"
-    },
     "table_picker": {
       "title": "插入表格",
       "rows_placeholder": "行",
