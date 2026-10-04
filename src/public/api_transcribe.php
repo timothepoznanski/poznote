@@ -36,6 +36,11 @@ require_once __DIR__ . '/../lib/ai-upstream.php';
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
+// Nothing below writes to the session, and a long recording can take
+// minutes to transcribe: holding PHP's session lock that long made every
+// other request of this browser wait (issue #1567).
+session_write_close();
+
 $action = $_GET['action'] ?? $_POST['action'] ?? 'transcribe';
 
 function sttJsonError($httpCode, $message) {

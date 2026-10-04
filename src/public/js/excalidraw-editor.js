@@ -42,6 +42,11 @@
     var TXT_INIT_ERROR_TEMPLATE = config.txt.initErrorTemplate || 'Error initializing Excalidraw: {{error}}';
     var TXT_ERROR_TEMPLATE = config.txt.errorTemplate || 'Error: {{error}}';
     var TXT_SAVE_FAILED = config.txt.saveFailed || 'Save failed';
+    var TXT_SAVE_TIMEOUT = config.txt.saveTimeout || 'The server did not answer in time. Your diagram is still open here, try saving again.';
+    // A save that never gets an answer left the editor on "Saving..." with
+    // no way out but leaving without saving (issue #1567). Generous, so a
+    // diagram of several megabytes still gets through on a slow connection.
+    var SAVE_TIMEOUT_MS = 5 * 60 * 1000;
     // The note background of each theme, so the editor draws on the same
     // ground the note shows the diagram on. The canvas itself is transparent
     // and lets this show through, see getCanvasBackground().
@@ -147,13 +152,32 @@
     var excalidrawAPI = null;
     var hasChanges = false;
     var initialElements = null;
+    // A diagram with a photo posts megabytes, so a second click while the
+    // first save is still on its way would send it all again
+    var saveInProgress = false;
+    // Leaving the page aborts a save still in flight; that abort is not an
+    // error worth an alert on the way out. A navigation can still be called
+    // off (the browser's "leave this page?" prompt), so beforeunload only
+    // counts for a few seconds: an error after that is shown again.
+    var pageHidden = false;
+    var unloadRequestedAt = 0;
+    window.addEventListener('beforeunload', function() { unloadRequestedAt = Date.now(); });
+    window.addEventListener('pagehide', function() { pageHidden = true; });
 
-    // Function to enable/disable the save button based on changes.
-    // "Save and exit" is intentionally always clickable: it must stay usable
-    // as an exit even right after a save, when there is nothing new to save.
+    function isLeavingPage() {
+        return pageHidden || Date.now() - unloadRequestedAt < 3000;
+    }
+
+    // Function to enable/disable the save buttons.
+    // Outside a save, "Save and exit" is intentionally always clickable: it
+    // must stay usable as an exit even right after a save, when there is
+    // nothing new to save. During one, both are disabled, so a click that
+    // would be ignored does not look like a button that stopped working.
     function updateSaveButtonsState() {
         var saveBtn = document.getElementById('saveBtn');
-        if (saveBtn) saveBtn.disabled = !hasChanges;
+        if (saveBtn) saveBtn.disabled = saveInProgress || !hasChanges;
+        var saveAndExitBtn = document.getElementById('saveAndExitBtn');
+        if (saveAndExitBtn) saveAndExitBtn.disabled = saveInProgress;
     }
 
     // Function to check if there are changes.
@@ -392,6 +416,44 @@
         return new XMLSerializer().serializeToString(svg);
     }
 
+    // The save's JSON answer. A proxy timeout or a PHP fatal answers with an
+    // HTML page or nothing at all, which response.json() reported as
+    // "JSON.parse: unexpected character at line 1 column 1" (issue #1567):
+    // say that the save failed, and with which status, instead.
+    async function readSaveResponse(response) {
+        var text = await response.text();
+        try {
+            return JSON.parse(text);
+        } catch (parseError) {
+            throw new Error(TXT_SAVE_FAILED + ' (HTTP ' + response.status + ')');
+        }
+    }
+
+    // Posts a save and gives its JSON answer, giving up after SAVE_TIMEOUT_MS
+    async function postSave(formData) {
+        var controller = new AbortController();
+        var timedOut = false;
+        var timer = setTimeout(function() {
+            timedOut = true;
+            controller.abort();
+        }, SAVE_TIMEOUT_MS);
+        try {
+            var response = await fetch('api_save_excalidraw.php', {
+                method: 'POST',
+                body: formData,
+                signal: controller.signal
+            });
+            return await readSaveResponse(response);
+        } catch (e) {
+            if (timedOut) {
+                throw new Error(TXT_SAVE_TIMEOUT);
+            }
+            throw e;
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
     // Save embedded diagram
     async function saveEmbeddedDiagram(data, elements, appState, files) {
         var previewSvg = await exportPreviewSvg(elements, appState, files);
@@ -409,12 +471,7 @@
             formData.append('cursor_position', cursorPosition);
         }
         
-        var response = await fetch('api_save_excalidraw.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        var result = await response.json();
+        var result = await postSave(formData);
         
         if (!result.success) {
             throw new Error(result.message || TXT_SAVE_FAILED);
@@ -436,12 +493,7 @@
         formData.append('diagram_data', JSON.stringify(data));
         formData.append('preview_svg', previewSvg);
 
-        var response = await fetch('api_save_excalidraw.php', {
-            method: 'POST',
-            body: formData
-        });
-
-        var result = await response.json();
+        var result = await postSave(formData);
 
         if (result.success) {
             // Update the note ID if it was a new note
@@ -564,6 +616,11 @@
                     alert(TXT_EDITOR_NOT_READY);
                     return;
                 }
+                if (saveInProgress) {
+                    return;
+                }
+                saveInProgress = true;
+                updateSaveButtonsState();
                 
                 this.textContent = TXT_SAVING;
                 
@@ -619,8 +676,13 @@
                     
                 } catch (e) {
                     console.error('Save error:', e);
-                    alert(tpl(TXT_ERROR_TEMPLATE, { error: e.message }));
                     this.textContent = TXT_SAVE;
+                    if (!isLeavingPage()) {
+                        alert(tpl(TXT_ERROR_TEMPLATE, { error: e.message }));
+                    }
+                } finally {
+                    saveInProgress = false;
+                    updateSaveButtonsState();
                 }
             });
         }
@@ -633,6 +695,11 @@
                     alert(TXT_EDITOR_NOT_READY);
                     return;
                 }
+                if (saveInProgress) {
+                    return;
+                }
+                saveInProgress = true;
+                updateSaveButtonsState();
                 
                 this.textContent = TXT_SAVING;
                 
@@ -684,8 +751,13 @@
                     
                 } catch (e) {
                     console.error('Save error:', e);
-                    alert(tpl(TXT_ERROR_TEMPLATE, { error: e.message }));
                     this.textContent = TXT_SAVE_AND_EXIT;
+                    if (!isLeavingPage()) {
+                        alert(tpl(TXT_ERROR_TEMPLATE, { error: e.message }));
+                    }
+                } finally {
+                    saveInProgress = false;
+                    updateSaveButtonsState();
                 }
             });
         }

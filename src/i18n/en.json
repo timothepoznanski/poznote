@@ -4739,7 +4739,8 @@
       "errors": {
         "failed_to_load": "Error: Failed to load Excalidraw. Please refresh the page.",
         "initializing_prefix": "Error initializing Excalidraw: {{error}}",
-        "save_failed": "Save failed"
+        "save_failed": "Save failed",
+        "save_timeout": "The server did not answer in time. Your diagram is still open here, try saving again."
       },
       "loading": "Loading Excalidraw Poznote...",
       "titles": {

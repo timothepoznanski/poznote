@@ -59,3 +59,24 @@ function poznoteFoldAccents(string $text): string
 
     return strtr(mb_strtolower($text, 'UTF-8'), $accents);
 }
+
+/**
+ * $html with each Excalidraw diagram replaced by $replacement, the way search
+ * and snippets see a note.
+ *
+ * A diagram's JSON carries its images as base64, so it can run to megabytes,
+ * and the lazy `.*?` this used to be exhausted PCRE's backtracking on it:
+ * preg_replace() answered null and the whole note lost its text to search
+ * (issue #1567). The body is now read once, possessively, up to the first
+ * </div>, which is where the old pattern stopped too. Escaped JSON holds no
+ * raw "<", so no tag can hide inside it.
+ */
+function poznoteReplaceExcalidrawContainers(string $html, string $replacement): string
+{
+    $result = preg_replace(
+        '/<div\b(?=[^>]*?\bclass="excalidraw-container")[^>]*+>(?:[^<]++|<(?!\/div>))*+<\/div>/',
+        $replacement,
+        $html
+    );
+    return $result ?? $html;
+}

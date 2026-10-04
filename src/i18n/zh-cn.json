@@ -264,7 +264,8 @@
       "errors": {
         "failed_to_load": "错误：无法加载 Excalidraw。请刷新页面。",
         "initializing_prefix": "初始化 Excalidraw 时出错: {{error}}",
-        "save_failed": "保存失败"
+        "save_failed": "保存失败",
+        "save_timeout": "服务器未及时响应。您的图表仍在此处打开，请尝试再次保存。"
       }
     },
     "messages": {

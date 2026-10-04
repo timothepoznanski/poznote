@@ -114,7 +114,9 @@
                 }
 
                 var tag = child.tagName;
-                if (SKIPPED_TAGS.test(tag) || child.hidden) {
+                // excalidraw-data is the diagram's JSON, kept in the note
+                // out of sight: megabytes of it are not text the note shows
+                if (SKIPPED_TAGS.test(tag) || child.hidden || child.classList.contains('excalidraw-data')) {
                     continue;
                 }
                 if (tag === 'BR') {

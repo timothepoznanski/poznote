@@ -508,6 +508,14 @@ function detectImportedTasklistContent($content, $fileExtension, $noteType) {
         return ['content' => $content, 'noteType' => $noteType, 'originalJsonData' => null];
     }
 
+    // A note holding an Excalidraw diagram is never a tasklist. Its scene
+    // JSON reads like one to the check below ("elements":[] isolates to a
+    // valid empty list), which imported the note as an empty tasklist and
+    // threw the diagram away.
+    if (is_string($content) && strpos($content, 'excalidraw-container') !== false) {
+        return ['content' => $content, 'noteType' => $noteType, 'originalJsonData' => null];
+    }
+
     $normalizedTasklistJson = normalizeImportedTasklistJson($content);
     if ($normalizedTasklistJson !== null) {
         return [

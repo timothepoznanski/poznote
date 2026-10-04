@@ -18,6 +18,7 @@ require_once __DIR__ . '/lib/snapshots.php';
 require_once __DIR__ . '/lib/ui-customization.php';
 require_once __DIR__ . '/lib/i18n.php';
 require_once __DIR__ . '/lib/icons.php';
+require_once __DIR__ . '/lib/search-text.php';
 require_once __DIR__ . '/lib/workspaces.php';
 require_once __DIR__ . '/lib/paths.php';
 require_once __DIR__ . '/lib/folders.php';
@@ -291,7 +292,7 @@ function cleanContentForSearch($content) {
     $content = preg_replace('/data:image\/[^;]+;base64,[A-Za-z0-9+\/=]+/', '[image]', $content);
     
     // Remove Excalidraw containers with embedded data
-    $content = preg_replace('/<div[^>]*class="excalidraw-container"[^>]*>.*?<\/div>/s', '[Excalidraw diagram]', $content);
+    $content = poznoteReplaceExcalidrawContainers((string)$content, '[Excalidraw diagram]');
     
     return $content;
 }

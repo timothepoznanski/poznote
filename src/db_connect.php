@@ -142,11 +142,7 @@ try {
         }
 
         // Remove Excalidraw containers with their data-excalidraw attributes and base64 images
-        $content = preg_replace(
-            '/<div[^>]*class="excalidraw-container"[^>]*>.*?<\/div>/s',
-            '[Excalidraw diagram]',
-            $content
-        );
+        $content = poznoteReplaceExcalidrawContainers((string)$content, '[Excalidraw diagram]');
         
         // Remove any remaining base64 image data
         $content = preg_replace('/data:image\/[^;]+;base64,[A-Za-z0-9+\/=]+/', '[image]', $content);

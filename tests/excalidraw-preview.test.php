@@ -80,3 +80,36 @@ test('the validator refuses what Excalidraw never exports', function () {
         '<svg xmlns="http://www.w3.org/2000/svg"><foreignObject><b>x</b></foreignObject></svg>'
     ));
 });
+
+test('a preview holding a photo is checked in full, not waved through', function () {
+    // A base64 run long enough for the old handler check to exhaust PCRE's
+    // backtracking, which preg_match() reported as false, read as "clean"
+    // (issue #1567).
+    $photo = '<image width="100%" height="100%" href="data:image/jpeg;base64,'
+        . str_repeat('QUFB', 400000) . '"/>';
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg"><symbol id="image-a">' . $photo . '</symbol></svg>';
+    assertTrue(poznoteIsAcceptableExcalidrawPreviewSvg($svg), 'photo preview rejected');
+
+    $hostile = str_replace('<image ', '<image onload="alert(1)" ', $svg);
+    assertFalse(poznoteIsAcceptableExcalidrawPreviewSvg($hostile), 'handler before a long payload');
+});
+
+test('a drawing with megabytes of path data still passes', function () {
+    $paths = str_repeat('<path d="M1 2 C ' . str_repeat('3.5 4.5 ', 30) . '" stroke="#1e1e1e" fill="none"></path>', 20000);
+    $svg = '<svg xmlns="http://www.w3.org/2000/svg"><g>' . $paths . '</g></svg>';
+    assertTrue(poznoteIsAcceptableExcalidrawPreviewSvg($svg));
+    assertFalse(poznoteIsAcceptableExcalidrawPreviewSvg(str_replace('</g>', '<rect onclick="x"/></g>', $svg)));
+});
+
+test('a ">" inside an attribute value does not hide a handler after it', function () {
+    assertFalse(poznoteIsAcceptableExcalidrawPreviewSvg(
+        '<svg xmlns="http://www.w3.org/2000/svg"><rect aria-label="a>b" onload="alert(1)" width="1" height="1"/></svg>'
+    ));
+    assertFalse(poznoteIsAcceptableExcalidrawPreviewSvg(
+        "<svg xmlns=\"http://www.w3.org/2000/svg\"><rect aria-label='\">' onclick='x' width=\"1\"/></svg>"
+    ));
+    // "on...=" quoted as a value is text, not a handler
+    assertTrue(poznoteIsAcceptableExcalidrawPreviewSvg(
+        '<svg xmlns="http://www.w3.org/2000/svg"><g aria-label="turn onload = off"><path d="M1 2"/></g></svg>'
+    ));
+});

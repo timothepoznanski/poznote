@@ -3529,6 +3529,12 @@ class NotesController {
      * This prevents blocking the user interface during automatic pushes.
      */
     private function triggerGitSyncAsync(int $noteId, string $action = 'push'): void {
+        // Release the session first: PHP holds its lock until the script
+        // ends, and fastcgi_finish_request() does not end it. The push below
+        // can take minutes, and every other request of this browser (an
+        // Excalidraw save, issue #1567) used to wait for it.
+        session_write_close();
+
         // Close the HTTP connection so the client doesn't wait
         if (function_exists('fastcgi_finish_request')) {
             fastcgi_finish_request();
@@ -3539,9 +3545,6 @@ class NotesController {
                 ob_end_flush();
             }
             flush();
-            if (function_exists('session_write_close')) {
-                session_write_close();
-            }
         }
 
         // Continue executing in background - push to Git

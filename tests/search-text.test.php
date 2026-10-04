@@ -61,3 +61,19 @@ test('folding lowercases and drops accents, ligatures included', function () {
     assertSame('reparer le velo a zanzibar', poznoteFoldAccents('Réparer le VÉLO à Zanzibar'));
     assertSame('coeur ecole', poznoteFoldAccents('Cœur ÉCOLE'));
 });
+
+test('a diagram holding a photo leaves the rest of the note searchable', function () {
+    // The JSON of a diagram with a photo: past what the old lazy pattern
+    // could backtrack over, which made preg_replace() return null (#1567).
+    $json = htmlspecialchars(json_encode(['files' => ['f' => [
+        'dataURL' => 'data:image/jpeg;base64,' . str_repeat('QUFB', 400000),
+    ]]]), ENT_QUOTES);
+    $full = '<p>before</p><div class="excalidraw-container" contenteditable="false"><img src="x" />'
+        . '<div class="excalidraw-data" style="display: none;">' . $json . '</div></div><p>after</p>';
+    $embedded = '<p>before</p><div class="excalidraw-container" id="d1" data-excalidraw="' . $json . '">'
+        . '<img src="x" /></div><p>after</p>';
+
+    assertSame('<p>before</p>[D]</div><p>after</p>', poznoteReplaceExcalidrawContainers($full, '[D]'));
+    assertSame('<p>before</p>[D]<p>after</p>', poznoteReplaceExcalidrawContainers($embedded, '[D]'));
+    assertSame('<p>no diagram</p>', poznoteReplaceExcalidrawContainers('<p>no diagram</p>', '[D]'));
+});
