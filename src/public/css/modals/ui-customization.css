@@ -279,9 +279,12 @@
     opacity: 1;
 }
 
+/* minmax(0, ...) rather than a bare 1fr: 1fr keeps a track at least as wide
+   as its content, and the names do not wrap, so one long name widened the
+   whole list past its card (#1559) */
 .ui-custom-items {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 6px 16px;
 }
 
@@ -311,6 +314,7 @@
 }
 
 .ui-custom-item span {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -319,7 +323,13 @@
 /* Responsive */
 @media (max-width: 600px) {
     .ui-custom-items {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* One narrow column: a long name wraps instead of being cut short */
+    .ui-custom-item span {
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 }
 
@@ -407,7 +417,7 @@ html[data-theme='dark'] .ui-custom-item:hover,
 
 #uiCustomizationSettings.ui-custom-mode-admin .ui-custom-items,
 #uiCustomizationSettings.ui-custom-mode-admin.ui-custom-filtering .ui-custom-items {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 2px;
 }
 
