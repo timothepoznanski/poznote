@@ -4518,7 +4518,7 @@
     "show_all": "Alle anzeigen",
     "show_all_hint": "Alle Notizen des Arbeitsbereichs laden",
     "search": {
-      "placeholder": "Notiz suchen..."
+      "placeholder": "Notiz oder Tag suchen..."
     },
     "tooltip": {
       "links": "{{count}} Verknüpfungen",

@@ -4146,7 +4146,7 @@
     "show_all": "Show all",
     "show_all_hint": "Load every note of the workspace",
     "search": {
-      "placeholder": "Find a note..."
+      "placeholder": "Find a note or a tag..."
     },
     "tooltip": {
       "links": "{{count}} links",

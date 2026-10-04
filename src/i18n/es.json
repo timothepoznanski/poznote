@@ -4519,7 +4519,7 @@
     "show_all": "Mostrar todo",
     "show_all_hint": "Cargar todas las notas del espacio de trabajo",
     "search": {
-      "placeholder": "Buscar una nota..."
+      "placeholder": "Buscar una nota o una etiqueta..."
     },
     "tooltip": {
       "links": "{{count}} enlaces",

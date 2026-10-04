@@ -4615,7 +4615,7 @@
     "show_all": "显示全部",
     "show_all_hint": "加载工作区的所有笔记",
     "search": {
-      "placeholder": "查找笔记..."
+      "placeholder": "查找笔记或标签..."
     },
     "tooltip": {
       "links": "{{count}} 个链接",

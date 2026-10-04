@@ -4623,7 +4623,7 @@
     "show_all": "Tout afficher",
     "show_all_hint": "Charger toutes les notes de l'espace de travail",
     "search": {
-      "placeholder": "Rechercher une note..."
+      "placeholder": "Rechercher une note ou un tag..."
     },
     "tooltip": {
       "links": "{{count}} liens",
