@@ -261,6 +261,7 @@ window.PoznoteExcalidraw = {
       <Excalidraw
         initialData={initialData || { elements: [], appState: {} }}
         theme={requestedTheme}
+        langCode={options.langCode || 'en'}
         libraryReturnUrl={libraryReturnUrl}
         UIOptions={{
           ...options.UIOptions,

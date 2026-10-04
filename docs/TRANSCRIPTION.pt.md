@@ -6,7 +6,8 @@
   <a href="TRANSCRIPTION.es.md">Español</a> ·
   <b>Português</b> ·
   <a href="TRANSCRIPTION.ru.md">Русский</a> ·
-  <a href="TRANSCRIPTION.zh-cn.md">简体中文</a>
+  <a href="TRANSCRIPTION.zh-cn.md">简体中文</a> ·
+  <a href="TRANSCRIPTION.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 

@@ -6,7 +6,8 @@
   <a href="README.es.md">Español</a> ·
   <b>Português</b> ·
   <a href="README.ru.md">Русский</a> ·
-  <a href="README.zh-cn.md">简体中文</a>
+  <a href="README.zh-cn.md">简体中文</a> ·
+  <a href="README.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 

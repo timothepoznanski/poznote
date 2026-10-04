@@ -471,7 +471,7 @@
                     // Keep the .note-tags-row wrapper so CSS spacing is preserved; JS will render the editable tags UI inside the .name_tags element.
                     echo '<div class="note-tags-row">';
                     echo '<div class="folder-wrapper">';
-                    echo '<span class="lucide lucide-folder icon_folder cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'"></span>';
+                    echo '<span class="lucide lucide-folder icon_folder cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('modals.folder.change_folder', [], 'Change folder').'"></span>';
                     $folder_path_segments = $folder_id ? getFolderPathSegments($folder_id, $con) : [];
                     if (!empty($folder_path_segments)) {
                         // Breadcrumb: each segment reveals (expands) its folder in the left folder list
@@ -485,7 +485,7 @@
                         }
                         echo '</span>';
                     } else {
-                        echo '<span class="folder_name cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('settings.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
+                        echo '<span class="folder_name cursor-pointer" data-action="show-move-folder-dialog" data-note-id="'.$row['id'].'" title="'.t_h('modals.folder.change_folder', [], 'Change folder').'">'.htmlspecialchars($folder_path, ENT_QUOTES).'</span>';
                     }
                     echo '</div>';
                     

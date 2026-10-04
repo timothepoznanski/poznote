@@ -13,7 +13,7 @@
  * renders as raw translation keys in another.
  */
 function poznoteSupportedLanguages(): array {
-    return ['en', 'fr', 'es', 'de', 'pt', 'ru', 'zh-cn'];
+    return ['en', 'fr', 'es', 'de', 'pt', 'ru', 'zh-cn', 'ko'];
 }
 
 /**

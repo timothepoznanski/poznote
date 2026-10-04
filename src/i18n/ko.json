@@ -1,0 +1,5183 @@
+{
+  "app": {
+    "name": "Poznote"
+  },
+  "welcome_note": {
+    "title": "Poznote에 오신 것을 환영합니다",
+    "content": "<p>Poznote는 노트 작성과 문서화를 위한 플랫폼입니다.</p>\n<br>\nPoznote가 제공하는 <a href=\"https://poznote.com/index.html#features\" target=\"_blank\" style=\"text-decoration: none;\">모든 기능</a>을 살펴보세요.\n<br><br>\n<code>+</code> 버튼을 눌러 첫 번째 노트를 만들어 보세요.\n<br><br>\n노트 안에서 <code>/</code>를 입력하거나 마우스 오른쪽 버튼을 클릭하면 명령 메뉴가 열립니다."
+  },
+  "markdown_syntax": {
+    "menu_item": "마크다운 구문",
+    "page_title": "마크다운 구문",
+    "heading": "Poznote에서 지원하는 마크다운 구문"
+  },
+  "common": {
+    "ok": "확인",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "delete": "삭제",
+    "create": "만들기",
+    "rename": "이름 바꾸기",
+    "move": "이동",
+    "close": "닫기",
+    "disable": "비활성화",
+    "enabled": "활성화됨",
+    "disabled": "비활성화됨",
+    "not_defined": "설정되지 않음",
+    "loading": "불러오는 중...",
+    "back_to_notes": "노트",
+    "home": "홈",
+    "back_to_home": "대시보드",
+    "back_to_settings": "설정으로 돌아가기",
+    "back": "뒤로",
+    "error": "오류",
+    "success": "성공",
+    "warning": "경고",
+    "notification": "알림",
+    "information": "정보",
+    "caution": "주의",
+    "tip": "팁",
+    "important": "중요",
+    "note": "참고",
+    "untitled": "제목 없음",
+    "access_denied": "접근이 거부되었습니다",
+    "apply": "적용",
+    "at": "",
+    "scroll_left": "왼쪽으로 스크롤",
+    "scroll_right": "오른쪽으로 스크롤",
+    "scroll_top": "맨 위로 스크롤",
+    "scroll_bottom": "맨 아래로 스크롤",
+    "outline": {
+      "title": "목차",
+      "no_headings": "이 노트에 제목 문단이 없습니다",
+      "unavailable_tasklist": "할 일 목록에서는 목차를 사용할 수 없습니다",
+      "toggle_panel": "목차 패널 열기/닫기",
+      "copy_section_link": "이 섹션의 링크 복사"
+    },
+    "link_copied": "링크가 복사되었습니다",
+    "print": "인쇄",
+    "yes": "예",
+    "no": "아니요",
+    "download": "다운로드",
+    "please_wait": "잠시 기다려 주세요",
+    "calendar": "달력",
+    "confirm_action": "작업 확인",
+    "confirmation": "확인",
+    "convert": "변환",
+    "date": {
+      "days_ago": "일 전",
+      "today": "오늘",
+      "yesterday": "어제"
+    },
+    "duplicate": "복제",
+    "login": {
+      "button": "로그인"
+    },
+    "network_error": "네트워크 오류",
+    "not_available": "사용할 수 없음",
+    "notes": "노트",
+    "saved": "저장됨",
+    "unknown_error": "알 수 없는 오류",
+    "none": "없음",
+    "show_more_notes": "더 보기 ({{count}} 남음)",
+    "menu": "메뉴"
+  },
+  "snapshot": {
+    "menu_item": "수정 이력",
+    "api": {
+      "invalid_note_id": "잘못된 노트 ID",
+      "note_not_found": "노트를 찾을 수 없습니다",
+      "already_exists": "오늘의 일일 수정 이력이 이미 있습니다.",
+      "create_directory_failed": "수정 이력 폴더를 만들지 못했습니다.",
+      "write_file_failed": "수정 이력 파일을 쓰지 못했습니다.",
+      "create_failed": "수정 이력을 저장하지 못했습니다.",
+      "skipped_empty_new_note": "새 노트가 비어 있어 아직 일일 수정 이력이 없습니다.",
+      "not_found_today": "오늘의 수정 이력을 찾을 수 없습니다.",
+      "read_failed": "수정 이력을 읽지 못했습니다.",
+      "retrieve_failed": "수정 이력을 불러오지 못했습니다.",
+      "invalid_entries_path": "잘못된 항목 경로",
+      "restore_note_file_failed": "노트 파일을 복원하지 못했습니다.",
+      "restore_success": "노트가 해당 수정 이력의 상태로 복원되었습니다.",
+      "restore_failed": "수정 이력을 복원하지 못했습니다.",
+      "not_found": "수정 이력을 찾을 수 없습니다.",
+      "delete_failed": "수정 이력을 삭제하지 못했습니다.",
+      "deleted": "수정 이력이 삭제되었습니다."
+    }
+  },
+  "settings": {
+    "card_help": {
+      "tenant_isolation": "SaaS 모드: 인스턴스의 다른 계정 검색, 개인 웹후크 등록 등 관리자가 아닌 사용자에 대해 차단되는 기능을 선택합니다. 패밀리 또는 팀 인스턴스에 대해서는 모든 항목을 선택하지 않은 상태로 둡니다.",
+      "my_profile": "프로필 정보를 보고 편집하세요.",
+      "change_password": "로그인에 사용되는 비밀번호를 변경하세요.",
+      "password_note_sso_only": "이 인스턴스에서는 비밀번호 로그인이 사용 중지되었습니다.",
+      "password_note_no_local": "비밀번호는 ID 제공업체에 의해 관리됩니다.",
+      "change_password_sso_only": "이 인스턴스는 SSO만 사용하므로 로그인 시 로컬 비밀번호가 허용되지 않습니다. 비밀번호 변경이 비활성화되었습니다.",
+      "change_password_no_local": "계정은 ID 공급자를 통해 로그인하고 로컬 비밀번호가 없으므로 변경 사항을 확인할 현재 비밀번호가 없습니다. 관리자는 관리 도구 > 사용자에서 관리자를 대신 설정할 수 있습니다.",
+      "app_passwords": "브라우저 확장 프로그램과 같이 API를 통해 연결하는 앱 및 확장 프로그램에 대한 비밀번호를 만듭니다. SSO를 통해 로그인하는 경우에도 작동하며 웹 인터페이스를 열거나 계정을 변경할 수 없으며 언제든지 취소할 수 있습니다.",
+      "two_factor": "로그인할 때 비밀번호 다음에 인증 앱에서 코드를 요청하세요.",
+      "two_factor_sso": "2단계 인증은 비밀번호로 로그인할 때 적용됩니다. 이 계정은 인증 제공자를 통해 로그인하며, 2단계 인증도 해당 제공자가 관리합니다.",
+      "git_sync": "노트를 Git 저장소에 백업하고 동기화 기록을 확인하세요.",
+      "extension": "웹페이지를 Poznote에 저장하려면 브라우저 확장 프로그램을 설치하세요.",
+      "install_app": "기기에 Poznote를 앱(PWA)으로 설치합니다.",
+      "check_updates": "최신 버전의 Poznote를 사용할 수 있는지 확인하세요.",
+      "backup_export": "노트, 첨부 파일 및 데이터베이스를 백업으로 다운로드하세요.",
+      "restore_import": "백업을 복원하거나 노트를 이 인스턴스로 가져옵니다.",
+      "storage_stats_user": "노트 및 첨부 파일이 사용하는 저장 용량을 확인하세요.",
+      "delete_account": "계정과 모든 데이터를 영구적으로 삭제하세요.",
+      "login_display": "로그인 페이지에 표시되는 제목을 사용자 지정합니다.",
+      "language": "인터페이스 언어를 변경합니다.",
+      "main_font": "애플리케이션 전체에 사용되는 글꼴을 선택하세요.",
+      "markdown_font": "마크다운 편집기에서 사용되는 글꼴을 선택하세요.",
+      "markdown_default_view_mode": "마크다운 노트가 미리보기, 편집 또는 분할 모드에서 열릴지 선택하세요.",
+      "font_size": "노트, 사이드바, 코드 블록 및 설정 페이지의 글꼴 크기를 조정합니다.",
+      "index_icon_scale": "노트 목록의 아이콘 크기를 조정합니다.",
+      "icon_rail_scale": "아이콘 사이드바의 아이콘 크기를 조절합니다.",
+      "timezone": "날짜와 시간을 표시하는 데 사용되는 시간대를 설정합니다.",
+      "date_time_format": "날짜와 시간이 표시되는 방식을 선택합니다.",
+      "note_age_filter": "선택한 일수 내에 업데이트된 노트만 표시합니다.",
+      "tasklist_insert_order": "새 할 일을 할 일 목록의 상단에 추가할지 하단에 추가할지 선택합니다.",
+      "diary_note_type": "새 일기 항목에 사용되는 노트 형식을 선택합니다.",
+      "diary_date_format": "새 일기 항목의 제목을 지정하는 데 사용되는 날짜 형식을 선택합니다.",
+      "show_created": "노트 헤더에 생성 날짜를 표시합니다.",
+      "note_icons": "목록의 노트 제목 옆에 사용자 지정 아이콘을 표시합니다.",
+      "note_color_palette": "노트에 사용할 수 있는 색상 팔레트를 사용자 지정합니다.",
+      "folder_counts": "각 폴더 옆에 노트 수를 표시합니다.",
+      "notes_without_folders": "폴더 목록 앞 대신 폴더 목록 뒤에 폴더 없이 노트를 표시합니다.",
+      "note_width": "노트 열의 백분율로 노트 내용의 최대 너비를 조정합니다.",
+      "markdown_split_card_view": "편집기와 미리보기가 포함된 프레임 분할 보기에 마크다운 노트를 표시합니다.",
+      "markdown_split_preview_left": "분할 모드에서는 왼쪽에 미리보기가 표시되고 오른쪽에 편집기가 표시됩니다.",
+      "markdown_colored": "마크다운의 각 제목 수준, 인라인 코드, 코드 블록 배경, 인용문, 표 머리글 및 구분선에 사용할 색상을 선택합니다.",
+      "code_wrap": "가로로 스크롤하는 대신 긴 줄을 코드 블록으로 묶습니다.",
+      "code_line_numbers": "마크다운 미리보기에서 코드 블록의 줄 번호를 표시합니다.",
+      "attachment_previews": "노트 내부 첨부 파일의 미리보기를 표시합니다.",
+      "attachments_at_bottom": "상단 대신 노트 하단에 첨부 파일 섹션을 표시합니다.",
+      "allow_executable_attachments": "이 인스턴스의 모든 계정에 대해 스크립트 및 실행 파일(.sh, .ps1, .bat, .exe, .py, ...)이 노트에 연결되도록 허용합니다. Poznote는 절대 실행하지 않으며 저장하고 제공만 합니다. .php 등 웹 서버가 실행할 수 있는 파일 형식은 차단된 상태로 유지됩니다.",
+      "backlinks_at_bottom": "노트 상단 대신 하단에 백링크 섹션을 표시합니다.",
+      "default_image_border": "기본적으로 테두리가 있고 패딩이 없는 노트의 이미지를 표시합니다.",
+      "spellcheck_html_notes": "서식 있는 텍스트 노트에서 브라우저 맞춤법 검사기를 활성화합니다.",
+      "slash_menu_trigger": "컴퓨터에서는 /, Alt + /를 입력하여 명령 메뉴를 열지, 키보드를 전혀 사용하지 않고 열지 여부를 선택합니다. 노트를 마우스 오른쪽 버튼으로 클릭하면 설정된 내용이 무엇이든 열립니다.",
+      "slash_menu_trigger_mobile": "모바일에서는 /를 입력하거나 하드웨어 키보드에서 Alt + /를 입력하여 명령 메뉴를 열지, 아니면 전혀 키보드에서 열지 않을지 선택합니다.",
+      "icon_sidebar_order": "아이콘 사이드바에 있는 버튼의 순서와 색상을 변경하고 버튼 사이에 구분 기호를 배치하세요.",
+      "users_admin": "사용자 계정을 생성, 편집 및 관리합니다.",
+      "oidc_config": "OpenID Connect 공급자를 사용하여 Single Sign-On을 설정합니다.",
+      "smtp_config": "알림과 같은 이메일을 보내는 데 사용되는 SMTP 서버를 설정합니다.",
+      "webhooks": "웹훅을 통해 인스턴스 이벤트를 외부 서비스로 보냅니다.",
+      "ai_assistant": "노트와 채팅하는 데 사용되는 AI 어시스턴트를 설정하세요.",
+      "git_sync_enabled": "이 인스턴스에서 Git 동기화를 활성화 또는 비활성화합니다.",
+      "import_limits": "가져오기당 허용되는 최대 파일 수를 설정합니다.",
+      "user_quotas": "노트의 수와 사용자당 사용 가능한 저장소를 제한합니다.",
+      "custom_css": "나만의 CSS를 적용하여 Poznote의 모양을 사용자 지정 설정하세요.",
+      "theme_list": "테마 버튼이 제공하는 테마와 순서를 선택하세요.",
+      "disaster_recovery": "데이터가 손실된 경우 백업에서 인스턴스를 복원합니다.",
+      "orphan_scanner": "더 이상 노트에 속하지 않는 첨부 파일을 찾아 정리하세요.",
+      "storage_stats": "이 인스턴스의 모든 사용자에 대한 저장용량 사용량을 확인하세요.",
+      "activity_log": "계정 삭제, 백업, 복원, 휴지통 비우기 및 작업 공간 삭제 등 민감한 작업을 검토합니다.",
+      "version": "GitHub에서 이 버전의 릴리스 노트를 엽니다.",
+      "github": "GitHub에서 Poznote 소스 코드를 엽니다.",
+      "api_rest": "Poznote REST API에 대한 정보를 표시합니다.",
+      "website": "공식 Poznote 웹사이트를 엽니다.",
+      "tips": "Poznote를 최대한 활용하기 위한 팁과 요령을 알아보세요.",
+      "discord": "Discord에서 Poznote 커뮤니티에 가입하세요.",
+      "discussions": "GitHub 토론에서 질문을 하거나 아이디어를 공유하세요.",
+      "support": "기부로 Poznote의 발전을 지원하세요.",
+      "s3_storage": "로컬 디스크 대신 S3 호환 개체 저장소에 노트 첨부 파일을 저장합니다.",
+      "s3_backup": "전체 백업 아카이브를 S3 호환 버킷에 수동으로 또는 일정에 따라 업로드하세요.",
+      "highlight_current_folder_tree": "작업 중인 폴더 계층 구조 외부에 있는 노트 및 폴더를 원하는 만큼 어둡게 합니다.",
+      "snapshots": "하루에 하나씩 남기는 자동 수정 이력의 보관 일수와 노트당 보관할 편집 보호 이력(AI 또는 MCP 수정 전)의 개수를 선택합니다.",
+      "stt": "노트를 지시하고 오디오 첨부 파일을 기록하는 데 사용되는 음성-텍스트 서버를 설정합니다.",
+      "sidebar_offline_marks": "이 브라우저에서 오프라인으로 사용할 수 있는 노트 옆에 작은 점을 표시하세요.",
+      "format_toolbar_mode": "컴퓨터에서 노트에서 텍스트를 선택할 때 서식 지정 버튼이 표시되는 위치를 선택합니다. 노트 도구 모음, 노트 작업 대신 또는 노트 도구 모음을 그대로 유지하는 선택 항목 위에 떠 있는 메뉴에서 선택합니다.",
+      "workspace_activity_emails": "내가 공유했거나 나와 공유된 작업 공간에서 다른 사용자가 노트를 변경하면 프로필의 이메일 주소로 알림을 받습니다. 이메일에는 생성·수정·삭제된 노트 목록만 포함되며, 노트 본문은 포함되지 않습니다. 변경 시 알림은 마지막 변경 후 몇 분 뒤, 일일 요약은 매일 오전 8시, 주간 요약은 월요일 오전 8시에 설정한 시간대를 기준으로 발송됩니다.",
+      "workspace_activity_emails_no_address": "이 이메일을 받으려면 프로필에 이메일 주소를 추가하세요."
+    },
+    "card_notes": {
+      "slash_menu_trigger_mobile": "모바일에서는 이 설정과 관계없이 키보드 위 도구 모음의 + 버튼으로 같은 메뉴를 열 수 있습니다."
+    },
+    "title": "설정",
+    "collapse_section": "섹션 접기",
+    "collapse_all_sections": "모두 접기",
+    "expand_section": "섹션 펼치기",
+    "expand_all_sections": "모두 펼치기",
+    "categories": {
+      "pinned": "고정됨",
+      "account": "내 계정",
+      "workspaces": "작업 공간",
+      "actions": "작업",
+      "admin_tools": "관리자 도구",
+      "display": "화면 표시",
+      "ui_customization": "화면 요소 표시",
+      "markdown": "마크다운",
+      "sidebar": "사이드바",
+      "note_content": "노트 내용",
+      "diary": "일기",
+      "other": "기타",
+      "about": "정보",
+      "documentation": "정보"
+    },
+    "groups": {
+      "attachments": "첨부 파일",
+      "code": "코드",
+      "users_access": "사용자 및 접근 권한",
+      "integrations": "연동",
+      "storage_limits": "저장용량 및 한도",
+      "appearance": "모양",
+      "maintenance": "유지보수",
+      "backup_sync": "백업 및 동기화",
+      "editing": "편집",
+      "apps": "앱",
+      "profile_sign_in": "프로필 및 로그인",
+      "language_region": "언어 및 지역",
+      "storage": "저장 공간",
+      "layout": "레이아웃",
+      "preferences": "환경설정"
+    },
+    "cards": {
+      "tenant_isolation": "사용자 기능 제한",
+      "user_management": "사용자 관리",
+      "backup_export": "백업/내보내기",
+      "restore_import": "복원/가져오기",
+      "git_sync": "Git 동기화",
+      "check_updates": "업데이트 확인",
+      "version": "버전",
+      "api_docs": "API 문서",
+      "documentation": "문서 GitHub",
+      "discussions": "GitHub 토론",
+      "news": "Poznote 블로그",
+      "website": "Poznote 웹사이트",
+      "tips": "팁",
+      "discord": "Discord",
+      "github_star": "GitHub에서 별표 남기기",
+      "guestbook": "Poznote 방명록",
+      "support": "Poznote 후원",
+      "buy_me_a_coffee": "커피 한 잔 후원하기",
+      "install_extension": "확장 프로그램 설치",
+      "install_app": "애플리케이션 설치",
+      "custom_css": "사용자 지정 CSS 경로",
+      "theme_list": "테마 목록",
+      "release_notes": "릴리스 노트",
+      "orphan_scanner": "미사용 첨부 파일 검사",
+      "storage_stats": "관리자 저장 공간 통계",
+      "activity_log": "활동 로그",
+      "storage_stats_user": "사용자 저장 공간 통계",
+      "change_password": "비밀번호 변경",
+      "app_passwords": "앱 비밀번호",
+      "two_factor": "2단계 인증",
+      "delete_account": "계정 삭제",
+      "import_limits": "가져오기 제한",
+      "user_quotas": "사용자 사용 한도",
+      "git_sync_toggle": "Git 동기화",
+      "allow_executable_attachments": "스크립트 및 실행 가능한 첨부 파일",
+      "oidc_config": "OIDC / SSO",
+      "smtp_config": "SMTP/이메일",
+      "webhooks": "관리자 웹훅",
+      "ai_assistant": "AI 어시스턴트",
+      "s3_storage": "S3 첨부 파일",
+      "s3_backup": "S3 백업",
+      "stt": "음성 텍스트 변환 (STT)",
+      "api_rest": "API REST"
+    },
+    "default_credentials": {
+      "both": "이 계정은 원래 제공된 사용자 이름과 비밀번호를 계속 사용합니다. 이 인스턴스에 접근할 수 있는 사람은 누구나 로그인할 수 있습니다.",
+      "password": "이 계정은 원래 제공된 비밀번호를 계속 사용합니다. 이 인스턴스에 접근할 수 있는 사람은 누구나 로그인할 수 있습니다.",
+      "username": "이 계정은 원래 제공된 사용자 이름을 계속 사용합니다.",
+      "change_password": "비밀번호 변경",
+      "change_username": "사용자 이름 변경"
+    },
+    "install_app": {
+      "launching": "설치가 시작됩니다. 기다려 주세요...",
+      "launching_acknowledge": "확인",
+      "unavailable": "지금은 설치할 수 없습니다. Chrome 모바일에서 브라우저 메뉴를 연 다음 가능한 경우 '앱 설치'(또는 '홈 화면에 추가')를 탭하세요.",
+      "already_installed": "이 기기에는 애플리케이션이 이미 설치되어 있습니다.",
+      "status": {
+        "available": "사용 가능",
+        "unavailable": "사용 불가",
+        "installed": "이미 설치됨"
+      }
+    },
+    "language": {
+      "label": "언어",
+      "english": "영어",
+      "french": "프랑스어",
+      "spanish": "스페인어",
+      "portuguese": "포르투갈어",
+      "german": "독일어",
+      "russian": "러시아어",
+      "chinese_simplified": "중국어 간체",
+      "korean": "한국어",
+      "login_page": "로그인 페이지 언어:",
+      "saved": "언어 설정이 저장되었습니다",
+      "save_error": "언어를 저장할 수 없습니다.",
+      "reload_hint": "새로고침 중..."
+    },
+    "value_help": {
+      "font_size_notes": "노트 내용",
+      "font_size_sidebar": "사이드바",
+      "font_size_code_blocks": "코드 블록",
+      "font_size_settings": "설정 페이지"
+    },
+    "storage_summary": {
+      "error": "저장소 사용량을 로드할 수 없습니다.",
+      "notes_detail": "노트의 {{active}}, 휴지통의 {{trash}}",
+      "local": "서버에서 사용되는 공간",
+      "database": "데이터베이스",
+      "note_files": "노트 파일",
+      "attachments": "첨부 파일",
+      "s3_attachments": "S3 저장소의 첨부 파일",
+      "s3_backups": "S3 저장소의 백업"
+    }
+  },
+  "workspaces": {
+    "menu": {
+      "edit_workspaces": "작업 공간 편집",
+      "new_workspace": "새로운 작업 공간",
+      "accounts": "계정",
+      "title": "작업 공간",
+      "shared_with_me": "나와 공유됨"
+    },
+    "errors": {
+      "already_exists": "이 이름을 가진 작업 공간이 이미 존재합니다.",
+      "cannot_delete_last": "마지막 작업 공간을 삭제할 수 없습니다.",
+      "invalid_new_name": "새 작업 공간 이름이 잘못되었습니다. 문자, 숫자, 공백, 대시 및 밑줄이 허용됩니다.",
+      "name_and_target_required": "작업 공간 이름 및 대상이 필요합니다.",
+      "name_exists": "이 이름을 가진 작업 공간이 이미 존재합니다.",
+      "name_required": "작업 공간 이름이 필요합니다",
+      "no_workspace_selected": "작업 공간이 선택되지 않았습니다.",
+      "not_found": "작업 공간을 찾을 수 없습니다",
+      "source_target_must_differ": "소스와 대상 작업 공간은 달라야 합니다."
+    },
+    "share": {
+      "actions": {
+        "enable": "공유",
+        "edit": "공유 수정",
+        "disable": "공유 해제"
+      },
+      "confirm": {
+        "title": "작업 공간 공유",
+        "message": "‘{{workspace}}’ 작업 공간에 접근할 사용자를 선택하세요. 선택한 사용자는 자신의 작업 공간 메뉴에서 이 작업 공간을 열고 노트와 폴더를 편집할 수 있습니다."
+      },
+      "messages": {
+        "disabled": "작업 공간은 더 이상 공유되지 않습니다.",
+        "url_copied": "공유 링크가 클립보드에 복사되었습니다!",
+        "saved": "작업 공간 공유 업데이트됨"
+      },
+      "errors": {
+        "save_failed": "작업 공간 공유를 업데이트하지 못했습니다.",
+        "not_allowed": "이 인스턴스에서는 다른 사용자와 공유할 수 없습니다."
+      },
+      "options": {
+        "users_loading": "사용자 불러오는 중...",
+        "no_users_found": "다른 사용자를 찾을 수 없습니다."
+      },
+      "status": {
+        "not_shared": "공유되지 않음"
+      }
+    },
+    "tags": {
+      "action": "태그",
+      "modal_title": "작업 공간 태그",
+      "placeholder": "쉼표로 구분한 태그(선택사항, 예: 학교, 심리학)",
+      "help": "태그를 사용하여 대시보드에서 작업 공간을 그룹화합니다.",
+      "saved": "태그 업데이트됨",
+      "save_error": "태그를 업데이트할 수 없습니다.",
+      "empty": "아직 태그가 없습니다."
+    },
+    "color": {
+      "action": "색상",
+      "modal_title": "작업 공간 색상",
+      "help": "여러 개의 작업 공간이 함께 표시될 때 색상은 노트와 작업 공간의 폴더를 대시보드에 표시합니다.",
+      "custom": "사용자 지정 색상",
+      "saved": "색상이 업데이트되었습니다.",
+      "save_error": "색상을 업데이트할 수 없습니다.",
+      "invalid": "잘못된 색상"
+    },
+    "actions": {
+      "menu": "작업 공간 작업",
+      "background": "배경",
+      "move_notes": "노트 이동",
+      "select": "선택"
+    },
+    "order": {
+      "handle": "드래그하여 재정렬하세요.",
+      "saved": "작업 공간 순서가 변경되었습니다",
+      "save_error": "작업 공간 순서를 업데이트할 수 없습니다."
+    },
+    "messages": {
+      "deleted_all": "작업 공간이 삭제되고 모든 관련 노트, 폴더 및 첨부 파일이 제거되었습니다.",
+      "notes_moved_to": "노트가 {{target}}로 이동되었습니다.",
+      "renamed": "작업 공간은 노트 및 라벨 전체에서 이름이 변경되었습니다."
+    },
+    "alerts": {
+      "error_prefix": "오류: {{error}}",
+      "unknown_error": "알 수 없는 오류"
+    },
+    "confirm_delete": {
+      "message": "\"{{workspace}}\" 작업 공간을 삭제하시겠습니까? 포함된 노트는 기본 작업 공간으로 이동됩니다.",
+      "title": "작업 공간 삭제 확인"
+    },
+    "default": {
+      "description_1": "Poznote를 시작할 때 어떤 작업 공간이 열리는지 선택하세요.",
+      "last_opened": "마지막으로 연 작업 공간(모든 기기)",
+      "last_opened_device": "이 기기에서 마지막으로 열린 작업 공간",
+      "title": "기본 작업 공간"
+    },
+    "info": {
+      "folders": "폴더",
+      "notes": "노트",
+      "shared": "공유됨",
+      "shared_with": "다음과 공유됨",
+      "tags": "태그"
+    },
+    "sections": {
+      "create": {
+        "placeholder": "작업 공간 이름을 입력하세요",
+        "title": "새로운 작업 공간 생성"
+      },
+      "existing": {
+        "empty": "작업 공간이 정의되지 않았습니다."
+      }
+    },
+    "filter": {
+      "placeholder": "이름 또는 태그로 필터링...",
+      "no_results": "이 필터와 일치하는 작업 공간이 없습니다."
+    }
+  },
+  "display": {
+    "title": "화면 표시",
+    "cards": {
+      "main_font": "앱 글꼴",
+      "markdown_font": "마크다운 편집기 글꼴",
+      "markdown_default_view_mode": "기본 보기 모드",
+      "login_display": "로그인 페이지 제목",
+      "note_font_size": "글꼴 크기",
+      "note_age_filter": "노트 날짜 필터",
+      "tasklist_insert_order": "할 일 추가 위치",
+      "diary_default_note_type": "일기 항목 형식",
+      "diary_date_format": "일기 입력 날짜 형식",
+      "timezone": "시간대",
+      "date_time_format": "날짜 및 시간 형식",
+      "show_note_created": "생성 날짜 표시",
+      "show_note_icons": "노트 아이콘 표시",
+      "note_color_palette": "노트 색상",
+      "show_folder_counts": "폴더 노트 수 표시",
+      "highlight_current_folder_tree": "현재 폴더 트리 강조 표시",
+      "notes_without_folders_after": "폴더 뒤에 노트 표시",
+      "show_folder_actions": "폴더 작업 표시",
+      "kanban_on_folder_click": "폴더 클릭 시 칸반 보기 열기",
+      "index_icon_scale": "인덱스 아이콘 크기 조정",
+      "icon_rail_scale": "아이콘 사이드바 아이콘 크기",
+      "note_content_width": "노트 내용 폭",
+      "markdown_split_card_view": "마크다운 영역 테두리",
+      "markdown_split_preview_left": "왼쪽에서 미리보기",
+      "markdown_colored": "마크다운 구문 색상 표시",
+      "code_block_word_wrap": "코드 블록 단어 줄 바꿈",
+      "code_block_line_numbers": "코드 블록 줄 번호",
+      "attachment_previews_in_note": "첨부 파일 미리보기",
+      "attachments_at_bottom": "첨부 파일을 하단에 표시",
+      "backlinks_at_bottom": "백링크를 하단에 표시",
+      "default_image_border_no_padding": "기본 이미지 테두리",
+      "icon_sidebar_order": "아이콘 사이드바 레이아웃",
+      "notes_dashboard": "노트 보드",
+      "spellcheck_html_notes": "맞춤법 검사",
+      "slash_menu_trigger": "명령 메뉴 바로가기(컴퓨터)",
+      "slash_menu_trigger_mobile": "명령 메뉴 바로가기(모바일)",
+      "snapshots": "수정 이력",
+      "sidebar_offline_marks": "오프라인 점 표시",
+      "format_toolbar_mode": "서식 도구 모음",
+      "workspace_activity_emails": "공유 작업 공간 알림 이메일"
+    },
+    "badges": {
+      "font_size_default": "기본값({{size}}px)",
+      "note_font_size": "{{size}}px",
+      "sidebar_font_size": "{{size}}px",
+      "code_block_font_size": "{{size}}px",
+      "settings_font_size": "{{size}}px",
+      "icon_sidebar_order_configure": "설정",
+      "slash_menu_alt_slash": "Alt + /",
+      "slash_menu_slash": "/",
+      "toolbar_mode": {
+        "both": "도구 모음 아이콘 + 슬래시 명령 메뉴",
+        "full": "도구 모음만",
+        "slash": "슬래시 명령만"
+      },
+      "format_toolbar_mode_toolbar": "노트 도구 모음에서",
+      "format_toolbar_mode_floating": "선택한 내용 위에 표시"
+    },
+    "alerts": {
+      "error_saving_preference": "환경설정을 저장하는 중에 오류가 발생했습니다."
+    },
+    "timezone": {
+      "alerts": {
+        "update_error": "시간대를 업데이트하는 중에 오류가 발생했습니다."
+      }
+    }
+  },
+  "tasklist": {
+    "open_tasks_page": "모든 할 일 보기",
+    "input_placeholder": "새 할 일을 작성하고 Enter를 눌러 목록에 추가하세요...",
+    "drag_to_reorder": "드래그하여 재정렬하세요.",
+    "add_to_top": "새 할 일을 상단에 추가",
+    "add_to_bottom": "새 할 일을 하단에 추가",
+    "insert_order_top": "상단",
+    "insert_order_bottom": "하단",
+    "clear_completed": "완료한 할 일 지우기",
+    "no_completed_tasks": "지울 완료한 할 일이 없습니다.",
+    "edit_task": "할 일 편집",
+    "edit_text_label": "할 일 내용",
+    "edit_hint": "Enter를 누르면 새 줄이 추가됩니다. Ctrl+Enter를 누르면 저장됩니다.",
+    "edit_empty_error": "할 일 내용을 입력해 주세요.",
+    "due_date": "마감일",
+    "due_remove": "마감일 삭제",
+    "due_remove_time": "시간 삭제",
+    "move_to_list": "다른 목록으로 이동",
+    "mark_important": "중요 표시",
+    "unmark_important": "중요 표시 해제",
+    "task_options": "할 일 옵션",
+    "remind_me": "알림",
+    "remind_me_hint": "마감일 및 시간에 알림이 발생합니다.",
+    "actions": "할 일 목록 메뉴",
+    "confirm_clear_completed": "완료한 할 일 {{count}}개를 삭제하시겠습니까?",
+    "confirm_uncheck_all": "할 일 {{count}}개의 완료 표시를 해제하시겠습니까?",
+    "move_error": "할 일을 이동할 수 없습니다",
+    "no_checked_tasks": "완료 표시를 해제할 할 일이 없습니다.",
+    "uncheck_all": "모든 할 일의 완료 표시 해제",
+    "add_subtask": "하위 할 일 추가",
+    "subtask_placeholder": "하위 할 일 추가...",
+    "delete_subtask": "하위 할 일 삭제"
+  },
+  "tags": {
+    "add_single": "태그 추가...",
+    "add_multiple": "태그 추가...",
+    "list_all": "태그 모두 나열",
+    "manage_note_tags": "노트 태그 관리",
+    "modal_title": "태그 관리",
+    "action": {
+      "color": "색상",
+      "rename": "이름 바꾸기",
+      "delete": "삭제",
+      "remove": "태그 제거"
+    },
+    "color": {
+      "modal_title": "태그 색상",
+      "apply_error": "태그 색상을 업데이트할 수 없습니다."
+    },
+    "color_filter": {
+      "label": "색상으로 필터링",
+      "none": "색상 없음",
+      "clear": "색상 필터 해제",
+      "results_one": "선택한 색상과 일치하는 태그 1개",
+      "results_other": "선택한 색상과 일치하는 태그 {{count}}개"
+    },
+    "empty": "태그를 찾을 수 없습니다.",
+    "count": {
+      "one": "태그 총 {{count}}개",
+      "other": "태그 총 {{count}}개"
+    },
+    "search": {
+      "placeholder": "태그 필터링...",
+      "results_one": "‘{{term}}’ 검색 결과: 태그 1개",
+      "results_other": "‘{{term}}’ 검색 결과: 태그 {{count}}개"
+    },
+    "rename": {
+      "title": "태그 이름 바꾸기",
+      "label": "새 이름",
+      "error": "이름 바꾸기 실패"
+    },
+    "delete": {
+      "title": "태그 삭제",
+      "confirm": "모든 노트에서 태그 \"{{tag}}\"을 삭제하시겠습니까?",
+      "error": "삭제 실패"
+    }
+  },
+  "download": "다운로드",
+  "convert": "변환",
+  "create": "만들기",
+  "edit": "편집",
+  "delete": "삭제",
+  "favorite": "즐겨찾기",
+  "share": "공유",
+  "info": {
+    "page_title": "노트 정보",
+    "actions": {
+      "back_to_note": "노트로 돌아가기"
+    },
+    "labels": {
+      "note_title": "노트 제목:",
+      "workspace": "작업 공간:",
+      "folder": "폴더:",
+      "created": "생성됨:",
+      "created_by": "작성자:",
+      "last_modified": "최종 수정 날짜:",
+      "last_modified_by": "최종 수정자:",
+      "tags": "태그:",
+      "favorite": "즐겨찾기:",
+      "attachments": "첨부 파일:",
+      "characters": "문자 수:",
+      "words": "단어 수:",
+      "lines": "줄 수:",
+      "note_id": "노트 ID:",
+      "full_path": "전체 경로:"
+    },
+    "attachments": {
+      "count_singular": "파일 1개",
+      "count_plural": "파일 {{count}}개"
+    },
+    "empty": {
+      "no_tags": "태그 없음"
+    },
+    "users": {
+      "user_id": "사용자 #{{id}}",
+      "deleted": "사용자 #{{id}}"
+    },
+    "errors": {
+      "load_failed": "노트 정보를 로드할 수 없습니다."
+    }
+  },
+  "attachments": {
+    "empty": "첨부 파일이 없습니다.",
+    "upload": {
+      "button_uploading": "업로드 중...",
+      "uploading": "업로드 중..."
+    },
+    "actions": {
+      "view": "보기",
+      "delete": "삭제",
+      "open_attachments": "첨부 파일 열기",
+      "download": "{{filename}} 다운로드",
+      "copy_link": "링크 복사",
+      "move": "다른 노트로 이동"
+    },
+    "errors": {
+      "select_file": "업로드할 파일을 선택해주세요.",
+      "no_note_selected": "노트를 선택하지 않았습니다.",
+      "file_too_large": "파일이 너무 큽니다(최대: {{maxSize}}).",
+      "http_error": "HTTP 오류: {{status}}",
+      "invalid_server_response": "서버 응답이 잘못되었습니다.",
+      "upload_failed": "업로드 실패: {{error}}",
+      "deletion_failed": "삭제 실패: {{error}}",
+      "deletion_failed_generic": "삭제에 실패했습니다.",
+      "loading_failed": "첨부 파일을 로드하지 못했습니다.",
+      "loading_error": "첨부 파일을 로드하는 중에 오류가 발생했습니다.",
+      "upload_failed_generic": "업로드에 실패했습니다. 다시 시도해 주세요.",
+      "upload_failed_connection": "업로드에 실패했습니다. 연결을 확인해주세요.",
+      "link_copy_failed": "링크를 복사하지 못했습니다.",
+      "blocked_extension_unlockable": "{{ext}} 파일은 기본적으로 차단됩니다. 설정 > 관리 도구 > 스크립트 및 실행 가능한 첨부 파일에서 이를 허용할 수 있습니다.",
+      "blocked_extension_locked": "{{ext}} 파일은 웹 서버에서 실행할 수 있으며 절대로 첨부할 수 없습니다.",
+      "blocked_mime_unlockable": "이 파일은 {{mime}}로 탐지되어 기본적으로 차단됩니다. 설정 > 관리 도구 > 스크립트 및 실행 파일 첨부에서 스크립트 및 실행 파일을 허용할 수 있습니다.",
+      "blocked_mime_locked": "해당 파일은 웹서버에서 실행할 수 있는 {{mime}}로 탐지되어 절대로 첨부할 수 없습니다.",
+      "blocked_extension_unlockable_user": "이 인스턴스에서는 {{ext}} 파일이 차단됩니다. 관리자는 설정 > 관리 도구 > 스크립트 및 실행 가능한 첨부 파일에서 이를 허용할 수 있습니다.",
+      "blocked_mime_unlockable_user": "이 파일은 {{mime}}로 감지되어 이 인스턴스에서 차단됩니다. 관리자는 설정 > 관리 도구 > 스크립트 및 실행 파일 첨부에서 스크립트 및 실행 파일을 허용할 수 있습니다.",
+      "move_failed": "이동 실패: {{error}}",
+      "move_failed_generic": "이동에 실패했습니다."
+    },
+    "messages": {
+      "upload_success": "파일이 업로드되었습니다!",
+      "deleted_success": "첨부 파일이 삭제되었습니다.",
+      "link_copied": "링크가 복사되었습니다!",
+      "moved_success": "첨부 파일이 \"{{heading}}\"로 이동되었습니다."
+    },
+    "page": {
+      "title": "첨부 파일 관리",
+      "subtitle": "노트에 대한 첨부 파일 관리:",
+      "upload_section_title": "새 첨부 파일 선택",
+      "drag_drop_info": "아래에 파일을 끌어서 놓을 수 있습니다.",
+      "all_types_accepted": "모든 파일 형식 허용(최대 200MB)",
+      "upload_button": "첨부",
+      "current_attachments": "현재 첨부 파일",
+      "loading_attachments": "첨부 파일 불러오는 중...",
+      "preview_alt": "미리보기",
+      "uploaded_prefix": "업로드된 날짜: ",
+      "open_in_new_tab": "새 탭에서 열기",
+      "pdf_label": "PDF",
+      "inline_images_hidden_notice": "노트 내용에 직접 삽입된 이미지는 여전히 첨부 파일로 저장되지만 모호함을 피하기 위해 여기에 숨겨져 있습니다."
+    },
+    "modals": {
+      "delete": {
+        "title": "첨부 파일 삭제",
+        "message": "이 첨부 파일을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+      }
+    },
+    "size": {
+      "units": {
+        "bytes": "바이트",
+        "kb": "KB",
+        "mb": "MB",
+        "gb": "GB"
+      }
+    },
+    "list": {
+      "title": "첨부 파일이 있는 노트",
+      "no_attachments": "아직 첨부 파일이 있는 노트가 없습니다.",
+      "back_to_notes": "노트",
+      "manage_attachments": "첨부 파일 관리",
+      "attachment_count_singular": "첨부 파일 1개",
+      "attachment_count_plural": "첨부 파일 {{count}}개",
+      "hint": "도구 모음에 있는 클립 버튼을 사용하여 노트에 첨부 파일을 추가하세요.",
+      "filter_placeholder": "노트 제목 또는 첨부 파일 이름으로 필터링...",
+      "no_filter_results": "검색어와 일치하는 노트가 없습니다.",
+      "show_thumbnails": "이 목록에 미리보기 이미지 표시",
+      "show_inline_images": "노트 내용에 이미 표시된 이미지도 표시합니다.",
+      "all_file_types": "모든 유형",
+      "file_type_filter": "파일 형식으로 필터링"
+    },
+    "context_menu": {
+      "open": "열기",
+      "download": "다운로드",
+      "transcribe": "음성 텍스트 변환",
+      "delete": "삭제",
+      "delete_confirm_title": "첨부 파일 삭제",
+      "delete_confirm_message": "'{{filename}}'를 삭제하시겠습니까? 노트에서 제거되어 복구할 수 없습니다.",
+      "delete_confirm_message_unnamed": "이 첨부 파일을 삭제하시겠습니까? 노트에서 제거되어 복구할 수 없습니다.",
+      "move": "다른 노트로 이동"
+    },
+    "move": {
+      "title": "첨부 파일 이동",
+      "description": "‘{{filename}}’ 파일을 옮길 노트를 선택하세요.",
+      "description_unnamed": "이 첨부 파일을 옮길 노트를 선택하세요.",
+      "search_placeholder": "노트를 검색하세요...",
+      "empty": "다른 노트를 찾을 수 없습니다",
+      "moving": "이동 중...",
+      "kept_notice": "이 노트 본문에서 파일을 사용하고 있으므로 복사본이 남습니다."
+    }
+  },
+  "modals": {
+    "paste_markdown": {
+      "title": "서식 있는 텍스트 삽입",
+      "menu_item": "서식 있는 텍스트 삽입",
+      "hint": "형식이 지정된 내용(웹 페이지, Word, 이메일)를 아래 상자에 붙여넣습니다. 서식, 제목, 링크, 목록 및 표는 마크다운으로 변환되어 검토, 편집한 다음 노트에 삽입할 수 있습니다.",
+      "placeholder": "여기에 붙여넣기(Ctrl+V)",
+      "preview_label": "마크다운 미리보기",
+      "insert": "삽입",
+      "converting": "변환 중...",
+      "error": "변환에 실패했습니다. 다시 시도해 주세요.",
+      "no_note": "노트가 열려 있지 않습니다.",
+      "empty": "클립보드가 비어 있습니다."
+    },
+    "insert_markdown": {
+      "title": "마크다운 삽입",
+      "menu_item": "마크다운 삽입",
+      "hint": "아래 상자에 마크다운을 붙여넣거나 입력하세요. 미리 볼 수 있는 서식 있는 텍스트로 변환된 다음 노트에 삽입됩니다.",
+      "placeholder": "여기에 마크다운을 붙여넣거나 입력하세요.",
+      "preview_label": "미리보기",
+      "insert": "삽입",
+      "converting": "변환 중...",
+      "error": "변환에 실패했습니다. 다시 시도해 주세요.",
+      "no_note": "노트가 열려 있지 않습니다."
+    },
+    "update": {
+      "title": "📱 애플리케이션 버전",
+      "backup_warning": "데이터를 백업하세요.",
+      "backup_hint": "<strong>설정 > 백업</strong>",
+      "current_version": "현재 버전:",
+      "latest_available": "최신 버전:",
+      "release_notes_button": "릴리스 노트 보기",
+      "self_hosted": "자체 호스팅 지침",
+      "cloud": "클라우드 지침"
+    },
+    "update_check": {
+      "title": "업데이트 확인 중...",
+      "status": "업데이트를 확인하는 동안 잠시 기다려 주세요..."
+    },
+    "login_display": {
+      "title": "로그인 표시 이름",
+      "description": "로그인 화면에 표시되는 이름을 설정합니다.",
+      "placeholder": "표시 이름"
+    },
+    "custom_css": {
+      "title": "사용자 지정 CSS",
+      "description": "Poznote의 모양을 사용자 지정하려면 CSS 파일을 업로드하세요. 이는 데이터 볼륨에 저장되며 선택한 것은 모든 사용자에게 적용됩니다.",
+      "theme_list_link": "CSS 파일을 테마로 제공할 수도 있습니다. {{link}}에 추가하세요.",
+      "theme_list_link_label": "테마 목록",
+      "no_file": "아직 저장된 CSS 파일이 없습니다.",
+      "none": "사용자 지정 CSS 없음",
+      "active": "적용됨",
+      "pending_upload": "저장 시 업로드됨",
+      "pending_replace": "저장 시 교체됨",
+      "delete_confirm": "{{name}}를 삭제하시겠습니까? 파일이 데이터 볼륨에서 제거됩니다.",
+      "upload": "CSS 파일 업로드",
+      "validation": "CSS 파일을 선택하세요.",
+      "placeholder": "custom.css",
+      "hint": "Docker 사용자: 파일을 data/css/ 볼륨 폴더(예: data/css/custom.css)에 저장하세요. 그렇지 않으면 이미지 내부의 css/custom.css에서 로드됩니다."
+    },
+    "theme_list": {
+      "title": "테마 목록",
+      "description": "아이콘 사이드바의 테마 버튼을 클릭할 때마다 이 목록의 다음 테마로 전환됩니다. 제공할 항목을 선택하고 화살표로 순서를 지정한 다음 CSS 파일을 선택하여 테마로도 제공하세요.",
+      "mode_help": "이 스타일시트는 밝은 모드용으로 작성되었습니까, 아니면 어두운 모드용으로 작성되었습니까?",
+      "move_up": "위로 이동",
+      "move_down": "아래로 이동",
+      "empty": "목록에 테마를 하나 이상 유지하세요.",
+      "badge_one": "테마 1개",
+      "badge_other": "테마 {{count}}개"
+    },
+    "import_limits": {
+      "title": "가져오기 제한",
+      "description": "가져오기 작업 중에 허용되는 최대 파일 수를 설정합니다.",
+      "max_individual_files": "최대 개별 파일",
+      "max_zip_files": "ZIP의 최대 파일 수",
+      "individual_badge": "개별 파일: {{count}}",
+      "zip_badge": "ZIP: {{count}}"
+    },
+    "user_quotas": {
+      "title": "사용자 사용 한도",
+      "description": "노트의 수와 각 사용자의 저장 공간을 제한하세요. 0은 무제한을 의미합니다. 관리자에는 제한이 없습니다. 저장소 통계 페이지에서 사용자당 이러한 한도를 재정의할 수 있습니다.",
+      "max_notes": "사용자당 최대 노트",
+      "max_storage": "사용자당 최대 로컬 저장 용량(MB)",
+      "max_storage_s3": "사용자당 최대 S3 첨부 파일 저장 용량(MB)",
+      "max_backups_s3": "사용자당 최대 S3 백업 저장소(MB)"
+    },
+    "ui_customization": {
+      "title": "화면 요소 설정",
+      "description": "인터페이스 요소를 표시하거나 숨깁니다. 선택하지 않은 항목은 숨겨집니다.",
+      "description_admin": "인터페이스 요소를 표시하거나 숨깁니다. 선택하지 않은 항목은 숨겨집니다. \"나\" 열은 자신의 인터페이스에 적용되고, \"사용자\" 열은 관리자를 제외한 이 인스턴스의 모든 사용자에게 적용됩니다.",
+      "column_me": "나",
+      "column_users": "사용자",
+      "description_global_highlight": "관리자 제외",
+      "locked_by_admin": "관리자가 모든 사용자에게 숨김",
+      "locked_by_tenant_isolation": "사용자 기능 제한으로 인해 이 기능이 차단되는 동안 자동으로 숨겨집니다.",
+      "toolbar_hint": "서식 지정 버튼(굵게, 목록, 코드…)은 노트에서 텍스트가 선택된 동안에만 나타납니다. 다른 작업은 ⋮ 메뉴에 그룹화되어 있습니다.",
+      "reminder_bell": "알림 아이콘",
+      "dashboard_filter_bar": "필터 막대",
+      "view_layout_toggle": "보기 전환(그리드/목록, 카드 크기)",
+      "index_search_bar": "검색창",
+      "tasklist_progress_bar": "할 일 목록 진행 표시줄",
+      "preview_code_block_delete": "마크다운 미리보기에서 코드 블록의 삭제 버튼",
+      "share_restrict_users": "공유: 특정 사용자로 제한",
+      "share_protocol_toggle": "공유: HTTPS 토글",
+      "share_shared_with_me": "공유: \"나와 공유됨\"",
+      "filter_placeholder": "항목 필터링...",
+      "no_results": "일치하는 항목이 없습니다.",
+      "show_unchecked_only": "선택하지 않은 항목만 표시",
+      "no_unchecked_results": "선택 취소된 항목이 없습니다.",
+      "sections": {
+        "home_cards": "대시보드 카드",
+        "create_cards": "카드 만들기",
+        "settings_cards": "설정 카드",
+        "toolbar": "도구 모음",
+        "slash_menu": "슬래시 메뉴",
+        "panels": "기타",
+        "dashboard_toolbar": "대시보드",
+        "icon_sidebar": "아이콘 레일",
+        "folder_actions": "폴더 작업",
+        "workspace_menu": "작업 공간 메뉴",
+        "note_actions": "노트 작업",
+        "mobile_editor_bar": "모바일 편집기 표시줄",
+        "sidebar": "사이드바"
+      },
+      "badge_all_visible": "모두 표시됨",
+      "badge_hidden_count_admin": "{{count}}개 숨김(관리자가 숨긴 항목 {{admin}}개)",
+      "badge_hidden_count_admin_columns": "내 화면에서 {{me}}개, 사용자 화면에서 {{users}}개 숨김",
+      "badge_hidden_count": "{{count}}개 숨김",
+      "check_all": "모두 선택",
+      "uncheck_all": "모두 선택 취소",
+      "collapse_all": "모두 접기",
+      "expand_all": "모두 펼치기",
+      "direct_copy_restore_section": "복원 페이지: \"표준 복원이 작동하지 않는 경우 복원\" 섹션",
+      "s3_backups_section": "백업 페이지: \"S3 백업\" 섹션",
+      "s3_restore_section": "복원 페이지: \"S3에서 복원\" 섹션",
+      "toggle_all_warning": "이렇게 하면 기존 사용자 지정이 모두 손실됩니다. 계속하시겠습니까?",
+      "folder_actions_toggle": "폴더의 메뉴 버튼(⋮)",
+      "note_actions_toggle": "노트의 메뉴 버튼(⋮)",
+      "note_actions_hint": "사이드바에 있는 각 노트의 ⋮ 메뉴 항목. 모두 선택을 취소하면 메뉴 버튼이 숨겨집니다.",
+      "theme_toggle": "테마 토글",
+      "panel_title": "화면 요소 표시",
+      "panel_button": "인터페이스 사용자 지정",
+      "panel_hint": "이 페이지의 요소만 나열됩니다. 아래를 선택하거나 선택 취소하여 요소를 숨기거나 표시하세요.",
+      "panel_all_options": "모든 옵션",
+      "panel_saving": "저장 중…",
+      "panel_saved": "저장됨",
+      "panel_save_error": "저장할 수 없습니다. 다시 시도해 주세요.",
+      "mobile_editor_bar_hint": "휴대폰이나 태블릿에서 노트를 편집하는 동안 화면 키보드 위에 표시되는 막대입니다.",
+      "mobile_editor_bar_show": "바 표시",
+      "sidebar_hint": "아이콘 레일과 노트 사이에 있는 노트 트리의 열입니다.",
+      "icon_rail_hint": "모든 페이지의 가장 왼쪽에 있는 좁은 아이콘 열입니다.",
+      "note_updated_date": "수정 날짜 표시",
+      "note_stats_characters": "문자 수 표시",
+      "note_stats_words": "단어 수 표시",
+      "note_stats_lines": "줄 수 표시",
+      "note_info_icon": "노트 제목 아래에 정보 아이콘 표시",
+      "note_scrollbar": "노트 스크롤바"
+    },
+    "icon_sidebar_order": {
+      "title": "아이콘 사이드바 레이아웃",
+      "description": "아이콘 사이드바에 있는 버튼의 순서를 변경하려면 항목을 드래그하세요. 구분 기호는 두 개의 버튼 그룹 사이에 가는 선을 그립니다. 사이드바 하단의 계정 버튼은 그대로 유지됩니다. 색상을 변경하려면 아이콘을 클릭하세요. 사이드바에 있는 버튼을 직접 마우스 오른쪽 버튼으로 클릭할 수도 있습니다.",
+      "change_color": "아이콘 색상 변경",
+      "reset": "순서 재설정",
+      "divider": "구분 기호",
+      "add_divider": "구분 기호 추가",
+      "remove_divider": "구분 기호 제거"
+    },
+    "language": {
+      "title": "언어 선택",
+      "description": "원하는 언어를 선택하세요:"
+    },
+    "input": {
+      "placeholder": "텍스트를 입력하세요"
+    },
+    "main_font": {
+      "title": "앱 글꼴",
+      "description": "기본 인터페이스 글꼴을 선택합니다. Inter 이외의 글꼴은 기기에 설치된 글꼴을 사용합니다.",
+      "options": {
+        "inter": "Inter(기본값)",
+        "system": "시스템"
+      }
+    },
+    "markdown_font": {
+      "title": "마크다운 편집기 글꼴",
+      "description": "마크다운 노트를 편집하는 동안 사용되는 글꼴입니다. 렌더링된 미리보기는 앱 글꼴을 유지합니다. 글꼴은 기기에 설치된 글꼴을 사용합니다.",
+      "options": {
+        "inherit": "앱 글꼴(기본값)",
+        "monospace": "시스템 고정폭"
+      }
+    },
+    "font_size": {
+      "title": "글꼴 크기",
+      "note_label": "노트 내용(px):",
+      "sidebar_label": "사이드바(px):",
+      "code_block_label": "코드 블록(px):",
+      "settings_label": "설정 페이지(px):",
+      "default_value": "{{size}} px는 기본값입니다.",
+      "preview": "미리보기"
+    },
+    "note_width": {
+      "title": "노트 내용 너비",
+      "description": "노트 열의 백분율로 노트 내용의 최대 너비를 선택합니다(100 = 전체 너비).",
+      "label": "최대 너비(%):",
+      "full_width": "전체 폭",
+      "default_value": "{{width}} %가 기본값입니다."
+    },
+    "index_icon_scale": {
+      "title": "인덱스 아이콘 크기 조정",
+      "description": "색인 페이지의 아이콘 크기를 조정합니다(배율):"
+    },
+    "confirm": {
+      "title": "작업 확인",
+      "message": "계속하시겠습니까?",
+      "save_and_exit": "저장하고 종료",
+      "exit_without_saving": "저장하지 않고 종료"
+    },
+    "folder": {
+      "new_title": "새 폴더",
+      "new_placeholder": "새 폴더 이름",
+      "new_subfolder_placeholder": "새 하위 폴더 이름",
+      "create": "만들기",
+      "rename_title": "폴더 이름 바꾸기",
+      "rename_placeholder": "새 폴더 이름",
+      "delete_title": "폴더 삭제",
+      "delete_folder": "폴더 삭제",
+      "change_folder": "폴더 변경",
+      "move_prefix": "이동",
+      "move_suffix": "에:",
+      "move_prompt": "\"{{title}}\"를 다음으로 이동합니다.",
+      "no_folder": "폴더 없음"
+    },
+    "move_note_folder": {
+      "title": "노트를 폴더로 이동",
+      "workspace_destination": "작업 공간 대상 선택:",
+      "target_folder": "대상 폴더 선택:",
+      "recent_folders": "최근 폴더",
+      "new_folder": "새 폴더",
+      "new_workspace": "새로운 작업 공간",
+      "folder_name_placeholder": "폴더 이름(하위 폴더에는 / 사용)",
+      "workspace_name_placeholder": "작업 공간 이름",
+      "enter_workspace_name": "작업 공간 이름을 입력하세요",
+      "enter_folder_name": "폴더 이름을 입력하세요."
+    },
+    "move_folder_files": {
+      "title": "모든 파일 이동",
+      "prompt_prefix": "모든 파일을 다음에서 이동하세요.",
+      "prompt_suffix": "에:",
+      "select_target": "대상 폴더 선택...",
+      "target_folder": "대상 폴더",
+      "hint_move_all": "한 작업 공간의 모든 노트를 다른 작업 공간으로 이동하려면 설정 → 작업 공간으로 이동하세요.",
+      "move_all": "모든 파일 이동"
+    },
+    "move_folder": {
+      "title": "폴더 이동",
+      "prompt_prefix": "폴더 이동",
+      "prompt_suffix": "이동할 위치:",
+      "select_target": "상위 폴더 선택...",
+      "root": "루트(최상위 수준)",
+      "hint": "이렇게 하면 폴더와 해당 폴더의 모든 노트가 하위 폴더로 이동됩니다. 최상위 레벨로 이동하려면 \"루트\"를 선택하세요.",
+      "move": "폴더 이동",
+      "workspace": "대상 작업 공간",
+      "parent": "대상 상위 폴더"
+    },
+    "workspaces": {
+      "move_notes_title": "노트 이동 출발지:",
+      "select_target_workspace": "대상 작업 공간 선택",
+      "rename_title": "작업 공간 이름 바꾸기",
+      "new_name": "새 이름",
+      "delete_title": "작업 공간 삭제 확인",
+      "delete_description": "모든 노트 및 폴더가 영구적으로 삭제되며 복구할 수 없습니다.",
+      "delete_placeholder": "확인하려면 작업 공간 이름을 입력하세요.",
+      "delete_button": "작업 공간 삭제"
+    },
+    "user_settings_info": {
+      "title": "계정 설정",
+      "message": "설정에서 사용자 이름, 이름, 비밀번호를 변경할 수 있습니다.",
+      "message_sso_only": "설정에서 사용자 이름과 이름을 변경할 수 있습니다.",
+      "change_password_button": "비밀번호 변경",
+      "edit_profile_button": "프로필 편집"
+    },
+    "create": {
+      "title_in_folder": "{{folder}}에서 생성",
+      "folder_fallback": "폴더",
+      "note": {
+        "title": "서식 있는 텍스트 노트"
+      },
+      "markdown": {
+        "title": "마크다운 노트"
+      },
+      "task_list": {
+        "title": "할 일 목록"
+      },
+      "linked": {
+        "title": "바로가기",
+        "default_heading": "{{note}}",
+        "success": "바로가기가 생성되었습니다.",
+        "error": "바로가기를 만드는 중에 오류가 발생했습니다."
+      },
+      "subfolder": {
+        "title": "하위 폴더"
+      },
+      "folder": {
+        "title": "폴더"
+      }
+    },
+    "folder_icon": {
+      "title": "폴더 아이콘 변경",
+      "default_icon": "기본 아이콘 설정",
+      "reset": "기본 동작 복원",
+      "search_placeholder": "아이콘 검색...",
+      "default_color": "기본값"
+    },
+    "linked_selector": {
+      "title": "노트에서 바로가기 만들기",
+      "description": "다른 폴더에서 참조할 수 있도록 노트에서 바로가기를 만듭니다.",
+      "search_placeholder": "노트 검색...",
+      "recent_label": "최근 노트"
+    },
+    "linked_folder_selector": {
+      "title": "바로가기를 위한 폴더 선택",
+      "description": "바로가기가 생성될 폴더를 선택하세요.",
+      "search_label": "폴더 필터링",
+      "search_placeholder": "폴더 검색...",
+      "folder_label": "대상 폴더",
+      "root": "루트(폴더 없음)"
+    },
+    "delete_linked_note": {
+      "title": "바로가기 삭제",
+      "message": "무엇을 삭제하시겠습니까?",
+      "delete_link_only": "이 바로가기만 삭제",
+      "delete_link_and_target": "노트와 해당 노트의 모든 바로가기 삭제"
+    },
+    "move_linked_note": {
+      "title": "바로가기 이동",
+      "message": "무엇을 이동하시겠습니까?",
+      "move_link_only": "이 바로가기만 이동",
+      "move_target_note": "원본 노트 이동"
+    },
+    "convert": {
+      "title": "노트 변환",
+      "message": "이 노트를 변환하시겠습니까?",
+      "to_html_title": "서식 있는 텍스트로 변환",
+      "to_html_message": "그러면 마크다운 노트가 서식 있는 텍스트 노트로 변환됩니다.",
+      "to_html_warning": "변환 결과가 기대와 다를 수 있으므로, 변환 전에 노트를 복제하여 원본 사본을 보관하는 것이 좋습니다.",
+      "to_markdown_title": "마크다운으로 변환",
+      "to_markdown_message": "그러면 서식 있는 텍스트 노트가 마크다운 형식으로 변환됩니다. 삽입된 이미지는 첨부 파일로 저장됩니다.",
+      "to_markdown_warning": "변환 결과가 기대와 다를 수 있으므로, 변환 전에 노트를 복제하여 원본 사본을 보관하는 것이 좋습니다.",
+      "converting": "노트 변환 중...",
+      "success": "노트가 변환되었습니다!",
+      "error": "노트 변환 오류",
+      "duplicate_button": "복제"
+    },
+    "export": {
+      "title": "노트 내보내기",
+      "markdown": {
+        "title": "마크다운으로 내보내기",
+        "description": "YAML 앞부분에 메타데이터(제목, 태그, 폴더)가 포함된 MD 파일로 다운로드"
+      },
+      "html": {
+        "title": "HTML로 내보내기",
+        "description": "HTML 파일과 모든 첨부 파일(이미지, 문서 등)이 포함된 ZIP 아카이브를 다운로드하세요."
+      },
+      "html_embedded": {
+        "title": "이미지가 포함된 HTML",
+        "description": "이미지가 포함된 단일 HTML 파일(Base64)로 다운로드합니다. 다른 첨부 파일은 포함되어 있지 않습니다."
+      },
+      "json": {
+        "title": "JSON으로 다운로드",
+        "description": "할 일 목록의 원본 데이터를 JSON 파일로 다운로드"
+      }
+    },
+    "task_move": {
+      "title": "할 일 이동",
+      "description": "이 할 일을 이동할 할 일 목록을 선택하세요.",
+      "search_placeholder": "할 일 목록 검색...",
+      "loading": "불러오는 중...",
+      "empty": "할 일 목록을 찾을 수 없습니다.",
+      "moving": "할 일 이동 중...",
+      "error": "할 일 목록을 로드할 수 없습니다.",
+      "confirm": "할 일 이동",
+      "create_new": "할 일 목록 생성",
+      "create_error": "할 일 목록을 생성할 수 없습니다."
+    },
+    "tasklist_picker": {
+      "title": "할 일 목록 삽입",
+      "description": "이 노트에 표시할 할 일 목록을 선택합니다.",
+      "confirm": "삽입"
+    },
+    "folder_tree_highlight": {
+      "title": "현재 폴더 트리 강조 표시",
+      "description": "노트 및 작업 중인 계층 구조 외부의 폴더는 페이드 아웃됩니다. 희미해지는 정도를 선택하세요.",
+      "dim_strength": "흐리게 표시",
+      "turn_off": "끄기",
+      "preview_current_folder": "현재 폴더",
+      "preview_current_note": "작업 중인 노트",
+      "preview_other_folder": "다른 폴더",
+      "preview_other_note": "다른 곳의 노트"
+    },
+    "markdown_colored": {
+      "title": "마크다운 구문 색상 표시",
+      "options": {
+        "off": "끄기",
+        "custom": "사용자 지정"
+      },
+      "theme_hint": "각 색상은 변경할 때까지 테마를 따릅니다. 변경된 색상 옆에 있는 화살표를 누르면 테마로 다시 돌아옵니다.",
+      "reset_element": "테마 색상 사용",
+      "elements": {
+        "h1": "제목 1",
+        "h2": "제목 2",
+        "h3": "제목 3",
+        "h4": "제목 4",
+        "h5": "제목 5",
+        "h6": "제목 6",
+        "code": "인라인 코드",
+        "codeblock": "코드 블록 배경",
+        "quote": "인용문",
+        "table": "표 머리글",
+        "hr": "구분 기호"
+      }
+    },
+    "note_color_palette": {
+      "title": "노트 색상",
+      "description": "노트에 할당할 수 있는 색상을 사용자 지정하세요. 항목의 이름을 바꾸거나 항목 색상을 변경하면 해당 항목을 사용할 때마다 노트가 업데이트됩니다.",
+      "add": "색상 추가",
+      "remove": "제거",
+      "reset": "기본값으로 재설정",
+      "name_placeholder": "색상 이름",
+      "count": "색상 {{count}}개",
+      "empty_error": "하나 이상의 색상을 추가하거나 기본값으로 재설정하세요."
+    },
+    "note_age_filter": {
+      "title": "노트 날짜 필터",
+      "description": "얼마 전까지 수정한 노트를 표시할지 선택하세요",
+      "options": {
+        "all": "모든 노트",
+        "last_30_days": "지난 30일",
+        "last_3_months": "지난 3개월",
+        "last_6_months": "지난 6개월",
+        "last_12_months": "지난 12개월",
+        "last_2_years": "지난 2년",
+        "custom_days": "지난 {{days}}일",
+        "custom_label": "사용자 지정",
+        "days": "일"
+      }
+    },
+    "timezone": {
+      "title": "시간대",
+      "description": "시간대를 선택하세요:",
+      "groups": {
+        "europe": "유럽",
+        "america": "아메리카",
+        "asia": "아시아",
+        "pacific": "태평양",
+        "africa": "아프리카"
+      }
+    },
+    "date_time_format": {
+      "title": "날짜 및 시간 형식",
+      "description": "날짜 및 시간 표시 방법을 선택합니다.",
+      "options": {
+        "default": "YYYY-MM-DD HH:mm",
+        "ymd_hi": "YYYY-MM-DD HH:mm",
+        "ymd_his": "YYYY-MM-DD HH:mm:ss",
+        "dmy_hi": "DD/MM/YYYY HH:mm",
+        "mdy_hia": "MM/DD/YYYY hh:mm AM/PM",
+        "long": "2026년 9월 12일 토요일 14:05",
+        "custom": "사용자 지정"
+      },
+      "custom_placeholder": "YYYY-MM-DD HH:mm:ss",
+      "custom_hint": "토큰: YYYY, MMMM, MMM, MM, dddd, ddd, DD, D, HH, h, hh, mm, ss, A",
+      "custom_invalid": "유효한 사용자 지정 형식을 입력하세요.",
+      "tokens_title": "토큰:",
+      "tokens": {
+        "YYYY": "연도 (2026)",
+        "MMMM": "월 이름(9월)",
+        "MMM": "짧은 월 이름(9월)",
+        "MM": "월 (08)",
+        "dddd": "요일명(토요일)",
+        "ddd": "짧은 요일 이름(토)",
+        "DD": "일 (16)",
+        "D": "일, 앞에 0 없음(5)",
+        "HH": "시간, 24시간 (14)",
+        "h": "시, 12시간제(2)",
+        "hh": "시, 12시간제·두 자리(02)",
+        "mm": "분 (05)",
+        "ss": "초 (09)",
+        "A": "오전/오후"
+      }
+    },
+    "markdown_default_view_mode": {
+      "title": "기본 보기 모드",
+      "description": "마크다운 노트 열기 방법을 선택하세요.",
+      "options": {
+        "preview": "미리보기",
+        "edit": "편집",
+        "split": "분할(편집기와 미리보기 나란히)",
+        "split_short": "분할",
+        "last": "마지막으로 사용한 모드"
+      },
+      "hint": "다른 모드로 전환한 노트는 다음에 기본 모드로 다시 열립니다. 새로운 노트는 항상 분할 모드로 열립니다."
+    },
+    "diary_date_format": {
+      "title": "일기 입력 날짜 형식",
+      "description": "새 일기 항목의 제목을 지정하는 데 사용되는 날짜 형식을 선택하세요.",
+      "options": {
+        "ymd": "YYYY-MM-DD",
+        "dmy_slash": "DD/MM/YYYY",
+        "mdy_slash": "MM/DD/YYYY",
+        "dmy_dot": "DD.MM.YYYY",
+        "ymd_slash": "YYYY/MM/DD",
+        "long": "2026년 9월 12일 토요일",
+        "custom": "사용자 지정"
+      },
+      "custom_placeholder": "DD MMMM YYYY",
+      "custom_hint": "토큰: YYYY, YY, MMMM, MMM, MM, dddd, ddd, DD, D. 연, 월, 일이 필요합니다.",
+      "custom_invalid": "연도, 월, 일이 포함된 유효한 사용자 지정 형식을 입력하세요.",
+      "hint": "기존 항목은 제목을 유지하고 해당 날짜와 계속 연결됩니다.",
+      "tokens_title": "토큰:",
+      "tokens": {
+        "YYYY": "연도 (2026)",
+        "YY": "연도, 2자리 (26)",
+        "MMMM": "월 이름(9월)",
+        "MMM": "짧은 월 이름(9월)",
+        "MM": "월 (08)",
+        "dddd": "요일명(토요일)",
+        "ddd": "짧은 요일 이름(토)",
+        "DD": "일 (05)",
+        "D": "일, 앞에 0 없음(5)"
+      },
+      "tokens_required": "연도, 월, 일이 모두 필요합니다."
+    },
+    "tenant_isolation": {
+      "title": "사용자 기능 제한",
+      "description": "관리자가 아닌 사용자에 대해 확인된 기능을 차단합니다(SaaS 모드). 관리자는 영향을 받지 않습니다. 패밀리 또는 팀 인스턴스에 대해서는 모든 항목을 선택하지 않은 상태로 둡니다.",
+      "features": {
+        "user_sharing": "사용자 검색 및 공유",
+        "user_sharing_help": "사용자 디렉토리는 관리자 전용이 되며 특정 사용자와의 공유가 거부됩니다.",
+        "user_webhooks": "사용자 웹훅",
+        "user_webhooks_help": "관리자가 아닌 사용자는 노트에 대한 이벤트를 외부 엔드포인트로 보내는 웹후크를 더 이상 등록할 수 없습니다.",
+        "user_s3_backups": "백업 페이지의 S3 백업",
+        "user_s3_backups_help": "관리자가 아닌 사용자는 더 이상 백업/내보내기 페이지의 S3 백업 섹션을 볼 수 없으며 버킷 아카이브를 업로드하거나 다운로드할 수 없습니다.",
+        "user_s3_restore": "복원 페이지의 S3 복원",
+        "user_s3_restore_help": "관리자가 아닌 사용자는 더 이상 복원/가져오기 페이지의 S3에서 복원 섹션을 볼 수 없으며 버킷 아카이브를 복원할 수 없습니다."
+      }
+    },
+    "note": {
+      "rename_title": "노트 이름 바꾸기",
+      "rename_placeholder": "새 노트 제목"
+    },
+    "snapshots": {
+      "title": "수정 이력",
+      "description": "노트가 변경되면 자동 수정 이력이 저장되며, {{minutes}}분마다 최대 하나씩 생성됩니다. 처음 {{hours}}시간 동안은 모두 보관하고, 그 이후에는 하루에 하나씩 아래 일수만큼 보관합니다. 직접 저장한 수정 이력은 이 제한에 포함되지 않습니다. 모든 수정 이력은 {{days}}일 후에 만료됩니다:",
+      "safety_description": "노트당 보관할 편집 보호 이력 개수입니다. AI 어시스턴트 또는 MCP 서버가 노트 본문을 바꾸기 직전에 저장되며, \"AI 편집 전\" 또는 \"MCP 편집 전\"으로 표시됩니다:",
+      "options": {
+        "unit": "일 동안 보관(자동 수정 이력 하루 1개)",
+        "safety_unit": "편집 보호 이력"
+      },
+      "badge": "노트당 {{count}}일 보관",
+      "badge_with_safety": "노트당 {{count}}일 보관, 편집 보호 이력 {{safety}}개",
+      "warning_title": "수정 이력은 노트 텍스트만 저장합니다. 첨부 파일과 이미지는 복사하지 않습니다.",
+      "warning": "노트에서 첨부 파일이나 이미지를 제거해도 수정 이력에 남아 있다면 디스크에 계속 보관됩니다. 해당 파일을 포함한 마지막 수정 이력이 삭제되거나 만료될 때(최대 {{days}}일), 또는 노트가 영구적으로 삭제될 때만 디스크에서 제거됩니다."
+    },
+    "api_rest": {
+      "github_option": "GitHub",
+      "swagger_option": "Swagger",
+      "title": "API REST"
+    },
+    "attachment": {
+      "title": "첨부 파일"
+    },
+    "background_image": {
+      "description": "작업 공간의 배경 이미지를 업로드하세요. 불투명도를 조절하여 은은하게 만들 수 있습니다.",
+      "no_image": "배경 이미지가 설정되지 않았습니다.",
+      "opacity": "배경 불투명도",
+      "remove": "제거",
+      "title": "배경 이미지 설정",
+      "upload": "이미지 업로드"
+    },
+    "tag_folder_notes": {
+      "apply": "태그 추가",
+      "applying": "태그 지정 중...",
+      "count_one": "노트 1개에 태그를 추가합니다",
+      "count_other": "노트 {{count}}개에 태그를 추가합니다",
+      "empty_folder": "이 폴더는 비어 있습니다.",
+      "error": "노트에 태그를 추가할 수 없습니다",
+      "existing_tags": "기존 태그",
+      "include_subfolders": "하위 폴더의 노트 포함",
+      "no_tags": "태그를 하나 이상 입력하세요.",
+      "placeholder": "태그, 쉼표로 구분",
+      "prompt_prefix": "모든 노트에 태그를 추가합니다.",
+      "prompt_suffix": ":",
+      "success_none": "모든 노트에는 이미 이러한 태그가 있습니다.",
+      "success_one": "노트 1개에 태그를 추가했습니다",
+      "success_other": "노트 {{count}}개에 태그를 추가했습니다",
+      "title": "모든 노트에 태그 추가"
+    },
+    "workspace_activity_emails": {
+      "options": {
+        "off": "끄기",
+        "instant": "변경 시 알림",
+        "daily": "일일 요약",
+        "weekly": "주간 요약"
+      }
+    }
+  },
+  "notes_list": {
+    "system_folders": {
+      "trash": "휴지통",
+      "tags": "태그",
+      "favorites": "즐겨찾기",
+      "public": "공유됨",
+      "attachments": "첨부 파일",
+      "no_folder": "폴더 없음"
+    },
+    "favorites": {
+      "empty": "아직 즐겨찾는 노트가 없습니다.",
+      "filter_placeholder": "제목 또는 폴더 이름으로 필터링..."
+    },
+    "drop_zone": {
+      "remove_from_folder": "폴더에서 제거하려면 여기에 드롭하세요."
+    },
+    "folder_actions": {
+      "add_favorite": "즐겨찾기에 추가",
+      "remove_favorite": "즐겨찾기에서 제거",
+      "menu": "폴더 작업",
+      "create": "여기서 생성",
+      "kanban_view": "칸반 보기",
+      "open_all_in_tabs": "모든 노트 열기",
+      "move_all_files": "모든 파일 이동",
+      "rename_folder": "폴더 이름 바꾸기",
+      "delete_folder": "폴더 삭제",
+      "move_folder": "폴더 이동",
+      "duplicate_folder": "폴더 복제",
+      "copy_folder": "복사",
+      "cut_folder": "잘라내기",
+      "paste_into_folder": "폴더에 붙여넣기",
+      "change_icon": "아이콘 변경",
+      "change_note_icon": "노트 아이콘 변경",
+      "download_folder": "다운로드",
+      "is_public": "공유됨",
+      "share_folder": "공유",
+      "tabs_not_available": "휴대기기에서는 탭을 사용할 수 없습니다.",
+      "no_notes_title": "노트 없음",
+      "no_notes_in_folder": "이 폴더에는 노트가 없습니다.",
+      "too_many_notes": "이 폴더에는 {{count}} 노트가 포함되어 있습니다. 브라우저에 부담을 주지 않도록 첫 번째 {{max}}만 열립니다.",
+      "subfolders_only_title": "하위 폴더 노트 열기",
+      "subfolders_only_message": "이 폴더에는 자체 노트가 없지만 해당 하위 폴더에는 {{count}} 노트가 포함되어 있습니다. 이 노트를 모두 여시겠습니까?",
+      "subfolders_only_message_one": "이 폴더에는 자체 노트가 없지만 해당 하위 폴더에는 1개의 노트가 있습니다. 열어 보시겠어요?",
+      "open_limit_notice": "브라우저에 부담을 주지 않도록 첫 번째 {{max}}만 열립니다.",
+      "open_all_confirm": "모두 열기",
+      "with_subfolders_message": "이 폴더에는 노트가 포함되어 있으며 해당 하위 폴더에도 포함되어 있습니다. 이 폴더({{own}})의 노트만 열겠습니까, 아니면 하위 폴더({{total}})를 포함한 모든 노트를 열겠습니까?",
+      "this_folder_only": "이 폴더만",
+      "show_only": "이 폴더만 표시",
+      "keep_offline": "오프라인 보관",
+      "stop_offline": "오프라인 보관 해제",
+      "kept_offline": "이 브라우저에 오프라인용으로 보관됨"
+    },
+    "folder_filter": {
+      "exit": "폴더 보기 종료"
+    },
+    "note_actions": {
+      "menu": "노트 작업",
+      "open_in_new_tab": "새 탭에서 열기",
+      "move_note": "노트 이동",
+      "is_shared": "공유됨",
+      "share_note": "노트 공유",
+      "rename_note": "노트 이름 바꾸기",
+      "delete_note": "노트 삭제",
+      "copy_note": "복사",
+      "cut_note": "잘라내기",
+      "paste_note": "여기에 붙여넣으세요",
+      "enter_note_name": "노트 제목을 입력하세요",
+      "attachments": "첨부 파일",
+      "convert_note": "노트 변환",
+      "keep_offline": "오프라인 보관",
+      "stop_offline": "오프라인 보관 해제",
+      "available_offline": "이 브라우저에서는 오프라인으로 사용 가능",
+      "not_available_offline": "이 브라우저에서는 오프라인으로 사용할 수 없습니다."
+    },
+    "favorites_menu": {
+      "title": "즐겨찾기 작업",
+      "clear": "즐겨찾기에서 모두 제거",
+      "clear_confirm_title": "즐겨찾기에서 모두 제거하시겠습니까?",
+      "clear_confirm_message": "이 작업 공간의 모든 노트 및 폴더는 즐겨찾기를 떠납니다. 노트 및 폴더 자체는 유지됩니다.",
+      "clear_button": "모두 제거",
+      "error": "즐겨찾기를 업데이트할 수 없습니다."
+    }
+  },
+  "tree_history": {
+    "undone": "실행 취소: {{action}}",
+    "redone": "다시 실행: {{action}}",
+    "nothing_to_undo": "실행취소할 항목이 없습니다.",
+    "nothing_to_redo": "다시 실행할 작업이 없습니다",
+    "undo_failed": "실행 취소 실패: {{error}}",
+    "redo_failed": "다시 실행 실패: {{error}}",
+    "actions": {
+      "move_note": "노트 이동",
+      "move_folder": "폴더 이동",
+      "delete_note": "노트 삭제",
+      "delete_folder": "폴더 삭제",
+      "paste_note": "노트 붙여넣기",
+      "paste_folder": "폴더 붙여넣기",
+      "rename_note": "노트 이름 바꾸기",
+      "rename_folder": "폴더 이름 바꾸기",
+      "batch": "항목 {{count}}개"
+    }
+  },
+  "tree_clipboard": {
+    "copied_note": "\"{{name}}\"를 복사했습니다.",
+    "cut_note": "‘{{name}}’ 잘라냄",
+    "copied_folder": "‘{{name}}’ 폴더 복사됨",
+    "cut_folder": "‘{{name}}’ 폴더 잘라냄",
+    "pasted_note": "‘{{name}}’ 붙여넣음",
+    "pasted_folder": "‘{{name}}’ 폴더 붙여넣음",
+    "nothing_to_paste": "붙여넣을 내용이 없습니다.",
+    "already_there": "이미 이 폴더에 있습니다.",
+    "cannot_paste_into_itself": "폴더를 자체 폴더에 붙여넣을 수 없습니다.",
+    "paste_failed": "붙여넣기 실패: {{error}}",
+    "copied_items": "항목 {{count}}개를 복사했습니다.",
+    "cut_items": "항목 {{count}}개 잘라냄",
+    "pasted_items": "항목 {{count}}개를 붙여넣었습니다."
+  },
+  "note_color": {
+    "modal_title": "노트 색상",
+    "folder_modal_title": "폴더 색상",
+    "custom": "사용자 지정 색상",
+    "remove": "색상 제거",
+    "apply_error": "노트 색상을 업데이트할 수 없습니다.",
+    "filter": "색상으로 필터링",
+    "filter_all": "모든 노트",
+    "filter_any": "모든 색상",
+    "filter_none": "색상 없음",
+    "manage_button": "색상 관리",
+    "names": {
+      "blue": "파란색",
+      "green": "초록색",
+      "yellow": "노란색",
+      "orange": "주황색",
+      "red": "빨간색",
+      "purple": "보라색",
+      "pink": "분홍색",
+      "gray": "회색"
+    }
+  },
+  "tabs": {
+    "context_menu": {
+      "pin": "탭 고정",
+      "unpin": "탭 고정 해제",
+      "close": "이 탭 닫기",
+      "close_all": "모두 닫기",
+      "close_others": "다른 탭 모두 닫기"
+    },
+    "close_all_tabs": "모든 탭 닫기",
+    "scroll_left": "탭을 왼쪽으로 스크롤",
+    "scroll_right": "탭을 오른쪽으로 스크롤"
+  },
+  "notes_manager": {
+    "actions": "대량 작업",
+    "all_types": "모든 유형",
+    "choose_action": "작업을 선택하세요",
+    "select_folder": "대상 폴더 선택",
+    "add_tag": "태그 추가",
+    "remove_tag": "태그 제거",
+    "add_favorite": "즐겨찾기에 추가",
+    "remove_favorite": "즐겨찾기에서 제거",
+    "move_to_trash": "휴지통으로 이동",
+    "trash_confirm": "선택한 노트를 휴지통으로 이동하시겠습니까?",
+    "enter_tag": "태그를 하나 이상 입력하세요.",
+    "tags_placeholder": "태그1, 태그2",
+    "move": "이동",
+    "applying": "적용 중...",
+    "selected": "선택됨",
+    "select_all": "보이는 항목 모두 선택",
+    "deselect_all": "모두 선택 취소",
+    "move_to": "다음으로 이동하세요...",
+    "moving": "이동 중...",
+    "moved": "이동 완료",
+    "root": "루트(폴더 없음)",
+    "filter_folders": "폴더 필터링...",
+    "filter_placeholder": "제목 또는 태그로 노트를 필터링합니다...",
+    "filter_type": "유형별로 필터링",
+    "type_html": "서식 있는 텍스트",
+    "type_markdown": "마크다운",
+    "type_tasklist": "할 일 목록",
+    "type_excalidraw": "Excalidraw",
+    "filter_age": "날짜 범위로 필터링",
+    "age_all": "모든 노트",
+    "age_recent": "최근만",
+    "empty": "노트를 찾을 수 없습니다.",
+    "select_all_in_folder": "이 폴더의 모든 노트 선택"
+  },
+  "update": {
+    "new_available": "🎉 새로운 업데이트가 가능합니다!",
+    "new_version_available": "직접 설치를 관리하고 있다면 GitHub의 <a href=\"https://github.com/timothepoznanski/poznote#update-application\" target=\"_blank\">업데이트 안내</a>에 따라 업데이트하세요. 호스팅 서비스를 이용하고 있다면 해당 제공자가 업데이트해야 합니다.",
+    "description": "데이터는 업데이트 중에도 보존됩니다.",
+    "up_to_date": "✅ Poznote가 최신 상태입니다",
+    "error_loading_version": "버전을 로드하는 중에 오류가 발생했습니다.",
+    "error_getting_version": "버전을 가져오는 중 오류가 발생했습니다."
+  },
+  "slash_menu": {
+    "plain_block": "일반 블록",
+    "block_languages": "블록 언어",
+    "back_to_normal": "일반 텍스트로 돌아가기",
+    "title": "제목",
+    "heading_1": "제목 1",
+    "heading_2": "제목 2",
+    "heading_3": "제목 3",
+    "heading_4": "제목 4",
+    "heading_5": "제목 5",
+    "heading_6": "제목 6",
+    "format_text": "텍스트 서식 지정",
+    "align": "정렬",
+    "align_left": "왼쪽",
+    "align_center": "가운데",
+    "align_right": "오른쪽",
+    "align_justify": "양쪽 맞춤",
+    "red": "빨간색",
+    "bold": "굵게",
+    "italic": "이탤릭체",
+    "highlight": "강조 표시",
+    "strikethrough": "취소선",
+    "code": "코드",
+    "inline_code": "인라인 코드",
+    "code_block_normal": "일반 블록",
+    "code_block": "코드 블록",
+    "list": "목록",
+    "bullet_list": "글머리 기호 목록",
+    "numbered_list": "번호가 매겨진 목록",
+    "lettered_list": "문자 목록",
+    "roman_list": "로마 숫자 목록",
+    "checklist": "체크리스트",
+    "done": "완료",
+    "image": "이미지",
+    "take_photo": "사진 촬영",
+    "excalidraw": "Excalidraw",
+    "mermaid": "Mermaid",
+    "mermaid_flowchart": "흐름도",
+    "mermaid_sequence": "시퀀스 다이어그램",
+    "mermaid_class": "클래스 다이어그램",
+    "mermaid_state": "상태 다이어그램",
+    "mermaid_er": "엔터티 관계",
+    "mermaid_gantt": "간트 차트",
+    "mermaid_pie": "원형 차트",
+    "mermaid_mindmap": "마인드맵",
+    "mermaid_timeline": "타임라인",
+    "mermaid_journey": "사용자 여정",
+    "mermaid_git": "Git 그래프",
+    "mermaid_quadrant": "사분면 차트",
+    "mermaid_xy": "막대 및 선 차트",
+    "emoji": "이모티콘",
+    "table": "표",
+    "separator": "구분 기호",
+    "link_to_note": "노트에 링크",
+    "link_to_attachment": "첨부 파일 링크",
+    "link": "링크",
+    "cancel": "취소",
+    "back": "뒤로",
+    "quote": "인용문",
+    "blockquote": "인용문 블록",
+    "callout_note": "노트",
+    "callout_tip": "팁",
+    "callout_important": "중요",
+    "callout_warning": "경고",
+    "callout_caution": "주의",
+    "toggle": "토글 목록",
+    "toggle_placeholder": "토글 목록",
+    "toggle_content_placeholder": "토글 목록 안에 내용을 입력하세요…",
+    "toggle_after_placeholder": "토글 목록 밖에 내용을 입력하세요…",
+    "code_block_placeholder_before": "여기에 텍스트를 작성하세요…",
+    "code_block_placeholder_after": "여기에 텍스트를 작성하세요…",
+    "youtube_video": "유튜브 영상",
+    "youtube_modal_title": "YouTube 비디오 삽입",
+    "youtube_url_label": "YouTube URL 또는 동영상 ID:",
+    "youtube_url_prompt": "YouTube 동영상 URL 또는 ID 입력:",
+    "youtube_help": "지원: youtube.com/watch?v=ID, youtu.be/ID 또는 동영상 ID만",
+    "youtube_insert": "삽입",
+    "youtube_invalid_url": "잘못된 YouTube URL",
+    "mp4_video": "MP4 비디오",
+    "mp4_uploading": "동영상 업로드 중...",
+    "mp4_upload_success": "동영상이 업로드되었습니다!",
+    "mp4_no_note": "노트가 선택되지 않았습니다.",
+    "mp4_invalid_file": "MP4 비디오를 선택하세요.",
+    "mp4_upload_failed": "업로드 실패: {{error}}",
+    "audio": "오디오",
+    "audio_uploading": "오디오 업로드 중...",
+    "audio_no_note": "노트가 선택되지 않았습니다.",
+    "audio_invalid_file": "오디오 파일을 선택하세요.",
+    "audio_upload_failed": "업로드 실패: {{error}}",
+    "date_section": "달력과 시간",
+    "date": "날짜",
+    "time": "시간",
+    "date_time": "날짜 및 시간",
+    "now": "지금",
+    "today": "오늘",
+    "now_time": "현재 시간",
+    "now_datetime": "현재 날짜 및 시간",
+    "tomorrow": "내일",
+    "yesterday": "어제",
+    "relative_date": "상대 날짜",
+    "day_after_tomorrow": "모레",
+    "next_week": "다음 주",
+    "next_month": "다음 달",
+    "next_year": "내년",
+    "day_before_yesterday": "그저께",
+    "last_week": "지난 주",
+    "last_month": "지난달",
+    "last_year": "작년",
+    "weekday": "요일",
+    "journal_link": "일기 항목에 대한 링크",
+    "tasklist_embed": "할 일 목록",
+    "template": "템플릿",
+    "template_none": "아직 템플릿이 없습니다.",
+    "template_none_hint": "'템플릿' 폴더 또는 작업 공간에 노트를 보관하세요",
+    "template_insert_failed": "템플릿을 삽입할 수 없습니다.",
+    "template_picker_title": "템플릿 삽입",
+    "template_filter_placeholder": "템플릿 필터링...",
+    "template_no_match": "이 필터와 일치하는 템플릿이 없습니다.",
+    "template_load_failed": "템플릿을 로드할 수 없습니다.",
+    "record_audio": "오디오 녹음",
+    "insert": "삽입",
+    "media": "미디어",
+    "color": "색상",
+    "youtube": "유튜브",
+    "bilibili": "빌리빌리",
+    "invalid_url": "잘못된 URL",
+    "bilibili_invalid_url": "유효한 Bilibili URL을 입력하세요.",
+    "bilibili_invalid_format": "Bilibili URL 형식이 잘못되었습니다. 동영상 페이지 URL(bilibili.com/video/BV...)을 사용하세요.",
+    "streaming_video_url_prompt": "스트리밍 비디오 URL 입력(YouTube, Vimeo 등):",
+    "bilibili_help": "Bilibili 비디오 페이지 URL(예: bilibili.com/video/BV...)을 입력하세요.",
+    "bilibili_modal_title": "Bilibili 비디오 삽입",
+    "video_insert": "삽입",
+    "copy": "복사",
+    "cut": "잘라내기",
+    "paste": "붙여넣기",
+    "paste_plain": "서식 없이 붙여넣기",
+    "paste_blocked": "브라우저는 Poznote가 여기에서 클립보드를 읽도록 허용하지 않습니다. {{shortcut}}를 사용하여 붙여넣습니다."
+  },
+  "api": {
+    "settings": {
+      "key_required": "키가 필요합니다",
+      "invalid_action": "잘못된 작업",
+      "internal_error": "내부 오류"
+    },
+    "errors": {
+      "workspace_not_found": "작업 공간을 찾을 수 없습니다",
+      "folder_not_found": "폴더를 찾을 수 없습니다",
+      "note_quota_reached": "노트 제한에 도달함: 이 인스턴스는 이 사용자에게 최대 {{max}} 노트(휴지통 포함)을 허용합니다.",
+      "storage_quota_reached": "저장소 한도에 도달함: 이 인스턴스는 이 사용자에게 최대 {{max}}MB의 저장소를 허용합니다.",
+      "linked_note_already_exists": "이 노트에 대한 바로가기가 이미 존재합니다.",
+      "method_not_allowed": "허용되지 않는 방법",
+      "invalid_action": "잘못된 작업",
+      "internal_server_error": "내부 서버 오류",
+      "duplicate_title_in_folder": "이 폴더에는 동일한 제목의 다른 노트가 있습니다.",
+      "note_id_required": "note_id가 필요합니다.",
+      "note_not_found": "노트를 찾을 수 없습니다",
+      "invalid_custom_token": "사용자 지정 링크가 잘못되었습니다.\n\n허용됨:\n\n문자, 숫자, -, _, . (4~128자)",
+      "token_already_in_use": "이미 사용 중인 사용자 지정 링크",
+      "no_token_generated": "링크가 생성되지 않았습니다.",
+      "server_error": "서버 오류: {{error}}",
+      "storage_s3_quota_reached": "S3 저장소 한도에 도달함: 이 인스턴스는 이 사용자에게 최대 {{max}}MB의 S3 저장소를 허용합니다.",
+      "backups_s3_quota_reached": "S3 백업 한도 도달: 이 인스턴스는 이 사용자에게 최대 {{max}}MB의 백업 아카이브를 허용합니다.",
+      "cannot_delete_last_workspace": "마지막 작업 공간을 삭제할 수 없습니다.",
+      "workspace_required": "작업 공간이 필요합니다",
+      "attachment_not_found": "첨부 파일을 찾을 수 없습니다",
+      "attachment_move_same_note": "이 첨부 파일은 이미 해당 노트에 있습니다.",
+      "attachment_move_target_not_found": "이동할 노트를 찾을 수 없습니다.",
+      "attachment_move_target_shortcut": "바로가기는 자체 첨부 파일을 보관할 수 없습니다."
+    }
+  },
+  "ui": {
+    "login_display": {
+      "prompt": "로그인 표시 이름(지우려면 비어 있음):"
+    },
+    "alerts": {
+      "saved": "저장됨",
+      "save_error": "저장 오류",
+      "network_error": "네트워크 오류"
+    }
+  },
+  "theme": {
+    "toggle": "테마 전환",
+    "names": {
+      "light": "라이트",
+      "dark": "다크",
+      "black": "블랙",
+      "lavender": "라벤더",
+      "sepia": "세피아",
+      "terminal": "터미널"
+    },
+    "choose": "테마를 선택하세요"
+  },
+  "table": {
+    "context_menu": {
+      "insert_row_above": "위에 행 삽입",
+      "insert_row_below": "아래에 행 삽입",
+      "insert_column_left": "왼쪽에 열 삽입",
+      "insert_column_right": "오른쪽에 열 삽입",
+      "align_column": "열 정렬",
+      "align_row": "행 정렬",
+      "align_cell": "셀 정렬",
+      "align_left": "왼쪽",
+      "align_center": "가운데",
+      "align_right": "오른쪽",
+      "reset_column_widths": "열 너비 재설정",
+      "fit_to_content": "내용에 표 맞추기",
+      "full_width": "전체 너비 표",
+      "delete_row": "행 삭제",
+      "delete_column": "열 삭제",
+      "delete_table": "표 삭제",
+      "errors": {
+        "cannot_delete_last_row": "표의 마지막 행을 삭제할 수 없습니다.",
+        "cannot_delete_last_column": "표의 마지막 열을 삭제할 수 없습니다."
+      },
+      "confirm": {
+        "delete_table": "이 표을 정말로 삭제하시겠습니까?"
+      }
+    }
+  },
+  "index": {
+    "folder_path": {
+      "reveal_in_list": "폴더 목록에 표시"
+    },
+    "errors": {
+      "create_task_list": "할 일 목록 생성 중 오류 발생",
+      "create_task_list_prefix": "할 일 목록 생성 중 오류 발생: ",
+      "create_markdown_note": "마크다운 노트 생성 중 오류 발생",
+      "create_markdown_note_prefix": "마크다운 노트 생성 중 오류 발생: ",
+      "conversion_failed_prefix": "변환 오류: {{error}}",
+      "network_error_converting": "노트를 변환하는 중 네트워크 오류가 발생했습니다."
+    },
+    "toolbar": {
+      "favorite_add": "즐겨찾기에 추가",
+      "favorite_remove": "즐겨찾기에서 제거",
+      "public_note": "노트 공유",
+      "attachments_with_count": "첨부 파일({{count}})",
+      "menu_actions": "메뉴 작업",
+      "convert_to_html": "서식 있는 텍스트로 변환",
+      "note_width": "노트 폭",
+      "note_width_current": "노트 폭: {{width}}",
+      "note_width_default": "기본값({{width}})",
+      "split_width": "분할 뷰 너비",
+      "split_resize": "창 크기를 조정하려면 드래그하세요.",
+      "convert_to_markdown": "마크다운으로 변환",
+      "share_note": "공유"
+    },
+    "share_modal": {
+      "description": "공유 URL은 이 노트에 대한 공개 링크를 생성합니다. URL이 생성되면 비밀번호로 노트를 보호하거나 공유 URL을 사용자 지정하는 등 더 많은 옵션을 추가할 수 있습니다.",
+      "create_url": "URL 생성",
+      "error_prefix": "오류: ",
+      "unknown_error": "공개 링크를 만드는 중 알 수 없는 오류가 발생했습니다.",
+      "error_creating": "공개 링크 생성 중 오류 발생: ",
+      "shared_via_folder_title": "공유 노트",
+      "shared_via_folder_message": "이 노트는 공유 폴더 \"{{folder}}\"에 있으므로 이미 공유되었습니다.",
+      "shared_via_folder_message_generic": "이 노트는 공유 폴더에 있으므로 이미 공유되었습니다.",
+      "shared_via_folder_create_question": "폴더 공유 외에 이 노트에 특정한 공유 링크도 생성하시겠습니까?",
+      "shared_via_folder_view_shares": "공유 보기"
+    },
+    "public_modal": {
+      "title": "공유 URL",
+      "renew": "갱신",
+      "renew_token": "링크 갱신",
+      "manage": "편집",
+      "custom_token": "사용자 지정 링크(선택사항)",
+      "custom_token_placeholder": "내-사용자 지정-링크-1",
+      "indexable": "검색 엔진의 색인 생성 허용",
+      "indexable_mobile": "인덱싱 허용",
+      "password": "비밀번호(선택사항)",
+      "password_placeholder": "비밀번호를 입력하세요"
+    },
+    "folder_share_modal": {
+      "title": "공유 폴더 URL",
+      "create_description": "공유 URL은 이 폴더에 대한 공개 링크를 생성합니다. URL이 생성되면 비밀번호로 폴더를 보호하거나 공유 URL을 사용자 지정하는 등 더 많은 옵션을 추가할 수 있습니다.",
+      "use_https": "HTTPS"
+    },
+    "task_permissions": {
+      "title": "권한",
+      "read_only": "읽기 전용",
+      "check_only": "완료 표시 및 해제만 허용",
+      "full": "전체 편집"
+    },
+    "note_permissions": {
+      "editable": "텍스트 편집 허용"
+    },
+    "folder_permissions": {
+      "editable": "노트 편집 허용"
+    },
+    "note": {
+      "new_note": "새 노트",
+      "new_note_numbered": "새 노트({{number}})",
+      "title_placeholder": "제목?",
+      "untitled": "제목 없음",
+      "created_on": "작성: {{date}}",
+      "modified_on": "수정: {{date}}",
+      "stats": {
+        "characters": {
+          "one": "문자 {{count}}자",
+          "other": "문자 {{count}}자"
+        },
+        "words": {
+          "one": "단어 {{count}}개",
+          "other": "단어 {{count}}개"
+        },
+        "lines": {
+          "one": "{{count}}줄",
+          "other": "{{count}}줄"
+        }
+      }
+    },
+    "editor": {
+      "placeholder_desktop": "텍스트를 입력하고 /를 사용하거나 명령 메뉴를 마우스 오른쪽 버튼으로 클릭하고, 이미지를 붙여넣거나 커서에 이미지를 놓습니다.",
+      "placeholder_mobile": "여기에 텍스트를 입력하거나 이미지를 붙여넣으세요..."
+    }
+  },
+  "editor": {
+    "code_block_language": {
+      "title": "코드 블록 언어",
+      "filter": "언어 필터링...",
+      "remove_tag": "태그 제거",
+      "button": "이 코드 블록의 언어 변경",
+      "plain_code": "코드(강조표시 없음)",
+      "no_match": "일치하는 언어가 없습니다."
+    },
+    "markdown_placeholder": "마크다운을 작성하고, /를 사용하거나 명령 메뉴를 마우스 오른쪽 버튼으로 클릭하고, 이미지를 붙여넣거나 커서에 이미지를 놓습니다.",
+    "markdown_placeholder_mobile": "여기에 마크다운을 작성하거나 이미지를 붙여넣으세요...",
+    "excalidraw": {
+      "placeholder_outside": "여기 다이어그램 외부에 작성하세요..."
+    },
+    "messages": {
+      "preview_mode_hint": "현재 미리보기 모드입니다. 마크다운 작성을 시작하려면 도구 모음의 버튼을 사용하여 편집 모드로 전환하세요.",
+      "split_preview_placeholder": "입력하는 동안 여기에 미리보기가 표시됩니다..."
+    },
+    "panes": {
+      "edit": "편집",
+      "preview": "미리보기"
+    },
+    "images": {
+      "delete_confirm": {
+        "title": "이미지 삭제",
+        "message": "이 이미지를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+      }
+    },
+    "code_block_delete": {
+      "title": "코드 블록 삭제",
+      "confirm_title": "코드 블록 삭제",
+      "confirm_message": "이 코드 블록을 삭제하시겠습니까?"
+    },
+    "code_block_line_numbers": {
+      "show": "줄 번호 표시",
+      "hide": "줄 번호 숨기기"
+    },
+    "colors": {
+      "none": "없음"
+    },
+    "font_size": {
+      "very_small": "매우 작음",
+      "small": "작게",
+      "normal": "보통",
+      "large": "크게",
+      "very_large": "매우 크게",
+      "huge": "아주 크게",
+      "giant": "최대 크기"
+    },
+    "table_picker": {
+      "title": "표 삽입",
+      "rows_placeholder": "행",
+      "cols_placeholder": "열",
+      "insert": "삽입"
+    },
+    "toolbar": {
+      "back_to_notes": "노트",
+      "bold": "굵게",
+      "italic": "이탤릭체",
+      "underline": "밑줄",
+      "strikethrough": "취소선",
+      "link": "링크",
+      "text_color": "텍스트 색상",
+      "highlight": "강조 표시",
+      "bullet_list": "글머리 기호 목록",
+      "numbered_list": "번호가 매겨진 목록",
+      "font_size": "글꼴 크기",
+      "code_block": "코드 블록",
+      "inline_code": "인라인 코드",
+      "clear_formatting": "서식 지우기",
+      "insert_excalidraw": "Excalidraw 다이어그램 삽입",
+      "insert_emoji": "이모티콘 삽입",
+      "insert_table": "표 삽입",
+      "insert_checklist": "체크리스트 삽입",
+      "toggle_checklist": "체크리스트 전환",
+      "remove_checklist": "체크박스 제거",
+      "add_separator": "구분 기호 추가",
+      "insert_note_reference": "노트 참조 삽입",
+      "open_in_new_tab": "새 탭에서 열기",
+      "create_linked_note": "바로가기 만들기",
+      "search_replace": "검색 및 바꾸기",
+      "split_view": "분할 보기 전환",
+      "save_now": "지금 저장",
+      "go_back": "돌아가기",
+      "go_forward": "앞으로 가기",
+      "switch_to_edit": "편집 모드로 전환",
+      "switch_to_preview": "미리보기 모드로 전환",
+      "more": "더보기"
+    },
+    "link": {
+      "add_title": "링크 추가",
+      "title": "링크 관리",
+      "url_label": "URL:",
+      "url_placeholder": "https://example.com",
+      "text_label": "링크 텍스트(선택사항):",
+      "text_placeholder": "표시된 텍스트",
+      "remove": "링크 삭제",
+      "cancel": "취소",
+      "save": "저장"
+    },
+    "paste": {
+      "images_dropped_one": "이미지 1개를 붙여넣지 못했습니다. 해당 이미지만 따로 복사해 추가하세요.",
+      "images_dropped_other": "이미지 {{count}}개를 붙여넣을 수 없습니다."
+    }
+  },
+  "image_menu": {
+    "view_large": "열기",
+    "download": "다운로드",
+    "resize": "크기 조정",
+    "edit": "편집",
+    "add_border": "테두리 추가",
+    "remove_border": "테두리 제거",
+    "add_border_no_padding": "패딩 없이 테두리 추가",
+    "remove_border_no_padding": "패딩 없이 테두리 제거",
+    "delete_image": "이미지 삭제",
+    "links": "링크",
+    "open_link": "링크 열기",
+    "add_link": "링크 추가",
+    "edit_link": "링크 수정",
+    "remove_link": "링크 삭제",
+    "link_modal": {
+      "title_add": "이미지에 링크 추가",
+      "title_edit": "이미지 링크 수정",
+      "description": "이 링크를 사용하면 노트가 공유될 때 이미지를 클릭할 수 있습니다.",
+      "url_label": "URL 입력:",
+      "url_placeholder": "https://www.example.com",
+      "cancel": "취소",
+      "ok": "확인"
+    }
+  },
+  "backup_export": {
+    "page": {
+      "title": "백업/내보내기"
+    },
+    "common": {
+      "all_workspaces": "모든 작업 공간",
+      "skip_s3_attachments": "ZIP에 S3 첨부 파일 제외(백업 파일 크기 감소)",
+      "skip_s3_attachments_help": "경고: 이 옵션을 활성화하면 S3에 저장된 첨부 파일이 ZIP 파일에 포함되지 않으므로, 이 아카이브만으로는 완전한 백업이 되지 않습니다. S3 첨부 파일이 필요한 경우 아래의 '첨부 파일 내보내기' 등을 통해 별도로 저장해야 합니다. 서버 로컬에 저장된 첨부 파일은 항상 포함됩니다."
+    },
+    "sections": {
+      "complete_backup": {
+        "title": "전체 백업",
+        "description_prefix": "데이터베이스, 노트, 첨부 파일이 포함된 전체 백업을 다운로드합니다.",
+        "description_suffix": "하나의 ZIP 파일로 저장됩니다.",
+        "use_cases": "두 가지 사용 사례:",
+        "use_case_restore_label": "복원",
+        "use_case_restore_text": "손실 시 데이터를 복구하려면 이 백업을 가져오세요.",
+        "use_case_offline_label": "오프라인에서 읽기",
+        "use_case_offline_text": "백업에 포함된",
+        "use_case_offline_text_suffix": "파일을 열면 Poznote 없이도 노트를 둘러볼 수 있습니다.",
+        "select_user": "사용자 프로필 선택:"
+      },
+      "structured_export": {
+        "title": "구조화된 내보내기",
+        "description": "Poznote 폴더 구조와 일치하는 폴더로 설정된 노트를 내보냅니다. 각 노트는 전체 계층 구조를 유지하면서 Poznote의 해당 폴더에 해당하는 디렉터리에 저장됩니다. 마크다운 파일에는 메타데이터가 포함된 YAML 머리말이 포함되어 있습니다.",
+        "warning": "참고: 이 내보내기 방식은 Poznote의 전체 백업을 위한 기능이 아닙니다.",
+        "select_workspace": "작업 공간 선택:",
+        "loading_workspaces": "작업 공간 불러오는 중..."
+      },
+      "attachments_export": {
+        "title": "첨부 파일 내보내기",
+        "description": "단일 ZIP 아카이브로 계정의 모든 첨부 파일을 다운로드하세요.",
+        "description_s3": "S3 저장소가 활성화되면 버킷에서 파일을 가져옵니다. 복원하기 전에 이 아카이브를 사용하여 S3 첨부 파일 없이 만든 백업에 누락된 파일을 추가하세요."
+      },
+      "s3_backup": {
+        "title": "S3 백업",
+        "description": "이 인스턴스에 설정된 S3 버킷에 계정의 백업 아카이브를 업로드하고 이미 저장된 아카이브를 다운로드하세요.",
+        "backup_now": "내 계정을 S3에 백업",
+        "confirm_run": "지금 S3 버킷에 계정을 백업하시겠습니까? 아카이브를 업로드하는 데 시간이 걸릴 수 있습니다.",
+        "confirm_run_overwrite": "경고: 최대 백업 수에 도달했으므로 이 백업은 가장 오래된 아카이브인 {{filename}}를 삭제합니다.",
+        "policy_auto": "관리자가 {{frequency}} 자동 백업을 설정했습니다. 사용자마다 최근 백업 {{retention}}개를 보관합니다. 보관 개수에 도달하면 새 백업을 만들 때 가장 오래된 백업 파일을 삭제합니다.",
+        "policy_auto_keep_all": "관리자가 자동 백업 {{frequency}}를 설정했습니다. 모든 아카이브가 보관됩니다.",
+        "policy_manual": "자동 백업이 비활성화되어 있습니다. 사용자마다 최근 백업 {{retention}}개를 보관합니다. 보관 개수에 도달하면 새 백업을 만들 때 가장 오래된 백업 파일을 삭제합니다.",
+        "policy_manual_keep_all": "자동 백업이 비활성화되었습니다. 모든 아카이브가 보관됩니다.",
+        "running": "버킷에 백업을 업로드하는 중...",
+        "done": "백업이 업로드되었습니다({{size}}).",
+        "error": "백업 실패: {{error}}",
+        "list_empty": "아직 버킷에 계정 백업이 없습니다."
+      }
+    },
+    "buttons": {
+      "download_complete_backup": "전체 백업 생성(ZIP)",
+      "download_structured_export": "구조화된 내보내기(ZIP) 다운로드",
+      "download_attachments_export": "첨부 파일 다운로드(ZIP)"
+    },
+    "spinner": {
+      "preparing": "백업 준비 중...",
+      "preparing_long": "백업 준비 중... 몇 분 정도 걸릴 수 있습니다."
+    },
+    "errors": {
+      "export_error": "내보내기 오류: {{error}}",
+      "complete_backup_error": "전체 백업 오류: {{error}}",
+      "cannot_create_zip": "ZIP 파일을 생성할 수 없습니다",
+      "failed_to_create_db_backup": "데이터베이스 백업을 생성하지 못했습니다.",
+      "failed_to_create_backup_file": "백업 파일을 생성하지 못했습니다.",
+      "s3_unreachable": "백업 파일을 만드는 동안 S3 버킷에 접근할 수 없어 일부 첨부 파일이 누락될 수 있습니다. 아무 파일도 저장하지 않았습니다. 버킷 연결을 확인하고 다시 시도하세요."
+    },
+    "dump": {
+      "title": "Poznote 데이터베이스 덤프",
+      "generated_on": "{{date}}에서 생성됨"
+    },
+    "index": {
+      "title": "Poznote 색인"
+    },
+    "job": {
+      "hint": "아카이브는 서버에 준비되어 있습니다. 대규모 계정의 경우 몇 분 정도 걸릴 수 있습니다. 이 페이지를 떠났다가 다시 돌아와도 준비는 계속됩니다.",
+      "download": "아카이브 다운로드",
+      "discard": "준비된 아카이브 삭제",
+      "preparing": "아카이브 준비 중...",
+      "queued": "내보내기가 대기 중입니다...",
+      "ready": "보관 파일이 준비되었습니다({{size}}). 이곳에서는 24시간 동안 이용 가능합니다.",
+      "error": "내보내기 실패: {{error}}",
+      "start_error": "내보내기를 시작할 수 없습니다: {{error}}"
+    }
+  },
+  "login": {
+    "page": {
+      "title": "로그인"
+    },
+    "redirecting": "리디렉션 중...",
+    "show_password": "비밀번호 표시",
+    "hide_password": "비밀번호 숨기기",
+    "admin_warning": "사용자 이름 <code>{{username}}</code> 및 비밀번호 <code>admin</code>로 로그인하세요. 로그인 후 설정에서 즉시 비밀번호를 변경하세요. 사용자 이름을 변경할 수도 있습니다.",
+    "fields": {
+      "username": "사용자 이름",
+      "username_or_email": "사용자 이름 또는 이메일",
+      "password": "비밀번호",
+      "profile": "프로필을 선택하세요"
+    },
+    "remember_me": "30일 동안 로그인 유지",
+    "button": "로그인",
+    "oidc_button": "{{provider}}로 계속하기",
+    "oidc_button_account": "{{account}}로 계속하기",
+    "oidc_other_account": "다른 계정으로 로그인",
+    "no_profiles": "사용 가능한 사용자 프로필이 없습니다. 관리자에게 문의하세요.",
+    "errors": {
+      "invalid_credentials": "사용자 이름이나 비밀번호가 잘못되었습니다.",
+      "oidc_disabled": "계정은 관리자에 의해 비활성화되었습니다. 자세한 내용은 해당 기관에 문의하세요.",
+      "oidc_no_profile": "\"{{identifier}}\"에 대한 사용자 프로필을 찾을 수 없습니다. 프로필을 만들려면 관리자에게 문의하세요.",
+      "oidc_failed": "SSO 로그인에 실패했습니다. 다시 시도해 주세요.",
+      "oidc_unauthorized": "이 애플리케이션에 접근할 권한이 없습니다. 관리자에게 문의하세요.",
+      "oidc_signup_limit": "이 인스턴스는 새 계정을 허용하지 않습니다. 관리자에게 문의하세요."
+    },
+    "account_select": {
+      "intro": "열려는 노트 계정을 선택하세요.",
+      "own_account": "계정",
+      "sign_out": "로그아웃",
+      "invalid": "이 계정을 선택할 수 없습니다."
+    },
+    "or": "또는",
+    "session_expired": "세션이 종료되었습니다. 이전 위치로 돌아가려면 다시 로그인하세요.",
+    "two_factor": {
+      "intro": "인증 앱의 6자리 코드를 입력하세요.",
+      "recovery_intro": "복구 코드 중 하나를 입력하세요. 각 코드는 한 번만 작동합니다.",
+      "code_placeholder": "인증코드",
+      "recovery_placeholder": "복구 코드",
+      "verify": "확인",
+      "use_recovery": "복구 코드 사용",
+      "use_app": "인증 앱 사용",
+      "cancel": "로그인으로 돌아가기",
+      "invalid_code": "코드가 잘못되었습니다. 다시 시도해 보세요.",
+      "expired": "확인 단계가 만료되었습니다. 다시 로그인하세요.",
+      "too_many_tries": "잘못된 코드가 너무 많습니다. 다시 로그인하세요."
+    }
+  },
+  "restore_import": {
+    "page": {
+      "title": "복원/가져오기"
+    },
+    "advanced": {
+      "show": "고급 가져오기 옵션 표시",
+      "hide": "고급 가져오기 옵션 숨기기"
+    },
+    "messages": {
+      "database_restored": "데이터베이스가 복원되었습니다!",
+      "complete_backup_restored": "{{message}}",
+      "notes_imported": "노트 {{count}}개를 작업 공간 \"{{workspace}}\", 폴더 \"{{folder}}\"로 가져왔습니다.",
+      "attachments_imported": "{{message}}",
+      "notes_imported_zip": "노트 {{count}}개를 ZIP에서 작업 공간 \"{{workspace}}\", 폴더 \"{{folder}}\"로 가져왔습니다.",
+      "notes_imported_with_folders": "노트 {{count}}개를 가져오고 작업 공간 \"{{workspace}}\"에 폴더 {{folders}}개를 생성했습니다.",
+      "pdf_notes_created": "PDF 파일 {{count}}개를 노트로 가져왔습니다. 각 파일은 해당 파일명을 제목으로 하는 노트에 첨부되었습니다."
+    },
+    "skipped_attachments": {
+      "header": "차단된 첨부 파일을 건너뛰었습니다.",
+      "unknown_path": "알 수 없는 경로",
+      "default_reason": "첨부 파일 보안 정책에 의해 차단됨",
+      "original_filename": "원본",
+      "note": "노트",
+      "recovery_hint": "이 파일들은 원본 ZIP 안에 남아 있으며, 보안상의 이유로 사용 가능한 첨부 파일로 복원되지 않았습니다. ZIP에서 수동으로 꺼낼 수 있습니다. 금지된 파일 형식을 그대로 다시 가져오면 차단됩니다. .zip처럼 허용된 압축 파일 안에 넣거나, 파일을 신뢰하는 경우에만 허용된 형식으로 변환하거나 이름을 바꾸세요. 신뢰하는 스크립트 또는 실행 파일이라면 관리자가 설정 > 관리자 도구 > 스크립트 및 실행 파일 첨부를 활성화한 뒤 다시 가져올 수 있습니다.",
+      "reasons": {
+        "invalid_filename": "잘못된 첨부 파일 이름",
+        "hidden_filename": "숨겨진 첨부 파일 이름은 허용되지 않습니다.",
+        "invalid_characters": "첨부 파일 이름에 잘못된 문자가 포함되어 있습니다.",
+        "filename_too_long": "첨부 파일 이름이 너무 깁니다.",
+        "blocked_extension": "첨부 파일 형식은 허용되지 않습니다.",
+        "blocked_mime": "첨부 파일 MIME 유형은 허용되지 않습니다."
+      }
+    },
+    "errors": {
+      "complete_restore_form_not_found": "전체 복원 양식을 찾을 수 없습니다. 다시 시도해 주세요.",
+      "form_not_found": "양식을 찾을 수 없습니다. 다시 시도해 주세요.",
+      "select_backup_first": "먼저 백업 파일을 선택하세요.",
+      "restore_error": "복원 오류: {{error}}",
+      "no_backup_file_or_upload": "백업 파일이 제공되지 않았거나 업로드 오류가 발생했습니다.",
+      "complete_restore_error": "전체 복원 오류: {{error}}{{message}}",
+      "no_complete_backup_file_or_upload": "완전한 백업 파일이 제공되지 않았거나 업로드 오류가 발생했습니다.",
+      "import_error": "가져오기 오류: {{error}}",
+      "no_notes_file_or_upload": "노트 파일이 제공되지 않았거나 업로드 오류가 발생했습니다.",
+      "no_attachments_file_or_upload": "첨부 파일이 제공되지 않았거나 업로드 오류가 발생했습니다.",
+      "no_notes_selected_or_upload": "노트가 선택되지 않았거나 업로드 오류가 발생했습니다.",
+      "file_type_zip_only": "ZIP 파일만 허용됩니다.",
+      "error_uploading_file": "파일을 업로드하는 중에 오류가 발생했습니다.",
+      "cannot_find_entries_directory": "항목 디렉토리를 찾을 수 없습니다.",
+      "cannot_open_zip": "ZIP 파일을 열 수 없습니다.",
+      "failed_extract_content": "{{file}}에서 내용을 추출하지 못했습니다.",
+      "s3_restore_forbidden": "이 계정에서는 S3에서 복원이 허용되지 않습니다.",
+      "s3_restore_invalid_key": "잘못된 백업 아카이브입니다.",
+      "s3_restore_download_error": "버킷에서 아카이브를 가져올 수 없습니다: {{error}}",
+      "cannot_find_attachments_directory": "첨부 파일 디렉터리를 찾을 수 없습니다",
+      "database_error_for_file": "{{file}}에 대한 데이터베이스 오류: {{message}}",
+      "errors_prefix": "오류:",
+      "failed_write_file": "{{file}} 파일을 쓰지 못했습니다.",
+      "internal_server_error": "내부 서버 오류",
+      "invalid_form_submission": "잘못된 양식 제출입니다. 다시 시도해 주세요."
+    },
+    "spinner": {
+      "processing": "복원 처리 중...",
+      "processing_long": "복원 처리 중... 몇 분 정도 걸릴 수 있습니다.",
+      "direct_copy_restoring": "복원 중입니다... 잠시 기다려 주세요.",
+      "importing_notes": "노트 가져오는 중..."
+    },
+    "units": {
+      "bytes": "바이트",
+      "kb": "KB",
+      "mb": "MB",
+      "gb": "GB"
+    },
+    "direct_copy": {
+      "backup_file_found": "발견된 백업 파일:",
+      "no_backup_found_prefix": "컨테이너에서 백업 파일을 찾을 수 없습니다.",
+      "no_backup_found_hint": "먼저 docker cp 명령을 실행하세요.",
+      "completed_successfully_prefix": "직접 파일 복사 복원이 완료되었습니다!",
+      "failed_prefix": "직접 파일 복사 복원 실패:",
+      "backup_not_found_for_restoration": "복원할 백업 파일을 찾을 수 없습니다.",
+      "buttons": {
+        "yes_restore_direct_copy": "예, 직접 복사본에서 복원"
+      }
+    },
+    "individual_notes": {
+      "default_title_with_date": "가져온 노트 {{date}}",
+      "file_count_one": "노트 1개",
+      "file_count_many": "노트 {{count}}개",
+      "summary": "이렇게 하면 {{fileText}}를 폴더에 할당하지 않고 Poznote 작업 공간으로 가져옵니다.",
+      "errors": {
+        "too_many_files": "선택한 파일이 너무 많습니다. 최대 허용 개수: {{max}}개 (현재 선택한 파일: {{count}}개)",
+        "workspace_not_found": "작업 공간이 존재하지 않습니다",
+        "entries_dir_not_found": "항목 디렉터리를 찾을 수 없습니다.",
+        "upload_error": "업로드 오류",
+        "invalid_file_type": "잘못된 파일 형식({{allowed}}만 허용됨)",
+        "cannot_read_file": "파일을 읽을 수 없습니다",
+        "no_workspace_available": "사용 가능한 작업 공간 없음"
+      },
+      "summary_with_location": "그러면 {{fileText}}를 작업 공간 \"{{workspace}}\", 폴더 \"{{folder}}\"로 가져옵니다.",
+      "summary_zip_with_location": "이렇게 하면 ZIP 아카이브의 모든 파일을 추출하여 작업 공간 \"{{workspace}}\", 폴더 \"{{folder}}\"로 가져옵니다."
+    },
+    "import_attachments": {
+      "summary": "{{count}} 첨부 파일을 가져왔습니다.",
+      "skipped_blocked": "해당 유형이 허용되지 않기 때문에 {{count}} 파일을 건너뛰었습니다.",
+      "errors": {
+        "no_allowed_files": "ZIP에는 차단된 파일 형식만 포함되어 있으므로 첨부 파일을 가져오지 못했습니다.\n{{details}}"
+      }
+    },
+    "sections": {
+      "restore_from_backup": {
+        "title": "Poznote ZIP 백업 파일에서 복원하시겠습니까?",
+        "description": "전체 백업에서 Poznote 데이터베이스 복원"
+      },
+      "standard_restore": {
+        "title": "표준 복원",
+        "description": "전체 백업 ZIP 파일을 선택하세요.",
+        "helper": "크기 제한 없음: 아카이브가 조각으로 업로드되고 백그라운드에서 복원됩니다."
+      },
+      "direct_copy_restore": {
+        "title": "직접 복사로 복원(서버에 대한 SSH 접근 권한이 있는 경우)",
+        "step1": "1. 파일을 컨테이너에 복사합니다(컨테이너 이름과 아카이브 경로 조정).",
+        "docker_command": "docker cp /path/to/backup.zip poznote-webserver-1:/tmp/backup_restore.zip",
+        "step2": "2. 복원하려면 아래를 클릭하세요.",
+        "intro": "이 방법은 브라우저를 통해 아무것도 업로드하지 않습니다. 백업 아카이브를 서버에 직접 복사하면 Poznote가 거기에서 복원합니다. 파일 크기에 관계없이 작동하며 위의 업로드가 불가능할 때 대체 수단으로 유용합니다.",
+        "filename_note": "아카이브는 정확히 /tmp/backup_restore.zip(정확한 이름)의 Poznote 컨테이너 내부에 배치되어야 합니다. 복사 후 이 페이지를 새로고침하세요. 파일이 자동으로 감지되고 크기가 아래에 표시됩니다."
+      },
+      "individual_notes": {
+        "title": "HTML, 마크다운, 텍스트 파일 또는 ZIP 아카이브를 가져오시겠습니까?",
+        "description": "개별 노트(HTML, 마크다운 또는 ZIP)를 특정 작업 공간 및 폴더로 가져오기",
+        "workspace": "대상 작업 공간",
+        "loading": "불러오는 중...",
+        "folder": "대상 폴더",
+        "optional": "선택사항",
+        "frontmatter_warning": "MD 노트의 머리말에 폴더 키가 포함되어 있는 경우 이 값은 아래에서 선택한 값보다 우선 적용됩니다. 따라서 먼저 폴더가 이미 존재하는지 확인해야 합니다. 그렇지 않으면 노트가 작업 공간의 루트에 생성됩니다.",
+        "zip_folders_info": "폴더 구조의 ZIP:",
+        "zip_folders_description": "ZIP에 폴더가 포함되어 있으면 Poznote에 폴더가 자동으로 생성되어 계층 구조(하위 폴더 포함)가 유지됩니다.",
+        "no_folder": "폴더 없음(루트 수준)",
+        "select_files": "파일 선택",
+        "files_info": "여러 파일(최대 {{maxIndividualFiles}}) 또는 단일 ZIP 파일(최대 {{maxZipFiles}} 파일). 이러한 한도는 변경될 수 있습니다.",
+        "files_info_link": "문서를 참조하세요",
+        "supported_formats": "지원됨: .html, .md, .markdown, .txt, .json, .zip",
+        "description_html": "개별 HTML, 마크다운, 텍스트, JSON 파일 또는 여러 파일을 담은 ZIP 파일을 가져옵니다.<br><br>마크다운 파일의 front matter에 title 키가 지정되어 있지 않으면 파일 이름에서 확장자를 제외한 부분으로 노트 제목을 자동 생성합니다.<br><br><strong>할 일 목록:</strong> tasks 배열이 담긴 .json 파일과 체크박스 문법(- [ ] 또는 - [x])을 사용하는 .md 파일은 자동으로 할 일 목록으로 가져옵니다.",
+        "helper": "한 번에 여러 파일을 선택할 수 있습니다(최대 50개 파일). 지원되는 형식: .html, .md, .markdown, .txt, .json"
+      },
+      "s3_restore": {
+        "title": "S3에서 복원",
+        "description": "이 인스턴스의 S3 버킷에 저장된 백업 아카이브 중 하나에서 직접 계정을 복원하세요.",
+        "loading": "불러오는 중...",
+        "empty": "아직 버킷에 계정 백업이 없습니다.",
+        "confirm": "{{filename}}에서 계정을 복원하시겠습니까? 현재 노트, 첨부 파일 및 설정이 아카이브 내용으로 대체됩니다."
+      }
+    },
+    "buttons": {
+      "start_restore": "복원 시작",
+      "start_import": "가져오기 시작"
+    },
+    "drag_drop": {
+      "individual_notes": "여기에 파일을 드롭하세요.",
+      "complete_backup": "여기에 백업 ZIP을 드롭하세요.",
+      "database": "여기에 SQL 파일을 드롭하세요.",
+      "notes": "노트 ZIP 파일을 여기에 끌어 놓으세요",
+      "attachments": "첨부 파일 ZIP을 여기에 끌어 놓으세요",
+      "sidebar": {
+        "drop_here": "가져올 노트 파일을 끌어 놓으세요",
+        "drop_into_folder": "\"{{folder}}\"로 가져오려면 드롭하세요.",
+        "folder_not_allowed": "\"{{folder}}\"로 가져올 수 없습니다.",
+        "importing": "노트 가져오는 중...",
+        "import_done": "노트를 가져왔습니다.",
+        "import_failed": "가져오기에 실패했습니다.",
+        "no_supported_files": "지원되는 파일을 끌어 놓지 않았습니다. 허용 형식: {{allowed}}",
+        "skipped_files": "{{count}} 지원되지 않는 파일을 건너뛰었습니다."
+      },
+      "errors": {
+        "system_folder": "노트는 \"{{folder}}\" 폴더로 가져올 수 없습니다."
+      }
+    },
+    "modals": {
+      "import_confirm": {
+        "title": "확실합니까?",
+        "body": "노트 제목, 태그, 검색 색인 및 메타데이터를 덮어쓰지만, 실제 노트 본문은 변경하지 않습니다. 이 작업은 되돌릴 수 없습니다.",
+        "confirm": "예, 가져오기"
+      },
+      "complete_restore": {
+        "title": "전체 복원을 진행하시겠습니까?",
+        "warning_html": "<strong>경고:</strong> 현재 데이터베이스를 덮어쓰며, <span style=\"color: #dc3545; font-weight: bold;\">모든 작업 공간</span>의 노트와 첨부 파일이 백업 데이터로 복원됩니다.",
+        "body_html": "데이터베이스를 덮어쓰고 <span style=\"color: #dc3545; font-weight: bold;\">모든 작업 공간</span>의 노트와 첨부 파일을 복원합니다.",
+        "confirm": "예, 전체 복원"
+      },
+      "import_notes": {
+        "title": "노트를 가져오시겠습니까?",
+        "body": "그러면 ZIP에서 모든 HTML 파일을 가져옵니다. 기존 노트 컬렉션에 파일이 추가됩니다.",
+        "confirm": "예, 노트 가져오기"
+      },
+      "import_attachments": {
+        "title": "첨부 파일을 가져오시겠습니까?",
+        "body": "이렇게 하면 ZIP의 모든 파일을 첨부 파일 폴더로 가져옵니다. 기존 첨부 파일에 파일이 추가됩니다.",
+        "confirm": "예, 첨부 파일 가져오기"
+      },
+      "complete_restore_direct_copy": {
+        "title": "전체 복원(직접 복사)하시겠습니까?",
+        "body_html": "데이터베이스를 덮어쓰고 <span style=\"color: #dc3545; font-weight: bold;\">모든 작업 공간</span>의 노트와 첨부 파일을 복원합니다.",
+        "confirm": "예, 전체 복원"
+      },
+      "import_individual_notes": {
+        "title": "개별 노트를 가져오시겠습니까?",
+        "body": "노트를 Poznote 작업 공간으로 가져옵니다.",
+        "confirm": "예, 노트를 가져옵니다."
+      }
+    },
+    "alerts": {
+      "ok": "확인",
+      "no_zip_selected_title": "선택한 ZIP 파일이 없습니다.",
+      "no_zip_selected_restore": "복원을 진행하기 전에 전체 백업 ZIP 파일을 선택하세요.",
+      "no_zip_selected_notes": "가져오기를 진행하기 전에 HTML 노트가 포함된 ZIP 파일을 선택하세요.",
+      "no_zip_selected_attachments": "가져오기를 진행하기 전에 첨부 파일이 포함된 ZIP 파일을 선택하세요.",
+      "no_sql_selected_title": "선택한 SQL 파일이 없습니다.",
+      "no_sql_selected_body": "데이터베이스 가져오기를 진행하기 전에 SQL 파일을 선택하세요.",
+      "no_files_selected_title": "선택한 파일이 없습니다.",
+      "no_files_selected_body": "가져오기를 진행하기 전에 하나 이상의 HTML 또는 마크다운 파일을 선택하세요.",
+      "too_many_files_title": "선택한 파일이 너무 많습니다.",
+      "too_many_files_body": "한 번에 최대 {{max}} 파일을 가져올 수 있습니다. {{count}} 파일을 선택했습니다. 파일 수를 줄이고 다시 시도하세요.",
+      "no_file_selected": {
+        "title": "선택한 파일이 없습니다.",
+        "body": "가져오기를 진행하기 전에 파일을 선택하세요."
+      },
+      "no_workspace_title": "작업 공간이 선택되지 않았습니다.",
+      "no_workspace_body": "가져온 노트에 대해 작업 공간을 선택하세요."
+    },
+    "inline": {
+      "standard": {
+        "button": "전체 복원 시작(표준)"
+      }
+    },
+    "chunked": {
+      "uploading": "백업 파일 업로드 중... {{percent}}%({{total}}개 중 {{done}}개)",
+      "queued": "복원 시작 중...",
+      "done": "복원이 완료되었습니다.",
+      "error": "복원 실패: {{error}}",
+      "upload_error": "업로드 실패: {{error}}",
+      "chunk_retry": "슬라이스를 업로드하지 못했습니다. 다시 시도하는 중입니다...",
+      "stage_assembling": "서버에서 아카이브를 조립하는 중...",
+      "stage_extracting": "아카이브를 추출하는 중...",
+      "stage_preparing": "데이터 준비 중...",
+      "stage_database": "데이터베이스를 복원하는 중...",
+      "stage_notes": "노트 복원 중... ({{done}}/{{total}})",
+      "stage_notes_simple": "노트를 복원하는 중...",
+      "stage_attachments": "첨부 파일을 복원하는 중... ({{done}}/{{total}})",
+      "stage_attachments_simple": "첨부 파일을 복원하는 중...",
+      "workspaces_title": "복원 완료",
+      "workspaces_body": "백업이 복원되었습니다. 어느 작업 공간을 여시겠습니까?",
+      "workspaces_close": "닫기",
+      "stage_downloading": "버킷에서 아카이브를 가져오는 중...",
+      "queued_uploaded": "업로드 완료, 복원 시작 중...",
+      "cancel_upload": "업로드 취소",
+      "foreign_upload": "다른 탭이나 창에서 이미 업로드가 진행 중입니다({{done}}/{{total}} 슬라이스 전송).",
+      "upload_interrupted": "전체 {{total}}개 조각 중 {{done}}개를 업로드한 뒤 전송이 중단되어 복원하지 않았습니다. 복원을 다시 시작할 수 있습니다.",
+      "upload_cancelled": "대기 중인 업로드가 취소되었습니다. 복원을 다시 시작할 수 있습니다.",
+      "worker_lost": "복원이 완료되기 전에 중지되었습니다. 서버 로그를 확인한 후 다시 시작하세요."
+    },
+    "chunked_import": {
+      "queued": "가져오기 시작 중...",
+      "queued_uploaded": "업로드 완료, 가져오기 시작 중...",
+      "stage_preparing": "아카이브를 읽는 중...",
+      "stage_attachments": "이미지 및 첨부 파일을 가져오는 중... ({{done}}/{{total}} 파일 검사)",
+      "stage_attachments_simple": "이미지와 첨부 파일을 가져오는 중...",
+      "stage_notes": "노트 가져오기... ({{done}}/{{total}})",
+      "stage_notes_simple": "노트 가져오기...",
+      "done": "가져오기가 완료되었습니다.",
+      "error": "가져오기 실패: {{error}}",
+      "upload_interrupted": "{{total}} 슬라이스 중 {{done}} 이후 이전 업로드가 중단되어 아무것도 가져오지 못했습니다. 가져오기를 다시 시작할 수 있습니다.",
+      "worker_lost": "가져오기가 완료되기 전에 중지되었습니다. 서버 로그를 확인한 후 다시 시작하세요."
+    },
+    "import_notes": {
+      "default_title": "가져온 노트",
+      "summary": "노트 {{imported}}개를 가져오고 {{updated}}개를 업데이트했습니다."
+    }
+  },
+  "markdown_guide": {
+    "page_title": "마크다운 가이드",
+    "title": "마크다운 가이드",
+    "toc": {
+      "label": "목차",
+      "title": "목차"
+    },
+    "common": {
+      "syntax": "구문",
+      "result": "결과"
+    },
+    "sections": {
+      "headers": {
+        "title": "제목 문단",
+        "heading1": "제목 1",
+        "heading2": "제목 2",
+        "heading3": "제목 3"
+      },
+      "text_formatting": {
+        "title": "텍스트 서식",
+        "bold": "굵은 글씨",
+        "italic": "이탤릭체 텍스트",
+        "strikethrough": "취소선",
+        "inline_code": "인라인 코드"
+      },
+      "unordered_lists": {
+        "title": "글머리 기호 목록",
+        "item_one": "항목 1",
+        "item_two": "항목 2",
+        "nested_item": "중첩된 항목"
+      },
+      "ordered_lists": {
+        "title": "번호 목록",
+        "first": "첫 번째",
+        "second": "두 번째",
+        "third": "세 번째"
+      },
+      "checkboxes": {
+        "title": "체크박스",
+        "unchecked_note": "체크되지 않은 항목(한칸만!)",
+        "unchecked": "선택하지 않은 항목",
+        "checked": "선택한 항목"
+      },
+      "images": {
+        "title": "이미지",
+        "alt_text": "대체 텍스트",
+        "preview": "(이미지 미리보기)"
+      },
+      "urls": {
+        "title": "URL",
+        "link_text": "링크 텍스트"
+      },
+      "code_blocks": {
+        "title": "코드 블록"
+      },
+      "quotes": {
+        "title": "인용문",
+        "quote_text": "이것은 인용문입니다",
+        "quote_line2": "두 줄에 걸쳐"
+      },
+      "line_breaks": {
+        "title": "줄 바꿈",
+        "description": "편집 모드에서 한 줄 바꿈을 하면 미리보기에서 줄 바꿈이 생성됩니다.",
+        "first_line": "첫 번째 줄",
+        "second_line": "두 번째 줄"
+      },
+      "horizontal_rule": {
+        "title": "수평선"
+      },
+      "tables": {
+        "title": "표",
+        "col_name": "이름",
+        "col_value": "값"
+      },
+      "math": {
+        "title": "수식",
+        "inline": {
+          "title": "인라인 수식"
+        },
+        "block": {
+          "title": "블록 수식"
+        },
+        "examples": {
+          "title": "더 많은 예"
+        }
+      },
+      "mermaid": {
+        "title": "Mermaid 다이어그램",
+        "node_a": "마크다운 쓰기",
+        "node_b": "다이어그램이 필요하십니까?",
+        "node_c": "Mermaid 사용",
+        "node_d": "계속해서 글을 쓰세요",
+        "edge_yes": "예",
+        "edge_no": "아니요"
+      }
+    }
+  },
+  "public": {
+    "button": "공유 노트",
+    "view_public_notes": "공유된 노트 보기",
+    "page": {
+      "title": "공유 노트",
+      "no_public_notes": "아직 공유된 노트가 없습니다.",
+      "public_hint": "노트 도구 모음에서 클라우드 버튼을 클릭하여 노트를 공유하세요."
+    },
+    "filter_placeholder": "이름이나 링크로 필터링...",
+    "no_filter_results": "검색어와 일치하는 항목이 없습니다.",
+    "filter_all": "모두",
+    "filter_notes": "노트",
+    "filter_folders": "폴더",
+    "no_shared_notes": "아직 공유된 노트가 없습니다.",
+    "no_shared_folders": "아직 공유 폴더가 없습니다.",
+    "no_shares": "아직 공유가 없습니다.",
+    "no_shares_hint": "도구 모음에서 클라우드 버튼을 클릭하여 노트 또는 폴더를 공유하세요.",
+    "restrict_users": "사용자로 제한",
+    "restrict_users_mobile": "제한",
+    "restrict_users_placeholder": "사용자 선택...",
+    "restricted_badge": "제한됨",
+    "restricted_help": "제한되면 나열된 사용자만 로그인 후 이 공유에 접근할 수 있습니다.",
+    "disabled_badge": "접근 불가",
+    "disabled_help": "이 공유에는 접근할 수 없습니다. 다시 접근할 수 있도록 설정할 때까지 링크는 더 이상 작동하지 않습니다.",
+    "back_to_notes": "노트로 돌아가기",
+    "revoke_modal": {
+      "title": "공유 취소",
+      "text": "이 공유를 영구적으로 삭제하거나 다시 활성화할 때까지 이를 유지하고 접근할 수 없도록 설정할 수 있습니다.",
+      "text_disabled": "현재 이 공유에 접근할 수 없습니다. 다시 접근할 수 있도록 설정하거나 영구적으로 삭제할 수 있습니다.",
+      "text_via_folder": "이 노트는 폴더를 통해 공유됩니다. 이 노트만 접근할 수 없게 만들 수 있습니다. 폴더 공유 및 다른 노트는 영향을 받지 않습니다.",
+      "text_via_folder_disabled": "이 노트는 현재 접근할 수 없습니다. 폴더 공유를 통해 다시 접근할 수 있도록 설정할 수 있습니다.",
+      "text_via_folder_parent_disabled": "이 노트는 해당 폴더 공유에 접근할 수 없게 설정되어 접근할 수 없습니다. 접근을 복원하려면 폴더 공유에 다시 접근할 수 있도록 설정하세요.",
+      "delete": "영구 삭제",
+      "disable": "접근 불가능하게 만들기",
+      "enable": "다시 접근 가능하게 만들기"
+    },
+    "no_users_found": "다른 사용자를 찾을 수 없습니다.",
+    "users_loading": "사용자 불러오는 중...",
+    "shared_with_me": "나와 공유됨",
+    "shared_by": "공유자:",
+    "no_shared_with_me": "아직 공유된 내용이 없습니다.",
+    "tree_tools": "폴더 트리",
+    "expand_all": "모두 펼치기",
+    "collapse_all": "모두 접기",
+    "tree_search_hint": "검색 결과는 자동으로 확장되어 표시됩니다.",
+    "expand_folder": "폴더 확장",
+    "collapse_folder": "폴더 축소",
+    "login_required_title": "로그인 필요",
+    "login_required_message": "이 내용은 특정 사용자에게만 제공됩니다. 접근하려면 로그인하세요.",
+    "access_denied_title": "접근이 거부되었습니다",
+    "access_denied_message": "이 내용을 볼 수 있는 권한이 없습니다.",
+    "table": {
+      "name": "이름",
+      "note": "노트",
+      "path": "경로/폴더",
+      "url": "공유 URL",
+      "folder": "폴더",
+      "token": "링크",
+      "actions": "작업"
+    },
+    "actions": {
+      "open": "열기",
+      "copy_url": "URL 복사",
+      "url_copied": "URL이 복사되었습니다!",
+      "revoke": "철회"
+    },
+    "direct_share": "공유 노트",
+    "via_folder": "폴더를 통해 공유됨",
+    "shared_folder_title": "공유 폴더",
+    "note_shared_through_folder": "폴더를 통해 공유되는 노트",
+    "folder_shared_through_parent": "상위 폴더를 통해 공유된 폴더",
+    "token_help": "사용자 지정 링크는 공개 URL에서 직접 정하는 고유한 부분입니다. 예를 들어 project-2026을 사용하면 노트 URL은 https://your-domain.example/project-2026 이며, 폴더 URL은 https://your-domain.example/folder/project-2026 입니다.",
+    "indexable": "인덱싱 가능",
+    "password_protected": "비밀번호로 보호됨",
+    "add_password_title": "비밀번호 보호 추가",
+    "change_password_title": "비밀번호 변경",
+    "password_remove_hint": "비밀번호 보호를 제거하려면 비워두세요.",
+    "enter_new_password": "새 비밀번호를 입력하세요",
+    "protection": {
+      "title": "비밀번호로 보호됨",
+      "note_heading": "비밀번호로 보호됨",
+      "folder_heading": "비밀번호로 보호된 폴더",
+      "error_incorrect": "비밀번호가 잘못되었습니다. 다시 시도해 주세요.",
+      "additional_password_required": "이 노트에는 추가 비밀번호가 필요합니다. 계속하려면 다음 비밀번호를 입력하세요.",
+      "placeholder": "비밀번호를 입력하세요",
+      "unlock": "잠금 해제"
+    },
+    "errors": {
+      "token_missing": "링크 누락",
+      "token_or_folder_auth_missing": "링크 또는 폴더 승인이 누락되었습니다.",
+      "link_in_use": "이 사용자 지정 링크는 이미 사용 중입니다.",
+      "link_invalid": "사용자 지정 링크가 잘못되었습니다. 허용되는 문자: 문자, 숫자, -, _, . (4~128자)",
+      "shared_folder_not_found": "공유 폴더를 찾을 수 없습니다",
+      "shared_folder_not_found_message": "이 링크와 일치하는 공유 폴더가 없습니다. 소유자가 공유를 제거했거나 링크가 잘못되었을 수 있습니다. 접근 권한이 필요하다고 생각되면 소유자나 관리자에게 문의하세요.",
+      "shared_note_not_found": "공유 노트를 찾을 수 없습니다",
+      "shared_note_not_found_message": "이 링크와 일치하는 공유 노트가 없습니다. 소유자가 공유를 제거했거나 링크가 잘못되었을 수 있습니다. 접근 권한이 필요하다고 생각되면 소유자나 관리자에게 문의하세요.",
+      "note_unavailable_message": "이 노트는 더 이상 사용할 수 없습니다. 소유자가 삭제했을 수도 있습니다. 오류라고 생각되면 소유자나 관리자에게 문의하세요.",
+      "link_incomplete_message": "이 링크는 불완전하므로 공유 내용을 식별할 수 없습니다. 받은 링크를 확인하거나 링크를 공유한 사람에게 새 링크를 요청하세요.",
+      "folder_not_found": "폴더를 찾을 수 없습니다",
+      "folder_unavailable_message": "이 폴더는 더 이상 사용할 수 없습니다. 소유자가 삭제했을 수도 있습니다. 오류라고 생각되면 소유자나 관리자에게 문의하세요.",
+      "note_not_found": "노트를 찾을 수 없습니다",
+      "server_error": "서버 오류",
+      "share_disabled_title": "이 공유에는 접근할 수 없습니다.",
+      "share_disabled_message": "소유자가 이 공유에 접근할 수 없도록 설정했습니다. 다시 접근해야 하는 경우 소유자나 관리자에게 문의하세요.",
+      "registry_admin_hint": "관리자로 로그인되어 있습니다. 소유자 계정에 이 공유가 계속 표시된다면 공유 링크 등록 정보가 동기화되지 않은 것입니다. 설정 > 관리자 도구에서 마스터 데이터베이스를 재구축하세요."
+    },
+    "edit": {
+      "button": "편집",
+      "save_failed": "변경 사항을 저장하지 못했습니다.",
+      "discard_confirm": "변경 사항을 버리시겠습니까?",
+      "locked": "다른 사람이 현재 이 노트를 편집하고 있습니다. 나중에 다시 시도해 주세요.",
+      "lock_lost": "다른 사람이 지금 이 노트를 편집하고 있습니다. 최근 변경 사항을 저장할 수 없습니다."
+    },
+    "access_denied_hint": "소유자가 선택한 계정만 이 공유를 열 수 있습니다. 접근이 필요한 경우 소유자나 관리자에게 문의하세요.",
+    "token_update_failed": "토큰을 업데이트하지 못했습니다."
+  },
+  "public_folder": {
+    "filter_placeholder": "제목으로 노트 필터링",
+    "no_filter_results": "결과가 없습니다.",
+    "view_notes": "목록으로 보기",
+    "view_kanban": "칸반으로 보기"
+  },
+  "kanban": {
+    "uncategorized": "분류되지 않음",
+    "actions": {
+      "enable": "칸반 보기 활성화",
+      "disable": "칸반 보기 비활성화",
+      "open": "칸반 보기 열기"
+    },
+    "add_column": "열 추가",
+    "new_column_title": "새 열",
+    "new_column_placeholder": "열 이름",
+    "notifications": {
+      "activated_title": "칸반 보기 활성화됨",
+      "activated_message": "이 폴더는 이제 칸반 모드에 있습니다. 해당 아이콘을 클릭하여 보드를 엽니다."
+    },
+    "list": {
+      "filter_placeholder": "보드 이름으로 필터링...",
+      "no_boards": "아직 칸반 보드가 없습니다.",
+      "hint": "여기에서 보려면 폴더에서 칸반 보기를 활성화하세요."
+    },
+    "completed": {
+      "show": "완료한 항목 표시",
+      "hide": "완료한 항목 숨기기",
+      "mark_completed": "완료로 표시",
+      "mark_active": "완료되지 않음으로 표시",
+      "error": "카드를 업데이트하지 못했습니다."
+    },
+    "due": {
+      "label": "마감일",
+      "overdue": "기한 지남"
+    },
+    "card_size": "카드 크기",
+    "sort": {
+      "label": "정렬 기준",
+      "date": "날짜",
+      "tag": "태그"
+    },
+    "subfolder": {
+      "expand": "하위 폴더 확장",
+      "collapse": "하위 폴더 축소"
+    },
+    "add_note": "노트 추가",
+    "empty": {
+      "message": "칸반 보기를 사용하려면 이 폴더에 하위 폴더를 만듭니다. 각 하위 폴더는 열이 됩니다.",
+      "title": "아직 하위 폴더가 없습니다."
+    }
+  },
+  "sidebar": {
+    "display": "화면 표시",
+    "home": "대시보드",
+    "settings": "설정",
+    "create": "만들기",
+    "expand_all_folders": "모든 폴더 확장",
+    "collapse_all_folders": "모든 폴더 축소",
+    "toggle": "왼쪽 열 숨기기/표시",
+    "hide_left_column": "왼쪽 열 숨기기",
+    "toggle_icon_sidebar": "아이콘 사이드바 숨기기/표시",
+    "show_hidden_icons": "숨겨진 아이콘 표시",
+    "other_accounts": {
+      "title": "기타 계정",
+      "error": "이 계정의 노트를 로드할 수 없습니다.",
+      "empty": "노트 없음",
+      "open": "이 계정 열기",
+      "view_here": "계정을 전환하지 않고 탭에 표시"
+    },
+    "show_offline_dots": "오프라인 점 표시",
+    "hide_offline_dots": "오프라인 점 숨기기",
+    "view_options": "옵션 보기",
+    "customize": "사이드바 사용자 지정 설정",
+    "customize_hint": "사이드바의 어떤 요소를 표시할지 선택하세요"
+  },
+  "home": {
+    "title": "대시보드",
+    "dashboard": "대시보드",
+    "folders": "폴더",
+    "shared_notes": "공유 노트",
+    "shared_folders": "공유 폴더",
+    "shares": "공유 관리",
+    "kanban": "칸반",
+    "note": "노트",
+    "notes": "노트",
+    "support_poznote": "Poznote 후원",
+    "version": "버전",
+    "filter_placeholder": "필터...",
+    "no_filter_results": "검색된 결과가 없습니다.",
+    "graph": "그래프"
+  },
+  "search": {
+    "placeholder": "검색...",
+    "clear": "검색 지우기",
+    "placeholder_notes": "하나 이상의 단어를 검색하세요...",
+    "placeholder_tags": "하나 이상의 태그를 검색하세요...",
+    "placeholder_combined": "노트 및 태그에서 검색...",
+    "search_in_notes": "노트에서 검색",
+    "search_in_tags": "태그에서 검색",
+    "toggle_date_filter": "날짜 필터 전환",
+    "created_from": "작성일 시작",
+    "created_to": "작성일 종료",
+    "validation": {
+      "select_type": "검색 옵션을 하나 이상 선택하세요(노트 또는 태그).",
+      "single_letter_warning": "단일 문자 단어로 검색하면 너무 많은 결과가 반환될 수 있습니다. 더 정확한 검색을 위해 더 긴 단어를 사용해 보세요.",
+      "invalid_date_range": "시작 날짜는 종료 날짜 이전이거나 같아야 합니다."
+    },
+    "placeholder_account": "{{account}}에서 검색..."
+  },
+  "icon_names": {
+    "briefcase": "서류가방",
+    "home": "집",
+    "star": "별",
+    "heart": "하트",
+    "lightbulb": "전구",
+    "image": "이미지",
+    "music": "음악",
+    "book": "책",
+    "graduation-cap": "졸업 모자",
+    "code": "코드",
+    "rocket": "로켓",
+    "plane": "비행기",
+    "map-marker-alt": "위치",
+    "calendar-alt": "달력",
+    "clock": "시계",
+    "user": "사용자",
+    "users": "사용자",
+    "cog": "설정",
+    "wrench": "렌치",
+    "paint-brush": "페인트 붓",
+    "palette": "팔레트",
+    "camera": "카메라",
+    "shield": "방패",
+    "lock": "자물쇠",
+    "key": "열쇠",
+    "envelope": "봉투",
+    "inbox": "받은편지함",
+    "archive": "보관함",
+    "box": "상자",
+    "shopping-cart": "카트",
+    "credit-card": "카드",
+    "chart-line": "차트",
+    "chart-bar": "다이어그램",
+    "database": "데이터베이스",
+    "server": "서버",
+    "cloud": "구름",
+    "download": "다운로드",
+    "upload": "업로드",
+    "tasks": "할 일",
+    "clipboard": "클립보드",
+    "file-alt": "파일",
+    "copy": "복사",
+    "gamepad": "게임",
+    "trophy": "트로피",
+    "gift": "선물",
+    "birthday-cake": "케이크",
+    "coffee": "커피",
+    "pizza-slice": "피자",
+    "utensils": "레스토랑",
+    "medkit": "의료",
+    "heartbeat": "건강",
+    "dumbbell": "아령",
+    "bicycle": "자전거",
+    "tree": "나무",
+    "leaf": "잎",
+    "seedling": "식물",
+    "paw": "애완동물",
+    "bug": "버그",
+    "flask": "과학",
+    "atom": "원자",
+    "magnet": "자석",
+    "fire": "불",
+    "sun": "태양",
+    "moon": "달",
+    "umbrella": "우산",
+    "snowflake": "눈",
+    "bolt": "번개",
+    "flag": "깃발",
+    "bookmark": "북마크",
+    "thumbs-up": "좋아요",
+    "smile": "미소",
+    "layer-group": "레이어",
+    "terminal": "터미널",
+    "at": "골뱅이 기호",
+    "hashtag": "해시태그",
+    "question-circle": "질문",
+    "times-circle": "닫기",
+    "eye": "눈",
+    "anchor": "닻",
+    "apple-alt": "사과",
+    "award": "수상",
+    "settings": "설정",
+    "mail": "메일",
+    "video": "비디오",
+    "trending-up": "상승 추세",
+    "list-todo": "할 일 목록",
+    "gamepad-2": "게임패드",
+    "utensils-crossed": "식기",
+    "briefcase-medical": "구급 가방",
+    "activity": "활동",
+    "bike": "자전거",
+    "tree-deciduous": "낙엽수",
+    "sprout": "새싹",
+    "paw-print": "발바닥 자국",
+    "flask-conical": "플라스크",
+    "flame": "불꽃",
+    "zap": "번개",
+    "layers": "레이어",
+    "at-sign": "골뱅이 기호",
+    "hash": "해시",
+    "help-circle": "도움",
+    "x-circle": "닫기",
+    "apple": "사과",
+    "candy": "사탕",
+    "badge-check": "인증된 배지",
+    "network": "네트워크",
+    "pie-chart": "원형 차트",
+    "clipboard-list": "목록",
+    "boxes": "상자",
+    "monitor": "모니터",
+    "scroll": "스크롤",
+    "dna": "DNA",
+    "dollar-sign": "달러",
+    "drum": "드럼",
+    "euro": "유로",
+    "feather": "깃털",
+    "file-code": "코드 파일",
+    "fingerprint": "지문",
+    "gem": "보석",
+    "glasses": "안경",
+    "globe": "지구",
+    "guitar": "기타",
+    "hamburger": "햄버거",
+    "hammer": "망치",
+    "hard-hat": "안전모",
+    "headphones": "헤드폰",
+    "headset": "헤드셋",
+    "mountain": "산",
+    "shapes": "모양",
+    "id-card": "신분증",
+    "factory": "공장",
+    "infinity": "무한대",
+    "swords": "칼",
+    "laptop": "노트북",
+    "map": "지도",
+    "medal": "메달",
+    "mic": "마이크",
+    "microscope": "현미경",
+    "banknote": "지폐",
+    "passport": "여권",
+    "pen": "펜",
+    "pencil": "연필",
+    "pepper": "후추",
+    "phone": "전화",
+    "piggy-bank": "돼지 저금통",
+    "plane-takeoff": "이륙",
+    "plug": "플러그",
+    "printer": "프린터",
+    "puzzle": "퍼즐",
+    "receipt": "영수증",
+    "bot": "봇",
+    "person-standing": "서있는 사람",
+    "satellite": "위성",
+    "satellite-dish": "위성 접시",
+    "shopping-bag": "쇼핑백",
+    "signpost": "이정표",
+    "git-branch": "Git 브랜치",
+    "flower": "꽃",
+    "stamp": "스탬프",
+    "waves": "파도",
+    "refresh-cw": "새로 고침",
+    "syringe": "주사기",
+    "tablet": "태블릿",
+    "gauge": "게이지",
+    "tag": "태그",
+    "tags": "태그",
+    "drama": "드라마",
+    "tools": "도구",
+    "tractor": "트랙터",
+    "trash-alt": "휴지통",
+    "tree-alt": "나무",
+    "truck": "트럭",
+    "tv": "TV",
+    "umbrella-beach": "해변 우산",
+    "utensil-spoon": "숟가락",
+    "vial": "약병",
+    "walking": "걷기",
+    "warehouse": "창고",
+    "weight": "무게",
+    "wind": "바람",
+    "columns": "열",
+    "message-circle": "메시지",
+    "bell": "종",
+    "binoculars": "쌍안경",
+    "book-open": "펼쳐진 책",
+    "brush": "브러시",
+    "building": "건물",
+    "bus": "버스",
+    "calculator": "계산기",
+    "car": "자동차",
+    "cloud-sun": "구름 낀 해",
+    "coins": "동전",
+    "compass": "나침반",
+    "crown": "왕관",
+    "film": "영화",
+    "folder-tree": "폴더 트리",
+    "hospital": "병원",
+    "school": "학교",
+    "stethoscope": "청진기",
+    "store": "상점",
+    "wallet": "지갑",
+    "wifi": "와이파이",
+    "yen-sign": "엔",
+    "bird": "새",
+    "cat": "고양이",
+    "dog": "개",
+    "fish": "물고기",
+    "fish-symbol": "물고기 상징",
+    "rabbit": "토끼",
+    "rat": "쥐",
+    "snail": "달팽이",
+    "squirrel": "다람쥐",
+    "turtle": "거북이",
+    "worm": "벌레",
+    "panda": "팬더",
+    "shrimp": "새우",
+    "shell": "껍질",
+    "bone": "뼈",
+    "egg": "계란",
+    "origami": "종이접기",
+    "banana": "바나나",
+    "carrot": "당근",
+    "cherry": "체리",
+    "citrus": "감귤류",
+    "cookie": "쿠키",
+    "croissant": "크로와상",
+    "cup-soda": "소다",
+    "dessert": "디저트",
+    "donut": "도넛",
+    "egg-fried": "달걀 프라이",
+    "grape": "포도",
+    "ham": "햄",
+    "beef": "쇠고기",
+    "ice-cream-bowl": "아이스크림 그릇",
+    "ice-cream-cone": "아이스크림",
+    "lollipop": "롤리팝",
+    "martini": "칵테일",
+    "milk": "우유",
+    "popcorn": "팝콘",
+    "popsicle": "아이스캔디",
+    "salad": "샐러드",
+    "sandwich": "샌드위치",
+    "soup": "수프",
+    "wheat": "밀",
+    "wine": "와인",
+    "beer": "맥주",
+    "candy-cane": "지팡이 사탕",
+    "chef-hat": "요리사 모자",
+    "cooking-pot": "요리 냄비",
+    "cloud-rain": "비",
+    "cloud-snow": "눈",
+    "cloud-lightning": "폭풍",
+    "cloud-moon": "흐린 밤",
+    "cloud-fog": "안개",
+    "rainbow": "무지개",
+    "sunrise": "일출",
+    "sunset": "일몰",
+    "thermometer": "온도계",
+    "tornado": "토네이도",
+    "droplet": "작은 물방울",
+    "droplets": "물방울",
+    "trees": "숲",
+    "tree-palm": "야자수",
+    "tree-pine": "소나무",
+    "tent-tree": "캠핑",
+    "clover": "클로버",
+    "flower-2": "꽃",
+    "mountain-snow": "눈 덮인 산",
+    "sun-snow": "태양과 눈",
+    "moon-star": "달과 별",
+    "sparkles": "반짝임",
+    "ship": "배",
+    "ship-wheel": "배의 키",
+    "sailboat": "범선",
+    "train-front": "기차",
+    "tram-front": "트램",
+    "ambulance": "구급차",
+    "fuel": "연료",
+    "car-front": "자동차",
+    "caravan": "캐러밴",
+    "forklift": "지게차",
+    "piano": "피아노",
+    "radio": "라디오",
+    "disc": "디스크",
+    "speaker": "스피커",
+    "boom-box": "붐박스",
+    "mic-vocal": "마이크",
+    "clapperboard": "클래퍼보드",
+    "podcast": "팟캐스트",
+    "audio-lines": "오디오",
+    "volleyball": "배구",
+    "dices": "주사위",
+    "dice-5": "주사위 5",
+    "spade": "스페이드",
+    "club": "클로버",
+    "joystick": "조이스틱",
+    "tent": "텐트",
+    "footprints": "발자국",
+    "telescope": "망원경",
+    "lamp": "램프",
+    "lamp-desk": "책상 램프",
+    "bed": "침대",
+    "sofa": "소파",
+    "armchair": "안락의자",
+    "bath": "목욕",
+    "shirt": "셔츠",
+    "watch": "시계",
+    "backpack": "배낭",
+    "luggage": "수하물",
+    "alarm-clock": "알람 시계",
+    "hourglass": "모래시계",
+    "scissors": "가위",
+    "ruler": "자",
+    "pipette": "피펫",
+    "wand": "마술 지팡이",
+    "party-popper": "파티",
+    "keyboard": "키보드",
+    "mouse": "마우스",
+    "cpu": "프로세서",
+    "hard-drive": "하드 드라이브",
+    "usb": "USB",
+    "bluetooth": "블루투스",
+    "router": "라우터",
+    "webcam": "웹캠",
+    "projector": "프로젝터",
+    "castle": "성",
+    "church": "교회",
+    "landmark": "랜드마크",
+    "hotel": "호텔",
+    "library": "도서관",
+    "brain": "뇌",
+    "skull": "두개골",
+    "ghost": "유령",
+    "baby": "아기",
+    "accessibility": "접근성",
+    "percent": "퍼센트",
+    "sparkle": "반짝임",
+    "sigma": "시그마",
+    "pi": "파이",
+    "recycle": "재활용",
+    "biohazard": "생물학적 위험",
+    "radiation": "방사선",
+    "heart-pulse": "심장 박동",
+    "frown": "슬픈 표정",
+    "laugh": "웃는 표정",
+    "angry": "화난 표정",
+    "meh": "무표정",
+    "sun-moon": "낮과 밤",
+    "handshake": "악수"
+  },
+  "folder_icon": {
+    "default": "기본값"
+  },
+  "git_sync": {
+    "workspaces": {
+      "title": "동기화할 작업 공간",
+      "all_label": "모든 작업 공간",
+      "all_desc": "나중에 만든 작업 공간을 포함하여 모든 작업 공간을 동기화합니다.",
+      "selected_label": "선택한 작업 공간만",
+      "selected_desc": "선택한 작업 공간의 노트와 첨부 파일만 푸시하고 가져옵니다. 풀(가져오기) 실행 시 다른 작업 공간의 노트는 변경되지 않지만, 푸시(보내기) 실행 시 선택되지 않은 작업 공간의 파일은 원격 저장소에서 삭제됩니다.",
+      "save": "작업 공간 설정 저장",
+      "saved": "동기화할 작업 공간이 변경되었습니다.",
+      "none_selected": "동기화할 작업 공간을 하나 이상 선택해 주세요."
+    },
+    "title": "{{provider}} 동기화",
+    "description": "노트와 첨부 파일을 GitHub, GitLab 또는 Forgejo와 동기화합니다. 파일은 일반 파일 형태로 저장되며, 태그·폴더·날짜·첨부 파일 정보는 metadata.json에 보존됩니다.",
+    "warning": "이 기능만을 유일한 백업 수단으로 사용하지 마세요.\n설정의 백업 기능으로 데이터를 정기적으로 내보내세요.",
+    "confirm_push": "모든 노트와 첨부 파일을 {{provider}} 저장소로 푸시(보내기)하시겠습니까? 기존 파일은 업데이트되며, Poznote에 더 이상 없는 파일은 원격 저장소에서 삭제됩니다.",
+    "confirm_pull": "{{provider}}에서 모든 노트와 첨부 파일을 가져오기(풀)하시겠습니까? 로컬 데이터는 원격 버전으로 덮어쓰며, {{provider}}에 없는 로컬 노트는 휴지통으로 이동합니다.",
+    "confirm_auto_pull": "새 세션이 시작되었습니다. {{provider}}에서 변경 사항을 가져오시겠습니까?",
+    "confirm_auto_pull_warning": "새 세션이 시작되었습니다. {{provider}}에서 변경 사항을 가져오시겠습니까?\n\n{{provider}}에 없는 로컬 노트는 휴지통으로 이동합니다.",
+    "auto_pull_complete": "Git 가져오기가 완료되었습니다. 페이지를 새로 고치는 중...",
+    "auto_pull_no_changes": "Git 가져오기가 완료되었습니다. 변경 사항이 없습니다.",
+    "pulling": "변경 사항을 가져오는 중...",
+    "starting": "동기화 중...",
+    "completed": "완료되었습니다!",
+    "config": {
+      "title": "설정",
+      "status": "상태",
+      "repository": "저장소",
+      "branch": "브랜치",
+      "mode": "동기화 모드",
+      "token": "접근 토큰",
+      "token_set": "설정됨",
+      "token_missing": "설정되지 않음",
+      "not_configured": "설정되지 않음",
+      "not_configured_yet": "설정하려면",
+      "hint": "{{provider}} 동기화가 비활성화되었습니다. 관리자는 설정 > 관리 도구에서 이를 활성화할 수 있습니다.",
+      "hint_enable": "Git 동기화가 비활성화되었습니다. 관리자는 설정 > 관리 도구에서 이를 활성화할 수 있습니다.",
+      "provider": "공급자",
+      "api_base": "API 기본 URL",
+      "author_name": "작성자 이름",
+      "author_email": "작성자 이메일",
+      "save": "설정 저장"
+    },
+    "auto_sync": {
+      "title": "자동 동기화",
+      "push_label": "종료 시 자동 보내기",
+      "push_description": "노트를 나갈 때(노트를 전환하거나 탭을 닫는 경우) 세션 중에 수정된 경우 최신 버전이 자동으로 Git 저장소로 푸시됩니다.",
+      "pull_label": "시작 시 자동 가져오기",
+      "pull_description": "세션마다 한 번씩 Git 저장소에서 가져올지 묻습니다. 기존 노트를 업데이트하고 새 노트를 가져오며, 원격 저장소에 없는 로컬 노트는 휴지통으로 이동합니다.",
+      "saving": "설정이 저장되었습니다"
+    },
+    "test": {
+      "title": "연결 테스트",
+      "button": "연결 테스트"
+    },
+    "last_sync": {
+      "title": "마지막 동기화",
+      "action": "작업",
+      "time": "시간",
+      "pushed": "보내기 완료",
+      "pulled": "가져오기 완료",
+      "notes": "노트"
+    },
+    "actions": {
+      "title": "동기화 작업",
+      "workspace": "작업 공간: {{workspace}}",
+      "target_workspace": "대상 작업 공간",
+      "all_workspaces": "모든 작업 공간",
+      "home_hint": "홈 사이드바에서도 보내기와 가져오기를 실행할 수 있습니다.",
+      "push": {
+        "title": "{{provider}}로 푸시(보내기)",
+        "description": "모든 노트와 첨부 파일을 일반 파일 형태로 {{provider}}에 내보냅니다. 기존 파일을 업데이트하고 Poznote에 더 이상 없는 파일은 제거합니다.",
+        "button": "푸시(보내기)"
+      },
+      "pull": {
+        "title": "{{provider}}에서 가져오기(풀)",
+        "description": "{{provider}}에서 모든 노트와 첨부 파일을 가져옵니다. 로컬 내용을 덮어쓰고 저장소에 없는 노트를 휴지통으로 이동합니다.",
+        "button": "가져오기(풀)"
+      }
+    },
+    "messages": {
+      "connection_success": "연결 성공! {{repo}}에 연결됨",
+      "connection_error": "연결 실패: {{error}}",
+      "push_success": "{{count}} 노트를 푸시하고 {{deleted}} 파일을 삭제했습니다({{errors}} 오류).",
+      "push_error": "보내기 실패: {{error}}",
+      "pull_success": "{{pulled}} 새 노트를 가져왔고, {{updated}} 기존 노트를 업데이트했으며, {{deleted}} 노트를 삭제했습니다({{errors}} 오류).",
+      "pull_error": "가져오기 실패: {{error}}",
+      "config_saved": "설정이 저장되었습니다.",
+      "config_save_error": "설정을 저장하지 못했습니다."
+    },
+    "debug": {
+      "title": "디버그 정보",
+      "show": "디버그 정보 표시",
+      "hide": "디버그 정보 숨기기",
+      "copy": "디버그 복사",
+      "copied": "복사되었습니다!",
+      "show_changes": "변경 사항만",
+      "show_all": "모두 표시",
+      "no_changes": "디버그에서 변경 사항을 찾을 수 없습니다."
+    },
+    "limitations": {
+      "title": "동기화 제한",
+      "element": "요소",
+      "html_notes": "HTML 노트",
+      "markdown_notes": "마크다운 노트",
+      "text_content": "텍스트 내용",
+      "attachments": "파일 첨부",
+      "embedded_images": "이미지",
+      "metadata": "메타데이터(태그, 날짜, ID)",
+      "embedded_note": "포함된 이미지는 HTML로 유지되지만 {{provider}}에는 표시되지 않습니다."
+    },
+    "not_configured": {
+      "title": "{{provider}} 동기화가 설정되지 않음",
+      "description": "{{provider}} 동기화를 사용하려면 .env 파일에서 {{provider}} 자격 증명을 설정해야 합니다.",
+      "steps_title": "설정 지침",
+      "step1": "'repo' 범위를 사용하여 {{provider}} 개인 접근 토큰을 생성합니다.",
+      "step2": "노트에 대한 {{provider}} 저장소(공개 또는 비공개)를 생성합니다.",
+      "step3": ".env 파일에 설정 추가",
+      "step4": "변경 사항을 적용하려면 애플리케이션을 다시 시작하세요."
+    }
+  },
+  "sort": {
+    "header": "정렬 기준",
+    "button_title": "정렬 기준: {{mode}}",
+    "save_failed": "정렬 순서를 변경할 수 없습니다.",
+    "modes": {
+      "name": "이름",
+      "date_modified": "수정된 날짜",
+      "date_created": "생성된 날짜",
+      "type": "유형",
+      "custom": "사용자 지정"
+    },
+    "hints": {
+      "name": "제목별 노트 및 이름별 폴더(A부터 Z까지)",
+      "date_modified": "가장 최근에 수정된 노트 먼저",
+      "date_created": "가장 최근에 생성된 노트 및 폴더 먼저",
+      "type": "노트는 유형(노트, markdown, 할 일 목록, 그림, 링크)별로 그룹화한 다음 제목별로 그룹화합니다.",
+      "custom": "노트 및 폴더를 드래그하여 설정한 순서"
+    },
+    "menu_items": {
+      "name": "이름순으로 정렬",
+      "date_modified": "수정된 날짜순으로 정렬",
+      "date_created": "생성 날짜순으로 정렬",
+      "type": "유형별로 정렬",
+      "custom": "사용자 지정 순서"
+    }
+  },
+  "calendar": {
+    "months": {
+      "january": "1월",
+      "february": "2월",
+      "march": "3월",
+      "april": "4월",
+      "may": "5월",
+      "june": "6월",
+      "july": "7월",
+      "august": "8월",
+      "september": "9월",
+      "october": "10월",
+      "november": "11월",
+      "december": "12월"
+    },
+    "weekdays": {
+      "monday": "월",
+      "tuesday": "화",
+      "wednesday": "수",
+      "thursday": "화",
+      "friday": "금",
+      "saturday": "토",
+      "sunday": "토"
+    },
+    "buttons": {
+      "previous_month": "이전 달",
+      "next_month": "다음 달",
+      "today": "오늘",
+      "show_calendar": "달력 표시",
+      "hide_calendar": "달력 숨기기"
+    },
+    "modes": {
+      "created": "생성됨",
+      "modified": "수정됨"
+    },
+    "day_counts": "생성: {{created}} / 수정: {{modified}}",
+    "modal": {
+      "title": "노트 날짜:",
+      "open_all": "모두 열기",
+      "close": "닫기",
+      "no_notes": "이날은 노트가 없습니다.",
+      "diary_open": "일기 항목 열기",
+      "diary_create": "일기 항목 생성"
+    }
+  },
+  "workspace_menu": {
+    "acting_as": " ({{user}} 계정으로 사용 중)",
+    "workspaces": "작업 공간",
+    "logout": "로그아웃"
+  },
+  "page_title": {
+    "switch_workspace": "작업 공간 전환",
+    "workspaces": "작업 공간",
+    "manage_workspaces": "작업 공간 관리"
+  },
+  "admin_tools": {
+    "orphan_scanner": {
+      "title": "미사용 첨부 파일 검사",
+      "description": "이 도구는 첨부 파일 폴더를 검색하고 노트(첨부 파일로 저장된 인라인 이미지 포함)에서 더 이상 참조되지 않는 파일을 식별합니다.",
+      "scan_button": "미사용 파일 검사",
+      "delete_button": "미사용 파일 삭제",
+      "delete_confirm": "이 파일을 영구적으로 삭제하시겠습니까?",
+      "table_user_id": "사용자 ID",
+      "table_total_files": "총 파일 수",
+      "table_orphans_found": "미사용 파일 수",
+      "table_details": "파일",
+      "orphans_label": "미사용 파일",
+      "deleted_files": "{{count}} 파일을 삭제했습니다.",
+      "table_user_id_short": "사용자",
+      "table_orphans_found_short": "미사용 파일",
+      "view_files": "{{count}} 파일 보기",
+      "modal_title": "미사용 파일",
+      "modal_title_user": "미사용 파일 - 사용자",
+      "files_label": "파일"
+    },
+    "storage_stats": {
+      "title": "저장 공간 통계",
+      "description": "노트의 개수와 각 계정이 사용하는 디스크 공간입니다.",
+      "quota_click_tip": "팁: 해당 계정에 대한 사용 한도 값을 변경하려면 표에서 사용 한도 값을 클릭하세요.",
+      "user_description": "계정에서 사용하는 노트 수 및 디스크 공간입니다.",
+      "user_s3_notice": "첨부 파일은 관리자가 설정한 대로 로컬이 아닌 S3 저장소에 저장됩니다.",
+      "db_help": "데이터베이스는 빠른 검색에 사용되는 노트의 설정과 원시 텍스트를 저장합니다.",
+      "files_help": "파일은 HTML 또는 마크다운 형식으로 된 노트의 내용입니다.",
+      "table_id": "ID",
+      "table_account": "계정",
+      "table_notes": "노트",
+      "table_trash": "휴지통",
+      "table_db": "데이터베이스 로컬(MB)",
+      "table_entries": "로컬 파일(MB)",
+      "table_attachments": "첨부 파일(MB)",
+      "table_total": "총 로컬(MB)",
+      "table_total_row": "합계",
+      "table_total_row_hint": "이 페이지뿐만 아니라 모든 계정에서",
+      "quota_modal_description": "전역 설정을 사용하려면 필드를 비워 두세요. 0은 무제한을 의미합니다.\n이러한 값은 전역 사용자 사용 한도을 재정의합니다.",
+      "quota_max_notes_for": "{{user}}용 최대 노트",
+      "quota_max_storage_for": "{{user}}의 최대 로컬 저장 용량(MB)",
+      "filter_placeholder": "계정 필터링...",
+      "hide_inactive": "비활성화된 계정 숨기기",
+      "export_csv": "CSV 내보내기",
+      "pager": {
+        "previous": "이전",
+        "next": "다음",
+        "status": "전체 {{pages}}페이지 중 {{page}}페이지 · 계정 {{total}}개",
+        "per_page": "페이지당",
+        "all": "모두"
+      },
+      "no_accounts": "계정을 찾을 수 없습니다.",
+      "table_attachments_local": "로컬 첨부 파일(MB)",
+      "table_attachments_s3": "첨부 파일 S3(MB)",
+      "quota_max_storage_s3_for": "{{user}}용 최대 S3 첨부 파일 저장 용량(MB)",
+      "quota_max_backups_s3_for": "{{user}}용 최대 S3 백업 저장소(MB)",
+      "table_backups_s3": "백업 S3(MB)",
+      "quota_admin_exempt": "관리자이기 때문에 무제한",
+      "quota_admin_exempt_message": "관리자 계정에는 사용 한도이 적용되지 않습니다. 노트 및 저장소는 무제한입니다.",
+      "table_notes_total": "전체 노트 수",
+      "quota_unlimited": "무제한",
+      "quota_percent_used": "{{percent}}% 사용됨",
+      "quota_unit_mb": "MB"
+    }
+  },
+  "activity_log": {
+    "title": "활동 로그",
+    "description": "이 인스턴스에서 수행된 민감한 작업 기록입니다.",
+    "help_intro": "기록된 작업:",
+    "filter_placeholder": "사용자 또는 세부정보 검색...",
+    "export_csv": "CSV 내보내기",
+    "empty": "아직 등록된 항목이 없습니다.",
+    "unknown_user": "알 수 없음",
+    "columns": {
+      "date": "날짜 및 시간",
+      "user": "사용자(ID)",
+      "action": "작업",
+      "details": "세부정보",
+      "source": "소스"
+    },
+    "actions": {
+      "user_login": "로그인",
+      "user_logout": "로그아웃",
+      "profile_updated": "프로필이 업데이트되었습니다.",
+      "quota_updated": "사용 한도이 업데이트되었습니다.",
+      "account_activated": "계정이 활성화됨",
+      "account_deactivated": "계정이 비활성화되었습니다",
+      "admin_granted": "관리자 역할이 부여됨",
+      "admin_revoked": "관리자 역할이 취소되었습니다.",
+      "account_deleted": "계정이 삭제되었습니다",
+      "access_granted": "계정 접근 권한이 부여됨",
+      "access_revoked": "계정 접근 권한이 철회되었습니다",
+      "app_password_created": "앱 비밀번호가 생성되었습니다.",
+      "app_password_revoked": "앱 비밀번호가 취소되었습니다.",
+      "workspace_created": "작업 공간이 생성되었습니다.",
+      "workspace_deleted": "작업 공간 삭제됨",
+      "workspace_shared": "작업 공간 공유됨",
+      "workspace_unshared": "작업 공간 공유 해제됨",
+      "backup_created": "백업이 생성되었습니다.",
+      "backup_restored": "백업이 복원되었습니다.",
+      "trash_emptied": "휴지통을 비웠습니다",
+      "note_deleted": "노트가 영구적으로 삭제되었습니다.",
+      "two_factor_enabled": "2단계 인증 활성화됨",
+      "two_factor_disabled": "2단계 인증 비활성화됨",
+      "two_factor_reset": "관리자가 2단계 인증을 비활성화함",
+      "two_factor_recovery_used": "복구 코드로 로그인됨",
+      "two_factor_recovery_regenerated": "복구 코드가 재생성되었습니다."
+    },
+    "filters": {
+      "all_actions": "모든 작업",
+      "apply": "필터",
+      "reset": "초기화"
+    },
+    "details": {
+      "performed_by": "작성자: {{user}}",
+      "data_deleted": "데이터가 삭제되었습니다",
+      "data_kept": "보관된 데이터",
+      "notes_deleted": "{{count}} 노트 삭제됨",
+      "notes_moved": "{{count}} 노트가 {{workspace}}로 이동되었습니다.",
+      "in_workspace": "{{workspace}}에서",
+      "untitled_note": "노트 #{{id}}",
+      "linked_deleted": "+{{count}} 연결된 노트",
+      "share_updated": "설정이 업데이트되었습니다.",
+      "allowed_users": "{{count}} 사용자로 제한됨",
+      "accounts": "계정: {{accounts}}",
+      "empty_value": "비어 있음",
+      "s3_objects_deleted": "{{count}} S3 객체가 삭제되었습니다.",
+      "s3_cleanup_failed": "S3 정리 실패",
+      "expires_at": "{{date}} 만료",
+      "recovery_codes_remaining": "{{count}}개 남음",
+      "shared_with": "{{users}}와 공유됨"
+    },
+    "destinations": {
+      "download": "다운로드",
+      "s3": "S3",
+      "server": "서버"
+    },
+    "sources": {
+      "upload": "업로드",
+      "s3": "S3",
+      "server": "서버"
+    },
+    "pager": {
+      "previous": "이전",
+      "next": "다음",
+      "status": "전체 {{pages}}페이지 중 {{page}}페이지 · 항목 {{total}}개",
+      "per_page": "페이지당",
+      "all": "모두"
+    },
+    "retention": {
+      "label": "로그 보관 기간",
+      "days": "{{days}}일",
+      "unlimited": "무제한",
+      "save": "저장"
+    },
+    "clear": {
+      "title": "활동 로그 지우기",
+      "button": "로그 지우기",
+      "confirm": "로그의 모든 항목을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+      "warning": "기록 {{count}}개가 영구적으로 삭제됩니다."
+    },
+    "messages": {
+      "retention_saved": "보존 기간은 {{days}}일로 설정되었습니다. {{removed}} 이전 항목이 제거되었습니다.",
+      "retention_unlimited": "보존이 무제한으로 설정되었습니다. 항목은 자동으로 제거되지 않습니다.",
+      "cleared": "{{count}} 항목이 삭제되었습니다."
+    },
+    "errors": {
+      "invalid_form": "잘못된 양식 제출입니다. 다시 시도해 주세요.",
+      "retention_failed": "보관 설정을 저장할 수 없습니다.",
+      "clear_failed": "로그를 지울 수 없습니다."
+    },
+    "fields": {
+      "username": "사용자 이름",
+      "email": "이메일",
+      "first_name": "이름",
+      "last_name": "성",
+      "quota_max_notes": "최대 노트 수",
+      "quota_max_storage_mb": "저장소(MB)",
+      "quota_max_storage_s3_mb": "S3 저장소(MB)",
+      "quota_max_backups_s3_mb": "S3 백업(MB)"
+    },
+    "methods": {
+      "password": "비밀번호",
+      "oidc": "SSO"
+    }
+  },
+  "backlinks": {
+    "title": "백링크"
+  },
+  "multiuser": {
+    "acting_as": "{{user}} 계정으로 사용 중",
+    "admin": {
+      "maintenance": {
+        "title": "마스터 데이터베이스 재구축",
+        "subtitle": "사용자 프로필 및 공개 공유 링크 복원",
+        "description": "마스터 데이터베이스(master.db)는 사용자 정보, 공개 링크, Poznote의 공통 설정을 저장합니다. 이 파일이 손실되거나 손상된 경우, 또는 사용자 폴더를 직접 복사·이동한 뒤 일부 공개 링크가 작동하지 않는 경우 이 도구를 사용하세요. 'data/users' 폴더를 검사하여 계정을 다시 등록하고, 개인 데이터베이스에서 실제 이름을 복구하며, 공개 공유 링크를 복원합니다.",
+        "repair_registry": "재구축",
+        "repair_registry_confirm": "그러면 모든 사용자 폴더를 검색하고 마스터 데이터베이스를 다시 구축합니다. 계속하시겠습니까?",
+        "repair_registry_success": "마스터 데이터베이스가 재구축되었습니다.\n\n- {{scanned}} 폴더 검색\n- {{added}} 사용자 복원\n- {{links}} 공유 링크 재구축",
+        "repair_registry_skipped": "- 다른 계정에 보관된 {{skipped}} 공유 링크",
+        "repair_registry_error": "재구축 오류: {{error}}"
+      },
+      "id": "ID",
+      "username": "사용자",
+      "email": "이메일",
+      "administrator": "관리자",
+      "administrator_short": "관리자",
+      "status": "상태",
+      "created_at": "생성됨",
+      "last_login": "마지막 로그인",
+      "never_connected": "없음",
+      "actions": "작업",
+      "active": "활성",
+      "inactive": "비활성",
+      "active_count": "{{count}} 활성",
+      "inactive_count": "{{count}} 비활성",
+      "filter_status_active": "활성화된 계정만 표시",
+      "filter_status_inactive": "비활성화된 계정만 표시",
+      "filter_status_clear": "모든 계정 표시",
+      "not_defined": "설정되지 않음",
+      "create_user": "프로필 만들기",
+      "export_csv": "CSV 내보내기",
+      "edit_user": "사용자 편집",
+      "filter_placeholder": "사용자 필터링...",
+      "hide_inactive": "비활성화된 계정 숨기기",
+      "pager": {
+        "previous": "이전",
+        "next": "다음",
+        "status": "전체 {{pages}}페이지 중 {{page}}페이지 · 사용자 {{total}}명",
+        "per_page": "페이지당",
+        "all": "모두"
+      },
+      "first_name": "이름",
+      "last_name": "성",
+      "click_to_activate": "활성화하려면 클릭하세요.",
+      "click_to_deactivate": "비활성화하려면 클릭하세요.",
+      "toggle_admin": "관리자 권한 부여 또는 취소",
+      "admin_id_1_locked": "사용자 ID 1에서는 관리자 역할을 제거할 수 없습니다.",
+      "email_usage_note": "사용자는 사용자 이름 대신 이메일 주소를 사용하여 로그인할 수 있습니다. 이메일 주소는 설정된 경우 OIDC 인증 및 알림 이메일에도 사용됩니다.",
+      "admin_note": "다른 사용자에게 관리자 권한을 부여하거나 취소하려면 관리 확인란을 사용하세요.",
+      "account_access": {
+        "column": "노트 접근",
+        "title": "노트 접근",
+        "manage": "노트 접근 관리",
+        "help": "이 사용자가 로그인 후 열 수 있는 노트 계정을 선택하세요.",
+        "own_only": "자신의 계정만",
+        "own_account": "자신의 계정"
+      },
+      "confirm_admin": {
+        "title": "관리자로 승격 확인",
+        "message": "\"{{username}}\"에 관리자 권한을 부여하시겠습니까?",
+        "privileges_title": "관리자는 다음을 수행할 수 있습니다.",
+        "privilege_notes": "모든 사용자의 노트를 ZIP 파일로 내보내기",
+        "privilege_passwords": "다른 모든 사용자의 비밀번호 변경",
+        "privilege_admin_panel": "이 사용자 관리 패널에 접근",
+        "confirm_button": "관리자 승격 확인"
+      },
+      "confirm_status": {
+        "deactivate_title": "비활성화 확인",
+        "deactivate_message": "\"{{username}}\" 사용자를 비활성화하시겠습니까? 더 이상 로그인할 수 없습니다.",
+        "deactivate_button": "비활성화",
+        "activate_title": "활성화 확인",
+        "activate_message": "정말로 \"{{username}}\" 사용자를 활성화하시겠습니까? 다시 로그인할 수 있습니다.",
+        "activate_button": "활성화"
+      },
+      "password_management": {
+        "manage_password": "비밀번호",
+        "reset_password": "비밀번호 재설정",
+        "set_password": "비밀번호 설정",
+        "reset_to_default": "기본 비밀번호로 재설정",
+        "modal_help": "이 계정에 대한 사용자 지정 비밀번호를 설정하거나 기본값으로 재설정하세요.",
+        "current_mode": "현재 모드",
+        "set_help": "최소 4자 이상입니다.",
+        "reset_help": "사용자 지정 비밀번호를 제거하고 이 사용자의 기본 비밀번호로 되돌립니다.",
+        "reset_confirm": "\"{{username}}\"의 비밀번호를 기본값으로 재설정하시겠습니까?",
+        "set_new_password": "\"{{username}}\"의 새 비밀번호:",
+        "reset_success": "비밀번호가 기본값으로 재설정되었습니다.",
+        "set_success": "비밀번호가 업데이트되었습니다.",
+        "status_custom": "사용자 지정",
+        "status_default": "기본값",
+        "status_custom_detail": "이 사용자는 사용자 지정 비밀번호를 사용합니다.",
+        "status_default_detail": "이 사용자는 기본 비밀번호를 사용합니다.",
+        "changed_at_prefix": "업데이트됨:",
+        "status_sso_only_detail": "이 사용자는 SSO를 통해 로그인하며 비밀번호가 없습니다. 비밀번호 로그인이 필요한 경우 아래 중 하나를 설정하세요."
+      },
+      "two_factor": {
+        "enabled_detail": "이 사용자에 대해 2단계 인증이 켜져 있습니다.",
+        "reset": "2단계 인증 비활성화",
+        "confirm_reset": "확인",
+        "reset_done": "2단계 인증이 꺼졌습니다. 이제 이 사용자는 비밀번호만 사용하여 로그인합니다."
+      },
+      "errors": {
+        "cannot_delete_self": "자신의 프로필을 삭제할 수 없습니다.",
+        "cannot_change_self": "자신의 상태/역할을 변경할 수 없습니다.",
+        "username_required": "사용자 이름이 필요합니다",
+        "s3_cleanup_failed": "계정은 삭제되었지만 S3 버킷에서 해당 계정의 파일을 제거하지 못했습니다: {{error}}. 파일을 수동으로 삭제하세요.",
+        "confirm_username_mismatch": "입력한 사용자 이름이 삭제할 계정과 일치하지 않습니다. 아무것도 삭제되지 않았습니다.",
+        "username_taken": "이 사용자 이름은 이미 사용 중입니다.",
+        "email_taken": "이 이메일 주소는 이미 다른 프로필에서 사용 중입니다.",
+        "no_email_profile_exists": "이메일 주소가 없는 다른 프로필이 이미 존재합니다. 이 프로필의 이메일 주소를 입력하세요.",
+        "oidc_subject_taken": "이 OIDC 주체 식별자는 이미 다른 프로필에 연결되어 있습니다",
+        "database_error": "데이터베이스 오류가 발생했습니다. 자세한 내용은 서버 로그를 확인하세요."
+      },
+      "delete_warning_everything": "이 계정에 속한 모든 내용은 즉시 영구적으로 삭제됩니다.",
+      "delete_warning_item_data": "노트, 폴더, 태그 및 첨부 파일",
+      "delete_warning_item_s3": "S3 버킷에 저장된 첨부 파일 및 백업 아카이브",
+      "delete_warning_no_recovery": "삭제한 데이터는 복구할 수 없습니다. 어떤 데이터도 보관하지 않으며 삭제 전에 백업을 만들지도 않습니다. 데이터가 필요하다면 삭제 전에 전체 백업 ZIP 파일을 다운로드하세요.",
+      "delete_confirm_label": "확인하려면 \"{{username}}\"를 입력하세요.",
+      "delete_confirm_placeholder": "확인하려면 사용자 이름을 입력하세요.",
+      "access_denied_admin": "접근이 거부되었습니다. 관리자 권한이 필요합니다.",
+      "confirm_delete": "정말로 \"{{username}}\" 사용자를 삭제하시겠습니까?",
+      "delete_id_1_locked": "사용자 ID 1은 삭제할 수 없습니다.",
+      "delete_user": "사용자 프로필 삭제",
+      "errors_label": "오류:",
+      "network_error": "네트워크 오류: ",
+      "new_password": "새 비밀번호",
+      "oidc_subject": "OIDC 주체 식별자(Subject, UUID)",
+      "oidc_subject_help": "선택사항: OIDC 제공업체(LLDAP, Authelia 등)의 UUID",
+      "oidc_subject_placeholder": "예: 510ec799-02f8-42e0-...",
+      "processing": "처리 중..."
+    }
+  },
+  "profile": {
+    "card": "내 프로필",
+    "modal": {
+      "title": "내 프로필",
+      "username": "사용자 이름",
+      "first_name": "이름",
+      "last_name": "성",
+      "email_admin_only": "관리자만 이메일 주소를 변경할 수 있습니다.",
+      "id": "ID"
+    },
+    "errors": {
+      "username_required": "사용자 이름이 필요합니다",
+      "username_invalid": "사용자 이름에는 문자, 숫자, 점, 밑줄, 대시만 포함할 수 있으며 숫자는 사용할 수 없습니다.",
+      "username_taken": "이 사용자 이름은 이미 사용 중입니다.",
+      "email_invalid": "잘못된 이메일 주소",
+      "email_taken": "이 이메일은 이미 사용 중입니다."
+    },
+    "logout": {
+      "confirm": "정말로 로그아웃하시겠습니까?",
+      "in_progress": "로그아웃 중...",
+      "switch_in_progress": "계정 전환 중..."
+    }
+  },
+  "password": {
+    "status": {
+      "custom": "사용자 지정 비밀번호",
+      "default": "기본값",
+      "sso_only": "SSO 전용"
+    },
+    "modal": {
+      "title": "비밀번호 변경",
+      "description": "현재 비밀번호를 입력하고 새 비밀번호를 선택하세요.",
+      "current": "현재 비밀번호",
+      "new": "새 비밀번호",
+      "confirm": "새 비밀번호 확인",
+      "status_custom": "본인 또는 관리자가 설정한 비밀번호를 사용하고 있습니다.",
+      "status_changed_at": "{{date}}에서 마지막으로 변경되었습니다.",
+      "status_default": "여전히 기본 비밀번호를 사용하고 있습니다. 현재 비밀번호로 입력한 후 원하는 비밀번호를 선택하세요.",
+      "status_sso_only": "이 프로필에는 비밀번호가 없습니다. SSO를 통해 로그인합니다. 비밀번호 로그인이 필요한 경우 관리자에게 설정을 요청하세요."
+    },
+    "errors": {
+      "all_required": "모든 필드를 입력해야 합니다.",
+      "mismatch": "새 비밀번호가 일치하지 않습니다.",
+      "too_short": "비밀번호는 4자 이상이어야 합니다.",
+      "incorrect_current": "현재 비밀번호가 올바르지 않습니다."
+    },
+    "success": "비밀번호가 변경되었습니다."
+  },
+  "app_passwords": {
+    "status": {
+      "none": "없음",
+      "count_one": "활성 1명",
+      "count_other": "{{count}} 활성"
+    },
+    "modal": {
+      "title": "앱 비밀번호",
+      "description": "앱 비밀번호를 사용하면 앱이나 확장 프로그램이 SSO를 통해 로그인하는 경우에도 계정 비밀번호 대신 사용자 이름으로 API를 사용할 수 있습니다. 웹 인터페이스를 열거나 관리에 접근하거나 계정을 변경할 수 없으며 언제든지 취소할 수 있습니다.",
+      "label_placeholder": "이름(예: Chrome 확장 프로그램)",
+      "expiry_label": "만료",
+      "expiry_never": "만료되지 않음",
+      "expiry_30": "30일",
+      "expiry_90": "90일",
+      "expiry_365": "1년",
+      "create": "만들기",
+      "close": "닫기",
+      "empty": "아직 앱 비밀번호가 없습니다.",
+      "secret_title": "앱 비밀번호 \"{{label}}\"",
+      "secret_notice": "지금 복사하세요. 다시 표시되지 않습니다.",
+      "usage_hint": "앱에서 사용자 이름과 이 값을 비밀번호로 입력하세요.",
+      "copy": "복사",
+      "copied": "복사됨",
+      "created": "작성: {{date}}",
+      "last_used": "마지막으로 사용한 {{date}}",
+      "never_used": "한번도 사용하지 않음",
+      "expires": "{{date}} 만료",
+      "expired": "만료됨",
+      "revoke": "철회",
+      "confirm_revoke": "확인"
+    },
+    "errors": {
+      "label_required": "앱 비밀번호에 이름을 지정하세요.",
+      "limit_reached": "한도에 도달했습니다. 다른 비밀번호를 만들기 전에 앱 비밀번호를 취소하세요.",
+      "load_failed": "앱 비밀번호를 로드할 수 없습니다.",
+      "generic": "문제가 발생했습니다. 다시 시도해 보세요."
+    }
+  },
+  "two_factor": {
+    "status": {
+      "enabled": "활성화됨",
+      "disabled": "비활성화됨"
+    },
+    "modal": {
+      "title": "2단계 인증",
+      "description": "로그인할 때 비밀번호를 입력한 뒤 휴대폰의 인증 앱(Aegis, Google Authenticator, 1Password, Bitwarden 등)에 표시된 6자리 코드를 입력해야 합니다. 비밀번호만 아는 사람은 계정에 접근할 수 없습니다.",
+      "api_notice": "계정 비밀번호로 API에 연결하는 앱(브라우저 확장 프로그램, MCP 서버, 스크립트 등)은 더 이상 작동하지 않습니다. 각 앱에 앱 비밀번호를 발급해 사용하세요.",
+      "sso_notice": "SSO로 로그인할 때는 이 코드가 필요하지 않습니다. 해당 로그인은 인증 제공자가 보호하므로, 인증 제공자에서도 2단계 인증을 활성화하세요.",
+      "current_password": "현재 비밀번호",
+      "cancel": "취소",
+      "setup": "설정",
+      "scan": "인증 앱으로 이 QR 코드를 스캔하거나 직접 키를 입력한 다음 앱에 표시되는 6자리 코드를 입력하세요.",
+      "copy": "복사",
+      "copied": "복사됨",
+      "code": "6자리 코드",
+      "enable": "활성화",
+      "recovery_intro": "2단계 인증이 활성화되었습니다. 복구 코드를 휴대폰과 분리된 안전한 장소에 보관하세요. 기기를 분실하면 각 복구 코드로 한 번씩 로그인할 수 있습니다. 이 코드는 다시 표시되지 않습니다.",
+      "download": "다운로드",
+      "saved_codes": "코드를 저장했습니다",
+      "recovery_remaining_one": "복구 코드가 1개 남았습니다.",
+      "recovery_remaining_other": "{{count}} 복구 코드가 남았습니다.",
+      "enabled_since": "{{date}}부터 활성화되었습니다.",
+      "enabled": "2단계 인증이 켜져 있습니다.",
+      "recovery_title": "복구 코드",
+      "recovery_help": "새 코드를 생성하면 이전 코드가 취소됩니다. 인증 앱의 코드로 확인하세요.",
+      "regenerate": "복구 코드 새로 만들기",
+      "disable_title": "2단계 인증 비활성화",
+      "disable_help": "비활성화하면 비밀번호만으로 로그인할 수 있습니다. 비밀번호와 인증 앱의 코드 또는 복구 코드를 입력해 확인하세요.",
+      "code_or_recovery": "코드 또는 복구 코드",
+      "disable": "비활성화",
+      "close": "닫기"
+    },
+    "errors": {
+      "invalid_code": "코드가 잘못되었습니다. 기기의 시간을 확인하고 다시 시도하세요.",
+      "invalid_password": "현재 비밀번호가 올바르지 않습니다.",
+      "too_many": "실패한 시도가 너무 많습니다. 나중에 다시 시도하세요.",
+      "generic": "문제가 발생했습니다. 다시 시도해 보세요.",
+      "password_required": "현재 비밀번호를 입력하세요.",
+      "code_required": "인증 앱에 표시된 코드를 입력하세요.",
+      "disable_required": "현재 비밀번호와 코드를 입력하세요."
+    }
+  },
+  "delete_account": {
+    "modal": {
+      "title": "계정 삭제",
+      "description": "\"{{username}}\" 계정을 삭제하려고 합니다.",
+      "confirm_placeholder": "확인하려면 사용자 이름을 입력하세요.",
+      "password_placeholder": "현재 비밀번호",
+      "button": "내 계정 삭제",
+      "warning_everything": "이 계정에 속한 모든 데이터가 즉시 영구적으로 삭제됩니다.",
+      "warning_item_data": "노트, 폴더, 태그 및 첨부 파일",
+      "warning_item_s3": "S3 버킷에 저장된 첨부 파일 및 백업 아카이브",
+      "warning_no_recovery": "삭제한 데이터는 복구할 수 없습니다. 어떤 데이터도 보관하지 않으며 삭제 전에 백업을 생성하지도 않습니다. 데이터가 필요하다면 삭제를 진행하기 전에 전체 백업 ZIP 파일을 다운로드하세요."
+    },
+    "errors": {
+      "confirm_mismatch": "사용자 이름 확인이 일치하지 않습니다",
+      "password_required": "비밀번호가 필요합니다",
+      "password_incorrect": "비밀번호가 올바르지 않습니다.",
+      "cannot_delete": "이 계정은 삭제할 수 없습니다.",
+      "data_not_deleted": "파일을 삭제할 수 없어 계정이 유지되었습니다. 관리자에게 문의하세요.",
+      "last_admin": "마지막 관리자 계정은 삭제할 수 없습니다."
+    }
+  },
+  "oidc_admin": {
+    "title": "OIDC 설정",
+    "description": "OpenID Connect(SSO) 인증을 설정합니다. 보안을 위해 클라이언트 ID와 클라이언트 비밀번호는 .env 파일에 설정됩니다.",
+    "saved": "OIDC 설정이 저장되었습니다.",
+    "error_saving": "일부 설정을 저장하는 중에 오류가 발생했습니다. 다시 시도해 주세요.",
+    "error_csrf": "잘못된 양식 제출입니다. 다시 시도해 주세요.",
+    "deprecated": "더 이상 사용되지 않음",
+    "section_general": "일반",
+    "section_credentials": "자격 증명",
+    "section_advanced": "고급",
+    "section_access_control": "접근 제어",
+    "section_login_behavior": "로그인 동작",
+    "fields": {
+      "enabled": "OIDC 인증 활성화",
+      "provider_name": "제공자 이름",
+      "issuer": "발급자 URL",
+      "client_id": "클라이언트 ID",
+      "client_secret": "클라이언트 시크릿",
+      "scopes": "스코프",
+      "discovery_url": "디스커버리 URL",
+      "redirect_uri": "리디렉션 URI",
+      "end_session_endpoint": "세션 종료 엔드포인트",
+      "post_logout_redirect_uri": "로그아웃 후 리디렉션 URI",
+      "groups_claim": "그룹 클레임",
+      "allowed_groups": "허용된 그룹",
+      "auto_create_users": "첫 번째 OIDC 로그인 시 사용자 프로필 자동 생성",
+      "max_users": "최대 계정 수",
+      "allowed_users": "허용된 사용자",
+      "api_audience": "API JWT 대상",
+      "disable_normal_login": "사용자 이름/비밀번호 로그인 비활성화(SSO에만 해당)",
+      "disable_basic_auth": "API에 대한 HTTP 기본 인증 비활성화"
+    },
+    "hints": {
+      "provider_name": "로그인 버튼에 표시되는 표시 이름(예: Google, Azure AD, Keycloak)",
+      "issuer": "OIDC 제공업체의 발급자 URL(예: https://accounts.google.com)",
+      "credentials": "클라이언트 ID와 클라이언트 비밀번호는 .env 파일에서 관리됩니다.",
+      "scopes": "공백으로 구분한 스코프(기본값: openid profile email)",
+      "discovery_url": "자동 검색 URL 재정의(발급자에서 파생하려면 비워 두세요)",
+      "redirect_uri": "사용자 지정 리디렉션 URI(자동 생성하려면 비워 두세요)",
+      "end_session_endpoint": "RP 시작 로그아웃을 위한 IdP 로그아웃 끝점(선택 사항)",
+      "post_logout_redirect_uri": "로그아웃 후 리디렉션 위치(기본값: 로그인 페이지)",
+      "groups_claim": "사용자 그룹이 담긴 토큰 클레임 이름(기본값: groups)",
+      "allowed_groups": "허용된 그룹의 쉼표로 구분된 목록입니다. 인증된 모든 사용자를 허용하려면 비워 두세요.",
+      "auto_create_users": "그룹 기반 접근 제어를 사용할 때 권장됩니다.",
+      "max_users": "사용자 프로필 수가 이 한도에 도달하면 자동 생성이 중지되어 신규 사용자가 가입할 수 없습니다. 기존 사용자는 계속 정상적으로 로그인할 수 있습니다. 0으로 설정하면 제한하지 않습니다.",
+      "max_users_current": "현재: {{count}} 프로필.",
+      "allowed_users": "이메일이나 사용자 이름을 입력하고 Enter를 눌러 추가하세요. 인증된 모든 사용자를 허용하려면 비워 두세요.",
+      "api_audience": "OIDC Bearer JWT API 요청에 대한 감사 요청이 수락되었습니다. 클라이언트 ID를 사용하려면 비워 두세요. 여러 대상에 대해 쉼표를 사용하세요.",
+      "disable_normal_login": "활성화되면 로그인 페이지에서는 OIDC 로그인만 가능합니다.",
+      "disable_normal_login_env": "비밀번호 로그인을 비활성화하려면(SSO에만 해당) .env 파일에서 POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true를 설정합니다.",
+      "disable_normal_login_active": "(현재 활동 중)",
+      "sso_only_admin_password": ".env 파일에서 POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true를 설정하여 이 인스턴스를 SSO 전용으로 만들 수 있습니다.",
+      "sso_only_admin_password_warning": "활성화하기 전에 하나 이상의 관리자 계정에 명시적인 비밀번호가 설정되어 있는지 확인하세요(설정 > 사용자).",
+      "sso_only_admin_password_recovery": "ID 공급자를 사용할 수 없는 경우 복구란 플래그를 다시 false로 전환하고 해당 비밀번호로 로그인하는 것을 의미합니다.",
+      "disable_basic_auth": "활성화되면 HTTP 기본 인증을 통해 계정 비밀번호로 인증된 API 요청이 거부됩니다(403). 사용자가 설정에서 생성한 앱 비밀번호는 계속 작동합니다."
+    },
+    "actions": {
+      "copy_all": "모두 복사",
+      "copied": "복사되었습니다!"
+    }
+  },
+  "smtp_admin": {
+    "title": "SMTP 설정",
+    "saved": "SMTP 설정이 저장되었습니다.",
+    "enabled": "SMTP 설정이 활성화되었습니다.",
+    "disabled": "SMTP 설정이 비활성화되었습니다.",
+    "error_saving": "SMTP 설정을 저장하는 중에 오류가 발생했습니다.",
+    "error_csrf": "잘못된 양식 제출입니다. 다시 시도해 주세요.",
+    "section_delivery": "알림 이메일 전달",
+    "section_provider": "SMTP 공급자",
+    "section_links": "링크",
+    "section_test": "테스트",
+    "security_none": "없음",
+    "actions": {
+      "enable": "SMTP 활성화",
+      "disable": "SMTP 비활성화"
+    },
+    "status": {
+      "configured": "설정됨",
+      "not_configured": "설정되지 않음"
+    },
+    "fields": {
+      "enabled": "SMTP 설정 활성화",
+      "host": "SMTP 호스트",
+      "port": "포트",
+      "security": "암호화",
+      "username": "사용자 이름",
+      "password": "비밀번호",
+      "clear_password": "저장된 비밀번호 지우기",
+      "from_email": "보낸 사람 이메일",
+      "from_name": "보낸 사람 이름",
+      "app_url": "앱 URL",
+      "test_recipient": "테스트 수신자"
+    },
+    "hints": {
+      "enabled": "활성화되면 Poznote는 이 SMTP 공급자를 사용하여 이메일을 보낼 수 있습니다.",
+      "security_summary": "STARTTLS는 일반적으로 포트 587을 사용하며 연결 후 TLS로 업그레이드됩니다. SSL/TLS는 일반적으로 포트 465의 연결에서 암호화됩니다. 없음은 암호화를 사용하지 않습니다.",
+      "security_tls": "STARTTLS: 표준 연결 후 TLS(일반적으로 포트 587)로 업그레이드합니다.",
+      "security_ssl": "SSL/TLS: 연결에서 암호화되며 일반적으로 포트 465입니다.",
+      "security_none": "없음: 암호화가 없으며 로컬 릴레이 또는 신뢰할 수 있는 네트워크에만 해당됩니다.",
+      "password_configured": "비밀번호가 설정되었습니다. 보관하려면 비워두세요.",
+      "password_empty": "비밀번호가 설정되지 않았습니다.",
+      "app_url": "알림 이메일에 직접 노트 링크를 포함하는 데 사용됩니다. 이 값은 자동으로 감지됩니다. 공개 URL이 다른 경우 수정하세요.",
+      "test_recipient": "SMTP 설정을 활성화하기 전에 공급자를 확인하려면 이를 사용합니다."
+    },
+    "test": {
+      "button": "테스트 이메일 보내기",
+      "success": "SMTP 설정이 저장되었으며 관리자가 계정에 대해 설정한 이메일 주소 {{email}}로 테스트 이메일이 전송되었습니다.",
+      "error": "SMTP 설정이 저장되었지만 테스트 이메일이 실패했습니다: {{error}}",
+      "no_account_email": "계정에는 이메일 주소가 설정되어 있지 않습니다. 프로필에 추가하려면 관리자에게 문의하세요.",
+      "subject": "Poznote SMTP 테스트",
+      "body_text": "Poznote에서 보낸 테스트 이메일입니다.\n\n메일을 받았다면 SMTP 설정이 작동하는 것입니다.",
+      "body_html_intro": "Poznote에서 보낸 테스트 이메일입니다.",
+      "body_html_success": "메일을 받았다면 SMTP 설정이 작동하는 것입니다."
+    },
+    "section_notifications": "신규 사용자 알림",
+    "notifications": {
+      "description": "새 사용자 계정이 생성되면 선택한 관리자에게 이메일을 보냅니다.",
+      "no_candidates": "아직 이메일 주소가 있는 관리자가 없습니다. 알림을 활성화하려면 사용자 페이지의 관리자 프로필에 프로필을 추가하세요."
+    }
+  },
+  "webhooks_user": {
+    "title": "사용자 웹훅",
+    "card": "사용자 웹훅",
+    "card_help": "웹후크를 통해 자신의 노트(알림 실행, 노트 생성 또는 공유)에 대한 이벤트를 ntfy 또는 n8n과 같은 외부 서비스로 보냅니다.",
+    "description": "Poznote는 노트 중 하나가 구독 이벤트(알림 실행, 노트 생성 또는 공개 공유)를 트리거할 때 등록된 각 엔드포인트에 JSON 페이로드가 포함된 HTTP POST 요청을 보냅니다. 노트만이 관련됩니다. 비밀이 설정된 경우 페이로드는 X-Poznote-Signature-256 헤더의 HMAC-SHA256으로 서명됩니다.",
+    "access_denied": "접근이 거부되었습니다. 이 인스턴스에서는 사용자 웹훅이 사용 중지되었습니다.",
+    "app_url_unset": "인스턴스 URL이 설정되지 않았으므로 페이로드는 직접 노트 링크를 전달하지 않습니다(data.note.url은 null임). 관리자에게 관리자 Webhooks 페이지에서 설정하도록 요청하세요.",
+    "app_url_unset_admin": "인스턴스 URL이 설정되지 않았으므로 페이로드는 직접 노트 링크를 전달하지 않습니다(data.note.url은 null임). 관리자 Webhooks 페이지에서 설정하세요."
+  },
+  "webhooks_admin": {
+    "event_help": {
+      "user_created": "관리자, API 또는 SSO 가입을 통해 사용자 계정이 생성되었습니다. 페이로드: 사용자 프로필과 생성 경로.",
+      "user_updated": "사용자 프로필이 변경되었습니다: 사용자 이름, 이메일, 이름 또는 관리자 역할. 페이로드: 업데이트된 프로필과 변경된 필드 목록입니다.",
+      "user_activated": "이전에 비활성화된 사용자 계정이 다시 활성화되었습니다. 페이로드: 사용자 프로필.",
+      "user_deactivated": "사용자 계정이 비활성화되어 더 이상 로그인할 수 없습니다. 페이로드: 사용자 프로필.",
+      "user_deleted": "사용자 계정이 삭제되었습니다. 페이로드: 삭제 전의 프로필입니다.",
+      "signup_cap_reached": "인스턴스가 최대 사용자 수에 도달하여 SSO 가입이 거부되었습니다. 페이로드: 한도와 시도된 사용자 이름 및 이메일.",
+      "quota_notes_reached": "노트 사용 한도에 도달하여 사용자 작업이 차단되었습니다. 페이로드: 사용자, 한도 및 현재 개수.",
+      "quota_storage_reached": "저장 사용 한도에 도달하여 사용자 작업이 차단되었습니다. 페이로드: 사용자, 한도 및 현재 사용량.",
+      "reminder_due": "노트 알림 중 하나가 트리거 시간에 도달했습니다. 다른 사용자의 미리 알림은 웹훅을 트리거하지 않습니다. 전체 페이로드: 노트(id, 제목, 작업 공간, 직접 링크) 및 알림 메시지.",
+      "reminder_due_title": "reminder.due와 같은 시점에 발생하지만 알림 메시지는 제외합니다. 식별자, 노트 제목, 직접 링크를 포함합니다.",
+      "reminder_due_minimal": "reminder.due와 같은 시점에 발생하지만 식별자(노트 ID, 알림 ID, 발생 시간)만 포함합니다. 노트 본문은 인스턴스 밖으로 전송되지 않습니다. 자세한 정보는 REST API로 조회할 수 있습니다.",
+      "note_created": "인터페이스 또는 REST API를 통해 계정에 노트가 생성되었습니다. 페이로드: 메타데이터만(노트 ID, 제목, 유형, 작업 공간, 폴더, 직접 링크), 노트 내용은 절대 아닙니다.",
+      "note_shared": "노트 중 하나에 대한 공개 공유 링크가 게시되었습니다. 페이로드: 노트(id, 제목, 작업 공간, 직접 링크), 공개 토큰 및 URL, 링크가 비밀번호로 보호되는지 여부.",
+      "settings_language_changed": "사용자가 설정에서 인터페이스 언어를 변경했습니다. 페이로드: 사용자 프로필, 새 언어 코드, 이전 언어 코드, 변경 사항이 인터페이스 또는 REST API에서 발생했는지 여부."
+    },
+    "title": "웹훅",
+    "description": "Poznote는 구독된 이벤트가 발생할 때 등록된 각 엔드포인트에 JSON 페이로드가 포함된 HTTP POST 요청을 보냅니다. 비밀이 설정된 경우 페이로드는 X-Poznote-Signature-256 헤더의 HMAC-SHA256으로 서명됩니다.",
+    "section_add": "웹훅 추가",
+    "section_list": "등록된 웹훅",
+    "fields": {
+      "url": "엔드포인트 URL",
+      "secret": "시크릿(선택사항)",
+      "events": "이벤트",
+      "app_url": "인스턴스 URL",
+      "description": "설명(선택사항)"
+    },
+    "hints": {
+      "secret": "수신자가 페이로드가 이 인스턴스에서 오는지 확인할 수 있도록 페이로드에 서명하는 데 사용됩니다.",
+      "app_url_env": "현재 POZNOTE_APP_URL 환경 변수: {{url}}에서 제공됩니다. 여기에 값을 저장하면 이 값이 무시됩니다.",
+      "app_url_unset": "설정되지 않음: 현재 페이로드에 노트 링크가 없습니다(data.note.url이 null임).",
+      "description": "엔드포인트를 구분하기 위해 아래 목록에 표시됩니다. 엔드포인트로 전송되지 않았습니다."
+    },
+    "status": {
+      "none": "없음"
+    },
+    "add_button": "웹훅 추가",
+    "empty": "아직 등록된 웹훅이 없습니다.",
+    "signed": "서명됨",
+    "last_delivery": "마지막 전송: {{status}}({{date}} UTC)",
+    "test_button": "테스트 보내기",
+    "enable_button": "활성화",
+    "disable_button": "비활성화",
+    "added": "웹훅이 추가되었습니다.",
+    "added_duplicate": "웹훅이 추가되었지만 이 URL은 이미 등록되어 있습니다. 각 항목은 모든 이벤트에 대해 자체 전달을 받습니다.",
+    "deleted": "웹훅이 삭제되었습니다.",
+    "enabled": "웹훅이 활성화되었습니다.",
+    "disabled": "웹훅이 비활성화되었습니다.",
+    "test_success": "테스트가 전달되었습니다(HTTP {{status}}).",
+    "test_failure": "테스트 전달에 실패했습니다({{status}}).",
+    "error_csrf": "잘못된 양식 제출입니다. 다시 시도해 주세요.",
+    "error_invalid_url": "웹훅 URL은 http:// 또는 https://로 시작해야 합니다.",
+    "error_no_events": "이벤트를 하나 이상 선택하세요.",
+    "error_saving": "웹훅을 저장하는 중에 오류가 발생했습니다.",
+    "error_not_found": "웹훅을 찾을 수 없습니다.",
+    "section_app_url": "인스턴스 URL",
+    "app_url_description": "페이로드(data.note.url)로 전송된 직접 노트 링크를 빌드하는 데 사용되는 이 Poznote 인스턴스의 공개 URL입니다. 링크를 보내지 않으려면 비워 두세요. 이는 알림 이메일에 사용된 것과 동일한 인스턴스 URL입니다.",
+    "app_url_saved": "인스턴스 URL이 저장되었습니다.",
+    "app_url_cleared": "인스턴스 URL이 삭제되었습니다. 페이로드는 더 이상 직접 노트 링크를 전달하지 않습니다.",
+    "error_invalid_app_url": "인스턴스 URL은 http:// 또는 https://로 시작해야 합니다.",
+    "placeholders": {
+      "description": "이 웹훅의 용도"
+    },
+    "edit_button": "편집",
+    "actions_menu": "작업",
+    "updated": "웹훅이 업데이트되었습니다.",
+    "delete_confirm": "이 웹훅을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "delete_title": "웹훅 삭제"
+  },
+  "reminder": {
+    "toolbar_button": "알림 설정",
+    "notifications": "알림",
+    "no_notifications": "알림 없음",
+    "dismiss": "닫기",
+    "dismiss_all": "모두 삭제",
+    "set_success": "다음에 대한 알림이 설정되었습니다.",
+    "removed": "알림이 삭제됨",
+    "repeats": "반복",
+    "just_now": "지금 막",
+    "new_notifications": "받은",
+    "notification_s": "알림",
+    "email": {
+      "subject": "알림: {{note}}",
+      "intro": "Poznote에 설정한 알림 시간이 되었습니다.",
+      "note": "노트: {{note}}",
+      "note_label": "노트",
+      "due_at": "알림 일시: {{date}}",
+      "due_at_label": "알림 시간",
+      "message": "메시지: {{message}}",
+      "open_link": "노트 열기: {{url}}",
+      "open_button": "노트 열기",
+      "untitled_note": "제목 없는 노트"
+    },
+    "modal": {
+      "title": "알림",
+      "date_label": "날짜 및 시간",
+      "in_30min": "30분",
+      "in_1h": "1시간",
+      "in_3h": "3시간",
+      "tomorrow": "내일",
+      "in_1week": "1주",
+      "remove": "알림 삭제",
+      "email_toggle": "이메일 알림 받기",
+      "email_hint": "{{email}}로",
+      "select_date": "날짜와 시간을 선택하세요.",
+      "past_time": "미래의 시간을 선택하세요.",
+      "repeat_label": "반복",
+      "repeat_none": "반복하지 않음",
+      "repeat_hourly": "매시간",
+      "repeat_daily": "매일",
+      "repeat_weekly": "매주",
+      "repeat_monthly": "매월",
+      "repeat_yearly": "매년",
+      "repeat_custom": "사용자 지정...",
+      "repeat_hint": "알림을 닫으면 다음 알림이 예약됩니다.",
+      "repeat_every": "매",
+      "repeat_minutes": "분",
+      "repeat_hours": "시간",
+      "repeat_days": "일",
+      "repeat_weeks": "주",
+      "repeat_months": "개월",
+      "repeat_years": "년",
+      "date_placeholder": "날짜",
+      "time_placeholder": "시간",
+      "no_date_configured": "설정된 날짜가 없습니다."
+    }
+  },
+  "settings_password": {
+    "title": "설정이 보호됨",
+    "heading": "설정 접근",
+    "description": "설정 페이지에 접속하려면 비밀번호가 필요합니다.",
+    "placeholder": "설정 비밀번호를 입력하세요",
+    "unlock": "잠금 해제",
+    "error_incorrect": "비밀번호가 잘못되었습니다. 다시 시도해 주세요."
+  },
+  "account_access": {
+    "owner_only_settings": "이 계정의 소유자가 아니기 때문에 이 계정의 설정에 접근할 수 없습니다.",
+    "current_user_label": "현재 사용자",
+    "current_user_id": "ID {{id}}"
+  },
+  "note_lock": {
+    "banner": "읽기 전용: {{user}}가 현재 이 노트를 편집 중입니다.",
+    "current_user_other_tab": "읽기 전용: 다른 탭이나 기기에서 이 계정으로 노트를 편집하고 있습니다.",
+    "checking": "편집 권한 확인 중...",
+    "unavailable": "읽기 전용: 이 노트의 편집 권한을 확인할 수 없습니다.",
+    "another_user": "다른 사용자",
+    "popup_title": "주의",
+    "lost_to_other_tab": "더 이상 이 노트에 대한 편집 잠금을 보유하지 않습니다. 현재 다른 탭에서 편집 중입니다.",
+    "lost_to_user": "더 이상 이 노트에 대한 편집 잠금을 보유하지 않습니다. {{user}}가 현재 편집 중입니다.",
+    "public_visitor": "공개 공유 링크의 방문자",
+    "take_over": "편집 권한 가져오기",
+    "take_over_title": "편집 권한을 가져오시겠습니까?",
+    "take_over_confirm": "{{user}}님이 현재 이 노트를 편집하고 있습니다. 편집 권한을 가져오면 해당 사용자의 편집기는 읽기 전용으로 전환되며, 아직 저장되지 않은 변경 사항은 서버에 반영되지 않고 상대방 기기에만 남게 됩니다. 계속하시겠습니까?",
+    "take_over_failed": "이 노트의 편집 권한을 가져올 수 없습니다.",
+    "taken_over_notice": "이 노트의 편집 권한을 가져왔습니다.",
+    "lost_unsaved_kept": "저장하지 않은 변경 사항은 이 기기에 보관되며, 노트를 다시 편집할 수 있게 되면 복구할 수 있습니다."
+  },
+  "live_refresh": {
+    "note_changed": "이 노트는 이 탭 외부에서 수정되었습니다.",
+    "note_changed_unsaved": "이 노트는 여기에 저장되지 않은 변경 사항이 있는 동안 이 탭 외부에서 수정되었습니다.",
+    "note_removed": "이 노트는 삭제되었거나 이 탭 외부의 휴지통으로 이동되었습니다.",
+    "reload": "새로고침",
+    "keep_mine": "내 버전 유지",
+    "discard_confirm": "새로 고치면 이 화면에서 변경한 내용이 사라집니다. 계속하시겠습니까?",
+    "discard_title": "저장되지 않은 변경 사항을 삭제하시겠습니까?",
+    "note_refreshed": "이 탭 외부에서 변경한 내용으로 새로고침되었습니다.",
+    "note_merged": "이 탭 외부에서 변경된 내용과 병합됩니다.",
+    "note_changed_conflict": "이 노트는 여기에 저장되지 않은 변경 사항이 있는 동안 이 탭 외부에서 수정되었습니다. 두 가지 변경 사항 세트가 겹쳐서 자동으로 병합될 수 없습니다."
+  },
+  "dashboard": {
+    "title": "노트 보드",
+    "empty": "아직 즐겨찾는 노트가 없습니다. 노트를 즐겨찾기로 표시하여 이 보드에 고정하세요.",
+    "filter_placeholder": "제목, 내용 또는 태그로 필터링...",
+    "pin_note": "상단에 고정",
+    "unpin_note": "고정 해제",
+    "pin_error": "고정된 상태를 업데이트할 수 없습니다.",
+    "reorder_error": "카드 순서를 저장할 수 없습니다.",
+    "others_section": "기타",
+    "unpin": "즐겨찾기에서 제거",
+    "no_folder": "기타 노트",
+    "toggle_all": "노트 모두 표시",
+    "toggle_favorites": "즐겨찾기만 표시",
+    "view": {
+      "button": "보기",
+      "size": "카드 크기",
+      "size_small": "S - 작게",
+      "size_medium": "M - 보통",
+      "size_large": "L - 크게",
+      "size_wide": "W - 넓게",
+      "layout": "레이아웃",
+      "layout_grid": "그리드",
+      "layout_list": "목록",
+      "full_height": "내용 높이에 맞춘 카드"
+    },
+    "scope": {
+      "title": "범위",
+      "hint": "표시할 작업 공간을 선택하세요. 태그를 선택하면 해당 태그가 지정된 모든 작업 공간이 표시됩니다.",
+      "menu_item": "여러 개의 작업 공간...",
+      "all": "모든 작업 공간",
+      "by_tag": "태그별",
+      "workspaces": "작업 공간",
+      "tag_label": "태그: {{tag}}",
+      "count_label": "{{count}} 작업 공간",
+      "no_tags": "아직 작업 공간에는 태그가 없습니다.",
+      "open": "이 작업 공간만 열어보세요",
+      "load_error": "작업 공간을 로드할 수 없습니다.",
+      "no_workspaces": "사용 가능한 작업 공간 없음",
+      "empty": "이 범위에는 아직 노트가 없습니다.",
+      "no_workspace_for_tag": "\"{{tag}}\" 태그가 지정된 작업 공간이 없습니다.",
+      "group_empty": "아직 아무것도 없습니다.",
+      "manage_workspaces": "작업 공간 관리"
+    },
+    "modified": {
+      "button": "마지막 수정으로 필터링",
+      "any": "언제든지",
+      "today": "오늘",
+      "week": "지난 7일",
+      "month": "지난 30일",
+      "quarter": "지난 90일",
+      "year": "지난 12개월"
+    },
+    "tag_filter": {
+      "button": "태그로 필터링",
+      "all": "모든 태그",
+      "empty": "이 보드에는 태그가 없습니다.",
+      "search": "태그 필터링...",
+      "no_match": "일치하는 태그가 없습니다."
+    },
+    "filters": {
+      "button": "필터",
+      "color": "색상",
+      "modified": "최종 수정됨",
+      "tags": "태그",
+      "reset": "필터 재설정"
+    },
+    "note_modal": {
+      "open_editor": "편집기에서 열기",
+      "save_error": "이 노트를 저장할 수 없습니다.",
+      "load_error": "이 노트를 로드할 수 없습니다.",
+      "conflict": "이 노트는 다른 곳에서 변경되었습니다. 여기의 최근 변경 사항이 저장되지 않았습니다. 현재 버전을 보려면 페이지를 새로고침하세요.",
+      "empty_tasks": "아직 할 일이 없습니다."
+    }
+  },
+  "graph": {
+    "title": "노트 그래프",
+    "loading": "그래프 작성 중...",
+    "empty": "표시할 노트가 없습니다.",
+    "empty_hint": "노트를 [[노트 제목]]과(와) 연결하면 여기에서 연결을 확인할 수 있습니다.",
+    "show_orphans": "연결 해제된 노트",
+    "show_orphans_hint": "링크가 없는 노트 표시",
+    "show_labels": "노트 제목",
+    "show_labels_hint": "점 아래에 노트 제목 표시",
+    "show_folders": "폴더",
+    "show_folders_hint": "각 폴더를 노트에 연결된 허브로 표시",
+    "show_icons": "사용자 지정 아이콘",
+    "show_icons_hint": "점 대신 사이드바에서 선택한 아이콘을 표시합니다.",
+    "view_toggle": "보기",
+    "view_network": "네트워크",
+    "view_tree": "트리",
+    "separate_groups": "별도의 그룹",
+    "separate_groups_hint": "연결된 노트의 각 그룹을 다른 그룹과 별도로 배치합니다.",
+    "reset_layout": "레이아웃 재설정",
+    "reset_layout_hint": "저장된 위치를 잊어버리고 그래프를 자동으로 재정렬합니다.",
+    "info": "정보",
+    "help_ctrl_drag": "Ctrl + 끌기 링크와 관계없이 점 자체를 이동합니다.",
+    "help_ctrl_drag_line": "줄을 Ctrl + 드래그하면 모든 항목이 포함된 폴더가 이동됩니다.",
+    "help_scroll": "스크롤하면 보기가 위아래로 이동됩니다.",
+    "help_zoom": "Ctrl + 스크롤 확대 및 축소",
+    "folder_filter_all": "모든 폴더",
+    "folder_filter_hint": "한 폴더의 노트만 표시",
+    "folder_modal_title": "폴더를 선택하세요",
+    "folder_modal_empty": "일치하는 폴더가 없습니다.",
+    "stats": "노트 {{notes}}개 · 링크 {{links}}개",
+    "limit_notice": "전체 {{total}}개 중 최근에 수정한 노트 {{count}}개",
+    "show_all": "모두 표시",
+    "show_all_hint": "작업 공간의 모든 노트를 로드합니다.",
+    "search": {
+      "placeholder": "노트나 태그 찾기..."
+    },
+    "tooltip": {
+      "links": "링크 {{count}}개",
+      "folder_notes": "폴더 · 노트 {{count}}개"
+    }
+  },
+  "note_reference": {
+    "broken": {
+      "tooltip": "노트를 찾을 수 없습니다. 생성하려면 클릭하세요.",
+      "confirm_title": "노트 생성",
+      "confirm_message": "새로운 노트 \"{{title}}\"를 만드시겠습니까?",
+      "confirm_button": "만들기",
+      "error_creating": "노트 생성 중 오류 발생"
+    },
+    "modal": {
+      "create_button": "만들기 및 연결",
+      "recent_notes": "최근 노트",
+      "search_placeholder": "노트를 검색하세요...",
+      "all_workspaces": "작업 공간 전체 검색"
+    },
+    "untitled": "제목 없음",
+    "empty": {
+      "no_match": "검색어와 일치하는 노트가 없습니다.",
+      "no_notes_found": "노트를 찾을 수 없습니다.",
+      "no_other": "다른 노트는 사용할 수 없습니다."
+    },
+    "error": {
+      "loading_notes": "노트 불러오는 중 오류 발생"
+    },
+    "loading": "불러오는 중..."
+  },
+  "ai_settings": {
+    "title": "AI 어시스턴트",
+    "description": "Poznote를 OpenAI 호환 AI 서버(Ollama, LM Studio, OpenAI 등)에 연결하여 조수와 노트에 대해 채팅하세요.",
+    "config_title": "설정",
+    "enable_label": "AI 어시스턴트 활성화",
+    "enable_description": "노트 도구 모음에 AI 채팅 버튼을 표시합니다.",
+    "users_label": "관리자가 설정한 글로벌 AI 어시스턴트를 사용할 수 있는 사용자",
+    "users_description": "선택된 사용자에게만 이 페이지의 설정에 대한 AI 채팅 버튼이 표시됩니다. 신규 사용자는 여기에 추가할 때까지 접근할 수 없습니다.",
+    "users_filter_placeholder": "사용자 필터링",
+    "users_filter_empty": "이 필터와 일치하는 사용자가 없습니다.",
+    "users_admin": "관리자",
+    "url_label": "서버 URL",
+    "url_description": "OpenAI 호환 API의 기본 URL입니다. Docker 호스트에서 실행 중인 Ollama를 사용하려면 http://host.docker.internal:11434 를 입력하세요.",
+    "model_label": "모델",
+    "model_empty_hint": "위의 \"{{button}}\"를 클릭한 다음 하나를 선택하세요.",
+    "model_none_found": "이 서버에서 반환된 모델이 없습니다.",
+    "api_key_label": "API 키(선택사항)",
+    "api_key_description": "로컬 Ollama 서버의 경우 비워 두세요. 클라우드 공급자에게 필요합니다.",
+    "save": "설정 저장",
+    "test": "접근 확인 및 모델 나열",
+    "testing": "연결 테스트 중...",
+    "test_success": "연결에 성공했습니다. {{count}} 모델을 사용할 수 있습니다. 아래 모델을 클릭하고 저장하세요.",
+    "test_failure": "연결 실패: {{error}}",
+    "footer_note": "AI 서버는 브라우저가 아닌 Poznote 서버에서 호출됩니다. 채팅 대화는 설정한 서버로 전송됩니다. 로컬 Ollama 인스턴스를 사용하면 해당 컴퓨터 외부로 데이터가 전송되지 않습니다.",
+    "messages": {
+      "saved": "설정이 저장되었습니다.",
+      "save_error": "설정을 저장하지 못했습니다."
+    },
+    "provider_label": "AI 제공업체",
+    "provider_custom": "기타(사용자 지정 URL)",
+    "api_key_label_required": "API 키",
+    "user_keys_label": "개인 API 키 허용",
+    "user_keys_description": "모든 사용자는 자신의 설정에서 AI 보조 카드를 받게 되며, 여기에서 자신의 공급자와 API 키를 입력할 수 있습니다. 사용자가 그렇게 하면 어시스턴트는 해당 사용자가 위 목록에 나타나는지 여부에 관계없이 이 페이지의 설정을 통하지 않고 해당 사용자의 자체 서버 및 키를 통해 응답합니다.",
+    "reasoning_effort_label": "추론 수준",
+    "reasoning_effort_description": "지원하는 모델의 경우 모델이 응답하기 전에 생각하는 시간입니다. 자동은 아무것도 보내지 않으며 선택권은 공급자에게 맡깁니다. 일부 OpenAI 모델은 도구를 거부하므로 없음으로 설정되지 않으면 노트를 탐색할 수 없습니다.",
+    "reasoning_effort_options": {
+      "auto": "자동(공급자 기본값)",
+      "none": "없음",
+      "minimal": "최소",
+      "low": "낮음",
+      "medium": "중간",
+      "high": "높음",
+      "xhigh": "매우 높음(xhigh)"
+    }
+  },
+  "ai_settings_user": {
+    "title": "내 AI 어시스턴트",
+    "card": "내 AI 어시스턴트",
+    "card_help": "자체 공급자 및 API 키와 함께 AI 어시스턴트를 사용하세요.",
+    "description": "개인 API 키로 AI 어시스턴트를 OpenAI 호환 서버(Ollama, LM Studio, OpenAI, Anthropic 등)에 연결합니다. 개인 설정을 사용하면 관리자의 설정 대신 적용됩니다.",
+    "disabled_notice": "관리자가 이 인스턴스에 개인 API 키를 허용하지 않았습니다.",
+    "using_instance": "어시스턴트는 현재 관리자가 설정한 설정을 통해 응답합니다. API 키를 대신 사용하려면 아래에서 자체 설정을 활성화하세요.",
+    "enable_label": "내 설정 사용",
+    "enable_description": "AI 채팅 버튼은 인스턴스 키 대신 아래의 서버 및 API 키를 사용합니다.",
+    "messages": {
+      "incomplete": "자신의 어시스턴트를 활성화하기 전에 서버 URL과 모델을 입력하세요."
+    }
+  },
+  "ai_chat": {
+    "title": "AI 어시스턴트",
+    "toolbar_button": "AI 어시스턴트",
+    "empty": "질문을 입력하세요.\nAI 어시스턴트는 노트를 검색하고 읽거나, 생성·편집·정리·삭제할 수 있습니다.",
+    "empty_open_note": "열려 있는 항목에 대해 \"이 노트\"라고 말하세요.",
+    "placeholder": "AI 어시스턴트에게 질문하세요...",
+    "send": "보내기",
+    "stop": "중지",
+    "clear": "대화 지우기",
+    "error": "오류: {{error}}",
+    "tool_search": "노트 검색 중: {{query}}",
+    "tool_read": "노트 #{{id}} 읽는 중",
+    "tool_list": "최근 노트 나열",
+    "no_tools_notice": "이 모델은 도구를 지원하지 않습니다. 어시스턴트는 노트를 탐색할 수 없습니다.",
+    "no_tools_reasoning_notice": "이 모델은 현재 추론 수준에서 도구를 거부하므로 어시스턴트가 노트를 탐색할 수 없습니다. AI 어시스턴트 설정에서 추론 수준을 없음으로 설정하세요.",
+    "unreachable": "{{attempts}} 시도 후 AI 서버에 연결할 수 없습니다: {{error}}",
+    "retrying": "AI 서버 연결에 실패하여 재시도 중입니다({{attempt}}/{{max}}).",
+    "retry": "다시 시도",
+    "tool_rename": "노트 #{{id}}의 이름을 \"{{title}}\"로 변경",
+    "tool_update": "노트 #{{id}} 편집 중",
+    "tool_create": "노트 생성: {{title}}",
+    "context_label": "노트:",
+    "model_label": "모델:",
+    "model_hint": "AI 어시스턴트 설정 열기",
+    "back_to_assistant": "AI 어시스턴트로 돌아가기",
+    "context_hint": "\"이 노트\"라고 말할 때 어시스턴트가 사용하는 노트입니다.",
+    "workspace_label": "작업 공간:",
+    "tool_tags": "노트 #{{id}}의 태그 업데이트",
+    "tool_list_tags": "태그 목록",
+    "tool_list_folders": "폴더 나열",
+    "tool_create_folder": "폴더 생성 중: {{path}}",
+    "tool_rename_folder": "폴더 이름을 \"{{folder}}\"에서 \"{{name}}\"로 변경",
+    "tool_move": "노트 #{{id}}를 {{folder}}로 이동",
+    "tool_move_root": "노트 #{{id}}를 해당 폴더 밖으로 이동",
+    "tool_favorite_on": "즐겨찾기에 노트 #{{id}} 추가",
+    "tool_favorite_off": "즐겨찾기에서 노트 #{{id}} 제거",
+    "tool_folder_favorite": "\"{{folder}}\" 폴더의 즐겨찾기 상태 업데이트 중",
+    "tool_reminder": "노트 #{{id}}에서 알림 설정",
+    "tool_reminder_remove": "노트 #{{id}} 알림 제거 중",
+    "tool_task_add": "할 일 추가: {{text}}",
+    "tool_task_update": "할 일 ‘{{task}}’ 업데이트 중",
+    "tool_task_delete": "할 일 ‘{{task}}’ 삭제 중",
+    "tool_subtask_add": "하위 할 일 추가: {{text}}",
+    "tool_subtask_update": "하위 할 일 ‘{{subtask}}’ 업데이트 중",
+    "tool_subtask_delete": "하위 할 일 ‘{{subtask}}’ 삭제 중",
+    "tool_checklist": "노트 #{{id}} 확인란 업데이트",
+    "tool_delete": "노트 #{{id}}를 휴지통으로 이동",
+    "tool_delete_folder": "폴더 \"{{folder}}\" 및 해당 노트를 휴지통으로 이동",
+    "scope_modal_title": "한 번에 하나의 작업 공간",
+    "scope_modal_text": "어시스턴트는 한 번에 여러 작업 공간에 대해 작업을 수행할 수 없습니다. 여기서는 작업 공간 \"{{workspace}}\"의 노트만 검색하고 읽고 변경합니다.",
+    "scope_modal_continue": "계속"
+  },
+  "stt_settings": {
+    "title": "음성 텍스트 변환",
+    "config_title": "설정",
+    "description": "음성을 노트 텍스트로 변환할 수 있도록 Poznote를 음성 텍스트 변환(STT) 서버에 연결하세요. 자체 호스팅 Whisper 서버 등 OpenAI 오디오 API와 호환되는 서버를 사용할 수 있습니다. 녹음 파일은 설정한 변환 서버로 전송되므로 해당 서버의 개인정보 처리 방침을 확인하세요.",
+    "enable_label": "음성 텍스트 변환 활성화",
+    "enable_description": "모든 노트의 슬래시 메뉴에 있는 삽입 아래에 있는 오디오 녹음 대화 상자에 녹음 버튼을 추가하고 오디오 첨부 파일에 녹음 작업을 추가합니다.",
+    "users_label": "관리자가 설정한 음성 텍스트 변환 서버를 사용하도록 허용된 사용자",
+    "users_description": "선택한 사용자만 이 페이지의 설정으로 음성을 녹음하고 텍스트로 변환할 수 있습니다. 신규 사용자는 여기에 추가해야 사용할 수 있습니다.",
+    "users_filter_placeholder": "사용자 필터링",
+    "provider_label": "음성 텍스트 변환 서버",
+    "url_description": "POST /v1/audio/transcriptions를 제공하는 서버의 기본 URL입니다. Docker 호스트에서 실행 중인 컨테이너를 사용하려면 http://host.docker.internal:8000 을 입력하세요.",
+    "api_key_description": "아무것도 요구하지 않는 로컬 서버의 경우 비워 두세요. OpenAI에 필요합니다.",
+    "model_description": "Systran/faster-whisper-small 같은 Whisper 모델입니다. 위의 연결 확인 버튼으로 서버가 제공하는 모델 목록을 확인할 수 있습니다. whisper.cpp는 실행 시 지정한 단일 모델을 사용하므로 이 설정을 무시하지만, 값은 입력해야 합니다.",
+    "model_none_found": "이 서버에는 모델이 나열되지 않습니다. 모델 이름을 알고 있는 경우 아래 필드에 입력하거나 서버 설명서를 확인하세요.",
+    "language_label": "음성 언어",
+    "language_description": "en, fr 또는 de와 같은 두 글자 코드입니다. 서버가 언어를 감지할 수 있도록 비워두세요. 이는 Whisper가 잘 수행하는 기능입니다. 항상 같은 문장으로 받아쓰기를 하면 짧은 문장이 다른 문장으로 오인될 때 설정하세요.",
+    "user_keys_label": "개인 음성 텍스트 변환 서버 허용",
+    "user_keys_description": "모든 사용자는 자신의 설정에서 자신의 서버와 API 키를 입력할 수 있는 음성 텍스트 변환 카드를 받습니다. 사용자가 그렇게 하면 해당 사용자가 위 목록에 표시되는지 여부에 관계없이 해당 오디오가 이 페이지의 서버가 아닌 해당 서버로 이동됩니다.",
+    "footer_note": "녹음 파일은 브라우저에서 변환 서버로 직접 전송되지 않고, Poznote 서버에 업로드된 뒤 변환 서버로 전달됩니다. Poznote는 사본을 보관하지 않습니다. 사용자가 녹음 파일을 노트에 첨부하도록 선택한 경우를 제외하면, 변환 결과를 받은 뒤 오디오를 삭제합니다.",
+    "messages": {
+      "saved": "설정이 저장되었습니다.",
+      "save_error": "설정을 저장하지 못했습니다."
+    },
+    "max_duration_label": "최대 녹음 길이",
+    "max_duration_description": "분 단위로 1부터 {{limit}}까지. 오디오 녹음은 해당 위치에 도달하면 저절로 중지되므로 탭 왼쪽 녹음에서는 한 시간 분량의 오디오를 보낼 수 없습니다. 대화 상자에는 이 제한에 대한 경과 시간이 표시됩니다. 기존 첨부 파일을 복사하는 데는 영향을 미치지 않습니다."
+  },
+  "stt_settings_user": {
+    "title": "내 음성 텍스트 변환 서버",
+    "card": "내 음성 텍스트 변환 서버",
+    "card_help": "녹음한 음성을 개인 음성 텍스트 변환 서버로 전송합니다.",
+    "description": "개인 API 키로 녹음 파일을 개인 음성 텍스트 변환 서버에 전송합니다. 개인 설정을 사용하면 관리자의 설정 대신 적용됩니다.",
+    "disabled_notice": "관리자가 이 인스턴스에서 개인 음성 텍스트 변환 서버의 사용을 허용하지 않았습니다.",
+    "using_instance": "현재 음성 텍스트 변환은 관리자가 설정한 서버를 통해 진행됩니다. 대신 자신의 설정을 사용하려면 아래에서 고유한 설정을 활성화하세요.",
+    "enable_label": "내 자체 서버 사용",
+    "enable_description": "받아쓰기 및 첨부 파일 음성 텍스트 변환은 인스턴스 키 대신 아래 서버 및 API 키를 사용합니다.",
+    "messages": {
+      "incomplete": "자체 음성 텍스트 변환 서버를 활성화하기 전에 서버 URL과 모델을 입력하세요."
+    }
+  },
+  "stt": {
+    "modal": {
+      "transcribing": "음성을 텍스트로 변환 중...",
+      "transcribing_file": "{{file}}의 음성을 텍스트로 변환 중...",
+      "review_label": "음성 텍스트 변환",
+      "keep_audio": "또한 이 노트에 녹음 파일을 첨부하세요.",
+      "insert": "삽입"
+    },
+    "attachment": {
+      "transcribe": "음성 텍스트 변환",
+      "transcribe_into_note": "노트로 음성 텍스트 변환"
+    },
+    "errors": {
+      "unsupported": "이 브라우저는 오디오를 녹음할 수 없습니다.",
+      "insecure_context": "마이크에는 HTTPS가 필요합니다. https 또는 localhost를 통해 Poznote를 엽니다.",
+      "permission_denied": "Poznote는 마이크를 사용할 수 없습니다.",
+      "no_microphone": "마이크를 찾을 수 없습니다.",
+      "microphone_failed": "마이크를 열 수 없습니다.",
+      "empty_recording": "아무것도 녹음되지 않았습니다.",
+      "nothing_heard": "서버는 이 녹음에서 아무 소리도 듣지 못했습니다.",
+      "no_note": "먼저 노트를 엽니다. 텍스트를 넣을 곳이 없습니다.",
+      "failed": "음성 텍스트 변환 실패: {{error}}",
+      "attach_failed": "텍스트를 삽입했지만 녹음을 첨부할 수 없습니다: {{error}}",
+      "note_locked": "이 노트는 지금 여기에서 편집할 수 없으므로 텍스트가 삽입되지 않았습니다. 위 상자에서 복사하세요."
+    },
+    "server_errors": {
+      "no_server": "설정된 음성 텍스트 변환 서버가 없습니다.",
+      "empty_result": "서버에서 음성 텍스트 변환 결과를 반환하지 않았습니다",
+      "admin_required": "관리자 권한이 필요합니다",
+      "no_url": "서버 URL이 설정되지 않았습니다.",
+      "unknown_action": "알 수 없는 작업",
+      "not_configured": "이 계정에는 음성 텍스트 변환이 설정되지 않았습니다.",
+      "post_required": "POST 필요",
+      "too_large_for_server": "녹음 파일이 너무 커서 이 서버에서 받아들일 수 없습니다.",
+      "no_audio": "오디오가 수신되지 않았습니다.",
+      "empty_recording": "녹음 내용이 비어 있습니다.",
+      "too_large": "녹음 파일이 너무 큽니다.",
+      "not_audio_file": "해당 파일은 Poznote가 음성 텍스트 변환을 위해 보낼 수 있는 오디오가 아닙니다.",
+      "ids_required": "노트 ID 및 첨부 파일 ID가 필요합니다.",
+      "note_read_failed": "노트를 읽을 수 없습니다.",
+      "note_not_found": "노트를 찾을 수 없습니다",
+      "attachment_not_found": "첨부 파일을 찾을 수 없습니다",
+      "attachment_not_audio": "해당 첨부 파일은 오디오 파일이 아닙니다",
+      "attachment_missing": "첨부 파일이 저장소에 없습니다",
+      "attachment_too_large": "녹음 내용이 너무 커서 텍스트로 변환할 수 없습니다.",
+      "timeout": "음성 텍스트 변환 서버가 {{seconds}}초 내에 응답하지 않았습니다. 더 짧은 녹음이나 더 작은 모델을 사용해 보세요."
+    }
+  },
+  "audio_recorder": {
+    "title": "오디오 녹음",
+    "hint_ready": "녹음을 시작하려면 시작을 누르세요. {{minutes}}분 이후에는 자체적으로 중지됩니다.",
+    "hint": "녹음. 노트에 오디오를 삽입하려면 중지하세요. {{minutes}}분 이후에는 자체적으로 중지됩니다.",
+    "hint_choice": "녹음. 노트에 오디오를 삽입하거나 텍스트로 변환하려면 중지하세요. {{minutes}}분 이후에는 자체적으로 중지됩니다.",
+    "start": "시작",
+    "stop": "중지 후 삽입",
+    "insert_audio": "오디오 삽입",
+    "transcribe": "음성 텍스트 변환",
+    "transcribe_note": "복사한 후에는 노트에 텍스트를 삽입하고 오디오를 첨부할 수도 있습니다.",
+    "language_auto": "자동으로 감지",
+    "language_default": "{{language}}(기본값)",
+    "saving": "녹음 저장 중...",
+    "max_duration": "최대 녹음 길이에 도달했습니다. 녹음된 내용을 삽입합니다.",
+    "max_duration_choice": "최대 녹음 길이에 도달했습니다. 녹음으로 무엇을 할지 선택하세요.",
+    "upload_failed": "녹음을 저장할 수 없습니다: {{error}}",
+    "download": "녹음 다운로드",
+    "no_note": "먼저 노트를 엽니다. 녹음은 해당 노트의 첨부 파일로 저장됩니다."
+  },
+  "diary": {
+    "title": "일기",
+    "today_button_go": "오늘의 항목으로 이동",
+    "today_button_create": "오늘의 항목 만들기",
+    "today_badge": "오늘",
+    "empty": "아직 일기 항목이 없습니다. 첫 번째 항목을 작성하려면 \"오늘의 항목 만들기\"를 클릭하세요. {{folder}}에 저장됩니다.",
+    "create_error": "일기 항목을 생성할 수 없습니다.",
+    "create_card_title": "일기 항목",
+    "folder_name": "일기",
+    "new_button": "새로운 일기",
+    "new_modal_title": "새로운 일기 생성",
+    "new_name_placeholder": "일기 이름",
+    "new_create_error": "일기를 생성할 수 없습니다.",
+    "journal_view": "일지 보기",
+    "journal_edit": "여기에서 편집하세요",
+    "journal_edit_done": "편집 완료",
+    "journal_edit_placeholder": "여기에 쓰세요...",
+    "journal_saving": "저장 중...",
+    "journal_saved": "저장됨",
+    "journal_save_error": "이 항목을 저장할 수 없습니다.",
+    "journal_conflict": "이 항목은 다른 곳에서 변경되었습니다. 여기의 최근 변경 사항이 저장되지 않았습니다. 현재 버전을 보려면 페이지를 새로고침하세요.",
+    "journal_empty_entry": "이 항목은 비어 있습니다.",
+    "journal_load_error": "이 항목을 로드할 수 없습니다.",
+    "delete_title": "일기 삭제",
+    "delete_confirm": "일기 \"{{name}}\"을 삭제하시겠습니까? 해당 폴더가 제거되고 모든 항목이 휴지통으로 이동됩니다.",
+    "delete_error": "일기를 삭제할 수 없습니다.",
+    "rename_title": "일기 이름 바꾸기",
+    "rename_error": "일기의 이름을 바꿀 수 없습니다."
+  },
+  "new_user_email": {
+    "subject": "새로운 Poznote 사용자: {{user}}",
+    "heading": "신규 사용자",
+    "intro": "Poznote에 새로운 사용자 계정이 생성되었습니다.",
+    "username_label": "사용자 이름",
+    "email_label": "이메일",
+    "source_label": "다음을 통해 생성됨",
+    "created_label": "생성 날짜",
+    "source_oidc": "싱글 사인온(OIDC)",
+    "source_other": "관리자 도구",
+    "no_email": "제공되지 않음",
+    "manage_link": "사용자 관리: {{url}}",
+    "manage_button": "사용자 관리",
+    "footer": "관리자 계정에 신규 사용자 알림이 활성화되어 있기 때문에 이 이메일을 받게 됩니다."
+  },
+  "workspace_activity_email": {
+    "subject_one": "공유 작업 공간 {{workspace}}의 변경 사항",
+    "subject_many": "{{count}} 공유 작업 공간의 변경 사항",
+    "heading": "공유 작업 공간 활동",
+    "intro": "{{date}} 이후 다른 사람이 변경한 내용입니다.",
+    "shared_by": "{{user}}가 공유함",
+    "shared_by_you": "내가 공유함",
+    "created_by": "작성자: {{user}}",
+    "edited_by": "수정자: {{user}}",
+    "deleted_by": "삭제자: {{user}}",
+    "untitled_note": "제목 없는 노트",
+    "more": "외 {{count}}개",
+    "footer": "Poznote 설정에서 공유 작업 공간 이메일이 켜져 있기 때문에 이 이메일을 받으셨습니다.",
+    "settings_link": "설정 열기"
+  },
+  "autosave": {
+    "notification": {
+      "saving": "변경 사항 저장 중...",
+      "saved": "저장되었습니다!"
+    },
+    "draft": {
+      "found_conflict": "이 노트에는 마지막 방문에서 저장되지 않은 변경 사항이 있지만 그 이후 다른 곳에서도 변경되었습니다. 유지하지 않는 버전은 노트 기록에 남습니다.",
+      "found_error": "이 노트에는 마지막 방문에서 저장되지 않은 변경 사항이 있습니다. 아직 저장할 수 없습니다.",
+      "restore": "저장되지 않은 변경 사항 유지",
+      "discard": "현재 버전을 유지하세요",
+      "restore_failed": "변경 사항을 저장할 수 없습니다. 연결을 확인하고 다시 시도하세요."
+    },
+    "beforeunload_warning": "⚠️ 저장되지 않은 변경 사항이 있습니다. 정말 떠나시겠어요?",
+    "unsaved_changes_title": "저장되지 않은 변경 사항",
+    "unsaved_changes_warning": "⚠️ 저장되지 않은 변경 사항이 있습니다. 정말 떠나시겠어요?"
+  },
+  "tasks_page": {
+    "title": "할 일",
+    "progress": "{{total}} 할 일 중 {{completed}} 할 일 완료",
+    "filter_all": "모두",
+    "filter_open": "해야 할 일",
+    "filter_important": "중요",
+    "filter_overdue": "기한 지남",
+    "filter_dated": "마감일 있음",
+    "filter_completed": "완료됨",
+    "filters": "필터",
+    "filter_placeholder": "할 일, 제목 또는 폴더 이름으로 필터링...",
+    "empty": "아직 할 일이 없습니다. 시작하려면 할 일 목록 노트를 생성하거나 노트에 체크리스트를 추가하세요.",
+    "empty_filtered": "이 필터와 일치하는 할 일이 없습니다.",
+    "note_badge": "노트",
+    "note_badge_title": "노트의 체크리스트 항목",
+    "show_note_checklists": "노트의 할 일 표시",
+    "collapse": "접기",
+    "expand": "펼치기",
+    "collapse_all": "모두 접기",
+    "expand_all": "모두 펼치기",
+    "view_list": "목록 보기",
+    "view_calendar": "달력 보기",
+    "calendar_no_tasks": "이 날짜에 할 일이 없습니다.",
+    "hide_list": "이 페이지에서 숨기기",
+    "unhide_list": "이 페이지에 다시 표시",
+    "show_hidden": "숨겨진 목록 표시",
+    "empty_hidden": "모든 목록이 숨겨져 있습니다."
+  },
+  "s3_settings": {
+    "title": "S3 첨부 파일 저장소",
+    "description": "로컬 디스크 대신 S3 호환 개체 저장소에 노트 첨부 파일을 저장합니다.",
+    "description_benefit": "첨부 파일이 많거나 큰 경우 특히 유용합니다. 서버 디스크는 가볍게 유지되고 전체 백업 zip은 S3 첨부 파일을 건너뛸 수 있습니다. 모든 것이 로컬 디스크에 남아 있으면 내보내기가 매우 무거워지거나 느려지거나 시간 초과로 인해 실패할 수도 있습니다.",
+    "description_scope": "설정은 이 인스턴스의 모든 사용자에게 적용됩니다.",
+    "attachments_only_note": "첨부 파일만 관련됩니다.",
+    "config_title": "설정",
+    "enable_label": "S3에 첨부 파일 저장",
+    "enable_description": "새 첨부 파일이 기록되는 위치만 결정합니다. 기존 파일은 디스크나 버킷 등 어디에 있든 계속 작동합니다. 아래 마이그레이션을 사용하여 이동하세요.",
+    "endpoint_label": "엔드포인트 URL",
+    "endpoint_description": "S3 API의 기본 URL입니다. 예: https://s3.amazonaws.com, http://minio:9000, https://<account>.r2.cloudflarestorage.com",
+    "region_label": "지역",
+    "region_description": "MinIO/Garage 및 지역을 무시하는 공급자의 경우 \"us-east-1\"을 그대로 둡니다.",
+    "bucket_label": "버킷",
+    "access_key_label": "접근 키",
+    "secret_key_label": "비밀 키",
+    "path_style_label": "경로 방식 주소 지정",
+    "path_style_description": "MinIO, Garage 및 대부분의 자체 호스팅 서버에 대해 활성화된 상태를 유지하세요. 공급자가 가상 ​​호스트 스타일(bucket.endpoint)을 요구하는 경우에만 비활성화합니다.",
+    "test": "테스트 연결",
+    "save": "설정 저장",
+    "testing": "연결 테스트 중...",
+    "test_success": "연결에 성공했습니다. 버킷에 연결할 수 있습니다.",
+    "test_failure": "연결 실패: {{error}}",
+    "migration_title": "마이그레이션",
+    "migration_description": "인스턴스의 모든 사용자에 대해 로컬 디스크와 버킷 간에 기존 첨부 파일을 이동합니다. 마이그레이션은 일괄적으로 실행되며 안전하게 중단 및 재개될 수 있습니다. 위의 스위치와 이 마이그레이션은 독립적입니다. 파일은 양쪽에서 제공되므로 어느 순서로든 실행할 수 있습니다.",
+    "status_local": "로컬 디스크에서",
+    "status_remote": "양동이에",
+    "status_unavailable": "이용할 수 없음",
+    "files_unit": "{{count}} 파일, {{size}}",
+    "migrate_to_s3": "로컬 파일을 S3로 마이그레이션",
+    "migrate_to_local": "파일을 로컬 디스크로 다시 가져오기",
+    "migrating": "마이그레이션 중... {{moved}} 파일이 이동되었으며 {{remaining}}가 남음",
+    "migration_done": "마이그레이션 완료: {{moved}} 파일이 이동되었습니다.",
+    "migration_error": "오류 후 마이그레이션이 중지되었습니다: {{error}}",
+    "confirm_to_s3": "모든 로컬 첨부 파일(모든 사용자)을 버킷으로 이동하시겠습니까?",
+    "confirm_to_local": "모든 버킷 첨부 파일을 로컬 디스크에 다시 다운로드하시겠습니까(모든 사용자)?",
+    "footer_note": "첨부 파일은 버킷의 attachments/{user id}/ 아래에 저장되며 항상 Poznote를 통해 제공됩니다(버킷은 비공개로 유지될 수 있음).",
+    "messages": {
+      "saved": "설정이 저장되었습니다.",
+      "save_error": "설정을 저장하지 못했습니다.",
+      "incomplete": "S3 저장소를 활성화하려면 엔드포인트, 버킷 및 자격 증명이 필요합니다.",
+      "disabled_files_remaining": "이제 S3 저장소가 비활성화되었지만 {{count}} 첨부 파일은 여전히 버킷에 있습니다. 위의 자격 증명이 계속 설정되어 있는 한 계속 제공됩니다. 아래 마이그레이션을 사용하여 로컬 디스크로 다시 가져오세요.",
+      "disabled_files_remaining_many": "이제 S3 저장소가 비활성화되었지만 첨부 파일은 여전히 버킷에 있습니다. 위의 자격 증명이 계속 설정되어 있는 한 계속 제공됩니다. 아래 마이그레이션을 사용하여 로컬 디스크로 다시 가져오세요.",
+      "disabled_bucket_unreachable": "이제 S3 저장소가 비활성화되었지만 버킷에 남은 파일이 있는지 확인할 수 없습니다. 첨부 파일이 여전히 거기에 저장되어 있는 경우 계속 제공되도록 자격 증명을 설정한 상태로 유지하고 버킷에 다시 연결할 수 있게 되면 로컬 디스크로 다시 마이그레이션하세요.",
+      "cleared_files_remaining": "S3 자격 증명이 지워졌지만 첨부 파일은 여전히 버킷에 있습니다. Poznote는 더 이상 도달할 수 없으므로 이를 사용하는 노트는 깨진 이미지를 표시합니다. 자격 증명을 다시 넣고 아래 마이그레이션을 사용하여 파일을 먼저 로컬 디스크로 가져옵니다."
+    },
+    "git_sync_note": "Git 동기화는 S3 저장소가 활성화된 동안 첨부 파일을 무시합니다."
+  },
+  "s3_backup": {
+    "title": "S3 백업",
+    "description": "전체 백업 아카이브(사용자당 하나의 ZIP, 전체 백업 다운로드와 동일)를 일정에 따라 수동 또는 자동으로 S3 호환 버킷에 업로드합니다.",
+    "description_scope": "설정은 이 인스턴스의 모든 사용자에게 적용되며, S3 첨부 파일 저장소 설정과는 별개입니다.",
+    "config_title": "설정",
+    "enable_label": "자동 백업",
+    "enable_description": "아래 일정에 따라 선택한 사용자를 버킷에 백업합니다. 이 페이지의 수동 백업은 이 스위치가 꺼진 상태에서도 연결이 설정되는 즉시 작동됩니다.",
+    "frequency_label": "빈도",
+    "frequency_daily": "매일",
+    "frequency_weekly": "매주",
+    "frequency_monthly": "월간(30일마다)",
+    "frequency_daily_inline": "매일",
+    "frequency_weekly_inline": "매주",
+    "frequency_monthly_inline": "30일마다",
+    "frequency_description": "첫 번째 자동 백업은 활성화 후 몇 분 내에 실행되고, 다음 자동 백업은 선택한 간격 이후에 실행됩니다.",
+    "retention_label": "사용자별로 보관할 백업",
+    "retention_description": "백업할 때마다 보관 개수 제한을 초과한 오래된 백업 파일을 버킷에서 삭제합니다. 0으로 설정하면 모든 백업을 보관합니다.",
+    "skip_s3_label": "S3에 이미 저장된 첨부 파일 건너뛰기",
+    "skip_s3_description": "첨부 파일이 S3 버킷(S3 저장소 기능)에 있는 경우 백업할 때마다 다운로드하는 대신 아카이브에서 제외하세요. 로컬 디스크의 첨부 파일은 항상 포함됩니다.",
+    "manual_title": "수동 백업",
+    "manual_description": "지금 바로 선택한 사용자를 한 번에 한 명씩 버킷에 백업하세요.",
+    "manual_retention_warning": "수동 백업과 예약 백업 모두 동일한 보관 개수 한도에 합산됩니다. 따라서 새 수동 백업 생성 시 오래된 예약 백업이 삭제될 수 있으며, 그 반대도 마찬가지입니다. 백업을 영구 보관하려면 로컬로 다운로드하세요.",
+    "run_now": "지금 백업",
+    "confirm_run": "선택한 사용자를 지금 버킷에 백업하시겠습니까?",
+    "running": "{{username}} 백업 중... ({{done}}/{{total}})",
+    "run_done": "백업 완료: 사용자 {{total}}명 중 {{uploaded}}명의 백업을 업로드했습니다.",
+    "run_error": "오류 후 백업이 중지되었습니다: {{error}}",
+    "user_ok": "{{username}}: 업로드됨 ({{size}})",
+    "user_fail": "{{username}}: 실패함 ({{error}})",
+    "not_configured": "먼저 버킷 연결을 설정하고 저장하세요.",
+    "last_run": "마지막 실행({{trigger}}): {{date}}, 사용자 {{total}}명 중 {{uploaded}}명의 백업을 업로드했습니다.",
+    "trigger_auto": "자동",
+    "trigger_manual": "수동",
+    "list_title": "버킷의 백업",
+    "list_empty": "아직 버킷에 백업이 없습니다.",
+    "list_error": "버킷을 나열할 수 없습니다: {{error}}",
+    "list_loading": "불러오는 중...",
+    "list_filter_placeholder": "사용자 또는 아카이브 이름으로 필터링...",
+    "list_count": "{{total}} 백업",
+    "list_count_filtered": "{{total}} 백업 중 {{shown}} 표시됨",
+    "list_no_match": "이 필터와 일치하는 백업이 없습니다.",
+    "col_user": "사용자",
+    "col_archive": "백업 파일",
+    "col_date": "날짜",
+    "col_size": "크기",
+    "download": "다운로드",
+    "delete": "삭제",
+    "confirm_delete": "버킷에서 백업 {{filename}}를 삭제하시겠습니까?",
+    "footer_note": "아카이브는 버킷의 backups/{user id}/ 아래에 저장되며 표준 \"복원/가져오기\" 페이지를 통해 복원할 수 있습니다.",
+    "messages": {
+      "incomplete": "자동 백업을 활성화하려면 엔드포인트, 버킷 및 자격 증명이 필요합니다.",
+      "saved": "설정이 저장되었습니다.",
+      "save_error": "설정을 저장하지 못했습니다.",
+      "no_user_selected": "백업할 사용자를 한 명 이상 선택하세요."
+    },
+    "users_label": "백업할 사용자",
+    "master_label": "S3 백업 활성화",
+    "master_description": "마스터 스위치. 비활성화되면 자동 백업이 중지되고 모든 사용자에 대해 S3 백업 및 복원 섹션이 사라집니다.",
+    "users_filter_placeholder": "이름, 사용자 이름, 이메일로 필터링하세요...",
+    "users_filter_clear": "필터 지우기",
+    "users_select_all": "모두 선택",
+    "users_select_none": "모두 선택 취소",
+    "users_no_match": "이 필터와 일치하는 사용자가 없습니다.",
+    "users_badge_admin": "관리자",
+    "users_badge_inactive": "비활성",
+    "users_count": "{{total}} 사용자 중 {{selected}}가 선택됨",
+    "users_count_filtered": "{{total}} 사용자 중 {{selected}}가 선택됨, {{shown}}가 표시됨"
+  },
+  "tasklist_embed": {
+    "unavailable": "이 할 일 목록은 더 이상 사용할 수 없습니다.",
+    "empty": "이 목록에는 아직 할 일이 없습니다.",
+    "add_placeholder": "할 일 추가...",
+    "save_error": "할 일 목록을 저장할 수 없습니다."
+  },
+  "trash": {
+    "count_one": "휴지통에 1 노트",
+    "count_other": "휴지통의 {{count}} 노트",
+    "note": {
+      "show_more": "더 보기",
+      "show_less": "간략히 보기",
+      "deleted_on": "{{date}}에서 삭제됨",
+      "created_on": "{{date}}에서 생성됨",
+      "last_modified_on": "{{date}}에 마지막으로 수정됨"
+    },
+    "sort": {
+      "label": "노트 정렬",
+      "deleted": "삭제일",
+      "created": "생성일"
+    },
+    "showing_limit_deleted": "최근에 삭제한 노트 {{count}}개만 표시됩니다",
+    "showing_limit_created": "최근에 만든 노트 {{count}}개만 표시됩니다",
+    "actions": {
+      "delete_forever": "영구 삭제",
+      "delete_permanently_tooltip": "영구 삭제",
+      "empty_trash": "휴지통 비우기",
+      "restore": "복원",
+      "restore_note_tooltip": "이 노트 복원"
+    },
+    "alerts": {
+      "delete_error_generic": "노트를 영구 삭제하는 중 오류가 발생했습니다",
+      "delete_error_prefix": "영구 삭제 중 오류: ",
+      "delete_error_title": "삭제 오류",
+      "empty_error_generic": "휴지통을 비우는 중 오류가 발생했습니다",
+      "empty_error_prefix": "휴지통 비우기 오류: ",
+      "empty_error_title": "휴지통 비우기 오류",
+      "restore_error_generic": "노트를 복원하는 중 오류가 발생했습니다",
+      "restore_error_prefix": "노트 복원 오류: ",
+      "restore_error_title": "복원 오류"
+    },
+    "empty": "휴지통에 노트가 없습니다.",
+    "modals": {
+      "delete": {
+        "message": "이 노트를 영구적으로 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+        "title": "노트 영구 삭제"
+      },
+      "empty": {
+        "message": "휴지통을 완전히 비우시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+        "title": "휴지통 비우기"
+      },
+      "restore": {
+        "message": "이 노트를 복원하시겠습니까?",
+        "title": "노트 복원"
+      }
+    },
+    "search": {
+      "placeholder": "휴지통에서 검색...",
+      "results_for": "\"{{term}}\"에 대한 검색 결과",
+      "results_one": "\"{{term}}\"에 대해 1 노트가 검색되었습니다.",
+      "results_other": "\"{{term}}\"에 대해 {{count}} 노트를 찾았습니다."
+    }
+  },
+  "archive": {
+    "menu_item": "노트 보관",
+    "folder_menu_item": "보관 폴더",
+    "confirm_title": "노트 보관",
+    "confirm_message": "\"{{title}}\" 노트를 폴더 경로를 유지한 채 \"{{workspace}}\" 작업 공간으로 이동하시겠습니까? 해당 작업 공간이 없으면 새로 생성됩니다.",
+    "confirm_button": "보관",
+    "already_archived": "이 노트는 이미 \"{{workspace}}\" 작업 공간에 있습니다.",
+    "folder_confirm_title": "보관 폴더",
+    "folder_confirm_message": "\"{{folder}}\" 폴더와 하위 폴더 및 포함된 노트가 기존 경로를 유지한 채 \"{{workspace}}\" 작업 공간으로 이동됩니다. 해당 작업 공간이 없으면 새로 생성됩니다.",
+    "folder_already_archived": "이 폴더는 이미 \"{{workspace}}\" 작업 공간에 있습니다.",
+    "errors": {
+      "duplicate_title": "동일한 제목의 노트가 이미 이 폴더에 보관되어 있습니다.",
+      "archive_prefix": "노트 보관 오류: {{error}}",
+      "folder_duplicate_titles": "아무것도 보관되지 않았습니다. 이 노트는 이미 동일한 폴더에 보관된 노트와 제목이 동일합니다: {{titles}}",
+      "folder_archive_prefix": "폴더를 보관하는 중 오류 발생: {{error}}"
+    }
+  },
+  "welcome_page": {
+    "page_title": "환영합니다",
+    "title": "Poznote에 오신 것을 환영합니다",
+    "lead": "Poznote에 오신 것을 환영합니다! 잠시 시간을 내어 나만의 노트 환경으로 설정해 보세요.",
+    "language_modal": {
+      "title": "언어를 선택하세요"
+    },
+    "preferences": {
+      "language": "언어",
+      "theme": "테마",
+      "theme_system": "내 시스템과 동일",
+      "date_format": "날짜 및 시간 형식",
+      "timezone": "시간대"
+    },
+    "account": {
+      "title": "계정",
+      "hint": "로그인할 때 사용할 사용자 이름과 비밀번호입니다.",
+      "username": "사용자 이름",
+      "username_hint": "문자, 숫자, 점, 밑줄 및 대시.",
+      "username_default_hint": "이 계정은 여전히 설치된 사용자 이름에 응답합니다. 직접 선택하세요.",
+      "current_password": "현재 비밀번호",
+      "new_password": "새 비밀번호",
+      "confirm_password": "비밀번호 확인",
+      "password_default_hint": "이 계정은 설치된 비밀번호({{password}})를 계속 사용합니다. 지금 직접 선택하세요.",
+      "password_unavailable": "ID 공급자를 통해 로그인하므로 여기서 설정할 비밀번호가 없습니다."
+    },
+    "footnote": "이 모든 것, 그리고 더 많은 것들이 나중에 설정에서 변경될 수 있습니다.",
+    "start": "Poznote 사용 시작하기",
+    "saving": "저장 중...",
+    "errors": {
+      "generic": "문제가 발생했습니다. 다시 시도해 주세요.",
+      "username_required": "사용자 이름이 필요합니다.",
+      "password_incomplete": "모든 비밀번호 상자를 입력하거나 모두 비워 두세요.",
+      "password_mismatch": "두 개의 새 비밀번호가 일치하지 않습니다.",
+      "password_too_short": "비밀번호는 4자 이상이어야 합니다."
+    }
+  },
+  "excalidraw": {
+    "editor": {
+      "alerts": {
+        "editor_not_ready": "편집기가 아직 준비되지 않았습니다",
+        "error_prefix": "오류: {{error}}"
+      },
+      "errors": {
+        "failed_to_load": "오류: Excalidraw를 로드하지 못했습니다. 페이지를 새로고침하세요.",
+        "initializing_prefix": "Excalidraw 초기화 오류: {{error}}",
+        "save_failed": "저장 실패"
+      },
+      "loading": "Excalidraw Poznote 불러오는 중...",
+      "titles": {
+        "embedded_diagram": "임베디드 다이어그램",
+        "new_note": "새 노트"
+      },
+      "toolbar": {
+        "exit_without_saving": "저장하지 않고 종료",
+        "save_and_exit": "저장하고 종료",
+        "saved": "저장되었습니다!",
+        "saving": "저장 중..."
+      }
+    }
+  },
+  "folders": {
+    "delete": {
+      "confirm_main": "\"{{folder}}\" 폴더를 삭제하시겠습니까?",
+      "details": {
+        "note_plural_html": "<strong>• {{count}}</strong> 노트가 휴지통으로 이동됩니다.",
+        "note_singular_html": "<strong>• {{count}}</strong> 노트가 휴지통으로 이동됩니다.",
+        "subfolder_plural_html": "<strong>• {{count}}</strong> 하위 폴더도 삭제됩니다.",
+        "subfolder_singular_html": "<strong>• {{count}}</strong> 하위 폴더도 삭제됩니다."
+      }
+    },
+    "empty": {
+      "confirm_button": "노트를 휴지통으로 보내기",
+      "confirm_message": "모든 노트를 \"{{folder}}\"에서 휴지통으로 이동하시겠습니까?",
+      "success_moved_to_trash": "모든 노트가 {{folder}} 폴더에서 휴지통으로 이동되었습니다.",
+      "title": "빈 폴더"
+    },
+    "errors": {
+      "cannot_rename_system_folders": "시스템 폴더의 이름을 바꿀 수 없습니다",
+      "check_content_prefix": "폴더 내용 확인 오류: {{error}}",
+      "create_prefix": "폴더 생성 오류: {{error}}",
+      "create_title": "폴더 생성 중 오류 발생",
+      "delete_prefix": "폴더 삭제 오류: {{error}}",
+      "duplicate_prefix": "폴더 복제 중 오류 발생: {{error}}",
+      "empty_folder_prefix": "폴더 비우기 오류: {{error}}",
+      "generic_prefix": "오류: {{error}}",
+      "load_prefix": "폴더 불러오는 중 오류 발생: {{error}}",
+      "move_files_prefix": "파일 이동 오류: {{error}}",
+      "move_folder_prefix": "폴더 이동 오류: {{error}}",
+      "rename_prefix": "폴더 이름 변경 중 오류 발생: {{error}}"
+    },
+    "filter_placeholder": "폴더 이름으로 필터링...",
+    "move": {
+      "moving": "이동 중...",
+      "success": "\"{{folder}}\" 폴더가 이동되었습니다."
+    },
+    "move_all": {
+      "empty_folder": "이 폴더는 비어 있습니다.",
+      "files_count_plural": "{{count}} 파일이 이동됩니다",
+      "files_count_singular": "파일 1개가 이동됩니다.",
+      "moving": "이동 중...",
+      "same_source_target": "소스 폴더와 대상 폴더는 동일할 수 없습니다.",
+      "unable_to_count_files": "파일 개수를 계산할 수 없습니다."
+    },
+    "move_note": {
+      "create_and_move": "생성 및 이동",
+      "errors": {
+        "move_prefix": "노트 이동 오류: {{error}}"
+      },
+      "select_note_first": "먼저 노트를 선택하세요.",
+      "select_target_folder": "대상 폴더를 선택하세요"
+    },
+    "no_folders": "아직 폴더가 없습니다.",
+    "subfolder": {
+      "modal_message": "하위 폴더 이름 입력({{parent}} 내)",
+      "modal_title": "새 하위 폴더"
+    },
+    "validation": {
+      "enter_folder_name": "폴더 이름을 입력하세요."
+    }
+  },
+  "modal_alerts": {
+    "cursor_warning": {
+      "message": "내용을 삽입하고 싶은 노트 편집 영역에 커서를 올려주세요.",
+      "title": "커서 위치 필수"
+    }
+  },
+  "search_replace": {
+    "no_matches": "결과 없음",
+    "replaced_all": "{{count}} 일치 항목을 교체했습니다.",
+    "result": "결과",
+    "results": "결과",
+    "search_placeholder": "찾을 내용...",
+    "replace_placeholder": "바꿀 내용...",
+    "previous": "이전 일치 항목",
+    "next": "다음 일치 항목",
+    "close": "닫기",
+    "replace": "바꾸기",
+    "replace_one": "현재 항목 바꾸기",
+    "replace_all": "모두 바꾸기",
+    "toggle_replace": "바꾸기 입력란 열기/닫기"
+  },
+  "colors": {
+    "red": "빨간색",
+    "orange": "주황색",
+    "amber": "호박색",
+    "yellow": "노란색",
+    "lime": "라임",
+    "green": "초록색",
+    "teal": "청록색",
+    "cyan": "청록색",
+    "blue": "파란색",
+    "indigo": "인디고",
+    "purple": "보라색",
+    "magenta": "마젠타",
+    "pink": "분홍색",
+    "brown": "브라운",
+    "gray": "회색",
+    "default": "기본값"
+  },
+  "page_menu": {
+    "button": "추가 옵션",
+    "split_view": "분할 보기"
+  },
+  "keyboard_shortcuts": {
+    "menu_item": "키보드 단축키",
+    "title": "키보드 단축키",
+    "filter_placeholder": "단축키 검색...",
+    "no_results": "검색어와 일치하는 단축키가 없습니다.",
+    "sections": {
+      "general": "일반",
+      "editor": "노트 편집기",
+      "editor_focus": "노트에 초점이 있는 동안 활성화됨",
+      "tree": "노트 및 폴더 트리",
+      "tree_focus": "트리에 포커스가 있는 동안 활성화됨"
+    },
+    "save_note": "노트 저장",
+    "snapshot": "노트 수정 이력 저장",
+    "search_replace": "노트에서 검색 및 바꾸기",
+    "note_nav": "폴더의 이전 또는 다음 노트",
+    "close": "메뉴, 패널 또는 창 닫기",
+    "bold": "굵게",
+    "italic": "이탤릭체",
+    "underline": "밑줄",
+    "strikethrough": "취소선",
+    "link": "링크 삽입",
+    "code_block": "코드 블록",
+    "slash_menu": "명령 메뉴 열기",
+    "slash_menu_hint": "설정 옵션에 따라 Alt + / 또는 단축키가 전혀 없습니다. 노트를 마우스 오른쪽 버튼으로 클릭하면 항상 열립니다.",
+    "emoji": "이름으로 이모티콘을 삽입하세요.",
+    "indent": "목록 항목 들여쓰기 또는 내어쓰기",
+    "checklist_toggle": "체크리스트 항목을 선택하거나 선택 취소하세요.",
+    "tree_move": "노트나 위, 아래 폴더로 이동하세요.",
+    "tree_open_folder": "폴더를 열거나 한 단계씩 들어갑니다.",
+    "tree_close_folder": "폴더를 닫거나 행이 있는 폴더로 이동하세요.",
+    "tree_rename": "노트 또는 폴더 이름 바꾸기",
+    "tree_open": "노트를 열거나 폴더를 열고 닫습니다.",
+    "tree_undo": "마지막 변경 사항 실행 취소",
+    "tree_redo": "다시 실행",
+    "tree_copy": "선택한 노트 및 폴더를 복사합니다.",
+    "tree_cut": "선택한 노트 및 폴더 잘라내기",
+    "tree_paste": "붙여넣기",
+    "keys": {
+      "shift": "Shift",
+      "enter": "Enter",
+      "escape": "Esc",
+      "tab": "Tab",
+      "delete": "Del",
+      "space": "Space",
+      "click": "클릭"
+    },
+    "tree_select_toggle": "노트 또는 폴더를 선택 항목에 추가하거나 제거하세요.",
+    "tree_select_range": "이 행까지의 모든 행을 선택하세요.",
+    "tree_delete": "선택한 노트 및 폴더를 휴지통으로 이동합니다.",
+    "focus_mode": "집중 모드 켜기 또는 끄기"
+  },
+  "icon_context_menu": {
+    "hide": "숨기기 버튼"
+  },
+  "account_note": {
+    "banner": "{{account}} 계정의 노트, 읽기 전용",
+    "open_to_edit": "수정하려면 열어주세요",
+    "not_found": "이 노트는 더 이상 사용할 수 없습니다."
+  },
+  "tree_selection": {
+    "count": "{{count}}개 선택됨",
+    "delete_title": "항목 {{count}}개 삭제",
+    "delete_message": "{{count}} 항목은 포함된 선택된 폴더 내의 휴지통, 노트로 이동됩니다. Ctrl+Z를 누르면 다시 표시됩니다.",
+    "delete_message_notes": "{{count}} 노트가 휴지통으로 이동됩니다. Ctrl+Z를 누르면 다시 표시됩니다.",
+    "delete_note_title": "노트 삭제",
+    "delete_note_message": "“{{name}}”는 휴지통으로 이동됩니다. Ctrl+Z를 누르면 다시 표시됩니다.",
+    "delete_note_message_untitled": "이 노트는 휴지통으로 이동됩니다. Ctrl+Z를 누르면 다시 표시됩니다.",
+    "deleted_items": "항목 {{count}}개를 휴지통으로 이동했습니다.",
+    "delete_failed": "삭제 실패: {{error}}",
+    "moved_items": "{{count}} 항목 이동됨",
+    "move_failed": "이동 실패: {{error}}",
+    "cannot_move_into_itself": "폴더는 폴더 자체로 이동할 수 없습니다.",
+    "favorited_items": "즐겨찾기에 {{count}} 아이템을 추가했습니다.",
+    "favorite_failed": "즐겨찾기를 업데이트할 수 없습니다: {{error}}",
+    "already_favorites": "이미 즐겨찾기에 있습니다."
+  },
+  "mobile_editor_bar": {
+    "insert": "삽입(슬래시 메뉴)",
+    "undo": "실행 취소",
+    "redo": "다시 실행",
+    "indent": "들여쓰기",
+    "outdent": "내어쓰기",
+    "hide_keyboard": "키보드 숨기기"
+  },
+  "focus_mode": {
+    "button": "집중 모드"
+  },
+  "offline": {
+    "page_title": "Poznote(오프라인)",
+    "signout": {
+      "removes": "오프라인으로 유지된 노트가 이 기기에서 제거됩니다.",
+      "done_title": "로그아웃되었습니다.",
+      "done_text": "오프라인으로 유지된 노트가 이 기기에서 제거되었습니다.",
+      "loss_title": "변경 사항이 삭제됩니다.",
+      "loss_text_one": "오프라인에서 변경한 내용 1건이 서버에 동기화되지 않았습니다. 지금 로그아웃하면 이 기기에서 삭제되며 복구할 수 없습니다.",
+      "loss_text_other": "오프라인에서 변경한 내용 {{count}}건이 서버에 동기화되지 않았습니다. 지금 로그아웃하면 이 기기에서 삭제되며 복구할 수 없습니다.",
+      "loss_more": "외 {{count}}건",
+      "loss_keep": "변경 사항을 보관하려면 취소하고 로그인 상태를 유지하세요. 연결이 복구되면 자동으로 전송됩니다.",
+      "loss_confirm": "변경 사항을 버리고 로그아웃"
+    },
+    "unsupported": "이 브라우저는 노트를 오프라인으로 유지할 수 없습니다.",
+    "status": {
+      "offline": "오프라인",
+      "online": "온라인",
+      "syncing": "동기화 중…",
+      "pending_one": "변경 사항 1개 대기 중",
+      "pending_other": "변경 사항 {{count}}건 대기 중"
+    },
+    "signin": {
+      "intro": "오프라인 상태입니다. 이 기기에 보관된 노트를 열려면 로그인하세요.",
+      "username": "사용자 이름 또는 이메일",
+      "password": "비밀번호",
+      "submit": "오프라인으로 로그인",
+      "checking": "확인 중…",
+      "unknown_account": "이 계정의 노트는 이 기기에 보관되지 않습니다.",
+      "wrong_password": "비밀번호가 잘못되었습니다. 이 기기에 마지막으로 로그인한 비밀번호를 사용하세요.",
+      "continue_intro": "이 기기에 아직 로그인되어 있으므로 최근 노트가 비밀번호 없이 열립니다.",
+      "continue": "{{name}} 계정으로 계속하기",
+      "retry": "다시 연결해 보세요"
+    },
+    "empty": {
+      "title": "오프라인에서 사용할 수 있는 노트가 없습니다.",
+      "text": "이 기기에 아직 보관된 노트가 없습니다. 인터넷에 연결한 상태로 Poznote를 한 번 열어 주세요. 최근 며칠 동안 수정한 노트는 오프라인에서도 사용할 수 있습니다."
+    },
+    "list": {
+      "search": "노트 검색",
+      "all_workspaces": "모든 작업 공간",
+      "recent": "지난 {{days}}일 동안 수정됨",
+      "no_results": "검색어와 일치하는 노트가 없습니다.",
+      "empty": "이 작업 공간에는 노트가 없습니다.",
+      "none": "지난 {{days}}일 동안 노트가 수정되지 않았습니다.",
+      "untitled": "제목 없음",
+      "not_synced": "아직 동기화되지 않음"
+    },
+    "new": {
+      "button": "새 노트",
+      "note": "노트",
+      "markdown": "마크다운 노트",
+      "tasklist": "할 일 목록"
+    },
+    "note": {
+      "placeholder": "노트를 선택하여 엽니다.",
+      "back": "목록으로 돌아가기",
+      "too_big": "{{limit}}MB보다 커서 오프라인에서 사용할 수 없습니다: {{files}}",
+      "file_size": "{{name}} ({{size}} MB)"
+    },
+    "unavailable": {
+      "title": "이 노트는 오프라인에서 사용할 수 없습니다.",
+      "text": "지난 {{days}}일 동안 수정된 노트만 이 기기에 보관됩니다. 이 노트는 온라인에 다시 연결되면 열립니다.",
+      "text_generic": "이 노트는 이 기기에 보관되지 않습니다. 온라인에 다시 연결되자마자 열립니다."
+    },
+    "online": {
+      "back": "다시 온라인 상태가 되었습니다.",
+      "synced": "다시 온라인 상태가 되었으며 변경 사항이 동기화되었습니다.",
+      "return": "Poznote로 돌아가기",
+      "open": "Poznote 열기",
+      "sign_in_needed": "다시 온라인 상태가 되었습니다. 오프라인으로 변경한 내용을 보내려면 로그인하세요.",
+      "sign_in": "로그인",
+      "wrong_account": "다시 온라인 상태가 되었지만 브라우저에 다른 계정으로 로그인되어 있습니다. 오프라인 변경 사항을 전송하려면 {{name}} 계정으로 Poznote를 열어 주세요.",
+      "push_failed": "일부 변경 사항을 아직 보낼 수 없습니다({{error}}). 이 기기에 보관됩니다."
+    },
+    "sync": {
+      "copy_title": "{{title}}(오프라인 사본)",
+      "conflict_copy": "오프라인 상태인 동안 \"{{title}}\" 노트가 다른 곳에서도 수정되었습니다. 이 기기에서 작업한 버전은 \"{{copy}}\"라는 이름으로 저장되었습니다.",
+      "recreated": "오프라인 상태에서 \"{{title}}\"가 다른 곳에서 삭제되었습니다. 버전이 새로운 노트로 다시 저장되었습니다.",
+      "push_failed": "'{{title}}'에 대한 오프라인 변경 사항을 아직 저장할 수 없습니다({{error}}). 다시 발송될 것입니다.",
+      "synced_one": "오프라인에서 변경한 노트 1개가 동기화되었습니다.",
+      "synced_other": "오프라인에서 변경한 노트 {{count}}개가 동기화되었습니다."
+    },
+    "banner": {
+      "open": "오프라인 노트 열기",
+      "offline": "오프라인 상태입니다. 최근에 수정된 노트는 여전히 오프라인 모드에서 열고 편집할 수 있습니다.",
+      "offline_no_copies": "오프라인 상태입니다. 다시 연결되면 변경 사항이 저장됩니다.",
+      "stuck": "오프라인 노트가 열리지 않았습니다. 브라우저가 아직 서버 응답을 기다리고 있습니다. VPN을 사용 중이라면 끈 뒤 다시 열어 보세요."
+    },
+    "settings": {
+      "enable": "오프라인 모드 활성화",
+      "enable_hint": "끄면 노트가 브라우저에 유지되지 않으며 모든 오프라인 옵션과 표시기가 앱에서 사라집니다.",
+      "card": "오프라인 노트",
+      "help": "네트워크 없이 열고 편집하려면 최근에 수정한 노트를 브라우저에 보관하세요.",
+      "badge": "지난 {{days}}일",
+      "description": "최근 며칠 동안 수정한 노트를 Poznote를 사용하는 브라우저에 보관하여 인터넷 연결 없이도 열고 편집할 수 있습니다. 오프라인에서 변경한 내용은 연결이 복구되면 전송됩니다. 0으로 설정하면 노트를 오프라인에 보관하지 않습니다.",
+      "kept_rules": "즐겨찾기와 메뉴에서 ‘오프라인 보관’을 선택한 노트 및 폴더는 날짜와 관계없이 모든 첨부 파일과 함께 보관됩니다.",
+      "unit": "일",
+      "limits_title": "한도:",
+      "limits_notes": "최근에 수정한 순서로 노트 {{notes}}개 및 전체 본문 {{text}}MB",
+      "limits_attachments": "기타 첨부 파일(PDF, 오디오 등): 즐겨찾기 또는 ‘오프라인 보관’을 선택한 노트만 해당",
+      "limits_file_size": "각각 최대 {{size}}MB의 파일: 더 큰 파일은 온라인에만 유지됩니다.",
+      "limits_files_total": "파일 {{count}}개 및 총 {{total}}MB까지, 브라우저 여유 공간의 최대 절반",
+      "warning": "로그아웃하면 브라우저에서 오프라인 노트가 제거됩니다. 공유 컴퓨터에서는 나갈 때 로그아웃하세요.",
+      "device_status_one": "이 브라우저에서 노트 1개를 오프라인으로 사용할 수 있습니다. 업데이트: {{date}}",
+      "device_status": "이 브라우저에서 노트 {{count}}개를 오프라인으로 사용할 수 있습니다. 업데이트: {{date}}",
+      "device_none": "이 브라우저에는 아직 아무것도 보관되지 않습니다. 노트를 한 번 열면 보관될 것입니다.",
+      "device_unsupported": "이 브라우저는 노트를 오프라인으로 유지할 수 없습니다(보안 HTTPS 연결이 필요함)."
+    },
+    "keep": {
+      "error": "오프라인 설정을 저장할 수 없습니다."
+    },
+    "page": {
+      "title": "오프라인",
+      "filter_placeholder": "이름이나 폴더로 필터링...",
+      "column_reason": "이유",
+      "filter_reason": "이유별로 필터링",
+      "reason_all": "모든 이유",
+      "reason_note": "오프라인 보관",
+      "reason_folder": "오프라인 보관 폴더에 포함됨",
+      "reason_favorite": "즐겨찾기",
+      "reason_recent": "지난 {{days}}일 동안 수정됨",
+      "reason_recent_one": "지난 하루 동안 수정됨",
+      "folder_direct": "오프라인 보관",
+      "folder_parent": "상위 폴더를 통해",
+      "empty": "아직 오프라인에서 사용할 수 있는 항목이 없습니다.",
+      "empty_hint": "노트 메뉴 또는 폴더에서 \"오프라인 보관\"를 선택하세요. 지난 {{days}}일에 수정된 즐겨찾기 및 노트도 유지됩니다.",
+      "disabled": "오프라인 노트가 꺼졌습니다.",
+      "disabled_hint": "설정, 오프라인 노트에서 노트를 며칠 동안 보관할지 선택하세요.",
+      "no_notes": "오프라인에서 사용할 수 있는 노트가 없습니다.",
+      "no_folders": "오프라인으로 보관한 폴더가 없습니다.",
+      "own_account_only": "오프라인 사본은 본인 계정의 노트만 보관합니다."
+    }
+  },
+  "revisions": {
+    "title": "수정 이력",
+    "description": "노트를 변경하면 변경 직전의 상태가 수정 이력으로 자동 저장됩니다. {{minutes}}분마다 최대 하나씩 저장됩니다.\n\n직접 저장할 수도 있으며(Ctrl + Alt + S), AI 어시스턴트 또는 MCP 서버가 본문을 바꾸기 직전에도 저장됩니다.\n\n자동 수정 이력은 처음 {{hours}}시간 동안 모두 보관하고, 이후에는 {{count}}일 동안 하루에 하나씩 보관합니다. 수정 이력은 {{days}}일 후에 만료됩니다.\n\n첨부 파일의 이전 버전은 저장하지 않습니다.",
+    "keep_count_link_title": "하루에 하나씩 남기는 수정 이력의 보관 일수 변경",
+    "history": "이력",
+    "loading": "불러오는 중...",
+    "today": "오늘",
+    "yesterday": "어제",
+    "kind": {
+      "auto": "자동",
+      "manual": "수동",
+      "ai": "AI 편집 전",
+      "mcp": "MCP 편집 전"
+    },
+    "same_as_current": "현재와 같음",
+    "same_as_previous": "변경 없음",
+    "same_as_previous_title": "이전 수정 이력과 본문, 제목, 태그가 같습니다.",
+    "current_version": "현재 버전",
+    "previous_revision": "이전 수정 이력",
+    "other_revisions": "다른 수정 이력",
+    "tabs": {
+      "changes": "변경 사항",
+      "content": "본문"
+    },
+    "compare_with": "비교 대상",
+    "layout": {
+      "label": "비교 방식",
+      "unified": "한 화면에서 비교",
+      "split": "나란히 비교"
+    },
+    "prev_change": "이전 변경 사항",
+    "next_change": "다음 변경 사항",
+    "added_lines": "{{count}}줄 추가",
+    "removed_lines": "{{count}}줄 삭제",
+    "unchanged_lines": "변경 없는 {{count}}줄",
+    "unchanged_line": "변경 없는 1줄",
+    "no_differences": "차이 없음",
+    "no_differences_hint": "두 버전의 본문, 제목, 태그가 같습니다.",
+    "no_previous": "가장 오래된 수정 이력이라 이전에 비교할 이력이 없습니다.",
+    "text_compare_hint": "서식 있는 텍스트 노트는 텍스트를 기준으로 비교하므로 서식만 바뀐 경우에는 차이가 표시되지 않습니다.",
+    "markdown_preview": "미리 보기",
+    "markdown_source": "원본",
+    "empty_content": "(내용 없음)",
+    "empty_title": "아직 수정 이력이 없습니다.",
+    "empty_hint": "노트를 변경하면 수정 이력이 자동 저장됩니다. 지금 직접 저장할 수도 있습니다.",
+    "actions": {
+      "menu": "작업",
+      "new": "수정 이력 저장",
+      "restore": "이 수정 이력 복원",
+      "copy": "본문 복사",
+      "delete": "이 수정 이력 삭제"
+    },
+    "messages": {
+      "created": "수정 이력이 저장되었습니다.",
+      "deleted": "수정 이력이 삭제되었습니다.",
+      "copied": "본문이 복사되었습니다."
+    },
+    "errors": {
+      "load_failed": "수정 이력을 불러오지 못했습니다.",
+      "create_failed": "수정 이력을 저장하지 못했습니다.",
+      "restore_failed": "이 수정 이력을 복원하지 못했습니다.",
+      "delete_failed": "이 수정 이력을 삭제하지 못했습니다.",
+      "copy_failed": "복사하지 못했습니다."
+    },
+    "confirm": {
+      "restore_title": "이 수정 이력을 복원하시겠습니까?",
+      "restore_message": "노트의 본문, 제목, 태그가 이 수정 이력의 상태로 바뀝니다. 현재 상태는 덮어쓰므로 보관하려면 먼저 수정 이력을 저장하세요.",
+      "restore_button": "복원",
+      "delete_title": "이 수정 이력을 삭제하시겠습니까?",
+      "delete_message": "이 수정 이력은 영구적으로 삭제됩니다.",
+      "delete_button": "삭제"
+    },
+    "meta": {
+      "title": "제목",
+      "tags": "태그"
+    },
+    "same_content": "본문이 같음",
+    "same_content_hint": "제목이나 태그만 다릅니다."
+  },
+  "mermaid_zoom": {
+    "open": "다이어그램 확대",
+    "dialog": "다이어그램",
+    "zoom_in": "확대",
+    "zoom_out": "축소",
+    "fit": "화면에 맞추기",
+    "actual_size": "실제 크기"
+  },
+  "workspace_background": {
+    "invalid_image": "올바른 이미지 파일을 선택하세요.",
+    "opacity_error": "불투명도 설정을 저장하지 못했습니다.",
+    "upload_error": "이미지를 업로드하지 못했습니다.",
+    "remove_error": "이미지를 삭제하지 못했습니다."
+  },
+  "share_errors": {
+    "public_folder_create_error": "공개 폴더 링크를 만들지 못했습니다: {{error}}"
+  }
+}

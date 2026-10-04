@@ -6,7 +6,8 @@
   <a href="WEBHOOKS.es.md">Español</a> ·
   <b>Português</b> ·
   <a href="WEBHOOKS.ru.md">Русский</a> ·
-  <a href="WEBHOOKS.zh-cn.md">简体中文</a>
+  <a href="WEBHOOKS.zh-cn.md">简体中文</a> ·
+  <a href="WEBHOOKS.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 

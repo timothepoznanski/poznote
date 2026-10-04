@@ -51,7 +51,9 @@
     "outline": {
       "title": "Outline",
       "no_headings": "No headings in this note",
-      "unavailable_tasklist": "Outline is not available for task lists"
+      "unavailable_tasklist": "Outline is not available for task lists",
+      "toggle_panel": "Toggle outline panel",
+      "copy_section_link": "Copy section link"
     },
     "link_copied": "Link copied",
     "print": "Print",
@@ -78,7 +80,8 @@
     "saved": "saved",
     "unknown_error": "Unknown error",
     "none": "None",
-    "show_more_notes": "Show more ({{count}} remaining)"
+    "show_more_notes": "Show more ({{count}} remaining)",
+    "menu": "Menu"
   },
   "snapshot": {
     "menu_item": "Revisions",
@@ -301,6 +304,7 @@
       "german": "German",
       "russian": "Russian",
       "chinese_simplified": "Chinese Simplified",
+      "korean": "Korean",
       "login_page": "Login page language:",
       "saved": "Language saved",
       "save_error": "Could not save language",
@@ -550,7 +554,8 @@
     "action": {
       "color": "Color",
       "rename": "Rename",
-      "delete": "Delete"
+      "delete": "Delete",
+      "remove": "Remove tag"
     },
     "color": {
       "modal_title": "Tag color",
@@ -1522,7 +1527,8 @@
     "filter_age": "Filter by age",
     "age_all": "All notes",
     "age_recent": "Recent only",
-    "empty": "No notes found."
+    "empty": "No notes found.",
+    "select_all_in_folder": "Select all in this folder"
   },
   "update": {
     "new_available": "🎉 New update available!",
@@ -4291,7 +4297,7 @@
   "stt_settings": {
     "title": "Transcription",
     "config_title": "Configuration",
-    "description": "Connect Poznote to a speech-to-text server so voice can be turned into note text. Any server speaking the OpenAI audio API works, including self-hosted Whisper servers, and the audio never leaves the machine that runs it.",
+    "description": "Connect Poznote to a speech-to-text server so voice can be turned into note text. Any server speaking the OpenAI audio API works, including self-hosted Whisper servers. Recordings are sent to the configured transcription server; check its privacy policy.",
     "enable_label": "Enable transcription",
     "enable_description": "Adds a Transcribe button to the Record audio dialog, found under Insert in the slash menu of every note, and a Transcribe action on audio attachments.",
     "users_label": "Users allowed to use the transcription server configured by the administrator",
@@ -4824,7 +4830,16 @@
     "no_matches": "No results",
     "replaced_all": "Replaced {{count}} match(es)",
     "result": "result",
-    "results": "results"
+    "results": "results",
+    "search_placeholder": "Find...",
+    "replace_placeholder": "Replace...",
+    "previous": "Previous",
+    "next": "Next",
+    "close": "Close",
+    "replace": "Replace",
+    "replace_one": "Replace",
+    "replace_all": "Replace All",
+    "toggle_replace": "Toggle replace"
   },
   "colors": {
     "red": "Red",
@@ -5155,5 +5170,14 @@
     "zoom_out": "Zoom out",
     "fit": "Fit to screen",
     "actual_size": "Actual size"
+  },
+  "workspace_background": {
+    "invalid_image": "Please select a valid image file",
+    "opacity_error": "Error saving opacity setting",
+    "upload_error": "Error uploading image",
+    "remove_error": "Error removing image"
+  },
+  "share_errors": {
+    "public_folder_create_error": "Failed to create public folder link: {{error}}"
   }
 }

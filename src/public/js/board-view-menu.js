@@ -155,7 +155,7 @@
             root.classList.toggle('is-list', layout === 'list');
             var sizeLabel = viewBtn.getAttribute('data-label-' + shown) || shown;
             var letter = viewBtn.querySelector('.board-view-size-letter');
-            if (letter) letter.textContent = sizeLabel.charAt(0).toUpperCase();
+            if (letter) letter.textContent = (viewBtn.getAttribute('data-badge-' + size) || sizeLabel.charAt(0)).toUpperCase();
             // The toggle advertises the current view
             viewBtn.title = layout === 'list'
                 ? (viewBtn.getAttribute('data-label-list') || '')

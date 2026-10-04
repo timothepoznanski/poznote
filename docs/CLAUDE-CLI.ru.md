@@ -6,7 +6,8 @@
   <a href="CLAUDE-CLI.es.md">Español</a> ·
   <a href="CLAUDE-CLI.pt.md">Português</a> ·
   <b>Русский</b> ·
-  <a href="CLAUDE-CLI.zh-cn.md">简体中文</a>
+  <a href="CLAUDE-CLI.zh-cn.md">简体中文</a> ·
+  <a href="CLAUDE-CLI.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 

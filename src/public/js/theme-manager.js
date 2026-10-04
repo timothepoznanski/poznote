@@ -360,6 +360,11 @@
         }
     });
 
+    // The dictionary loads asynchronously; refresh labels once translations arrive.
+    document.addEventListener('poznote:i18n:loaded', function () {
+        updateThemeUI(getCurrentThemeMode());
+    });
+
     // Initialize theme when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initTheme);

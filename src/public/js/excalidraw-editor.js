@@ -524,6 +524,7 @@
                 
                 excalidrawAPI = window.PoznoteExcalidraw.init('app', {
                     initialData: safeInitialData,
+                    langCode: config.language === 'ko' ? 'ko-KR' : 'en',
                     theme: currentTheme,
                     canvasBackgroundColor: getCanvasBackground(),
                     currentItemStrokeColor: getCurrentItemStrokeColor(currentPoznoteTheme),

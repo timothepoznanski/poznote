@@ -6,7 +6,8 @@
   <b>Español</b> ·
   <a href="VSCODE-COPILOT.pt.md">Português</a> ·
   <a href="VSCODE-COPILOT.ru.md">Русский</a> ·
-  <a href="VSCODE-COPILOT.zh-cn.md">简体中文</a>
+  <a href="VSCODE-COPILOT.zh-cn.md">简体中文</a> ·
+  <a href="VSCODE-COPILOT.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 
