@@ -502,8 +502,18 @@ html[data-theme='dark'] .dash-section-title {
     text-overflow: ellipsis;
 }
 
+/* One line per row: the text and the thumbnail sit side by side again, the
+   thumbnail (first in the markup, for the float) back at the end */
 .view-layout-list .dash-card-body {
+    display: flex;
+    gap: 10px;
     align-items: center;
+}
+
+.view-layout-list .dash-card-body .board-card-excerpt,
+.view-layout-list .dash-card-body .board-card-tasks {
+    flex: 1;
+    min-width: 0;
 }
 
 .view-layout-list .board-card-excerpt {
@@ -517,6 +527,8 @@ html[data-theme='dark'] .dash-section-title {
 .view-layout-list .dash-card-thumb {
     width: 34px;
     height: 34px;
+    margin: 0;
+    order: 1;
 }
 
 .view-layout-list .board-card-footer {
@@ -1359,23 +1371,27 @@ html[data-theme='dark'] body.dashboard-page .modal-buttons button.dashboard-scop
 }
 
 /* Reuse note content classes from existing styles */
-/* Optional thumbnail (first image of the note) next to the excerpt */
+/* Optional thumbnail (first image of the note) next to the excerpt. The
+   thumbnail floats, so a text taller than the image carries on under it at
+   the full width of the card. */
 .dash-card-body {
-    display: flex;
-    gap: 10px;
-    align-items: flex-start;
+    display: flow-root;
+    overflow: hidden;
     min-width: 0;
     flex: 1;
     min-height: 0;
 }
 
+/* clip rather than hidden: hidden would make the text its own formatting
+   context, a column beside the float that never runs under it */
 .dash-card-body .board-card-excerpt,
 .dash-card-body .board-card-tasks {
-    flex: 1;
-    min-width: 0;
+    overflow: clip;
 }
 
 .dash-card-thumb {
+    float: right;
+    margin: 0 0 4px 10px;
     flex-shrink: 0;
     width: 62px;
     height: 62px;
