@@ -13,7 +13,9 @@ test('text that is not a checklist yields no items', function () {
     assertSame([], extractMarkdownChecklistItems("juste un paragraphe\n\net un autre"));
 });
 
-// buildNoteCardPreview() reads the note's file: point it at a temp one.
+// buildNoteCardPreview() reads the note's file: point it at a temp one. The
+// stub only wins when no earlier test file loaded functions.php; otherwise the
+// real helper answers with the entries folder, which a fresh checkout lacks.
 if (!function_exists('getEntryFilename')) {
     function getEntryFilename($id, $type) {
         return sys_get_temp_dir() . '/poznote-test-entry-' . (int)$id . '.txt';
@@ -22,11 +24,22 @@ if (!function_exists('getEntryFilename')) {
 
 function cardPreviewOf(string $content, string $type, bool $withSearch = true): array {
     $file = getEntryFilename(987654, $type);
+    $dir = dirname($file);
+    $madeDirs = [];
+    for ($d = $dir; !is_dir($d); $d = dirname($d)) {
+        array_unshift($madeDirs, $d);
+    }
+    if ($madeDirs !== []) {
+        mkdir($dir, 0777, true);
+    }
     file_put_contents($file, $content);
     try {
         return buildNoteCardPreview(987654, $type, $withSearch);
     } finally {
         @unlink($file);
+        foreach (array_reverse($madeDirs) as $d) {
+            @rmdir($d);
+        }
     }
 }
 
