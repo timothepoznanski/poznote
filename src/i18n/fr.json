@@ -1125,9 +1125,6 @@
       "huge": "Énorme",
       "giant": "Géante"
     },
-    "emoji": {
-      "hint_windows": "Sur Windows, appuyez sur Win + ; pour ouvrir le sélecteur d’emojis"
-    },
     "table_picker": {
       "title": "Insérer un tableau",
       "rows_placeholder": "Lignes",
@@ -4626,7 +4623,7 @@
     "show_all": "Tout afficher",
     "show_all_hint": "Charger toutes les notes de l'espace de travail",
     "search": {
-      "placeholder": "Rechercher une note..."
+      "placeholder": "Rechercher une note ou un tag..."
     },
     "tooltip": {
       "links": "{{count}} liens",
@@ -5357,7 +5354,7 @@
   },
   "revisions": {
     "title": "Révisions",
-    "description": "Une révision est enregistrée automatiquement quand vous modifiez une note, au plus une toutes les {{minutes}} minutes : elle contient la note telle qu'elle était juste avant la modification. Vous pouvez aussi en enregistrer une vous-même (Ctrl + Alt + S), et une est enregistrée juste avant que l'assistant IA ou le serveur MCP ne remplace le contenu. Les révisions automatiques sont toutes conservées pendant {{hours}} heures, puis une par jour pendant {{count}} jours. Les révisions expirent au bout de {{days}} jours. Les pièces jointes ne sont pas versionnées.",
+    "description": "Une révision est enregistrée automatiquement quand vous modifiez une note, au plus une toutes les {{minutes}} minutes : elle contient la note telle qu'elle était juste avant la modification.\n\nVous pouvez aussi en enregistrer une vous-même (Ctrl + Alt + S), et une est enregistrée juste avant que l'assistant IA ou le serveur MCP ne remplace le contenu.\n\nLes révisions automatiques sont toutes conservées pendant {{hours}} heures, puis une par jour pendant {{count}} jours. Les révisions expirent au bout de {{days}} jours.\n\nLes pièces jointes ne sont pas versionnées.",
     "keep_count_link_title": "Modifier le nombre de jours pendant lesquels une révision par jour est conservée",
     "history": "Historique",
     "loading": "Chargement...",

@@ -17,6 +17,9 @@
  * A note or a folder whose icon was customised in the sidebar carries that
  * icon, which the view draws in place of the dot.
  *
+ * Each note carries its tags, which the search field of the view matches
+ * next to the titles.
+ *
  * The view opens on the most recently modified notes only (?limit=), so a
  * large workspace does not read every note file before anything shows.
  */
@@ -57,7 +60,7 @@ class GraphController
                 $limit = max(0, (int) $_GET['limit']);
             }
 
-            $sql = "SELECT id, heading, type, folder, folder_id, favorite, icon, icon_color,
+            $sql = "SELECT id, heading, type, folder, folder_id, favorite, tags, icon, icon_color,
                            COALESCE(updated, created) AS modified
                       FROM entries
                      WHERE trash = 0
@@ -115,6 +118,7 @@ class GraphController
                     'folder_id' => $folderId !== 0 ? $folderId : null,
                     'type'      => (string) $row['type'],
                     'favorite'  => (int) ($row['favorite'] ?? 0) === 1,
+                    'tags'      => $this->tagList((string) ($row['tags'] ?? '')),
                 ] + $this->customIcon($row, defaultNoteIconForType($row['type']));
 
                 $idSet[$id] = true;
@@ -251,6 +255,17 @@ class GraphController
             ] + $this->customIcon($row, 'lucide-folder');
         }
         return $folders;
+    }
+
+    /**
+     * The tags of a note, as stored in one comma or space separated string.
+     *
+     * @return array<int, string>
+     */
+    private function tagList(string $tags): array
+    {
+        $list = preg_split('/[,\s]+/', $tags, -1, PREG_SPLIT_NO_EMPTY);
+        return $list === false ? [] : array_values(array_unique($list));
     }
 
     /**

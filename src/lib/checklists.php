@@ -27,7 +27,11 @@ function collapseNoteCardWhitespace($text) {
  * running in the page) empty. The excerpt is then worked out from the head of
  * the note alone: collapsing the whitespace of every note in full was most of
  * the dashboard's response time on a large workspace.
- * @return array{text: string, tasks: ?array, search: string, image: ?string}
+ *
+ * 'headings' gives, for a markdown note, the heading level (1-6, 0 for plain
+ * text) of each line of 'text', so a card can tint its heading lines like the
+ * note does ("Colored markdown"); null when the excerpt holds no heading.
+ * @return array{text: string, tasks: ?array, search: string, image: ?string, headings?: ?array<int, int>}
  */
 function buildNoteCardPreview($noteId, $type, $withSearch = true) {
     $excerptLength = 220;
@@ -85,7 +89,12 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true) {
     }
 
     if ($type === 'markdown') {
-        $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', $raw);
+        $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', str_replace("\x01", '', $raw));
+        // A heading line keeps its level as \x01<level> until the excerpt is
+        // cut, see 'headings' below.
+        $text = preg_replace_callback('/^ {0,3}(#{1,6})[^\S\n]+(?=\S)/m', function ($m) {
+            return "\x01" . strlen($m[1]);
+        }, $text);
         $text = preg_replace('/^ {0,3}#{1,6}\s+/m', '', $text);
         $text = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $text);
         $text = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $text);
@@ -117,13 +126,38 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true) {
         } while (strlen($head) < $length && mb_strlen($collapsed, 'UTF-8') <= $excerptLength);
         $text = $collapsed;
     }
+
+    // Heading marks out of the text, their levels kept line by line. A
+    // heading left empty by the stripping above (an image alone) goes with
+    // its line, as the collapsing would have removed it.
+    $lineLevels = [];
+    if (strpos($text, "\x01") !== false) {
+        $lines = [];
+        foreach (explode("\n", $text) as $line) {
+            $level = 0;
+            if (preg_match('/^\x01([1-6])/', $line, $m)) {
+                $level = (int)$m[1];
+            }
+            $line = trim(preg_replace('/\x01[1-6]?/', '', $line));
+            if ($line === '') continue;
+            $lines[] = $line;
+            $lineLevels[] = $level;
+        }
+        $text = implode("\n", $lines);
+    }
+
     $previewText = $text;
     if ($previewText !== '' && mb_strlen($previewText, 'UTF-8') > $excerptLength) {
         $previewText = rtrim(mb_substr($previewText, 0, $excerptLength, 'UTF-8')) . '…';
     }
 
+    $headings = array_slice($lineLevels, 0, substr_count($previewText, "\n") + 1);
+    if (array_sum($headings) === 0) {
+        $headings = null;
+    }
+
     $search = $withSearch ? preg_replace('/\s+/u', ' ', $text) : '';
-    return ['text' => $previewText, 'tasks' => null, 'search' => $search, 'image' => $image];
+    return ['text' => $previewText, 'tasks' => null, 'search' => $search, 'image' => $image, 'headings' => $headings];
 }
 
 /**

@@ -36,7 +36,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 				<button type="button" id="graphViewToggle" class="graph-reset-btn graph-icon-btn initially-hidden" data-txt-view="<?php echo t_h('graph.view_toggle', [], 'View'); ?>" data-txt-network="<?php echo t_h('graph.view_network', [], 'Network'); ?>" data-txt-tree="<?php echo t_h('graph.view_tree', [], 'Tree'); ?>">
 					<i class="lucide lucide-share-2"></i>
 				</button>
-				<button type="button" id="graphSearchBtn" class="graph-reset-btn graph-icon-btn" aria-expanded="false" aria-controls="graphSearchWrapper" aria-label="<?php echo t_h('graph.search.placeholder', [], 'Find a note...'); ?>" title="<?php echo t_h('graph.search.placeholder', [], 'Find a note...'); ?>">
+				<button type="button" id="graphSearchBtn" class="graph-reset-btn graph-icon-btn" aria-expanded="false" aria-controls="graphSearchWrapper" aria-label="<?php echo t_h('graph.search.placeholder', [], 'Find a note or a tag...'); ?>" title="<?php echo t_h('graph.search.placeholder', [], 'Find a note or a tag...'); ?>">
 					<i class="lucide lucide-search"></i>
 				</button>
 				<div class="graph-search-wrapper initially-hidden" id="graphSearchWrapper">
@@ -44,7 +44,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 						type="text"
 						id="graphSearchInput"
 						class="home-search-input graph-search-input"
-						placeholder="<?php echo t_h('graph.search.placeholder', [], 'Find a note...'); ?>"
+						placeholder="<?php echo t_h('graph.search.placeholder', [], 'Find a note or a tag...'); ?>"
 						autocomplete="off"
 					>
 					<button type="button" id="graphSearchClear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">

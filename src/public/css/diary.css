@@ -311,6 +311,17 @@ html[data-theme='dark'] .diary-context-menu-item.danger [class*="lucide-"] {
     color: var(--pz-text-inverse);
 }
 
+/* A coloured card (css/dashboard.css, .has-note-color) keeps today's marks:
+   its tint would otherwise take the border and wash the tag out under its
+   white label */
+.dash-card.has-note-color.diary-card-today {
+    border-color: var(--pz-accent-text);
+}
+
+.dash-card.has-note-color .diary-today-tag {
+    background: var(--pz-accent-text);
+}
+
 .diary-empty .lucide {
     color: var(--pz-accent-text);
 }
@@ -749,6 +760,32 @@ body.markdown-colored .diary-journal-markdown h6 {
     color: var(--mdc-h6);
 }
 
+/* Heading lines of a card's excerpt (board view), levels from
+   buildNoteCardPreview() */
+body.markdown-colored .board-card-excerpt .board-card-h1 {
+    color: var(--mdc-h1);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h2 {
+    color: var(--mdc-h2);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h3 {
+    color: var(--mdc-h3);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h4 {
+    color: var(--mdc-h4);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h5 {
+    color: var(--mdc-h5);
+}
+
+body.markdown-colored .board-card-excerpt .board-card-h6 {
+    color: var(--mdc-h6);
+}
+
 body.markdown-colored .diary-journal-markdown pre {
     background: color-mix(in srgb, var(--mdc-codeblock) 8%, var(--pz-surface));
 }
@@ -843,6 +880,14 @@ html[data-theme='dark'] .diary-card-today {
 html[data-theme='dark'] .diary-today-tag {
     background: var(--pz-accent-text);
     color: var(--pz-text-strong);
+}
+
+html[data-theme='dark'] .dash-card.has-note-color.diary-card-today {
+    border-color: var(--pz-accent-text);
+}
+
+html[data-theme='dark'] .dash-card.has-note-color .diary-today-tag {
+    background: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .diary-switch-btn {

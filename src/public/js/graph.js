@@ -414,6 +414,7 @@
                 id: raw.id,
                 title: raw.title,
                 folder: raw.folder || '',
+                tags: Array.isArray(raw.tags) ? raw.tags : [],
                 folderId: raw.folder_id,
                 folderSlot: raw.folder && folderSlots[raw.folder] !== undefined ? folderSlots[raw.folder] : -1,
                 icon: raw.icon || '',
@@ -1958,6 +1959,13 @@
         meta.textContent = parts.join(' · ');
         tooltip.appendChild(meta);
 
+        if (node.tags && node.tags.length) {
+            var tags = document.createElement('div');
+            tags.className = 'graph-tooltip-meta';
+            tags.textContent = node.tags.map(function (tag) { return '#' + tag; }).join(' ');
+            tooltip.appendChild(tags);
+        }
+
         tooltip.classList.remove('initially-hidden');
         moveTooltip(e);
     }
@@ -1985,12 +1993,27 @@
     /* Search                                                                  */
     /* --------------------------------------------------------------------- */
 
+    // A term matches the titles and the tags; behind a "#" it matches the
+    // tags alone, so "#work" leaves out a note merely titled "Homework".
     function applySearch() {
         var term = searchTerm.trim().toLowerCase();
+        var tagsOnly = term.charAt(0) === '#';
+        if (tagsOnly) { term = term.slice(1).trim(); }
         svg.classList.toggle('has-search', term !== '');
+        var hits = {};
         nodes.forEach(function (node) {
-            var hit = term !== '' && node.title.toLowerCase().indexOf(term) !== -1;
+            var hit = term !== '' && (
+                (!tagsOnly && node.title.toLowerCase().indexOf(term) !== -1) ||
+                (node.tags || []).some(function (tag) {
+                    return tag.toLowerCase().indexOf(term) !== -1;
+                })
+            );
             node.el.classList.toggle('search-hit', hit);
+            hits[node.id] = hit;
+        });
+        // The lines of a found note or folder stay lit with it
+        edges.forEach(function (edge) {
+            edge.el.classList.toggle('search-hit', !!(hits[edge.source.id] || hits[edge.target.id]));
         });
     }
 

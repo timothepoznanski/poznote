@@ -533,8 +533,12 @@ function handleSaveResponse(data) {
         if (jsonData.date && jsonData.title) {
             timeText = jsonData.date;
 
-            // Check if server modified the title for uniqueness
-            if (elements.title && jsonData.title !== jsonData.original_title) {
+            // Check if server modified the title for uniqueness. A title edited
+            // since the request left is newer than this response: leave it,
+            // its own save brings the server's version back. Trimmed spaces
+            // are not a rename either, the space being typed must stay.
+            if (elements.title && jsonData.title !== String(jsonData.original_title).trim()
+                && currentTitle === jsonData.original_title) {
                 elements.title.value = jsonData.title;
                 titleChanged = true;
             }

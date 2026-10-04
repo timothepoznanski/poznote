@@ -60,7 +60,9 @@
         actionsBtn: document.getElementById('revisionsActionsBtn'),
         actionsMenu: document.getElementById('revisionsActionsMenu'),
         prevChange: document.getElementById('revisionsPrevChange'),
-        nextChange: document.getElementById('revisionsNextChange')
+        nextChange: document.getElementById('revisionsNextChange'),
+        infoBtn: document.getElementById('revisionsInfoBtn'),
+        infoContent: document.getElementById('revisionsInfoContent')
     };
 
     function tr(key, fallback, vars) {
@@ -1161,6 +1163,15 @@
 
     els.newBtns.forEach(function (button) {
         button.addEventListener('click', saveRevision);
+    });
+
+    // What a revision is and how long it is kept, rendered by the server
+    // (it carries the link to the retention setting)
+    els.infoBtn.addEventListener('click', function () {
+        if (!window.modalAlert || typeof window.modalAlert.alert !== 'function') return;
+        window.modalAlert.alert('', 'info', document.title.split(' · ')[0], {
+            messageNode: els.infoContent.content.cloneNode(true)
+        });
     });
 
     els.restoreBtn.addEventListener('click', function () {

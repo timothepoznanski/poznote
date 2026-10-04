@@ -1134,9 +1134,6 @@
       "huge": "Riesig",
       "giant": "Gigantisch"
     },
-    "emoji": {
-      "hint_windows": "Unter Windows drücken Sie Win + ;, um die Emoji-Auswahl zu öffnen"
-    },
     "table_picker": {
       "title": "Tabelle einfügen",
       "rows_placeholder": "Zeilen",
@@ -4521,7 +4518,7 @@
     "show_all": "Alle anzeigen",
     "show_all_hint": "Alle Notizen des Arbeitsbereichs laden",
     "search": {
-      "placeholder": "Notiz suchen..."
+      "placeholder": "Notiz oder Tag suchen..."
     },
     "tooltip": {
       "links": "{{count}} Verknüpfungen",
@@ -5252,7 +5249,7 @@
   },
   "revisions": {
     "title": "Versionen",
-    "description": "Eine Version wird automatisch gespeichert, wenn Sie eine Notiz ändern, höchstens eine alle {{minutes}} Minuten: Sie enthält die Notiz so, wie sie unmittelbar vor der Änderung war. Sie können auch selbst eine speichern (Strg + Alt + S), und eine wird gespeichert, unmittelbar bevor der KI-Assistent oder der MCP-Server den Inhalt ersetzt. Automatische Versionen bleiben {{hours}} Stunden lang alle erhalten, danach eine pro Tag für {{count}} Tage. Versionen laufen nach {{days}} Tagen ab. Anhänge werden nicht versioniert.",
+    "description": "Eine Version wird automatisch gespeichert, wenn Sie eine Notiz ändern, höchstens eine alle {{minutes}} Minuten: Sie enthält die Notiz so, wie sie unmittelbar vor der Änderung war.\n\nSie können auch selbst eine speichern (Strg + Alt + S), und eine wird gespeichert, unmittelbar bevor der KI-Assistent oder der MCP-Server den Inhalt ersetzt.\n\nAutomatische Versionen bleiben {{hours}} Stunden lang alle erhalten, danach eine pro Tag für {{count}} Tage. Versionen laufen nach {{days}} Tagen ab.\n\nAnhänge werden nicht versioniert.",
     "keep_count_link_title": "Ändern, für wie viele Tage eine Version pro Tag aufbewahrt wird",
     "history": "Verlauf",
     "loading": "Wird geladen...",

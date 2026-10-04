@@ -92,7 +92,7 @@ $description = str_replace('%%COUNT%%', $keepCountLink, t_h('revisions.descripti
     'days' => POZNOTE_SNAPSHOTS_MAX_AGE_DAYS,
     'minutes' => (int) round(POZNOTE_SNAPSHOTS_AUTO_INTERVAL_SECONDS / 60),
     'hours' => POZNOTE_SNAPSHOTS_DENSE_HOURS,
-], 'A revision is saved automatically when you change a note, at most one every {{minutes}} minutes: it holds the note as it was just before the change. You can also save one yourself (Ctrl + Alt + S), and one is saved right before the AI assistant or the MCP server replaces the content. Automatic revisions are all kept for {{hours}} hours, then one per day for {{count}} days. Revisions expire after {{days}} days. Attachments are not versioned.'));
+], 'A revision is saved automatically when you change a note, at most one every {{minutes}} minutes: it holds the note as it was just before the change.' . "\n\n" . 'You can also save one yourself (Ctrl + Alt + S), and one is saved right before the AI assistant or the MCP server replaces the content.' . "\n\n" . 'Automatic revisions are all kept for {{hours}} hours, then one per day for {{count}} days. Revisions expire after {{days}} days.' . "\n\n" . 'Attachments are not versioned.'));
 // Keep the shortcut on one line
 $description = preg_replace('/(?:Ctrl|Strg) \+ Alt \+ S/u', '<span class="revisions-nowrap">$0</span>', $description);
 ?>
@@ -129,9 +129,10 @@ $description = preg_replace('/(?:Ctrl|Strg) \+ Alt \+ S/u', '<span class="revisi
                     <i class="lucide lucide-history"></i>
                     <span><?php echo t_h('revisions.title', [], 'Revisions'); ?></span>
                 </h1>
+                <button type="button" class="revisions-info-btn" id="revisionsInfoBtn" aria-haspopup="dialog" title="<?php echo t_h('common.information', [], 'Information'); ?>" aria-label="<?php echo t_h('common.information', [], 'Information'); ?>"><i class="lucide lucide-info"></i></button>
             </div>
         </header>
-        <p class="revisions-description"><?php echo $description; ?></p>
+        <template id="revisionsInfoContent"><span class="revisions-description"><?php echo $description; ?></span></template>
 
         <div class="revisions-layout">
             <aside class="revisions-sidebar" aria-label="<?php echo t_h('revisions.history', [], 'History'); ?>">

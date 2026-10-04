@@ -143,6 +143,11 @@
       var position = getComputedStyle(el).position;
       return isShown(el) && position !== 'absolute' && position !== 'fixed';
     });
+    // In the order the row shows them (css/index-mobile.css reorders a few)
+    inRow = inRow.map(function (el, index) {
+      return { el: el, order: parseInt(getComputedStyle(el).order, 10) || 0, index: index };
+    }).sort(function (a, b) { return a.order - b.order || a.index - b.index; })
+      .map(function (item) { return item.el; });
     var total = inRow.reduce(function (sum, el) { return sum + outerWidth(el); }, 0) + gap * Math.max(0, inRow.length - 1);
     if (total <= available + 0.5) {
       closeOverflowMenu(anchor);
@@ -175,12 +180,21 @@
 
     var target = useMoreMenu ? moreMenu : overflowMenu;
     var first = target.firstChild;
+    // Revisions stays the first entry of the ⋮ menu (note_display.php)
+    if (useMoreMenu && first && first.nodeType === 1 && first.getAttribute('data-action') === 'show-snapshot') first = first.nextSibling;
     moved.forEach(function (el) {
       el.classList.add(OVERFLOWED);
       var entry = menuEntry(el);
-      // The ⋮ menu may already list that button
-      if (!entry || (useMoreMenu && target.querySelector('[data-selector="' + entry.getAttribute('data-selector') + '"]:not(.' + ITEM + ')'))) return;
-      target.insertBefore(entry, first);
+      // The ⋮ menu may already list that button, by its selector or, for an
+      // entry that runs the action itself (Revisions), by its action
+      if (!entry) return;
+      var action = el.getAttribute('data-action');
+      var listed = '[data-selector="' + entry.getAttribute('data-selector') + '"]:not(.' + ITEM + ')'
+        + (action ? ', [data-action="' + action + '"]:not(.' + ITEM + ')' : '');
+      if (useMoreMenu && target.querySelector(listed)) return;
+      // Delete closes the menu on a phone
+      var last = useMoreMenu && el.classList.contains('btn-trash') && window.matchMedia('(max-width: 800px)').matches;
+      target.insertBefore(entry, last ? null : first);
     });
     if (!moved.length) anchor.hidden = true;
   }

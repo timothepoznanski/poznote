@@ -38,12 +38,16 @@ body.revisions-page {
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 16px;
+    margin-bottom: 16px;
 }
 
 .revisions-heading {
     grid-column: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     min-width: 0;
-    text-align: center;
 }
 
 .revisions-title {
@@ -62,13 +66,28 @@ body.revisions-page {
     color: var(--pz-accent-text);
 }
 
-.revisions-description {
-    max-width: 860px;
-    margin: 10px auto 16px;
+.revisions-info-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--pz-radius);
+    background: transparent;
     color: var(--pz-text-muted);
-    font-size: 13px;
-    line-height: 1.5;
-    text-align: center;
+    cursor: pointer;
+}
+
+.revisions-info-btn:hover {
+    background: var(--pz-surface-hover);
+    color: var(--pz-text);
+}
+
+.revisions-info-btn .lucide {
+    width: 18px;
+    height: 18px;
 }
 
 .revisions-nowrap {
@@ -973,15 +992,11 @@ html:has(> body.revisions-page)::-webkit-scrollbar-thumb:hover,
     .revisions-header {
         grid-template-columns: auto 1fr auto;
         gap: 10px;
+        margin-bottom: 12px;
     }
 
     .revisions-title {
         font-size: 18px;
-    }
-
-    .revisions-description {
-        margin: 8px 0 12px;
-        font-size: 12px;
     }
 
     .revisions-layout {

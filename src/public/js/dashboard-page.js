@@ -269,10 +269,12 @@
             content = '<div class="board-card-excerpt">' + esc(note.text).replace(/\n/g, '<br>') + '</div>';
         }
 
-        // First image of the note as a thumbnail next to the excerpt
+        // First image of the note as a thumbnail next to the excerpt. It
+        // comes first so the text can wrap around it (it floats).
         if (note.image) {
-            content = '<div class="dash-card-body">' + content +
+            content = '<div class="dash-card-body">' +
                 '<div class="dash-card-thumb"><img src="' + esc(note.image) + '" alt="" loading="lazy" decoding="async" draggable="false"></div>' +
+                content +
             '</div>';
         }
 

@@ -470,22 +470,6 @@ html[data-theme='dark'] #poznoteToast.notification-warning {
 }
 
 /* ============================================
-   Emoji Picker
-   ============================================ */
-
-html[data-theme='dark'] .emoji-hint {
-    background: var(--pz-surface);
-    border-left-color: var(--pz-accent-text);
-    color: var(--pz-text);
-}
-
-html[data-theme='dark'] .emoji-hint kbd {
-    background: var(--pz-chrome-bg);
-    border-color: var(--pz-border);
-    color: var(--pz-text);
-}
-
-/* ============================================
    Table Picker
    ============================================ */
 

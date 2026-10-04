@@ -1224,6 +1224,13 @@
     document.addEventListener('DOMContentLoaded', function () {
         // Attach global event listeners
         document.addEventListener('click', handleIndexClick);
+        // Save now must not take the focus away from the note: on a phone the
+        // keyboard would close
+        document.addEventListener('mousedown', function (e) {
+            if (e.target.closest && e.target.closest('.note-edit-toolbar .btn-save')) {
+                e.preventDefault();
+            }
+        });
         document.addEventListener('click', handleNoteBackgroundClick);
         document.addEventListener('focusin', handleIndexFocus);
 

@@ -18,6 +18,21 @@ input[type="radio"] {
 }
 
 /* CSS Title */
+
+/* Emoji in the title: colour glyphs fill the whole em box and read much
+   larger than the letters beside them. An input cannot size one character,
+   so the system emoji font is declared for the emoji ranges only, scaled
+   down. Where none of these fonts is installed the face is skipped and the
+   emoji keep their normal size. */
+@font-face {
+    font-family: 'Poznote Title Emoji';
+    src: local('Apple Color Emoji'), local('AppleColorEmoji'),
+        local('Segoe UI Emoji'),
+        local('Noto Color Emoji'), local('NotoColorEmoji');
+    unicode-range: U+200D, U+20E3, U+FE0F, U+2300-23FF, U+2600-27BF, U+2B00-2BFF, U+1F000-1FAFF, U+E0020-E007F;
+    size-adjust: 78%;
+}
+
 .css-title {
     margin-top: 15px;
     margin-bottom: 20px;
@@ -25,7 +40,7 @@ input[type="radio"] {
     font-size: 24px;
     font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poznote Title Emoji', 'Inter', sans-serif;
 }
 
 .css-title:focus {

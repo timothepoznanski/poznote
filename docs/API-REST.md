@@ -1845,6 +1845,8 @@ Return the note-link graph used by the graph view: one node per non-trashed note
 
 A node or a folder whose icon was customised carries it: `icon` is the Lucide class shown in the sidebar (the default icon when only the color was changed) and `icon_color` the color picked for it, `null` when none was. Both are `null` when nothing was customised.
 
+`tags` on a node lists the tags of the note, an empty array when it has none.
+
 **Query Parameters:**
 
 | Parameter | Type | Description |
@@ -1860,7 +1862,7 @@ A node or a folder whose icon was customised carries it: `icon` is the Lucide cl
 {
   "success": true,
   "nodes": [
-    { "id": 123, "title": "Project plan", "folder": "Work", "folder_id": 7, "type": "note", "favorite": false, "icon": "lucide-rocket", "icon_color": "#2563eb" }
+    { "id": 123, "title": "Project plan", "folder": "Work", "folder_id": 7, "type": "note", "favorite": false, "tags": ["work", "planning"], "icon": "lucide-rocket", "icon_color": "#2563eb" }
   ],
   "edges": [
     { "source": 123, "target": 456 }

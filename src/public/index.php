@@ -570,9 +570,7 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
         }
     })();
     </script>
-    <div id="save-indicator" class="save-indicator" style="display: none;">
-        <i class="lucide lucide-save"></i>
-    </div>
+    <div id="save-indicator" class="save-indicator" style="display: none;"></div>
     
     <!-- Global configuration (CSP compliant) -->
     <?php

@@ -1,9 +1,9 @@
 /**
  * View controls for the dashboard / diary boards, next to the filter bar:
  * - a single view toggle cycling grid small -> medium -> large -> wide ->
- *   list, showing the grid icon plus the size letter in grid layout and the
- *   list icon in list layout (wide: the width beyond large at the medium
- *   height)
+ *   list (large -> wide -> list on a phone with full height on), showing the
+ *   grid icon plus the size letter in grid layout and the list icon in list
+ *   layout (wide: the width beyond large at the medium height)
  * - a full-height toggle: in grid layout each card takes the height of its
  *   own content instead of being cut at the row height, and the cards pack
  *   under one another like a masonry wall (see watchCardHeights)
@@ -26,6 +26,11 @@
     var LAYOUTS = ['grid', 'list'];
     // The single toggle walks through every view: the four grid sizes, then list.
     var VIEWS = ['small', 'medium', 'large', 'wide', 'list'];
+    // On a phone (the 800px breakpoint of dashboard.css) with full-height
+    // cards, small and medium are left out: the toggle only offers large
+    // (one column), wide and list.
+    var MOBILE_FULL_HEIGHT_VIEWS = ['large', 'wide', 'list'];
+    var mobileQuery = window.matchMedia ? window.matchMedia('(max-width: 800px)') : null;
     // Height of the grid rows in full-height mode (grid-auto-rows in
     // dashboard.css): a card spans as many of them as its content needs.
     var MASONRY_ROW = 2;
@@ -119,9 +124,21 @@
             }
         }
 
+        function views() {
+            return fullHeight && mobileQuery && mobileQuery.matches ? MOBILE_FULL_HEIGHT_VIEWS : VIEWS;
+        }
+
+        // A small or medium preference shows as wide where those two are left
+        // out, its closest look there. The stored preference is left alone,
+        // so it comes back once full height is off or the window grows.
+        function shownSize() {
+            return views().indexOf(size) !== -1 ? size : 'wide';
+        }
+
         function apply() {
+            var shown = shownSize();
             SIZES.forEach(function (s) {
-                container.classList.toggle('view-size-' + s, s === size);
+                container.classList.toggle('view-size-' + s, s === shown);
             });
             LAYOUTS.forEach(function (l) {
                 container.classList.toggle('view-layout-' + l, l === layout);
@@ -136,7 +153,7 @@
             }
             // is-list swaps the toggle icon (CSS)
             root.classList.toggle('is-list', layout === 'list');
-            var sizeLabel = viewBtn.getAttribute('data-label-' + size) || size;
+            var sizeLabel = viewBtn.getAttribute('data-label-' + shown) || shown;
             var letter = viewBtn.querySelector('.board-view-size-letter');
             if (letter) letter.textContent = sizeLabel.charAt(0).toUpperCase();
             // The toggle advertises the current view
@@ -155,8 +172,9 @@
         }
 
         viewBtn.addEventListener('click', function () {
-            var current = layout === 'list' ? 'list' : size;
-            var next = VIEWS[(VIEWS.indexOf(current) + 1) % VIEWS.length];
+            var available = views();
+            var current = layout === 'list' ? 'list' : shownSize();
+            var next = available[(available.indexOf(current) + 1) % available.length];
             if (next === 'list') {
                 layout = 'list';
             } else {
@@ -172,6 +190,13 @@
             fitColumns();
         });
 
+        if (mobileQuery && mobileQuery.addEventListener) {
+            mobileQuery.addEventListener('change', function () {
+                apply();
+                fitColumns();
+            });
+        }
+
         if (fullHeightBtn) {
             fullHeightBtn.addEventListener('click', function () {
                 fullHeight = !fullHeight;
@@ -179,6 +204,8 @@
                     localStorage.setItem(prefix + 'ViewFullHeight', fullHeight ? '1' : '0');
                 } catch (e) { /* storage unavailable */ }
                 apply();
+                // On a phone the shown size may have just changed
+                fitColumns();
             });
         }
     }

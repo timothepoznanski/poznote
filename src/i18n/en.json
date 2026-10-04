@@ -1895,9 +1895,6 @@
       "huge": "Huge",
       "giant": "Giant"
     },
-    "emoji": {
-      "hint_windows": "On Windows, press Win + ; to open the emoji picker"
-    },
     "table_picker": {
       "title": "Insert table",
       "rows_placeholder": "Rows",
@@ -4149,7 +4146,7 @@
     "show_all": "Show all",
     "show_all_hint": "Load every note of the workspace",
     "search": {
-      "placeholder": "Find a note..."
+      "placeholder": "Find a note or a tag..."
     },
     "tooltip": {
       "links": "{{count}} links",
@@ -5074,7 +5071,7 @@
   },
   "revisions": {
     "title": "Revisions",
-    "description": "A revision is saved automatically when you change a note, at most one every {{minutes}} minutes: it holds the note as it was just before the change. You can also save one yourself (Ctrl + Alt + S), and one is saved right before the AI assistant or the MCP server replaces the content. Automatic revisions are all kept for {{hours}} hours, then one per day for {{count}} days. Revisions expire after {{days}} days. Attachments are not versioned.",
+    "description": "A revision is saved automatically when you change a note, at most one every {{minutes}} minutes: it holds the note as it was just before the change.\n\nYou can also save one yourself (Ctrl + Alt + S), and one is saved right before the AI assistant or the MCP server replaces the content.\n\nAutomatic revisions are all kept for {{hours}} hours, then one per day for {{count}} days. Revisions expire after {{days}} days.\n\nAttachments are not versioned.",
     "keep_count_link_title": "Change for how many days one revision per day is kept",
     "history": "History",
     "loading": "Loading...",

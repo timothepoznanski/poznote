@@ -84,13 +84,21 @@
         } else if (note.text) {
             // The preview keeps the note's line breaks; render them as <br>
             // (line-clamp handles <br> correctly, unlike white-space: pre-line)
-            content = '<div class="board-card-excerpt">' + esc(note.text).replace(/\n/g, '<br>') + '</div>';
+            // A markdown heading line carries its level, tinted by the
+            // "Colored markdown" setting like the note (css/diary.css)
+            var headings = note.headings || [];
+            content = '<div class="board-card-excerpt">' + note.text.split('\n').map(function (line, index) {
+                var level = headings[index];
+                return level ? '<span class="board-card-heading board-card-h' + level + '">' + esc(line) + '</span>' : esc(line);
+            }).join('<br>') + '</div>';
         }
 
-        // First image of the note as a thumbnail next to the excerpt
+        // First image of the note as a thumbnail next to the excerpt. It
+        // comes first so the text can wrap around it (it floats).
         if (note.image) {
-            content = '<div class="dash-card-body">' + content +
+            content = '<div class="dash-card-body">' +
                 '<div class="dash-card-thumb"><img src="' + esc(note.image) + '" alt="" loading="lazy" decoding="async"></div>' +
+                content +
             '</div>';
         }
 
@@ -108,7 +116,16 @@
 
         var iconHtml = buildNoteIcon(note, 'dash-note-icon');
 
-        return '<div class="dash-card dash-note-card' + (isToday ? ' diary-card-today' : '') + '" data-note-id="' + note.id + '" title="' + esc(note.heading) + '">' +
+        // The tint comes from --note-color alone, css/dashboard.css derives
+        // the background and border from it (as dashboard-page.js)
+        var colorAttrs = '';
+        if (note.colorHex) {
+            colorAttrs = ' data-color="' + esc(note.color || '') + '"' +
+                ' style="--note-color:' + esc(note.colorHex) + '"';
+        }
+
+        return '<div class="dash-card dash-note-card' + (note.colorHex ? ' has-note-color' : '') + (isToday ? ' diary-card-today' : '') +
+            '" data-note-id="' + note.id + '" title="' + esc(note.heading) + '"' + colorAttrs + '>' +
             '<a class="dash-card-link" href="' + esc(note.url) + '">' +
                 '<div class="dash-card-note-title">' + iconHtml + esc(note.heading) + '</div>' +
                 content +
@@ -461,6 +478,8 @@
         }
         text = text.replace(/\s+/g, ' ').trim();
         note.text = text.length > 300 ? text.slice(0, 300) : text;
+        // One line from here on: the levels of the old excerpt no longer apply
+        note.headings = null;
         note.search = normalizeSearchText(note.heading + ' ' + (note.tags || []).join(' ') + ' ' + text);
     }
 
@@ -1079,10 +1098,13 @@
                 return noteMatchesSearch(note, activeFilterTerm);
             });
         }
+        if (activeColorFilter) {
+            visibleNotes = visibleNotes.filter(noteMatchesColor);
+        }
 
         var noResults = document.getElementById('diaryNoResults');
         if (noResults) {
-            noResults.style.display = (activeFilterTerm && visibleNotes.length === 0) ? 'block' : 'none';
+            noResults.style.display = ((activeFilterTerm || activeColorFilter) && visibleNotes.length === 0) ? 'block' : 'none';
         }
 
         if (viewMode === 'journal') {
@@ -1112,6 +1134,342 @@
         if (currentMonth !== null) html += '</div></section>';
 
         container.innerHTML = html;
+    }
+
+    // --- Card color picker ---
+    //
+    // A right-click on a card of the board, or a long press on touch, opens
+    // the dashboard's picker (#noteColorModal). The chosen palette id goes to
+    // PUT /notes/{id}/color and the note in memory is patched, so the board
+    // re-renders tinted without a reload, and the dashboard shows the same.
+
+    var COLOR_LONG_PRESS_MS = 450;
+    var COLOR_TOUCH_SLOP = 8;
+    var colorTargetNoteId = null;
+    var colorPendingValue = '';
+
+    function findNoteById(noteId) {
+        for (var i = 0; i < notes.length; i++) {
+            if (String(notes[i].id) === String(noteId)) return notes[i];
+        }
+        return null;
+    }
+
+    function markSelectedSwatch() {
+        document.querySelectorAll('#noteColorGrid .note-color-option').forEach(function (option) {
+            var isSelected = option.getAttribute('data-color-value') === colorPendingValue;
+            option.classList.toggle('selected', isSelected);
+            option.setAttribute('aria-checked', isSelected ? 'true' : 'false');
+        });
+    }
+
+    function openNoteColorModal(noteId) {
+        var modal = document.getElementById('noteColorModal');
+        var grid = document.getElementById('noteColorGrid');
+        var note = findNoteById(noteId);
+        if (!modal || !grid || !note) return;
+
+        colorTargetNoteId = note.id;
+        colorPendingValue = note.color || '';
+
+        var titleEl = document.getElementById('noteColorModalNoteTitle');
+        if (titleEl) titleEl.textContent = note.heading || '';
+
+        grid.innerHTML = '';
+        (Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : []).forEach(function (entry) {
+            var option = document.createElement('button');
+            option.type = 'button';
+            option.className = 'note-color-option';
+            option.setAttribute('role', 'radio');
+            option.setAttribute('data-color-value', entry.id);
+            option.title = entry.name;
+            option.setAttribute('aria-label', entry.name);
+            option.innerHTML = '<span class="note-color-swatch" style="background-color:' + esc(entry.hex) + '"></span>' +
+                '<span class="note-color-name">' + esc(entry.name) + '</span>';
+            option.addEventListener('click', function () {
+                colorPendingValue = entry.id;
+                markSelectedSwatch();
+            });
+            grid.appendChild(option);
+        });
+        markSelectedSwatch();
+
+        modal.style.display = 'flex';
+    }
+
+    function closeNoteColorModal() {
+        var modal = document.getElementById('noteColorModal');
+        if (modal) modal.style.display = 'none';
+        colorTargetNoteId = null;
+        colorPendingValue = '';
+    }
+
+    function applyNoteColor(value) {
+        if (colorTargetNoteId === null) return;
+        var noteId = colorTargetNoteId;
+
+        fetch('api/v1/notes/' + encodeURIComponent(noteId) + '/color', {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+            body: JSON.stringify({ color: value })
+        }).then(function (response) {
+            return response.json().catch(function () { return {}; }).then(function (result) {
+                if (!response.ok) throw new Error(result.error || result.message || '');
+                return result;
+            });
+        }).then(function (result) {
+            var note = findNoteById(noteId);
+            if (note) {
+                note.color = result.color || '';
+                note.colorHex = result.color_hex || '';
+            }
+            closeNoteColorModal();
+            buildColorFilterSection();
+            render();
+        }).catch(function (err) {
+            showError((txt.colorApplyError || 'Could not update the note color.') + (err.message ? ' ' + err.message : ''));
+        });
+    }
+
+    function initNoteColorPicker() {
+        var modal = document.getElementById('noteColorModal');
+        var container = document.getElementById('diaryContent');
+        if (!modal || !container) return;
+
+        container.addEventListener('contextmenu', function (e) {
+            var card = e.target.closest ? e.target.closest('.dash-note-card') : null;
+            if (!card) return;
+            e.preventDefault();
+            openNoteColorModal(card.getAttribute('data-note-id'));
+        });
+
+        // Touch: iOS fires no contextmenu, so the long press is timed here.
+        // The tap that ends it must not open the note behind the picker.
+        var press = null;
+        var suppressClick = false;
+        function cancelPress() {
+            if (press) clearTimeout(press.timer);
+            press = null;
+        }
+        container.addEventListener('touchstart', function (e) {
+            cancelPress();
+            suppressClick = false;
+            var card = e.target.closest ? e.target.closest('.dash-note-card') : null;
+            if (!card || e.touches.length !== 1) return;
+            var touch = e.touches[0];
+            press = {
+                x: touch.clientX,
+                y: touch.clientY,
+                timer: setTimeout(function () {
+                    press = null;
+                    suppressClick = true;
+                    openNoteColorModal(card.getAttribute('data-note-id'));
+                }, COLOR_LONG_PRESS_MS)
+            };
+        }, { passive: true });
+        container.addEventListener('touchmove', function (e) {
+            if (!press) return;
+            var touch = e.touches[0];
+            if (Math.abs(touch.clientX - press.x) > COLOR_TOUCH_SLOP || Math.abs(touch.clientY - press.y) > COLOR_TOUCH_SLOP) cancelPress();
+        }, { passive: true });
+        container.addEventListener('touchend', cancelPress);
+        container.addEventListener('touchcancel', cancelPress);
+        container.addEventListener('click', function (e) {
+            if (!suppressClick) return;
+            suppressClick = false;
+            if (e.target.closest && e.target.closest('.dash-note-card')) e.preventDefault();
+        }, true);
+
+        var applyBtn = document.getElementById('noteColorApplyBtn');
+        if (applyBtn) applyBtn.addEventListener('click', function () { applyNoteColor(colorPendingValue || ''); });
+        var clearBtn = document.getElementById('noteColorClearBtn');
+        if (clearBtn) clearBtn.addEventListener('click', function () { applyNoteColor(''); });
+        modal.querySelectorAll('[data-action="close-note-color-modal"]').forEach(function (btn) {
+            btn.addEventListener('click', closeNoteColorModal);
+        });
+
+        var pressedOnBackdrop = false;
+        modal.addEventListener('mousedown', function (e) { pressedOnBackdrop = (e.target === modal); });
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal && pressedOnBackdrop) closeNoteColorModal();
+            pressedOnBackdrop = false;
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && colorTargetNoteId !== null) closeNoteColorModal();
+        });
+    }
+
+    // --- Color filter ---
+    //
+    // The dashboard's filter button and panel, with the colour section alone:
+    // the colours the entries carry, any colour, none. It applies to the
+    // board and the journal view, and is kept per diary.
+
+    // null = off, a palette id, a custom hex, or '__any__' / '__none__'
+    var activeColorFilter = null;
+
+    function colorFilterKey() {
+        return 'diaryColorFilter:' + (data.workspace || '') + ':' + (data.diaryId || '');
+    }
+
+    function saveColorFilter() {
+        try {
+            var store = window.__poznoteUserStorage || window.localStorage;
+            if (activeColorFilter) {
+                store.setItem(colorFilterKey(), activeColorFilter);
+            } else {
+                store.removeItem(colorFilterKey());
+            }
+        } catch (e) { /* storage unavailable */ }
+    }
+
+    function restoreColorFilter() {
+        try {
+            var store = window.__poznoteUserStorage || window.localStorage;
+            activeColorFilter = store.getItem(colorFilterKey()) || null;
+        } catch (e) {
+            activeColorFilter = null;
+        }
+    }
+
+    function noteMatchesColor(note) {
+        if (!activeColorFilter) return true;
+        if (activeColorFilter === '__any__') return !!note.colorHex;
+        if (activeColorFilter === '__none__') return !note.colorHex;
+        return note.color === activeColorFilter;
+    }
+
+    function updateColorFilterButton() {
+        var btn = document.getElementById('diaryFilterBtn');
+        if (!btn) return;
+        btn.classList.toggle('active', !!activeColorFilter);
+        var badge = btn.querySelector('.dashboard-filter-badge');
+        if (badge) {
+            badge.hidden = !activeColorFilter;
+            badge.textContent = activeColorFilter ? '1' : '';
+        }
+        var footer = document.querySelector('#diaryFilterMenu .dashboard-filter-footer');
+        if (footer) footer.hidden = !activeColorFilter;
+    }
+
+    function setColorFilter(value) {
+        activeColorFilter = value;
+        saveColorFilter();
+        buildColorFilterSection();
+        render();
+    }
+
+    function buildColorFilterSection() {
+        updateColorFilterButton();
+        var section = document.getElementById('diaryFilterColorSection');
+        if (!section) return;
+        section.innerHTML = '';
+
+        var palette = Array.isArray(window.NOTE_COLOR_PALETTE) ? window.NOTE_COLOR_PALETTE : [];
+        // Only the colours the entries carry: the whole palette would offer
+        // filters that match nothing
+        var usedColors = {};
+        notes.forEach(function (note) {
+            if (note.color) usedColors[String(note.color)] = true;
+        });
+
+        var entries = [{ value: null, label: txt.colorFilterAll || 'All notes', hex: null }];
+        if (Object.keys(usedColors).length > 0) {
+            entries.push({ value: '__any__', label: txt.colorFilterAny || 'Any color', hex: null });
+            entries.push({ value: '__none__', label: txt.colorFilterNone || 'No color', hex: null });
+            palette.forEach(function (entry) {
+                if (usedColors[entry.id]) entries.push({ value: entry.id, label: entry.name, hex: entry.hex });
+            });
+            // Custom colours (set through the API) belong to no palette entry
+            Object.keys(usedColors).filter(function (value) {
+                return value.charAt(0) === '#';
+            }).sort().forEach(function (hex) {
+                entries.push({ value: hex, label: hex, hex: hex });
+            });
+        }
+
+        // A restored filter may target a colour no entry carries any more:
+        // its chip stays, so the panel still shows what is on
+        if (activeColorFilter && !entries.some(function (entry) { return entry.value === activeColorFilter; })) {
+            var stale = null;
+            palette.forEach(function (entry) {
+                if (entry.id === activeColorFilter) stale = { value: entry.id, label: entry.name, hex: entry.hex };
+            });
+            var isHex = String(activeColorFilter).charAt(0) === '#';
+            entries.push(stale || {
+                value: activeColorFilter,
+                label: isHex ? activeColorFilter : (activeColorFilter === '__none__' ? (txt.colorFilterNone || 'No color') : (txt.colorFilterAny || 'Any color')),
+                hex: isHex ? activeColorFilter : null
+            });
+        }
+
+        entries.forEach(function (entry) {
+            var active = activeColorFilter === entry.value;
+            var chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = 'dashboard-filter-chip' + (active ? ' active' : '');
+            chip.setAttribute('aria-pressed', active ? 'true' : 'false');
+            chip.innerHTML = (entry.hex ? '<span class="note-color-swatch" style="background-color:' + esc(entry.hex) + '"></span>' : '') +
+                '<span>' + esc(entry.label) + '</span>';
+            chip.addEventListener('click', function () { setColorFilter(entry.value); });
+            section.appendChild(chip);
+        });
+    }
+
+    function initColorFilter() {
+        var btn = document.getElementById('diaryFilterBtn');
+        var menu = document.getElementById('diaryFilterMenu');
+        if (!btn || !menu) return;
+
+        // The panel is position:fixed: anchored to its button, kept inside
+        // the viewport (as positionFilterPanel in dashboard-page.js)
+        function positionPanel() {
+            if (menu.hidden) return;
+            var rect = btn.getBoundingClientRect();
+            var top = rect.bottom + 6;
+            menu.style.top = top + 'px';
+            menu.style.maxHeight = Math.max(160, window.innerHeight - top - 12) + 'px';
+            var width = menu.offsetWidth || 300;
+            menu.style.left = Math.max(8, Math.min(rect.left, window.innerWidth - width - 8)) + 'px';
+        }
+
+        function closePanel() {
+            menu.hidden = true;
+            btn.setAttribute('aria-expanded', 'false');
+        }
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!menu.hidden) {
+                closePanel();
+                return;
+            }
+            buildColorFilterSection();
+            menu.hidden = false;
+            positionPanel();
+            btn.setAttribute('aria-expanded', 'true');
+        });
+
+        var reset = document.getElementById('diaryFilterResetBtn');
+        if (reset) reset.addEventListener('click', function () { setColorFilter(null); });
+
+        // The path is taken when the click is dispatched: a chip rebuilds the
+        // section on click, so its target is detached by now
+        document.addEventListener('click', function (e) {
+            if (menu.hidden) return;
+            var path = e.composedPath ? e.composedPath() : [e.target];
+            if (path.indexOf(menu) === -1 && path.indexOf(btn) === -1) closePanel();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !menu.hidden) {
+                closePanel();
+                btn.focus();
+            }
+        });
+        window.addEventListener('resize', positionPanel);
+        window.addEventListener('scroll', positionPanel, true);
     }
 
     // --- Today's entry ---
@@ -1441,6 +1799,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         viewMode = readViewMode();
         applyViewMode();
+        restoreColorFilter();
+        updateColorFilterButton();
         initOutline();
         render();
 
@@ -1456,6 +1816,8 @@
 
         initJournalEditing();
         initDiaryContextMenu();
+        initNoteColorPicker();
+        initColorFilter();
         openRequestedDate();
 
         document.querySelectorAll('.diary-switch-delete').forEach(function (btn) {

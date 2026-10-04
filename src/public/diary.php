@@ -69,6 +69,7 @@ function diaryBuildNoteData(array $note, string $pageWorkspace): array {
     $tags = array_values(array_filter(array_map('trim', explode(',', (string)($note['tags'] ?? '')))));
     $iconRaw = !empty($note['icon']) ? convertFontAwesomeToLucide($note['icon']) : '';
     $iconColor = poznoteIconColorCss($note['icon_color'] ?? '');
+    $noteColor = !empty($note['color']) ? (string)$note['color'] : '';
     $created = convertUtcToUserTimezone((string)($note['created'] ?? ''), 'Y-m-d');
     $titleDate = parseDiaryEntryTitle(trim((string)($note['heading'] ?? '')));
     return [
@@ -84,6 +85,9 @@ function diaryBuildNoteData(array $note, string $pageWorkspace): array {
         // newtab=1 tells tabs.js to open the note as a new internal tab (see js/tabs.js).
         'url'       => 'index.php?note=' . $noteId . '&newtab=1' . ($pageWorkspace !== '' ? '&workspace=' . urlencode($pageWorkspace) : ''),
         'text'      => $preview['text'],
+        // Heading level of each line of the excerpt (markdown), for the
+        // "Colored markdown" tints of the cards
+        'headings'  => $preview['headings'] ?? null,
         'tasks'     => $preview['tasks'],
         'image'     => $preview['image'] ?? null,
         'tags'      => $tags,
@@ -92,6 +96,10 @@ function diaryBuildNoteData(array $note, string $pageWorkspace): array {
         'updated'   => convertUtcToUserTimezone((string)($note['updated'] ?? ''), 'Y-m-d'),
         'icon'      => $iconRaw,
         'iconColor' => $iconColor,
+        // Card colour, as on the dashboard: 'color' is the stored value
+        // (palette id or custom hex), 'colorHex' what the card is tinted with
+        'color'     => $noteColor,
+        'colorHex'  => $noteColor !== '' ? resolveNoteColorHex($noteColor) : '',
     ];
 }
 
@@ -116,7 +124,7 @@ try {
         if (!empty($diaryFolderIds)) {
             $placeholders = implode(',', array_fill(0, count($diaryFolderIds), '?'));
             $stmt = $con->prepare(
-                "SELECT id, heading, type, tags, created, updated, icon, icon_color FROM entries" .
+                "SELECT id, heading, type, tags, created, updated, icon, icon_color, color FROM entries" .
                 " WHERE trash = 0 AND folder_id IN ($placeholders) AND workspace = ?" .
                 " ORDER BY created DESC, id DESC"
             );
@@ -240,6 +248,22 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 				<i class="lucide lucide-scroll"></i>
 			</button>
 			<?php renderBoardViewMenu('diary'); ?>
+			<?php // Colour filter, the dashboard's filter panel with its colour section alone (initColorFilter in js/diary-page.js) ?>
+			<div class="dashboard-color-filter-wrap">
+				<button type="button" id="diaryFilterBtn" class="dashboard-color-filter-btn dashboard-filter-btn" title="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-label="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-haspopup="true" aria-expanded="false">
+					<i class="lucide lucide-filter"></i>
+					<span class="dashboard-filter-badge" hidden></span>
+				</button>
+				<div id="diaryFilterMenu" class="dashboard-color-filter-menu dashboard-filter-panel" hidden>
+					<div class="dashboard-filter-section">
+						<div class="dashboard-filter-section-title"><?php echo t_h('dashboard.filters.color', [], 'Color'); ?></div>
+						<div id="diaryFilterColorSection" class="dashboard-filter-chips"></div>
+					</div>
+					<div class="dashboard-filter-footer" hidden>
+						<button type="button" id="diaryFilterResetBtn" class="dashboard-filter-reset"><i class="lucide lucide-x"></i> <?php echo t_h('dashboard.filters.reset', [], 'Reset filters'); ?></button>
+					</div>
+				</div>
+			</div>
 			<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
 				<i class="lucide lucide-search dashboard-filter-icon"></i>
 				<input
@@ -287,7 +311,23 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 		<ul class="outline-nav" id="diaryOutlineNav"></ul>
 	</aside>
 
+	<?php // Colour of an entry's card, opened by a right-click or a long press on it: same picker as dashboard.php ?>
+	<div id="noteColorModal" class="modal">
+		<div class="modal-content">
+			<h3 id="noteColorModalTitle"><?php echo t_h('note_color.modal_title', [], 'Note color'); ?></h3>
+			<p class="note-color-modal-subtitle" id="noteColorModalNoteTitle"></p>
+			<div class="note-color-grid" id="noteColorGrid" role="radiogroup"></div>
+			<div class="modal-buttons">
+				<button type="button" class="note-color-manage-btn" onclick="window.location.href='settings.php?open=note-colors#note-color-palette-card'" title="<?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?>" aria-label="<?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?>"><i class="lucide lucide-palette"></i> <span class="note-color-btn-label"><?php echo t_h('note_color.manage_button', [], 'Manage colors'); ?></span></button>
+				<button type="button" class="btn-danger" id="noteColorClearBtn" title="<?php echo t_h('note_color.remove', [], 'Remove color'); ?>" aria-label="<?php echo t_h('note_color.remove', [], 'Remove color'); ?>"><i class="lucide lucide-eraser"></i> <span class="note-color-btn-label"><?php echo t_h('note_color.remove', [], 'Remove color'); ?></span></button>
+				<button type="button" class="btn-cancel" data-action="close-note-color-modal"><?php echo t_h('common.cancel'); ?></button>
+				<button type="button" class="btn-primary" id="noteColorApplyBtn"><?php echo t_h('common.apply', [], 'Apply'); ?></button>
+			</div>
+		</div>
+	</div>
+
 	<script>
+	window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;
 	window.DIARY_DATA = {
 		notes: <?php echo json_encode($diaryNotes, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>,
 		todayNoteId: <?php echo json_encode($todayNoteId); ?>,
@@ -327,6 +367,10 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 			journalSaveError: <?php echo json_encode(t('diary.journal_save_error', [], 'Could not save this entry.')); ?>,
 			journalConflict: <?php echo json_encode(t('diary.journal_conflict', [], 'This entry was changed elsewhere. Your latest changes here were not saved: reload the page to see the current version.')); ?>,
 			journalEmptyEntry: <?php echo json_encode(t('diary.journal_empty_entry', [], 'This entry is empty.')); ?>,
+			colorFilterAll: <?php echo json_encode(t('note_color.filter_all', [], 'All notes')); ?>,
+			colorFilterAny: <?php echo json_encode(t('note_color.filter_any', [], 'Any color')); ?>,
+			colorFilterNone: <?php echo json_encode(t('note_color.filter_none', [], 'No color')); ?>,
+			colorApplyError: <?php echo json_encode(t('note_color.apply_error', [], 'Could not update the note color.')); ?>,
 			journalLoadError: <?php echo json_encode(t('diary.journal_load_error', [], 'Could not load this entry.')); ?>,
 			create: <?php echo json_encode(t('common.create', [], 'Create')); ?>,
 			cancel: <?php echo json_encode(t('common.cancel', [], 'Cancel')); ?>
