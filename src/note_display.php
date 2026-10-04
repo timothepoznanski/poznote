@@ -359,7 +359,7 @@
                         echo '<button type="button" class="toolbar-btn btn-search-replace note-action-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-search"></i></button>';
                     }
 
-                    echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn desktop-only" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Revisions').'"><i class="lucide lucide-history"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-snapshot note-action-btn" data-action="show-snapshot" data-note-id="'.$row['id'].'" title="'.t_h('snapshot.menu_item', [], 'Revisions').'"><i class="lucide lucide-history"></i></button>';
 
                     // The note width and the split view are set from the "..."
                     // menu of the floating stack (ui_customization_panel.php),
@@ -382,6 +382,10 @@
 
                     // Dropdown menu (actions moved here - visible on both mobile and desktop)
                     echo '<div class="dropdown-menu mobile-toolbar-menu" hidden role="menu" aria-label="'.t_h('index.toolbar.menu_actions', [], 'Menu actions').'">';
+
+                    // Revisions opens the menu, ahead of the buttons js/toolbar-overflow.js
+                    // lists there when the row is too short
+                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Revisions').'</button>';
 
                     if ($note_type === 'markdown') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-paste-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.paste_markdown.menu_item', [], 'Insert rich text').'</button>';
@@ -429,8 +433,6 @@
                     } elseif ($note_type === 'note') {
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-convert"><i class="lucide lucide-refresh-cw-alt"></i> '.t_h('index.toolbar.convert_to_markdown', [], 'Convert to Markdown').'</button>';
                     }
-
-                    echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Revisions').'</button>';
                     echo '</div>';
                     echo '</div>';
                 

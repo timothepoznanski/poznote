@@ -498,6 +498,22 @@ pre code.hljs,
     /* Put it last in the toolbar */
 }
 
+/* Revisions comes ahead of Reminder, then Delete, then the menu button: the
+   row is short on a phone, and js/toolbar-overflow.js moves out the buttons
+   that end it */
+.note-edit-toolbar .btn-reminder {
+    order: 1;
+}
+
+.note-edit-toolbar .btn-trash {
+    order: 2;
+}
+
+.note-edit-toolbar .toolbar-menu-anchor,
+.note-edit-toolbar .toolbar-overflow-anchor {
+    order: 3;
+}
+
 /* Mobile tree rows: long titles end with an ellipsis */
 .folder-toggle,
 .note-list-item {
@@ -612,6 +628,7 @@ a.links_arbo_left::-webkit-scrollbar,
 .note-edit-toolbar .btn-publish:not(.hide-on-selection),
 .note-edit-toolbar .btn-attachment:not(.hide-on-selection),
 .note-edit-toolbar .btn-reminder:not(.hide-on-selection),
+.note-edit-toolbar .btn-snapshot:not(.hide-on-selection),
 .note-edit-toolbar .btn-trash:not(.hide-on-selection),
 .note-edit-toolbar .markdown-view-mode-btn:not(.hide-on-selection),
 .note-edit-toolbar .mobile-more-btn:not(.hide-on-selection),
