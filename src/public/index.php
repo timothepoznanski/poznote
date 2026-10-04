@@ -266,6 +266,7 @@ $settings = [
     'hide_folder_actions' => null,
     'note_list_sort' => 'updated_desc',
     'notes_without_folders_after_folders' => '1',
+    'folder_icon_opens_kanban' => '0',
     'code_block_word_wrap' => '1',
     'code_block_line_numbers' => '0',
     'markdown_split_card_view' => '1',
@@ -286,7 +287,7 @@ $settings = [
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'folder_icon_opens_kanban', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -445,6 +446,12 @@ if ($show_note_created_setting) {
 }
 if (poznoteSettingEnabled($settings['hide_folder_actions'], true)) {
     $extra_body_classes .= ' folder-actions-always-visible';
+}
+// A click on a folder icon in the tree opens its Kanban view instead of the
+// icon picker (issue 1566, js/notes-list-events.js)
+$folder_icon_opens_kanban = poznoteSettingEnabled($settings['folder_icon_opens_kanban'], false);
+if ($folder_icon_opens_kanban) {
+    $extra_body_classes .= ' folder-icon-opens-kanban';
 }
 if ($center_note_content_enabled) {
     $extra_body_classes .= ' center-note-content';

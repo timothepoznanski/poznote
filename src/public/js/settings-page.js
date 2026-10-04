@@ -101,6 +101,7 @@
             'highlight_current_folder_tree',
             'folder_tree_dim_level',
             'notes_without_folders_after_folders',
+            'folder_icon_opens_kanban',
             'sidebar_offline_marks',
             'markdown_split_card_view',
             'markdown_split_preview_left',
@@ -2789,6 +2790,7 @@
         // (panel:note-created-date, panel:note-icons, panel:folder-note-count).
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
+        setupToggleCard('folder-icon-kanban-card', 'folder-icon-kanban-status', 'folder_icon_opens_kanban', false, false);
         setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false, true);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
         setupToggleCard('markdown-split-preview-left-card', 'markdown-split-preview-left-status', 'markdown_split_preview_left', false, false);

@@ -112,6 +112,7 @@ $settingsPageUserKeys = [
     'highlight_current_folder_tree',
     'folder_tree_dim_level',
     'notes_without_folders_after_folders',
+    'folder_icon_opens_kanban',
     'sidebar_offline_marks',
     'markdown_split_card_view',
     'markdown_split_preview_left',
@@ -976,6 +977,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.notes_without_folders_after', [], 'Show notes after folders'); ?></span>
                     <span id="notes-without-folders-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Folder icon click opens the Kanban view (issue 1566) -->
+            <div class="home-card" id="folder-icon-kanban-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.folder_icon_opens_kanban', [], 'A click on a folder icon in the notes list opens the folder\'s Kanban view instead of the icon picker. The icon can still be changed from the folder menu or from the Kanban view.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-columns-2"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.folder_icon_opens_kanban', [], 'Folder icon opens Kanban'); ?></span>
+                    <span id="folder-icon-kanban-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

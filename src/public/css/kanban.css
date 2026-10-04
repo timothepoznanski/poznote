@@ -347,6 +347,25 @@
     box-shadow: 0 10px 20px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
+/* Touch drag (js/kanban.js setupTouchDrag): a finger holding a card must not
+   select its text nor open the browser's long-press menu. */
+.kanban-card.kanban-card-touch-hold {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* The copy of the card that follows the finger */
+.kanban-card.kanban-card-touch-ghost {
+    position: fixed;
+    z-index: 10000;
+    margin: 0;
+    pointer-events: none;
+    transition: none;
+    opacity: 0.9;
+    box-shadow: 0 10px 20px rgba(var(--pz-shadow-rgb), 0.25);
+}
+
 /* ===== Card completion button ===== */
 .kanban-card-complete-btn {
     position: absolute;

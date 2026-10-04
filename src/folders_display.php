@@ -498,6 +498,16 @@ function renderFolderActionsMenu($currentWorkspace = '') {
         $menu .= "</div>";
     }
 
+    // Change icon: only with "Folder icon opens Kanban" on (issue 1566), where
+    // the icon click no longer opens the picker. Otherwise the icon itself is
+    // the way in and the entry would be a duplicate.
+    if (poznoteSettingEnabled(getSetting('folder_icon_opens_kanban', '0'), false)) {
+        $menu .= "<div class='folder-actions-menu-item' data-action='change-folder-icon'>";
+        $menu .= "<i class='lucide lucide-palette'></i>";
+        $menu .= "<span>" . t_h('notes_list.folder_actions.change_icon', [], 'Change icon') . "</span>";
+        $menu .= "</div>";
+    }
+
     // Rename folder action
     $menu .= "<div class='folder-actions-menu-item' data-action='rename-folder'>";
     $menu .= "<i class='lucide lucide-pencil'></i>";

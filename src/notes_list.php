@@ -484,7 +484,10 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $favoritesIconStyle = $favoritesIconCss !== '' ? " style='color: " . htmlspecialchars($favoritesIconCss, ENT_QUOTES) . " !important;'" : "";
             echo "<i class='lucide lucide-star folder-icon'$favoritesIconStyle></i>";
         } else {
-            $changeIconTitle = t_h('notes_list.folder_actions.change_icon', [], 'Change icon');
+            // With "Folder icon opens Kanban" on, the click opens the board (js/notes-list-events.js)
+            $changeIconTitle = poznoteSettingEnabled(getSetting('folder_icon_opens_kanban', '0'), false)
+                ? t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view')
+                : t_h('notes_list.folder_actions.change_icon', [], 'Change icon');
             $customIconColorCss = poznoteIconColorCss($customIconColor);
             $iconStyle = $customIconColorCss !== '' ? " style='color: " . htmlspecialchars($customIconColorCss, ENT_QUOTES) . " !important;'" : "";
             $iconColorAttr = $customIconColor ? " data-icon-color='" . htmlspecialchars($customIconColor, ENT_QUOTES) . "'" : "";
