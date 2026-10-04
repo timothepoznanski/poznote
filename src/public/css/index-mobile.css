@@ -492,6 +492,12 @@ pre code.hljs,
     /* Put it first in the toolbar */
 }
 
+/* Save now comes right after Home, ahead of the buttons that precede it in
+   the markup (task order, view mode) */
+.note-edit-toolbar .btn-save {
+    order: -1;
+}
+
 /* Mobile menu button in toolbar - always last */
 .mobile-more-btn {
     order: 999 !important;
@@ -623,6 +629,7 @@ a.links_arbo_left::-webkit-scrollbar,
 }
 
 .note-edit-toolbar .mobile-home-btn,
+.note-edit-toolbar .btn-save:not(.hide-on-selection),
 .note-edit-toolbar .btn-task-order:not(.hide-on-selection),
 .note-edit-toolbar .btn-favorite:not(.hide-on-selection),
 .note-edit-toolbar .btn-publish:not(.hide-on-selection),

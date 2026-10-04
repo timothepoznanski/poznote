@@ -25,6 +25,15 @@
     transition: color 0.2s;
 }
 
+/* Touch screens keep :hover on the last button tapped, which left its icon in
+   the hover colour (icons.css) until something else was tapped */
+@media (hover: none) {
+    .note-edit-toolbar .toolbar-btn [class*="lucide-"]:hover {
+        color: var(--pz-icon);
+        transform: none;
+    }
+}
+
 /* The text-color palette icon used to be forced to `color: inherit`, which on a
    <button> resolves to the UA's buttontext (black in light mode) or to the dark
    theme's --pz-text, never to the --pz-icon grey every other toolbar icon uses.
