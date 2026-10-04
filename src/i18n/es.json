@@ -5253,7 +5253,7 @@
   },
   "revisions": {
     "title": "Revisiones",
-    "description": "Se guarda una revisión automáticamente cuando modifica una nota, como máximo una cada {{minutes}} minutos: contiene la nota tal como estaba justo antes del cambio. También puede guardar una usted mismo (Ctrl + Alt + S), y se guarda una justo antes de que el asistente de IA o el servidor MCP reemplace el contenido. Las revisiones automáticas se conservan todas durante {{hours}} horas, y después una por día durante {{count}} días. Las revisiones caducan a los {{days}} días. Los adjuntos no se versionan.",
+    "description": "Se guarda una revisión automáticamente cuando modifica una nota, como máximo una cada {{minutes}} minutos: contiene la nota tal como estaba justo antes del cambio.\n\nTambién puede guardar una usted mismo (Ctrl + Alt + S), y se guarda una justo antes de que el asistente de IA o el servidor MCP reemplace el contenido.\n\nLas revisiones automáticas se conservan todas durante {{hours}} horas, y después una por día durante {{count}} días. Las revisiones caducan a los {{days}} días.\n\nLos adjuntos no se versionan.",
     "keep_count_link_title": "Cambiar durante cuántos días se conserva una revisión por día",
     "history": "Historial",
     "loading": "Cargando...",
