@@ -125,6 +125,13 @@ body::-webkit-scrollbar {
     -webkit-overflow-scrolling: touch;
 }
 
+/* A column hidden on this device (body.sidebar-collapsed, css/layout.css) still
+   fills the screen here: it keeps its padding rather than the 0 of the hidden
+   state. */
+body.sidebar-collapsed #left_col {
+    padding: 6px 16px 16px 16px !important;
+}
+
 .notes-list-scrollable-content {
     padding-bottom: var(--mobile-sidebar-bottom-space);
     scroll-padding-bottom: var(--mobile-sidebar-bottom-space);
