@@ -118,3 +118,30 @@ test('the entry column gives the diagram back whichever form it holds', function
     assertSame(null, poznoteExcalidrawDataFromEntry(''));
     assertSame(null, poznoteExcalidrawDataFromEntry(null));
 });
+
+test('a caret position maps to the same place in the HTML, entities and breaks included', function () {
+    $html = '<p>ab</p><p>c&nbsp;d &amp; é<br>f</p>';
+    // "ab" + end of block = 3, so position 3 is right after the first </p>
+    assertSame('<p>ab</p>', substr($html, 0, poznoteHtmlOffsetForTextPosition($html, 3)));
+    // an entity counts for the one character it shows
+    assertSame('<p>ab</p><p>c&nbsp;', substr($html, 0, poznoteHtmlOffsetForTextPosition($html, 5)));
+    // a multi-byte character is never cut, and <br> counts for one
+    assertSame('<p>ab</p><p>c&nbsp;d &amp; é', substr($html, 0, poznoteHtmlOffsetForTextPosition($html, 10)));
+    assertSame('<p>ab</p><p>c&nbsp;d &amp; é<br>', substr($html, 0, poznoteHtmlOffsetForTextPosition($html, 11)));
+    assertSame(0, poznoteHtmlOffsetForTextPosition($html, 0));
+    assertSame(strlen($html), poznoteHtmlOffsetForTextPosition($html, 999));
+});
+
+test('finding the caret in a note that holds a large diagram takes no time', function () {
+    // The loop this replaced was quadratic: minutes on a note like this one,
+    // whatever was being inserted (issue #1567).
+    $json = htmlspecialchars(json_encode(['files' => ['f' => ['dataURL' => 'data:image/jpeg;base64,' . str_repeat('QUFB', 400000)]]]));
+    $html = '<p>intro</p><div class="excalidraw-container" id="e1" data-excalidraw="' . $json . '"><img src="x" /></div>'
+        . '<p>' . str_repeat('mot ', 500) . '</p>';
+    $start = microtime(true);
+    $offset = poznoteHtmlOffsetForTextPosition($html, 1000);
+    assertTrue(microtime(true) - $start < 1.0, 'caret lookup took too long');
+    // "intro" and its </p> count 6, the diagram's </div> one more: the
+    // remaining 993 characters are read in the last paragraph
+    assertSame(strpos($html, '<p>mot') + 3 + 993, $offset);
+});

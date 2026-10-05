@@ -233,3 +233,63 @@ function poznoteExcalidrawPreviewAttachmentIds(string $html, int $noteId): array
     }
     return array_values(array_unique($ids));
 }
+
+/**
+ * The byte offset in $html where the text position $textOffset falls, for a
+ * diagram inserted at the caret of a rich-text note.
+ *
+ * The position counts what the browser counted (normalizeHtmlToText in
+ * js/excalidraw.js): one per character outside tags, an entity for what it
+ * decodes to, and one per <br> and per closing block tag.
+ *
+ * It reads $html once. The loop this replaces stepped through the note with
+ * mb_substr(), which walks the string from its start on every call, so its
+ * cost grew with the square of the note's size: 37 seconds for a note of
+ * 160 KB, and past PHP's ten-minute limit for one that already held a
+ * diagram with a photo, whatever was being inserted (issue #1567).
+ */
+function poznoteHtmlOffsetForTextPosition(string $html, int $textOffset): int
+{
+    $length = strlen($html);
+    $position = 0;
+    $text = 0;
+
+    while ($position < $length && $text < $textOffset) {
+        $byte = $html[$position];
+
+        if ($byte === '<') {
+            $tagEnd = strpos($html, '>', $position);
+            if ($tagEnd === false) {
+                break;
+            }
+            if (preg_match('/^\s*(?:br\b|\/(?:p|div|li|h[1-6])\b)/i', substr($html, $position + 1, 16))) {
+                $text++;
+            }
+            $position = $tagEnd + 1;
+            continue;
+        }
+
+        if ($byte === '&') {
+            // No entity name runs past 32 characters
+            $semicolon = strpos(substr($html, $position, 34), ';');
+            if ($semicolon !== false) {
+                $entity = substr($html, $position, $semicolon + 1);
+                $decoded = html_entity_decode($entity, ENT_QUOTES | ENT_HTML5);
+                if ($decoded !== $entity) {
+                    $text += mb_strlen($decoded);
+                    $position += $semicolon + 1;
+                    continue;
+                }
+            }
+        }
+
+        // One character: its lead byte and the continuation bytes after it
+        $position++;
+        while ($position < $length && (ord($html[$position]) & 0xC0) === 0x80) {
+            $position++;
+        }
+        $text++;
+    }
+
+    return $position;
+}
