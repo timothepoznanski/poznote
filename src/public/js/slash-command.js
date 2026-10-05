@@ -2016,11 +2016,23 @@
     }
 
     function isTaskInputElement(input) {
-        return !!(input && input.tagName === 'INPUT' && input.classList && (
+        return isTaskEditTextarea(input) || !!(input && input.tagName === 'INPUT' && input.classList && (
             input.classList.contains('task-input') ||
             input.classList.contains('task-edit-input') ||
             input.classList.contains('task-subitem-input')
         ));
+    }
+
+    // The textarea of the "Edit task" dialog (js/tasklist-edit-modal.js), which
+    // also edits subtasks and the tasks of an embedded list
+    function isTaskEditTextarea(el) {
+        return !!(el && el.tagName === 'TEXTAREA' && el.id === 'taskEditTextarea');
+    }
+
+    // Plain text fields the menu opens in (title, task fields): their caret is
+    // a selectionStart offset, not a DOM range
+    function isTextFieldElement(el) {
+        return !!(el && (el.tagName === 'INPUT' || isTaskEditTextarea(el)));
     }
 
     // The "add a subtask" field of a task (js/tasklist-subtasks.js); the field that
@@ -2044,7 +2056,7 @@
     }
 
     function openEmojiForInput(input) {
-        if (!input || input.tagName !== 'INPUT') return;
+        if (!isTextFieldElement(input)) return;
 
         input.focus();
         window.savedActiveInput = input;
@@ -2064,7 +2076,7 @@
     }
 
     function openDateForInput(input, request) {
-        if (!input || input.tagName !== 'INPUT') return;
+        if (!isTextFieldElement(input)) return;
 
         pauseTaskEditBlurSave(input);
 
@@ -4109,6 +4121,44 @@
         positionMenuAtRect(slashMenuAnchorRect);
     }
 
+    // Viewport rect of the caret at offset `pos` of a textarea, measured on a
+    // hidden copy that wraps the same way
+    function getTextareaCaretRect(textarea, pos) {
+        try {
+            const styles = window.getComputedStyle(textarea);
+            const rect = textarea.getBoundingClientRect();
+            const mirror = document.createElement('div');
+            ['fontFamily', 'fontSize', 'fontWeight', 'fontStyle', 'letterSpacing', 'lineHeight', 'textTransform',
+                'textIndent', 'tabSize', 'wordSpacing', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
+                'borderTopWidth', 'borderRightWidth', 'borderBottomWidth', 'borderLeftWidth', 'boxSizing'].forEach(function (prop) {
+                mirror.style[prop] = styles[prop];
+            });
+            mirror.style.borderStyle = 'solid';
+            mirror.style.position = 'fixed';
+            mirror.style.visibility = 'hidden';
+            mirror.style.left = rect.left + 'px';
+            mirror.style.top = rect.top + 'px';
+            mirror.style.width = rect.width + 'px';
+            mirror.style.whiteSpace = 'pre-wrap';
+            mirror.style.overflowWrap = 'break-word';
+            mirror.textContent = textarea.value.substring(0, pos);
+            const marker = document.createElement('span');
+            marker.textContent = '\u200b';
+            mirror.appendChild(marker);
+            document.body.appendChild(mirror);
+            const markerRect = marker.getBoundingClientRect();
+            document.body.removeChild(mirror);
+            return {
+                left: markerRect.left - textarea.scrollLeft,
+                top: markerRect.top - textarea.scrollTop,
+                bottom: markerRect.bottom - textarea.scrollTop
+            };
+        } catch (e) {
+            console.debug('slash-command: getTextareaCaretRect() failed:', e);
+            return null;
+        }
+    }
+
     // Show slash menu for an input field (title or task)
     function showSlashMenuForInput(input, pos) {
         hideSlashMenu();
@@ -4167,6 +4217,15 @@
         // Calculate caret position relative to viewport
         let x = rect.left + paddingLeft + textWidth - scrollLeft;
         let y = rect.bottom + 6;
+        let aboveY = rect.top;
+
+        // A textarea wraps: the menu goes under the line of the caret
+        const caretRect = input.tagName === 'TEXTAREA' ? getTextareaCaretRect(input, pos) : null;
+        if (caretRect) {
+            x = caretRect.left;
+            y = Math.min(caretRect.bottom, rect.bottom) + 6;
+            aboveY = Math.max(caretRect.top, rect.top);
+        }
 
         // Boundary checks
         if (x + menuRect.width > window.innerWidth - padding) {
@@ -4176,7 +4235,7 @@
         x = Math.max(padding, x);
 
         if (y + menuRect.height > window.innerHeight - padding) {
-            y = Math.max(padding, rect.top - menuRect.height - 6);
+            y = Math.max(padding, aboveY - menuRect.height - 6);
         }
 
         slashMenuElement.style.left = x + 'px';
@@ -4521,7 +4580,7 @@
             }
 
             // Handle input fields (title inputs)
-            if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+            if (isTextFieldElement(savedEditableElement)) {
                 const input = savedEditableElement;
                 const text = input.value;
                 const start = slashOffset;
@@ -4702,7 +4761,7 @@
             // to lose the selection in the contenteditable.
             try {
                 // For INPUT fields, save selectionStart/End
-                if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+                if (isTextFieldElement(savedEditableElement)) {
                     inputCursorPosition = {
                         start: savedEditableElement.selectionStart,
                         end: savedEditableElement.selectionEnd
@@ -4723,7 +4782,7 @@
 
         // Restore cursor position that was set by deleteSlashText, in case
         // hideSlashMenu() disrupted it by removing the menu DOM element.
-        if (inputCursorPosition && savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+        if (inputCursorPosition && isTextFieldElement(savedEditableElement)) {
             // Restore cursor for INPUT fields
             try {
                 savedEditableElement.focus();
@@ -4976,7 +5035,7 @@
 
     // Schedule an async filter update based on current input
     function scheduleFilterUpdate() {
-        if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+        if (isTextFieldElement(savedEditableElement)) {
             setTimeout(() => updateFilterFromInput(savedEditableElement), 0);
         } else if (codeMirrorSlashEditor) {
             setTimeout(updateFilterFromCodeMirror, 0);
@@ -5461,8 +5520,8 @@
         const hideSlash = !!(options && options.hideSlash);
 
         // Title inputs and task inputs
-        if (target.tagName === 'INPUT'
-            && (target.classList.contains('css-title') || target.classList.contains('task-input') || isNewSubtaskInput(target))) {
+        if (isTaskEditTextarea(target) || (target.tagName === 'INPUT'
+            && (target.classList.contains('css-title') || target.classList.contains('task-input') || isNewSubtaskInput(target)))) {
             const start = target.selectionStart;
             const end = target.selectionEnd;
             target.value = target.value.slice(0, start) + '/' + target.value.slice(end);
@@ -5811,10 +5870,11 @@
             const target = e.target;
 
             // Check if this is a title input field or a task list input
-            // Only the new-task and new-subtask inputs get the slash menu; task-edit-input is excluded
-            // to avoid intercepting literal '/' characters (e.g. file paths) during task editing.
+            // The new-task and new-subtask inputs and the "Edit task" dialog get the slash menu;
+            // the inline task-edit-input is excluded to avoid intercepting literal '/' characters
+            // (e.g. file paths) during task editing.
             const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
-            const isTaskInput = (target.tagName === 'INPUT' && target.classList.contains('task-input')) || isNewSubtaskInput(target);
+            const isTaskInput = (target.tagName === 'INPUT' && target.classList.contains('task-input')) || isNewSubtaskInput(target) || isTaskEditTextarea(target);
             if (isTitleInput || isTaskInput) {
                 const value = target.value;
                 const pos = target.selectionStart;
