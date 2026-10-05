@@ -129,7 +129,7 @@ if ($note_id > 0) {
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo htmlspecialchars(getUserLanguage(), ENT_QUOTES); ?>">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0"/>
@@ -179,6 +179,7 @@ if ($note_id > 0) {
     <!-- CSP-compliant configuration via JSON -->
     <script type="application/json" id="excalidraw-config"><?php
         $excalidrawConfig = [
+            'language' => getUserLanguage(),
             'noteId' => $note_id,
             'noteTitle' => $note_title,
             'workspace' => $workspace,

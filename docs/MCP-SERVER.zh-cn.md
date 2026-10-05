@@ -6,7 +6,8 @@
   <a href="MCP-SERVER.es.md">Español</a> ·
   <a href="MCP-SERVER.pt.md">Português</a> ·
   <a href="MCP-SERVER.ru.md">Русский</a> ·
-  <b>简体中文</b>
+  <b>简体中文</b> ·
+  <a href="MCP-SERVER.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 

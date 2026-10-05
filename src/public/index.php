@@ -954,8 +954,8 @@ $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
         <button
             id="toggleOutlineBtn"
             class="toggle-outline-btn"
-            aria-label="Toggle outline panel"
-            title="Toggle outline panel">
+            aria-label="<?php echo t_h('common.outline.toggle_panel', [], 'Toggle outline panel'); ?>"
+            title="<?php echo t_h('common.outline.toggle_panel', [], 'Toggle outline panel'); ?>">
             <i class="lucide lucide-chevron-right"></i>
         </button>
     </div>

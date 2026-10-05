@@ -60,6 +60,7 @@ LANGUAGES = {
     "pt": "Português",
     "ru": "Русский",
     "zh-cn": "简体中文",
+    "ko": "한국어",
 }
 
 SELECTOR_START = "<!-- lang-selector -->"

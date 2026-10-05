@@ -852,6 +852,11 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
                 // Looked up by key through the window.t shim below.
                 'strings' => [
                     'common.close' => t('common.close', [], 'Close'),
+                    'common.outline.toggle_panel' => t('common.outline.toggle_panel', [], 'Toggle outline panel'),
+                    'common.outline.copy_section_link' => t('common.outline.copy_section_link', [], 'Copy section link'),
+                    'common.outline.unavailable_tasklist' => t('common.outline.unavailable_tasklist', [], 'Outline is not available for task lists'),
+                    'common.outline.no_headings' => t('common.outline.no_headings', [], 'No headings in this note'),
+                    'common.link_copied' => t('common.link_copied', [], 'Link copied'),
                     'mermaid_zoom.open' => t('mermaid_zoom.open', [], 'Enlarge diagram'),
                     'mermaid_zoom.dialog' => t('mermaid_zoom.dialog', [], 'Diagram'),
                     'mermaid_zoom.zoom_in' => t('mermaid_zoom.zoom_in', [], 'Zoom in'),
@@ -977,8 +982,8 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
             <button
                 id="toggleOutlineBtn"
                 class="toggle-outline-btn"
-                aria-label="Toggle outline panel"
-                title="Toggle outline panel">
+                aria-label="<?php echo t_h('common.outline.toggle_panel', [], 'Toggle outline panel'); ?>"
+                title="<?php echo t_h('common.outline.toggle_panel', [], 'Toggle outline panel'); ?>">
                 <i class="lucide lucide-chevron-right"></i>
             </button>
         </div>

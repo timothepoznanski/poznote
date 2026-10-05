@@ -37,6 +37,7 @@ $currentLang = getUserLanguage();
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
       data-txt-selected="<?php echo t_h('notes_manager.selected', [], 'selected'); ?>"
       data-txt-select-all="<?php echo t_h('notes_manager.select_all', [], 'Select all'); ?>"
+      data-txt-select-all-folder="<?php echo t_h('notes_manager.select_all_in_folder', [], 'Select all in this folder'); ?>"
       data-txt-deselect-all="<?php echo t_h('notes_manager.deselect_all', [], 'Deselect all'); ?>"
       data-txt-move-to="<?php echo t_h('notes_manager.move_to', [], 'Move to...'); ?>"
 	data-txt-choose-action="<?php echo t_h('notes_manager.choose_action', [], 'Choose an action...'); ?>"

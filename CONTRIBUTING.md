@@ -1,5 +1,7 @@
 # Contributing to Poznote
 
+[한국어](docs/CONTRIBUTING.ko.md)
+
 Thanks for taking the time to contribute. This page is short on purpose, there are only two things you really need to get right.
 
 ## 1. Send your pull request to `dev`, not `main`
