@@ -763,10 +763,64 @@
         insertMarkdownAtCursor(prefix, 0);
     }
 
-    // Insert an HTML heading (h1, h2, h3)
+    // True when the caret sits in an editable rich-text note
+    function isCaretInHtmlNote() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return false;
+        let node = selection.getRangeAt(0).startContainer;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        const noteEntry = node && node.closest ? node.closest('.noteentry') : null;
+        return !!(noteEntry && noteEntry.isContentEditable && noteEntry.getAttribute('data-note-type') !== 'markdown');
+    }
+
+    // deleteSlashText() leaves a selected zero-width space where a "/" that
+    // was not typed stood alone in its text node, for the node inserted next
+    // to replace. The execCommand paths below insert no node: take it out,
+    // unless it is all that holds the line open.
+    function dropSelectedSlashPlaceholder() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount || selection.isCollapsed) return;
+        const range = selection.getRangeAt(0);
+        const node = range.startContainer;
+        if (node.nodeType !== 3 || node !== range.endContainer || range.toString() !== '\u200B') return;
+        if (node.textContent === '\u200B' && !node.previousSibling && !node.nextSibling) return;
+        range.deleteContents();
+    }
+
+    function notifyCaretNoteChanged() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return;
+        let node = selection.getRangeAt(0).startContainer;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        const noteEntry = node && node.closest ? node.closest('.noteentry') : null;
+        if (noteEntry) noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // The toolbar's list command (js/toolbar-editor-utils.js), which keeps the
+    // list out of a <p>
+    function execListCommand(ordered) {
+        if (typeof window.execHtmlListCommand === 'function') return window.execHtmlListCommand(ordered);
+        return document.execCommand(ordered ? 'insertOrderedList' : 'insertUnorderedList');
+    }
+
+    // Turn the line under the caret into a heading (h1 to h6). formatBlock, the
+    // toolbar's path: the line itself becomes the heading and Ctrl+Z takes it
+    // back. Inserting an <hN> node at the caret left it nested in the line's
+    // paragraph, next to an empty line of its own, and outside the undo
+    // history (issue #1580).
     function insertHeading(level) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
+
+        if (isCaretInHtmlNote() && typeof window.applyHtmlBlockStyle === 'function') {
+            dropSelectedSlashPlaceholder();
+            window.applyHtmlBlockStyle(String(level));
+            notifyCaretNoteChanged();
+            if (window.outlinePanel && typeof window.outlinePanel.refresh === 'function') {
+                setTimeout(() => window.outlinePanel.refresh(), 50);
+            }
+            return;
+        }
 
         const range = selection.getRangeAt(0);
         const tag = 'h' + level;
@@ -823,19 +877,33 @@
         }
     }
 
+    // Bold, italic, strikethrough at the caret: the toolbar's execCommand, which
+    // arms the style for what is typed next and stays on the undo stack. The
+    // node inserted directly did not, and a redo put the text back in the wrong
+    // order (issue #1580). Kept for a phone, where the keyboard coming back up
+    // drops a style armed that way.
+    function insertInlineFormat(command, tagName) {
+        const isPhone = !!(window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
+        if (!isPhone && isCaretInHtmlNote()) {
+            dropSelectedSlashPlaceholder();
+            if (document.execCommand(command)) return;
+        }
+        insertInlineElement(tagName);
+    }
+
     // Insert bold text
     function insertBold() {
-        insertInlineElement('strong');
+        insertInlineFormat('bold', 'strong');
     }
 
     // Insert italic text
     function insertItalic() {
-        insertInlineElement('em');
+        insertInlineFormat('italic', 'em');
     }
 
     // Insert strikethrough text
     function insertStrikethrough() {
-        insertInlineElement('s');
+        insertInlineFormat('strikeThrough', 's');
     }
 
     // Insert inline code
@@ -1297,6 +1365,20 @@
     function insertList(ordered, markerType) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
+
+        // The toolbar's path: the line itself becomes the list item, outside
+        // its paragraph, and Ctrl+Z takes it back (issue #1580)
+        if (isCaretInHtmlNote()) dropSelectedSlashPlaceholder();
+        if (isCaretInHtmlNote() && execListCommand(ordered)) {
+            if (ordered && markerType) {
+                let node = selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
+                if (node && node.nodeType === 3) node = node.parentNode;
+                const ol = node && node.closest ? node.closest('ol') : null;
+                if (ol) ol.setAttribute('type', markerType);
+            }
+            notifyCaretNoteChanged();
+            return;
+        }
 
         const range = selection.getRangeAt(0);
 
@@ -3328,13 +3410,13 @@
                 return;
             }
             if (kind === 'ul') {
-                document.execCommand('insertUnorderedList');
+                execListCommand(false);
                 return;
             }
             let ol = selectionOrderedList();
             const currentType = ol ? (ol.getAttribute('type') || '') : null;
             if (!ol || currentType === (markerType || '')) {
-                document.execCommand('insertOrderedList');
+                execListCommand(true);
                 ol = selectionOrderedList();
                 if (!ol || currentType !== null) return;
             }
@@ -3906,8 +3988,59 @@
             .join('');
     }
 
-    // Build submenu HTML for level 2 menu items
-    function buildSubmenuHTML(items) {
+    // The ids of a submenu's entries already applied where the menu was opened
+    // (the selection, or the caret), so the menu can mark them (issue #1580):
+    // heading level, bold / italic / underline / strikethrough, alignment and
+    // list type. Rich-text notes only: Markdown would have to parse the line.
+    function getActiveSubmenuItemIds(parentId) {
+        const ids = [];
+        const noteEntry = savedNoteEntry;
+        if (!noteEntry || codeMirrorSlashEditor || isTextFieldElement(savedEditableElement)) return ids;
+        if (noteEntry.getAttribute('data-note-type') === 'markdown' || !noteEntry.isContentEditable) return ids;
+
+        const sel = window.getSelection();
+        const range = (selectionSlashContext && selectionSlashContext.range) || (sel && sel.rangeCount ? sel.getRangeAt(0) : null);
+        let node = range ? range.startContainer : null;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        if (!node || !node.closest || !noteEntry.contains(node)) return ids;
+
+        const within = function (selector) {
+            const el = node.closest(selector);
+            return el && el !== noteEntry && noteEntry.contains(el) ? el : null;
+        };
+
+        if (parentId === 'title') {
+            const heading = within('h1, h2, h3, h4, h5, h6');
+            ids.push(heading ? heading.tagName.toLowerCase() : 'normal');
+        } else if (parentId === 'format') {
+            [['bold', 'bold'], ['italic', 'italic'], ['underline', 'underline'], ['strikethrough', 'strikeThrough']].forEach(function (pair) {
+                try {
+                    if (document.queryCommandState(pair[1])) ids.push(pair[0]);
+                } catch (e) { /* ignore */ }
+            });
+        } else if (parentId === 'align') {
+            const block = within('p, div, li, h1, h2, h3, h4, h5, h6, blockquote, td, th') || noteEntry;
+            const align = window.getComputedStyle(block).textAlign;
+            if (align === 'center' || align === 'right' || align === 'justify') ids.push('align-' + align);
+            else if (align === 'end') ids.push('align-right');
+            else ids.push('align-left');
+        } else if (parentId === 'list') {
+            const item = within('li');
+            const list = item ? item.parentElement : null;
+            if (list && list.tagName === 'UL' && !item.querySelector(':scope > input[type="checkbox"]')) {
+                ids.push('bullets');
+            } else if (list && list.tagName === 'OL') {
+                const type = list.getAttribute('type');
+                ids.push(type === 'a' ? 'letters' : (type === 'i' ? 'roman' : 'numbers'));
+            }
+        }
+        return ids;
+    }
+
+    // Build submenu HTML for level 2 menu items. parentId is the entry the
+    // submenu opens from, for the marks on the formats already applied.
+    function buildSubmenuHTML(items, parentId) {
+        const activeIds = parentId ? getActiveSubmenuItemIds(parentId) : [];
         const isMobile = window.innerWidth < 768;
         const t = window.t || ((key, params, fallback) => fallback);
 
@@ -3941,6 +4074,7 @@
                     '<div class="slash-command-item' + selectedClass + disabledClass + '" data-submenu-id="' + item.id + '" data-submenu-index="' + idx + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
                     '<span class="slash-command-label">' + escapeHtml(item.label) + hintHtml + '</span>' +
+                    (activeIds.indexOf(item.id) !== -1 ? '<i class="lucide lucide-check slash-command-active-mark"></i>' : '') +
                     submenuIndicator +
                     '</div>'
                 );
@@ -4342,7 +4476,7 @@
 
         submenuElement = document.createElement('div');
         submenuElement.className = 'slash-command-menu slash-command-submenu';
-        submenuElement.innerHTML = buildSubmenuHTML(cmd.submenu);
+        submenuElement.innerHTML = buildSubmenuHTML(cmd.submenu, cmd.id);
 
         document.body.appendChild(submenuElement);
 
@@ -4633,6 +4767,25 @@
             const text = slashTextNode.textContent;
             // Safety: we don't want to delete less than the slash itself
             const safeEndOffset = Math.max(slashOffset + 1, Math.min(text.length, currentOffset));
+
+            // A typed "/" and its filter are on the browser's undo stack. Taking
+            // them out through execCommand keeps them there: rewriting the text
+            // node directly left Ctrl+Z replaying its steps on text that had
+            // changed under it, and the history stopped responding (issue #1580).
+            // A "/" put in by a right-click or the Insert button was never typed
+            // and goes the direct way below.
+            if (sel && !slashInsertedByButton && slashTextNode.isConnected) {
+                try {
+                    const typedRange = document.createRange();
+                    typedRange.setStart(slashTextNode, slashOffset);
+                    typedRange.setEnd(slashTextNode, safeEndOffset);
+                    sel.removeAllRanges();
+                    sel.addRange(typedRange);
+                    if (document.execCommand('delete')) return;
+                } catch (e) {
+                    console.debug('slash-command: deleteSlashText() failed:', e);
+                }
+            }
 
             const before = text.substring(0, slashOffset);
             const after = text.substring(safeEndOffset);

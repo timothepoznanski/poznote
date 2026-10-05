@@ -625,7 +625,7 @@
                         toggleMarkdownList('ul');
                     }
                 } else {
-                    document.execCommand('insertUnorderedList');
+                    execHtmlListCommand(false);
                 }
                 break;
             case 'exec-ordered-list':
@@ -634,7 +634,7 @@
                         toggleMarkdownList('ol');
                     }
                 } else {
-                    document.execCommand('insertOrderedList');
+                    execHtmlListCommand(true);
                 }
                 break;
             case 'exec-task-list':
@@ -1166,6 +1166,26 @@
     }
 
     /**
+     * The last line of a rich-text note when it is a plain block (paragraph,
+     * div, heading), null otherwise. The caret goes inside it: left on the
+     * note itself, after its last block, Firefox types loose text under that
+     * block (issue #1580).
+     * @param {HTMLElement} el
+     */
+    function getLastTextLine(el) {
+        if (!el.classList.contains('noteentry')) return null;
+        var last = el.lastChild;
+        while (last && last.nodeType === Node.TEXT_NODE && last.textContent.trim() === '') {
+            last = last.previousSibling;
+        }
+        if (!last || last.nodeType !== Node.ELEMENT_NODE || !/^(P|DIV|H[1-6])$/.test(last.tagName)) return null;
+        if (!last.isContentEditable || (last.className && !last.classList.contains('excalidraw-placeholder'))) return null;
+        // A div wrapping a list, a table... is not a line
+        if (last.querySelector('p, div, ul, ol, table, pre, blockquote, details, aside')) return null;
+        return last;
+    }
+
+    /**
      * Helper to place cursor at the end of contentEditable
      * @param {HTMLElement} el 
      */
@@ -1173,7 +1193,12 @@
         el.focus();
         if (typeof window.getSelection != "undefined" && typeof document.createRange != "undefined") {
             var range = document.createRange();
-            range.selectNodeContents(el);
+            var lastLine = getLastTextLine(el);
+            if (lastLine && lastLine.lastChild && lastLine.lastChild.nodeName === 'BR') {
+                range.setStartBefore(lastLine.lastChild);
+            } else {
+                range.selectNodeContents(lastLine || el);
+            }
             range.collapse(false);
             var sel = window.getSelection();
             sel.removeAllRanges();

@@ -1884,9 +1884,6 @@
     },
     "markdown_placeholder": "Write your markdown, use / or right-click for command menu, paste images or drop an image at cursor.",
     "markdown_placeholder_mobile": "Write your markdown or paste images here...",
-    "excalidraw": {
-      "placeholder_outside": "Write outside the diagram here…"
-    },
     "messages": {
       "preview_mode_hint": "You are in preview mode. Switch to edit mode using the button in the toolbar to start writing markdown.",
       "split_preview_placeholder": "Preview will appear here as you type..."

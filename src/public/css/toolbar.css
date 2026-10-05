@@ -420,6 +420,13 @@ html[data-theme='dark'] .toolbar-btn.is-format-active {
     display: none;
 }
 
+/* The "/" and right-click menu opens beside the selection: the two would
+   overlap, and the menu holds the same formats (issue #1580). The bar is back
+   when the menu closes with the selection still there. */
+body:has(> .slash-command-menu) .floating-format-toolbar {
+    visibility: hidden;
+}
+
 /* One line: what does not fit is listed in its "…" menu instead */
 .floating-format-toolbar > * {
     flex-shrink: 0;

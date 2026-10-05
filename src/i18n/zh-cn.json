@@ -1102,9 +1102,6 @@
     },
     "markdown_placeholder": "编写您的 Markdown，使用 / 或右键打开命令菜单，粘贴图片或在光标处拖放图片。",
     "markdown_placeholder_mobile": "在此处编写您的 Markdown 或粘贴图片...",
-    "excalidraw": {
-      "placeholder_outside": "在图形外在此输入…"
-    },
     "messages": {
       "preview_mode_hint": "您处于预览模式。请使用工具栏中的按钮切换到编辑模式开始编写 Markdown。",
       "split_preview_placeholder": "预览将随着您的输入在此处显示..."
