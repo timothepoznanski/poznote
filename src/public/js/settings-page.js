@@ -2078,6 +2078,189 @@
         });
     }
 
+    // ---- Custom fonts (discussion #1562) ----
+    //
+    // The modal lists the families built from the files in data/fonts/. An
+    // upload or a delete is applied at once, there is nothing to save: the
+    // two font lists of this page are rendered by the server, so the page is
+    // reloaded when the modal closes on a changed library.
+    var customFonts = [];
+    var customFontsChanged = false;
+
+    function customFontsBadgeText() {
+        if (customFonts.length === 0) return getTranslations().notDefined;
+        return customFonts.length === 1
+            ? tr('modals.custom_fonts.badge_one', {}, '1 font')
+            : tr('modals.custom_fonts.badge_other', { count: customFonts.length }, customFonts.length + ' fonts');
+    }
+
+    function refreshCustomFontsBadge() {
+        var badge = document.getElementById('custom-fonts-badge');
+        if (!badge) return;
+        badge.textContent = customFontsBadgeText();
+        badge.className = 'setting-status ' + (customFonts.length ? 'enabled' : 'disabled');
+    }
+
+    function loadCustomFonts(callback) {
+        fetch('api_upload_font.php', { method: 'GET', credentials: 'same-origin' })
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                customFonts = Array.isArray(data.fonts) ? data.fonts : [];
+                refreshCustomFontsBadge();
+                if (typeof callback === 'function') callback(true);
+            })
+            .catch(function () {
+                var badge = document.getElementById('custom-fonts-badge');
+                if (badge) {
+                    badge.textContent = tr('common.error', {}, 'Error');
+                    badge.className = 'setting-status disabled';
+                }
+                if (typeof callback === 'function') callback(false);
+            });
+    }
+
+    // "400, 700, italic · 3 files · 212 KB"
+    function customFontMeta(font) {
+        var faces = Array.isArray(font.faces) ? font.faces : [];
+        var weights = [];
+        var italic = false;
+        faces.forEach(function (face) {
+            if (face.style === 'italic') italic = true;
+            if (face.label && weights.indexOf(face.label) === -1) weights.push(face.label);
+        });
+        weights.sort(function (a, b) { return parseInt(a, 10) - parseInt(b, 10); });
+        if (italic) weights.push(tr('modals.custom_fonts.italic', {}, 'italic'));
+
+        var count = Array.isArray(font.files) ? font.files.length : 0;
+        var parts = [weights.join(', ')];
+        parts.push(count === 1
+            ? tr('modals.custom_fonts.files_one', {}, '1 file')
+            : tr('modals.custom_fonts.files_other', { count: count }, count + ' files'));
+        parts.push(customCssFormatSize(font.size));
+        return parts.filter(function (part) { return part; }).join(' \u00b7 ');
+    }
+
+    function renderCustomFonts() {
+        var list = document.getElementById('customFontsList');
+        var noFile = document.getElementById('customFontsNoFile');
+        if (!list) return;
+
+        list.innerHTML = '';
+        if (noFile) noFile.style.display = customFonts.length === 0 ? 'block' : 'none';
+
+        customFonts.forEach(function (font) {
+            var row = document.createElement('div');
+            row.className = 'custom-css-theme';
+
+            var body = document.createElement('span');
+            body.className = 'custom-css-theme-body';
+
+            var name = document.createElement('span');
+            name.className = 'custom-css-theme-name';
+            name.textContent = font.name;
+            body.appendChild(name);
+
+            var meta = document.createElement('span');
+            meta.className = 'custom-css-theme-meta';
+            meta.textContent = customFontMeta(font);
+            body.appendChild(meta);
+            row.appendChild(body);
+
+            var del = document.createElement('button');
+            del.type = 'button';
+            del.className = 'custom-css-theme-delete';
+            del.title = tr('common.delete', {}, 'Delete');
+            del.setAttribute('aria-label', tr('common.delete', {}, 'Delete'));
+            del.innerHTML = '<i class="lucide lucide-trash-2"></i>';
+            del.addEventListener('click', function () { deleteCustomFont(font); });
+            row.appendChild(del);
+
+            list.appendChild(row);
+        });
+    }
+
+    function customFontsFailed(error) {
+        alert((error && error.message) || tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+    }
+
+    function customFontsRequest(url, options) {
+        options.credentials = 'same-origin';
+        return fetch(url, options)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                if (!data || !data.success) {
+                    throw new Error((data && data.error) || '');
+                }
+                customFonts = Array.isArray(data.fonts) ? data.fonts : [];
+                customFontsChanged = true;
+                renderCustomFonts();
+                refreshCustomFontsBadge();
+                return data;
+            });
+    }
+
+    function uploadCustomFonts(files) {
+        var body = new FormData();
+        var total = files.length;
+        var accepted = 0;
+        Array.prototype.forEach.call(files, function (file) {
+            if (/\.(woff2|woff|ttf|otf)$/i.test(file.name)) {
+                body.append('font_files[]', file);
+                accepted++;
+            }
+        });
+        if (accepted === 0) {
+            alert(tr('modals.custom_fonts.validation', {}, 'Please select WOFF2, WOFF, TTF or OTF font files.'));
+            return;
+        }
+
+        customFontsRequest('api_upload_font.php', { method: 'POST', body: body })
+            .then(function (data) {
+                var rejected = Array.isArray(data.rejected) ? data.rejected : [];
+                if (rejected.length || accepted < total) {
+                    alert(tr('modals.custom_fonts.some_rejected', {},
+                        'Some files were not stored: they are not fonts, or they are larger than 10 MB.'));
+                }
+            })
+            .catch(customFontsFailed);
+    }
+
+    function deleteCustomFont(font) {
+        var message = tr('modals.custom_fonts.delete_confirm', { name: font.name },
+            'Delete ' + font.name + '? Its files are removed from your data volume.');
+        var run = function () {
+            customFontsRequest('api_upload_font.php?family=' + encodeURIComponent(font.id), { method: 'DELETE' })
+                .catch(customFontsFailed);
+        };
+
+        if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+            window.modalAlert.confirm(message, tr('modals.custom_fonts.title', {}, 'Custom fonts'))
+                .then(function (confirmed) { if (confirmed) run(); });
+        } else if (window.confirm(message)) {
+            run();
+        }
+    }
+
+    function showCustomFontsModal() {
+        var modal = document.getElementById('customFontsModal');
+        if (!modal) return;
+
+        loadCustomFonts(function () {
+            renderCustomFonts();
+            modal.style.display = 'flex';
+        });
+    }
+
+    function closeCustomFontsModal() {
+        try { closeModal('customFontsModal'); } catch (e) {
+            console.debug('settings-page: closeModal() failed:', e);
+        }
+        if (customFontsChanged) {
+            reloadOpener();
+            window.location.reload();
+        }
+    }
+
     // Colored markdown: an element follows the theme (css/tokens.css,
     // .markdown-colored) until the user picks a colour for it; the stored JSON
     // holds "" for the ones that follow. These are the fixed colours the modal
@@ -2955,6 +3138,30 @@
         var customCssCard = document.getElementById('custom-css-card');
         if (customCssCard) {
             customCssCard.addEventListener('click', showCustomCssModal);
+        }
+
+        var customFontsCard = document.getElementById('custom-fonts-card');
+        if (customFontsCard) {
+            customFontsCard.addEventListener('click', showCustomFontsModal);
+            // Also picks up files dropped straight into data/fonts/
+            loadCustomFonts();
+        }
+
+        var uploadCustomFontsBtn = document.getElementById('uploadCustomFontsBtn');
+        var customFontsFileInput = document.getElementById('customFontsFileInput');
+        if (uploadCustomFontsBtn && customFontsFileInput) {
+            uploadCustomFontsBtn.addEventListener('click', function () {
+                customFontsFileInput.click();
+            });
+            customFontsFileInput.addEventListener('change', function (e) {
+                if (e.target.files && e.target.files.length) uploadCustomFonts(e.target.files);
+                customFontsFileInput.value = '';
+            });
+        }
+
+        var closeCustomFontsBtn = document.getElementById('closeCustomFontsBtn');
+        if (closeCustomFontsBtn) {
+            closeCustomFontsBtn.addEventListener('click', closeCustomFontsModal);
         }
 
         // Icon Sidebar Order card - opens its own modal (card click, move

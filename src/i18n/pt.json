@@ -512,7 +512,8 @@
       "sidebar_offline_marks": "Mostra um pequeno ponto ao lado das notas disponíveis offline neste navegador.",
       "format_toolbar_mode": "Num computador, escolha onde aparecem os botões de formatação quando seleciona texto numa nota: na barra de ferramentas da nota, no lugar das ações da nota, ou num menu flutuante acima da seleção, que deixa a barra de ferramentas da nota como está.",
       "workspace_activity_emails": "Receba um e-mail quando outra pessoa alterar uma nota em um espaço de trabalho que você compartilha ou em um compartilhado com você. Ele lista as notas criadas, editadas e excluídas, nunca o conteúdo delas, e é enviado para o endereço de e-mail do seu perfil. Conforme as alterações: alguns minutos após a última alteração. Resumo diário: às 8:00. Resumo semanal: na segunda-feira às 8:00, no seu fuso horário.",
-      "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails."
+      "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails.",
+      "custom_fonts": "Envie arquivos de fonte para oferecê-los a todos os usuários nas listas de fonte do aplicativo e do editor Markdown."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -617,7 +618,8 @@
       "s3_storage": "Anexos S3",
       "s3_backup": "Backups S3",
       "stt": "Transcrição",
-      "api_rest": "API REST"
+      "api_rest": "API REST",
+      "custom_fonts": "Fontes personalizadas"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -1832,6 +1834,21 @@
         "daily": "Resumo diário",
         "weekly": "Resumo semanal"
       }
+    },
+    "custom_fonts": {
+      "title": "Fontes personalizadas",
+      "description": "Envie arquivos de fonte (WOFF2, WOFF, TTF ou OTF), por exemplo uma família baixada do Google Fonts. Eles ficam armazenados no seu volume de dados, e cada usuário pode então escolhê-los como fonte do aplicativo ou do editor Markdown.",
+      "no_file": "Nenhuma fonte armazenada ainda",
+      "upload": "Enviar arquivos de fonte",
+      "hint": "Selecione todos os arquivos de uma família de uma vez (normal, negrito, itálico), ou o seu único arquivo de fonte variável. Sem arquivo de negrito, o texto em negrito mantém a fonte padrão.",
+      "badge_one": "1 fonte",
+      "badge_other": "{{count}} fontes",
+      "italic": "itálico",
+      "files_one": "1 arquivo",
+      "files_other": "{{count}} arquivos",
+      "validation": "Selecione arquivos de fonte WOFF2, WOFF, TTF ou OTF.",
+      "some_rejected": "Alguns arquivos não foram armazenados: não são fontes, ou têm mais de 10 MB.",
+      "delete_confirm": "Excluir {{name}}? Os arquivos são removidos do seu volume de dados."
     }
   },
   "notes_list": {

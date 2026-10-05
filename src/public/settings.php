@@ -27,6 +27,9 @@ $pageWorkspace = trim(getWorkspaceFilter());
 // Check if current user is admin (used multiple times in template)
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 
+// The font families an admin uploaded, offered in both font lists
+$customFonts = function_exists('poznoteCustomFonts') ? poznoteCustomFonts() : [];
+
 // ============================================================
 // SETTINGS PASSWORD PROTECTION
 // ============================================================
@@ -864,6 +867,13 @@ if ($canUseUserWebhooks) {
                         <option value="trebuchet" style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS</option>
                         <option value="georgia" style="font-family: Georgia, serif;">Georgia</option>
                         <option value="times" style="font-family: 'Times New Roman', serif;">Times New Roman</option>
+                        <?php if ($customFonts !== []): ?>
+                        <optgroup label="<?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?>">
+                            <?php foreach ($customFonts as $customFont): ?>
+                            <option value="<?php echo htmlspecialchars($customFont['id'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($customFont['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
             </div>
@@ -1219,6 +1229,13 @@ if ($canUseUserWebhooks) {
                         <option value="fira" style="font-family: 'Fira Code', monospace;">Fira Code</option>
                         <option value="sourcecodepro" style="font-family: 'Source Code Pro', monospace;">Source Code Pro</option>
                         <option value="ubuntumono" style="font-family: 'Ubuntu Mono', monospace;">Ubuntu Mono</option>
+                        <?php if ($customFonts !== []): ?>
+                        <optgroup label="<?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?>">
+                            <?php foreach ($customFonts as $customFont): ?>
+                            <option value="<?php echo htmlspecialchars($customFont['id'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($customFont['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
             </div>
@@ -1554,6 +1571,18 @@ if ($canUseUserWebhooks) {
                     <div class="home-card-content">
                         <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
                         <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Custom fonts: the families offered in the two font lists -->
+                <div class="home-card" id="custom-fonts-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.custom_fonts', [], 'Upload font files to offer them to every user in the App font and Markdown editor font lists.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-type"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?></span>
+                        <span id="custom-fonts-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
 

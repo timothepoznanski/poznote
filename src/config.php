@@ -3,6 +3,7 @@
 // because poznoteRenderStylesheets() builds its hrefs with poznoteAsset().
 require_once __DIR__ . '/css_assets.php';
 require_once __DIR__ . '/theme_catalog.php';
+require_once __DIR__ . '/font_catalog.php';
 require_once __DIR__ . '/lib/color-palette.php';
 
 // ============================================================
@@ -494,6 +495,26 @@ function poznoteRenderThemeListScript() {
 }
 
 /**
+ * Hand the custom fonts to the browser, next to the theme list and for the
+ * same reason: js/theme-init.js declares the faces of the font a user picked
+ * before the first paint, so it has to know them before it runs. Nothing is
+ * emitted while no font was uploaded.
+ */
+function poznoteRenderCustomFontsScript() {
+    $fonts = poznoteCustomFontsForClient(poznoteGetAppPathPrefix());
+    if ($fonts === []) {
+        return '';
+    }
+
+    $json = json_encode($fonts, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    if ($json === false) {
+        return '';
+    }
+
+    return '<script>window.__poznoteCustomFonts=' . $json . ';</script>';
+}
+
+/**
  * Limit automatic stylesheet injection to HTML responses.
  */
 function poznoteIsHtmlResponseBuffer($buffer) {
@@ -527,7 +548,7 @@ function poznoteIsHtmlResponseBuffer($buffer) {
  * configured instance (tests/output-injection.test.php).
  */
 function poznoteInjectIntoHtmlHead(string $buffer, string $themeScript, string $linkTag): string {
-    if ($themeScript !== '' && strpos($buffer, 'window.__poznoteThemeList') === false) {
+    if ($themeScript !== '' && strpos($buffer, $themeScript) === false) {
         // A callback, not a replacement string: the JSON carries characters
         // preg_replace would read as backreferences.
         $buffer = preg_replace_callback(
@@ -599,7 +620,11 @@ function poznoteInjectCustomCssIntoHtml($buffer, $phase = PHP_OUTPUT_HANDLER_STA
         return $buffer;
     }
 
-    return poznoteInjectIntoHtmlHead((string)$buffer, poznoteRenderThemeListScript(), poznoteRenderCustomCssLinkTag());
+    return poznoteInjectIntoHtmlHead(
+        (string)$buffer,
+        poznoteRenderThemeListScript() . poznoteRenderCustomFontsScript(),
+        poznoteRenderCustomCssLinkTag()
+    );
 }
 
 /**
@@ -662,6 +687,7 @@ if (
     && (
         (defined('CUSTOM_CSS_PATH') && CUSTOM_CSS_PATH !== '')
         || poznoteThemeListIsConfigured()
+        || poznoteCustomFonts() !== []
     )
 ) {
     define('POZNOTE_CUSTOM_CSS_BUFFER_STARTED', true);

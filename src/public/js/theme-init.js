@@ -346,6 +346,54 @@ window.__poznoteClearUserStorage = function (userId) {
     }
 })();
 
+// Custom fonts - the families an admin uploaded (font_catalog.php), handed to
+// the page by config.php ahead of this script. Both font settings below offer
+// them next to the fonts of the device, under ids that start with 'custom:'.
+(function () {
+    function findCustomFont(fontKey) {
+        var list = window.__poznoteCustomFonts;
+        if (!fontKey || !Array.isArray(list)) return null;
+        for (var i = 0; i < list.length; i++) {
+            if (list[i] && list[i].id === fontKey) return list[i];
+        }
+        return null;
+    }
+
+    // The @font-face rules declaring a custom font's files as `family`. Each
+    // face comes with the weight range it answers (see
+    // poznoteFontWeightRanges() in font_catalog.php for how they are shared out).
+    //
+    // `pinned` lists the weights another stylesheet already declares for that
+    // family, the bundled Inter's when the app font is swapped. A range does
+    // not reliably outrank a face declared at one exact weight inside it:
+    // Chromium kept drawing weight 400 with the bundled Inter Regular under a
+    // custom face claiming 1 to 1000. A face with the very same descriptors
+    // does replace it, the last one declared wins, so each pinned weight gets
+    // one of its own, pointing at the file whose range holds it.
+    function customFontFaces(font, family, pinned) {
+        var css = '';
+        var exact = '';
+        for (var i = 0; i < font.faces.length; i++) {
+            var face = font.faces[i];
+            var src = "src: url('" + String(face.url).replace(/['\\\n]/g, '') + "') format('" + face.format + "'); ";
+            css += "@font-face { font-family: '" + family + "'; " + src +
+                'font-weight: ' + face.weight + '; font-style: ' + face.style + '; } ';
+
+            var range = String(face.weight).split(' ');
+            for (var j = 0; pinned && face.style === 'normal' && j < pinned.length; j++) {
+                if (pinned[j] >= parseInt(range[0], 10) && pinned[j] <= parseInt(range[1], 10)) {
+                    exact += "@font-face { font-family: '" + family + "'; " + src +
+                        'font-weight: ' + pinned[j] + '; font-style: normal; } ';
+                }
+            }
+        }
+        return css + exact;
+    }
+
+    window.__poznoteFindCustomFont = findCustomFont;
+    window.__poznoteCustomFontFaces = customFontFaces;
+})();
+
 // Main app font - runs synchronously in <head> to avoid a font flash.
 // Every stylesheet references the 'Inter' family by name (often with
 // !important), so the font is swapped globally by re-declaring the 'Inter'
@@ -420,11 +468,22 @@ window.__poznoteClearUserStorage = function (userId) {
         if (existing && existing.parentNode) {
             existing.parentNode.removeChild(existing);
         }
+        var style = document.createElement('style');
+        style.id = 'main-font-override';
+
+        // An uploaded font: its files become the faces of 'Inter'. A font
+        // that was deleted since is not found and leaves the bundled Inter.
+        var custom = window.__poznoteFindCustomFont(fontKey);
+        if (custom) {
+            // 300, 400 and 600: the faces css/fonts.css declares
+            style.textContent = window.__poznoteCustomFontFaces(custom, 'Inter', [300, 400, 600]);
+            document.documentElement.appendChild(style);
+            return;
+        }
+
         var def = FONTS[fontKey];
         if (!def) return; // 'inter' or unknown value -> bundled Inter
 
-        var style = document.createElement('style');
-        style.id = 'main-font-override';
         style.textContent =
             // The regular face answers 300 as well as 400: css/fonts.css bundles a
             // real Inter Light, and without this range a page asking for 300
@@ -480,6 +539,16 @@ window.__poznoteClearUserStorage = function (userId) {
             existing.parentNode.removeChild(existing);
         }
         var stack = EDITOR_FONTS[fontKey];
+        var faces = '';
+
+        // An uploaded font is declared under a family name of its own, so the
+        // editor can use it whatever the app font is.
+        var custom = window.__poznoteFindCustomFont(fontKey);
+        if (custom) {
+            var family = 'poznote-editor-font';
+            faces = window.__poznoteCustomFontFaces(custom, family);
+            stack = "'" + family + "', monospace";
+        }
         if (!stack) return; // 'inherit' or unknown value -> app font
 
         // noteentry.css forces 'Inter' with !important on nearly every element
@@ -487,7 +556,7 @@ window.__poznoteClearUserStorage = function (userId) {
         // the repeated id raises specificity above that rule so this wins.
         var style = document.createElement('style');
         style.id = 'markdown-font-override';
-        style.textContent =
+        style.textContent = faces +
             '.markdown-codemirror-host :is(.cm-editor, .cm-scroller, .cm-content, .cm-line, .cm-line *, ' +
             '#markdown-font#markdown-font#markdown-font) { font-family: ' + stack + ' !important; }';
         document.documentElement.appendChild(style);

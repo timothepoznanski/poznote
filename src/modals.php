@@ -227,6 +227,39 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
+<!-- Custom Fonts Modal: the font files stored in data/fonts/ -->
+<div id="customFontsModal" class="modal">
+    <div class="modal-content">
+        <h3><?php echo t_h('modals.custom_fonts.title', [], 'Custom fonts'); ?></h3>
+        <p><?php echo t_h('modals.custom_fonts.description', [], 'Upload font files (WOFF2, WOFF, TTF or OTF), for instance a family downloaded from Google Fonts. They are stored in your data volume, and every user can then pick them as App font or Markdown editor font.'); ?></p>
+
+        <div class="custom-css-upload-controls">
+            <input type="file" id="customFontsFileInput" accept=".woff2,.woff,.ttf,.otf,font/woff2,font/woff,font/ttf,font/otf" multiple style="display:none">
+
+            <div id="customFontsNoFile" class="no-css-text" style="display:none">
+                <?php echo t_h('modals.custom_fonts.no_file', [], 'No font stored yet'); ?>
+            </div>
+
+            <div id="customFontsList" class="custom-css-theme-list"></div>
+
+            <div class="custom-css-actions">
+                <button type="button" class="btn-secondary" id="uploadCustomFontsBtn">
+                    <i class="lucide lucide-upload"></i>
+                    <?php echo t_h('modals.custom_fonts.upload', [], 'Upload font files'); ?>
+                </button>
+            </div>
+
+            <div class="custom-css-block-help">
+                <?php echo t_h('modals.custom_fonts.hint', [], 'Select every file of a family at once (regular, bold, italic), or its single variable font file. Without a bold file, bold text keeps the default font.'); ?>
+            </div>
+        </div>
+
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="closeCustomFontsBtn"><?php echo t_h('common.close'); ?></button>
+        </div>
+    </div>
+</div>
+
 <!-- Theme List Modal: what the rail's theme button walks through, in order -->
 <div id="themeListModal" class="modal">
     <div class="modal-content">

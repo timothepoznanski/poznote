@@ -762,6 +762,26 @@ Konfigurieren Sie dies unter **Einstellungen > Anzeige > Sichtbarkeit von Elemen
 </details>
 
 <details>
+<summary><strong>Benutzerdefinierte Schriftarten</strong></summary>
+<br>
+
+Poznote wird mit Inter ausgeliefert und kann die auf Ihrem Gerät installierten Schriftarten verwenden. Um eine beliebige andere Schriftart zu nutzen, zum Beispiel eine Familie von Google Fonts, lädt ein Administrator ihre Dateien einmal hoch, danach kann jeder Benutzer sie auswählen.
+
+Laden Sie sie unter **Einstellungen > Admin-Werkzeuge > Benutzerdefinierte Schriftarten** hoch und wählen Sie die Schriftart dann unter **Einstellungen > Anzeige > App-Schriftart** oder **Einstellungen > Markdown > Markdown-Editor-Schriftart**.
+
+Hinweise:
+
+- Akzeptiert werden WOFF2, WOFF, TTF und OTF, bis zu 10 MB pro Datei.
+- Eine Familie besteht aus mehreren Dateien (normal, fett, kursiv...) oder aus einer einzigen variablen Schriftdatei. Wählen Sie alle Dateien einer Familie in einem Upload aus, sie werden unter dem Familiennamen zusammengefasst.
+- Die Schriftarten werden von Ihrer eigenen Instanz ausgeliefert, es wird nichts von Google oder einem anderen Drittanbieter geladen. Laden Sie die Familie zuerst herunter, von [Google Fonts](https://fonts.google.com) (**Get font > Download all**) oder [google-webfonts-helper](https://gwfh.mranftl.com/fonts).
+- Eine Familie ohne fette Datei behält für fetten Text und Überschriften die Standardschriftart, laden Sie also auch die fette Datei hoch.
+- Die Dateien werden in `data/fonts/` (Ihrem Docker-Volume) gespeichert und überstehen daher Image-Updates. Von Hand dorthin kopierte Dateien werden beim Öffnen des Dialogs **Benutzerdefinierte Schriftarten** erkannt.
+- Jeder Benutzer wählt seine eigene Schriftart. Wird eine Familie gelöscht, erhalten die Benutzer, die sie gewählt hatten, wieder die Standardschriftart.
+- Nur Administratoren können Schriftarten hochladen oder löschen.
+
+</details>
+
+<details>
 <summary><strong>Benutzerdefinierte CSS-Anpassungen</strong></summary>
 <br>
 
@@ -869,6 +889,7 @@ Poznote verwendet eine Master-Datenbank (`data/master.db`) für gemeinsame Koord
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

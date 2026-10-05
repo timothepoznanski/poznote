@@ -762,6 +762,26 @@ Configure isso em **Configurações > Tela > Visibilidade dos elementos**.
 </details>
 
 <details>
+<summary><strong>Fontes personalizadas</strong></summary>
+<br>
+
+O Poznote vem com a Inter e pode usar as fontes instaladas no seu dispositivo. Para usar qualquer outra fonte, por exemplo uma família do Google Fonts, um administrador envia os arquivos uma vez e cada usuário pode então escolhê-la.
+
+Envie-os em **Configurações > Ferramentas de administração > Fontes personalizadas** e depois escolha a fonte em **Configurações > Tela > Fonte do aplicativo** ou **Configurações > Markdown > Fonte do editor markdown**.
+
+Notas:
+
+- Os formatos aceitos são WOFF2, WOFF, TTF e OTF, até 10 MB por arquivo.
+- Uma família são vários arquivos (normal, negrito, itálico...) ou um único arquivo de fonte variável. Selecione todos os arquivos de uma família no mesmo envio, eles são agrupados sob o nome da família.
+- As fontes são servidas pela sua própria instância, nada é carregado do Google nem de qualquer outro terceiro. Baixe primeiro a família, no [Google Fonts](https://fonts.google.com) (**Get font > Download all**) ou no [google-webfonts-helper](https://gwfh.mranftl.com/fonts).
+- Uma família sem arquivo de negrito mantém a fonte padrão no texto em negrito e nos títulos, portanto envie também o arquivo de negrito.
+- Os arquivos ficam em `data/fonts/` (seu volume Docker), então sobrevivem às atualizações da imagem. Arquivos copiados manualmente para essa pasta são detectados ao abrir a janela **Fontes personalizadas**.
+- Cada usuário escolhe a sua própria fonte. Excluir uma família devolve à fonte padrão os usuários que a tinham escolhido.
+- Somente administradores podem enviar ou excluir fontes.
+
+</details>
+
+<details>
 <summary><strong>Substituições com CSS personalizado</strong></summary>
 <br>
 
@@ -869,6 +889,7 @@ O Poznote usa um banco de dados mestre (`data/master.db`) para os dados de coord
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

@@ -762,6 +762,26 @@ Configure it in **Settings > Display > Element visibility**.
 </details>
 
 <details>
+<summary><strong>Custom Fonts</strong></summary>
+<br>
+
+Poznote ships with Inter and can use the fonts installed on your device. To use any other font, for instance a family from Google Fonts, an administrator uploads its files once and every user can then pick it.
+
+Upload them in **Settings > Admin Tools > Custom fonts**, then choose the font in **Settings > Display > App font** or **Settings > Markdown > Markdown editor font**.
+
+Notes:
+
+- Accepted formats are WOFF2, WOFF, TTF and OTF, up to 10 MB per file.
+- A family is several files (regular, bold, italic...) or a single variable font file. Select all the files of a family in one upload, they are grouped under the family name.
+- The fonts are served by your own instance, nothing is loaded from Google or any other third party. Download the family first, from [Google Fonts](https://fonts.google.com) (**Get font > Download all**) or [google-webfonts-helper](https://gwfh.mranftl.com/fonts).
+- A family without a bold file keeps the default font for bold text and headings, so upload the bold file too.
+- The files are stored in `data/fonts/` (your Docker volume), so they survive image updates. Files copied there by hand are picked up when the **Custom fonts** dialog is opened.
+- Each user chooses their own font. Deleting a family sends the users who had picked it back to the default font.
+- Only administrators can upload or delete fonts.
+
+</details>
+
+<details>
 <summary><strong>Custom CSS Overrides</strong></summary>
 <br>
 
@@ -869,6 +889,7 @@ Poznote uses a master database (`data/master.db`) for shared coordination data, 
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

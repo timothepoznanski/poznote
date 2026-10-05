@@ -187,7 +187,8 @@
       "sidebar_offline_marks": "Show a small dot next to the notes available offline in this browser.",
       "format_toolbar_mode": "On a computer, choose where the formatting buttons show when you select text in a note: in the note toolbar, in place of the note actions, or in a menu floating above the selection, which leaves the note toolbar as it is.",
       "workspace_activity_emails": "Receive an email when someone else changes a note in a workspace you share, or in one shared with you. It lists the notes created, edited and deleted, never their content, and is sent to the email address of your profile. As changes happen: a few minutes after the last change. Daily summary: at 8:00. Weekly summary: on Monday at 8:00, in your timezone.",
-      "workspace_activity_emails_no_address": "Add an email address to your profile to receive these emails."
+      "workspace_activity_emails_no_address": "Add an email address to your profile to receive these emails.",
+      "custom_fonts": "Upload font files to offer them to every user in the App font and Markdown editor font lists."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -273,7 +274,8 @@
       "s3_storage": "S3 Attachments",
       "s3_backup": "S3 Backups",
       "stt": "Transcription",
-      "api_rest": "API REST"
+      "api_rest": "API REST",
+      "custom_fonts": "Custom fonts"
     },
     "default_credentials": {
       "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
@@ -1339,6 +1341,21 @@
         "daily": "Daily summary",
         "weekly": "Weekly summary"
       }
+    },
+    "custom_fonts": {
+      "title": "Custom fonts",
+      "description": "Upload font files (WOFF2, WOFF, TTF or OTF), for instance a family downloaded from Google Fonts. They are stored in your data volume, and every user can then pick them as App font or Markdown editor font.",
+      "no_file": "No font stored yet",
+      "upload": "Upload font files",
+      "hint": "Select every file of a family at once (regular, bold, italic), or its single variable font file. Without a bold file, bold text keeps the default font.",
+      "badge_one": "1 font",
+      "badge_other": "{{count}} fonts",
+      "italic": "italic",
+      "files_one": "1 file",
+      "files_other": "{{count}} files",
+      "validation": "Please select WOFF2, WOFF, TTF or OTF font files.",
+      "some_rejected": "Some files were not stored: they are not fonts, or they are larger than 10 MB.",
+      "delete_confirm": "Delete {{name}}? Its files are removed from your data volume."
     }
   },
   "notes_list": {

@@ -762,6 +762,26 @@ Configúralo en **Configuración > Pantalla > Visibilidad de los elementos**.
 </details>
 
 <details>
+<summary><strong>Fuentes personalizadas</strong></summary>
+<br>
+
+Poznote incluye Inter y puede usar las fuentes instaladas en tu dispositivo. Para usar cualquier otra fuente, por ejemplo una familia de Google Fonts, un administrador sube sus archivos una vez y cada usuario puede elegirla después.
+
+Súbelas en **Configuración > Herramientas de administración > Fuentes personalizadas**, y luego elige la fuente en **Configuración > Pantalla > Fuente de la aplicación** o **Configuración > Markdown > Fuente del editor markdown**.
+
+Notas:
+
+- Los formatos aceptados son WOFF2, WOFF, TTF y OTF, hasta 10 MB por archivo.
+- Una familia son varios archivos (normal, negrita, cursiva...) o un único archivo de fuente variable. Selecciona todos los archivos de una familia en la misma subida, se agrupan bajo el nombre de la familia.
+- Las fuentes las sirve tu propia instancia, no se carga nada desde Google ni desde ningún otro tercero. Descarga primero la familia, desde [Google Fonts](https://fonts.google.com) (**Get font > Download all**) o [google-webfonts-helper](https://gwfh.mranftl.com/fonts).
+- Una familia sin archivo de negrita conserva la fuente predeterminada para el texto en negrita y los títulos, así que sube también el archivo de negrita.
+- Los archivos se guardan en `data/fonts/` (tu volumen de Docker), por lo que sobreviven a las actualizaciones de la imagen. Los archivos copiados a mano en esa carpeta se detectan al abrir el diálogo **Fuentes personalizadas**.
+- Cada usuario elige su propia fuente. Eliminar una familia devuelve a la fuente predeterminada a los usuarios que la habían elegido.
+- Solo los administradores pueden subir o eliminar fuentes.
+
+</details>
+
+<details>
 <summary><strong>Personalización con CSS</strong></summary>
 <br>
 
@@ -869,6 +889,7 @@ Poznote usa una base de datos maestra (`data/master.db`) para los datos de coord
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

@@ -511,7 +511,8 @@
       "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur.",
       "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle.",
       "workspace_activity_emails": "Recevez un email quand quelqu'un d'autre modifie une note dans un espace de travail que vous partagez, ou dans un espace partagé avec vous. Il liste les notes créées, modifiées et supprimées, jamais leur contenu, et il est envoyé à l'adresse email de votre profil. Au fil des modifications : quelques minutes après la dernière modification. Résumé quotidien : à 8 h. Résumé hebdomadaire : le lundi à 8 h, dans votre fuseau horaire.",
-      "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails."
+      "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails.",
+      "custom_fonts": "Importez des fichiers de police pour les proposer à tous les utilisateurs dans les listes Police de l'application et Police de l'éditeur Markdown."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -616,7 +617,8 @@
       "s3_storage": "Pièces jointes S3",
       "s3_backup": "Sauvegardes S3",
       "stt": "Transcription",
-      "api_rest": "API REST"
+      "api_rest": "API REST",
+      "custom_fonts": "Polices personnalisées"
     },
     "default_credentials": {
       "both": "Ce compte utilise encore le login et le mot de passe livrés par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",
@@ -1838,6 +1840,21 @@
         "daily": "Résumé quotidien",
         "weekly": "Résumé hebdomadaire"
       }
+    },
+    "custom_fonts": {
+      "title": "Polices personnalisées",
+      "description": "Importez des fichiers de police (WOFF2, WOFF, TTF ou OTF), par exemple une famille téléchargée depuis Google Fonts. Ils sont stockés dans votre volume de données, et chaque utilisateur peut ensuite les choisir comme police de l'application ou de l'éditeur Markdown.",
+      "no_file": "Aucune police stockée pour le moment",
+      "upload": "Importer des fichiers de police",
+      "hint": "Sélectionnez tous les fichiers d'une famille en une fois (normal, gras, italique), ou son unique fichier de police variable. Sans fichier gras, le texte en gras garde la police par défaut.",
+      "badge_one": "1 police",
+      "badge_other": "{{count}} polices",
+      "italic": "italique",
+      "files_one": "1 fichier",
+      "files_other": "{{count}} fichiers",
+      "validation": "Veuillez sélectionner des fichiers de police WOFF2, WOFF, TTF ou OTF.",
+      "some_rejected": "Certains fichiers n'ont pas été stockés : ce ne sont pas des polices, ou ils dépassent 10 Mo.",
+      "delete_confirm": "Supprimer {{name}} ? Ses fichiers sont retirés de votre volume de données."
     }
   },
   "notes_list": {

@@ -511,7 +511,8 @@
       "sidebar_offline_marks": "在此浏览器中可离线使用的笔记旁显示一个小圆点。",
       "format_toolbar_mode": "在电脑上，选择在笔记中选中文本时格式按钮显示的位置：在笔记工具栏中替代笔记操作，或在所选内容上方的浮动菜单中，笔记工具栏保持不变。",
       "workspace_activity_emails": "当其他人更改了您共享的工作区或与您共享的工作区中的笔记时，接收邮件通知。邮件会列出新建、修改和删除的笔记，但不包含笔记内容，并发送到您个人资料中的邮箱地址。有更改时：在最后一次更改后几分钟发送。每日摘要：8:00 发送。每周摘要：每周一 8:00 发送，以您的时区为准。",
-      "workspace_activity_emails_no_address": "请在个人资料中添加邮箱地址以接收这些邮件。"
+      "workspace_activity_emails_no_address": "请在个人资料中添加邮箱地址以接收这些邮件。",
+      "custom_fonts": "上传字体文件，让所有用户都能在“应用字体”和“Markdown 编辑器字体”列表中选用。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -616,7 +617,8 @@
       "s3_storage": "S3 附件",
       "s3_backup": "S3 备份",
       "stt": "转录",
-      "api_rest": "REST API"
+      "api_rest": "REST API",
+      "custom_fonts": "自定义字体"
     },
     "default_credentials": {
       "both": "此账户仍在使用默认的用户名和密码。任何能访问此实例的人都可以登录。",
@@ -1830,6 +1832,21 @@
         "daily": "每日摘要",
         "weekly": "每周摘要"
       }
+    },
+    "custom_fonts": {
+      "title": "自定义字体",
+      "description": "上传字体文件（WOFF2、WOFF、TTF 或 OTF），例如从 Google Fonts 下载的字体家族。文件保存在您的数据卷中，之后每位用户都可以将其选为应用字体或 Markdown 编辑器字体。",
+      "no_file": "尚未保存任何字体",
+      "upload": "上传字体文件",
+      "hint": "请一次选择同一家族的所有文件（常规、粗体、斜体），或其单个可变字体文件。没有粗体文件时，粗体文字仍使用默认字体。",
+      "badge_one": "1 个字体",
+      "badge_other": "{{count}} 个字体",
+      "italic": "斜体",
+      "files_one": "1 个文件",
+      "files_other": "{{count}} 个文件",
+      "validation": "请选择 WOFF2、WOFF、TTF 或 OTF 字体文件。",
+      "some_rejected": "部分文件未保存：它们不是字体，或超过 10 MB。",
+      "delete_confirm": "删除 {{name}}？其文件将从您的数据卷中移除。"
     }
   },
   "notes_list": {

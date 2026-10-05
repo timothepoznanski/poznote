@@ -762,6 +762,26 @@ Poznote 允许您隐藏不使用的元素，让界面更加简洁。
 </details>
 
 <details>
+<summary><strong>自定义字体</strong></summary>
+<br>
+
+Poznote 自带 Inter 字体，也可以使用您设备上已安装的字体。若要使用其他任何字体，例如 Google Fonts 上的字体家族，由管理员上传一次字体文件，之后每位用户都可以选用。
+
+在 **设置 > 管理工具 > 自定义字体** 中上传，然后在 **设置 > 显示 > 应用字体** 或 **设置 > Markdown > Markdown 编辑器字体** 中选择该字体。
+
+说明：
+
+- 支持 WOFF2、WOFF、TTF 和 OTF 格式，每个文件最大 10 MB。
+- 一个字体家族由多个文件组成（常规、粗体、斜体等），或只有一个可变字体文件。请在同一次上传中选择该家族的所有文件，它们会归入同一个家族名称下。
+- 字体由您自己的实例提供，不会从 Google 或任何其他第三方加载内容。请先从 [Google Fonts](https://fonts.google.com)（**Get font > Download all**）或 [google-webfonts-helper](https://gwfh.mranftl.com/fonts) 下载字体家族。
+- 没有粗体文件的家族，粗体文字和标题仍使用默认字体，因此请同时上传粗体文件。
+- 文件保存在 `data/fonts/`（您的 Docker 卷）中，因此在镜像更新后仍然保留。手动复制到该目录的文件会在打开 **自定义字体** 对话框时被识别。
+- 每位用户选择自己的字体。删除某个家族后，选用它的用户会回到默认字体。
+- 只有管理员可以上传或删除字体。
+
+</details>
+
+<details>
 <summary><strong>自定义 CSS 覆盖</strong></summary>
 <br>
 
@@ -869,6 +889,7 @@ Poznote 使用一个主数据库（`data/master.db`）存放共享的协调数�
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

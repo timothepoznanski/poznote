@@ -762,6 +762,26 @@ Configurez-la dans **Paramètres > Affichage > Visibilité des éléments**.
 </details>
 
 <details>
+<summary><strong>Polices personnalisées</strong></summary>
+<br>
+
+Poznote est livré avec Inter et peut utiliser les polices installées sur votre appareil. Pour utiliser n'importe quelle autre police, par exemple une famille de Google Fonts, un administrateur importe ses fichiers une fois et chaque utilisateur peut ensuite la choisir.
+
+Importez-les dans **Paramètres > Outils d'administration > Polices personnalisées**, puis choisissez la police dans **Paramètres > Affichage > Police de l'application** ou **Paramètres > Markdown > Police de l'éditeur markdown**.
+
+Remarques :
+
+- Les formats acceptés sont WOFF2, WOFF, TTF et OTF, jusqu'à 10 Mo par fichier.
+- Une famille, c'est plusieurs fichiers (normal, gras, italique...) ou un seul fichier de police variable. Sélectionnez tous les fichiers d'une famille dans le même import, ils sont regroupés sous le nom de la famille.
+- Les polices sont servies par votre propre instance, rien n'est chargé depuis Google ni depuis un autre tiers. Téléchargez d'abord la famille, depuis [Google Fonts](https://fonts.google.com) (**Get font > Download all**) ou [google-webfonts-helper](https://gwfh.mranftl.com/fonts).
+- Une famille sans fichier gras garde la police par défaut pour le texte en gras et les titres, importez donc aussi le fichier gras.
+- Les fichiers sont stockés dans `data/fonts/` (votre volume Docker), ils survivent donc aux mises à jour de l'image. Les fichiers copiés à la main dans ce dossier sont pris en compte à l'ouverture de la fenêtre **Polices personnalisées**.
+- Chaque utilisateur choisit sa propre police. Supprimer une famille ramène à la police par défaut les utilisateurs qui l'avaient choisie.
+- Seuls les administrateurs peuvent importer ou supprimer des polices.
+
+</details>
+
+<details>
 <summary><strong>Surcharges CSS personnalisées</strong></summary>
 <br>
 
@@ -869,6 +889,7 @@ Poznote utilise une base de données maîtresse (`data/master.db`) pour les donn
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

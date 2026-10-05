@@ -1,18 +1,21 @@
 /* Custom CSS Upload Modal Styles */
 
-#customCssModal .modal-content {
+#customCssModal .modal-content,
+#customFontsModal .modal-content {
     max-width: 500px;
     padding: 30px;
     border-radius: var(--pz-radius-xl);
 }
 
-#customCssModal h3 {
+#customCssModal h3,
+#customFontsModal h3 {
     margin-top: 0;
     margin-bottom: 15px;
     font-size: 1.25rem;
 }
 
-#customCssModal p {
+#customCssModal p,
+#customFontsModal p {
     color: var(--pz-text-muted);
     font-size: 0.95rem;
     line-height: 1.5;
@@ -133,12 +136,14 @@
     transition: background-color 0.2s, opacity 0.2s;
 }
 
-#uploadCustomCssBtn {
+#uploadCustomCssBtn,
+#uploadCustomFontsBtn {
     background-color: var(--pz-accent);
     color: var(--pz-text-inverse);
 }
 
-#uploadCustomCssBtn:hover {
+#uploadCustomCssBtn:hover,
+#uploadCustomFontsBtn:hover {
     background-color: var(--pz-accent-hover);
 }
 

@@ -512,7 +512,8 @@
       "sidebar_offline_marks": "Zeigt einen kleinen Punkt neben den Notizen, die in diesem Browser offline verfügbar sind.",
       "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt.",
       "workspace_activity_emails": "Erhalten Sie eine E-Mail, wenn jemand anderes eine Notiz in einem Arbeitsbereich ändert, den Sie teilen oder der mit Ihnen geteilt wird. Sie listet die erstellten, bearbeiteten und gelöschten Notizen auf, nie deren Inhalt, und geht an die E-Mail-Adresse Ihres Profils. Bei Änderungen: einige Minuten nach der letzten Änderung. Tägliche Zusammenfassung: um 8:00 Uhr. Wöchentliche Zusammenfassung: montags um 8:00 Uhr, in Ihrer Zeitzone.",
-      "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten."
+      "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten.",
+      "custom_fonts": "Laden Sie Schriftdateien hoch, um sie allen Benutzern in den Listen App-Schriftart und Markdown-Editor-Schriftart anzubieten."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -617,7 +618,8 @@
       "s3_storage": "S3-Anhänge",
       "s3_backup": "S3-Sicherungen",
       "stt": "Transkription",
-      "api_rest": "REST-API"
+      "api_rest": "REST-API",
+      "custom_fonts": "Benutzerdefinierte Schriftarten"
     },
     "default_credentials": {
       "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
@@ -1832,6 +1834,21 @@
         "daily": "Tägliche Zusammenfassung",
         "weekly": "Wöchentliche Zusammenfassung"
       }
+    },
+    "custom_fonts": {
+      "title": "Benutzerdefinierte Schriftarten",
+      "description": "Laden Sie Schriftdateien hoch (WOFF2, WOFF, TTF oder OTF), zum Beispiel eine von Google Fonts heruntergeladene Familie. Sie werden in Ihrem Daten-Volume gespeichert, und jeder Benutzer kann sie anschließend als App-Schriftart oder Markdown-Editor-Schriftart wählen.",
+      "no_file": "Noch keine Schriftart gespeichert",
+      "upload": "Schriftdateien hochladen",
+      "hint": "Wählen Sie alle Dateien einer Familie auf einmal aus (normal, fett, kursiv) oder ihre einzelne variable Schriftdatei. Ohne fette Datei behält fetter Text die Standardschriftart.",
+      "badge_one": "1 Schriftart",
+      "badge_other": "{{count}} Schriftarten",
+      "italic": "kursiv",
+      "files_one": "1 Datei",
+      "files_other": "{{count}} Dateien",
+      "validation": "Bitte wählen Sie Schriftdateien im Format WOFF2, WOFF, TTF oder OTF aus.",
+      "some_rejected": "Einige Dateien wurden nicht gespeichert: Es sind keine Schriftarten, oder sie sind größer als 10 MB.",
+      "delete_confirm": "{{name}} löschen? Die Dateien werden aus Ihrem Daten-Volume entfernt."
     }
   },
   "notes_list": {
