@@ -333,7 +333,7 @@
             time: (due && due.length > 10) ? due.substring(11, 16) : '',
             // A new due date reminds by default; an existing one keeps its choice
             remind: due ? !!opts.task.dueReminder : true,
-            email: opts.task.dueReminderEmail !== undefined ? !!opts.task.dueReminderEmail : true,
+            email: !!opts.task.dueReminderEmail,
             hadDue: !!due,
             onSave: opts.onSave
         };
