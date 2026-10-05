@@ -2018,18 +2018,27 @@
     function isTaskInputElement(input) {
         return !!(input && input.tagName === 'INPUT' && input.classList && (
             input.classList.contains('task-input') ||
-            input.classList.contains('task-edit-input')
+            input.classList.contains('task-edit-input') ||
+            input.classList.contains('task-subitem-input')
         ));
     }
 
+    // The "add a subtask" field of a task (js/tasklist-subtasks.js); the field that
+    // renames a subtask in place shares the class and gets no menu
+    function isNewSubtaskInput(input) {
+        return !!(input && input.tagName === 'INPUT' && input.classList
+            && input.classList.contains('task-subitem-input')
+            && input.closest('.task-subitem-form'));
+    }
+
     function pauseTaskEditBlurSave(input) {
-        if (input && input.classList && input.classList.contains('task-edit-input') && typeof window.pauseTaskEditBlurSave === 'function') {
+        if (input && input.classList && (input.classList.contains('task-edit-input') || input.classList.contains('task-subitem-input')) && typeof window.pauseTaskEditBlurSave === 'function') {
             window.pauseTaskEditBlurSave(input);
         }
     }
 
     function resumeTaskEditBlurSave(input) {
-        if (input && input.classList && input.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+        if (input && input.classList && (input.classList.contains('task-edit-input') || input.classList.contains('task-subitem-input')) && typeof window.resumeTaskEditBlurSave === 'function') {
             window.resumeTaskEditBlurSave(input);
         }
     }
@@ -5453,7 +5462,7 @@
 
         // Title inputs and task inputs
         if (target.tagName === 'INPUT'
-            && (target.classList.contains('css-title') || target.classList.contains('task-input'))) {
+            && (target.classList.contains('css-title') || target.classList.contains('task-input') || isNewSubtaskInput(target))) {
             const start = target.selectionStart;
             const end = target.selectionEnd;
             target.value = target.value.slice(0, start) + '/' + target.value.slice(end);
@@ -5802,10 +5811,10 @@
             const target = e.target;
 
             // Check if this is a title input field or a task list input
-            // Only the new-task input (task-input) gets the slash menu; task-edit-input is excluded
+            // Only the new-task and new-subtask inputs get the slash menu; task-edit-input is excluded
             // to avoid intercepting literal '/' characters (e.g. file paths) during task editing.
             const isTitleInput = target.tagName === 'INPUT' && target.classList.contains('css-title');
-            const isTaskInput = target.tagName === 'INPUT' && target.classList.contains('task-input');
+            const isTaskInput = (target.tagName === 'INPUT' && target.classList.contains('task-input')) || isNewSubtaskInput(target);
             if (isTitleInput || isTaskInput) {
                 const value = target.value;
                 const pos = target.selectionStart;
