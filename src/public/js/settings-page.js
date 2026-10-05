@@ -4580,7 +4580,8 @@
         'card:sidebarAiChatBtn': 'card:edgeAiChatBtn',
         'toolbar:btn-split-view': 'card:edgeSplitViewBtn',
         'toolbar:btn-note-width': 'card:edgeMenuNoteWidth',
-        'toolbar:btn-info': 'card:edgeMenuNoteInfo'
+        'toolbar:btn-info': 'card:edgeMenuNoteInfo',
+        'toolbar:btn-paste-markdown': 'slash:paste-markdown'
     };
 
     function normalizeHiddenUiKey(key) {

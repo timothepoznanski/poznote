@@ -293,7 +293,7 @@
         wireSublineDrag(list);
         // The information icon follows the strip: when every entry of the
         // strip is hidden ("Element visibility"), it opens the line and
-        // drops its dot (css/notes/subline.css)
+        // starts where the line does (css/notes/subline.css)
         if (typeof ResizeObserver === 'function') {
             new ResizeObserver(function () {
                 list.parentElement.classList.toggle('no-entries', list.offsetWidth === 0);

@@ -40,8 +40,6 @@
         'btn-uncheck-all': ['uncheck-all-tasks'],
         'btn-print': ['print-note'],
         'btn-archive': ['archive-note'],
-        // Markdown notes offer "Insert rich text", HTML notes "Insert Markdown"
-        'btn-paste-markdown': ['show-paste-markdown-modal', 'show-insert-markdown-modal'],
         'btn-open-tasks-page': ['open-tasks-page']
     };
 
@@ -76,7 +74,8 @@
         // menu (discussion 1482).
         'toolbar:btn-split-view': 'card:edgeSplitViewBtn',
         'toolbar:btn-note-width': 'card:edgeMenuNoteWidth',
-        'toolbar:btn-info': 'card:edgeMenuNoteInfo'
+        'toolbar:btn-info': 'card:edgeMenuNoteInfo',
+        'toolbar:btn-paste-markdown': 'slash:paste-markdown'
     };
 
     function sanitizeHiddenKeys(hidden) {

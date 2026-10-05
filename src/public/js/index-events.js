@@ -920,30 +920,6 @@
                     showConvertNoteModal(noteId, convertTo);
                 }
                 break;
-            case 'show-paste-markdown-modal': {
-                // Close the dropdown first, or it stays open behind the modal.
-                var toolbarElForPaste = target.closest('.note-edit-toolbar');
-                if (toolbarElForPaste) {
-                    var menuElForPaste = toolbarElForPaste.querySelector('.mobile-toolbar-menu');
-                    if (menuElForPaste) menuElForPaste.hidden = true;
-                }
-                if (typeof window.showPasteMarkdownModal === 'function') {
-                    window.showPasteMarkdownModal(noteId);
-                }
-                break;
-            }
-            case 'show-insert-markdown-modal': {
-                // Close the dropdown first, or it stays open behind the modal.
-                var toolbarElForInsertMd = target.closest('.note-edit-toolbar');
-                if (toolbarElForInsertMd) {
-                    var menuElForInsertMd = toolbarElForInsertMd.querySelector('.mobile-toolbar-menu');
-                    if (menuElForInsertMd) menuElForInsertMd.hidden = true;
-                }
-                if (typeof window.showInsertMarkdownModal === 'function') {
-                    window.showInsertMarkdownModal(noteId);
-                }
-                break;
-            }
             case 'rename-note':
                 if (noteId && typeof window.renameNote === 'function') {
                     window.renameNote(noteId, target.dataset.noteTitle || '');

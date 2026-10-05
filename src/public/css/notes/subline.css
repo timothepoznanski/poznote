@@ -2,8 +2,8 @@
  * Notes - Subline & Title Spacing
  *
  * Styles for the note subline, the small line of metadata under the title
- * (creation date, modification date, characters / words / lines, then an
- * information icon, with a dot between two entries), and innernote h4 title
+ * (creation date, modification date, characters / words / lines with a dot
+ * between two entries, then an information icon), and innernote h4 title
  * spacing.
  */
 
@@ -97,11 +97,17 @@ body.show-note-created .note-subline {
 }
 
 /* The information icon stands after the strip, not in it: it stays in view
-   however far the strip is scrolled. With no entry left before it, it is the
-   first thing on the line and its dot goes (js/note-stats.js marks the line);
-   the slot stays, so the icon lands where the line starts. */
-.note-subline.no-entries > .note-sub-info::before {
-    visibility: hidden;
+   however far the strip is scrolled. It is a button, not one more piece of
+   metadata: a plain gap sets it apart from the entries, no dot. With no entry
+   left before it, it is the first thing on the line (js/note-stats.js marks
+   the line) and takes the width of the dot slot the line is shifted by, so
+   the icon lands where the line starts. */
+.note-sub-info {
+    margin-left: 14px;
+}
+
+.note-subline.no-entries > .note-sub-info {
+    margin-left: var(--note-sub-dot-slot);
 }
 
 .note-sub-stat {
@@ -114,8 +120,7 @@ body.show-note-created .note-subline {
    whatever entries are hidden, which no selector could tell. */
 .note-sub-created::before,
 .note-sub-updated::before,
-.note-sub-stat::before,
-.note-sub-info::before {
+.note-sub-stat::before {
     content: "\00b7";
     display: inline-block;
     width: var(--note-sub-dot-slot);

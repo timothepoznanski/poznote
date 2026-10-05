@@ -46,10 +46,17 @@ function poznoteGetNonHideableUiKeys() {
  * markdown preview (issue #1406). The preview edits nothing else, and a
  * misclick next to the copy button costs the whole block, so it is off until
  * asked for.
+ *
+ * The line under the note title opens with the modification date and the word
+ * count only (discussion #1577): the creation date and the character and line
+ * counts are one tick away, and in the note information either way.
  */
 function poznoteGetDefaultHiddenUiKeys() {
     return [
         'panel:preview-code-block-delete',
+        'panel:note-created-date',
+        'panel:note-stats-characters',
+        'panel:note-stats-lines',
     ];
 }
 
@@ -81,6 +88,9 @@ function poznoteNormalizeHiddenUiKey($key) {
         'toolbar:btn-split-view' => 'card:edgeSplitViewBtn',
         'toolbar:btn-note-width' => 'card:edgeMenuNoteWidth',
         'toolbar:btn-info' => 'card:edgeMenuNoteInfo',
+        // "Insert rich text" / "Insert Markdown" left the note's ⋮ menu for
+        // the Insert section of the slash menu (discussion #1577).
+        'toolbar:btn-paste-markdown' => 'slash:paste-markdown',
     ];
 
     return $renamed[$key] ?? $key;
@@ -427,8 +437,6 @@ function poznoteGetToolbarMenuActions() {
         'btn-uncheck-all' => ['uncheck-all-tasks'],
         'btn-print' => ['print-note'],
         'btn-archive' => ['archive-note'],
-        // Markdown notes offer "Insert rich text", HTML notes "Insert Markdown"
-        'btn-paste-markdown' => ['show-paste-markdown-modal', 'show-insert-markdown-modal'],
         'btn-open-tasks-page' => ['open-tasks-page'],
     ];
 }

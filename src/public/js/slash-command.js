@@ -2285,7 +2285,8 @@
         'tasklist-embed': true,
         'link-to-attachment': true,
         'mp4-video': true,
-        'audio-file': true
+        'audio-file': true,
+        'paste-markdown': true
     };
 
     function isOfflinePage() {
@@ -2742,6 +2743,42 @@
         }
     }
 
+    // Paste content written for the other kind of note, converted on the way
+    // in: Markdown into a rich text note (js/insert-markdown-modal.js), rich
+    // text into a Markdown note (js/paste-markdown-modal.js). One command id
+    // for both, each note type only ever shows its own. The two used to sit
+    // in the note's ⋮ menu (discussion #1577). Both dialogs convert on the
+    // server, hence OFFLINE_UNAVAILABLE_COMMANDS.
+    function getPasteConvertedSlashCommand(t, isMarkdown) {
+        // The dialogs are part of the notes page only (modals.php);
+        // filterSlashCommands() drops the missing entry elsewhere
+        if (!document.getElementById(isMarkdown ? 'pasteMarkdownModal' : 'insertMarkdownModal')) {
+            return null;
+        }
+        return {
+            id: 'paste-markdown',
+            icon: 'lucide-clipboard',
+            label: isMarkdown
+                ? t('modals.paste_markdown.menu_item', null, 'Insert rich text')
+                : t('modals.insert_markdown.menu_item', null, 'Insert Markdown'),
+            aliases: isMarkdown
+                ? ['paste', 'rich text', 'html', 'convert']
+                : ['paste', 'markdown', 'md', 'convert'],
+            // The dialog takes the focus; the insertion gives it back
+            noRefocus: true,
+            action: function () {
+                var show = isMarkdown ? window.showPasteMarkdownModal : window.showInsertMarkdownModal;
+                if (typeof show !== 'function') return;
+                var context = getEditorContext();
+                var noteEntry = savedNoteEntry || (context && context.noteEntry);
+                var noteId = noteEntry && noteEntry.getAttribute ? noteEntry.getAttribute('data-note-id') : null;
+                // Once the caret has settled where the slash text was removed:
+                // the Markdown dialog reads it when it opens
+                setTimeout(function () { show(noteId); }, 10);
+            }
+        };
+    }
+
     // Return slash commands common between HTML and Markdown modes
     function getCommonSlashCommands() {
         var t = window.t || (function (key, params, fallback) { return fallback; });
@@ -3019,7 +3056,8 @@
                                 window.insertSeparator();
                             }
                         }
-                    }
+                    },
+                    getPasteConvertedSlashCommand(t, false)
                 ]
             },
             ...buildDiagramItems(t, common, false),
@@ -3346,7 +3384,8 @@
                         action: function () {
                             insertMarkdownAtCursor('\n---\n', 0);
                         }
-                    }
+                    },
+                    getPasteConvertedSlashCommand(t, true)
                 ]
             },
             ...buildDiagramItems(t, common, true),
