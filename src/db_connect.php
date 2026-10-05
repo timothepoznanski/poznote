@@ -161,7 +161,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 45; // 45: entries.offline and folders.offline, "Keep offline" marks read by the offline manifest
+    $CURRENT_SCHEMA_VERSION = 46; // 46: creation date, character and line counts hidden by default on the line under the note title (poznoteGetDefaultHiddenUiKeys)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an

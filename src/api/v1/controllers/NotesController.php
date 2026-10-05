@@ -2908,7 +2908,22 @@ class NotesController {
                     $content
                 );
                 
-                $convertedContent = $this->htmlToMarkdown($content);
+                // An embedded Excalidraw diagram crosses the conversion as a
+                // placeholder and comes back as it was stored, the raw HTML
+                // block a Markdown note keeps it in. Converted like the rest,
+                // it came out as a plain image: its scene was lost and it
+                // could no longer be edited (issue #1576).
+                require_once __DIR__ . '/../../../lib/ai-note-diagrams.php';
+                $convertedContent = $this->htmlToMarkdown(aiHideEmbeddedDiagrams($content, false));
+                if (strpos($convertedContent, AI_DIAGRAM_PREFIX) !== false) {
+                    // A block of its own, as the diagram editor writes it
+                    $convertedContent = preg_replace(
+                        '~\s*(!\[[^\]\n]*\]\(' . preg_quote(AI_DIAGRAM_PREFIX, '~') . '[^)\n]*\))\s*~',
+                        "\n\n$1\n\n",
+                        $convertedContent
+                    ) ?? $convertedContent;
+                    $convertedContent = ltrim(aiRestoreEmbeddedDiagrams($convertedContent, $content, true), "\n");
+                }
                 $newType = 'markdown';
             } else {
                 // Converting markdown to HTML: keep attachments as attachments (don't convert to base64)

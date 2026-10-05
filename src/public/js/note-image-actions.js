@@ -102,8 +102,8 @@ function skipBlankTextNodes(node, direction) {
 }
 
 /**
- * True for a "Write outside the diagram here…" paragraph the user never typed in.
- * Older insertions stored the hint as literal dots instead of data-ph.
+ * True for an empty paragraph kept beside a diagram that the user never typed in.
+ * Older insertions stored a hint in it, as literal dots.
  */
 function isEmptyExcalidrawPlaceholder(node) {
     if (!node || node.nodeType !== Node.ELEMENT_NODE || !node.classList.contains('excalidraw-placeholder')) {
@@ -133,6 +133,35 @@ function removeExcalidrawPlaceholdersAround(previousNode, nextNode) {
         placeholder.remove();
     });
 }
+
+/**
+ * The empty paragraph beside a diagram a click was aimed at, when the browser
+ * put the caret somewhere else. It holds no node, its height comes from a
+ * ::before, so Firefox finds nothing to land on and sends the click to the
+ * nearest real content: the diagram, or the line before (issue #1580).
+ */
+function getClickedExcalidrawPlaceholder(target, selection) {
+    if (!target || !target.classList || !target.classList.contains('excalidraw-placeholder')) return null;
+    const noteEntry = target.closest('.noteentry');
+    if (!noteEntry || !noteEntry.isContentEditable) return null;
+    if (!isEmptyExcalidrawPlaceholder(target) || target.contains(selection.anchorNode)) return null;
+    return target;
+}
+
+document.addEventListener('click', function (e) {
+    if (e.button !== 0) return;
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount || !selection.isCollapsed) return;
+
+    const placeholder = getClickedExcalidrawPlaceholder(e.target, selection);
+    if (!placeholder) return;
+
+    const range = document.createRange();
+    range.setStart(placeholder, 0);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+});
 
 function deleteImageAttachmentIfOwnedByNote(img, expectedNoteId) {
     const src = img ? img.getAttribute('src') : '';

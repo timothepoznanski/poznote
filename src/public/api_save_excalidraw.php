@@ -280,8 +280,6 @@ if ($note_id > 0) {
     }
     
     // Generate new Excalidraw HTML content
-    $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…');
-    $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
 
     if ($attachmentId) {
         // Build img classes preserving border settings.
@@ -358,8 +356,6 @@ function saveEmbeddedDiagram() {
     $workspace = trim($_POST['workspace'] ?? '') ?: getWorkspaceFilter();
     $diagram_data = isset($_POST['diagram_data']) ? $_POST['diagram_data'] : '';
     $cursor_position = isset($_POST['cursor_position']) ? intval($_POST['cursor_position']) : null;
-    $excalidraw_placeholder = t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…');
-    $excalidraw_placeholder = htmlspecialchars($excalidraw_placeholder, ENT_QUOTES);
     
     if ($note_id <= 0 || empty($diagram_id)) {
         http_response_code(400);
@@ -432,6 +428,12 @@ function saveEmbeddedDiagram() {
             // Remove old attachment if found. The note before this save
             // gets its automatic revision first, so that the preview it
             // shows is known to be still needed.
+            // A copy of the diagram pasted into the same note shows the same
+            // preview until it is edited in turn: the file stays while the
+            // note still points to it elsewhere (issue #1576).
+            if ($oldAttachmentId && substr_count($html_content, '/attachments/' . $oldAttachmentId . '"') > 1) {
+                $oldAttachmentId = null;
+            }
             if ($oldAttachmentId) {
                 poznoteCreateAutomaticSnapshot($con, $note_id);
                 $existingAttachments = excalidrawRetirePreviews((int)$note_id, $existingAttachments, [$oldAttachmentId]);
@@ -510,9 +512,23 @@ function saveEmbeddedDiagram() {
             $img_style_attr = ' style="' . $base_style . '"';
         }
         
+        // The Align command places a diagram with side margins on its container
+        // (alignHtmlDiagrams() in js/toolbar-editor-utils.js): carry them over,
+        // the container is rebuilt from scratch below
+        $container_align_style = '';
+        $container_tag_pattern = '/<div\b(?=[^>]*class="excalidraw-container")(?=[^>]*id="' . preg_quote($diagram_id, '/') . '")[^>]*>/s';
+        if (preg_match($container_tag_pattern, $html_content, $container_tag_match) &&
+            preg_match('/\bstyle="([^"]*)"/', $container_tag_match[0], $container_style_match)) {
+            foreach (['margin-left', 'margin-right'] as $margin_property) {
+                if (preg_match('/(?:^|;)\s*' . $margin_property . '\s*:\s*(auto|0(?:px)?)\s*(?:;|$)/i', $container_style_match[1], $margin_match)) {
+                    $container_align_style .= ' ' . $margin_property . ': ' . strtolower($margin_match[1]) . ';';
+                }
+            }
+        }
+
         // Create the core diagram HTML without placeholders initially
         // Keep all attributes on a single line for consistent regex matching
-        $diagram_html_core = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" style="cursor: pointer; text-align: center;" data-diagram-id="' . htmlspecialchars($diagram_id) . '" data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
+        $diagram_html_core = '<div class="excalidraw-container" id="' . htmlspecialchars($diagram_id) . '" style="cursor: pointer; text-align: center;' . $container_align_style . '" data-diagram-id="' . htmlspecialchars($diagram_id) . '" data-excalidraw="' . htmlspecialchars($diagram_data) . '">';
         
         if ($attachmentId) {
             // Use attachment URL instead of base64
@@ -573,11 +589,12 @@ function saveEmbeddedDiagram() {
                 }
             } else {
                 // Neither container nor button exists, insert at cursor position if available
-                // Build diagram with empty placeholder paragraphs for easier cursor navigation;
-                // the dots are rendered by CSS (:empty:before with data-ph) and disappear once the user types
-                $diagram_html_new = '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>' .
+                // Build diagram with an empty paragraph on each side, so the caret
+                // can always be put above and below it. They show as plain empty
+                // lines (the "Write outside the diagram" hint is gone, issue #1580)
+                $diagram_html_new = '<p class="excalidraw-placeholder"></p>' .
                                    $diagram_html_core .
-                                   '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_placeholder . '"></p>';
+                                   '<p class="excalidraw-placeholder"></p>';
                 
                 if ($cursor_position !== null && !empty($html_content)) {
                     // Normalize HTML to text length comparable to DOM selection offsets

@@ -1104,9 +1104,6 @@
     },
     "markdown_placeholder": "Écrivez votre markdown, utilisez / ou le clic droit pour ouvrir le menu des commandes, collez des images ou glissez-déposez une image à l’emplacement du curseur.",
     "markdown_placeholder_mobile": "Écrivez votre markdown ou collez des images ici...",
-    "excalidraw": {
-      "placeholder_outside": "Écrivez en dehors du diagramme ici…"
-    },
     "messages": {
       "preview_mode_hint": "Vous êtes en mode prévisualisation. Utilisez le bouton dans la barre d'outils pour passer en mode édition et commencer à écrire en markdown.",
       "split_preview_placeholder": "La prévisualisation s'affichera ici au fur et à mesure que vous tapez..."

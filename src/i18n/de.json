@@ -1104,9 +1104,6 @@
     },
     "markdown_placeholder": "Schreiben Sie Ihr Markdown, verwenden Sie / oder einen Rechtsklick, um das Befehlsmenü zu öffnen, fügen Sie Bilder ein oder legen Sie ein Bild am Cursor ab.",
     "markdown_placeholder_mobile": "Schreiben Sie Ihr Markdown hier oder fügen Sie Bilder ein...",
-    "excalidraw": {
-      "placeholder_outside": "Hier außerhalb des Diagramms schreiben…"
-    },
     "messages": {
       "preview_mode_hint": "Sie befinden sich im Vorschaumodus. Wechseln Sie mit der Schaltfläche in der Symbolleiste in den Bearbeitungsmodus, um mit dem Schreiben von Markdown zu beginnen.",
       "split_preview_placeholder": "Die Vorschau wird hier beim Tippen angezeigt..."

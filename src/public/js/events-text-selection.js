@@ -513,10 +513,18 @@ function initTextSelectionHandlers() {
             if (btn) btn.classList.toggle('is-format-active', isActive);
             if (barButton) barButton.classList.toggle('is-format-active', isActive);
         });
+
+        // The Title button, lit in a heading like Bold on bold text (issue
+        // #1580). Rich-text notes: a Markdown heading is a "#" in the source.
+        var inHeading = !isMarkdown && typeof getHtmlSelectionHeading === 'function' && !!getHtmlSelectionHeading();
+        var titleBtn = document.querySelector('.btn-text-height.show-on-selection');
+        var titleBarButton = document.querySelector('#mobileEditorBar [data-action="change-font-size"]');
+        if (titleBtn) titleBtn.classList.toggle('is-format-active', inHeading);
+        if (titleBarButton) titleBarButton.classList.toggle('is-format-active', inHeading && isMobileFormattingViewport());
     }
 
     function clearFormatActiveStates() {
-        document.querySelectorAll('.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough, #mobileEditorBar .is-format-active')
+        document.querySelectorAll('.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough, .btn-text-height, #mobileEditorBar .is-format-active')
             .forEach(function (btn) { btn.classList.remove('is-format-active'); });
     }
 

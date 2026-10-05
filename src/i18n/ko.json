@@ -1884,9 +1884,6 @@
     },
     "markdown_placeholder": "마크다운을 작성하고, /를 사용하거나 명령 메뉴를 마우스 오른쪽 버튼으로 클릭하고, 이미지를 붙여넣거나 커서에 이미지를 놓습니다.",
     "markdown_placeholder_mobile": "여기에 마크다운을 작성하거나 이미지를 붙여넣으세요...",
-    "excalidraw": {
-      "placeholder_outside": "여기 다이어그램 외부에 작성하세요..."
-    },
     "messages": {
       "preview_mode_hint": "현재 미리보기 모드입니다. 마크다운 작성을 시작하려면 도구 모음의 버튼을 사용하여 편집 모드로 전환하세요.",
       "split_preview_placeholder": "입력하는 동안 여기에 미리보기가 표시됩니다..."

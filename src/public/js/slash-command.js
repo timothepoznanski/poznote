@@ -763,10 +763,173 @@
         insertMarkdownAtCursor(prefix, 0);
     }
 
-    // Insert an HTML heading (h1, h2, h3)
+    // True when the caret sits in an editable rich-text note
+    function isCaretInHtmlNote() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return false;
+        let node = selection.getRangeAt(0).startContainer;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        const noteEntry = node && node.closest ? node.closest('.noteentry') : null;
+        return !!(noteEntry && noteEntry.isContentEditable && noteEntry.getAttribute('data-note-type') !== 'markdown');
+    }
+
+    // deleteSlashText() leaves a selected zero-width space where a "/" that
+    // was not typed stood alone in its text node, for the node inserted next
+    // to replace. The execCommand paths below insert no node: take it out,
+    // unless it is all that holds the line open.
+    function dropSelectedSlashPlaceholder() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount || selection.isCollapsed) return;
+        const range = selection.getRangeAt(0);
+        const node = range.startContainer;
+        if (node.nodeType !== 3 || node !== range.endContainer || range.toString() !== '\u200B') return;
+        if (node.textContent === '\u200B' && !node.previousSibling && !node.nextSibling) return;
+        range.deleteContents();
+    }
+
+    // A link through insertHTML, the caret left after it. Firefox leaves the
+    // caret inside the new link, where the text typed next would join it.
+    function insertLinkHtmlUndoable(linkHtml) {
+        if (!isCaretInHtmlNote()) return false;
+        dropSelectedSlashPlaceholder();
+        if (!document.execCommand('insertHTML', false, linkHtml)) return false;
+
+        const selection = window.getSelection();
+        let node = selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        const link = node && node.closest ? node.closest('a') : null;
+        if (link) {
+            const after = document.createRange();
+            after.setStartAfter(link);
+            after.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(after);
+        }
+        return true;
+    }
+
+    // The rich-text note holding the caret
+    function getCaretNoteEntry() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return null;
+        let node = selection.getRangeAt(0).startContainer;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        return node && node.closest ? node.closest('.noteentry') : null;
+    }
+
+    // An inline format at a bare caret, on the browser's undo stack (issue
+    // #1580): a zero-width space is typed through execCommand, selected, and
+    // handed to `apply`, one of the toolbar's helpers for a selection. The
+    // caret ends after it, inside the format. Inserting the wrapper node
+    // directly was invisible to Ctrl+Z, and a redo put the text back in the
+    // wrong order.
+    function formatTypedCaretHolder(apply, keepTrailingHolder) {
+        if (!isCaretInHtmlNote()) return false;
+        dropSelectedSlashPlaceholder();
+        // keepTrailingHolder types a second one that stays after the format:
+        // Chrome rewrites an element inserted at the very end of a line
+        const typed = keepTrailingHolder ? '\u200B\u200B' : '\u200B';
+        if (!document.execCommand('insertText', false, typed)) return false;
+
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return false;
+        const range = selection.getRangeAt(0);
+        const node = range.startContainer;
+        const offset = range.startOffset;
+        if (node.nodeType !== 3 || offset < typed.length || node.textContent.substr(offset - typed.length, typed.length) !== typed) return true;
+
+        const holder = document.createRange();
+        holder.setStart(node, offset - typed.length);
+        holder.setEnd(node, offset - typed.length + 1);
+        selection.removeAllRanges();
+        selection.addRange(holder);
+        apply();
+        if (selection.rangeCount && !selection.isCollapsed) selection.collapseToEnd();
+        notifyCaretNoteChanged();
+        return true;
+    }
+
+    // Opens an empty line for a block when the line under the caret already
+    // holds something: a new paragraph after that line, the caret in it.
+    // insertHTML only keeps a block whole on an empty line, anywhere else
+    // Chrome merges parts of it with the text around.
+    function openEmptyLineAtCaret(noteEntry) {
+        const selection = window.getSelection();
+        let node = selection.getRangeAt(0).startContainer;
+        if (node.nodeType === 3) node = node.parentNode;
+        let line = node.closest('p, div, li, td, th, h1, h2, h3, h4, h5, h6, blockquote');
+        if (!line || !noteEntry.contains(line)) line = noteEntry;
+        if (line.textContent.replace(/[\s\u200B\u00A0]/g, '') === '' && !line.querySelector('img')) return;
+
+        if (line !== noteEntry) {
+            const lineEnd = document.createRange();
+            lineEnd.selectNodeContents(line);
+            lineEnd.collapse(false);
+            selection.removeAllRanges();
+            selection.addRange(lineEnd);
+        }
+        document.execCommand('insertParagraph');
+    }
+
+    // A block (quote, callout, toggle, code block) at the caret, on the
+    // browser's undo stack (issue #1580). `element` is serialised and goes in
+    // through insertHTML, on an empty line of its own (openEmptyLineAtCaret).
+    // Returns the element now in the
+    // note, a different object from the one passed, or null when the caller
+    // has to fall back on inserting the node itself.
+    function insertBlockElementUndoable(element, extraHtmlBefore, extraHtmlAfter) {
+        if (!isCaretInHtmlNote()) return null;
+        const noteEntry = getCaretNoteEntry();
+        if (!noteEntry) return null;
+
+        dropSelectedSlashPlaceholder();
+        openEmptyLineAtCaret(noteEntry);
+
+        const marker = 'data-slash-new';
+        element.setAttribute(marker, '1');
+        const html = (extraHtmlBefore || '') + element.outerHTML + (extraHtmlAfter || '');
+        element.removeAttribute(marker);
+        if (!document.execCommand('insertHTML', false, html)) return null;
+
+        const live = noteEntry.querySelector('[' + marker + ']');
+        if (live) live.removeAttribute(marker);
+        return live;
+    }
+
+    function notifyCaretNoteChanged() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return;
+        let node = selection.getRangeAt(0).startContainer;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        const noteEntry = node && node.closest ? node.closest('.noteentry') : null;
+        if (noteEntry) noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    // The toolbar's list command (js/toolbar-editor-utils.js), which keeps the
+    // list out of a <p>
+    function execListCommand(ordered) {
+        if (typeof window.execHtmlListCommand === 'function') return window.execHtmlListCommand(ordered);
+        return document.execCommand(ordered ? 'insertOrderedList' : 'insertUnorderedList');
+    }
+
+    // Turn the line under the caret into a heading (h1 to h6). formatBlock, the
+    // toolbar's path: the line itself becomes the heading and Ctrl+Z takes it
+    // back. Inserting an <hN> node at the caret left it nested in the line's
+    // paragraph, next to an empty line of its own, and outside the undo
+    // history (issue #1580).
     function insertHeading(level) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
+
+        if (isCaretInHtmlNote() && typeof window.applyHtmlBlockStyle === 'function') {
+            dropSelectedSlashPlaceholder();
+            window.applyHtmlBlockStyle(String(level));
+            notifyCaretNoteChanged();
+            if (window.outlinePanel && typeof window.outlinePanel.refresh === 'function') {
+                setTimeout(() => window.outlinePanel.refresh(), 50);
+            }
+            return;
+        }
 
         const range = selection.getRangeAt(0);
         const tag = 'h' + level;
@@ -793,10 +956,51 @@
         }
     }
 
+    // Inline code, a text colour or a highlight at the caret through the
+    // toolbar's helpers, so Ctrl+Z follows (formatTypedCaretHolder). False when
+    // the format has no such helper and the node has to be inserted directly.
+    function insertInlineElementUndoable(tagName, styleObj) {
+        if (tagName === 'code' && !styleObj && typeof window.insertInlineCode === 'function') {
+            return formatTypedCaretHolder(function () {
+                const noteEntry = getCaretNoteEntry();
+                window.insertInlineCode('\u200B');
+                // The caret goes inside the new <code>, after its placeholder
+                const selection = window.getSelection();
+                const caret = selection.rangeCount ? selection.getRangeAt(0) : null;
+                if (!noteEntry || !caret) return;
+                let target = null;
+                noteEntry.querySelectorAll('code').forEach(function (code) {
+                    if (code.textContent !== '\u200B' || code.closest('pre')) return;
+                    if (!target || caret.comparePoint(code, 0) <= 0) target = code;
+                });
+                if (!target || !target.firstChild) return;
+                const inside = document.createRange();
+                inside.setStart(target.firstChild, 1);
+                inside.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(inside);
+            }, true);
+        }
+        if (tagName !== 'span' || !styleObj) return false;
+        if (styleObj.color && typeof window.applyColorToSelection === 'function') {
+            return formatTypedCaretHolder(function () {
+                window.applyColorToSelection(styleObj.color === 'inherit' ? 'none' : styleObj.color);
+            });
+        }
+        if (styleObj.backgroundColor && typeof window.applyHighlightToSelection === 'function') {
+            return formatTypedCaretHolder(function () {
+                window.applyHighlightToSelection(styleObj.backgroundColor);
+            });
+        }
+        return false;
+    }
+
     // Insert an inline HTML element (strong, em, mark, code, etc.)
     function insertInlineElement(tagName, styleObj) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
+
+        if (insertInlineElementUndoable(tagName, styleObj)) return;
 
         const range = selection.getRangeAt(0);
         const el = document.createElement(tagName);
@@ -823,19 +1027,33 @@
         }
     }
 
+    // Bold, italic, strikethrough at the caret: the toolbar's execCommand, which
+    // arms the style for what is typed next and stays on the undo stack. The
+    // node inserted directly did not, and a redo put the text back in the wrong
+    // order (issue #1580). Kept for a phone, where the keyboard coming back up
+    // drops a style armed that way.
+    function insertInlineFormat(command, tagName) {
+        const isPhone = !!(window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
+        if (!isPhone && isCaretInHtmlNote()) {
+            dropSelectedSlashPlaceholder();
+            if (document.execCommand(command)) return;
+        }
+        insertInlineElement(tagName);
+    }
+
     // Insert bold text
     function insertBold() {
-        insertInlineElement('strong');
+        insertInlineFormat('bold', 'strong');
     }
 
     // Insert italic text
     function insertItalic() {
-        insertInlineElement('em');
+        insertInlineFormat('italic', 'em');
     }
 
     // Insert strikethrough text
     function insertStrikethrough() {
-        insertInlineElement('s');
+        insertInlineFormat('strikeThrough', 's');
     }
 
     // Insert inline code
@@ -905,8 +1123,8 @@
         const range = selection.getRangeAt(0);
 
         // Create code block (pre > code structure)
-        const pre = document.createElement('pre');
-        const code = document.createElement('code');
+        let pre = document.createElement('pre');
+        let code = document.createElement('code');
 
         if (!language) {
             pre.classList.add('plain-block');
@@ -923,15 +1141,43 @@
         }
 
         // Keep a real text insertion point before the visual empty line.
-        const caretTextNode = document.createTextNode('');
+        let caretTextNode = document.createTextNode('');
         const br = document.createElement('br');
         code.appendChild(caretTextNode);
         code.appendChild(br);
         pre.appendChild(code);
 
-        // Insert at cursor position
-        range.deleteContents();
-        range.insertNode(pre);
+        // Through insertHTML when possible, so Ctrl+Z takes the block back
+        // (issue #1580). What follows works on the block now in the note.
+        // The block goes in with the host js/copy-code-on-focus.js would put
+        // around it: wrapped afterwards, the <pre> is no longer where the
+        // browser inserted it and Firefox cannot undo the insertion. Firefox
+        // also adds the line break of an empty block itself, a second one
+        // would show as an extra line.
+        const host = document.createElement('div');
+        host.className = 'code-block-actions-host';
+        host.style.position = 'relative';
+        host.style.maxWidth = '100%';
+        host.style.boxSizing = 'border-box';
+        const hostedPre = pre.cloneNode(true);
+        if (/Gecko\/\d/.test(navigator.userAgent)) {
+            const hostedBreak = hostedPre.querySelector('code > br');
+            if (hostedBreak) hostedBreak.remove();
+        }
+        host.appendChild(hostedPre);
+        const liveHost = insertBlockElementUndoable(host);
+        const livePre = liveHost ? liveHost.querySelector('pre') : null;
+        const liveCode = livePre ? livePre.querySelector('code') : null;
+        if (liveCode) {
+            pre = livePre;
+            code = liveCode;
+            caretTextNode = document.createTextNode('');
+            code.insertBefore(caretTextNode, code.firstChild);
+        } else {
+            // Insert at cursor position
+            range.deleteContents();
+            range.insertNode(pre);
+        }
 
         function focusNoteEntry() {
             const noteEntry = pre.closest('.noteentry');
@@ -1020,6 +1266,12 @@
                 break;
             }
             node = node.parentNode;
+        }
+
+        // Outside inline code, the toolbar's Clear formatting on a typed
+        // placeholder does the same and Ctrl+Z follows (issue #1580)
+        if (!currentNode.closest('code') && formatTypedCaretHolder(function () { document.execCommand('removeFormat'); })) {
+            return;
         }
 
         // Create span that resets all formatting to default
@@ -1118,11 +1370,18 @@
         if (!selection.rangeCount) return;
 
         const range = selection.getRangeAt(0);
-        const element = buildCalloutElement(type);
+        let element = buildCalloutElement(type);
 
-        // Insert at cursor position
-        range.deleteContents();
-        range.insertNode(element);
+        // Through insertHTML when possible, so Ctrl+Z takes the block back
+        // (issue #1580)
+        const liveElement = insertBlockElementUndoable(element);
+        if (liveElement) {
+            element = liveElement;
+        } else {
+            // Insert at cursor position
+            range.deleteContents();
+            range.insertNode(element);
+        }
 
         // Prepare the desired selection inside the element but don't apply it yet
         const newRange = document.createRange();
@@ -1270,23 +1529,34 @@
         emptyLineAfter.setAttribute('data-ph', toggleAfterPlaceholder);
         emptyLineAfter.innerHTML = '';
 
-        // Insert at cursor position
-        range.deleteContents();
+        // Through insertHTML when possible, so Ctrl+Z takes the block back
+        // (issue #1580)
+        let liveSummary = null;
+        const liveDetails = insertBlockElementUndoable(details, emptyLineBefore.outerHTML, emptyLineAfter.outerHTML);
+        if (liveDetails) {
+            liveSummary = liveDetails.querySelector('summary');
+            // Chrome drops the attribute
+            const liveContent = liveDetails.querySelector('.toggle-content');
+            if (liveContent && !liveContent.hasAttribute('contenteditable')) liveContent.setAttribute('contenteditable', 'true');
+        } else {
+            // Insert at cursor position
+            range.deleteContents();
 
-        // Insert in reverse order to maintain correct sequence: before -> details -> after
-        range.insertNode(emptyLineAfter);
-        range.insertNode(details);
-        range.insertNode(emptyLineBefore);
+            // Insert in reverse order to maintain correct sequence: before -> details -> after
+            range.insertNode(emptyLineAfter);
+            range.insertNode(details);
+            range.insertNode(emptyLineBefore);
+        }
 
         // Place cursor at the end of the summary text
         const newRange = document.createRange();
-        newRange.selectNodeContents(summary);
+        newRange.selectNodeContents(liveSummary || summary);
         newRange.collapse(false);
         selection.removeAllRanges();
         selection.addRange(newRange);
 
         // Trigger input event for autosave
-        const noteEntry = details.closest('.noteentry');
+        const noteEntry = (liveDetails || details).closest('.noteentry');
         if (noteEntry) {
             noteEntry.dispatchEvent(new Event('input', { bubbles: true }));
         }
@@ -1297,6 +1567,20 @@
     function insertList(ordered, markerType) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
+
+        // The toolbar's path: the line itself becomes the list item, outside
+        // its paragraph, and Ctrl+Z takes it back (issue #1580)
+        if (isCaretInHtmlNote()) dropSelectedSlashPlaceholder();
+        if (isCaretInHtmlNote() && execListCommand(ordered)) {
+            if (ordered && markerType) {
+                let node = selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
+                if (node && node.nodeType === 3) node = node.parentNode;
+                const ol = node && node.closest ? node.closest('ol') : null;
+                if (ol) ol.setAttribute('type', markerType);
+            }
+            notifyCaretNoteChanged();
+            return;
+        }
 
         const range = selection.getRangeAt(0);
 
@@ -1809,7 +2093,22 @@
             const html = result.href
                 ? '<a href="' + escapeSlashHtml(result.href) + '">' + escapeSlashHtml(result.text) + '</a>&nbsp;'
                 : escapeSlashHtml(result.text);
-            if (typeof window.insertHTMLAtSelection === 'function') {
+            // execCommand first, so Ctrl+Z takes the date back (issue #1580)
+            let insertedByCommand = false;
+            if (isCaretInHtmlNote()) {
+                dropSelectedSlashPlaceholder();
+                if (result.href) {
+                    // The space is typed apart: at the end of the inserted
+                    // markup, Chrome wraps it in a span with a fixed font size
+                    insertedByCommand = insertLinkHtmlUndoable('<a href="' + escapeSlashHtml(result.href) + '">' + escapeSlashHtml(result.text) + '</a>');
+                    if (insertedByCommand) document.execCommand('insertText', false, '\u00A0');
+                } else {
+                    insertedByCommand = document.execCommand('insertText', false, result.text);
+                }
+            }
+            if (insertedByCommand) {
+                // done
+            } else if (typeof window.insertHTMLAtSelection === 'function') {
                 window.insertHTMLAtSelection(html);
             } else {
                 // Fallback for HTML notes
@@ -1986,7 +2285,8 @@
         'tasklist-embed': true,
         'link-to-attachment': true,
         'mp4-video': true,
-        'audio-file': true
+        'audio-file': true,
+        'paste-markdown': true
     };
 
     function isOfflinePage() {
@@ -2443,6 +2743,42 @@
         }
     }
 
+    // Paste content written for the other kind of note, converted on the way
+    // in: Markdown into a rich text note (js/insert-markdown-modal.js), rich
+    // text into a Markdown note (js/paste-markdown-modal.js). One command id
+    // for both, each note type only ever shows its own. The two used to sit
+    // in the note's ⋮ menu (discussion #1577). Both dialogs convert on the
+    // server, hence OFFLINE_UNAVAILABLE_COMMANDS.
+    function getPasteConvertedSlashCommand(t, isMarkdown) {
+        // The dialogs are part of the notes page only (modals.php);
+        // filterSlashCommands() drops the missing entry elsewhere
+        if (!document.getElementById(isMarkdown ? 'pasteMarkdownModal' : 'insertMarkdownModal')) {
+            return null;
+        }
+        return {
+            id: 'paste-markdown',
+            icon: 'lucide-clipboard',
+            label: isMarkdown
+                ? t('modals.paste_markdown.menu_item', null, 'Insert rich text')
+                : t('modals.insert_markdown.menu_item', null, 'Insert Markdown'),
+            aliases: isMarkdown
+                ? ['paste', 'rich text', 'html', 'convert']
+                : ['paste', 'markdown', 'md', 'convert'],
+            // The dialog takes the focus; the insertion gives it back
+            noRefocus: true,
+            action: function () {
+                var show = isMarkdown ? window.showPasteMarkdownModal : window.showInsertMarkdownModal;
+                if (typeof show !== 'function') return;
+                var context = getEditorContext();
+                var noteEntry = savedNoteEntry || (context && context.noteEntry);
+                var noteId = noteEntry && noteEntry.getAttribute ? noteEntry.getAttribute('data-note-id') : null;
+                // Once the caret has settled where the slash text was removed:
+                // the Markdown dialog reads it when it opens
+                setTimeout(function () { show(noteId); }, 10);
+            }
+        };
+    }
+
     // Return slash commands common between HTML and Markdown modes
     function getCommonSlashCommands() {
         var t = window.t || (function (key, params, fallback) { return fallback; });
@@ -2720,7 +3056,8 @@
                                 window.insertSeparator();
                             }
                         }
-                    }
+                    },
+                    getPasteConvertedSlashCommand(t, false)
                 ]
             },
             ...buildDiagramItems(t, common, false),
@@ -2777,16 +3114,21 @@
                                             sel.removeAllRanges();
                                             sel.addRange(savedRange);
 
-                                            // Replace the selected text with the link
-                                            savedRange.deleteContents();
-                                            savedRange.insertNode(a);
+                                            // Replace the selected text with the link:
+                                            // through execCommand so Ctrl+Z takes it back
+                                            // (issue #1580), which also leaves the caret
+                                            // after the link
+                                            if (!insertLinkHtmlUndoable(a.outerHTML)) {
+                                                savedRange.deleteContents();
+                                                savedRange.insertNode(a);
 
-                                            // Position cursor after the link
-                                            const newRange = document.createRange();
-                                            newRange.setStartAfter(a);
-                                            newRange.setEndAfter(a);
-                                            sel.removeAllRanges();
-                                            sel.addRange(newRange);
+                                                // Position cursor after the link
+                                                const newRange = document.createRange();
+                                                newRange.setStartAfter(a);
+                                                newRange.setEndAfter(a);
+                                                sel.removeAllRanges();
+                                                sel.addRange(newRange);
+                                            }
                                         } else if (sel && sel.rangeCount > 0) {
                                             // Fallback: insert at current position
                                             const range = sel.getRangeAt(0);
@@ -3042,7 +3384,8 @@
                         action: function () {
                             insertMarkdownAtCursor('\n---\n', 0);
                         }
-                    }
+                    },
+                    getPasteConvertedSlashCommand(t, true)
                 ]
             },
             ...buildDiagramItems(t, common, true),
@@ -3328,13 +3671,13 @@
                 return;
             }
             if (kind === 'ul') {
-                document.execCommand('insertUnorderedList');
+                execListCommand(false);
                 return;
             }
             let ol = selectionOrderedList();
             const currentType = ol ? (ol.getAttribute('type') || '') : null;
             if (!ol || currentType === (markerType || '')) {
-                document.execCommand('insertOrderedList');
+                execListCommand(true);
                 ol = selectionOrderedList();
                 if (!ol || currentType !== null) return;
             }
@@ -3554,7 +3897,7 @@
             if (plainOnly || typeof navigator.clipboard.read !== 'function') {
                 data.setData('text/plain', await navigator.clipboard.readText());
             } else {
-                const items = await navigator.clipboard.read();
+                const items = await readClipboardItems();
                 for (const item of items) {
                     for (const type of item.types) {
                         const blob = await item.getType(type);
@@ -3585,7 +3928,15 @@
         const active = document.activeElement;
         const target = active && editable.contains(active) ? active : editable;
         const event = new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true });
-        target.dispatchEvent(event);
+        // Firefox empties the clipboardData of an event built by a page, so
+        // a rich-text note pasted as plain text there: its paste handler
+        // (js/events-rte-paste.js) reads what the menu read instead
+        window._poznoteMenuPasteData = data;
+        try {
+            target.dispatchEvent(event);
+        } finally {
+            window._poznoteMenuPasteData = null;
+        }
         if (event.defaultPrevented) return;
 
         const text = (data.getData('text/plain') || '').replace(/\r\n?/g, '\n');
@@ -3595,6 +3946,18 @@
             if (current) api.replaceRange(codeMirrorEditor, current.start, current.end, text);
         } else {
             document.execCommand('insertText', false, text);
+        }
+    }
+
+    // The HTML as it was copied, where the browser can give it (Chrome): the
+    // cleaned-up flavour it returns otherwise empties the address of every
+    // picture copied from a note, which a Ctrl+V keeps (issue #1576).
+    async function readClipboardItems() {
+        try {
+            return await navigator.clipboard.read({ unsanitized: ['text/html'] });
+        } catch (e) {
+            if (e && e.name === 'NotAllowedError') throw e;
+            return navigator.clipboard.read();
         }
     }
 
@@ -3906,8 +4269,59 @@
             .join('');
     }
 
-    // Build submenu HTML for level 2 menu items
-    function buildSubmenuHTML(items) {
+    // The ids of a submenu's entries already applied where the menu was opened
+    // (the selection, or the caret), so the menu can mark them (issue #1580):
+    // heading level, bold / italic / underline / strikethrough, alignment and
+    // list type. Rich-text notes only: Markdown would have to parse the line.
+    function getActiveSubmenuItemIds(parentId) {
+        const ids = [];
+        const noteEntry = savedNoteEntry;
+        if (!noteEntry || codeMirrorSlashEditor || isTextFieldElement(savedEditableElement)) return ids;
+        if (noteEntry.getAttribute('data-note-type') === 'markdown' || !noteEntry.isContentEditable) return ids;
+
+        const sel = window.getSelection();
+        const range = (selectionSlashContext && selectionSlashContext.range) || (sel && sel.rangeCount ? sel.getRangeAt(0) : null);
+        let node = range ? range.startContainer : null;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        if (!node || !node.closest || !noteEntry.contains(node)) return ids;
+
+        const within = function (selector) {
+            const el = node.closest(selector);
+            return el && el !== noteEntry && noteEntry.contains(el) ? el : null;
+        };
+
+        if (parentId === 'title') {
+            const heading = within('h1, h2, h3, h4, h5, h6');
+            ids.push(heading ? heading.tagName.toLowerCase() : 'normal');
+        } else if (parentId === 'format') {
+            [['bold', 'bold'], ['italic', 'italic'], ['underline', 'underline'], ['strikethrough', 'strikeThrough']].forEach(function (pair) {
+                try {
+                    if (document.queryCommandState(pair[1])) ids.push(pair[0]);
+                } catch (e) { /* ignore */ }
+            });
+        } else if (parentId === 'align') {
+            const block = within('p, div, li, h1, h2, h3, h4, h5, h6, blockquote, td, th') || noteEntry;
+            const align = window.getComputedStyle(block).textAlign;
+            if (align === 'center' || align === 'right' || align === 'justify') ids.push('align-' + align);
+            else if (align === 'end') ids.push('align-right');
+            else ids.push('align-left');
+        } else if (parentId === 'list') {
+            const item = within('li');
+            const list = item ? item.parentElement : null;
+            if (list && list.tagName === 'UL' && !item.querySelector(':scope > input[type="checkbox"]')) {
+                ids.push('bullets');
+            } else if (list && list.tagName === 'OL') {
+                const type = list.getAttribute('type');
+                ids.push(type === 'a' ? 'letters' : (type === 'i' ? 'roman' : 'numbers'));
+            }
+        }
+        return ids;
+    }
+
+    // Build submenu HTML for level 2 menu items. parentId is the entry the
+    // submenu opens from, for the marks on the formats already applied.
+    function buildSubmenuHTML(items, parentId) {
+        const activeIds = parentId ? getActiveSubmenuItemIds(parentId) : [];
         const isMobile = window.innerWidth < 768;
         const t = window.t || ((key, params, fallback) => fallback);
 
@@ -3941,6 +4355,7 @@
                     '<div class="slash-command-item' + selectedClass + disabledClass + '" data-submenu-id="' + item.id + '" data-submenu-index="' + idx + '" data-has-sub-submenu="' + hasSubmenu + '">' +
                     iconHtml +
                     '<span class="slash-command-label">' + escapeHtml(item.label) + hintHtml + '</span>' +
+                    (activeIds.indexOf(item.id) !== -1 ? '<i class="lucide lucide-check slash-command-active-mark"></i>' : '') +
                     submenuIndicator +
                     '</div>'
                 );
@@ -4342,7 +4757,7 @@
 
         submenuElement = document.createElement('div');
         submenuElement.className = 'slash-command-menu slash-command-submenu';
-        submenuElement.innerHTML = buildSubmenuHTML(cmd.submenu);
+        submenuElement.innerHTML = buildSubmenuHTML(cmd.submenu, cmd.id);
 
         document.body.appendChild(submenuElement);
 
@@ -4633,6 +5048,25 @@
             const text = slashTextNode.textContent;
             // Safety: we don't want to delete less than the slash itself
             const safeEndOffset = Math.max(slashOffset + 1, Math.min(text.length, currentOffset));
+
+            // A typed "/" and its filter are on the browser's undo stack. Taking
+            // them out through execCommand keeps them there: rewriting the text
+            // node directly left Ctrl+Z replaying its steps on text that had
+            // changed under it, and the history stopped responding (issue #1580).
+            // A "/" put in by a right-click or the Insert button was never typed
+            // and goes the direct way below.
+            if (sel && !slashInsertedByButton && slashTextNode.isConnected) {
+                try {
+                    const typedRange = document.createRange();
+                    typedRange.setStart(slashTextNode, slashOffset);
+                    typedRange.setEnd(slashTextNode, safeEndOffset);
+                    sel.removeAllRanges();
+                    sel.addRange(typedRange);
+                    if (document.execCommand('delete')) return;
+                } catch (e) {
+                    console.debug('slash-command: deleteSlashText() failed:', e);
+                }
+            }
 
             const before = text.substring(0, slashOffset);
             const after = text.substring(safeEndOffset);

@@ -151,6 +151,14 @@
     font-size: 13px;
 }
 
+/* The format already applied where the menu opened: Heading 2 in a heading
+   2, Bold on bold text, the current alignment or list type (issue #1580) */
+.slash-command-active-mark {
+    margin-left: 12px;
+    font-size: 14px;
+    color: var(--pz-accent);
+}
+
 /* Informational rows, like "No templates yet" in the Template submenu */
 .slash-command-item.slash-command-disabled {
     cursor: default;

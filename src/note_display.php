@@ -387,14 +387,10 @@
                     // lists there when the row is too short
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-snapshot" data-note-id="'.$row['id'].'"><i class="lucide lucide-history"></i> '.t_h('snapshot.menu_item', [], 'Revisions').'</button>';
 
-                    if ($note_type === 'markdown') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-paste-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.paste_markdown.menu_item', [], 'Insert rich text').'</button>';
-                    }
-
-                    // HTML notes get the mirror action: paste Markdown, insert it as HTML.
-                    if ($note_type === 'note') {
-                        echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="show-insert-markdown-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-clipboard"></i> '.t_h('modals.insert_markdown.menu_item', [], 'Insert Markdown').'</button>';
-                    }
+                    // "Insert rich text" (Markdown notes) and "Insert Markdown"
+                    // (HTML notes) are about the content, not the note: they
+                    // live in the Insert section of the slash menu
+                    // (js/slash-command.js, pasteConverted).
 
                     // Search and replace button (only for note and markdown types, shown in mobile menu)
                     if ($note_type === 'note' || $note_type === 'markdown') {
@@ -674,16 +670,14 @@
                         // This allows iframes, audio, and video to render properly
                         $display_content = unescapeMediaInHtml($display_content);
 
-                        // Normalize the navigation paragraphs around Excalidraw diagrams:
-                        // older insertions stored literal dots as text, and saved data-ph
-                        // hints are frozen in the language active at save time. Rewrite any
-                        // placeholder paragraph that holds no real user text so the hint
-                        // always follows the current UI language
+                        // The empty paragraphs around Excalidraw diagrams once carried a
+                        // hint ("Write outside the diagram here…"), as literal dots in
+                        // the oldest notes, then as a data-ph attribute. The hint is
+                        // gone (issue #1580): strip what the stored notes still hold
                         if (strpos($display_content, 'excalidraw-placeholder') !== false) {
-                            $excalidraw_ph = htmlspecialchars(t('editor.excalidraw.placeholder_outside', [], 'Write outside the diagram here…'), ENT_QUOTES);
                             $display_content = preg_replace(
                                 '/<p class="excalidraw-placeholder"(?:\s+data-ph="[^"]*")?>\s*(?:\.{3}|…|&hellip;|&#8230;)?\s*<\/p>/u',
-                                '<p class="excalidraw-placeholder" data-ph="' . $excalidraw_ph . '"></p>',
+                                '<p class="excalidraw-placeholder"></p>',
                                 $display_content
                             );
                         }

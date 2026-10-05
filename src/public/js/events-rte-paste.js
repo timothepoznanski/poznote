@@ -310,6 +310,54 @@ function showPasteDroppedImagesToast(count) {
 }
 
 /**
+ * Give a pasted Excalidraw diagram an id of its own when the page already
+ * holds the one it was copied from. Editing looks a diagram up by its id, so
+ * a copy pasted into the same note opened, and saved over, the original.
+ *
+ * @param {string} html - Poznote-internal clipboard HTML
+ * @returns {string} The HTML, with the ids in use replaced
+ */
+function renamePastedDiagrams(html) {
+    if (html.indexOf('excalidraw-container') === -1) return html;
+
+    var renamed = {};
+    var count = 0;
+    return html.replace(/(\s(?:id|data-diagram-id)=")(excalidraw-[\w-]+)(")/g, function (match, before, id, after) {
+        if (!renamed[id]) {
+            renamed[id] = document.getElementById(id) ? 'excalidraw-' + Date.now() + '-' + (++count) : id;
+        }
+        return before + renamed[id] + after;
+    });
+}
+
+/**
+ * The selection range, widened over any Excalidraw diagram one of its ends
+ * falls into. A diagram is its container (which holds the drawing) around a
+ * preview image: a selection resting on the image alone copied a plain
+ * picture, which pasted with no way to edit or align it (issue #1576).
+ *
+ * @param {Range} range - The selection range
+ * @param {HTMLElement} note - The .noteentry containing the selection
+ * @returns {Range} The range to copy; the one given when no diagram is cut
+ */
+function expandRangeOverDiagrams(range, note) {
+    function diagramOf(node) {
+        var el = node && node.nodeType === 1 ? node : (node ? node.parentNode : null);
+        var container = el && el.closest ? el.closest('.excalidraw-container') : null;
+        return container && container !== note && note.contains(container) ? container : null;
+    }
+
+    var startDiagram = diagramOf(range.startContainer);
+    var endDiagram = diagramOf(range.endContainer);
+    if (!startDiagram && !endDiagram) return range;
+
+    var expanded = range.cloneRange();
+    if (startDiagram) expanded.setStartBefore(startDiagram);
+    if (endDiagram) expanded.setEndAfter(endDiagram);
+    return expanded;
+}
+
+/**
  * Handle rich text paste - clean up styles that might conflict with theme
  * @param {string} htmlData - The pasted HTML data
  * @returns {boolean} True if paste was handled
@@ -322,6 +370,7 @@ function handleRichTextPaste(htmlData) {
     if (htmlData.includes(poznoteMarker)) {
         var fullHtml = htmlData.replace(poznoteMarker, '').replace('<!-- poznote-table-cells -->', '');
         if (!fullHtml || fullHtml.trim() === '') return false;
+        fullHtml = renamePastedDiagrams(fullHtml);
         document.execCommand('insertHTML', false, fullHtml);
         triggerNoteSave();
         return true;
@@ -548,7 +597,12 @@ function writeNoteSelectionToClipboard(e) {
     // Serialise the selection into HTML, restoring the block/inline
     // ancestors that cloneContents() drops (list wrapper, heading tag,
     // styled spans...) so pasting reproduces the copied structure
-    var range = selection.getRangeAt(0);
+    var range = expandRangeOverDiagrams(selection.getRangeAt(0), note);
+    if (range !== selection.getRangeAt(0)) {
+        // A cut then removes what was copied: the whole diagram
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
     var fragment = wrapCopiedFragmentWithAncestors(range.cloneContents(), range, note);
     var tempDiv = document.createElement('div');
     tempDiv.appendChild(fragment);
@@ -606,8 +660,12 @@ function setupPasteHandling() {
             if (!note) return;
 
             var isMarkdownNote = note.getAttribute('data-note-type') === 'markdown';
-            var items = (e.clipboardData && e.clipboardData.items) ? e.clipboardData.items : null;
-            var htmlData = e.clipboardData ? e.clipboardData.getData('text/html') : '';
+            // Firefox gives the paste event of the right-click menu an empty
+            // clipboardData; the menu leaves what it read here for that
+            // (pasteFromClipboard() in js/slash-command.js)
+            var clipboardData = (!e.isTrusted && window._poznoteMenuPasteData) || e.clipboardData;
+            var items = (clipboardData && clipboardData.items) ? clipboardData.items : null;
+            var htmlData = clipboardData ? clipboardData.getData('text/html') : '';
 
             // Handle image paste. An image file and the HTML can describe the
             // same selection (OneNote, Outlook, Excel), and the HTML wins
@@ -624,7 +682,7 @@ function setupPasteHandling() {
             // Skip rich text processing for markdown notes
             if (isMarkdownNote) return;
 
-            var plainText = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+            var plainText = clipboardData ? clipboardData.getData('text/plain') : '';
 
             // Windows editors (VS Code, Notepad++) put CRLF on the clipboard.
             // The handlers below split on \n, which would leave a stray CR at

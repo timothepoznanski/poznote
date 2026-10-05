@@ -201,7 +201,6 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-print" checked><span><?php echo t_h('common.print', [], 'Print'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-convert" checked><span><?php echo t_h('modals.convert.title', [], 'Convert'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-audio" checked><span><?php echo t_h('slash_menu.audio', [], 'Audio'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-paste-markdown" checked><span><?php echo t_h('modals.paste_markdown.menu_item', [], 'Insert rich text'); ?> / <?php echo t_h('modals.insert_markdown.menu_item', [], 'Insert Markdown'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-clear-completed" checked><span><?php echo t_h('tasklist.clear_completed', [], 'Clear completed tasks'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-uncheck-all" checked><span><?php echo t_h('tasklist.uncheck_all', [], 'Uncheck all tasks'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-open-tasks-page" checked><span><?php echo t_h('tasklist.open_tasks_page', [], 'View all tasks'); ?></span></label>
@@ -239,6 +238,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:mermaid" checked><span><?php echo t_h('slash_menu.mermaid', [], 'Mermaid'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:table" checked><span><?php echo t_h('slash_menu.table', [], 'Table'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:separator" checked><span><?php echo t_h('slash_menu.separator', [], 'Separator'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:paste-markdown" checked><span><?php echo t_h('modals.paste_markdown.menu_item', [], 'Insert rich text'); ?> / <?php echo t_h('modals.insert_markdown.menu_item', [], 'Insert Markdown'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:note-reference" checked><span><?php echo t_h('slash_menu.link_to_note', [], 'Link to note'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:template" checked><span><?php echo t_h('slash_menu.template', [], 'Template'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:link-to-attachment" checked><span><?php echo t_h('slash_menu.link_to_attachment', [], 'Link to attachment'); ?></span></label>

@@ -831,6 +831,17 @@
             }
 
             mutations.forEach(function(mutation) {
+                // A block taken out of its host by Ctrl+Z (the browser undoes
+                // the insertion of the <pre>, it knows nothing of the host put
+                // around it afterwards): the empty host and its buttons go too
+                var host = mutation.target;
+                if (mutation.removedNodes.length && host.nodeType === 1 && host.isConnected &&
+                    host.classList.contains('code-block-actions-host') && host.closest('.noteentry') &&
+                    !getCodeBlockElements(host).length &&
+                    Array.prototype.some.call(mutation.removedNodes, function (node) { return node.nodeName === 'PRE'; })) {
+                    host.remove();
+                }
+
                 mutation.addedNodes.forEach(function(node) {
                     if (node.nodeType !== 1) return; // Element nodes only
                     if (node.matches && node.matches('pre:not(.indented-pre), .code-block')) {

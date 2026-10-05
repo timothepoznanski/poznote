@@ -13,12 +13,11 @@ div[contentEditable=true]:empty:before {
     color: var(--pz-text-subtle);
 }
 
-/* Placeholder lines around embedded Excalidraw diagrams */
+/* The empty paragraphs kept above and below an embedded Excalidraw diagram,
+   so the caret can always go there. A plain empty line: the zero-width space
+   gives the paragraph its height, it has no <br> of its own. */
 .excalidraw-placeholder:empty:before {
-    content: attr(data-ph);
-    color: var(--pz-text-subtle);
-    font-style: italic;
-    opacity: 0.6;
+    content: "\200B";
 }
 
 /* Exclude code blocks from automatic placeholder */

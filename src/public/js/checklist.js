@@ -762,6 +762,57 @@
   // ===== PUBLIC API =====
 
   /**
+   * Insert a built checklist at the caret through execCommand. Returns its
+   * first item as it now stands in the note, or null when the command did not
+   * take and the caller has to insert the nodes itself.
+   */
+  function insertChecklistUndoable(checklist, noteentry) {
+    const sel = window.getSelection();
+    if (!sel.rangeCount) return null;
+    if (!sel.isCollapsed) {
+      // The slash menu leaves a selected zero-width space where its "/" stood
+      // when it was not typed (right-click, Insert button): it goes, unless it
+      // is all the line holds, in which case the checklist replaces it
+      const selected = sel.getRangeAt(0);
+      const holder = selected.startContainer;
+      if (selected.toString() !== '\u200B' || holder.nodeType !== 3 || holder !== selected.endContainer) return null;
+      if (holder.textContent !== '\u200B' || holder.previousSibling || holder.nextSibling) selected.deleteContents();
+    }
+
+    let line = sel.getRangeAt(0).startContainer;
+    if (line.nodeType === 3) line = line.parentNode;
+    line = line.closest('p, div, li, td, th, h1, h2, h3, h4, h5, h6, blockquote');
+    if (!line || !noteentry.contains(line)) line = noteentry;
+    if (getCleanText(line) !== '' || line.querySelector('img, video, iframe, input, table')) {
+      // A new line after this one: only on an empty line does the browser
+      // keep the inserted markup whole
+      if (line !== noteentry) {
+        const lineEnd = document.createRange();
+        lineEnd.selectNodeContents(line);
+        lineEnd.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(lineEnd);
+      }
+      document.execCommand('insertParagraph');
+    }
+
+    const marker = 'data-checklist-new';
+    checklist.setAttribute(marker, '1');
+    const html = checklist.outerHTML;
+    checklist.removeAttribute(marker);
+    if (!document.execCommand('insertHTML', false, html)) return null;
+
+    const live = noteentry.querySelector('[' + marker + ']');
+    if (!live) return null;
+    live.removeAttribute(marker);
+    // The browser may drop the attribute that keeps the caret out of the box
+    live.querySelectorAll('input[type="checkbox"]').forEach(function(box) {
+      box.setAttribute('contenteditable', 'false');
+    });
+    return live.querySelector('li');
+  }
+
+  /**
    * Insert a new checklist at cursor position
    * @param {{checked?: boolean}} [options] - checked: start with a completed item
    *   (the slash menu's "Done" entry, for journaling what was achieved)
@@ -790,6 +841,22 @@
     const firstItem = createChecklistItem(startChecked, '');
     checklist.appendChild(firstItem);
     
+    // Through insertHTML first, so Ctrl+Z takes the checklist back and a redo
+    // puts it where it was: nodes inserted directly are invisible to the
+    // browser's undo history (issue #1580). The checklist goes on a line of
+    // its own, where the browser keeps its markup as it is.
+    const liveItem = insertChecklistUndoable(checklist, noteentry);
+    if (liveItem) {
+      const liveText = liveItem.querySelector('.' + TEXT_CLASS);
+      if (liveText) {
+        setTimeout(function() {
+          setCursorInElement(liveText, false);
+        }, 10);
+      }
+      markAsModified(noteentry);
+      return;
+    }
+
     range.deleteContents();
 
     // Top-level block the caret sits in (the line the slash command was
