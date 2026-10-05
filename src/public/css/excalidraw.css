@@ -329,7 +329,8 @@ body {
 body.excalidraw-editor-page {
     --excalidraw-toolbar-height: 48px;
     --excalidraw-viewport-height: 100vh;
-    --excalidraw-note-background: #ffffff;
+    /* The ground the note shows the diagram on, whatever the theme. */
+    --excalidraw-note-background: var(--pz-bg);
     margin: 0;
     background: var(--pz-bg);
     color: var(--pz-text);

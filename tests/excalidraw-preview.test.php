@@ -113,3 +113,26 @@ test('a ">" inside an attribute value does not hide a handler after it', functio
         '<svg xmlns="http://www.w3.org/2000/svg"><g aria-label="turn onload = off"><path d="M1 2"/></g></svg>'
     ));
 });
+
+test('a preview holding a photo gets the dark-scheme counter filter once', function () {
+    $svg = poznoteProtectExcalidrawPreviewPhotos(excalidrawExport(['image' => true]));
+    assertSame(1, substr_count($svg, 'poznote-photo-scheme'));
+    assertContains('@media (prefers-color-scheme: dark)', $svg);
+    // Inside the root, so the file is still one well-formed <svg>.
+    assertSame(0, strpos($svg, '<svg'));
+    assertContains('height="227.9"><style class="poznote-photo-scheme">', $svg);
+    assertSame($svg, poznoteProtectExcalidrawPreviewPhotos($svg));
+    assertSame(true, poznoteIsAcceptableExcalidrawPreviewSvg($svg));
+});
+
+test('a preview with no photo is left untouched', function () {
+    $bare = excalidrawExport();
+    assertSame($bare, poznoteProtectExcalidrawPreviewPhotos($bare));
+});
+
+test('the counter filter survives a later theme strip', function () {
+    // A stale tab re-posts what it loaded: the strip must not take the rule
+    // for one of the filters Excalidraw bakes in.
+    $svg = poznoteProtectExcalidrawPreviewPhotos(excalidrawExport(['image' => true]));
+    assertSame($svg, poznoteStripExcalidrawPreviewTheme($svg));
+});

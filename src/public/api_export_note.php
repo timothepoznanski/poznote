@@ -749,6 +749,10 @@ function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [
             max-width: 100%;
             height: auto;
             margin: 16px 0;
+            /* This page is light whatever the system prefers, and an
+               Excalidraw preview reads the scheme to decide how to draw its
+               photos. */
+            color-scheme: light;
         }
         
         /* Task lists */

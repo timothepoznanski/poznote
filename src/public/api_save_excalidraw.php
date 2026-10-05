@@ -47,7 +47,8 @@ function excalidrawAssertNoteNotLockedByOther(int $note_id): void {
 /**
  * The preview the note displays through <img>: the SVG Excalidraw exported,
  * crisp at any pixel density (issue #1434), with the theme it was exported
- * under taken back out of it (issue #1445). Returns null when the request
+ * under taken back out of it (issue #1445) and its photos kept upright in a
+ * dark theme (issue #1578). Returns null when the request
  * carries none, and answers 400 when it carries something that is not an
  * Excalidraw SVG. Both rules live in lib/excalidraw-preview.php.
  */
@@ -62,7 +63,7 @@ function excalidrawReadPreviewSvg(): ?string {
         echo json_encode(['success' => false, 'message' => 'Invalid image type']);
         exit;
     }
-    return $svg;
+    return poznoteProtectExcalidrawPreviewPhotos($svg);
 }
 
 /**

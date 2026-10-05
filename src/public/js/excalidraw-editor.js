@@ -58,23 +58,9 @@
     // no way out but leaving without saving (issue #1567). Generous, so a
     // diagram of several megabytes still gets through on a slow connection.
     var SAVE_TIMEOUT_MS = 5 * 60 * 1000;
-    // The note background of each theme, so the editor draws on the same
-    // ground the note shows the diagram on. The canvas itself is transparent
-    // and lets this show through, see getCanvasBackground().
-    var EXCALIDRAW_THEME_COLORS = {
-        light: {
-            noteBackground: '#ffffff',
-            itemStroke: '#1e1e1e'
-        },
-        dark: {
-            noteBackground: '#252526',
-            itemStroke: '#1e1e1e'
-        },
-        black: {
-            noteBackground: '#141821',
-            itemStroke: '#1e1e1e'
-        }
-    };
+    // Excalidraw's own default stroke. It is authored as a light-mode colour
+    // in every theme: a dark one inverts the canvas, see getCanvasBackground().
+    var ITEM_STROKE_COLOR = '#1e1e1e';
 
     function tpl(template, vars) {
         return String(template).replace(/\{\{(\w+)\}\}/g, function(match, key) {
@@ -145,7 +131,7 @@
                     scrollX: existingData.appState.scrollX || 0,
                     scrollY: existingData.appState.scrollY || 0,
                     theme: initialTheme,
-                    currentItemStrokeColor: getCurrentItemStrokeColor(initialPoznoteTheme),
+                    currentItemStrokeColor: getCurrentItemStrokeColor(),
                     currentItemBackgroundColor: 'transparent',
                     exportBackground: true,
                     exportWithDarkMode: initialTheme === 'dark'
@@ -217,25 +203,13 @@
         updateSaveButtonsState();
     }
 
+    // The mode the page is painted in, as js/theme-init.js resolved it in the
+    // head. Reading the stored theme here instead only knew light, dark and
+    // black: under any other theme (a named one, or a custom stylesheet such
+    // as Catppuccin) the editor followed the system and could open light on a
+    // white ground for a note shown dark (issue #1578).
     function getPoznoteTheme() {
-        try {
-            var theme = normalizePoznoteTheme(window.__poznoteForcedTheme)
-                || normalizePoznoteTheme((window.__poznoteUserStorage || localStorage).getItem('poznote-theme'))
-                || 'system';
-            if (theme === 'system') {
-                theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
-            }
-            return theme === 'black' ? 'black' : normalizeTheme(theme);
-        } catch (e) {
-            return 'light';
-        }
-    }
-
-    function normalizePoznoteTheme(theme) {
-        theme = String(theme || '').toLowerCase();
-        return theme === 'black' || theme === 'dark' || theme === 'light' || theme === 'system'
-            ? theme
-            : null;
+        return normalizeTheme(document.documentElement.getAttribute('data-theme'));
     }
 
     function normalizeTheme(theme) {
@@ -251,12 +225,7 @@
         var normalizedTheme = normalizeTheme(poznoteTheme);
         document.body.classList.toggle('excalidraw-shell-dark', normalizedTheme === 'dark');
         document.body.classList.toggle('excalidraw-shell-light', normalizedTheme !== 'dark');
-        document.body.style.setProperty('--excalidraw-note-background', getNoteBackground(poznoteTheme));
         applyExcalidrawDomTheme(normalizedTheme);
-    }
-
-    function getNoteBackground(theme) {
-        return getThemeColors(theme).noteBackground;
     }
 
     // Excalidraw paints nothing behind the drawing: the canvas is transparent
@@ -268,13 +237,8 @@
         return 'transparent';
     }
 
-    function getCurrentItemStrokeColor(theme) {
-        return getThemeColors(theme).itemStroke;
-    }
-
-    function getThemeColors(theme) {
-        var poznoteTheme = theme === 'black' ? 'black' : normalizeTheme(theme);
-        return EXCALIDRAW_THEME_COLORS[poznoteTheme] || EXCALIDRAW_THEME_COLORS.light;
+    function getCurrentItemStrokeColor() {
+        return ITEM_STROKE_COLOR;
     }
 
     function applyExcalidrawDomTheme(theme) {
@@ -290,7 +254,7 @@
         return Object.assign({}, appState || {}, {
             theme: theme,
             viewBackgroundColor: getCanvasBackground(),
-            currentItemStrokeColor: getCurrentItemStrokeColor(poznoteTheme),
+            currentItemStrokeColor: getCurrentItemStrokeColor(),
             currentItemBackgroundColor: 'transparent',
             exportBackground: true,
             exportWithDarkMode: theme === 'dark'
@@ -577,7 +541,7 @@
                     appState: {
                         theme: currentTheme,
                         viewBackgroundColor: getCanvasBackground(),
-                        currentItemStrokeColor: getCurrentItemStrokeColor(currentPoznoteTheme),
+                        currentItemStrokeColor: getCurrentItemStrokeColor(),
                         currentItemBackgroundColor: 'transparent',
                         exportBackground: true,
                         exportWithDarkMode: currentTheme === 'dark'
@@ -590,7 +554,7 @@
                     langCode: EXCALIDRAW_LANG_CODES[config.language] || 'en',
                     theme: currentTheme,
                     canvasBackgroundColor: getCanvasBackground(),
-                    currentItemStrokeColor: getCurrentItemStrokeColor(currentPoznoteTheme),
+                    currentItemStrokeColor: getCurrentItemStrokeColor(),
                     currentItemBackgroundColor: 'transparent'
                 });
 
