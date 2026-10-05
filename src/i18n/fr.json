@@ -5167,6 +5167,7 @@
     "snapshot": "Enregistrer une révision de la note",
     "search_replace": "Rechercher et remplacer dans la note",
     "note_nav": "Note précédente ou suivante du dossier",
+    "note_scroll": "Faire défiler la note vers le haut ou le bas",
     "close": "Fermer un menu, un panneau ou une fenêtre",
     "bold": "Gras",
     "italic": "Italique",

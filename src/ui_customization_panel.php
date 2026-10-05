@@ -38,7 +38,8 @@ $uiCustomizationPanelAiLabel = t_h('ai_chat.toolbar_button', [], 'AI assistant')
 /*
  * Keyboard shortcuts listed by the "..." menu's modal, grouped by where they
  * act. Each combination is a list of keys; "mod" is Ctrl (⌘ on macOS) and
- * "alt" Alt (⌥ on macOS), swapped by js/ui-customization-panel.js on open.
+ * "alt" Alt (⌥ on macOS), swapped by js/ui-customization-panel.js on open;
+ * a literal "Ctrl" stays Ctrl on macOS too.
  * The handlers live in js/keyboard-shortcuts.js (general), js/events-rte-notes.js
  * plus build/markdown-editor/src/main.js (editor), js/checklist.js, js/slash-command.js,
  * js/emoji-autocomplete.js, js/tree-undo-clipboard.js and js/tree-keyboard-nav.js (tree). The editor and
@@ -54,6 +55,7 @@ $pzShortcutGroups = [
             ['keys' => [['mod', 'alt', 'S']], 'label' => t_h('keyboard_shortcuts.snapshot', [], 'Save a revision of the note')],
             ['keys' => [['mod', 'Shift', 'F']], 'label' => t_h('keyboard_shortcuts.search_replace', [], 'Search and replace in the note')],
             ['keys' => [['alt', '↑'], ['alt', '↓']], 'label' => t_h('keyboard_shortcuts.note_nav', [], 'Previous or next note in the folder')],
+            ['keys' => [['Ctrl', '↑'], ['Ctrl', '↓']], 'label' => t_h('keyboard_shortcuts.note_scroll', [], 'Scroll the note up or down')],
             ['keys' => [['Esc']], 'label' => t_h('keyboard_shortcuts.close', [], 'Close a menu, panel or window')],
             ['keys' => [['F11']], 'label' => t_h('keyboard_shortcuts.focus_mode', [], 'Turn focus mode on or off')],
         ],

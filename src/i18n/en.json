@@ -4884,6 +4884,7 @@
     "snapshot": "Save a revision of the note",
     "search_replace": "Search and replace in the note",
     "note_nav": "Previous or next note in the folder",
+    "note_scroll": "Scroll the note up or down",
     "close": "Close a menu, panel or window",
     "bold": "Bold",
     "italic": "Italic",

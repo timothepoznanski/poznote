@@ -5063,6 +5063,7 @@
     "snapshot": "Guardar una revisión de la nota",
     "search_replace": "Buscar y reemplazar en la nota",
     "note_nav": "Nota anterior o siguiente de la carpeta",
+    "note_scroll": "Desplazar la nota hacia arriba o hacia abajo",
     "close": "Cerrar un menú, un panel o una ventana",
     "bold": "Negrita",
     "italic": "Cursiva",

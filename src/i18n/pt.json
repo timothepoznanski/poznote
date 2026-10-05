@@ -5063,6 +5063,7 @@
     "snapshot": "Guardar uma revisão da nota",
     "search_replace": "Pesquisar e substituir na nota",
     "note_nav": "Nota anterior ou seguinte da pasta",
+    "note_scroll": "Deslocar a nota para cima ou para baixo",
     "close": "Fechar um menu, um painel ou uma janela",
     "bold": "Negrito",
     "italic": "Itálico",

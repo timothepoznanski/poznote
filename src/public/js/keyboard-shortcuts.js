@@ -5,6 +5,7 @@
  * - Ctrl+Shift+F / Cmd+Shift+F: open the note's search and replace bar
  *   (plain Ctrl+F / Cmd+F does the same from the Markdown editor)
  * - Alt+ArrowUp / Alt+ArrowDown: switch between notes in the current folder
+ * - Ctrl+ArrowUp / Ctrl+ArrowDown: scroll the note without moving the caret
  * All are always on; the former opt-in settings were removed.
  */
 
@@ -63,6 +64,31 @@
         if (target) {
             target.click();
         }
+    }
+
+    // One press of Ctrl+ArrowUp/ArrowDown, the distance of a browser's own arrow key
+    var NOTE_SCROLL_STEP_PX = 40;
+
+    // The element that scrolls the open note: #right_col, or in the Markdown
+    // split view the pane the key was pressed in (the editor's by default)
+    function getNoteScrollElement(target) {
+        var noteEntry = document.querySelector('#right_col .noteentry');
+        if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) {
+            var preview = noteEntry.querySelector('.markdown-preview');
+            if (preview && target && target.closest && target.closest('.markdown-preview') === preview) {
+                return preview;
+            }
+            var editorEl = noteEntry.querySelector('.markdown-editor');
+            return (editorEl && editorEl.querySelector('.cm-scroller')) || editorEl || preview;
+        }
+        return document.getElementById('right_col');
+    }
+
+    function scrollNoteByStep(target, direction) {
+        var scroller = getNoteScrollElement(target);
+        if (!scroller) return false;
+        scroller.scrollTop += direction * NOTE_SCROLL_STEP_PX;
+        return true;
     }
 
     var savedToastTimeoutId = null;
@@ -146,6 +172,22 @@
             if (isMacPlatform && isTextEditingContext(e.target)) return;
             e.preventDefault();
             navigateToSiblingNote(e.key === 'ArrowDown' ? 1 : -1);
+            return;
+        }
+
+        // Ctrl+ArrowUp/ArrowDown scrolls the note and leaves the caret where
+        // it is (discussion 1564). Ctrl on a Mac too: Cmd+Arrow jumps to the
+        // start or the end of the text there.
+        if (e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey &&
+            (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+            // A field outside the note, a menu or a window keeps its own keys
+            if (e.target && e.target.closest) {
+                if (e.target.closest('textarea, select, .modal, [role="dialog"], [role="menu"]')) return;
+                if (e.target.closest('input') && !e.target.closest('#right_col')) return;
+            }
+            if (scrollNoteByStep(e.target, e.key === 'ArrowDown' ? 1 : -1)) {
+                e.preventDefault();
+            }
         }
     }
 

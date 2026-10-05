@@ -5159,6 +5159,7 @@
     "snapshot": "保存笔记的修订版本",
     "search_replace": "在笔记中查找替换",
     "note_nav": "文件夹中的上一篇或下一篇笔记",
+    "note_scroll": "向上或向下滚动笔记",
     "close": "关闭菜单、面板或窗口",
     "bold": "粗体",
     "italic": "斜体",
