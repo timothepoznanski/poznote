@@ -478,7 +478,8 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     overflow-wrap: anywhere;
 }
 
-.diary-journal-edit {
+.diary-journal-edit,
+.diary-journal-tags-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -492,26 +493,101 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     cursor: pointer;
 }
 
-.diary-journal-edit .lucide {
+.diary-journal-edit .lucide,
+.diary-journal-tags-btn .lucide {
     width: 15px;
     height: 15px;
 }
 
 .diary-journal-edit:hover,
-.diary-journal-edit:focus-visible {
+.diary-journal-edit:focus-visible,
+.diary-journal-tags-btn:hover,
+.diary-journal-tags-btn:focus-visible {
     color: var(--pz-accent-text);
     background: var(--pz-surface-hover);
 }
 
-/* The pencil shows a check while its entry is being edited */
+/* The pencil shows a check while its entry is being edited; the tag button
+   is lit while the tags row below is its editor */
 .diary-journal-entry.is-editing .diary-journal-edit,
-.diary-journal-entry.is-editing .diary-journal-edit [class*="lucide-"] {
+.diary-journal-entry.is-editing .diary-journal-edit [class*="lucide-"],
+.diary-journal-entry.is-tag-editing .diary-journal-tags-btn,
+.diary-journal-entry.is-tag-editing .diary-journal-tags-btn [class*="lucide-"] {
     color: var(--pz-accent-text);
 }
 
 .diary-journal-tags {
     flex-wrap: wrap;
     margin: -4px 0 12px;
+}
+
+/* Tags being edited (js/diary-page.js): each one carries a remove button, so
+   it is no longer cut at the card width, and an input follows them. */
+.diary-journal-entry.is-tag-editing .diary-journal-tags {
+    overflow: visible;
+}
+
+.diary-journal-entry.is-tag-editing .board-card-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    max-width: 100%;
+    padding-right: 3px;
+}
+
+.diary-journal-tag-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.diary-journal-tag-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-circle);
+    background: transparent;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.diary-journal-tag-remove .lucide {
+    width: 11px;
+    height: 11px;
+}
+
+.diary-journal-tag-remove:hover,
+.diary-journal-tag-remove:focus-visible {
+    color: var(--pz-danger-text);
+    background: var(--pz-surface);
+}
+
+.diary-journal-tag-input {
+    flex: 0 1 150px;
+    min-width: 90px;
+    height: 22px;
+    box-sizing: border-box;
+    padding: 0 8px;
+    border: 1px solid var(--pz-accent);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
+    color: var(--pz-text-strong);
+    font: inherit;
+    font-size: 12px;
+    outline: none;
+}
+
+.diary-journal-tag-input::placeholder {
+    color: var(--pz-text-muted);
+}
+
+/* Chromium's arrow for the suggestions list: they open as one types */
+.diary-journal-tag-input::-webkit-calendar-picker-indicator {
+    display: none !important;
 }
 
 /* ---------- Journal entry body ----------
@@ -969,8 +1045,22 @@ html[data-theme='dark'] .diary-journal-title {
 
 html[data-theme='dark'] .diary-journal-edit:hover [class*="lucide-"],
 html[data-theme='dark'] .diary-journal-edit:focus-visible [class*="lucide-"],
-html[data-theme='dark'] .diary-journal-entry.is-editing .diary-journal-edit [class*="lucide-"] {
+html[data-theme='dark'] .diary-journal-entry.is-editing .diary-journal-edit [class*="lucide-"],
+html[data-theme='dark'] .diary-journal-tags-btn:hover [class*="lucide-"],
+html[data-theme='dark'] .diary-journal-tags-btn:focus-visible [class*="lucide-"],
+html[data-theme='dark'] .diary-journal-entry.is-tag-editing .diary-journal-tags-btn [class*="lucide-"] {
     color: var(--pz-accent-text);
+}
+
+html[data-theme='dark'] .diary-journal-tag-remove:hover [class*="lucide-"],
+html[data-theme='dark'] .diary-journal-tag-remove:focus-visible [class*="lucide-"] {
+    color: var(--pz-danger-text);
+}
+
+html[data-theme='dark'] .diary-journal-tag-input {
+    border-color: var(--pz-accent-text);
+    background: var(--pz-surface);
+    color: var(--pz-text-strong);
 }
 
 html[data-theme='dark'] .diary-journal-editor {
