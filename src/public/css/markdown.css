@@ -1125,8 +1125,10 @@ body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirro
     max-height: var(--markdown-split-pane-height, calc(100vh - 240px));
 }
 
+/* 2px less than the pane: the frame's border is inside its height, and a
+   content taller than what is left would scroll an empty note. */
 body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host .cm-content {
-    min-height: var(--markdown-split-pane-height, calc(100vh - 240px));
+    min-height: calc(var(--markdown-split-pane-height, calc(100vh - 240px)) - 2px);
     padding: 18px;
 }
 
