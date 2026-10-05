@@ -428,6 +428,12 @@ function saveEmbeddedDiagram() {
             // Remove old attachment if found. The note before this save
             // gets its automatic revision first, so that the preview it
             // shows is known to be still needed.
+            // A copy of the diagram pasted into the same note shows the same
+            // preview until it is edited in turn: the file stays while the
+            // note still points to it elsewhere (issue #1576).
+            if ($oldAttachmentId && substr_count($html_content, '/attachments/' . $oldAttachmentId . '"') > 1) {
+                $oldAttachmentId = null;
+            }
             if ($oldAttachmentId) {
                 poznoteCreateAutomaticSnapshot($con, $note_id);
                 $existingAttachments = excalidrawRetirePreviews((int)$note_id, $existingAttachments, [$oldAttachmentId]);

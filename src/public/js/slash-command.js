@@ -3897,7 +3897,7 @@
             if (plainOnly || typeof navigator.clipboard.read !== 'function') {
                 data.setData('text/plain', await navigator.clipboard.readText());
             } else {
-                const items = await navigator.clipboard.read();
+                const items = await readClipboardItems();
                 for (const item of items) {
                     for (const type of item.types) {
                         const blob = await item.getType(type);
@@ -3928,7 +3928,15 @@
         const active = document.activeElement;
         const target = active && editable.contains(active) ? active : editable;
         const event = new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true });
-        target.dispatchEvent(event);
+        // Firefox empties the clipboardData of an event built by a page, so
+        // a rich-text note pasted as plain text there: its paste handler
+        // (js/events-rte-paste.js) reads what the menu read instead
+        window._poznoteMenuPasteData = data;
+        try {
+            target.dispatchEvent(event);
+        } finally {
+            window._poznoteMenuPasteData = null;
+        }
         if (event.defaultPrevented) return;
 
         const text = (data.getData('text/plain') || '').replace(/\r\n?/g, '\n');
@@ -3938,6 +3946,18 @@
             if (current) api.replaceRange(codeMirrorEditor, current.start, current.end, text);
         } else {
             document.execCommand('insertText', false, text);
+        }
+    }
+
+    // The HTML as it was copied, where the browser can give it (Chrome): the
+    // cleaned-up flavour it returns otherwise empties the address of every
+    // picture copied from a note, which a Ctrl+V keeps (issue #1576).
+    async function readClipboardItems() {
+        try {
+            return await navigator.clipboard.read({ unsanitized: ['text/html'] });
+        } catch (e) {
+            if (e && e.name === 'NotAllowedError') throw e;
+            return navigator.clipboard.read();
         }
     }
 
