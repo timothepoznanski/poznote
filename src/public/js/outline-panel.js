@@ -65,7 +65,9 @@ function updateOutlineToggleAvailability(noteElement) {
     document.body.classList.toggle('outline-disabled', isDisabled);
 
     if (toggleBtn) {
-        const enabledTitle = 'Toggle outline panel';
+        const enabledTitle = typeof window.t === 'function'
+            ? window.t('common.outline.toggle_panel', null, 'Toggle outline panel')
+            : 'Toggle outline panel';
         const disabledTitle = typeof window.t === 'function'
             ? window.t('common.outline.unavailable_tasklist', null, 'Outline is not available for task lists')
             : 'Outline is not available for task lists';
@@ -1374,3 +1376,8 @@ window.outlinePanel = {
     extractHeadings: extractHeadings,
     renderOutline: renderOutline
 };
+
+// Refresh the outline toggle after the asynchronous dictionary has loaded.
+document.addEventListener('poznote:i18n:loaded', function () {
+    updateOutlineToggleAvailability(getCurrentOutlineNoteElement());
+});

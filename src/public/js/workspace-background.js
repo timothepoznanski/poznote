@@ -221,9 +221,9 @@
         
         if (!file.type.match('image.*')) {
             if (typeof window.showError === 'function') {
-                window.showError('Please select a valid image file');
+                window.showError((typeof window.t === 'function' ? window.t('workspace_background.invalid_image', null, 'Please select a valid image file') : 'Please select a valid image file'));
             } else {
-                alert('Please select a valid image file');
+                alert((typeof window.t === 'function' ? window.t('workspace_background.invalid_image', null, 'Please select a valid image file') : 'Please select a valid image file'));
             }
             return;
         }
@@ -275,9 +275,9 @@
         setBackgroundOpacity(currentWorkspace, opacity, function(success) {
             if (!success) {
                 if (typeof window.showError === 'function') {
-                    window.showError('Error saving opacity setting');
+                    window.showError((typeof window.t === 'function' ? window.t('workspace_background.opacity_error', null, 'Error saving opacity setting') : 'Error saving opacity setting'));
                 } else {
-                    alert('Error saving opacity setting');
+                    alert((typeof window.t === 'function' ? window.t('workspace_background.opacity_error', null, 'Error saving opacity setting') : 'Error saving opacity setting'));
                 }
             }
 
@@ -310,17 +310,17 @@
                 closeBackgroundModal();
             } else {
                 if (typeof window.showError === 'function') {
-                    window.showError(data.error || 'Error uploading image');
+                    window.showError(data.error || (typeof window.t === 'function' ? window.t('workspace_background.upload_error', null, 'Error uploading image') : 'Error uploading image'));
                 } else {
-                    alert(data.error || 'Error uploading image');
+                    alert(data.error || (typeof window.t === 'function' ? window.t('workspace_background.upload_error', null, 'Error uploading image') : 'Error uploading image'));
                 }
             }
         })
         .catch(error => {
             if (typeof window.showError === 'function') {
-                window.showError('Error uploading image');
+                window.showError((typeof window.t === 'function' ? window.t('workspace_background.upload_error', null, 'Error uploading image') : 'Error uploading image'));
             } else {
-                alert('Error uploading image');
+                alert((typeof window.t === 'function' ? window.t('workspace_background.upload_error', null, 'Error uploading image') : 'Error uploading image'));
             }
         });
     }
@@ -336,17 +336,17 @@
                 closeBackgroundModal();
             } else {
                 if (typeof window.showError === 'function') {
-                    window.showError(data.error || 'Error removing image');
+                    window.showError(data.error || (typeof window.t === 'function' ? window.t('workspace_background.remove_error', null, 'Error removing image') : 'Error removing image'));
                 } else {
-                    alert(data.error || 'Error removing image');
+                    alert(data.error || (typeof window.t === 'function' ? window.t('workspace_background.remove_error', null, 'Error removing image') : 'Error removing image'));
                 }
             }
         })
         .catch(error => {
             if (typeof window.showError === 'function') {
-                window.showError('Error removing image');
+                window.showError((typeof window.t === 'function' ? window.t('workspace_background.remove_error', null, 'Error removing image') : 'Error removing image'));
             } else {
-                alert('Error removing image');
+                alert((typeof window.t === 'function' ? window.t('workspace_background.remove_error', null, 'Error removing image') : 'Error removing image'));
             }
         });
     }

@@ -635,7 +635,7 @@ function addTagElement(container, tagText, noteId) {
     const deleteButton = document.createElement('span');
     deleteButton.className = 'tag-delete-button';
     deleteButton.innerHTML = '×';
-    deleteButton.title = 'Remove tag';
+    deleteButton.title = typeof window.t === 'function' ? window.t('tags.action.remove', null, 'Remove tag') : 'Remove tag';
     deleteButton.addEventListener('click', function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -1265,6 +1265,9 @@ window.triggerAutoSaveForNote = triggerAutoSaveForNote;
 
 // Listen for i18n loaded event to update tag input placeholders
 document.addEventListener('poznote:i18n:loaded', function () {
+    document.querySelectorAll('.tag-delete-button').forEach(function (button) {
+        button.title = typeof window.t === 'function' ? window.t('tags.action.remove', null, 'Remove tag') : 'Remove tag';
+    });
     // Update all tag input placeholders with translations
     document.querySelectorAll('.tag-input').forEach(function (input) {
         const container = input.closest('.editable-tags-container');

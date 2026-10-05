@@ -10,6 +10,9 @@
     let draggedCard = null;
     let draggedFromFolderId = null;
     let pointerStartedInTaskPreview = false;
+    let lastPointerWasTouch = false;
+    // The card a finger is holding or dragging, see setupTouchDrag()
+    let touchDrag = null;
     let trackedKanbanBoard = null;
     let kanbanScrollResizeObserver = null;
 
@@ -86,11 +89,344 @@
     }
 
     /**
+     * Move a card into a drop zone and persist it. Shared by the native drop
+     * and the touch drag, and given its own card reference: dragend clears
+     * the drag state while the request is still on its way.
+     */
+    async function moveKanbanCardToZone(card, fromFolderId, columnContent) {
+        const targetFolderId = columnContent.dataset.folderId;
+        const noteId = card.dataset.noteId;
+
+        // Don't do anything if dropped in the same column
+        if (targetFolderId === fromFolderId) {
+            return;
+        }
+
+        // Move the card visually immediately for best UX
+        const originalParent = card.parentNode;
+        const originalSibling = card.nextElementSibling;
+        const oldFolderId = fromFolderId;
+        const originalOrder = card.dataset.kanbanOrder;
+
+        // A dragged card always lands in the active area, above the
+        // completed section and the subfolder groups of the target zone.
+        insertActiveCardIntoZone(columnContent, card);
+        card.dataset.folderId = targetFolderId;
+
+        // Dropping into a collapsed subfolder group opens it so the card
+        // does not vanish from view.
+        const targetSection = columnContent.closest('.kanban-subfolder-section');
+        if (targetSection && !targetSection.classList.contains('is-expanded')) {
+            applySubfolderSectionState(targetSection, true);
+            storeSubfolderSectionState(targetSection.dataset.folderId, true);
+        }
+        card.dataset.kanbanOrder = nextKanbanOrder();
+        card.classList.add('kanban-card-dropped');
+
+        // Dragging a completed card into another column puts it back into
+        // active work, so its completed state is cleared.
+        const wasCompleted = card.dataset.completed === '1';
+        if (wasCompleted) {
+            card.classList.remove('kanban-card-completed');
+            card.dataset.completed = '0';
+            const completeBtn = card.querySelector('.kanban-card-complete-btn');
+            if (completeBtn) {
+                const label = kanbanT('kanban.completed.mark_completed', 'Mark as completed');
+                completeBtn.setAttribute('aria-pressed', 'false');
+                completeBtn.setAttribute('aria-label', label);
+                completeBtn.title = label;
+            }
+        }
+
+        // Remove animation class after it completes
+        setTimeout(() => {
+            card.classList.remove('kanban-card-dropped');
+        }, 300);
+
+        resortKanbanColumnIfNeeded(columnContent);
+
+        // Update column counts visually
+        updateColumnCounts();
+
+        // Persist the change to the database
+        try {
+            const success = await moveNoteToFolder(noteId, targetFolderId);
+
+            if (!success) {
+                console.error("Kanban: API move failed, reverting UI...");
+                // Revert the visual change if API call failed
+                if (originalParent) originalParent.insertBefore(card, originalSibling);
+                card.dataset.folderId = oldFolderId;
+                if (originalOrder) card.dataset.kanbanOrder = originalOrder;
+                if (wasCompleted) {
+                    card.classList.add('kanban-card-completed');
+                    card.dataset.completed = '1';
+                }
+                updateColumnCounts();
+                showError('Failed to move note');
+            } else {
+                if (wasCompleted) {
+                    // Best-effort: the move already succeeded, so a failure
+                    // here only leaves a stale completed flag in the DB.
+                    setKanbanCompleted(noteId, false).catch((err) => {
+                        console.error('Kanban: could not clear completed flag after move:', err);
+                    });
+                }
+                // Mark note for auto-push since we moved a note (if auto-push enabled)
+                if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                    window.setNeedsAutoPush(true);
+                }
+                
+                // Success: refresh the sidebar without rebuilding the already-updated Kanban view.
+                if (typeof window.refreshNotesListAfterFolderAction === 'function') {
+                    window.refreshNotesListAfterFolderAction(null, { skipKanbanViewRefresh: true });
+                }
+            }
+        } catch (error) {
+            console.error('Kanban: Error during persistence:', error);
+            // Revert on error
+            if (originalParent) {
+                originalParent.insertBefore(card, originalSibling);
+                card.dataset.folderId = oldFolderId;
+                if (originalOrder) card.dataset.kanbanOrder = originalOrder;
+                if (wasCompleted) {
+                    card.classList.add('kanban-card-completed');
+                    card.dataset.completed = '1';
+                }
+            }
+            updateColumnCounts();
+            showError('Error moving note');
+        }
+    }
+
+    /**
+     * Touch drag (issue #1566). A phone turns a long press on a draggable
+     * element into a native drag, but some of them (Android 17 beta, Chrome
+     * and Firefox alike) fire dragstart and then neither follow the finger
+     * nor end the drag, which left the card dimmed for good. A finger gets
+     * its own drag instead: hold a card, then move it. The mouse keeps the
+     * native drag.
+     */
+    function setupTouchDrag() {
+        const HOLD_MS = 350;
+        const MOVE_TOLERANCE = 8;
+        const EDGE = 56;
+        const MAX_SCROLL_STEP = 10;
+
+        function findTouch(touchList) {
+            for (let i = 0; i < touchList.length; i++) {
+                if (touchList[i].identifier === touchDrag.id) return touchList[i];
+            }
+            return null;
+        }
+
+        function endTouchDrag() {
+            const drag = touchDrag;
+            if (!drag) return;
+            touchDrag = null;
+
+            clearTimeout(drag.timer);
+            if (drag.frame) cancelAnimationFrame(drag.frame);
+            if (drag.ghost) drag.ghost.remove();
+            drag.card.classList.remove('kanban-card-touch-hold', 'dragging');
+            clearKanbanDragOver();
+        }
+
+        function startDragging() {
+            const drag = touchDrag;
+            if (!drag || !drag.card.isConnected) {
+                endTouchDrag();
+                return;
+            }
+
+            const rect = drag.card.getBoundingClientRect();
+            const ghost = drag.card.cloneNode(true);
+            ghost.classList.add('kanban-card-touch-ghost');
+            ghost.removeAttribute('draggable');
+            ghost.style.left = rect.left + 'px';
+            ghost.style.top = rect.top + 'px';
+            ghost.style.width = rect.width + 'px';
+            ghost.style.height = rect.height + 'px';
+            document.body.appendChild(ghost);
+
+            drag.ghost = ghost;
+            drag.active = true;
+            drag.card.classList.add('dragging');
+
+            if (navigator.vibrate) {
+                try { navigator.vibrate(10); } catch (_e) { /* not allowed here */ }
+            }
+
+            updateDragPosition();
+            drag.frame = requestAnimationFrame(autoScroll);
+        }
+
+        function zoneAtPoint(x, y) {
+            const zone = getKanbanDropZone(document.elementFromPoint(x, y));
+            if (zone) return zone;
+
+            // A column is only as tall as its cards: a finger in the empty
+            // space below a short one still aims at it.
+            const board = touchDrag.card.closest('.kanban-board');
+            if (!board) return null;
+            const boardRect = board.getBoundingClientRect();
+            if (x < boardRect.left || x > boardRect.right || y < boardRect.top || y > boardRect.bottom) return null;
+
+            const columns = board.querySelectorAll(':scope > .kanban-column');
+            for (let i = 0; i < columns.length; i++) {
+                const rect = columns[i].getBoundingClientRect();
+                if (x >= rect.left && x <= rect.right && y >= rect.top) {
+                    return columns[i].querySelector('.kanban-column-content');
+                }
+            }
+            return null;
+        }
+
+        function updateDragPosition() {
+            const drag = touchDrag;
+            drag.ghost.style.transform = 'translate(' + (drag.x - drag.startX) + 'px, ' + (drag.y - drag.startY) + 'px) rotate(3deg)';
+
+            const zone = zoneAtPoint(drag.x, drag.y);
+            if (zone === drag.zone) return;
+
+            drag.zone = zone;
+            clearKanbanDragOver();
+            if (zone) {
+                zone.classList.add('drag-over');
+                const highlight = getKanbanDropHighlight(zone);
+                if (highlight) highlight.classList.add('drag-over');
+            }
+        }
+
+        // How far to scroll this frame when the finger sits near an edge
+        function edgeStep(position, start, end) {
+            if (position < start + EDGE) {
+                return -Math.ceil(MAX_SCROLL_STEP * Math.min(1, (start + EDGE - position) / EDGE));
+            }
+            if (position > end - EDGE) {
+                return Math.ceil(MAX_SCROLL_STEP * Math.min(1, (position - (end - EDGE)) / EDGE));
+            }
+            return 0;
+        }
+
+        function autoScroll() {
+            const drag = touchDrag;
+            if (!drag || !drag.active) return;
+
+            let scrolled = false;
+
+            // The board sideways, to reach the columns out of view
+            const board = drag.card.closest('.kanban-board');
+            if (board) {
+                const rect = board.getBoundingClientRect();
+                const step = edgeStep(drag.x, rect.left, rect.right);
+                if (step) {
+                    const before = board.scrollLeft;
+                    board.scrollBy({ left: step, behavior: 'instant' });
+                    scrolled = board.scrollLeft !== before;
+                }
+            }
+
+            // The hovered column up and down
+            const column = drag.zone && drag.zone.closest('.kanban-column-content');
+            if (column && column.scrollHeight > column.clientHeight) {
+                const rect = column.getBoundingClientRect();
+                const step = edgeStep(drag.y, rect.top, rect.bottom);
+                if (step) {
+                    const before = column.scrollTop;
+                    column.scrollBy({ top: step, behavior: 'instant' });
+                    scrolled = scrolled || column.scrollTop !== before;
+                }
+            }
+
+            if (scrolled) updateDragPosition();
+            drag.frame = requestAnimationFrame(autoScroll);
+        }
+
+        document.addEventListener('touchstart', (e) => {
+            if (touchDrag) {
+                // A second finger: this is no longer a card drag
+                endTouchDrag();
+                return;
+            }
+            if (e.touches.length !== 1) return;
+
+            const targetEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
+            const card = targetEl && targetEl.closest('.kanban-inline-view .kanban-card');
+            if (!card || targetEl.closest('button, input, label, a')) return;
+
+            const touch = e.touches[0];
+            touchDrag = {
+                card: card,
+                id: touch.identifier,
+                startX: touch.clientX,
+                startY: touch.clientY,
+                x: touch.clientX,
+                y: touch.clientY,
+                active: false,
+                ghost: null,
+                zone: null,
+                frame: 0,
+                timer: setTimeout(startDragging, HOLD_MS)
+            };
+            // No text selection while the finger rests on the card
+            card.classList.add('kanban-card-touch-hold');
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!touchDrag) return;
+            const touch = findTouch(e.touches);
+            if (!touch) return;
+
+            if (!touchDrag.active) {
+                // Moving before the hold completes is a scroll
+                if (Math.abs(touch.clientX - touchDrag.startX) > MOVE_TOLERANCE ||
+                    Math.abs(touch.clientY - touchDrag.startY) > MOVE_TOLERANCE) {
+                    endTouchDrag();
+                }
+                return;
+            }
+
+            // The card follows the finger, the page stays put
+            if (e.cancelable) e.preventDefault();
+            touchDrag.x = touch.clientX;
+            touchDrag.y = touch.clientY;
+            updateDragPosition();
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (!touchDrag || !findTouch(e.changedTouches)) return;
+
+            const drag = touchDrag;
+            const wasActive = drag.active;
+            if (wasActive) updateDragPosition();
+            const zone = drag.zone;
+            endTouchDrag();
+
+            if (!wasActive) return;
+
+            // The release must not open the note
+            if (e.cancelable) e.preventDefault();
+            if (zone && zone.isConnected && drag.card.isConnected) {
+                moveKanbanCardToZone(drag.card, drag.card.dataset.folderId, zone);
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchcancel', endTouchDrag);
+
+        // The long press would otherwise open the browser's own menu
+        document.addEventListener('contextmenu', (e) => {
+            if (touchDrag) e.preventDefault();
+        }, true);
+    }
+
+    /**
      * Setup drag and drop functionality using document delegation
      */
     function setupDelegatedEvents() {
         document.addEventListener('pointerdown', (e) => {
             pointerStartedInTaskPreview = !!e.target.closest('.kanban-tasklist-preview');
+            lastPointerWasTouch = e.pointerType === 'touch';
         }, true);
 
         document.addEventListener('pointerup', () => {
@@ -103,6 +439,12 @@
             // Text-selection drags fire dragstart with a text node target
             const targetEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
             if (!targetEl) return;
+
+            // A finger drags through setupTouchDrag(), never the native drag
+            if ((lastPointerWasTouch || touchDrag) && targetEl.closest('.kanban-card')) {
+                e.preventDefault();
+                return;
+            }
 
             if (pointerStartedInTaskPreview || targetEl.closest('.kanban-tasklist-preview')) {
                 e.preventDefault();
@@ -184,7 +526,7 @@
         });
 
         // Drop
-        document.addEventListener('drop', async (e) => {
+        document.addEventListener('drop', (e) => {
             const columnContent = getKanbanDropZone(e.target);
             if (!columnContent) return;
 
@@ -200,110 +542,10 @@
                 return;
             }
 
-            const targetFolderId = columnContent.dataset.folderId;
-            const noteId = draggedCard.dataset.noteId;
-
-            // Don't do anything if dropped in the same column
-            if (targetFolderId === draggedFromFolderId) {
-                return;
-            }
-
-            // Move the card visually immediately for best UX
-            const originalParent = draggedCard.parentNode;
-            const originalSibling = draggedCard.nextElementSibling;
-            const oldFolderId = draggedFromFolderId;
-            const originalOrder = draggedCard.dataset.kanbanOrder;
-
-            // A dragged card always lands in the active area, above the
-            // completed section and the subfolder groups of the target zone.
-            insertActiveCardIntoZone(columnContent, draggedCard);
-            draggedCard.dataset.folderId = targetFolderId;
-
-            // Dropping into a collapsed subfolder group opens it so the card
-            // does not vanish from view.
-            const targetSection = columnContent.closest('.kanban-subfolder-section');
-            if (targetSection && !targetSection.classList.contains('is-expanded')) {
-                applySubfolderSectionState(targetSection, true);
-                storeSubfolderSectionState(targetSection.dataset.folderId, true);
-            }
-            draggedCard.dataset.kanbanOrder = nextKanbanOrder();
-            draggedCard.classList.add('kanban-card-dropped');
-
-            // Dragging a completed card into another column puts it back into
-            // active work, so its completed state is cleared.
-            const wasCompleted = draggedCard.dataset.completed === '1';
-            if (wasCompleted) {
-                draggedCard.classList.remove('kanban-card-completed');
-                draggedCard.dataset.completed = '0';
-                const completeBtn = draggedCard.querySelector('.kanban-card-complete-btn');
-                if (completeBtn) {
-                    const label = kanbanT('kanban.completed.mark_completed', 'Mark as completed');
-                    completeBtn.setAttribute('aria-pressed', 'false');
-                    completeBtn.setAttribute('aria-label', label);
-                    completeBtn.title = label;
-                }
-            }
-
-            // Remove animation class after it completes
-            setTimeout(() => {
-                if (draggedCard) draggedCard.classList.remove('kanban-card-dropped');
-            }, 300);
-
-            resortKanbanColumnIfNeeded(columnContent);
-
-            // Update column counts visually
-            updateColumnCounts();
-
-            // Persist the change to the database
-            try {
-                const success = await moveNoteToFolder(noteId, targetFolderId);
-
-                if (!success) {
-                    console.error("Kanban: API move failed, reverting UI...");
-                    // Revert the visual change if API call failed
-                    if (originalParent) originalParent.insertBefore(draggedCard, originalSibling);
-                    draggedCard.dataset.folderId = oldFolderId;
-                    if (originalOrder) draggedCard.dataset.kanbanOrder = originalOrder;
-                    if (wasCompleted) {
-                        draggedCard.classList.add('kanban-card-completed');
-                        draggedCard.dataset.completed = '1';
-                    }
-                    updateColumnCounts();
-                    showError('Failed to move note');
-                } else {
-                    if (wasCompleted) {
-                        // Best-effort: the move already succeeded, so a failure
-                        // here only leaves a stale completed flag in the DB.
-                        setKanbanCompleted(noteId, false).catch((err) => {
-                            console.error('Kanban: could not clear completed flag after move:', err);
-                        });
-                    }
-                    // Mark note for auto-push since we moved a note (if auto-push enabled)
-                    if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
-                        window.setNeedsAutoPush(true);
-                    }
-                    
-                    // Success: refresh the sidebar without rebuilding the already-updated Kanban view.
-                    if (typeof window.refreshNotesListAfterFolderAction === 'function') {
-                        window.refreshNotesListAfterFolderAction(null, { skipKanbanViewRefresh: true });
-                    }
-                }
-            } catch (error) {
-                console.error('Kanban: Error during persistence:', error);
-                // Revert on error
-                if (draggedCard && originalParent) {
-                    originalParent.insertBefore(draggedCard, originalSibling);
-                    draggedCard.dataset.folderId = oldFolderId;
-                    if (originalOrder) draggedCard.dataset.kanbanOrder = originalOrder;
-                    if (wasCompleted) {
-                        draggedCard.classList.add('kanban-card-completed');
-                        draggedCard.dataset.completed = '1';
-                    }
-                }
-                updateColumnCounts();
-                showError('Error moving note');
-            }
+            moveKanbanCardToZone(draggedCard, draggedFromFolderId, columnContent);
         });
+
+        setupTouchDrag();
 
         // Task checkbox delegation. The task area is interactive but the rest of the card still opens/drags normally.
         document.addEventListener('change', (e) => {

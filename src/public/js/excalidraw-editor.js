@@ -32,6 +32,17 @@
         return;
     }
     
+    // Poznote language -> Excalidraw locale (the bundle ships them all)
+    var EXCALIDRAW_LANG_CODES = {
+        'fr': 'fr-FR',
+        'es': 'es-ES',
+        'de': 'de-DE',
+        'pt': 'pt-BR',
+        'ru': 'ru-RU',
+        'zh-cn': 'zh-CN',
+        'ko': 'ko-KR'
+    };
+
     // Translation texts
     var TXT_EDITOR_NOT_READY = config.txt.editorNotReady || 'Editor not ready';
     var TXT_SAVING = config.txt.saving || 'Saving...';
@@ -576,6 +587,7 @@
                 
                 excalidrawAPI = window.PoznoteExcalidraw.init('app', {
                     initialData: safeInitialData,
+                    langCode: EXCALIDRAW_LANG_CODES[config.language] || 'en',
                     theme: currentTheme,
                     canvasBackgroundColor: getCanvasBackground(),
                     currentItemStrokeColor: getCurrentItemStrokeColor(currentPoznoteTheme),

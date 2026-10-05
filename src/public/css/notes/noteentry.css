@@ -78,6 +78,28 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     }
 }
 
+/* Space below the note (discussion 1564, setting note_virtual_space): empty
+   room under the last line, so the end of the text can be scrolled up the
+   screen. It is the .note-bottom-space div that closes .innernote, a click on
+   which already puts the caret at the end of the note (js/index-events.js).
+   The markdown split view scrolls its two panes instead of the column: they
+   get the same room in css/markdown.css and the div gives its own back.
+   The arrow to the bottom stops at the last line, not under this room
+   (getNoteVirtualSpace, js/index-events.js). */
+@media screen and (min-width: 801px) {
+    body.note-virtual-space {
+        --pz-note-virtual-space: 50vh;
+    }
+
+    body.note-virtual-space #right_col .note-bottom-space {
+        height: var(--pz-note-virtual-space);
+    }
+
+    body.note-virtual-space #right_col .innernote:has(.noteentry.markdown-split-mode) .note-bottom-space {
+        height: 0;
+    }
+}
+
 /* Scroll-to-edge arrows, fixed at the bottom-right of the note and stacked
    under the floating stack of css/ui-customization-panel.css, whose buttons
    share their size (--pz-edge-btn-size, larger on mobile where they are

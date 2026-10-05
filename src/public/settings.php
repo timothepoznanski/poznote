@@ -27,6 +27,9 @@ $pageWorkspace = trim(getWorkspaceFilter());
 // Check if current user is admin (used multiple times in template)
 $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 
+// The font families an admin uploaded, offered in both font lists
+$customFonts = function_exists('poznoteCustomFonts') ? poznoteCustomFonts() : [];
+
 // ============================================================
 // SETTINGS PASSWORD PROTECTION
 // ============================================================
@@ -112,6 +115,7 @@ $settingsPageUserKeys = [
     'highlight_current_folder_tree',
     'folder_tree_dim_level',
     'notes_without_folders_after_folders',
+    'folder_icon_opens_kanban',
     'sidebar_offline_marks',
     'markdown_split_card_view',
     'markdown_split_preview_left',
@@ -123,6 +127,7 @@ $settingsPageUserKeys = [
     'attachment_previews_in_note',
     'attachments_at_bottom',
     'backlinks_at_bottom',
+    'note_virtual_space',
     'default_image_border_no_padding',
     'center_note_content',
     'note_age_filter_days',
@@ -535,6 +540,7 @@ if ($canUseUserWebhooks) {
                                 'zh-cn' => 'settings.language.chinese_simplified',
                                 'en' => 'settings.language.english',
                                 'fr' => 'settings.language.french',
+                                'ko' => 'settings.language.korean',
                                 'de' => 'settings.language.german',
                                 'pt' => 'settings.language.portuguese',
                                 'ru' => 'settings.language.russian',
@@ -863,6 +869,13 @@ if ($canUseUserWebhooks) {
                         <option value="trebuchet" style="font-family: 'Trebuchet MS', sans-serif;">Trebuchet MS</option>
                         <option value="georgia" style="font-family: Georgia, serif;">Georgia</option>
                         <option value="times" style="font-family: 'Times New Roman', serif;">Times New Roman</option>
+                        <?php if ($customFonts !== []): ?>
+                        <optgroup label="<?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?>">
+                            <?php foreach ($customFonts as $customFont): ?>
+                            <option value="<?php echo htmlspecialchars($customFont['id'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($customFont['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
             </div>
@@ -979,6 +992,16 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
+            <!-- Folder icon click opens the Kanban view (issue 1566) -->
+            <div class="home-card" id="folder-icon-kanban-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.folder_icon_opens_kanban', [], 'A click on a folder icon in the notes list opens the folder\'s Kanban view instead of the icon picker. The icon can still be changed from the folder menu or from the Kanban view.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-columns-2"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.folder_icon_opens_kanban', [], 'Folder icon opens Kanban'); ?></span>
+                    <span id="folder-icon-kanban-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
             <?php if (poznoteOfflineModeEnabled()): ?>
             <!-- Offline notes marked in the tree (js/offline-marks.js) -->
             <div class="home-card" id="sidebar-offline-marks-card">
@@ -1014,6 +1037,16 @@ if ($canUseUserWebhooks) {
                             <input type="range" id="note-width-range" class="settings-inline-control" data-control="note-width-range" min="10" max="100" step="5" value="100">
                             <output class="settings-inline-value" for="note-width-range"><?php echo t_h('modals.note_width.full_width', [], 'Full Width'); ?></output>
                         </span>
+                    </div>
+                </div>
+
+                <!-- Space below the note (discussion 1564) -->
+                <div class="home-card desktop-only" id="note-virtual-space-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_virtual_space', [], 'Leave empty room under the last line of a note, so the end of the text can be scrolled up to the middle of the screen instead of staying at the very bottom.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-move-vertical"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.note_virtual_space', [], 'Space below the note'); ?></span>
+                        <span id="note-virtual-space-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                     </div>
                 </div>
 
@@ -1208,6 +1241,13 @@ if ($canUseUserWebhooks) {
                         <option value="fira" style="font-family: 'Fira Code', monospace;">Fira Code</option>
                         <option value="sourcecodepro" style="font-family: 'Source Code Pro', monospace;">Source Code Pro</option>
                         <option value="ubuntumono" style="font-family: 'Ubuntu Mono', monospace;">Ubuntu Mono</option>
+                        <?php if ($customFonts !== []): ?>
+                        <optgroup label="<?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?>">
+                            <?php foreach ($customFonts as $customFont): ?>
+                            <option value="<?php echo htmlspecialchars($customFont['id'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($customFont['name'], ENT_QUOTES, 'UTF-8'); ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
+                        <?php endif; ?>
                     </select>
                 </div>
             </div>
@@ -1543,6 +1583,18 @@ if ($canUseUserWebhooks) {
                     <div class="home-card-content">
                         <span class="home-card-title"><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span>
                         <span id="custom-css-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Custom fonts: the families offered in the two font lists -->
+                <div class="home-card" id="custom-fonts-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.custom_fonts', [], 'Upload font files to offer them to every user in the App font and Markdown editor font lists.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-type"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?></span>
+                        <span id="custom-fonts-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
 

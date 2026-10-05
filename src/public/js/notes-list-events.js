@@ -455,6 +455,13 @@
                 break;
 
             case 'open-folder-icon-picker':
+                // With "Folder icon opens Kanban" on, a tree icon opens the
+                // board; the icons of the Kanban view itself keep the picker.
+                if (document.body.classList.contains('folder-icon-opens-kanban') &&
+                    !actionElement.closest('.kanban-inline-view')) {
+                    handleOpenKanban(event, actionElement);
+                    break;
+                }
                 event.preventDefault();
                 event.stopImmediatePropagation();
                 var folderData = getFolderData(actionElement);

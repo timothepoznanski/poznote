@@ -816,6 +816,7 @@ function renderBoardViewMenu(string $prefix) {
     $idPrefix = htmlspecialchars($prefix, ENT_QUOTES, 'UTF-8');
     echo '<div class="board-view-controls" data-view-prefix="' . $idPrefix . '">' .
         '<button type="button" id="' . $idPrefix . 'ViewLayoutBtn" class="board-view-btn board-view-layout-toggle"' .
+            ' data-badge-small="S" data-badge-medium="M" data-badge-large="L" data-badge-wide="W"' .
             ' data-label-grid="' . t_h('dashboard.view.layout_grid', [], 'Grid') . '"' .
             ' data-label-list="' . t_h('dashboard.view.layout_list', [], 'List') . '"' .
             ' data-label-small="' . t_h('dashboard.view.size_small', [], 'Small') . '"' .

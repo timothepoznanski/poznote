@@ -6,7 +6,8 @@
   <a href="docs/README.es.md">Español</a> ·
   <a href="docs/README.pt.md">Português</a> ·
   <a href="docs/README.ru.md">Русский</a> ·
-  <a href="docs/README.zh-cn.md">简体中文</a>
+  <a href="docs/README.zh-cn.md">简体中文</a> ·
+  <a href="docs/README.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 
@@ -573,6 +574,19 @@ Use `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` if you want to hide the local usern
 
 > **Breaking change:** previous OIDC settings in `.env` are no longer read, except `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET`, and `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`. After upgrading, re-enter the other OIDC settings from the admin page.
 
+#### URLs to register with your identity provider
+
+When you create the application (client) in your identity provider, register the first URL below as the redirect URI (also called callback URL), and the second one as the post-logout redirect URI if your provider asks for it:
+
+```text
+https://YOUR_SERVER/oidc_callback.php
+https://YOUR_SERVER/login.php
+```
+
+Poznote builds both from the host name the request arrives on, always with `https://`. If your provider needs something else, set **Redirect URI** or **Post-logout redirect URI** in the Advanced section of the OIDC admin page, and register that exact value.
+
+The discovery URL does not usually need to be filled in: Poznote appends `/.well-known/openid-configuration` to the **Issuer URL**. With Authentik, for example, the issuer is `https://AUTHENTIK_HOST/application/o/APPLICATION_SLUG/`. Set **Discovery URL** only if your provider publishes that document somewhere else.
+
 #### Access Control Example (Groups + Auto-Provision)
 
 From the OIDC admin page, configure:
@@ -762,6 +776,26 @@ Configure it in **Settings > Display > Element visibility**.
 </details>
 
 <details>
+<summary><strong>Custom Fonts</strong></summary>
+<br>
+
+Poznote ships with Inter and can use the fonts installed on your device. To use any other font, for instance a family from Google Fonts, an administrator uploads its files once and every user can then pick it.
+
+Upload them in **Settings > Admin Tools > Custom fonts**, then choose the font in **Settings > Display > App font** or **Settings > Markdown > Markdown editor font**.
+
+Notes:
+
+- Accepted formats are WOFF2, WOFF, TTF and OTF, up to 10 MB per file.
+- A family is several files (regular, bold, italic...) or a single variable font file. Select all the files of a family in one upload, they are grouped under the family name.
+- The fonts are served by your own instance, nothing is loaded from Google or any other third party. Download the family first, from [Google Fonts](https://fonts.google.com) (**Get font > Download all**) or [google-webfonts-helper](https://gwfh.mranftl.com/fonts).
+- A family without a bold file keeps the default font for bold text and headings, so upload the bold file too.
+- The files are stored in `data/fonts/` (your Docker volume), so they survive image updates. Files copied there by hand are picked up when the **Custom fonts** dialog is opened.
+- Each user chooses their own font. Deleting a family sends the users who had picked it back to the default font.
+- Only administrators can upload or delete fonts.
+
+</details>
+
+<details>
 <summary><strong>Custom CSS Overrides</strong></summary>
 <br>
 
@@ -869,6 +903,7 @@ Poznote uses a master database (`data/master.db`) for shared coordination data, 
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

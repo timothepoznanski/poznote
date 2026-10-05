@@ -163,10 +163,34 @@
         return [document.getElementById('right_col')].filter(Boolean);
     }
 
+    /**
+     * Height of the empty room the "Space below the note" setting adds under
+     * the last line of a scroll target (discussion 1564): the bottom of the
+     * note is above it, so the arrow to the bottom stops there and hides
+     * from there on. #right_col gets it from .note-bottom-space, a split pane
+     * from its bottom padding (css/notes/noteentry.css, css/markdown.css).
+     */
+    function getNoteVirtualSpace(element) {
+        if (!element || !document.body.classList.contains('note-virtual-space')) return 0;
+
+        if (element.id === 'right_col') {
+            var space = element.querySelector('.note-bottom-space');
+            return space ? space.offsetHeight : 0;
+        }
+
+        var padded = element.classList.contains('cm-scroller') ? element.querySelector('.cm-content') : element;
+        return padded ? (parseFloat(getComputedStyle(padded).paddingBottom) || 0) : 0;
+    }
+
+    // How far down a target scrolls before only the room above is left
+    function getNoteScrollMaxTop(element) {
+        return Math.max(0, element.scrollHeight - element.clientHeight - getNoteVirtualSpace(element));
+    }
+
     function scrollElementToEdge(element, edge) {
         if (!element) return;
 
-        var top = edge === 'top' ? 0 : Math.max(0, element.scrollHeight - element.clientHeight);
+        var top = edge === 'top' ? 0 : getNoteScrollMaxTop(element);
         var behavior = isReducedMotionPreferred() ? 'auto' : 'smooth';
 
         if (typeof element.scrollTo === 'function') {
@@ -198,7 +222,7 @@
         return targets.every(function (target) {
             if (!target) return true;
 
-            var maxTop = Math.max(0, target.scrollHeight - target.clientHeight);
+            var maxTop = getNoteScrollMaxTop(target);
             if (maxTop <= threshold) return true;
 
             if (edge === 'top') {
@@ -331,7 +355,7 @@
         targets.forEach(function (target) {
             if (!target || target === skip) return;
 
-            var maxTop = Math.max(0, target.scrollHeight - target.clientHeight);
+            var maxTop = getNoteScrollMaxTop(target);
             if (maxTop <= threshold) return;
 
             canScrollUp = canScrollUp || target.scrollTop > threshold;

@@ -881,7 +881,9 @@ async function createPublicFolderShare(folderId) {
 
     } catch (error) {
         console.error('Failed to create folder share:', error);
-        alert('Failed to create public folder link: ' + error.message);
+        alert(typeof window.t === 'function'
+            ? window.t('share_errors.public_folder_create_error', { error: error.message }, 'Failed to create public folder link: ' + error.message)
+            : 'Failed to create public folder link: ' + error.message);
     }
 }
 

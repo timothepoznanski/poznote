@@ -6,7 +6,8 @@
   <b>Español</b> ·
   <a href="README.pt.md">Português</a> ·
   <a href="README.ru.md">Русский</a> ·
-  <a href="README.zh-cn.md">简体中文</a>
+  <a href="README.zh-cn.md">简体中文</a> ·
+  <a href="README.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 
@@ -573,6 +574,19 @@ Usa `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` si quieres ocultar el formulario lo
 
 > **Cambio incompatible:** los antiguos ajustes de OIDC en `.env` ya no se leen, salvo `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET` y `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`. Tras actualizar, vuelve a introducir los demás ajustes de OIDC desde la página de administración.
 
+#### URL que hay que registrar en tu proveedor de identidad
+
+Al crear la aplicación (cliente) en tu proveedor de identidad, registra la primera URL de abajo como URI de redirección (también llamada URL de callback), y la segunda como URI de redirección tras cerrar sesión si tu proveedor la pide:
+
+```text
+https://YOUR_SERVER/oidc_callback.php
+https://YOUR_SERVER/login.php
+```
+
+Poznote construye ambas a partir del nombre de host por el que llega la petición, siempre con `https://`. Si tu proveedor necesita otra cosa, define **URI de redirección** o **URI de redirección tras cerrar sesión** en la sección Avanzado de la página de administración de OIDC, y registra exactamente ese valor.
+
+Por lo general no hace falta rellenar la URL de descubrimiento: Poznote añade `/.well-known/openid-configuration` a la **URL del emisor**. Con Authentik, por ejemplo, el emisor es `https://AUTHENTIK_HOST/application/o/APPLICATION_SLUG/`. Define **URL de descubrimiento** solo si tu proveedor publica ese documento en otro lugar.
+
 #### Ejemplo de control de acceso (grupos + aprovisionamiento automático)
 
 Desde la página de administración de OIDC, configura:
@@ -762,6 +776,26 @@ Configúralo en **Configuración > Pantalla > Visibilidad de los elementos**.
 </details>
 
 <details>
+<summary><strong>Fuentes personalizadas</strong></summary>
+<br>
+
+Poznote incluye Inter y puede usar las fuentes instaladas en tu dispositivo. Para usar cualquier otra fuente, por ejemplo una familia de Google Fonts, un administrador sube sus archivos una vez y cada usuario puede elegirla después.
+
+Súbelas en **Configuración > Herramientas de administración > Fuentes personalizadas**, y luego elige la fuente en **Configuración > Pantalla > Fuente de la aplicación** o **Configuración > Markdown > Fuente del editor markdown**.
+
+Notas:
+
+- Los formatos aceptados son WOFF2, WOFF, TTF y OTF, hasta 10 MB por archivo.
+- Una familia son varios archivos (normal, negrita, cursiva...) o un único archivo de fuente variable. Selecciona todos los archivos de una familia en la misma subida, se agrupan bajo el nombre de la familia.
+- Las fuentes las sirve tu propia instancia, no se carga nada desde Google ni desde ningún otro tercero. Descarga primero la familia, desde [Google Fonts](https://fonts.google.com) (**Get font > Download all**) o [google-webfonts-helper](https://gwfh.mranftl.com/fonts).
+- Una familia sin archivo de negrita conserva la fuente predeterminada para el texto en negrita y los títulos, así que sube también el archivo de negrita.
+- Los archivos se guardan en `data/fonts/` (tu volumen de Docker), por lo que sobreviven a las actualizaciones de la imagen. Los archivos copiados a mano en esa carpeta se detectan al abrir el diálogo **Fuentes personalizadas**.
+- Cada usuario elige su propia fuente. Eliminar una familia devuelve a la fuente predeterminada a los usuarios que la habían elegido.
+- Solo los administradores pueden subir o eliminar fuentes.
+
+</details>
+
+<details>
 <summary><strong>Personalización con CSS</strong></summary>
 <br>
 
@@ -869,6 +903,7 @@ Poznote usa una base de datos maestra (`data/master.db`) para los datos de coord
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

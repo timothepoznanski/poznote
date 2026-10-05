@@ -13,6 +13,7 @@
         txtTypeTasklist: body.getAttribute('data-txt-type-tasklist') || 'Tasklist',
         txtTypeExcalidraw: body.getAttribute('data-txt-type-excalidraw') || 'Excalidraw',
         txtSelected:    body.getAttribute('data-txt-selected') || 'selected',
+        txtSelectAllFolder: body.getAttribute('data-txt-select-all-folder') || 'Select all in this folder',
         txtSelectAll:   body.getAttribute('data-txt-select-all') || 'Select all visible',
         txtDeselectAll: body.getAttribute('data-txt-deselect-all') || 'Deselect all',
         txtMove:        body.getAttribute('data-txt-move') || 'Move',
@@ -543,7 +544,7 @@
 
         var groupSelectAll = document.createElement('button');
         groupSelectAll.className = 'nm-group-select-btn';
-        groupSelectAll.title = 'Select all in this folder';
+        groupSelectAll.title = cfg.txtSelectAllFolder;
         groupSelectAll.innerHTML = '<i class="lucide lucide-check-square"></i>';
 
         if (key === '__none__') {

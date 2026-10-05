@@ -57,6 +57,114 @@ function poznoteRenderMarkdownSyntaxContent() {
                 'iframes' => ['title' => 'Iframes', 'description' => 'Iframes are limited to trusted domains allowed by Poznote configuration.'],
             ],
         ],
+        'ko' => [
+            'intro' => 'Poznote 미리보기에서 지원하는 마크다운 및 안전한 HTML 문법을 항목별 예시와 함께 안내합니다.',
+            'filter_placeholder' => '문법 예시 검색...',
+            'no_results' => '검색어와 일치하는 문법 예시가 없습니다.',
+            'nav_label' => '마크다운 문법 섹션',
+            'nav' => [
+                'text' => '텍스트',
+                'blocks' => '블록',
+                'lists' => '목록',
+                'tables' => '표',
+                'advanced' => '고급',
+                'html' => '허용되는 HTML',
+            ],
+            'sections' => [
+                'text' => '텍스트와 인라인 서식',
+                'blocks' => '블록',
+                'lists' => '목록',
+                'tables' => '표',
+                'advanced' => '고급',
+                'html' => '허용되는 HTML',
+            ],
+            'cards' => [
+                'headings' => [
+                    'title' => '제목 문단',
+                    'description' => '1~6단계 제목 문단을 지원합니다.',
+                ],
+                'emphasis' => [
+                    'title' => '굵게, 기울임꼴, 취소선',
+                    'description' => '별표 또는 밑줄로 굵게, 기울임꼴, 취소선을 표시할 수 있습니다.',
+                ],
+                'highlight_color_code' => [
+                    'title' => '강조 표시, 색상, 인라인 코드',
+                    'description' => '==...== 강조 표시와 인라인 코드를 지원하며, 편집기에서 생성한 색상 span을 보존합니다.',
+                ],
+                'links_refs' => [
+                    'title' => '링크와 노트 참조',
+                    'description' => '마크다운 링크, 일반 URL, 꺾쇠괄호로 감싼 URL, 내부 노트 링크, [[Note title]] 형식의 노트 참조를 지원합니다.',
+                ],
+                'images_breaks' => [
+                    'title' => '이미지와 줄 바꿈',
+                    'description' => '일반 이미지와 줄 바꿈을 미리보기에 표시합니다.',
+                ],
+                'code_blocks' => [
+                    'title' => '코드 블록',
+                    'description' => '구분 기호로 감싼 코드 블록은 구문 강조를 지원합니다. 언어를 normal 또는 code로 지정하면 구문 강조 없이 표시합니다.',
+                ],
+                'blockquotes' => [
+                    'title' => '인용문 블록',
+                    'description' => '인용문 블록을 여러 줄에 걸쳐 작성할 수 있습니다.',
+                ],
+                'callouts' => [
+                    'title' => '안내 상자',
+                    'description' => 'Note, Tip, Important, Warning, Caution 안내 상자를 인식합니다. [!Type] 뒤에 텍스트를 입력하면 제목을 직접 지정할 수 있습니다.',
+                ],
+                'horizontal_rules' => [
+                    'title' => '구분선',
+                    'description' => '하이픈, 별표 또는 밑줄을 세 개 이상 입력하면 구분선이 생깁니다.',
+                ],
+                'bullet_lists' => [
+                    'title' => '글머리 기호 목록',
+                    'description' => '-, *, +를 글머리 기호로 사용할 수 있습니다.',
+                ],
+                'ordered_lists' => [
+                    'title' => '번호 목록',
+                    'description' => '일반 번호 목록과 Poznote의 중첩 번호 매기기를 지원합니다.',
+                ],
+                'nested_lists' => [
+                    'title' => '중첩 목록',
+                    'description' => '들여쓰기로 하위 목록을 만들 수 있습니다.',
+                ],
+                'task_lists' => [
+                    'title' => '할 일 목록',
+                    'description' => '할 일 목록은 미리보기에서 체크박스로 표시됩니다.',
+                ],
+                'basic_tables' => [
+                    'title' => '기본 표',
+                    'description' => 'Poznote가 표를 인식하려면 구분 행이 필요합니다.',
+                ],
+                'table_alignment' => [
+                    'title' => '열 정렬',
+                    'description' => '구분 행에 콜론을 사용하면 열을 왼쪽, 가운데 또는 오른쪽으로 정렬할 수 있습니다.',
+                ],
+                'math' => [
+                    'title' => '수식',
+                    'description' => 'KaTeX를 사용할 수 있으면 인라인 수식과 블록 수식을 표시합니다.',
+                ],
+                'mermaid' => [
+                    'title' => 'Mermaid',
+                    'description' => '언어를 mermaid로 지정한 코드 블록을 Mermaid 다이어그램으로 인식합니다.',
+                ],
+                'media' => [
+                    'title' => '미디어',
+                    'description' => '로컬 또는 HTTP(S) 소스를 사용하는 안전한 video 및 audio 태그를 보존합니다.',
+                ],
+                'details_summary' => [
+                    'title' => '접기/펼치기와 요약',
+                    'description' => 'details와 summary 태그를 허용합니다.',
+                ],
+                'underline_linebreaks' => [
+                    'title' => '밑줄과 줄 바꿈',
+                    'description' => 'u와 br 태그를 보존합니다.',
+                ],
+                'iframes' => [
+                    'title' => 'iframe',
+                    'description' => 'iframe은 Poznote 설정에서 허용한 신뢰할 수 있는 도메인으로 제한됩니다.',
+                ],
+            ],
+        ],
         'fr' => [
             'intro' => 'La syntaxe Markdown et HTML sûre prise en charge par la prévisualisation Poznote, avec un exemple pour chaque élément.',
             'filter_placeholder' => 'Filtrer les exemples de syntaxe...',

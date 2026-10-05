@@ -6,7 +6,8 @@
   <a href="README.es.md">Español</a> ·
   <a href="README.pt.md">Português</a> ·
   <a href="README.ru.md">Русский</a> ·
-  <a href="README.zh-cn.md">简体中文</a>
+  <a href="README.zh-cn.md">简体中文</a> ·
+  <a href="README.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 
@@ -573,6 +574,19 @@ Utilisez `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` pour masquer le formulaire loc
 
 > **Changement incompatible :** les anciens réglages OIDC du fichier `.env` ne sont plus lus, à l'exception de `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET` et `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`. Après la mise à jour, saisissez de nouveau les autres réglages OIDC depuis la page d'administration.
 
+#### URL à déclarer chez votre fournisseur d'identité
+
+Quand vous créez l'application (client) chez votre fournisseur d'identité, déclarez la première URL ci-dessous comme URI de redirection (aussi appelée URL de callback), et la seconde comme URI de redirection après déconnexion si votre fournisseur la demande :
+
+```text
+https://YOUR_SERVER/oidc_callback.php
+https://YOUR_SERVER/login.php
+```
+
+Poznote construit les deux à partir du nom d'hôte sur lequel la requête arrive, toujours en `https://`. Si votre fournisseur a besoin d'autre chose, renseignez **URI de redirection** ou **URI de redirection post-déconnexion** dans la section Avancé de la page d'administration OIDC, et déclarez exactement cette valeur.
+
+L'URL de découverte n'a en général pas besoin d'être renseignée : Poznote ajoute `/.well-known/openid-configuration` à l'**URL de l'émetteur**. Avec Authentik, par exemple, l'émetteur est `https://AUTHENTIK_HOST/application/o/APPLICATION_SLUG/`. Ne renseignez **URL de découverte** que si votre fournisseur publie ce document ailleurs.
+
 #### Exemple de contrôle d'accès (groupes + création automatique)
 
 Depuis la page d'administration OIDC, configurez :
@@ -762,6 +776,26 @@ Configurez-la dans **Paramètres > Affichage > Visibilité des éléments**.
 </details>
 
 <details>
+<summary><strong>Polices personnalisées</strong></summary>
+<br>
+
+Poznote est livré avec Inter et peut utiliser les polices installées sur votre appareil. Pour utiliser n'importe quelle autre police, par exemple une famille de Google Fonts, un administrateur importe ses fichiers une fois et chaque utilisateur peut ensuite la choisir.
+
+Importez-les dans **Paramètres > Outils d'administration > Polices personnalisées**, puis choisissez la police dans **Paramètres > Affichage > Police de l'application** ou **Paramètres > Markdown > Police de l'éditeur markdown**.
+
+Remarques :
+
+- Les formats acceptés sont WOFF2, WOFF, TTF et OTF, jusqu'à 10 Mo par fichier.
+- Une famille, c'est plusieurs fichiers (normal, gras, italique...) ou un seul fichier de police variable. Sélectionnez tous les fichiers d'une famille dans le même import, ils sont regroupés sous le nom de la famille.
+- Les polices sont servies par votre propre instance, rien n'est chargé depuis Google ni depuis un autre tiers. Téléchargez d'abord la famille, depuis [Google Fonts](https://fonts.google.com) (**Get font > Download all**) ou [google-webfonts-helper](https://gwfh.mranftl.com/fonts).
+- Une famille sans fichier gras garde la police par défaut pour le texte en gras et les titres, importez donc aussi le fichier gras.
+- Les fichiers sont stockés dans `data/fonts/` (votre volume Docker), ils survivent donc aux mises à jour de l'image. Les fichiers copiés à la main dans ce dossier sont pris en compte à l'ouverture de la fenêtre **Polices personnalisées**.
+- Chaque utilisateur choisit sa propre police. Supprimer une famille ramène à la police par défaut les utilisateurs qui l'avaient choisie.
+- Seuls les administrateurs peuvent importer ou supprimer des polices.
+
+</details>
+
+<details>
 <summary><strong>Surcharges CSS personnalisées</strong></summary>
 <br>
 
@@ -869,6 +903,7 @@ Poznote utilise une base de données maîtresse (`data/master.db`) pour les donn
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

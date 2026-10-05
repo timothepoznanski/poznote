@@ -1330,3 +1330,18 @@ body.markdown-split-preview-left:not(.markdown-split-card-view) .noteentry.markd
         opacity: 1;
     }
 }
+
+/* Space below the note (discussion 1564, css/notes/noteentry.css): in the
+   split view each pane scrolls on its own, so each gets the room under its
+   last line. Kept last: the framed view and the preview on the left set
+   their paddings with the shorthand. */
+@media screen and (min-width: 801px) {
+    body.note-virtual-space .noteentry.markdown-split-mode .markdown-codemirror-host .cm-content {
+        padding-bottom: var(--pz-note-virtual-space);
+    }
+
+    body.note-virtual-space .noteentry.markdown-split-mode .markdown-editor:not(.markdown-codemirror-host),
+    body.note-virtual-space .noteentry.markdown-split-mode .markdown-preview {
+        padding-bottom: var(--pz-note-virtual-space) !important;
+    }
+}

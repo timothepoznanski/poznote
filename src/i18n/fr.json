@@ -465,6 +465,7 @@
       "note_color_palette": "Personnalisez la palette de couleurs disponible pour les notes.",
       "folder_counts": "Affichez le nombre de notes à côté de chaque dossier.",
       "notes_without_folders": "Affichez les notes sans dossier après la liste des dossiers plutôt qu'avant.",
+      "folder_icon_opens_kanban": "Un clic sur l'icône d'un dossier dans la liste des notes ouvre la vue Kanban du dossier au lieu du sélecteur d'icône. L'icône reste modifiable depuis le menu du dossier ou depuis la vue Kanban.",
       "note_width": "Ajustez la largeur maximale du contenu des notes, en pourcentage de la colonne de note.",
       "markdown_split_card_view": "Affichez les notes markdown dans une vue scindée encadrée avec éditeur et aperçu.",
       "markdown_split_preview_left": "En mode scindé, affiche l'aperçu à gauche et l'éditeur à droite.",
@@ -475,6 +476,7 @@
       "attachments_at_bottom": "Affichez la section des pièces jointes en bas des notes plutôt qu'en haut.",
       "allow_executable_attachments": "Autorise les scripts et exécutables (.sh, .ps1, .bat, .exe, .py, ...) en pièce jointe, pour tous les comptes de cette instance. Poznote ne les exécute jamais, il ne fait que les stocker et les servir. Les types qu'un serveur web pourrait exécuter, comme .php, restent bloqués.",
       "backlinks_at_bottom": "Affichez la section des rétroliens en bas des notes plutôt qu'en haut.",
+      "note_virtual_space": "Laisse un espace vide sous la dernière ligne d'une note, pour pouvoir remonter la fin du texte au milieu de l'écran au lieu de la garder tout en bas.",
       "default_image_border": "Affichez par défaut les images des notes avec une bordure et sans marge intérieure.",
       "spellcheck_html_notes": "Activez le correcteur orthographique du navigateur dans les notes en texte enrichi.",
       "slash_menu_trigger": "Sur ordinateur, choisissez si le menu de commandes s'ouvre en tapant /, avec Alt + /, ou avec aucune touche. Un clic droit dans une note l'ouvre quel que soit ce réglage.",
@@ -510,7 +512,8 @@
       "sidebar_offline_marks": "Affiche une petite pastille à côté des notes disponibles hors ligne dans ce navigateur.",
       "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle.",
       "workspace_activity_emails": "Recevez un email quand quelqu'un d'autre modifie une note dans un espace de travail que vous partagez, ou dans un espace partagé avec vous. Il liste les notes créées, modifiées et supprimées, jamais leur contenu, et il est envoyé à l'adresse email de votre profil. Au fil des modifications : quelques minutes après la dernière modification. Résumé quotidien : à 8 h. Résumé hebdomadaire : le lundi à 8 h, dans votre fuseau horaire.",
-      "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails."
+      "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails.",
+      "custom_fonts": "Importez des fichiers de police pour les proposer à tous les utilisateurs dans les listes Police de l'application et Police de l'éditeur Markdown."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -567,6 +570,7 @@
       "german": "Allemand",
       "russian": "Russe",
       "chinese_simplified": "Chinois simplifié",
+      "korean": "Coréen",
       "login_page": "Langue de la page de connexion :",
       "saved": "Langue enregistrée",
       "save_error": "Impossible d'enregistrer la langue",
@@ -615,7 +619,8 @@
       "s3_storage": "Pièces jointes S3",
       "s3_backup": "Sauvegardes S3",
       "stt": "Transcription",
-      "api_rest": "API REST"
+      "api_rest": "API REST",
+      "custom_fonts": "Polices personnalisées"
     },
     "default_credentials": {
       "both": "Ce compte utilise encore le login et le mot de passe livrés par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",
@@ -818,6 +823,7 @@
       "show_folder_counts": "Afficher le nombre de notes par dossier",
       "highlight_current_folder_tree": "Mettre en avant le dossier courant",
       "notes_without_folders_after": "Afficher les notes après les dossiers",
+      "folder_icon_opens_kanban": "L'icône de dossier ouvre le Kanban",
       "show_folder_actions": "Afficher les actions de dossier",
       "kanban_on_folder_click": "Ouvrir la vue Kanban au clic sur dossier",
       "index_icon_scale": "Taille des icônes (Index)",
@@ -831,6 +837,7 @@
       "attachment_previews_in_note": "Aperçus des pièces jointes",
       "attachments_at_bottom": "Pièces jointes en bas",
       "backlinks_at_bottom": "Backlinks en bas",
+      "note_virtual_space": "Espace sous la note",
       "default_image_border_no_padding": "Bordure par défaut des images",
       "icon_sidebar_order": "Disposition de la barre d'icônes",
       "notes_dashboard": "Tableau de notes",
@@ -1836,6 +1843,21 @@
         "daily": "Résumé quotidien",
         "weekly": "Résumé hebdomadaire"
       }
+    },
+    "custom_fonts": {
+      "title": "Polices personnalisées",
+      "description": "Importez des fichiers de police (WOFF2, WOFF, TTF ou OTF), par exemple une famille téléchargée depuis Google Fonts. Ils sont stockés dans votre volume de données, et chaque utilisateur peut ensuite les choisir comme police de l'application ou de l'éditeur Markdown.",
+      "no_file": "Aucune police stockée pour le moment",
+      "upload": "Importer des fichiers de police",
+      "hint": "Sélectionnez tous les fichiers d'une famille en une fois (normal, gras, italique), ou son unique fichier de police variable. Sans fichier gras, le texte en gras garde la police par défaut.",
+      "badge_one": "1 police",
+      "badge_other": "{{count}} polices",
+      "italic": "italique",
+      "files_one": "1 fichier",
+      "files_other": "{{count}} fichiers",
+      "validation": "Veuillez sélectionner des fichiers de police WOFF2, WOFF, TTF ou OTF.",
+      "some_rejected": "Certains fichiers n'ont pas été stockés : ce ne sont pas des polices, ou ils dépassent 10 Mo.",
+      "delete_confirm": "Supprimer {{name}} ? Ses fichiers sont retirés de votre volume de données."
     }
   },
   "notes_list": {
@@ -5148,6 +5170,7 @@
     "snapshot": "Enregistrer une révision de la note",
     "search_replace": "Rechercher et remplacer dans la note",
     "note_nav": "Note précédente ou suivante du dossier",
+    "note_scroll": "Faire défiler la note vers le haut ou le bas",
     "close": "Fermer un menu, un panneau ou une fenêtre",
     "bold": "Gras",
     "italic": "Italique",

@@ -6,7 +6,8 @@
   <a href="CHROME-EXTENSION.es.md">Español</a> ·
   <a href="CHROME-EXTENSION.pt.md">Português</a> ·
   <a href="CHROME-EXTENSION.ru.md">Русский</a> ·
-  <b>简体中文</b>
+  <b>简体中文</b> ·
+  <a href="CHROME-EXTENSION.ko.md">한국어</a>
 </p>
 <!-- /lang-selector -->
 

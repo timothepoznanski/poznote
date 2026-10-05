@@ -466,6 +466,7 @@
       "note_color_palette": "Personalize a paleta de cores disponível para as notas.",
       "folder_counts": "Mostre o número de notas ao lado de cada pasta.",
       "notes_without_folders": "Mostre as notas sem pasta depois da lista de pastas em vez de antes.",
+      "folder_icon_opens_kanban": "Um clique no ícone de uma pasta na lista de notas abre a vista Kanban da pasta em vez do seletor de ícones. O ícone continua a poder ser alterado no menu da pasta ou na vista Kanban.",
       "note_width": "Ajuste a largura máxima do conteúdo das notas, como porcentagem da coluna da nota.",
       "markdown_split_card_view": "Exiba notas markdown em uma visão dividida emoldurada com editor e pré-visualização.",
       "markdown_split_preview_left": "No modo dividido, mostra a pré-visualização à esquerda e o editor à direita.",
@@ -476,6 +477,7 @@
       "attachments_at_bottom": "Mostre a seção de anexos na parte inferior das notas em vez do topo.",
       "allow_executable_attachments": "Permite anexar scripts e executáveis (.sh, .ps1, .bat, .exe, .py, ...), para todas as contas desta instância. O Poznote nunca os executa, apenas os armazena e os entrega. Os tipos que um servidor web poderia executar, como .php, continuam bloqueados.",
       "backlinks_at_bottom": "Mostre a seção de backlinks na parte inferior das notas em vez do topo.",
+      "note_virtual_space": "Deixa um espaço vazio abaixo da última linha de uma nota, para poder subir o fim do texto até ao meio do ecrã em vez de o manter mesmo em baixo.",
       "default_image_border": "Exiba por padrão as imagens das notas com borda e sem preenchimento.",
       "spellcheck_html_notes": "Ative o corretor ortográfico do navegador nas notas de texto formatado.",
       "slash_menu_trigger": "No computador, escolha se o menu de comandos abre digitando /, com Alt + / ou sem nenhuma tecla. Um clique com o botão direito numa nota abre-o seja qual for esta definição.",
@@ -511,7 +513,8 @@
       "sidebar_offline_marks": "Mostra um pequeno ponto ao lado das notas disponíveis offline neste navegador.",
       "format_toolbar_mode": "Num computador, escolha onde aparecem os botões de formatação quando seleciona texto numa nota: na barra de ferramentas da nota, no lugar das ações da nota, ou num menu flutuante acima da seleção, que deixa a barra de ferramentas da nota como está.",
       "workspace_activity_emails": "Receba um e-mail quando outra pessoa alterar uma nota em um espaço de trabalho que você compartilha ou em um compartilhado com você. Ele lista as notas criadas, editadas e excluídas, nunca o conteúdo delas, e é enviado para o endereço de e-mail do seu perfil. Conforme as alterações: alguns minutos após a última alteração. Resumo diário: às 8:00. Resumo semanal: na segunda-feira às 8:00, no seu fuso horário.",
-      "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails."
+      "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails.",
+      "custom_fonts": "Envie arquivos de fonte para oferecê-los a todos os usuários nas listas de fonte do aplicativo e do editor Markdown."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -568,6 +571,7 @@
       "german": "Alemão",
       "russian": "Russo",
       "chinese_simplified": "Chinês simplificado",
+      "korean": "Coreano",
       "login_page": "Idioma da página de login:",
       "saved": "Idioma salvo",
       "save_error": "Não foi possível salvar o idioma",
@@ -616,7 +620,8 @@
       "s3_storage": "Anexos S3",
       "s3_backup": "Backups S3",
       "stt": "Transcrição",
-      "api_rest": "API REST"
+      "api_rest": "API REST",
+      "custom_fonts": "Fontes personalizadas"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -816,6 +821,7 @@
       "show_folder_counts": "Mostrar Contagem de Notas das Pastas",
       "highlight_current_folder_tree": "Realçar a árvore de pastas atual",
       "notes_without_folders_after": "Mostrar notas após as pastas",
+      "folder_icon_opens_kanban": "O ícone da pasta abre o Kanban",
       "show_folder_actions": "Mostrar Ações da Pasta",
       "kanban_on_folder_click": "Abrir visualização Kanban ao clicar na pasta",
       "index_icon_scale": "Escala de ícones do índice",
@@ -829,6 +835,7 @@
       "attachment_previews_in_note": "Pré-visualizações de anexos",
       "attachments_at_bottom": "Anexos no final",
       "backlinks_at_bottom": "Backlinks no final",
+      "note_virtual_space": "Espaço abaixo da nota",
       "default_image_border_no_padding": "Borda padrão de imagem",
       "icon_sidebar_order": "Layout da barra de ícones",
       "notes_dashboard": "Quadro de notas",
@@ -1830,6 +1837,21 @@
         "daily": "Resumo diário",
         "weekly": "Resumo semanal"
       }
+    },
+    "custom_fonts": {
+      "title": "Fontes personalizadas",
+      "description": "Envie arquivos de fonte (WOFF2, WOFF, TTF ou OTF), por exemplo uma família baixada do Google Fonts. Eles ficam armazenados no seu volume de dados, e cada usuário pode então escolhê-los como fonte do aplicativo ou do editor Markdown.",
+      "no_file": "Nenhuma fonte armazenada ainda",
+      "upload": "Enviar arquivos de fonte",
+      "hint": "Selecione todos os arquivos de uma família de uma vez (normal, negrito, itálico), ou o seu único arquivo de fonte variável. Sem arquivo de negrito, o texto em negrito mantém a fonte padrão.",
+      "badge_one": "1 fonte",
+      "badge_other": "{{count}} fontes",
+      "italic": "itálico",
+      "files_one": "1 arquivo",
+      "files_other": "{{count}} arquivos",
+      "validation": "Selecione arquivos de fonte WOFF2, WOFF, TTF ou OTF.",
+      "some_rejected": "Alguns arquivos não foram armazenados: não são fontes, ou têm mais de 10 MB.",
+      "delete_confirm": "Excluir {{name}}? Os arquivos são removidos do seu volume de dados."
     }
   },
   "notes_list": {
@@ -5044,6 +5066,7 @@
     "snapshot": "Guardar uma revisão da nota",
     "search_replace": "Pesquisar e substituir na nota",
     "note_nav": "Nota anterior ou seguinte da pasta",
+    "note_scroll": "Deslocar a nota para cima ou para baixo",
     "close": "Fechar um menu, um painel ou uma janela",
     "bold": "Negrito",
     "italic": "Itálico",

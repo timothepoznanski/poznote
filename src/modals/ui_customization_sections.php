@@ -71,6 +71,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-tree-highlight-card" checked><span><?php echo t_h('display.cards.highlight_current_folder_tree', [], 'Highlight current folder tree'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:notes-without-folders-card" checked><span><?php echo t_h('display.cards.notes_without_folders_after', [], 'Notes without folders'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-icon-kanban-card" checked><span><?php echo t_h('display.cards.folder_icon_opens_kanban', [], 'Folder icon opens Kanban'); ?></span></label>
         <?php if (poznoteOfflineModeEnabled()): ?><label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebar-offline-marks-card" checked><span><?php echo t_h('display.cards.sidebar_offline_marks', [], 'Show offline dot'); ?></span></label><?php endif; ?>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
@@ -81,6 +82,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachment-previews-card" checked><span><?php echo t_h('display.cards.attachment_previews_in_note', [], 'Attachment previews'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachments-at-bottom-card" checked><span><?php echo t_h('display.cards.attachments_at_bottom', [], 'Attachments at bottom'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backlinks-at-bottom-card" checked><span><?php echo t_h('display.cards.backlinks_at_bottom', [], 'Backlinks at bottom'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-virtual-space-card" checked><span><?php echo t_h('display.cards.note_virtual_space', [], 'Space below the note'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:default-image-border-card" checked><span><?php echo t_h('display.cards.default_image_border_no_padding', [], 'Default image border (no padding)'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:icon-sidebar-order-card" checked><span><?php echo t_h('display.cards.icon_sidebar_order', [], 'Icon sidebar layout'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:api-rest-card" checked><span><?php echo t_h('settings.cards.api_rest', [], 'API REST'); ?></span></label>
@@ -101,6 +103,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-quotas-card" checked><span><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-fonts-card" checked><span><?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:theme-list-card" checked><span><?php echo t_h('settings.cards.theme_list', [], 'Theme list'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:disaster-recovery-card" checked><span><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
