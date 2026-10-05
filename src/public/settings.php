@@ -127,6 +127,7 @@ $settingsPageUserKeys = [
     'attachment_previews_in_note',
     'attachments_at_bottom',
     'backlinks_at_bottom',
+    'note_virtual_space',
     'default_image_border_no_padding',
     'center_note_content',
     'note_age_filter_days',
@@ -1035,6 +1036,16 @@ if ($canUseUserWebhooks) {
                             <input type="range" id="note-width-range" class="settings-inline-control" data-control="note-width-range" min="10" max="100" step="5" value="100">
                             <output class="settings-inline-value" for="note-width-range"><?php echo t_h('modals.note_width.full_width', [], 'Full Width'); ?></output>
                         </span>
+                    </div>
+                </div>
+
+                <!-- Space below the note (discussion 1564) -->
+                <div class="home-card desktop-only" id="note-virtual-space-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.note_virtual_space', [], 'Leave empty room under the last line of a note, so the end of the text can be scrolled up to the middle of the screen instead of staying at the very bottom.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon"><i class="lucide lucide-move-vertical"></i></div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('display.cards.note_virtual_space', [], 'Space below the note'); ?></span>
+                        <span id="note-virtual-space-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                     </div>
                 </div>
 

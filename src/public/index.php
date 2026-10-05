@@ -276,6 +276,7 @@ $settings = [
     'attachment_previews_in_note' => '0',
     'attachments_at_bottom' => '0',
     'backlinks_at_bottom' => '0',
+    'note_virtual_space' => '0',
     'default_image_border_no_padding' => '0',
     'spellcheck_html_notes' => '0',
     'highlight_current_folder_tree' => '0',
@@ -287,7 +288,7 @@ $settings = [
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'folder_icon_opens_kanban', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'folder_icon_opens_kanban', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'note_virtual_space', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -480,6 +481,10 @@ if (poznoteSettingEnabled($settings['markdown_split_card_view'], true)) {
 }
 if (poznoteSettingEnabled($settings['markdown_split_preview_left'], false)) {
     $extra_body_classes .= ' markdown-split-preview-left';
+}
+// Empty room under the last line of a note (discussion 1564), css/notes/noteentry.css
+if (poznoteSettingEnabled($settings['note_virtual_space'], false)) {
+    $extra_body_classes .= ' note-virtual-space';
 }
 // Mode markdown notes with content open in (js/markdown-view-modes.js reads
 // it from <body data-markdown-default-mode>). 'last' follows the mode last
