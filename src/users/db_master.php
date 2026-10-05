@@ -311,6 +311,26 @@ function initializeMasterDatabase(PDO $con): void {
         error_log("Failed to add note_edit_locks.holder_kind column: " . $e->getMessage());
     }
     
+    // Web Push subscriptions: one row per browser or installed app that asked
+    // for reminder notifications. They live here and not in the account's own
+    // database so the reminder worker finds the accounts to scan in one query,
+    // and because an endpoint belongs to a device: signing in as someone else
+    // on it moves the row instead of leaving the first account subscribed.
+    $con->exec("
+        CREATE TABLE IF NOT EXISTS push_subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            endpoint TEXT NOT NULL UNIQUE,
+            p256dh TEXT NOT NULL,
+            auth TEXT NOT NULL,
+            user_agent TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            last_success_at DATETIME,
+            last_error TEXT
+        )
+    ");
+    $con->exec("CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user ON push_subscriptions(user_id)");
+
     // Outgoing webhooks. Instance webhooks (user_id NULL) are registered by
     // admins and notified of instance events; user webhooks belong to a single
     // account (user_id) and are notified of that account's own content events.
@@ -1717,6 +1737,10 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
         $stmt = $con->prepare("DELETE FROM shared_links WHERE user_id = ?");
         $stmt->execute([$id]);
 
+        // Stop pushing reminders to the user's devices.
+        $stmt = $con->prepare("DELETE FROM push_subscriptions WHERE user_id = ?");
+        $stmt->execute([$id]);
+
         // Delete account access grants involving this user.
         $stmt = $con->prepare("DELETE FROM user_account_access WHERE accessor_user_id = ? OR target_user_id = ?");
         $stmt->execute([$id, $id]);
@@ -1989,6 +2013,121 @@ function listWebhookUserIdsForEvents(array $events): array {
         }
     }
     return array_keys($userIds);
+}
+
+// A device re-registers its subscription from time to time, so the cap only
+// has to stop a client from filling the table.
+const PUSH_SUBSCRIPTIONS_PER_USER = 20;
+
+/**
+ * Register a device for an account's reminder pushes. The endpoint is unique:
+ * a device already known, under this account or another, is updated in place.
+ */
+function savePushSubscription(int $userId, string $endpoint, string $p256dh, string $auth, string $userAgent = ''): bool {
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("
+            INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth, user_agent)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT(endpoint) DO UPDATE SET
+                user_id = excluded.user_id,
+                p256dh = excluded.p256dh,
+                auth = excluded.auth,
+                user_agent = excluded.user_agent,
+                last_error = NULL
+        ");
+        $stmt->execute([$userId, $endpoint, $p256dh, $auth, substr($userAgent, 0, 300)]);
+
+        // Keep the newest ones
+        $con->prepare("
+            DELETE FROM push_subscriptions
+            WHERE user_id = ?
+              AND id NOT IN (SELECT id FROM push_subscriptions WHERE user_id = ? ORDER BY id DESC LIMIT ?)
+        ")->execute([$userId, $userId, PUSH_SUBSCRIPTIONS_PER_USER]);
+        return true;
+    } catch (Exception $e) {
+        error_log('savePushSubscription failed: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Forget a device. With a user id only that account's row goes (a request
+ * from the device); without one the endpoint is dropped whoever owns it (the
+ * push service said it no longer exists).
+ */
+function deletePushSubscription(string $endpoint, ?int $userId = null): bool {
+    try {
+        $con = getMasterConnection();
+        if ($userId === null) {
+            $stmt = $con->prepare("DELETE FROM push_subscriptions WHERE endpoint = ?");
+            $stmt->execute([$endpoint]);
+        } else {
+            $stmt = $con->prepare("DELETE FROM push_subscriptions WHERE endpoint = ? AND user_id = ?");
+            $stmt->execute([$endpoint, $userId]);
+        }
+        return $stmt->rowCount() > 0;
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+function listPushSubscriptions(int $userId): array {
+    try {
+        $stmt = getMasterConnection()->prepare("SELECT id, endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = ? ORDER BY id");
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+/** Accounts with at least one subscribed device, for the reminder worker. */
+function listPushSubscriptionUserIds(): array {
+    try {
+        $rows = getMasterConnection()->query("SELECT DISTINCT user_id FROM push_subscriptions ORDER BY user_id")->fetchAll(PDO::FETCH_COLUMN);
+        return array_map('intval', $rows);
+    } catch (Exception $e) {
+        return [];
+    }
+}
+
+function markPushSubscriptionResult(int $id, ?string $error): void {
+    try {
+        if ($error === null) {
+            getMasterConnection()->prepare("UPDATE push_subscriptions SET last_success_at = ?, last_error = NULL WHERE id = ?")
+                ->execute([gmdate('Y-m-d H:i:s'), $id]);
+        } else {
+            getMasterConnection()->prepare("UPDATE push_subscriptions SET last_error = ? WHERE id = ?")
+                ->execute([substr($error, 0, 500), $id]);
+        }
+    } catch (Exception $e) {
+        // Bookkeeping only
+    }
+}
+
+/**
+ * The instance's VAPID private key (PEM), created on first use. Browsers tie
+ * a subscription to the matching public key, so it is generated once and
+ * kept: replacing it invalidates every subscription.
+ */
+function getPushVapidPrivateKey(): ?string {
+    require_once __DIR__ . '/../lib/web-push.php';
+
+    $pem = (string)getGlobalSetting('push_vapid_private_key', '');
+    if ($pem !== '' && webPushPublicPoint($pem) !== null) {
+        return $pem;
+    }
+    if (!function_exists('openssl_pkey_new')) {
+        return null;
+    }
+    $pair = webPushGenerateKeyPair();
+    if ($pair === null || !setGlobalSetting('push_vapid_private_key', $pair['private_pem'])) {
+        return null;
+    }
+    // Two first requests at once: whichever key ended up stored is the key
+    $stored = (string)getGlobalSetting('push_vapid_private_key', '');
+    return webPushPublicPoint($stored) !== null ? $stored : null;
 }
 
 /**

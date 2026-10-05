@@ -1337,6 +1337,101 @@ class UsersController {
     }
 
     /**
+     * GET /api/v1/users/me/push - What a browser needs to subscribe to the
+     * account's reminder pushes: the instance's VAPID public key.
+     */
+    public function pushStatus() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        require_once dirname(__DIR__, 3) . '/lib/web-push.php';
+        $privateKey = getPushVapidPrivateKey();
+        $publicKey = $privateKey !== null ? webPushPublicPoint($privateKey) : null;
+
+        return [
+            'available' => $publicKey !== null,
+            'public_key' => $publicKey !== null ? webPushBase64UrlEncode($publicKey) : null,
+            'subscriptions' => count(listPushSubscriptions($userId)),
+        ];
+    }
+
+    /**
+     * POST /api/v1/users/me/push/subscriptions - Register this device
+     * Body: { endpoint: string, keys: { p256dh: string, auth: string } },
+     * i.e. a PushSubscription as the browser serialises it.
+     */
+    public function savePushSubscription() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        require_once dirname(__DIR__, 3) . '/lib/web-push.php';
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $endpoint = is_array($data) && is_string($data['endpoint'] ?? null) ? trim($data['endpoint']) : '';
+        $keys = is_array($data) && is_array($data['keys'] ?? null) ? $data['keys'] : [];
+        $p256dh = is_string($keys['p256dh'] ?? null) ? trim($keys['p256dh']) : '';
+        $auth = is_string($keys['auth'] ?? null) ? trim($keys['auth']) : '';
+
+        if (!webPushIsAllowedEndpoint($endpoint)) {
+            http_response_code(400);
+            return ['error' => 'The endpoint is not a known browser push service'];
+        }
+        if (!webPushValidSubscriptionKeys($p256dh, $auth)) {
+            http_response_code(400);
+            return ['error' => 'Invalid subscription keys'];
+        }
+        if (getPushVapidPrivateKey() === null) {
+            http_response_code(503);
+            return ['error' => 'Push notifications are not available on this instance'];
+        }
+
+        if (!savePushSubscription($userId, $endpoint, $p256dh, $auth, (string)($_SERVER['HTTP_USER_AGENT'] ?? ''))) {
+            http_response_code(500);
+            return ['error' => 'Failed to save the subscription'];
+        }
+
+        return ['success' => true];
+    }
+
+    /**
+     * DELETE /api/v1/users/me/push/subscriptions - Forget this device
+     * Body: { endpoint: string }
+     */
+    public function deletePushSubscription() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        $endpoint = is_array($data) && is_string($data['endpoint'] ?? null) ? trim($data['endpoint']) : '';
+        if ($endpoint === '') {
+            http_response_code(400);
+            return ['error' => 'endpoint is required'];
+        }
+
+        // Only the account's own row: an endpoint is a secret of the device,
+        // but knowing one must not unsubscribe somebody else.
+        return ['success' => true, 'deleted' => deletePushSubscription($endpoint, $userId)];
+    }
+
+    /**
      * GET /api/v1/users/me/app-passwords - List the current user's app passwords
      * The secrets are never returned; each row carries a short hint instead.
      */

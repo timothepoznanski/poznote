@@ -222,6 +222,9 @@ if (isset($_GET['oidc_error'])) {
     <link rel="apple-touch-icon" href="pwa/poznote.png">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="<?php echo poznoteAsset('pwa/pwa.js'); ?>" defer></script>
+    <?php if (!$renderAccountSelection): // choosing an account is done signed in ?>
+    <script src="<?php echo poznoteAsset('js/push-signout.js'); ?>" defer></script>
+    <?php endif; ?>
     <?php poznoteRenderStylesheets('login'); ?>
     <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
     <link rel="icon" href="favicon.svg" type="image/svg+xml">

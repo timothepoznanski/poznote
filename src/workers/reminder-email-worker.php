@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../ReminderEmailService.php';
 require_once __DIR__ . '/../ReminderWebhookService.php';
+require_once __DIR__ . '/../ReminderPushService.php';
 require_once __DIR__ . '/../WorkspaceActivityEmailService.php';
 
 const REMINDER_EMAIL_WORKER_INTERVAL_SECONDS = 60;
@@ -56,6 +57,26 @@ do {
         }
     } catch (Throwable $e) {
         poznoteReminderWorkerLog('webhook fatal: ' . $e->getMessage());
+    }
+
+    try {
+        $pushService = new ReminderPushService();
+        $pushResult = $pushService->processDueReminders();
+
+        if (!empty($pushResult['errors']) || (int)$pushResult['sent'] > 0 || (int)$pushResult['failed'] > 0) {
+            poznoteReminderWorkerLog(
+                'push enabled=' . ($pushResult['enabled'] ? '1' : '0')
+                . ' sent=' . (int)$pushResult['sent']
+                . ' failed=' . (int)$pushResult['failed']
+                . ' users_checked=' . (int)$pushResult['users_checked']
+                . ' skipped_users=' . (int)$pushResult['skipped_users']
+            );
+            foreach (array_slice($pushResult['errors'] ?? [], 0, 10) as $error) {
+                poznoteReminderWorkerLog('push error: ' . $error);
+            }
+        }
+    } catch (Throwable $e) {
+        poznoteReminderWorkerLog('push fatal: ' . $e->getMessage());
     }
 
     // Shared workspace emails ride on the same minute tick: "instant" needs

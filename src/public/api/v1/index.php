@@ -1014,6 +1014,20 @@ $router->delete('/users/me/app-passwords/{id}', function($params) use ($usersCon
     echo json_encode($usersController->revokeAppPassword($params['id']));
 });
 
+// Web Push: devices subscribed to the account's reminder notifications,
+// see src/lib/web-push.php and src/ReminderPushService.php
+$router->get('/users/me/push', function($params) use ($usersController) {
+    echo json_encode($usersController->pushStatus());
+});
+
+$router->post('/users/me/push/subscriptions', function($params) use ($usersController) {
+    echo json_encode($usersController->savePushSubscription());
+});
+
+$router->delete('/users/me/push/subscriptions', function($params) use ($usersController) {
+    echo json_encode($usersController->deletePushSubscription());
+});
+
 // Two-factor authentication on password sign-in, see src/lib/totp.php
 $router->get('/users/me/two-factor', function($params) use ($usersController) {
     echo json_encode($usersController->twoFactorStatus());

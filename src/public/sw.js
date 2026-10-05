@@ -58,13 +58,40 @@ self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
 });
 
-// A reminder notification shown through the service worker (Chrome on
-// Android, js/reminder-notifications.js): a tap brings Poznote to the front
-// on the note, in an open tab when there is one.
+// A reminder pushed by the server (ReminderPushService.php) while no page may
+// be open: this is what makes it reach a closed PWA. The payload is
+// { id, title, body, url }, url being relative to the app.
+self.addEventListener('push', (event) => {
+  let reminder = {};
+  try {
+    reminder = event.data ? event.data.json() : {};
+  } catch (error) {
+    reminder = {};
+  }
+  const scope = self.registration.scope;
+  const options = {
+    body: reminder.body || '',
+    icon: new URL('pwa/poznote-192.png', scope).href,
+    data: { id: reminder.id || null, url: reminder.url ? new URL(reminder.url, scope).href : '' },
+  };
+  // Same tag as js/reminder-notifications.js: one notification per reminder
+  if (reminder.id) options.tag = 'poznote-reminder-' + reminder.id;
+  event.waitUntil(self.registration.showNotification(reminder.title || 'Poznote', options));
+});
+
+// A reminder notification shown through the service worker (a push, or
+// Chrome on Android from js/reminder-notifications.js): a tap marks the
+// reminder read and brings Poznote to the front on the note, in an open tab
+// when there is one.
 self.addEventListener('notificationclick', (event) => {
-  const url = event.notification.data && event.notification.data.url;
+  const data = event.notification.data || {};
+  const url = data.url;
   event.notification.close();
   event.waitUntil((async () => {
+    if (data.id) {
+      const readUrl = new URL('api/v1/reminders/' + encodeURIComponent(data.id) + '/read', self.registration.scope);
+      await fetch(readUrl, { method: 'POST', credentials: 'include' }).catch(() => {});
+    }
     const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
     if (windows.length) {
       const client = await windows[0].focus();
