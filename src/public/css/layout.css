@@ -240,6 +240,14 @@ body {
         background: transparent;
     }
 
+    /* Framed split panes: the bar stops short of the rounded corners, where
+       the frame would cut into it. */
+    body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-editor::-webkit-scrollbar-track,
+    body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller::-webkit-scrollbar-track,
+    body.markdown-split-card-view .noteentry.markdown-split-mode .markdown-preview::-webkit-scrollbar-track {
+        margin-block: var(--pz-radius-2xl);
+    }
+
     /* 10px to grab, 6px to see: the transparent border is not painted. */
     #right_col::-webkit-scrollbar-thumb,
     .noteentry.markdown-split-mode .markdown-editor-container::-webkit-scrollbar-thumb,

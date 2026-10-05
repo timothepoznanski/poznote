@@ -4872,6 +4872,105 @@ paths:
         '200':
           description: Password status
 
+  /users/me/push:
+    get:
+      tags: [Users]
+      summary: Web Push status of the current user
+      description: |
+        What a browser needs to subscribe to the account's reminder notifications: the
+        instance's VAPID public key, generated on first use. A subscribed device receives
+        a reminder as a system notification even while Poznote is closed.
+        Does NOT require X-User-ID header. Not available to requests authenticated with an app password.
+      responses:
+        '200':
+          description: Push status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: boolean
+                    description: False when the instance cannot sign push messages (no openssl)
+                  public_key:
+                    type: string
+                    nullable: true
+                    description: VAPID public key, base64url, to pass as applicationServerKey
+                  subscriptions:
+                    type: integer
+                    description: Devices currently subscribed for this account
+        '403':
+          description: Requested with an app password, or not the owner of the active account
+  /users/me/push/subscriptions:
+    post:
+      tags: [Users]
+      summary: Subscribe a device to reminder notifications
+      description: |
+        Body is a PushSubscription as the browser serialises it. The endpoint must belong
+        to a browser push service (Google, Mozilla, Apple, Microsoft); anything else is
+        refused. Registering a known endpoint again updates it, and moves it to the current
+        account when it belonged to another one.
+        Does NOT require X-User-ID header. Not available to requests authenticated with an app password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endpoint, keys]
+              properties:
+                endpoint:
+                  type: string
+                  example: https://fcm.googleapis.com/fcm/send/abc123
+                keys:
+                  type: object
+                  required: [p256dh, auth]
+                  properties:
+                    p256dh:
+                      type: string
+                    auth:
+                      type: string
+      responses:
+        '200':
+          description: Device subscribed
+        '400':
+          description: Unknown push service or malformed keys
+        '403':
+          description: Requested with an app password, or not the owner of the active account
+        '503':
+          description: Push notifications are not available on this instance
+    delete:
+      tags: [Users]
+      summary: Unsubscribe a device from reminder notifications
+      description: |
+        Only removes a subscription of the current account.
+        Does NOT require X-User-ID header. Not available to requests authenticated with an app password.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endpoint]
+              properties:
+                endpoint:
+                  type: string
+      responses:
+        '200':
+          description: Result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  deleted:
+                    type: boolean
+        '400':
+          description: endpoint is missing
+        '403':
+          description: Requested with an app password, or not the owner of the active account
   /users/me/app-passwords:
     get:
       tags: [Users]

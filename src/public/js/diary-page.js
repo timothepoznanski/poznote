@@ -217,9 +217,7 @@
         var editable = journalNoteIsEditable(note);
         var editLabel = txt.journalEdit || 'Edit here';
 
-        var tags = (note.tags || []).map(function (tag) {
-            return '<span class="board-card-tag">' + esc(tag) + '</span>';
-        }).join('');
+        var tagsLabel = txt.journalTagsEdit || 'Edit tags';
 
         return '<article class="diary-journal-entry' + (isToday ? ' is-today' : '') + '" data-note-id="' + note.id + '">' +
             '<header class="diary-journal-header">' +
@@ -233,6 +231,10 @@
                     subtitle +
                 '</div>' +
                 '<span class="diary-journal-save-status" aria-live="polite"></span>' +
+                // Tags are edited in their row below, on every kind of entry
+                '<button type="button" class="diary-journal-tags-btn" aria-pressed="false" title="' + esc(tagsLabel) + '" aria-label="' + esc(tagsLabel) + '">' +
+                    '<i class="lucide lucide-tag"></i>' +
+                '</button>' +
                 // The pencil edits in place (the title opens the note); a
                 // tasklist or a shortcut has no inline editor and no pencil
                 (editable
@@ -241,7 +243,8 @@
                       '</button>'
                     : '') +
             '</header>' +
-            (tags ? '<div class="board-card-footer diary-journal-tags">' + tags + '</div>' : '') +
+            // Always there, empty without tags (hidden then): the tag editor fills it
+            '<div class="board-card-footer diary-journal-tags">' + buildJournalTags(note, false) + '</div>' +
             // Markdown paragraphs carry their own gap, rich-text ones are flush
             // as in the editor (same split as public_note.css).
             '<div class="diary-journal-body' + (note.type === 'markdown' ? ' diary-journal-markdown' : '') + ' is-loading">' +
@@ -364,6 +367,7 @@
 
     function renderJournal(container, visibleNotes) {
         finishAllJournalEdits(null);
+        closeJournalTagEditor(true);
         if (journalObserver) {
             journalObserver.disconnect();
             journalObserver = null;
@@ -427,7 +431,8 @@
     }
 
     function journalHasUnsavedEdit() {
-        return journalEditList().some(function (state) { return state.dirty || state.saving; });
+        return Object.keys(journalTagSaves).length > 0 ||
+            journalEditList().some(function (state) { return state.dirty || state.saving; });
     }
 
     function setJournalSaveStatus(entry, kind, text) {
@@ -671,13 +676,18 @@
 
         // One entry at a time: the others are saved and rendered again
         journalEditList().forEach(function (state) { finishJournalEdit(state); });
+        closeJournalTagEditor(true);
 
         entry.classList.add('is-edit-loading');
         // The source is read afresh: the rendered body may be minutes old,
         // and the version token must be the one the save is checked against.
+        // A tag save still on its way changes that token: it lands first.
         var url = 'api/v1/notes/' + encodeURIComponent(noteId);
         if (data.workspace) url += '?workspace=' + encodeURIComponent(data.workspace);
-        fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+        (journalTagSaves[noteId] || Promise.resolve())
+            .then(function () {
+                return fetch(url, { credentials: 'same-origin', headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } });
+            })
             .then(function (response) {
                 return response.json().catch(function () { return {}; }).then(function (result) {
                     if (!response.ok || !result.note) {
@@ -731,10 +741,224 @@
         });
     }
 
+    // --- Journal tag editing (discussion 1565) ---
+    //
+    // The tag button of an entry turns its tags row into an editor: every
+    // tag gets a remove button and an input follows them, suggesting the
+    // workspace's tags. Each change is saved at once through
+    // PUT api/v1/notes/{id}/tags, which replaces the note's tags.
+
+    var JOURNAL_TAG_DATALIST_ID = 'diaryJournalTagSuggestions';
+    var journalTagEdit = null;     // { noteId, note, entry } while a tags row is open
+    var journalTagSaves = {};      // note id -> promise of its last tag save
+    var journalTagsRequested = false;
+
+    function buildJournalTag(tag, editing) {
+        var removeLabel = txt.journalTagRemove || 'Remove tag';
+        return '<span class="board-card-tag" data-tag="' + esc(tag) + '">' +
+            '<span class="diary-journal-tag-name">' + esc(tag) + '</span>' +
+            (editing
+                ? '<button type="button" class="diary-journal-tag-remove" title="' + esc(removeLabel) + '" aria-label="' + esc(removeLabel) + ' ' + esc(tag) + '">' +
+                    '<i class="lucide lucide-x"></i>' +
+                  '</button>'
+                : '') +
+        '</span>';
+    }
+
+    function buildJournalTags(note, editing) {
+        var html = (note.tags || []).map(function (tag) { return buildJournalTag(tag, editing); }).join('');
+        if (!editing) return html;
+        var placeholder = txt.journalTagPlaceholder || 'Add a tag...';
+        return html + '<input type="text" class="diary-journal-tag-input" list="' + JOURNAL_TAG_DATALIST_ID + '"' +
+            ' placeholder="' + esc(placeholder) + '" aria-label="' + esc(placeholder) + '"' +
+            ' autocomplete="off" autocapitalize="off" spellcheck="false">';
+    }
+
+    function renderJournalTags(entry, note, editing) {
+        var row = entry.querySelector('.diary-journal-tags');
+        if (row) row.innerHTML = buildJournalTags(note, editing);
+    }
+
+    // Same shape as the server keeps (NotesController::sanitizeTags): no
+    // comma, and an underscore where a space was.
+    function cleanJournalTag(value) {
+        return String(value || '').replace(/,/g, ' ').trim().replace(/\s+/g, '_');
+    }
+
+    function rememberJournalTagSuggestion(tag) {
+        var list = document.getElementById(JOURNAL_TAG_DATALIST_ID);
+        if (!list) return;
+        var known = Array.prototype.some.call(list.options, function (option) { return option.value === tag; });
+        if (known) return;
+        var option = document.createElement('option');
+        option.value = tag;
+        list.appendChild(option);
+    }
+
+    // The workspace's tags, offered by the input; fetched once, when the
+    // first tags row opens.
+    function loadJournalTagSuggestions() {
+        if (journalTagsRequested) return;
+        journalTagsRequested = true;
+        var list = document.createElement('datalist');
+        list.id = JOURNAL_TAG_DATALIST_ID;
+        document.body.appendChild(list);
+        fetch('api/v1/tags?workspace=' + encodeURIComponent(data.workspace || ''), {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        })
+            .then(function (response) { return response.ok ? response.json() : {}; })
+            .then(function (result) {
+                ((result && result.tags) || []).forEach(rememberJournalTagSuggestion);
+            })
+            .catch(function () { /* no suggestions: the input still works */ });
+    }
+
+    // Saves follow one another per note, each sending the tags as they are
+    // by then; an entry's body being saved goes first, since its save is
+    // checked against a version that a tag change moves on.
+    function saveJournalTags(entry, note, previous) {
+        var noteId = note.id;
+        var tags = note.tags.slice();
+        var before = journalEditList().map(function (state) {
+            return state.noteId === noteId ? finishJournalEdit(state) : null;
+        });
+        before.push(journalTagSaves[noteId] || null);
+
+        var save = Promise.all(before)
+            .then(function () {
+                var payload = { tags: tags };
+                if (data.workspace) payload.workspace = data.workspace;
+                return fetch('api/v1/notes/' + encodeURIComponent(noteId) + '/tags', {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(payload)
+                });
+            })
+            .then(function (response) {
+                return response.json().catch(function () { return {}; }).then(function (result) {
+                    if (!response.ok || !result.note) {
+                        throw new Error(result.error || result.message || ('HTTP ' + response.status));
+                    }
+                    if (entry.isConnected && !journalEdits[noteId]) setJournalSaveStatus(entry, '', '');
+                });
+            })
+            .catch(function (err) {
+                // Back to the tags the server still has, unless a later
+                // change is already on its way with its own outcome
+                if (journalTagSaves[noteId] !== save) return;
+                note.tags = previous;
+                if (!entry.isConnected) return;
+                renderJournalTags(entry, note, !!journalTagEdit && journalTagEdit.noteId === noteId);
+                setJournalSaveStatus(entry, 'error', (txt.journalTagsSaveError || 'Could not save the tags.') + ' ' + err.message);
+            })
+            .then(function () {
+                if (journalTagSaves[noteId] === save) delete journalTagSaves[noteId];
+            });
+        journalTagSaves[noteId] = save;
+        return save;
+    }
+
+    function addJournalTag(value) {
+        var edit = journalTagEdit;
+        var tag = cleanJournalTag(value);
+        if (!edit || !tag) return;
+        var note = edit.note;
+        var previous = note.tags || [];
+        var lower = tag.toLowerCase();
+        if (previous.some(function (existing) { return existing.toLowerCase() === lower; })) return;
+
+        note.tags = previous.concat([tag]);
+        // The filter finds the entry by its new tag without a reload
+        if (note.search) note.search += ' ' + tag;
+        var input = edit.entry.querySelector('.diary-journal-tag-input');
+        if (input) input.insertAdjacentHTML('beforebegin', buildJournalTag(tag, true));
+        rememberJournalTagSuggestion(tag);
+        saveJournalTags(edit.entry, note, previous);
+    }
+
+    function removeJournalTag(chip) {
+        var edit = journalTagEdit;
+        if (!edit || !chip) return;
+        var tag = chip.getAttribute('data-tag');
+        var note = edit.note;
+        var previous = note.tags || [];
+        note.tags = previous.filter(function (existing) { return existing !== tag; });
+        chip.remove();
+        if (note.tags.length !== previous.length) saveJournalTags(edit.entry, note, previous);
+        var input = edit.entry.querySelector('.diary-journal-tag-input');
+        if (input) input.focus({ preventScroll: true });
+    }
+
+    // What is typed becomes tags at each space or comma; the rest stays in
+    // the input until Enter, or until the editor is left.
+    function commitJournalTagInput(input, all) {
+        var parts = input.value.split(/[\s,]+/);
+        var rest = all ? '' : parts.pop();
+        input.value = rest;
+        parts.forEach(addJournalTag);
+    }
+
+    function setJournalTagsButton(entry, editing) {
+        var btn = entry.querySelector('.diary-journal-tags-btn');
+        if (btn) btn.setAttribute('aria-pressed', editing ? 'true' : 'false');
+        entry.classList.toggle('is-tag-editing', editing);
+    }
+
+    // keepTyped: text still in the input becomes a tag (Escape drops it)
+    function closeJournalTagEditor(keepTyped) {
+        var edit = journalTagEdit;
+        if (!edit) return;
+        var input = edit.entry.querySelector('.diary-journal-tag-input');
+        if (keepTyped && input) commitJournalTagInput(input, true);
+        journalTagEdit = null;
+        if (!edit.entry.isConnected) return;
+        renderJournalTags(edit.entry, edit.note, false);
+        setJournalTagsButton(edit.entry, false);
+    }
+
+    function openJournalTagEditor(entry) {
+        if (!entry) return;
+        var noteId = parseInt(entry.getAttribute('data-note-id'), 10);
+        var note = findJournalNote(noteId);
+        if (!note) return;
+        closeJournalTagEditor(true);
+        // An open body editor is saved and closed: one thing edited at a time
+        finishAllJournalEdits(null);
+
+        journalTagEdit = { noteId: noteId, note: note, entry: entry };
+        loadJournalTagSuggestions();
+        renderJournalTags(entry, note, true);
+        setJournalTagsButton(entry, true);
+        setJournalSaveStatus(entry, '', '');
+        var input = entry.querySelector('.diary-journal-tag-input');
+        if (input) input.focus({ preventScroll: true });
+    }
+
     function initJournalEditing() {
         var diaryContent = document.getElementById('diaryContent');
         if (diaryContent) {
             diaryContent.addEventListener('click', function (e) {
+                var tagsBtn = e.target.closest('.diary-journal-tags-btn');
+                if (tagsBtn) {
+                    var tagsEntry = tagsBtn.closest('.diary-journal-entry');
+                    if (journalTagEdit && journalTagEdit.entry === tagsEntry) {
+                        closeJournalTagEditor(true);
+                    } else {
+                        openJournalTagEditor(tagsEntry);
+                    }
+                    return;
+                }
+                var removeBtn = e.target.closest('.diary-journal-tag-remove');
+                if (removeBtn) {
+                    removeJournalTag(removeBtn.closest('.board-card-tag'));
+                    return;
+                }
                 var editBtn = e.target.closest('.diary-journal-edit');
                 if (editBtn) {
                     var entry = editBtn.closest('.diary-journal-entry');
@@ -757,8 +981,35 @@
             });
         }
 
+        if (diaryContent) {
+            diaryContent.addEventListener('input', function (e) {
+                if (!e.target.classList || !e.target.classList.contains('diary-journal-tag-input')) return;
+                // A suggestion picked from the list is a whole tag
+                commitJournalTagInput(e.target, e.inputType === 'insertReplacementText');
+            });
+            diaryContent.addEventListener('keydown', function (e) {
+                if (!e.target.classList || !e.target.classList.contains('diary-journal-tag-input')) return;
+                if (e.key === 'Enter' && !e.isComposing) {
+                    e.preventDefault();
+                    // Enter on an empty input: the tags are done
+                    if (e.target.value.trim() === '') {
+                        closeJournalTagEditor(false);
+                    } else {
+                        commitJournalTagInput(e.target, true);
+                    }
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closeJournalTagEditor(false);
+                }
+            });
+        }
+
         // A click anywhere else leaves the editor
         document.addEventListener('mousedown', function (e) {
+            if (journalTagEdit && e.target.closest &&
+                !(journalTagEdit.entry.contains(e.target) && e.target.closest('.diary-journal-tags, .diary-journal-tags-btn'))) {
+                closeJournalTagEditor(true);
+            }
             if (!Object.keys(journalEdits).length) return;
             var entry = e.target.closest ? e.target.closest('.diary-journal-entry') : null;
             finishAllJournalEdits(entry);
@@ -1112,6 +1363,7 @@
             return;
         }
         finishAllJournalEdits(null);
+        closeJournalTagEditor(true);
         if (journalObserver) {
             journalObserver.disconnect();
             journalObserver = null;

@@ -5,7 +5,7 @@ function toggleEmojiPicker() {
 
   if (existingPicker) {
     existingPicker.remove();
-    if (window.savedActiveInput && window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+    if (window.savedActiveInput && window.savedActiveInput.classList && (window.savedActiveInput.classList.contains('task-edit-input') || window.savedActiveInput.classList.contains('task-subitem-input')) && typeof window.resumeTaskEditBlurSave === 'function') {
       window.resumeTaskEditBlurSave(window.savedActiveInput);
     }
     window.savedRanges.emoji = null;
@@ -150,7 +150,7 @@ function toggleEmojiPicker() {
   });
 
   closePicker = setupPopupDismiss(picker, '.btn-emoji', function () {
-    if (window.savedActiveInput && window.savedActiveInput.classList && window.savedActiveInput.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+    if (window.savedActiveInput && window.savedActiveInput.classList && (window.savedActiveInput.classList.contains('task-edit-input') || window.savedActiveInput.classList.contains('task-subitem-input')) && typeof window.resumeTaskEditBlurSave === 'function') {
       window.resumeTaskEditBlurSave(window.savedActiveInput);
     }
     window.savedRanges.emoji = null;
@@ -236,7 +236,7 @@ function insertEmoji(emoji) {
 
     input.setRangeText(emoji, start, end, 'end');
     input.dispatchEvent(new Event('input', { bubbles: true }));
-    if (input.classList && input.classList.contains('task-edit-input') && typeof window.resumeTaskEditBlurSave === 'function') {
+    if (input.classList && (input.classList.contains('task-edit-input') || input.classList.contains('task-subitem-input')) && typeof window.resumeTaskEditBlurSave === 'function') {
       window.resumeTaskEditBlurSave(input);
     }
 

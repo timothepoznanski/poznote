@@ -21,8 +21,9 @@ function isTaskEditBlurSavePaused(input) {
     return !!(input && input.dataset && input.dataset.taskEditBlurSavePaused === 'true');
 }
 
+// Also holds the "add a subtask" field open while a picker of its slash menu has the focus
 function pauseTaskEditBlurSave(input) {
-    if (input && input.classList && input.classList.contains('task-edit-input')) {
+    if (input && input.classList && (input.classList.contains('task-edit-input') || input.classList.contains('task-subitem-input'))) {
         input.dataset.taskEditBlurSavePaused = 'true';
     }
 }

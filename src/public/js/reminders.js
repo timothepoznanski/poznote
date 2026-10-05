@@ -218,7 +218,9 @@ function openReminderModal(noteId, currentReminderAt) {
     const now = new Date();
     const localIso = toLocalDateTimeInputValue(now);
     dateInput.min = localIso;
-    dateInput.value = '';
+    // A new reminder starts on the current date and time, shown in the two
+    // buttons and highlighted in their pickers
+    dateInput.value = currentReminderAt ? '' : localIso;
 
     // Show current reminder if exists
     if (currentReminderAt) {
@@ -317,6 +319,10 @@ function saveReminder() {
 
     // Convert to UTC ISO string
     const utcIso = localDate.toISOString();
+
+    if (typeof window.poznoteRequestReminderNotifications === 'function') {
+        window.poznoteRequestReminderNotifications();
+    }
 
     fetch('/api/v1/notes/' + reminderNoteId + '/reminder', {
         method: 'POST',

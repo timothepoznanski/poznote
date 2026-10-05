@@ -960,7 +960,7 @@
                 task_id: String(task.id),
                 reminder_at: trigger,
                 message: task.text,
-                email_enabled: task.dueReminderEmail !== undefined ? !!task.dueReminderEmail : true,
+                email_enabled: !!task.dueReminderEmail,
                 recurrence: task.dueRecurrence || null
             })
         }).catch(function (e) {

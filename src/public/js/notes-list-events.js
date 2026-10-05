@@ -752,6 +752,12 @@
     var EMPTY_SIDEBAR_EXCLUDED = '.folder-header, .note-list-item, .other-accounts, .other-account-header, ' +
         '.notes-list-actions, .folder-filter-banner, a, button, input, textarea, select, [contenteditable="true"]';
 
+    // On a phone the column is the whole screen (css/index-mobile.css): it cannot
+    // be hidden, so a long press on it does not offer to
+    function isMobileSidebarLayout() {
+        return window.matchMedia('(max-width: 800px)').matches;
+    }
+
     function openCreateMenuOnEmptySidebar(event) {
         var target = event.target;
         var leftCol = document.getElementById('left_col');
@@ -761,7 +767,7 @@
         if (!inEmptyArea || target.closest(EMPTY_SIDEBAR_EXCLUDED)) return;
 
         if (typeof window.openCreateMenu === 'function' &&
-            window.openCreateMenu({ x: event.clientX, y: event.clientY, columnActions: true })) {
+            window.openCreateMenu({ x: event.clientX, y: event.clientY, columnActions: !isMobileSidebarLayout() })) {
             event.preventDefault();
         }
     }

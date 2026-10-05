@@ -251,6 +251,9 @@ const EXPORT_STYLES = '
         height: auto;
         border-radius: 4px;
         margin: 1em 0;
+        /* This page is light whatever the system prefers, and an Excalidraw
+           preview reads the scheme to decide how to draw its photos. */
+        color-scheme: light;
     }
     hr {
         border: 0;

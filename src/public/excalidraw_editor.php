@@ -136,6 +136,7 @@ if ($note_id > 0) {
     <title><?php echo htmlspecialchars($note_title, ENT_QUOTES); ?> - Excalidraw</title>
     
     <!-- Theme initialization - CSP compliant -->
+    <script src="js/theme-init.js?v=<?php echo $themeAssetVersion; ?>"></script>
     <script src="js/excalidraw-theme-init.js?v=<?php echo $themeAssetVersion; ?>"></script>
     <script src="js/session-guard.js?v=<?php echo $themeAssetVersion; ?>"></script>
     

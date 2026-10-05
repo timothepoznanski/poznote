@@ -213,6 +213,8 @@ function editSubtask(taskId, subtaskId, noteId) {
 
 // Show the "add a subtask" field under a task. It stays open after each addition so
 // several subtasks can be typed in a row; Escape or leaving it empty closes it.
+// Like the new-task field, it opens the slash menu (js/slash-command.js): link to a
+// note, emoji, date.
 function openSubtaskInput(taskId, noteId, event) {
     if (event) {
         event.preventDefault();
@@ -283,6 +285,8 @@ function openSubtaskInput(taskId, noteId, event) {
             e.stopPropagation();
             submit();
         } else if (e.key === 'Escape') {
+            // Already handled: it closed the slash menu of the field
+            if (e.defaultPrevented) return;
             e.preventDefault();
             e.stopPropagation();
             closeInput();
@@ -290,8 +294,10 @@ function openSubtaskInput(taskId, noteId, event) {
     });
     input.addEventListener('blur', function () {
         // Left empty: the field goes away. Deferred so a click on another control
-        // of the row (its handler may redraw the list) is not cut short.
+        // of the row (its handler may redraw the list) is not cut short. It stays
+        // while a picker of its slash menu (link to note, emoji, date) has the focus.
         setTimeout(function () {
+            if (isTaskEditBlurSavePaused(input)) return;
             if (form.isConnected && document.activeElement !== input && !input.value.trim()) closeInput();
         }, 150);
     });

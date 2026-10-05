@@ -20,6 +20,7 @@ require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../markdown_parser.php';
 require_once __DIR__ . '/../html_to_markdown.php';
+require_once __DIR__ . '/ai-note-diagrams.php';
 
 define('AI_NOTE_READ_LIMIT', 16000);
 define('AI_INLINE_IMAGE_PREFIX', '/poznote-inline-image/');
@@ -110,8 +111,10 @@ function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
     }
     if ($noteType === 'note' || $noteType === 'html') {
         $format = 'html';
-        $content = aiHtmlToMarkdown($content);
-    } elseif ($noteType !== 'markdown') {
+        $content = aiHtmlToMarkdown(aiHideEmbeddedDiagrams($content, false));
+    } elseif ($noteType === 'markdown') {
+        $content = aiHideEmbeddedDiagrams($content, true);
+    } else {
         // Other types (drawings, ...): readable plain text
         $format = $noteType;
         $content = preg_replace('/<br\s*\/?>|<\/(p|div|h[1-6]|li|tr)>/i', "\n", $content);
@@ -153,6 +156,9 @@ function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
         // Repeated next to the content: models that skim the system prompt
         // still see it right where they read the note
         $result['hint'] = 'Rich-text note shown as Markdown. To edit it, send Markdown (never HTML) to update_note_content; it is converted back.';
+    }
+    if (strpos($content, AI_DIAGRAM_PREFIX) !== false) {
+        $result['diagrams'] = 'Each image whose address starts with ' . AI_DIAGRAM_PREFIX . ' stands for an Excalidraw diagram of the note. Keep that line exactly as it is in update_note_content to keep the diagram; it can be moved, and removing it deletes the diagram.';
     }
     return $result;
 }
@@ -848,6 +854,7 @@ function aiToolUpdateNoteContent($con, array $args, $chatWorkspace, $actorUserId
         return json_encode(['error' => 'This note is too long for the assistant to rewrite safely: get_note only shows its first part, so the rest would be lost. Tell the user to edit it by hand.']);
     }
     $filename = getEntryFilename($noteId, $noteType);
+    $stored = is_readable($filename) ? (string)file_get_contents($filename) : (string)($note['entry'] ?? '');
     if ($noteType === 'markdown') {
         $content = sanitizeMarkdownContent($content);
     } else {
@@ -860,9 +867,12 @@ function aiToolUpdateNoteContent($con, array $args, $chatWorkspace, $actorUserId
         }
         $content = sanitizeHtml($content);
         if (strpos($content, AI_INLINE_IMAGE_PREFIX) !== false) {
-            $stored = is_readable($filename) ? (string)file_get_contents($filename) : (string)($note['entry'] ?? '');
             $content = aiRestoreInlineImages($content, $stored);
         }
+    }
+    // After the sanitizers: the diagrams go back as they were stored
+    if (strpos($content, AI_DIAGRAM_PREFIX) !== false) {
+        $content = aiRestoreEmbeddedDiagrams($content, $stored, $noteType === 'markdown');
     }
     // The previous version stays one click away on the Revisions page
     $snapshotTaken = poznoteCreateSafetySnapshot($con, $noteId, 'ai');

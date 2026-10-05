@@ -46,6 +46,35 @@ function poznoteStripExcalidrawPreviewTheme(string $svg): string
 }
 
 /**
+ * Keep an embedded photo upright under the page's dark-theme inversion.
+ *
+ * The page inverts the whole <img> in a dark theme, which is right for a
+ * stroke and wrong for a photo: its highlights blow out and it reads as a
+ * washed-out negative (issue #1578). Excalidraw solves this in its own dark
+ * export with a counter filter on each image, and the same filter goes here,
+ * but conditionally, because the file carries no theme: the note's <img> says
+ * which scheme its theme paints through color-scheme (css/tokens.css), and an
+ * SVG shown through <img> reads that as prefers-color-scheme.
+ *
+ * An embedded SVG is left to invert like the rest of the drawing, as
+ * Excalidraw does. A browser that does not pass color-scheme down to an SVG
+ * image (Safari) never matches the query and keeps the inverted photo.
+ */
+function poznoteProtectExcalidrawPreviewPhotos(string $svg): string
+{
+    if (stripos($svg, '<image') === false || strpos($svg, 'poznote-photo-scheme') !== false) {
+        return $svg;
+    }
+
+    $style = '<style class="poznote-photo-scheme">@media (prefers-color-scheme: dark){'
+        . 'image:not([href^="data:image/svg"]){filter:invert(100%) hue-rotate(180deg) saturate(1.25)}'
+        . '}</style>';
+
+    // Straight after the root's opening tag, whose attributes hold no ">".
+    return (string) preg_replace('/<svg\b[^>]*>/i', '$0' . $style, $svg, 1);
+}
+
+/**
  * The SVG is only ever displayed through <img>, where nothing in it can run,
  * and is served with the sandbox headers every SVG attachment gets. These
  * checks refuse what Excalidraw never produces (scripts, handlers, HTML

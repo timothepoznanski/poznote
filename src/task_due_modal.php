@@ -104,7 +104,7 @@ try {
                         </span>
                     </span>
                     <span class="toggle-switch reminder-email-switch">
-                        <input type="checkbox" id="taskDueEmailInput" <?php echo $taskDueEmailAvailable ? 'checked' : ''; ?>>
+                        <input type="checkbox" id="taskDueEmailInput">
                         <span class="toggle-slider"></span>
                     </span>
                 </label>

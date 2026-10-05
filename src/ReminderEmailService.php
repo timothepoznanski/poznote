@@ -230,6 +230,10 @@ class ReminderEmailService {
             'webhook_attempts' => 'INTEGER DEFAULT 0',
             'webhook_last_attempt_at' => 'DATETIME',
             'webhook_error' => 'TEXT',
+            'push_sent_at' => 'DATETIME',
+            'push_attempts' => 'INTEGER DEFAULT 0',
+            'push_last_attempt_at' => 'DATETIME',
+            'push_error' => 'TEXT',
         ];
 
         foreach ($columns as $name => $definition) {

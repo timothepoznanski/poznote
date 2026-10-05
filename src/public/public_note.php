@@ -25,7 +25,7 @@ foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
 $cspNonce = base64_encode(random_bytes(16));
 
 // Set security headers for public notes
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{$cspNonce}' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{$cspNonce}' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
 header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: SAMEORIGIN");
 
@@ -1010,6 +1010,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 <script src="<?php echo poznoteAsset('js/outline-panel.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/mermaid-theme.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/mermaid-zoom.js'); ?>"></script>
+<script src="<?php echo poznoteAsset('js/excalidraw-theme-colors.js'); ?>"></script>
 <script src="<?php echo poznoteAsset('js/public-note.js'); ?>"></script>
 <?php if ($noteBodyEditable): ?>
 <script src="<?php echo poznoteAsset('js/shortcut-key.js'); ?>"></script>

@@ -217,6 +217,9 @@
         if (!state) return;
         const dueAt = state.day ? (state.day + (state.time ? 'T' + state.time : '')) : null;
         const remind = !!(state.remind && dueAt);
+        if (remind && typeof window.poznoteRequestReminderNotifications === 'function') {
+            window.poznoteRequestReminderNotifications();
+        }
         applyAndClose({
             dueAt: dueAt,
             dueReminder: remind,
@@ -325,14 +328,20 @@
         if (!modal || !opts || !opts.task) return;
 
         const due = normalizeDue(opts.task.dueAt);
+        // A new due date starts on the current date and time, shown in the
+        // two buttons and highlighted in their pickers
+        const now = new Date();
+        const today = now.getFullYear() + '-' + pad2(now.getMonth() + 1) + '-' + pad2(now.getDate());
+        const currentTime = pad2(now.getHours()) + ':' + pad2(now.getMinutes());
         state = {
             noteId: opts.noteId,
             taskId: opts.taskId !== undefined ? opts.taskId : opts.task.id,
             taskText: opts.task.text || '',
-            day: due ? due.substring(0, 10) : '',
-            time: (due && due.length > 10) ? due.substring(11, 16) : '',
-            remind: !!opts.task.dueReminder,
-            email: opts.task.dueReminderEmail !== undefined ? !!opts.task.dueReminderEmail : true,
+            day: due ? due.substring(0, 10) : today,
+            time: due ? (due.length > 10 ? due.substring(11, 16) : '') : currentTime,
+            // A new due date reminds by default; an existing one keeps its choice
+            remind: due ? !!opts.task.dueReminder : true,
+            email: !!opts.task.dueReminderEmail,
             hadDue: !!due,
             onSave: opts.onSave
         };

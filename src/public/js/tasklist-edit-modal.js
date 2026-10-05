@@ -127,6 +127,9 @@ function attachTaskEditModalHandlers(modal) {
                 e.preventDefault();
                 saveTaskEditFromModal();
             } else if (e.key === 'Escape') {
+                // Already handled: it closed the slash menu of the field, or
+                // the emoji picker that menu opened
+                if (e.defaultPrevented || document.querySelector('.emoji-picker')) return;
                 e.preventDefault();
                 closeTaskEditModal();
             }

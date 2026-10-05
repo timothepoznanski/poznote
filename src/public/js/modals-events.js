@@ -276,6 +276,10 @@
         // The alert/confirm overlay handles its own Escape key
         if (document.querySelector('.alert-modal-overlay.show')) return;
 
+        // So does the emoji picker, which can sit above a modal (the slash menu
+        // of the "Edit task" dialog opens it)
+        if (document.querySelector('.emoji-picker')) return;
+
         const openModals = Array.from(document.querySelectorAll('.modal')).filter(function (modal) {
             return modal.style.display === 'flex' || modal.style.display === 'block';
         });

@@ -47,7 +47,8 @@ function excalidrawAssertNoteNotLockedByOther(int $note_id): void {
 /**
  * The preview the note displays through <img>: the SVG Excalidraw exported,
  * crisp at any pixel density (issue #1434), with the theme it was exported
- * under taken back out of it (issue #1445). Returns null when the request
+ * under taken back out of it (issue #1445) and its photos kept upright in a
+ * dark theme (issue #1578). Returns null when the request
  * carries none, and answers 400 when it carries something that is not an
  * Excalidraw SVG. Both rules live in lib/excalidraw-preview.php.
  */
@@ -62,7 +63,7 @@ function excalidrawReadPreviewSvg(): ?string {
         echo json_encode(['success' => false, 'message' => 'Invalid image type']);
         exit;
     }
-    return $svg;
+    return poznoteProtectExcalidrawPreviewPhotos($svg);
 }
 
 /**
@@ -587,18 +588,13 @@ function saveEmbeddedDiagram() {
                     
                     // If cursor position is valid
                     if ($cursor_position >= 0 && $cursor_position <= mb_strlen($plain_text)) {
-                        // Find the HTML position that corresponds to the plain text position
-                        $html_position = findHtmlPositionFromTextOffset($html_content, $cursor_position);
-                        
-                        if ($html_position !== false) {
-                            // Insert the diagram at the calculated position
-                            $html_content = mb_substr($html_content, 0, $html_position) . 
-                                           $diagram_html_new . 
-                                           mb_substr($html_content, $html_position);
-                        } else {
-                            // Fallback: add at the end if position calculation fails
-                            $html_content .= $diagram_html_new;
-                        }
+                        // Find the HTML position (a byte offset) that corresponds to the plain text position
+                        $html_position = poznoteHtmlOffsetForTextPosition($html_content, $cursor_position);
+
+                        // Insert the diagram at the calculated position
+                        $html_content = substr($html_content, 0, $html_position) .
+                                       $diagram_html_new .
+                                       substr($html_content, $html_position);
                     } else {
                         // Invalid cursor position, add at the end
                         $html_content .= $diagram_html_new;
@@ -642,76 +638,3 @@ function saveEmbeddedDiagram() {
     }
 }
 
-/**
- * Find the HTML position corresponding to a plain text offset
- * This helps insert content at the cursor position in HTML content
- */
-function findHtmlPositionFromTextOffset($html_content, $text_offset) {
-    // Decode HTML entities first to get accurate text position
-    $decoded_html = html_entity_decode($html_content, ENT_QUOTES | ENT_HTML5);
-    
-    $html_length = mb_strlen($decoded_html);
-    $text_position = 0;
-    $html_position = 0;
-    $in_tag = false;
-    
-    while ($html_position < $html_length && $text_position < $text_offset) {
-        $char = mb_substr($decoded_html, $html_position, 1);
-        
-        if ($char === '<') {
-            $in_tag = true;
-            $tag_end = mb_strpos($decoded_html, '>', $html_position);
-            if ($tag_end === false) {
-                break;
-            }
-
-            $tag_content = mb_substr($decoded_html, $html_position + 1, $tag_end - $html_position - 1);
-            $tag_trim = trim($tag_content);
-            $tag_name = strtolower(preg_replace('/\s+.*/', '', ltrim($tag_trim, '/')));
-
-            // Count line breaks for <br> and closing block tags
-            if ($tag_name === 'br') {
-                $text_position++;
-            } else if (preg_match('/^\/(p|div|li|h[1-6])\b/i', $tag_trim)) {
-                $text_position++;
-            }
-
-            $html_position = $tag_end;
-            $in_tag = false;
-        } else if ($char === '>') {
-            $in_tag = false;
-        } else if (!$in_tag) {
-            // Count non-tag characters as text
-            $text_position++;
-        }
-        
-        $html_position++;
-    }
-    
-    // Return position in original HTML (with entities)
-    // We need to find the corresponding position in the original string
-    $original_position = 0;
-    $decoded_position = 0;
-    
-    while ($decoded_position < $html_position && $original_position < mb_strlen($html_content)) {
-        // Check if we're at an HTML entity in the original content
-        if (mb_substr($html_content, $original_position, 1) === '&') {
-            // Find the end of the entity
-            $entity_end = mb_strpos($html_content, ';', $original_position);
-            if ($entity_end !== false) {
-                $entity = mb_substr($html_content, $original_position, $entity_end - $original_position + 1);
-                $decoded_entity = html_entity_decode($entity, ENT_QUOTES | ENT_HTML5);
-                
-                // Skip the entire entity in original, but only count decoded length in decoded
-                $original_position = $entity_end + 1;
-                $decoded_position += mb_strlen($decoded_entity);
-                continue;
-            }
-        }
-        
-        $original_position++;
-        $decoded_position++;
-    }
-    
-    return $original_position;
-}

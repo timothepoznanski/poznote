@@ -65,7 +65,7 @@
         const timeOnly = !!(options && options.timeOnly);
         if (timeOnly) {
             timeMenuMode = 'hours';
-            timeMenuHour = selectedTime !== '' ? parseInt(selectedTime.substring(0, 2), 10) : null;
+            timeMenuHour = openingHour();
         }
 
         const picker = document.createElement('div');
@@ -88,6 +88,12 @@
                     parseInt(timeStr.substring(3, 5), 10)));
             }
             return timeStr;
+        }
+
+        // Hour highlighted when the hour menu opens: the selected one, the
+        // current hour while no time is set (as the calendar marks today)
+        function openingHour() {
+            return selectedTime !== '' ? parseInt(selectedTime.substring(0, 2), 10) : new Date().getHours();
         }
 
         function selectedHour() {
@@ -289,7 +295,7 @@
                     selectedDayStr = dayString(today.getFullYear(), today.getMonth(), today.getDate());
                 }
                 timeMenuMode = 'hours';
-                timeMenuHour = selectedTime !== '' ? parseInt(selectedTime.substring(0, 2), 10) : null;
+                timeMenuHour = openingHour();
                 render();
                 return;
             }
@@ -413,7 +419,7 @@
             if (e.target.closest('[data-time-menu]')) {
                 // Open the two-step time menu: hours first
                 timeMenuMode = 'hours';
-                timeMenuHour = selectedTime !== '' ? parseInt(selectedTime.substring(0, 2), 10) : null;
+                timeMenuHour = openingHour();
                 render();
                 return;
             }

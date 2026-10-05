@@ -60,12 +60,17 @@
         }
     }
 
+    // Title and task fields, the textarea of the "Edit task" dialog included
+    function isTextField(el) {
+        return !!(el && (el.tagName === 'INPUT' || (el.tagName === 'TEXTAREA' && el.id === 'taskEditTextarea')));
+    }
+
     /**
      * Task and title inputs get a [[Title]] reference, which only resolves
      * within the current workspace; editors get an id link that works anywhere.
      */
     function canLinkAcrossWorkspaces() {
-        return !(savedEditableElement && savedEditableElement.tagName === 'INPUT');
+        return !isTextField(savedEditableElement);
     }
 
     function setAllWorkspacesSearch(enabled) {
@@ -132,7 +137,7 @@
      */
     function saveSelection() {
         // Preference for input fields (slash command support)
-        if (window._slashCommandInputCursor && window._slashCommandSavedEditableElement && window._slashCommandSavedEditableElement.tagName === 'INPUT') {
+        if (window._slashCommandInputCursor && isTextField(window._slashCommandSavedEditableElement)) {
             savedEditableElement = window._slashCommandSavedEditableElement;
             savedRange = null;
             savedSelection = null;
@@ -187,7 +192,7 @@
             selection.removeAllRanges();
             selection.addRange(savedRange);
             return true;
-        } else if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+        } else if (isTextField(savedEditableElement)) {
             // Support for input fields (task lists, title)
             try { 
                 savedEditableElement.focus(); 
@@ -204,7 +209,7 @@
         if (
             savedEditableElement &&
             savedEditableElement.classList &&
-            savedEditableElement.classList.contains('task-edit-input') &&
+            (savedEditableElement.classList.contains('task-edit-input') || savedEditableElement.classList.contains('task-subitem-input')) &&
             typeof window.resumeTaskEditBlurSave === 'function'
         ) {
             window.resumeTaskEditBlurSave(savedEditableElement);
@@ -495,7 +500,7 @@
         const noteEntry = document.querySelector('.noteentry');
 
         // Handle input fields (task lists, titles)
-        if (savedEditableElement && savedEditableElement.tagName === 'INPUT') {
+        if (isTextField(savedEditableElement)) {
             insertInputReference(heading, noteId);
             return;
         }
@@ -702,6 +707,9 @@
                     createNoteAndInsertReference();
                 }
             } else if (e.key === 'Escape') {
+                // Handled here: the dialog under this one (the "Edit task"
+                // dialog opens it from its slash menu) must stay open
+                e.preventDefault();
                 closeNoteReferenceModal();
             }
         });

@@ -13,7 +13,9 @@
     border: 1px solid var(--pz-border);
     /* border-radius: 12px; */
     box-shadow: 0 8px 25px rgba(var(--pz-shadow-rgb), 0.15);
-    z-index: 1000;
+    /* Above modals (.modal is 9999, .modal-content 10000): the slash menu
+       of the "Edit task" dialog opens it */
+    z-index: 10001;
     width: 360px;
     max-height: 550px;
     overflow-y: auto;
