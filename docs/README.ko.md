@@ -763,6 +763,26 @@ curl -u 'username:pzn_2f7c…' https://YOUR_SERVER/api/v1/notes
 </details>
 
 <details>
+<summary><strong>사용자 지정 글꼴</strong></summary>
+<br>
+
+Poznote에는 Inter가 포함되어 있으며 기기에 설치된 글꼴도 사용할 수 있습니다. Google Fonts의 글꼴 패밀리 같은 다른 글꼴을 쓰려면 관리자가 파일을 한 번 업로드하면 되고, 이후 모든 사용자가 선택할 수 있습니다.
+
+**설정 > 관리 도구 > 사용자 지정 글꼴**에서 업로드한 뒤 **설정 > 표시 > 앱 글꼴** 또는 **설정 > 마크다운 > 마크다운 편집기 글꼴**에서 글꼴을 선택하세요.
+
+참고 사항:
+
+- 지원 형식은 WOFF2, WOFF, TTF, OTF이며 파일당 최대 10MB
+- 글꼴 패밀리는 여러 파일(보통, 굵게, 이탤릭체 등) 또는 가변 글꼴 파일 하나로 구성됩니다. 한 패밀리의 파일을 한 번에 모두 선택해 업로드하면 패밀리 이름으로 묶입니다.
+- 글꼴은 사용 중인 인스턴스에서 직접 제공하며 Google 등 제3자에서 불러오는 것은 없습니다. 먼저 [Google Fonts](https://fonts.google.com)(**Get font > Download all**) 또는 [google-webfonts-helper](https://gwfh.mranftl.com/fonts)에서 패밀리를 내려받으세요.
+- 굵은 글꼴 파일이 없는 패밀리는 굵은 텍스트와 제목에 기본 글꼴을 유지하므로 굵은 글꼴 파일도 함께 업로드하세요.
+- 파일은 Docker 볼륨의 `data/fonts/`에 저장되어 이미지 업데이트 후에도 유지됩니다. 직접 복사해 넣은 파일은 **사용자 지정 글꼴** 창을 열 때 인식됩니다.
+- 글꼴은 사용자마다 따로 선택합니다. 패밀리를 삭제하면 그 글꼴을 선택했던 사용자는 기본 글꼴로 돌아갑니다.
+- 업로드와 삭제는 관리자만 가능
+
+</details>
+
+<details>
 <summary><strong>사용자 CSS 적용</strong></summary>
 <br>
 
@@ -870,6 +890,7 @@ html[data-theme='dark'] {
 data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
+├── fonts/                       # Custom fonts uploaded by an administrator
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database

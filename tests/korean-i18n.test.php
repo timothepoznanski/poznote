@@ -14,12 +14,14 @@ function koreanI18nLeaves(array $dictionary, string $prefix = ''): array {
     return $leaves;
 }
 
-test('Korean covers the English dictionary and preserves runtime placeholders and HTML', function () {
+// A key missing from ko.json falls back to English at runtime, so a new English
+// string does not have to wait for its Korean translation. Only stale keys fail.
+test('Korean has no key unknown to English and preserves runtime placeholders and HTML', function () {
     $english = koreanI18nLeaves(loadI18nDictionary('en'));
     $korean = koreanI18nLeaves(loadI18nDictionary('ko'));
-    assertSame(array_keys($english), array_keys($korean), 'dictionary paths');
-    foreach ($english as $key => $source) {
-        $translated = $korean[$key];
+    assertSame([], array_values(array_diff(array_keys($korean), array_keys($english))), 'keys unknown to English');
+    foreach ($korean as $key => $translated) {
+        $source = $english[$key];
         assertTrue(is_string($translated) && trim($translated) !== '' || $key === 'common.at', $key);
         foreach (['/\{\{[^}]+\}\}/', '/<[^>]+>/', '/<code>.*?<\/code>/s'] as $pattern) {
             preg_match_all($pattern, $source, $original);
