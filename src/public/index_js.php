@@ -122,6 +122,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/share.js',
         'js/reminders.js',
         'js/notifications-modal.js',
+        'js/reminder-notifications.js',
         'js/icon-sidebar-git.js',
         'js/icon-sidebar-toggle.js',
         'js/folder-hierarchy.js',

@@ -58,6 +58,23 @@ self.addEventListener('install', (event) => {
   event.waitUntil(self.skipWaiting());
 });
 
+// A reminder notification shown through the service worker (Chrome on
+// Android, js/reminder-notifications.js): a tap brings Poznote to the front
+// on the note, in an open tab when there is one.
+self.addEventListener('notificationclick', (event) => {
+  const url = event.notification.data && event.notification.data.url;
+  event.notification.close();
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    if (windows.length) {
+      const client = await windows[0].focus();
+      if (url && client) await client.navigate(url);
+      return;
+    }
+    if (url) await self.clients.openWindow(url);
+  })());
+});
+
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const cacheNames = await caches.keys();

@@ -1,5 +1,5 @@
 (function () {
-    var POLL_INTERVAL = 45000;
+    var POLL_INTERVAL = 30000;
     var labels = window.NOTIFICATIONS_TXT || {};
 
     function parseReminderDate(value) {
