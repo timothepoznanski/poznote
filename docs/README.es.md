@@ -574,6 +574,19 @@ Usa `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` si quieres ocultar el formulario lo
 
 > **Cambio incompatible:** los antiguos ajustes de OIDC en `.env` ya no se leen, salvo `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET` y `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`. Tras actualizar, vuelve a introducir los demás ajustes de OIDC desde la página de administración.
 
+#### URL que hay que registrar en tu proveedor de identidad
+
+Al crear la aplicación (cliente) en tu proveedor de identidad, registra la primera URL de abajo como URI de redirección (también llamada URL de callback), y la segunda como URI de redirección tras cerrar sesión si tu proveedor la pide:
+
+```text
+https://YOUR_SERVER/oidc_callback.php
+https://YOUR_SERVER/login.php
+```
+
+Poznote construye ambas a partir del nombre de host por el que llega la petición, siempre con `https://`. Si tu proveedor necesita otra cosa, define **URI de redirección** o **URI de redirección tras cerrar sesión** en la sección Avanzado de la página de administración de OIDC, y registra exactamente ese valor.
+
+Por lo general no hace falta rellenar la URL de descubrimiento: Poznote añade `/.well-known/openid-configuration` a la **URL del emisor**. Con Authentik, por ejemplo, el emisor es `https://AUTHENTIK_HOST/application/o/APPLICATION_SLUG/`. Define **URL de descubrimiento** solo si tu proveedor publica ese documento en otro lugar.
+
 #### Ejemplo de control de acceso (grupos + aprovisionamiento automático)
 
 Desde la página de administración de OIDC, configura:

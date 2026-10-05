@@ -574,6 +574,19 @@ POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false
 
 > **호환성 변경:** `.env`의 기존 OIDC 설정은 `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET`, `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` 외에는 읽지 않습니다. 업데이트 후 나머지는 관리자 페이지에서 다시 입력하세요.
 
+#### 인증 제공업체에 등록할 URL
+
+인증 제공업체에서 애플리케이션(클라이언트)을 만들 때 아래 첫 번째 URL을 리디렉션 URI(콜백 URL)로 등록하고, 제공업체가 요구하면 두 번째 URL을 로그아웃 후 리디렉션 URI로 등록하세요.
+
+```text
+https://YOUR_SERVER/oidc_callback.php
+https://YOUR_SERVER/login.php
+```
+
+Poznote는 요청이 들어온 호스트 이름으로 두 URL을 만들며 항상 `https://`를 사용합니다. 제공업체에 다른 값이 필요하면 OIDC 관리 페이지의 고급 섹션에서 **리디렉션 URI** 또는 **로그아웃 후 리디렉션 URI**를 설정하고 정확히 그 값을 등록하세요.
+
+디스커버리 URL은 보통 입력할 필요가 없습니다. Poznote가 **발급자 URL** 뒤에 `/.well-known/openid-configuration`을 붙입니다. 예를 들어 Authentik의 발급자는 `https://AUTHENTIK_HOST/application/o/APPLICATION_SLUG/`입니다. 제공업체가 이 문서를 다른 위치에 게시할 때만 **디스커버리 URL**을 설정하세요.
+
 #### 접근 제어 예시(그룹 + 자동 생성)
 
 OIDC 관리자 페이지에서 다음을 설정하세요.

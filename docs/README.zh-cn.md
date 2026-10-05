@@ -574,6 +574,19 @@ POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false
 
 > **破坏性变更：** `.env` 中以前的 OIDC 设置不再被读取，`POZNOTE_OIDC_CLIENT_ID`、`POZNOTE_OIDC_CLIENT_SECRET` 和 `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN` 除外。升级后，请在管理页面中重新填写其他 OIDC 设置。
 
+#### 需要在身份提供商处登记的 URL
+
+在身份提供商处创建应用（客户端）时，请将下面第一个 URL 登记为重定向 URI（也称回调 URL）；如果提供商要求，再将第二个登记为注销后重定向 URI：
+
+```text
+https://YOUR_SERVER/oidc_callback.php
+https://YOUR_SERVER/login.php
+```
+
+Poznote 根据请求到达的主机名生成这两个地址，并且始终使用 `https://`。如果您的提供商需要其他值，请在 OIDC 管理页面的高级部分设置 **重定向 URI** 或 **注销后重定向 URI**，并登记完全相同的值。
+
+发现 URL 通常无需填写：Poznote 会在 **Issuer URL** 后追加 `/.well-known/openid-configuration`。例如使用 Authentik 时，issuer 为 `https://AUTHENTIK_HOST/application/o/APPLICATION_SLUG/`。只有当提供商把该文档发布在其他位置时才需要设置 **发现 URL**。
+
 #### 访问控制示例（组 + 自动创建）
 
 在 OIDC 管理页面中配置：

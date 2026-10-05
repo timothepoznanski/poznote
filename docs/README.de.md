@@ -574,6 +574,19 @@ Verwenden Sie `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, wenn Sie das lokale Form
 
 > **Inkompatible Änderung:** Frühere OIDC-Einstellungen in `.env` werden nicht mehr gelesen, mit Ausnahme von `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET` und `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`. Geben Sie die übrigen OIDC-Einstellungen nach dem Upgrade auf der Administrationsseite erneut ein.
 
+#### URLs, die beim Identitätsanbieter einzutragen sind
+
+Wenn Sie die Anwendung (den Client) bei Ihrem Identitätsanbieter anlegen, tragen Sie die erste URL unten als Redirect-URI (auch Callback-URL genannt) ein und die zweite als Post-Logout-Redirect-URI, falls Ihr Anbieter danach fragt:
+
+```text
+https://YOUR_SERVER/oidc_callback.php
+https://YOUR_SERVER/login.php
+```
+
+Poznote bildet beide aus dem Hostnamen, über den die Anfrage eintrifft, immer mit `https://`. Braucht Ihr Anbieter etwas anderes, setzen Sie **Redirect-URI** oder **Post-Logout-Redirect-URI** im Abschnitt Erweitert der OIDC-Administrationsseite und tragen Sie genau diesen Wert ein.
+
+Die Discovery-URL muss in der Regel nicht ausgefüllt werden: Poznote hängt `/.well-known/openid-configuration` an die **Issuer-URL** an. Bei Authentik lautet der Issuer zum Beispiel `https://AUTHENTIK_HOST/application/o/APPLICATION_SLUG/`. Setzen Sie **Discovery-URL** nur, wenn Ihr Anbieter dieses Dokument an anderer Stelle veröffentlicht.
+
 #### Beispiel für Zugriffskontrolle (Gruppen + automatisches Anlegen)
 
 Konfigurieren Sie auf der OIDC-Administrationsseite:

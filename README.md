@@ -574,6 +574,19 @@ Use `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true` if you want to hide the local usern
 
 > **Breaking change:** previous OIDC settings in `.env` are no longer read, except `POZNOTE_OIDC_CLIENT_ID`, `POZNOTE_OIDC_CLIENT_SECRET`, and `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN`. After upgrading, re-enter the other OIDC settings from the admin page.
 
+#### URLs to register with your identity provider
+
+When you create the application (client) in your identity provider, register the first URL below as the redirect URI (also called callback URL), and the second one as the post-logout redirect URI if your provider asks for it:
+
+```text
+https://YOUR_SERVER/oidc_callback.php
+https://YOUR_SERVER/login.php
+```
+
+Poznote builds both from the host name the request arrives on, always with `https://`. If your provider needs something else, set **Redirect URI** or **Post-logout redirect URI** in the Advanced section of the OIDC admin page, and register that exact value.
+
+The discovery URL does not usually need to be filled in: Poznote appends `/.well-known/openid-configuration` to the **Issuer URL**. With Authentik, for example, the issuer is `https://AUTHENTIK_HOST/application/o/APPLICATION_SLUG/`. Set **Discovery URL** only if your provider publishes that document somewhere else.
+
 #### Access Control Example (Groups + Auto-Provision)
 
 From the OIDC admin page, configure:
