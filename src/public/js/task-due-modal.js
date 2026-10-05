@@ -331,7 +331,8 @@
             taskText: opts.task.text || '',
             day: due ? due.substring(0, 10) : '',
             time: (due && due.length > 10) ? due.substring(11, 16) : '',
-            remind: !!opts.task.dueReminder,
+            // A new due date reminds by default; an existing one keeps its choice
+            remind: due ? !!opts.task.dueReminder : true,
             email: opts.task.dueReminderEmail !== undefined ? !!opts.task.dueReminderEmail : true,
             hadDue: !!due,
             onSave: opts.onSave
