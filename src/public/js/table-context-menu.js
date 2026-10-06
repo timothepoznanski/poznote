@@ -56,6 +56,7 @@
             { label: tr('table.context_menu.reset_column_widths', 'Reset column widths'), action: 'resetColumnWidths', icon: '↔', id: 'resetColumnWidths' },
             { label: tr('table.context_menu.fit_to_content', 'Fit table to content'), action: 'fitTable', icon: '→←', id: 'fitTable' },
             { label: tr('table.context_menu.full_width', 'Full-width table'), action: 'fullWidthTable', icon: '←→', id: 'fullWidthTable' },
+            { formulas: true },
             { separator: true },
             { label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true },
             { label: tr('table.context_menu.delete_column', 'Delete column'), action: 'deleteCol', icon: '🗑️', danger: true },
@@ -68,6 +69,11 @@
                 contextMenu.appendChild(createAlignRow('column', pickAlignment));
                 contextMenu.appendChild(createAlignRow('row', pickAlignment));
                 contextMenu.appendChild(createAlignRow('cell', pickAlignment));
+            } else if (item.formulas) {
+                contextMenu.appendChild(createFormulaItem(formula => {
+                    executeTableAction('formula', formula);
+                    hideTableContextMenu();
+                }));
             } else if (item.separator) {
                 const separator = document.createElement('div');
                 separator.className = 'table-context-menu-separator';
@@ -142,6 +148,120 @@
     }
 
     /**
+     * A menu entry that opens a submenu beside it, on hover and on click
+     * (touch screens). Returns the entry and the submenu to fill.
+     */
+    function createSubmenuItem(icon, label) {
+        const item = document.createElement('div');
+        item.className = 'table-context-menu-item table-context-menu-parent';
+        item.innerHTML = `<span style="width:20px;text-align:center">${icon}</span><span>${label}</span><span class="table-context-menu-chevron">›</span>`;
+
+        const submenu = document.createElement('div');
+        submenu.className = 'table-context-menu-submenu';
+        item.appendChild(submenu);
+
+        const open = () => {
+            // A submenu of a submenu keeps going the way its parent went, so
+            // it does not come back over the menu
+            const parentFlipped = !!item.parentElement.closest('.table-context-menu-parent.flip');
+            item.classList.toggle('flip', parentFlipped);
+            submenu.style.top = '';
+            item.classList.add('open');
+            let rect = submenu.getBoundingClientRect();
+            if (parentFlipped ? rect.left < 0 : rect.right > window.innerWidth) {
+                item.classList.toggle('flip', !parentFlipped);
+                rect = submenu.getBoundingClientRect();
+            }
+            if (rect.bottom > window.innerHeight) {
+                submenu.style.top = (submenu.offsetTop - (rect.bottom - window.innerHeight) - 10) + 'px';
+            }
+        };
+        item.addEventListener('mouseenter', open);
+        item.addEventListener('mouseleave', () => item.classList.remove('open'));
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            open();
+        });
+        return { item, submenu };
+    }
+
+    /**
+     * Builds the "Formulas" entry: a Column and a Row submenu holding the
+     * same formulas, computed over the column or the row of the cell that
+     * was right-clicked and written in that cell (js/table-formulas.js).
+     * Each entry shows the mark its cell gets in the note (css/table-picker.css).
+     * onPick receives the formula, null to remove it.
+     */
+    function createFormulaItem(onPick) {
+        const formulas = createSubmenuItem('Σ', tr('table.context_menu.formulas', 'Formulas'));
+        formulas.item.dataset.item = 'formulas';
+
+        const addEntry = (parent, formula, icon, label) => {
+            const el = document.createElement('div');
+            el.className = 'table-context-menu-item';
+            if (formula) {
+                el.dataset.formula = formula;
+                el.innerHTML = `<span class="table-context-menu-formula-mark">${icon}</span><span>${label}</span>`;
+            } else {
+                el.dataset.item = 'removeFormula';
+                el.textContent = label;
+            }
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                formulas.item.querySelectorAll('.open').forEach(opened => opened.classList.remove('open'));
+                formulas.item.classList.remove('open');
+                onPick(formula);
+            });
+            parent.appendChild(el);
+        };
+
+        const kinds = [
+            { kind: 'sum', icon: 'Σ', label: tr('table.context_menu.formula_sum', 'Sum') },
+            { kind: 'avg', icon: 'x̄', label: tr('table.context_menu.formula_avg', 'Average') },
+            { kind: 'min', icon: 'min', label: tr('table.context_menu.formula_min', 'Minimum') },
+            { kind: 'max', icon: 'max', label: tr('table.context_menu.formula_max', 'Maximum') },
+            { kind: 'count', icon: '#', label: tr('table.context_menu.formula_count', 'Count') },
+            { kind: 'prod', icon: '×', label: tr('table.context_menu.formula_product', 'Product') }
+        ];
+        [
+            { axis: 'col', icon: '↕', label: tr('table.context_menu.formula_column', 'Column') },
+            { axis: 'row', icon: '↔', label: tr('table.context_menu.formula_row', 'Row') }
+        ].forEach(axis => {
+            const group = createSubmenuItem(axis.icon, axis.label);
+            kinds.forEach(entry => addEntry(group.submenu, entry.kind + '-' + axis.axis, entry.icon, entry.label));
+            formulas.submenu.appendChild(group.item);
+        });
+
+        const separator = document.createElement('div');
+        separator.className = 'table-context-menu-separator';
+        separator.dataset.item = 'removeFormula';
+        formulas.submenu.appendChild(separator);
+        addEntry(formulas.submenu, null, '', tr('table.context_menu.formula_remove', 'Remove the formula'));
+
+        return formulas.item;
+    }
+
+    /**
+     * Shows the Formulas entry on body cells only, with the cell's current
+     * formula highlighted and "Remove the formula" when it has one
+     */
+    function refreshFormulaItem(menu, formula, available) {
+        const item = menu.querySelector('[data-item="formulas"]');
+        if (!item) return;
+        item.classList.remove('open');
+        item.querySelectorAll('.open').forEach(opened => opened.classList.remove('open'));
+        item.style.display = available && window.pzTableFormulas ? '' : 'none';
+        item.querySelectorAll('[data-formula]').forEach(el => {
+            el.classList.toggle('active', el.dataset.formula === formula);
+        });
+        item.querySelectorAll('[data-item="removeFormula"]').forEach(el => {
+            el.style.display = formula ? '' : 'none';
+        });
+    }
+
+    /**
      * Reflects the table under the pointer in the menu (current alignment,
      * width reset only offered when some width was set, table width options
      * other than the current one)
@@ -160,6 +280,7 @@
     function refreshTableContextMenu(menu, table, cell) {
         const columns = window.pzTableColumns;
         refreshAlignButtons(menu, table, cell);
+        refreshFormulaItem(menu, window.pzTableFormulas ? window.pzTableFormulas.readFormula(cell) : null, cell.tagName === 'TD');
         const reset = menu.querySelector('[data-item="resetColumnWidths"]');
         if (reset) {
             reset.style.display = columns && columns.hasColumnWidths(table) ? '' : 'none';
@@ -259,6 +380,9 @@
             case 'fitTable':
             case 'fullWidthTable':
                 if (!window.pzTableColumns || !window.pzTableColumns.setTableWidthMode(activeTable, action === 'fitTable' ? 'fit' : 'full')) return;
+                break;
+            case 'formula':
+                if (!window.pzTableFormulas || !window.pzTableFormulas.setFormula(activeTable, activeCell, value)) return;
                 break;
             case 'deleteTable':
                 // Asynchronous (styled confirmation): it saves the note itself
@@ -481,6 +605,9 @@
         menuItems.push({ separator: true });
         // Markdown only knows column alignment (the separator row), not rows
         menuItems.push({ align: true });
+        if (!isHeader) {
+            menuItems.push({ formulas: true });
+        }
         menuItems.push({ separator: true });
         if (!isHeader) {
             menuItems.push({ label: tr('table.context_menu.delete_row', 'Delete row'), action: 'deleteRow', icon: '🗑️', danger: true });
@@ -492,6 +619,8 @@
         menuItems.forEach(item => {
             if (item.align) {
                 mdContextMenu.appendChild(createAlignRow('column', (scope, align) => runMdTableAction('align', align)));
+            } else if (item.formulas) {
+                mdContextMenu.appendChild(createFormulaItem(formula => runMdTableAction('formula', formula)));
             } else if (item.separator) {
                 const sep = document.createElement('div');
                 sep.className = 'table-context-menu-separator';
@@ -523,6 +652,7 @@
 
         const menu = createMdTableContextMenu(isHeader);
         refreshAlignButtons(menu, table, cell);
+        refreshFormulaItem(menu, cell.getAttribute('data-md-formula'), !isHeader);
         menu.style.display = 'block';
 
         let left = x, top = y;
@@ -796,6 +926,19 @@
                 if (cellIndex >= cells.length) return;
                 cells[cellIndex] = value === 'center' ? ':---:' : (value === 'right' ? '---:' : ':---');
                 lines[sepLine] = '| ' + cells.join(' | ') + ' |';
+                break;
+            }
+            case 'formula': {
+                // The source cell holds the formula (=SUM(col)); removing it
+                // leaves the value that was displayed
+                if (rowIndex === 0 || !window.pzTableFormulas) return;
+                const line = tableStart + tableLineIndex;
+                const cells = getMarkdownTableCells(lines[line]);
+                if (cellIndex >= cells.length) return;
+                cells[cellIndex] = value
+                    ? window.pzTableFormulas.markdownToken(value)
+                    : mdActiveCell.textContent.trim();
+                lines[line] = '| ' + cells.join(' | ') + ' |';
                 break;
             }
             case 'deleteTable': {

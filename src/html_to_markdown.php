@@ -10,6 +10,19 @@
  */
 
 /**
+ * Markdown source cell for a rich-text formula cell (data-formula value),
+ * the form markdown_parser.php reads back
+ */
+function poznoteHtmlToMarkdownFormulaToken($formula) {
+    $names = ['sum' => 'SUM', 'avg' => 'AVG', 'min' => 'MIN', 'max' => 'MAX', 'count' => 'COUNT', 'prod' => 'PRODUCT'];
+    $parts = explode('-', (string)$formula);
+    if (count($parts) !== 2 || !isset($names[$parts[0]]) || !in_array($parts[1], ['col', 'row'], true)) {
+        return '';
+    }
+    return '=' . $names[$parts[0]] . '(' . $parts[1] . ')';
+}
+
+/**
  * Inline tags kept when reducing a list item to text. List rules run before
  * the inline rules, so these have to survive that step to become **bold**,
  * *italic*, `code` and links; the whitelist matches the one the inline rules
@@ -86,9 +99,13 @@ function poznoteHtmlToMarkdown(string $html): string {
         preg_match_all('/<tr[^>]*>(.*?)<\/tr>/is', $tableHtml, $rowMatches);
         foreach ($rowMatches[1] as $rowHtml) {
             $cells = [];
-            preg_match_all('/<(?:th|td)[^>]*>(.*?)<\/(?:th|td)>/is', $rowHtml, $cellMatches);
-            foreach ($cellMatches[1] as $cellHtml) {
-                $cells[] = trim(strip_tags($cellHtml));
+            preg_match_all('/<(?:th|td)([^>]*)>(.*?)<\/(?:th|td)>/is', $rowHtml, $cellMatches);
+            foreach ($cellMatches[2] as $cellIndex => $cellHtml) {
+                // A formula cell goes back to its Markdown form, =SUM(col)
+                $formulaToken = preg_match('/\bdata-formula=["\']([a-z-]+)["\']/i', $cellMatches[1][$cellIndex], $formulaMatch)
+                    ? poznoteHtmlToMarkdownFormulaToken(strtolower($formulaMatch[1]))
+                    : '';
+                $cells[] = $formulaToken !== '' ? $formulaToken : trim(strip_tags($cellHtml));
             }
             if (!empty($cells)) $rows[] = $cells;
         }

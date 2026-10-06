@@ -695,7 +695,9 @@ function _mdRenderTableHtml(tableRows, tableAlignments, tableStartLine, renderCe
         for (var c = 0; c < row.cells.length; c++) {
             var alignment = tableAlignments[c];
             var alignAttr = alignment ? ' style="text-align: ' + alignment + ';"' : '';
-            tableHtml += '<' + cellTag + alignAttr + '>' + renderCell(row.cells[c]) + '</' + cellTag + '>';
+            // Formula cells (js/table-formulas.js) are marked for the table menu
+            var formulaAttr = row.formulas && row.formulas[c] ? ' data-md-formula="' + row.formulas[c] + '"' : '';
+            tableHtml += '<' + cellTag + alignAttr + formulaAttr + '>' + renderCell(row.cells[c]) + '</' + cellTag + '>';
         }
         tableHtml += '</tr>';
     }
@@ -1911,6 +1913,10 @@ function parseMarkdown(text) {
             i--; // Adjust because the for loop will increment
 
             if (tableRows.length > 0) {
+                // =SUM(col), =AVG(row)... cells show their value
+                if (typeof window !== 'undefined' && window.pzTableFormulas) {
+                    window.pzTableFormulas.resolveMarkdownRows(tableRows);
+                }
                 result.push(_mdRenderTableHtml(tableRows, tableAlignments, tableStartLine, applyInlineStyles));
             }
             continue;

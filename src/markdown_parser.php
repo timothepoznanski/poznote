@@ -221,6 +221,286 @@ function getMarkdownTableAlignments($line) {
     }, getMarkdownTableCells($line));
 }
 
+/*
+ * Table formulas (discussion #1586): a cell holding =SUM(col), =AVG(row),
+ * =MIN(col), =MAX(row), =COUNT(col) or =PRODUCT(row) shows the sum, average,
+ * minimum, maximum, count or product of its column or row.
+ * Same rules as js/table-formulas.js, which renders the preview: keep the
+ * two in step.
+ */
+
+/**
+ * Reads a source cell such as "=SUM(col)" or "**=avg(row)**".
+ * @return array{formula:string,open:string,close:string}|null
+ */
+function parseMarkdownTableFormulaToken($text) {
+    if (!preg_match('/^([*_~]*)=\s*(sum|avg|average|min|max|count|prod|product)\s*\(\s*(col|column|row)\s*\)([*_~]*)$/i', trim((string)$text), $m)) {
+        return null;
+    }
+    $name = strtolower($m[2]);
+    $kind = $name === 'average' ? 'avg' : ($name === 'product' ? 'prod' : $name);
+    return [
+        'formula' => $kind . '-' . (strtolower($m[3]) === 'row' ? 'row' : 'col'),
+        'open' => $m[1],
+        'close' => $m[4],
+    ];
+}
+
+/**
+ * Reads a cell as a number: "1 234,56 €", "$1,234.56", "-12", "45%".
+ * Anything else around the digits ("Phase 2", "3 kg", a date) is text.
+ * @return array{value:float,decimals:int,comma:bool,prefix:string,suffix:string}|null
+ */
+function parseTableFormulaNumber($text) {
+    $s = trim((string)preg_replace('/[\s\x{00a0}\x{202f}\x{2009}]+/u', ' ', (string)$text));
+    $s = trim((string)preg_replace('/^[*_~`]+|[*_~`]+$/', '', $s));
+    if (!preg_match('/^([-+\x{2212}]?)\s*(\p{Sc}|[A-Z]{3})?(\s*)([-+\x{2212}]?)\s*(\d(?:[\d.,\' ]*\d)?|[.,]\d+)(\s*)(%|\p{Sc}|[A-Z]{3})?$/u', $s, $m)) {
+        return null;
+    }
+    $m += array_fill(0, 8, '');
+    if ($m[1] !== '' && $m[4] !== '') {
+        return null;
+    }
+
+    $body = $m[5];
+    $dots = substr_count($body, '.');
+    $commas = substr_count($body, ',');
+    $decimalSep = '';
+    if ($dots && $commas) {
+        $decimalSep = strrpos($body, '.') > strrpos($body, ',') ? '.' : ',';
+    } elseif ($commas === 1 && !preg_match('/^\d{1,3},\d{3}$/', $body)) {
+        $decimalSep = ',';
+    } elseif ($dots === 1) {
+        $decimalSep = '.';
+    }
+
+    $cut = $decimalSep !== '' ? strrpos($body, $decimalSep) : strlen($body);
+    $whole = substr($body, 0, $cut);
+    $fraction = (string)substr($body, $cut + 1);
+    // Separators left in the whole part must group thousands, which keeps
+    // dates and phone numbers out
+    if (!preg_match('/^\d*$/', $whole) && !preg_match('/^\d{1,3}(?:[.,\' ]\d{3})+$/', $whole)) {
+        return null;
+    }
+    if (!preg_match('/^\d*$/', $fraction)) {
+        return null;
+    }
+
+    $digits = (string)preg_replace('/\D/', '', $whole);
+    $value = (float)(($digits !== '' ? $digits : '0') . '.' . ($fraction !== '' ? $fraction : '0'));
+    $sign = $m[1] !== '' ? $m[1] : $m[4];
+    if ($sign === '-' || $sign === "\u{2212}") {
+        $value = -$value;
+    }
+
+    return [
+        'value' => $value,
+        'decimals' => strlen($fraction),
+        'comma' => $decimalSep === ',',
+        'prefix' => $m[2] !== '' ? $m[2] . $m[3] : '',
+        'suffix' => $m[7] !== '' ? $m[6] . $m[7] : '',
+    ];
+}
+
+/**
+ * Whether the numbers carry different currencies or units ("2 €" and "$3",
+ * or euros and a percentage): no total of those means anything
+ */
+function hasTableFormulaMixedUnits(array $numbers) {
+    $unit = null;
+    foreach ($numbers as $n) {
+        $own = trim($n['prefix']) !== '' ? trim($n['prefix']) : trim($n['suffix']);
+        if ($own === '') {
+            continue;
+        }
+        if ($unit === null) {
+            $unit = $own;
+        } elseif ($own !== $unit) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * What a formula cell shows when its cells cannot be computed together
+ */
+function getTableFormulaIncompatibleText() {
+    $fallback = 'Incompatible formula';
+    return function_exists('t') ? t('table.context_menu.formula_incompatible', [], $fallback) : $fallback;
+}
+
+/**
+ * The one currency (or unit sign) found among the numbers, '' when they
+ * disagree. A product reads "2" x "2,50 €" as euros.
+ */
+function getTableFormulaCommonAffix(array $numbers, $key, $ignoreEmpty) {
+    $found = null;
+    foreach ($numbers as $n) {
+        if ($ignoreEmpty && $n[$key] === '') {
+            continue;
+        }
+        if ($found === null) {
+            $found = $n[$key];
+        } elseif (trim($found) !== trim($n[$key])) {
+            return '';
+        }
+    }
+    return $found ?? '';
+}
+
+/**
+ * The text a formula cell shows for the given cells of its line. The result
+ * takes the decimals, decimal separator and currency of the cells.
+ */
+function computeTableFormula($formula, array $texts) {
+    $kind = explode('-', $formula)[0];
+    $numbers = [];
+    foreach ($texts as $text) {
+        $parsed = parseTableFormulaNumber($text);
+        if ($parsed === null) {
+            continue;
+        }
+        // In a product a percentage is a rate: 200 x 20% is 40
+        if ($kind === 'prod' && trim($parsed['suffix']) === '%') {
+            $parsed['value'] /= 100;
+            $parsed['rate_decimals'] = 2;
+            $parsed['suffix'] = '';
+        }
+        $numbers[] = $parsed;
+    }
+    if ($kind === 'count') {
+        return (string)count($numbers);
+    }
+    if (!$numbers) {
+        return '0';
+    }
+    if (hasTableFormulaMixedUnits($numbers)) {
+        return getTableFormulaIncompatibleText();
+    }
+
+    $value = $kind === 'prod' ? 1.0 : (($kind === 'min' || $kind === 'max') ? $numbers[0]['value'] : 0.0);
+    $inputDecimals = 0;
+    $decimalsTotal = 0;
+    $comma = null;
+    foreach ($numbers as $n) {
+        if ($kind === 'prod') {
+            $value *= $n['value'];
+        } elseif ($kind === 'min') {
+            $value = min($value, $n['value']);
+        } elseif ($kind === 'max') {
+            $value = max($value, $n['value']);
+        } else {
+            $value += $n['value'];
+        }
+        $inputDecimals = max($inputDecimals, $n['decimals']);
+        $decimalsTotal += $n['decimals'] + ($n['rate_decimals'] ?? 0);
+        if ($comma === null && $n['decimals']) {
+            $comma = $n['comma'];
+        }
+    }
+    if ($kind === 'avg') {
+        $value /= count($numbers);
+    }
+    $inputDecimals = min($inputDecimals, 10);
+
+    $decimals = $inputDecimals;
+    if ($kind === 'avg') {
+        $decimals = max($inputDecimals, 2);
+    } elseif ($kind === 'prod') {
+        $decimals = min($decimalsTotal, 10);
+    }
+    $out = number_format(abs($value), $decimals, '.', '');
+    // An average or a product only keeps the extra decimals it needs
+    while ($decimals > $inputDecimals && substr($out, -1) === '0') {
+        $out = substr($out, 0, -1);
+        $decimals--;
+    }
+    if (substr($out, -1) === '.') {
+        $out = substr($out, 0, -1);
+    }
+
+    $negative = $value < 0 && (float)$out != 0.0;
+    if ($comma) {
+        $out = str_replace('.', ',', $out);
+    }
+
+    return ($negative ? '-' : '')
+        . getTableFormulaCommonAffix($numbers, 'prefix', $kind === 'prod')
+        . $out
+        . getTableFormulaCommonAffix($numbers, 'suffix', $kind === 'prod');
+}
+
+/**
+ * Replaces the formula cells of a parsed table (rows of cells + is_header)
+ * with their value and records them under 'formulas'. A formula skips the
+ * header row and the other formulas of its own direction, so a total never
+ * counts the average next to it, while a column total does add up the row
+ * totals above it; hence the few passes.
+ */
+function resolveMarkdownTableFormulas(array $tableRows) {
+    $entries = [];
+    $text = [];
+    $formula = [];
+    foreach ($tableRows as $r => $row) {
+        $isHeader = ($r === 0 && !empty($row['is_header']));
+        foreach ($row['cells'] as $c => $cell) {
+            $token = $isHeader ? null : parseMarkdownTableFormulaToken($cell);
+            $text[$r][$c] = $token ? '' : $cell;
+            $formula[$r][$c] = $token ? $token['formula'] : null;
+            if ($token) {
+                $entries[] = [$r, $c, $token];
+            }
+        }
+    }
+    if (!$entries) {
+        return $tableRows;
+    }
+
+    for ($pass = 0; $pass < 4; $pass++) {
+        $changed = false;
+        foreach ($entries as [$r, $c, $token]) {
+            $byRow = substr($token['formula'], -3) === 'row';
+            $texts = [];
+            if ($byRow) {
+                foreach ($text[$r] as $oc => $otherText) {
+                    $other = $formula[$r][$oc];
+                    if ($oc === $c || ($other !== null && substr($other, -3) === 'row')) {
+                        continue;
+                    }
+                    $texts[] = $otherText;
+                }
+            } else {
+                foreach ($text as $or => $rowTexts) {
+                    $isHeader = ($or === 0 && !empty($tableRows[0]['is_header']));
+                    if ($or === $r || $isHeader || !array_key_exists($c, $rowTexts)) {
+                        continue;
+                    }
+                    $other = $formula[$or][$c];
+                    if ($other !== null && substr($other, -3) !== 'row') {
+                        continue;
+                    }
+                    $texts[] = $rowTexts[$c];
+                }
+            }
+            $value = computeTableFormula($token['formula'], $texts);
+            if ($value !== $text[$r][$c]) {
+                $text[$r][$c] = $value;
+                $changed = true;
+            }
+        }
+        if (!$changed) {
+            break;
+        }
+    }
+
+    foreach ($entries as [$r, $c, $token]) {
+        $tableRows[$r]['cells'][$c] = $token['open'] . $text[$r][$c] . $token['close'];
+        $tableRows[$r]['formulas'][$c] = $token['formula'];
+    }
+    return $tableRows;
+}
+
 function renderMarkdownMermaidBlock($source) {
     $mermaidSource = trim(html_entity_decode((string)$source, ENT_QUOTES, 'UTF-8'));
     $escapedSource = htmlspecialchars($mermaidSource, ENT_QUOTES, 'UTF-8');
@@ -1395,6 +1675,8 @@ function parseMarkdown($text) {
             
             // Generate HTML table
             if (count($tableRows) > 0) {
+                // =SUM(col), =AVG(row)... cells show their value
+                $tableRows = resolveMarkdownTableFormulas($tableRows);
                 $tableHTML = '<table>';
                 
                 // Process rows
@@ -1408,7 +1690,9 @@ function parseMarkdown($text) {
                         $cellContent = $applyInlineStyles($row[$c]);
                         $alignment = isset($tableAlignments[$c]) ? $tableAlignments[$c] : '';
                         $alignAttr = $alignment !== '' ? ' style="text-align: ' . $alignment . ';"' : '';
-                        $tableHTML .= '<' . $cellTag . $alignAttr . '>' . $cellContent . '</' . $cellTag . '>';
+                        // Kept by a rich-text note the Markdown is converted to
+                        $formulaAttr = isset($tableRows[$r]['formulas'][$c]) ? ' data-formula="' . $tableRows[$r]['formulas'][$c] . '"' : '';
+                        $tableHTML .= '<' . $cellTag . $alignAttr . $formulaAttr . '>' . $cellContent . '</' . $cellTag . '>';
                     }
                     $tableHTML .= '</tr>';
                 }

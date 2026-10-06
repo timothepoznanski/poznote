@@ -194,6 +194,54 @@
     margin: 4px 0;
 }
 
+/* Formulas: entries that open a submenu beside the menu (two levels) */
+.table-context-menu-parent {
+    position: relative;
+}
+
+.table-context-menu-chevron {
+    margin-left: auto;
+    padding-left: 12px;
+}
+
+.table-context-menu-submenu {
+    position: absolute;
+    left: 100%;
+    top: -5px;
+    display: none;
+    min-width: 180px;
+    padding: 4px 0;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
+    white-space: nowrap;
+    cursor: default;
+}
+
+.table-context-menu-parent.open > .table-context-menu-submenu {
+    display: block;
+}
+
+.table-context-menu-parent.flip > .table-context-menu-submenu {
+    left: auto;
+    right: 100%;
+}
+
+/* The mark the formula's cell shows in the note, ahead of its name */
+.table-context-menu-formula-mark {
+    width: 28px;
+    text-align: center;
+    color: var(--pz-text-muted);
+}
+
+/* The formula the cell already holds */
+.table-context-menu-submenu .table-context-menu-item.active::after {
+    content: '✓';
+    margin-left: auto;
+    padding-left: 12px;
+}
+
 /* Align column: label + three icon buttons on one row */
 .table-context-menu-align-row {
     display: flex;
@@ -235,6 +283,72 @@
 
 .table-context-menu-align-btn.active [class*="lucide-"] {
     color: var(--pz-accent);
+}
+
+/* ── Formula cells (js/table-formulas.js) ───────────────────────────────── */
+
+/* A small mark in the corner names the formula: what it computes (Σ sum,
+   x̄ average, min, max, # count, × product) and over what (↕ the column,
+   ↔ the row). data-formula is an HTML note's cell, data-md-formula a
+   Markdown preview's. */
+.noteentry td[data-formula],
+.noteentry td[data-md-formula] {
+    position: relative;
+}
+
+.noteentry td[data-formula]::after,
+.noteentry td[data-md-formula]::after {
+    content: var(--pz-formula-kind, '') var(--pz-formula-axis, '');
+    position: absolute;
+    top: 2px;
+    right: 3px;
+    font-size: 8px;
+    font-weight: var(--pz-weight-normal);
+    font-style: normal;
+    line-height: 1;
+    color: var(--pz-text-subtle);
+    pointer-events: none;
+    user-select: none;
+}
+
+.noteentry td[data-formula^="sum-"],
+.noteentry td[data-md-formula^="sum-"] {
+    --pz-formula-kind: 'Σ';
+}
+
+.noteentry td[data-formula^="avg-"],
+.noteentry td[data-md-formula^="avg-"] {
+    --pz-formula-kind: 'x̄';
+}
+
+.noteentry td[data-formula^="min-"],
+.noteentry td[data-md-formula^="min-"] {
+    --pz-formula-kind: 'min';
+}
+
+.noteentry td[data-formula^="max-"],
+.noteentry td[data-md-formula^="max-"] {
+    --pz-formula-kind: 'max';
+}
+
+.noteentry td[data-formula^="count-"],
+.noteentry td[data-md-formula^="count-"] {
+    --pz-formula-kind: '#';
+}
+
+.noteentry td[data-formula^="prod-"],
+.noteentry td[data-md-formula^="prod-"] {
+    --pz-formula-kind: '×';
+}
+
+.noteentry td[data-formula$="-col"],
+.noteentry td[data-md-formula$="-col"] {
+    --pz-formula-axis: '↕';
+}
+
+.noteentry td[data-formula$="-row"],
+.noteentry td[data-md-formula$="-row"] {
+    --pz-formula-axis: '↔';
 }
 
 /* ── Column resize (HTML notes) ─────────────────────────────────────────── */
@@ -279,6 +393,11 @@ html[data-theme='dark'] .noteentry table th.pz-cell-selected {
 }
 
 /* Dark mode */
+html[data-theme='dark'] .table-context-menu-submenu {
+    background: var(--pz-surface);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4);
+}
+
 html[data-theme='dark'] .table-context-menu {
     background: var(--pz-bg);
     border-color: var(--pz-border);
