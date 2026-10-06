@@ -130,6 +130,7 @@
       "main_font": "Choose the font used throughout the application.",
       "markdown_font": "Choose the font used in the markdown editor.",
       "markdown_default_view_mode": "Choose whether markdown notes open in preview, edit or split mode.",
+      "markdown_new_note_view_mode": "Choose whether a new markdown note opens in split, edit or live rendering mode. Live rendering is then turned on for the other notes too. On a phone a new note never opens in split mode.",
       "font_size": "Adjust the font size of notes, sidebar, code blocks and the settings page.",
       "index_icon_scale": "Adjust the size of the icons in the note list.",
       "icon_rail_scale": "Adjust the size of the icons in the icon sidebar.",
@@ -452,6 +453,7 @@
       "main_font": "App font",
       "markdown_font": "Markdown editor font",
       "markdown_default_view_mode": "Default view mode",
+      "markdown_new_note_view_mode": "New note view mode",
       "login_display": "Login page title",
       "note_font_size": "Font size",
       "note_age_filter": "Note age filter",
@@ -1242,9 +1244,10 @@
         "edit": "Edit",
         "split": "Split (editor and preview side by side)",
         "split_short": "Split",
-        "last": "Last used mode"
+        "last": "Last used mode",
+        "live": "Live rendering"
       },
-      "hint": "A note you switch to another mode opens again in the default mode next time. New notes always open in split mode."
+      "hint": "A note you switch to another mode opens again in the default mode next time."
     },
     "diary_date_format": {
       "title": "Diary entry date format",
@@ -1766,6 +1769,17 @@
       "reset_column_widths": "Reset column widths",
       "fit_to_content": "Fit table to content",
       "full_width": "Full-width table",
+      "formulas": "Formulas",
+      "formula_column": "Column",
+      "formula_row": "Row",
+      "formula_sum": "Sum",
+      "formula_avg": "Average",
+      "formula_min": "Minimum",
+      "formula_max": "Maximum",
+      "formula_count": "Count",
+      "formula_product": "Product",
+      "formula_remove": "Remove the formula",
+      "formula_incompatible": "Incompatible formula",
       "delete_row": "Delete row",
       "delete_column": "Delete column",
       "delete_table": "Delete table",
@@ -1952,6 +1966,10 @@
       "create_linked_note": "Create shortcut",
       "search_replace": "Search and replace",
       "split_view": "Toggle split view",
+      "view_cycle_live": "Switch to live rendering",
+      "view_cycle_split": "Switch to split view",
+      "view_cycle_preview": "Back to preview mode",
+      "view_cycle_edit": "Back to edit mode",
       "save_now": "Save now",
       "go_back": "Go back",
       "go_forward": "Go forward",
@@ -4884,7 +4902,8 @@
   },
   "page_menu": {
     "button": "More options",
-    "split_view": "Split view"
+    "split_view": "Split view",
+    "markdown_view": "Markdown view (preview, live, split)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Keyboard shortcuts",

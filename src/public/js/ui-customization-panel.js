@@ -376,8 +376,8 @@
         });
     }
 
-    // The open note, for the controls that act on it: the split-view button of
-    // the stack and the entries of the menu. Called when a note is loaded, and
+    // The open note, for the controls that act on it: the view button of the
+    // stack and the entries of the menu. Called when a note is loaded, and
     // again when the menu opens, so an entry can never describe the note that
     // was open two notes ago. Everything here no-ops on the dashboard and the
     // settings pages, which open no note and render none of it. The controls
@@ -391,12 +391,41 @@
         // while another session holds the lock (js/note-edit-lock.js)
         var isLocked = !!entry && typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteId);
 
-        var splitButton = document.getElementById('edgeSplitViewBtn');
-        if (splitButton) {
-            splitButton.hidden = !isMarkdown;
-            splitButton.setAttribute('aria-pressed', isSplit ? 'true' : 'false');
-            splitButton.classList.toggle('is-active', isSplit);
-            splitButton.setAttribute('data-note-id', noteId);
+        // One button for the view of a Markdown note: it shows the state it is
+        // in and says where a click leads (cycleMarkdownView() in
+        // js/markdown-view-modes.js, which also knows a phone has no split).
+        var viewButton = document.getElementById('edgeSplitViewBtn');
+        if (viewButton) {
+            var isLive = typeof window.isMarkdownLiveEditingEnabled === 'function' && window.isMarkdownLiveEditingEnabled();
+            var viewState = isSplit ? 'split' : (isLive ? 'live' : 'classic');
+            var nextState = typeof window.getNextMarkdownViewState === 'function'
+                ? window.getNextMarkdownViewState(viewState)
+                : 'classic';
+            // Leaving the cycle goes back to where it started: the preview, or
+            // the classic editor when the pencil was on
+            if (nextState === 'classic') {
+                nextState = typeof window.getMarkdownClassicReturnMode === 'function'
+                    ? window.getMarkdownClassicReturnMode(noteId)
+                    : 'preview';
+            }
+            var viewLabel = viewButton.getAttribute('data-label-' + nextState) || '';
+            var viewIcon = viewButton.querySelector('i');
+
+            viewButton.hidden = !isMarkdown;
+            viewButton.classList.toggle('is-active', viewState !== 'classic');
+            viewButton.setAttribute('data-view-state', viewState);
+            viewButton.setAttribute('data-note-id', noteId);
+            if (viewLabel) {
+                viewButton.title = viewLabel;
+                viewButton.setAttribute('aria-label', viewLabel);
+            }
+            if (viewIcon) {
+                viewIcon.className = {
+                    classic: 'lucide lucide-file-text',
+                    live: 'devicon-markdown',
+                    split: 'lucide lucide-columns-2'
+                }[viewState];
+            }
         }
 
         var syntaxItem = document.getElementById('edgeMenuMarkdownSyntax');

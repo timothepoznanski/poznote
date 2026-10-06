@@ -120,6 +120,7 @@ $settingsPageUserKeys = [
     'markdown_split_card_view',
     'markdown_split_preview_left',
     'markdown_default_view_mode',
+    'markdown_new_note_view_mode',
     'markdown_colored',
     'markdown_colored_custom',
     'code_block_word_wrap',
@@ -1208,7 +1209,7 @@ if ($canUseUserWebhooks) {
 
             <!-- Default View Mode (preview / edit / split / last used) -->
             <div class="home-card settings-inline-card" id="markdown-default-view-mode-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode.'); ?> <?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode opens again in the default mode next time. New notes always open in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode.'); ?> <?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode opens again in the default mode next time.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
                 <div class="home-card-content">
                     <label class="home-card-title" for="markdown-default-view-mode-select"><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></label>
@@ -1217,6 +1218,20 @@ if ($canUseUserWebhooks) {
                         <option value="edit"><?php echo t_h('modals.markdown_default_view_mode.options.edit', [], 'Edit'); ?></option>
                         <option value="split"><?php echo t_h('modals.markdown_default_view_mode.options.split_short', [], 'Split'); ?></option>
                         <option value="last"><?php echo t_h('modals.markdown_default_view_mode.options.last', [], 'Last used mode'); ?></option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- View mode of a new, empty note (split / edit / live rendering) -->
+            <div class="home-card settings-inline-card" id="markdown-new-note-view-mode-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_new_note_view_mode', [], 'Choose whether a new markdown note opens in split, edit or live rendering mode. Live rendering is then turned on for the other notes too. On a phone a new note never opens in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-file-plus"></i></div>
+                <div class="home-card-content">
+                    <label class="home-card-title" for="markdown-new-note-view-mode-select"><?php echo t_h('display.cards.markdown_new_note_view_mode', [], 'New note view mode'); ?></label>
+                    <select id="markdown-new-note-view-mode-select" class="settings-inline-control settings-inline-select" data-control="markdown-new-note-view-mode-select">
+                        <option value="split"><?php echo t_h('modals.markdown_default_view_mode.options.split_short', [], 'Split'); ?></option>
+                        <option value="edit"><?php echo t_h('modals.markdown_default_view_mode.options.edit', [], 'Edit'); ?></option>
+                        <option value="live"><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live rendering'); ?></option>
                     </select>
                 </div>
             </div>

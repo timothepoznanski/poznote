@@ -85,6 +85,22 @@
         console.error('Failed to parse excalidraw context:', e);
     }
     
+    // Leaving for the note, saved or not: the notes page scrolls back to the
+    // diagram that was being edited (showReturnedExcalidrawDiagram() in
+    // js/excalidraw.js). A standalone Excalidraw note has nothing to scroll to.
+    function rememberDiagramForReturn() {
+        if (!isEmbeddedDiagram || !diagramId || !(noteId > 0)) return;
+        try {
+            sessionStorage.setItem('excalidraw_return', JSON.stringify({
+                noteId: String(noteId),
+                diagramId: String(diagramId),
+                at: Date.now()
+            }));
+        } catch (e) {
+            console.debug('excalidraw-editor: could not remember the diagram:', e);
+        }
+    }
+
     // Safer data handling
     var existingData = null;
     try {
@@ -723,6 +739,7 @@
                     // After saving, redirect back to notes
                     var params = new URLSearchParams({ workspace: workspace });
                     if (noteId > 0) params.append('note', noteId);
+                    rememberDiagramForReturn();
                     window.location.href = 'index.php?' + params.toString();
                     
                 } catch (e) {
@@ -744,6 +761,7 @@
             cancelBtn.addEventListener('click', function() {
                 var params = new URLSearchParams({ workspace: workspace });
                 if (noteId > 0) params.append('note', noteId);
+                rememberDiagramForReturn();
                 window.location.href = 'index.php?' + params.toString();
             });
         }

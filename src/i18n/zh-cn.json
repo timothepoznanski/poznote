@@ -451,6 +451,7 @@
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
       "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。",
+      "markdown_new_note_view_mode": "选择新建的 Markdown 笔记以分栏、编辑还是实时渲染模式打开。选择实时渲染后，其他笔记也会启用实时渲染。在手机上新笔记不会以分栏模式打开。",
       "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "icon_rail_scale": "调整图标侧边栏中图标的大小。",
@@ -808,6 +809,7 @@
       "main_font": "应用字体",
       "markdown_font": "Markdown 编辑器字体",
       "markdown_default_view_mode": "默认打开模式",
+      "markdown_new_note_view_mode": "新笔记打开模式",
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_age_filter": "笔记时间筛选",
@@ -1170,6 +1172,10 @@
       "open_in_new_tab": "在新标签页中打开",
       "search_replace": "查找替换",
       "split_view": "切换分屏视图",
+      "view_cycle_live": "切换到实时渲染",
+      "view_cycle_split": "切换到分屏视图",
+      "view_cycle_preview": "返回预览模式",
+      "view_cycle_edit": "返回编辑模式",
       "switch_to_edit": "切换到编辑模式",
       "switch_to_preview": "切换到预览模式",
       "save_now": "立即保存",
@@ -1709,9 +1715,10 @@
         "edit": "编辑",
         "split": "分栏（编辑器与预览并排）",
         "split_short": "分栏",
-        "last": "上次使用的模式"
+        "last": "上次使用的模式",
+        "live": "实时渲染"
       },
-      "hint": "切换到其他模式的笔记，下次打开时会恢复为默认模式。新笔记始终以分栏模式打开。"
+      "hint": "切换到其他模式的笔记，下次打开时会恢复为默认模式。"
     },
     "diary_date_format": {
       "title": "日记条目日期格式",
@@ -2249,6 +2256,17 @@
       "reset_column_widths": "重置列宽",
       "fit_to_content": "表格适应内容",
       "full_width": "表格全宽",
+      "formulas": "公式",
+      "formula_column": "列",
+      "formula_row": "行",
+      "formula_sum": "求和",
+      "formula_avg": "平均值",
+      "formula_min": "最小值",
+      "formula_max": "最大值",
+      "formula_count": "计数",
+      "formula_product": "乘积",
+      "formula_remove": "移除公式",
+      "formula_incompatible": "公式不兼容",
       "delete_row": "删除行",
       "delete_column": "删除列",
       "delete_table": "删除表格",
@@ -5145,7 +5163,8 @@
   },
   "page_menu": {
     "button": "更多选项",
-    "split_view": "分屏视图"
+    "split_view": "分屏视图",
+    "markdown_view": "Markdown 视图（预览、实时、分屏）"
   },
   "keyboard_shortcuts": {
     "menu_item": "键盘快捷键",

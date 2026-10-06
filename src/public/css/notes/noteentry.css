@@ -137,6 +137,14 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     display: none !important;
 }
 
+/* Nowhere to go that way (top of the note, bottom, or a note that fits): the
+   arrow stays in its place, dimmed, and lets the pointer through. */
+.note-scroll-edge-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
 .note-scroll-edge-btn:hover,
 .note-scroll-edge-btn:focus {
     opacity: 1;
@@ -341,6 +349,15 @@ textarea:focus {
     content-visibility: auto;
     contain-intrinsic-size: 300px 200px;
     image-rendering: auto;
+}
+
+/* Not the images CodeMirror draws in the Markdown editor: its widget buffers
+   are empty <img> of no size, and the placeholder size above made each one
+   200px tall for a frame, long enough for the second click of a double-click
+   to land on the wrong line (live rendering, discussion 1582). */
+.noteentry .cm-editor img {
+    content-visibility: visible;
+    contain-intrinsic-size: auto;
 }
 
 /* An image being uploaded into a note (js/attachments.js, js/slash-command.js):

@@ -196,8 +196,11 @@ function deleteImageAttachmentIfOwnedByNote(img, expectedNoteId) {
     fetch('/api/v1/notes/' + noteId + '/attachments', { method: 'POST', body: formData });
 }
 
+// In the preview, or in the Markdown editor's live rendering, which shows a
+// diagram through the same markup and a picture with the same index
+// (build/markdown-editor/src/main.js and live-preview.js)
 function isSourceBackedMarkdownImage(img) {
-    return !!(img && img.closest('.markdown-preview') && (
+    return !!(img && (img.closest('.markdown-preview') || img.closest('.markdown-excalidraw-render') || img.classList.contains('cm-live-image')) && (
         img.hasAttribute('data-markdown-image-index') ||
         !!img.closest('.excalidraw-container[data-markdown-excalidraw-index]')
     ));

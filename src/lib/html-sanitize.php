@@ -266,7 +266,7 @@ function sanitizeHtml($html) {
     $allowedAttrs = [
         'a' => ['href', 'title', 'target', 'rel', 'download'],
         'img' => ['src', 'alt', 'title', 'width', 'height', 'data-is-excalidraw', 'data-excalidraw-note-id'],
-        'td' => ['colspan', 'rowspan'],
+        'td' => ['colspan', 'rowspan', 'data-formula'], // data-formula: computed cells (js/table-formulas.js)
         'th' => ['colspan', 'rowspan', 'scope'],
         'ol' => ['type', 'start'], // Lettered / roman list markers (#1429), first number (#1534)
         'div' => ['class', 'data-tasklist-json', 'data-markdown-content', 'data-excalidraw', 'data-diagram-id', 'data-task-embed', 'contenteditable'],

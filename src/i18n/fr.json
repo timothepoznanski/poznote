@@ -451,6 +451,7 @@
       "main_font": "Choisissez la police utilisée dans toute l'application.",
       "markdown_font": "Choisissez la police utilisée dans l'éditeur markdown.",
       "markdown_default_view_mode": "Choisir si les notes markdown s'ouvrent en aperçu, en édition ou en vue partagée.",
+      "markdown_new_note_view_mode": "Choisir si une nouvelle note markdown s'ouvre en vue partagée, en édition ou en rendu en direct. Le rendu en direct est alors activé aussi pour les autres notes. Sur téléphone, une nouvelle note ne s'ouvre jamais en vue partagée.",
       "font_size": "Ajustez la taille de police des notes, de la barre latérale, des blocs de code et de la page des paramètres.",
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "icon_rail_scale": "Ajustez la taille des icônes de la barre d'icônes.",
@@ -809,6 +810,7 @@
       "main_font": "Police de l'application",
       "markdown_font": "Police de l'éditeur markdown",
       "markdown_default_view_mode": "Mode d'ouverture",
+      "markdown_new_note_view_mode": "Mode d'ouverture des nouvelles notes",
       "login_display": "Titre page de connexion",
       "note_font_size": "Taille de police",
       "note_age_filter": "Filtre d’ancienneté",
@@ -1162,6 +1164,10 @@
       "create_linked_note": "Créer un raccourci",
       "open_in_new_tab": "Ouvrir dans un nouvel onglet",
       "split_view": "Activer/désactiver la vue divisée",
+      "view_cycle_live": "Passer au rendu en direct",
+      "view_cycle_split": "Passer à la vue divisée",
+      "view_cycle_preview": "Revenir au mode aperçu",
+      "view_cycle_edit": "Revenir au mode édition",
       "search_replace": "Rechercher et remplacer",
       "save_now": "Enregistrer maintenant",
       "go_back": "Retour",
@@ -1723,9 +1729,10 @@
         "edit": "Édition",
         "split": "Vue partagée (éditeur et aperçu côte à côte)",
         "split_short": "Vue partagée",
-        "last": "Dernier mode utilisé"
+        "last": "Dernier mode utilisé",
+        "live": "Rendu en direct"
       },
-      "hint": "Une note passée dans un autre mode se rouvre ensuite dans le mode par défaut. Les nouvelles notes s'ouvrent toujours en vue partagée."
+      "hint": "Une note passée dans un autre mode se rouvre ensuite dans le mode par défaut."
     },
     "diary_date_format": {
       "title": "Format de date des entrées de journal",
@@ -2257,6 +2264,17 @@
       "reset_column_widths": "Réinitialiser la largeur des colonnes",
       "fit_to_content": "Ajuster le tableau au contenu",
       "full_width": "Tableau pleine largeur",
+      "formulas": "Formules",
+      "formula_column": "Colonne",
+      "formula_row": "Ligne",
+      "formula_sum": "Somme",
+      "formula_avg": "Moyenne",
+      "formula_min": "Minimum",
+      "formula_max": "Maximum",
+      "formula_count": "Nombre",
+      "formula_product": "Produit",
+      "formula_remove": "Supprimer la formule",
+      "formula_incompatible": "Formule non compatible",
       "delete_row": "Supprimer la ligne",
       "delete_column": "Supprimer la colonne",
       "delete_table": "Supprimer le tableau",
@@ -5153,7 +5171,8 @@
   },
   "page_menu": {
     "button": "Plus d'options",
-    "split_view": "Vue divisée"
+    "split_view": "Vue divisée",
+    "markdown_view": "Vue Markdown (aperçu, direct, divisée)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Raccourcis clavier",

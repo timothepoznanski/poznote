@@ -112,7 +112,6 @@ $pzShortcutKeyLabels = [
 $pzMoreMenuLabel = t_h('page_menu.button', [], 'More options');
 // Focus mode (discussion 1482): F11 or this button, see js/icon-sidebar-toggle.js
 $pzFocusModeLabel = t_h('focus_mode.button', [], 'Focus mode') . ' (F11)';
-$pzSplitViewLabel = t_h('editor.toolbar.split_view', [], 'Toggle split view');
 require_once __DIR__ . '/markdown_syntax_content.php';
 ?>
     <!-- Floating stack at the bottom-right of the page: split view, customize
@@ -122,13 +121,24 @@ require_once __DIR__ . '/markdown_syntax_content.php';
          (note_display.php) sit under it, see css/ui-customization-panel.css. -->
     <div class="pz-edge-stack">
         <?php if ($uiCustomizationPanelPage === 'notes'): ?>
-        <!-- Split view (discussion 1482): used to be a toolbar button. Hidden
-             until a Markdown note is open and lit while the split is on, both
-             from js/ui-customization-panel.js. Desktop only, like the split
-             view itself. -->
-        <button type="button" id="edgeSplitViewBtn" class="pz-edge-btn pz-edge-split-btn" data-action="toggle-split-view" aria-pressed="false" hidden
-            title="<?php echo $pzSplitViewLabel; ?>" aria-label="<?php echo $pzSplitViewLabel; ?>">
-            <i class="lucide lucide-columns-2"></i>
+        <!-- View of a Markdown note, one button cycling through its three
+             states: classic (preview, with the pencil to edit), live rendering
+             in the editor (discussion 1582, the account's markdown_live_editing
+             setting) and split view (discussion 1482). It shows the icon of
+             the state it is in, lit outside the classic one, and its title
+             says where a click leads; the last one goes back to where the
+             cycle started, the preview or the classic editor. Hidden until a
+             Markdown note is open.
+             All from js/ui-customization-panel.js; the cycle itself is
+             cycleMarkdownView() in js/markdown-view-modes.js. A phone has no
+             split view and goes classic, live, classic. -->
+        <button type="button" id="edgeSplitViewBtn" class="pz-edge-btn pz-edge-view-btn" data-action="cycle-markdown-view" hidden
+            data-label-live="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live rendering'); ?>"
+            data-label-split="<?php echo t_h('editor.toolbar.view_cycle_split', [], 'Switch to split view'); ?>"
+            data-label-preview="<?php echo t_h('editor.toolbar.view_cycle_preview', [], 'Back to preview mode'); ?>"
+            data-label-edit="<?php echo t_h('editor.toolbar.view_cycle_edit', [], 'Back to edit mode'); ?>"
+            title="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live rendering'); ?>" aria-label="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live rendering'); ?>">
+            <i class="lucide lucide-file-text"></i>
         </button>
         <?php endif; ?>
         <button type="button" id="edgeCustomizeBtn" class="pz-edge-btn" data-action="toggle-ui-customization-panel" aria-controls="uiCustomizationPanel"

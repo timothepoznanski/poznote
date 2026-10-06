@@ -695,7 +695,9 @@ function _mdRenderTableHtml(tableRows, tableAlignments, tableStartLine, renderCe
         for (var c = 0; c < row.cells.length; c++) {
             var alignment = tableAlignments[c];
             var alignAttr = alignment ? ' style="text-align: ' + alignment + ';"' : '';
-            tableHtml += '<' + cellTag + alignAttr + '>' + renderCell(row.cells[c]) + '</' + cellTag + '>';
+            // Formula cells (js/table-formulas.js) are marked for the table menu
+            var formulaAttr = row.formulas && row.formulas[c] ? ' data-md-formula="' + row.formulas[c] + '"' : '';
+            tableHtml += '<' + cellTag + alignAttr + formulaAttr + '>' + renderCell(row.cells[c]) + '</' + cellTag + '>';
         }
         tableHtml += '</tr>';
     }
@@ -1044,8 +1046,14 @@ function parseMarkdown(text) {
     // Protect inline code spans so their content is not consumed by math regexes
     let protectedRawCode = [];
     let rawCodeIndex = 0;
-    text = text.replace(/(?<!\\)`([^`\n]+?)(?<!\\)`/g, function (match, code) {
+    // A span opens on a run of backticks and closes on the next run of the same
+    // length, so a longer run can hold backticks: `` `code` ``. One space on each
+    // side is dropped, which is what lets the content start or end with a backtick.
+    text = text.replace(/(?<![\\`])(`+)(?!`)([^\n]*?[^`\n])\1(?!`)/g, function (match, ticks, code) {
         let placeholder = '\x00RAWCODE' + rawCodeIndex + '\x00';
+        if (code.length > 2 && code.charAt(0) === ' ' && code.charAt(code.length - 1) === ' ' && code.trim() !== '') {
+            code = code.slice(1, -1);
+        }
         protectedRawCode[rawCodeIndex] = code;
         rawCodeIndex++;
         return rememberPlaceholderSource(placeholder, match);
@@ -1905,6 +1913,10 @@ function parseMarkdown(text) {
             i--; // Adjust because the for loop will increment
 
             if (tableRows.length > 0) {
+                // =SUM(col), =AVG(row)... cells show their value
+                if (typeof window !== 'undefined' && window.pzTableFormulas) {
+                    window.pzTableFormulas.resolveMarkdownRows(tableRows);
+                }
                 result.push(_mdRenderTableHtml(tableRows, tableAlignments, tableStartLine, applyInlineStyles));
             }
             continue;

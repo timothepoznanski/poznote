@@ -26,6 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
+import { livePreview } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -260,23 +261,50 @@ function getExcalidrawBlocks(text) {
   return blocks
 }
 
+// The diagram itself rides along in the placeholder, as the very markup the
+// preview shows for it (same sanitizer, js/markdown-parser.js; same
+// data-markdown-excalidraw-index, which is how the image menu's actions find
+// the block in the source, js/markdown-actions.js). markdown.css shows it in
+// place of the summary while live rendering is on (.cm-live-preview,
+// ./live-preview.js) and keeps it out of the way otherwise, where
+// loading="lazy" means the picture is not even fetched.
 class ExcalidrawPlaceholderWidget extends WidgetType {
-  constructor(summary) {
+  constructor(summary, rawHtml, index) {
     super()
     this.summary = summary
+    this.rawHtml = rawHtml
+    this.index = index
   }
 
   eq(other) {
-    return other.summary === this.summary
+    return other.summary === this.summary && other.rawHtml === this.rawHtml && other.index === this.index
   }
 
-  toDOM() {
+  toDOM(view) {
     const placeholder = document.createElement('span')
     placeholder.className = 'markdown-excalidraw-placeholder'
     placeholder.setAttribute('contenteditable', 'false')
     placeholder.setAttribute('spellcheck', 'false')
     placeholder.setAttribute('data-summary', this.summary)
     placeholder.setAttribute('title', this.summary)
+
+    if (typeof window._mdSanitizeExcalidrawContainerHtml === 'function') {
+      const render = document.createElement('span')
+      render.className = 'markdown-excalidraw-render'
+      render.innerHTML = window._mdSanitizeExcalidrawContainerHtml(this.rawHtml, this.index)
+
+      const image = render.querySelector('.excalidraw-container img[src]')
+      if (image) {
+        image.draggable = false
+        image.loading = 'lazy'
+        image.addEventListener('load', () => view.requestMeasure())
+        image.addEventListener('error', () => view.requestMeasure())
+        placeholder.classList.add('has-image')
+        placeholder.removeAttribute('title')
+        placeholder.appendChild(render)
+      }
+    }
+
     return placeholder
   }
 
@@ -295,12 +323,12 @@ function buildExcalidrawDecorations(doc) {
   const text = doc.toString()
   const decorations = []
 
-  getExcalidrawBlocks(text).forEach(block => {
+  getExcalidrawBlocks(text).forEach((block, index) => {
     const lineStart = block.from === 0 || text.charAt(block.from - 1) === '\n'
     const lineEnd = block.to === text.length || text.charAt(block.to) === '\n'
 
     decorations.push(Decoration.replace({
-      widget: new ExcalidrawPlaceholderWidget(buildExcalidrawSummary(block.rawHtml)),
+      widget: new ExcalidrawPlaceholderWidget(buildExcalidrawSummary(block.rawHtml), block.rawHtml, index),
       block: lineStart && lineEnd
     }).range(block.from, block.to))
   })
@@ -931,6 +959,12 @@ function createReadOnlyExtensions(readOnly) {
   ]
 }
 
+// Live rendering (./live-preview.js) is off in the split view, whose preview
+// pane already shows the result: the caller turns it on and off as modes change.
+function createLivePreviewExtensions(enabled) {
+  return enabled ? livePreview : []
+}
+
 function isDarkThemeActive() {
   const root = document.documentElement
   return !!(
@@ -1042,6 +1076,25 @@ function setReadOnly(host, readOnly) {
   host.classList.toggle('markdown-editor-readonly', !!readOnly)
   host.setAttribute('aria-readonly', readOnly ? 'true' : 'false')
   return true
+}
+
+function setLivePreview(host, enabled) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  enabled = !!enabled
+  if (instance.livePreview === enabled) return true
+
+  instance.livePreview = enabled
+  host.classList.toggle('markdown-live-editing', enabled)
+  instance.view.dispatch({
+    effects: instance.livePreviewCompartment.reconfigure(createLivePreviewExtensions(enabled))
+  })
+  return true
+}
+
+function isLivePreview(host) {
+  const instance = getInstance(host)
+  return !!(instance && instance.livePreview)
 }
 
 function focus(host) {
@@ -1280,10 +1333,12 @@ function createEditor(host, options = {}) {
   if (existing) {
     setValue(host, options.value || '', { preserveSelection: false })
     setReadOnly(host, !!options.readOnly)
+    setLivePreview(host, !!options.livePreview)
     return existing
   }
 
   const readOnlyCompartment = new Compartment()
+  const livePreviewCompartment = new Compartment()
   const themeCompartment = new Compartment()
   const placeholderText = String(options.placeholder || '')
 
@@ -1291,6 +1346,7 @@ function createEditor(host, options = {}) {
   host.removeAttribute('contenteditable')
   host.setAttribute('data-codemirror-enabled', 'true')
   host.classList.add('markdown-codemirror-host')
+  host.classList.toggle('markdown-live-editing', !!options.livePreview)
 
   const updateListener = EditorView.updateListener.of(update => {
     if (update.selectionSet) {
@@ -1373,6 +1429,7 @@ function createEditor(host, options = {}) {
       markdownTableLinePlugin,
       markdownCodeLinePlugin,
       hangingIndentPlugin,
+      livePreviewCompartment.of(createLivePreviewExtensions(!!options.livePreview)),
       readOnlyCompartment.of(createReadOnlyExtensions(!!options.readOnly)),
       themeCompartment.of(createThemeExtensions()),
       updateListener,
@@ -1413,6 +1470,8 @@ function createEditor(host, options = {}) {
     view,
     readOnlyCompartment,
     themeCompartment,
+    livePreviewCompartment,
+    livePreview: !!options.livePreview,
     themeObserver: null
   }
   instance.themeObserver = observeThemeChanges(instance)
@@ -1438,6 +1497,7 @@ function destroyEditor(host) {
   host.removeAttribute('data-codemirror-enabled')
   host.removeAttribute('data-codemirror-value')
   host.classList.remove('markdown-codemirror-host')
+  host.classList.remove('markdown-live-editing')
   return true
 }
 
@@ -1466,6 +1526,8 @@ window.PoznoteMarkdownCodeMirror = {
   getLastActiveEditor,
   setValue,
   setReadOnly,
+  setLivePreview,
+  isLivePreview,
   focus,
   hasFocus,
   getSelectionOffsets,

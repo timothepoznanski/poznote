@@ -18,7 +18,7 @@ Poznote용 MCP(Model Context Protocol) 서버입니다. 자연어로 AI를 통�
 이 서버는 **HTTP 전송만** 지원합니다(MCP Streamable HTTP).
 
 > [!TIP]
-> Poznote 안에서 Ollama 같은 로컬 모델과 직접 채팅하려면 MCP 서버가 필요하지 않습니다. 내장 [AI 어시스턴트](AI-ASSISTANT.ko.md)를 사용하세요(**설정 → 관리 도구 → AI 어시스턴트**). MCP 서버는 MCP를 지원하는 *외부* 어시스턴트를 노트에 연결하는 용도입니다. Ollama 자체는 모델 실행 환경이며 MCP 클라이언트가 아니므로 직접 연결할 수 없습니다.
+> Poznote 안에서 Ollama 같은 로컬 모델과 직접 채팅하려면 MCP 서버가 필요하지 않습니다. 내장 [AI 어시스턴트](AI-ASSISTANT.ko.md)를 사용하세요(**설정 > 관리자 도구 > AI 어시스턴트**). MCP 서버는 MCP를 지원하는 *외부* 어시스턴트를 노트에 연결하는 용도입니다. Ollama 자체는 모델 실행 환경이며 MCP 클라이언트가 아니므로 직접 연결할 수 없습니다.
 
 <p align="center">
   <img src="mcp-poznote.gif" alt="Poznote MCP Server demo" width="100%">
@@ -288,7 +288,7 @@ MCP 서버에 네트워크로 접근해야 한다면 다음으로 보호하세�
 
 MCP 서버는 `data/.mcp_token`의 내부 Bearer 토큰으로 Poznote REST API에 연결합니다. Poznote가 자동 생성하며 Docker Compose가 `./data`를 MCP 컨테이너에 읽기 전용으로 마운트하므로 `.env`에 보관할 필요가 없습니다.
 
-이 토큰이 MCP 서버임을 식별하므로 토큰을 가진 요청이 노트 본문이나 할 일을 변경하기 직전에 스냅샷을 생성합니다(`update_note`, `add_task`, `update_task`, `complete_task`, `delete_task`, `add_subtask`, `update_subtask`, `delete_subtask`). 노트의 **수정 이력** 페이지에 “MCP 편집 전”으로 표시되어 AI 재작성으로 누락된 내용을 복원할 수 있습니다. 최신 스냅샷과 본문이 같으면 건너뛰며 노트별로 최근 편집 보호 스냅샷(AI 편집 전 및 MCP 편집 전) 20개를 보관합니다. 편집량이 많다면 **설정 → 수정 이력**에서 최대 200개로 늘릴 수 있습니다.
+이 토큰이 MCP 서버임을 식별하므로 토큰을 가진 요청이 노트 본문이나 할 일을 변경하기 직전에 스냅샷을 생성합니다(`update_note`, `add_task`, `update_task`, `complete_task`, `delete_task`, `add_subtask`, `update_subtask`, `delete_subtask`). 노트의 **수정 이력** 페이지에 “MCP 편집 전”으로 표시되어 AI 재작성으로 누락된 내용을 복원할 수 있습니다. 최신 스냅샷과 본문이 같으면 건너뛰며 노트별로 최근 편집 보호 스냅샷(AI 편집 전 및 MCP 편집 전) 20개를 보관합니다. 편집량이 많다면 **설정 > 작업 > 수정 이력**에서 최대 200개로 늘릴 수 있습니다.
 
 ---
 

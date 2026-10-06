@@ -743,6 +743,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		<script src="<?php echo poznoteAsset('js/panel-back.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/markdown-source.js'); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/table-formulas.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/markdown-parser.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/ai-chat.js'); ?>"></script>
 		<?php endif; ?>

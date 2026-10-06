@@ -384,8 +384,15 @@
                 state.canScrollDown = false;
             }
 
-            if (topButton) topButton.hidden = !state.canScrollUp;
-            if (bottomButton) bottomButton.hidden = !state.canScrollDown;
+            // Disabled rather than hidden: the arrows keep their place, and
+            // the floating stack above them no longer moves as the note scrolls
+            // (hidden is cleared for a note rendered before that change and
+            // kept by the offline cache)
+            [[topButton, state.canScrollUp], [bottomButton, state.canScrollDown]].forEach(function (pair) {
+                if (!pair[0]) return;
+                pair[0].hidden = false;
+                pair[0].disabled = !pair[1];
+            });
         });
 
         updateNoteScrollbarClearance(colFits);
@@ -936,10 +943,11 @@
                 }
                 blurAfterPointerActivation(target, e);
                 break;
-            case 'toggle-split-view':
-                if (noteId && typeof window.toggleMarkdownSplitView === 'function') {
-                    window.toggleMarkdownSplitView(noteId);
+            case 'cycle-markdown-view':
+                if (noteId && typeof window.cycleMarkdownView === 'function') {
+                    window.cycleMarkdownView(noteId);
                 }
+                blurAfterPointerActivation(target, e);
                 break;
             case 'show-note-info':
                 if (noteId && typeof window.showNoteInfoModal === 'function') {

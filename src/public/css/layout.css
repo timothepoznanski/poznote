@@ -287,6 +287,18 @@ body {
             scrollbar-color: var(--pz-scrollbar) transparent;
         }
 
+        /* On Linux its thin bar is 6px with a 2px thumb, a 1px line with
+           overlay scrollbars. The standard one is the 6px pill in a 12px
+           bar that the other browsers get above (html.pz-os-linux,
+           js/theme-init.js). */
+        html.pz-os-linux #right_col,
+        html.pz-os-linux .noteentry.markdown-split-mode .markdown-editor-container,
+        html.pz-os-linux .noteentry.markdown-split-mode .markdown-editor,
+        html.pz-os-linux .noteentry.markdown-split-mode .markdown-codemirror-host .cm-scroller,
+        html.pz-os-linux .noteentry.markdown-split-mode .markdown-preview {
+            scrollbar-width: auto;
+        }
+
         body.note-col-fits #right_col {
             scrollbar-color: transparent transparent;
         }
