@@ -121,6 +121,7 @@ $settingsPageUserKeys = [
     'markdown_split_preview_left',
     'markdown_default_view_mode',
     'markdown_new_note_view_mode',
+    'markdown_live_show_syntax',
     'markdown_colored',
     'markdown_colored_custom',
     'code_block_word_wrap',
@@ -1233,6 +1234,16 @@ if ($canUseUserWebhooks) {
                         <option value="edit"><?php echo t_h('modals.markdown_default_view_mode.options.edit', [], 'Edit'); ?></option>
                         <option value="live"><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live rendering'); ?></option>
                     </select>
+                </div>
+            </div>
+
+            <!-- Live rendering: syntax back under the caret, or never shown -->
+            <div class="home-card" id="markdown-live-show-syntax-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_live_show_syntax', [], 'In live rendering, show the Markdown syntax of the element the cursor is on (the # of a heading, the ** of bold text, the address of a link). Turn it off to never see the syntax: formatting is then done from the toolbar, the menus and the shortcuts. Tables, diagrams and formulas still open their source when clicked, which is the only way to edit them.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-type"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_live_show_syntax', [], 'Show Markdown syntax at the cursor'); ?></span>
+                    <span id="markdown-live-show-syntax-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

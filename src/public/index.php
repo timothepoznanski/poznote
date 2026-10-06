@@ -284,13 +284,14 @@ $settings = [
     'folder_tree_dim_level' => '',
     'markdown_default_view_mode' => 'preview',
     'markdown_new_note_view_mode' => 'split',
+    'markdown_live_show_syntax' => '0',
     'sidebar_offline_marks' => '1',
     'favorites_sort' => POZNOTE_FAVORITES_SORT_DEFAULT,
     'favorites_icon_color' => ''
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'folder_icon_opens_kanban', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_live_editing', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'note_virtual_space', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'markdown_new_note_view_mode', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'folder_icon_opens_kanban', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_live_editing', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'note_virtual_space', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'markdown_new_note_view_mode', 'markdown_live_show_syntax', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
     }
@@ -505,6 +506,10 @@ if (!in_array($markdown_new_note_view_mode, ['split', 'edit', 'live'], true)) {
 // Live rendering in the Markdown editor (discussion 1582): read from <body
 // data-markdown-live-editing> by js/markdown-editor.js
 $markdown_live_editing = poznoteSettingEnabled($settings['markdown_live_editing'], false);
+// Whether live rendering brings the syntax back under the caret, or never
+// shows it (the default): <body data-markdown-live-syntax>, read by the
+// editor bundle
+$markdown_live_show_syntax = poznoteSettingEnabled($settings['markdown_live_show_syntax'], false);
 // Colored markdown ('0' = off, 'custom' = per-element colors chosen by the
 // user): body class + --mdc-* colours, lib/markdown-colored.php (diary.php
 // builds its <body> the same way for the journal view)
@@ -548,7 +553,7 @@ $body_classes = trim($extra_body_classes);
 $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-new-note-mode="<?php echo htmlspecialchars($markdown_new_note_view_mode, ENT_QUOTES); ?>" data-markdown-live-editing="<?php echo $markdown_live_editing ? '1' : '0'; ?>">
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-new-note-mode="<?php echo htmlspecialchars($markdown_new_note_view_mode, ENT_QUOTES); ?>" data-markdown-live-editing="<?php echo $markdown_live_editing ? '1' : '0'; ?>" data-markdown-live-syntax="<?php echo $markdown_live_show_syntax ? '1' : '0'; ?>">
     <script>
     (function () {
         try {

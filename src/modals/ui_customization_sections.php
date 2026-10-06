@@ -56,6 +56,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:main-font-card" checked><span><?php echo t_h('display.cards.main_font', [], 'App font'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-default-view-mode-card" checked><span><?php echo t_h('display.cards.markdown_default_view_mode', [], 'Default view mode'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-new-note-view-mode-card" checked><span><?php echo t_h('display.cards.markdown_new_note_view_mode', [], 'New note view mode'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-live-show-syntax-card" checked><span><?php echo t_h('display.cards.markdown_live_show_syntax', [], 'Show Markdown syntax at the cursor'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-font-card" checked><span><?php echo t_h('display.cards.markdown_font', [], 'Markdown editor font'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:font-size-card" checked><span><?php echo t_h('display.cards.note_font_size', [], 'Font size'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:index-icon-scale-card" checked><span><?php echo t_h('display.cards.index_icon_scale', [], 'Index icon scaling'); ?></span></label>

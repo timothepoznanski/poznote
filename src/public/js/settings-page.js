@@ -107,6 +107,7 @@
             'markdown_split_preview_left',
             'markdown_default_view_mode',
             'markdown_new_note_view_mode',
+            'markdown_live_show_syntax',
             'markdown_colored',
             'markdown_colored_custom',
             'code_block_word_wrap',
@@ -2985,6 +2986,7 @@
         setupToggleCard('folder-icon-kanban-card', 'folder-icon-kanban-status', 'folder_icon_opens_kanban', false, false);
         setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false, true);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
+        setupToggleCard('markdown-live-show-syntax-card', 'markdown-live-show-syntax-status', 'markdown_live_show_syntax', false, false);
         setupToggleCard('markdown-split-preview-left-card', 'markdown-split-preview-left-status', 'markdown_split_preview_left', false, false);
         refreshMarkdownColoredBadge();
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);

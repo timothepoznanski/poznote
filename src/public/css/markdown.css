@@ -476,6 +476,12 @@ body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-
     display: block;
 }
 
+/* Syntax that is never shown (markdown_live_show_syntax off): still in the
+   line as text, which the editor steps over as one piece, but not laid out. */
+.markdown-codemirror-host .cm-live-preview .cm-live-squeezed {
+    display: none;
+}
+
 /* Paragraphs aligned from the toolbar (<p align="...">) */
 .markdown-codemirror-host .cm-live-preview .cm-line.cm-live-align-left {
     text-align: left;
