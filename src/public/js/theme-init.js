@@ -301,6 +301,11 @@ window.__poznoteClearUserStorage = function (userId) {
         var r = document.documentElement;
         r.setAttribute('data-theme', effectiveTheme);
         r.style.colorScheme = effectiveTheme;
+        // Firefox draws scrollbar-width: thin as a hairline on Linux only, so
+        // css/layout.css needs to tell that desktop apart (#1544).
+        if (/Linux/.test(navigator.platform || '') && !/Android/.test(navigator.userAgent || '')) {
+            r.classList.add('pz-os-linux');
+        }
         // Painted inline so the page is not white for a frame. theme-manager.js
         // removes it once the stylesheets are in, so a theme can own the canvas.
         r.style.backgroundColor = palette.contentBg;
