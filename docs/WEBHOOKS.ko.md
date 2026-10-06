@@ -43,8 +43,8 @@ Poznote는 웹훅을 **발신**하기만 합니다. 이메일 발송, 워크플�
 
 | 범위 | 관리 위치 | 사용자 | 이벤트 |
 |---|---|---|---|
-| **관리자 웹훅** | **설정 > 관리 도구 > 관리자 웹훅** | 관리자만 | 인스턴스 이벤트: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached` |
-| **사용자 웹훅** | **설정 > 사용자 웹훅** | 모든 계정(사용자 기능 제한으로 차단된 경우 제외) | 본인 콘텐츠 이벤트: `note.created`, `note.shared`, `reminder.due`, `reminder.due_title`, `reminder.due_minimal` |
+| **관리자 웹훅** | **설정 > 관리자 도구 > 관리자 웹훅** | 관리자만 | 인스턴스 이벤트: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached` |
+| **사용자 웹훅** | **설정 > 작업 > 사용자 웹훅** | 모든 계정(사용자 기능 제한으로 차단된 경우 제외) | 본인 콘텐츠 이벤트: `note.created`, `note.shared`, `reminder.due`, `reminder.due_title`, `reminder.due_minimal` |
 
 격리 규칙은 엄격합니다. 사용자 이벤트는 해당 계정이 등록한 엔드포인트에만 전달됩니다. 다른 사용자의 노트나 알림은 전달되지 않습니다. 인스턴스 이벤트는 구독한 모든 관리자 웹훅에 전달됩니다.
 
@@ -145,7 +145,7 @@ def verify(raw_body: bytes, signature_header: str, secret: str) -> bool:
 https://poznote.example.com/index.php?note=42&workspace=Poznote
 ```
 
-링크는 **설정 > 관리 도구 > 관리자 웹훅**의 **인스턴스 URL**에서 지정한 공개 주소로 만듭니다(관리자 전용). 알림 이메일과 같은 값을 사용하므로 한쪽에서 설정하면 둘 다 적용됩니다. REST API의 `smtp_app_url` 설정이나 대체값인 `POZNOTE_APP_URL` 또는 `APP_URL` 환경 변수로도 설정할 수 있습니다.
+링크는 **설정 > 관리자 도구 > 관리자 웹훅**의 **인스턴스 URL**에서 지정한 공개 주소로 만듭니다(관리자 전용). 알림 이메일과 같은 값을 사용하므로 한쪽에서 설정하면 둘 다 적용됩니다. REST API의 `smtp_app_url` 설정이나 대체값인 `POZNOTE_APP_URL` 또는 `APP_URL` 환경 변수로도 설정할 수 있습니다.
 
 인스턴스 URL이 없으면 `data.note.url`은 `null`이며 링크를 포함하지 않습니다.
 
@@ -199,7 +199,7 @@ https://poznote.example.com/index.php?note=42&workspace=Poznote
 
 ### 인스턴스 이벤트
 
-**설정 > 관리 도구 > 관리자 웹훅**에서 관리하며 구독한 모든 관리자 웹훅에 전달합니다.
+**설정 > 관리자 도구 > 관리자 웹훅**에서 관리하며 구독한 모든 관리자 웹훅에 전달합니다.
 
 #### user.created
 
@@ -367,9 +367,9 @@ https://poznote.example.com/index.php?note=42&workspace=Poznote
 
 ### 사용자 이벤트
 
-**설정 > 사용자 웹훅**에서 관리하며 이벤트를 발생시킨 계정의 엔드포인트에만 전달합니다. 따라서 `user` 객체를 포함하지 않습니다. 엔드포인트 자체가 계정 소속이며 노트 ID가 대상을 식별합니다.
+**설정 > 작업 > 사용자 웹훅**에서 관리하며 이벤트를 발생시킨 계정의 엔드포인트에만 전달합니다. 따라서 `user` 객체를 포함하지 않습니다. 엔드포인트 자체가 계정 소속이며 노트 ID가 대상을 식별합니다.
 
-관리자는 **설정 > 관리 도구 > 사용자 기능 제한**의 **사용자 웹훅** 옵션으로 일반 사용자에게 차단할 수 있습니다. 차단하면 페이지 접근과 이벤트 전송이 모두 중지되며 관리자는 영향을 받지 않습니다.
+관리자는 **설정 > 관리자 도구 > 사용자 기능 제한**의 **사용자 웹훅** 옵션으로 일반 사용자에게 차단할 수 있습니다. 차단하면 페이지 접근과 이벤트 전송이 모두 중지되며 관리자는 영향을 받지 않습니다.
 
 #### note.created
 
