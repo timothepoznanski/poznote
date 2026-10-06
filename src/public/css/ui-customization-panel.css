@@ -77,6 +77,14 @@
     color: inherit;
 }
 
+/* The Markdown mark of the view button in its live state (css/devicon.css) is wider
+   than it is tall and sits in a square box: a little larger, it weighs the
+   same as the line icons around it. */
+.pz-edge-btn [class*="devicon-"] {
+    font-size: calc(var(--pz-edge-icon-size) * 1.3);
+    color: inherit;
+}
+
 /* Element visibility: lit while its panel is open, like the AI toggle */
 body.ui-custom-panel-open #edgeCustomizeBtn {
     opacity: 1;
@@ -97,10 +105,10 @@ html.focus-mode .pz-edge-focus-btn {
     color: var(--pz-accent-text);
 }
 
-/* Split view (discussion 1482): lit while the split is on, like the toggles
-   above. js/ui-customization-panel.js sets is-active and unhides the button
-   for a Markdown note. */
-.pz-edge-split-btn.is-active {
+/* View of a Markdown note (classic, live rendering, split view): lit outside
+   the classic state, like the toggles above. js/ui-customization-panel.js sets
+   is-active and the icon, and unhides the button for a Markdown note. */
+.pz-edge-view-btn.is-active {
     opacity: 1;
     color: var(--pz-accent-text);
 }
@@ -109,12 +117,12 @@ html.focus-mode .pz-edge-focus-btn {
     display: none;
 }
 
-/* The split view and the width change a layout the phone does not have, and
-   the Customize toggle swaps its button in the stack for an entry of the menu:
-   a phone has little room to spare beside the note. */
+/* The width changes a layout the phone does not have, and the Customize
+   toggle swaps its button in the stack for an entry of the menu: a phone has
+   little room to spare beside the note. The view button stays, without its
+   split state (js/markdown-view-modes.js). */
 @media (max-width: 800px) {
     .pz-edge-focus-btn,
-    .pz-edge-split-btn,
     .page-more-menu-item-desktop,
     #edgeCustomizeBtn {
         display: none !important;
@@ -515,7 +523,8 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
 }
 
 /* Raised over the arrows below it: one arrow showing is a button plus a gap,
-   both is twice that. On mobile the arrows show only with the note on screen
+   both is twice that. The arrows are disabled, not hidden, when there is
+   nowhere to scroll (js/index-events.js), so both show for any open note. On mobile the arrows show only with the note on screen
    (body.note-open, css/notes/noteentry.css), so the lift follows that. */
 @media (min-width: 801px) {
     body:has(.note-scroll-edge-btn:not([hidden])) .pz-edge-stack {

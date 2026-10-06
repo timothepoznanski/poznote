@@ -55,6 +55,12 @@ html[data-theme='dark'] .pz-edge-btn:focus {
     color: var(--pz-accent-text);
 }
 
+/* The Markdown view button stays lit outside its classic state (live
+   rendering, split view): the muted colour above outweighed its light rule. */
+html[data-theme='dark'] .pz-edge-view-btn.is-active {
+    color: var(--pz-accent-text);
+}
+
 html[data-theme='dark'] .note-scroll-edge-btn:hover,
 html[data-theme='dark'] .note-scroll-edge-btn:focus,
 html[data-theme='dark'] .pz-edge-btn:hover,

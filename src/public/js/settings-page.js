@@ -106,6 +106,7 @@
             'markdown_split_card_view',
             'markdown_split_preview_left',
             'markdown_default_view_mode',
+            'markdown_new_note_view_mode',
             'markdown_colored',
             'markdown_colored_custom',
             'code_block_word_wrap',
@@ -664,6 +665,13 @@
         initInlineControl('markdown-default-view-mode-select', {
             load: loadSettingValue('markdown_default_view_mode', normalizeMarkdownDefaultViewMode),
             save: saveSettingValue('markdown_default_view_mode')
+        });
+
+        initInlineControl('markdown-new-note-view-mode-select', {
+            load: loadSettingValue('markdown_new_note_view_mode', function (value) {
+                return value === 'edit' || value === 'live' ? value : 'split';
+            }),
+            save: saveSettingValue('markdown_new_note_view_mode')
         });
 
         initInlineControl('slash-menu-trigger-select', {

@@ -148,6 +148,38 @@ function _mdIsEscapedMarkdownImage(content, offset) {
     return slashCount % 2 === 1;
 }
 
+// The images the preview renders, in its order (the index is what it writes
+// as data-markdown-image-index and what the functions below look an image up
+// by), each with its place in the source. The Markdown editor's live rendering
+// draws its pictures from this list, so that the image menu acts on them as it
+// does in the preview (build/markdown-editor/src/live-preview.js).
+function _mdListRenderedMarkdownImages(content) {
+    var rawContent = String(content || '');
+    var imageRegex = _mdGetMarkdownImageRegex();
+    var ignoredRanges = _mdGetIgnoredMarkdownImageRanges(rawContent);
+    var images = [];
+    var match;
+
+    while ((match = imageRegex.exec(rawContent)) !== null) {
+        if (_mdIsOffsetInRanges(match.index, ignoredRanges) || _mdIsEscapedMarkdownImage(rawContent, match.index)) {
+            continue;
+        }
+
+        images.push({
+            index: images.length,
+            from: match.index,
+            to: imageRegex.lastIndex,
+            alt: match[1] || '',
+            url: match[2] || '',
+            title: match[3] || '',
+            borderClass: _mdGetMarkdownImageBorderClass(match[4]),
+            width: _mdGetMarkdownImageWidth(match[4])
+        });
+    }
+
+    return images;
+}
+
 function _mdUpdateMarkdownImageBorderAtIndex(content, targetImageIndex, borderClass) {
     var rawContent = String(content || '');
     var imageRegex = _mdGetMarkdownImageRegex();
@@ -465,6 +497,7 @@ window._mdUpdateMarkdownImageWidthAtIndex = _mdUpdateMarkdownImageWidthAtIndex;
 window._mdDeleteMarkdownImageAtIndex = _mdDeleteMarkdownImageAtIndex;
 window._mdUpdateExcalidrawImageBorderAtIndex = _mdUpdateExcalidrawImageBorderAtIndex;
 window._mdUpdateExcalidrawImageWidthAtIndex = _mdUpdateExcalidrawImageWidthAtIndex;
+window._mdListRenderedMarkdownImages = _mdListRenderedMarkdownImages;
 window._mdDeleteExcalidrawBlockAtIndex = _mdDeleteExcalidrawBlockAtIndex;
 window._mdGetExcalidrawEditorPlaceholderSource = _mdGetExcalidrawEditorPlaceholderSource;
 window._mdCreateExcalidrawEditorPlaceholder = _mdCreateExcalidrawEditorPlaceholder;

@@ -31,6 +31,29 @@ function setCodeMirrorMarkdownContent(editorDiv, content, options) {
     return api.setValue(editorDiv, String(content || ''), options || {});
 }
 
+// Live rendering (discussion 1582, build/markdown-editor/src/live-preview.js):
+// the editor shows formatted text and hides the syntax away from the caret.
+// On when the user's markdown_live_editing setting is (index.php renders it as
+// <body data-markdown-live-editing>), except in the split view, whose preview
+// pane already shows the result next to the source.
+function isMarkdownLiveEditingEnabled() {
+    try {
+        return !!document.body && document.body.getAttribute('data-markdown-live-editing') === '1';
+    } catch (e) {
+        return false;
+    }
+}
+
+function syncMarkdownLiveEditing(noteEntry) {
+    var api = getMarkdownCodeMirrorApi();
+    if (!api || !noteEntry || typeof api.setLivePreview !== 'function') return;
+
+    var editorDiv = noteEntry.querySelector('.markdown-editor');
+    if (!editorDiv || !isCodeMirrorMarkdownEditor(editorDiv)) return;
+
+    api.setLivePreview(editorDiv, isMarkdownLiveEditingEnabled() && !noteEntry.classList.contains('markdown-split-mode'));
+}
+
 function initializeCodeMirrorMarkdownEditor(editorDiv, markdownContent, readOnly) {
     var api = getMarkdownCodeMirrorApi();
     if (!api || !editorDiv || typeof api.createEditor !== 'function') {
@@ -42,7 +65,8 @@ function initializeCodeMirrorMarkdownEditor(editorDiv, markdownContent, readOnly
         api.createEditor(editorDiv, {
             value: String(markdownContent || ''),
             placeholder: editorDiv.getAttribute('data-ph') || '',
-            readOnly: !!readOnly
+            readOnly: !!readOnly,
+            livePreview: isMarkdownLiveEditingEnabled() && !editorDiv.closest('.markdown-split-mode')
         });
     } catch (error) {
         console.error('Error initializing CodeMirror Markdown editor:', error);
@@ -726,6 +750,8 @@ window.scheduleMarkdownSplitPaneHeightUpdate = scheduleMarkdownSplitPaneHeightUp
 // module is visible here, and so renaming one of them fails the lint rather
 // than silently breaking a caller in another file.
 window.initializeCodeMirrorMarkdownEditor = initializeCodeMirrorMarkdownEditor;
+window.syncMarkdownLiveEditing = syncMarkdownLiveEditing;
+window.isMarkdownLiveEditingEnabled = isMarkdownLiveEditingEnabled;
 window.normalizeContentEditableText = normalizeContentEditableText;
 window.getSelectionOffsetsInTextElement = getSelectionOffsetsInTextElement;
 window.getMarkdownLineStartOffsets = getMarkdownLineStartOffsets;

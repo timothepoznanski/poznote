@@ -452,6 +452,7 @@
       "main_font": "Elige la fuente utilizada en toda la aplicación.",
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
       "markdown_default_view_mode": "Elige si las notas markdown se abren en vista previa, edición o vista dividida.",
+      "markdown_new_note_view_mode": "Elige si una nota markdown nueva se abre en vista dividida, en edición o con renderizado en vivo. El renderizado en vivo se activa entonces también para las demás notas. En el móvil una nota nueva nunca se abre en vista dividida.",
       "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "icon_rail_scale": "Ajusta el tamaño de los iconos de la barra de iconos.",
@@ -809,6 +810,7 @@
       "main_font": "Fuente de la aplicación",
       "markdown_font": "Fuente del editor markdown",
       "markdown_default_view_mode": "Modo de apertura",
+      "markdown_new_note_view_mode": "Modo de apertura de notas nuevas",
       "login_display": "Título de página de inicio de sesión",
       "note_font_size": "Tamaño de fuente",
       "note_age_filter": "Filtro de antigüedad",
@@ -1171,6 +1173,10 @@
       "create_linked_note": "Crear atajo",
       "open_in_new_tab": "Abrir en nueva pestaña",
       "split_view": "Alternar vista dividida",
+      "view_cycle_live": "Cambiar a renderizado en vivo",
+      "view_cycle_split": "Cambiar a vista dividida",
+      "view_cycle_preview": "Volver al modo vista previa",
+      "view_cycle_edit": "Volver al modo edición",
       "search_replace": "Buscar y reemplazar",
       "save_now": "Guardar ahora",
       "go_back": "Atrás",
@@ -1717,9 +1723,10 @@
         "edit": "Edición",
         "split": "Vista dividida (editor y vista previa lado a lado)",
         "split_short": "Vista dividida",
-        "last": "Último modo usado"
+        "last": "Último modo usado",
+        "live": "Renderizado en vivo"
       },
-      "hint": "Una nota que cambies a otro modo se vuelve a abrir en el modo predeterminado. Las notas nuevas siempre se abren en vista dividida."
+      "hint": "Una nota que cambies a otro modo se vuelve a abrir en el modo predeterminado."
     },
     "diary_date_format": {
       "title": "Formato de fecha de las entradas del diario",
@@ -5060,7 +5067,8 @@
   },
   "page_menu": {
     "button": "Más opciones",
-    "split_view": "Vista dividida"
+    "split_view": "Vista dividida",
+    "markdown_view": "Vista Markdown (vista previa, en vivo, dividida)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Atajos de teclado",

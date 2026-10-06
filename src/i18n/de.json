@@ -452,6 +452,7 @@
       "main_font": "Wählen Sie die Schriftart für die gesamte Anwendung.",
       "markdown_font": "Wählen Sie die Schriftart für den Markdown-Editor.",
       "markdown_default_view_mode": "Festlegen, ob Markdown-Notizen in der Vorschau, im Bearbeitungsmodus oder geteilt geöffnet werden.",
+      "markdown_new_note_view_mode": "Festlegen, ob eine neue Markdown-Notiz geteilt, im Bearbeitungsmodus oder in der Live-Darstellung geöffnet wird. Die Live-Darstellung wird dann auch für die anderen Notizen eingeschaltet. Auf dem Smartphone öffnet sich eine neue Notiz nie geteilt.",
       "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste, Codeblöcken und der Einstellungsseite an.",
       "index_icon_scale": "Passen Sie die Größe der Symbole in der Notizenliste an.",
       "icon_rail_scale": "Passen Sie die Größe der Symbole in der Icon-Seitenleiste an.",
@@ -809,6 +810,7 @@
       "main_font": "App-Schriftart",
       "markdown_font": "Markdown-Editor-Schriftart",
       "markdown_default_view_mode": "Standardansicht",
+      "markdown_new_note_view_mode": "Ansicht für neue Notizen",
       "login_display": "Login-Seiten-Titel",
       "note_font_size": "Schriftgröße",
       "note_age_filter": "Altersfilter",
@@ -1171,6 +1173,10 @@
       "create_linked_note": "Verknüpfung erstellen",
       "open_in_new_tab": "In neuem Tab öffnen",
       "split_view": "Geteilte Ansicht umschalten",
+      "view_cycle_live": "Zur Live-Darstellung wechseln",
+      "view_cycle_split": "Zur geteilten Ansicht wechseln",
+      "view_cycle_preview": "Zurück zum Vorschaumodus",
+      "view_cycle_edit": "Zurück zum Bearbeitungsmodus",
       "search_replace": "Suchen und ersetzen",
       "save_now": "Jetzt speichern",
       "go_back": "Zurück",
@@ -1717,9 +1723,10 @@
         "edit": "Bearbeiten",
         "split": "Geteilt (Editor und Vorschau nebeneinander)",
         "split_short": "Geteilt",
-        "last": "Zuletzt verwendeter Modus"
+        "last": "Zuletzt verwendeter Modus",
+        "live": "Live-Darstellung"
       },
-      "hint": "Eine Notiz, die in einen anderen Modus geschaltet wird, öffnet sich beim nächsten Mal wieder im Standardmodus. Neue Notizen öffnen sich immer geteilt."
+      "hint": "Eine Notiz, die in einen anderen Modus geschaltet wird, öffnet sich beim nächsten Mal wieder im Standardmodus."
     },
     "diary_date_format": {
       "title": "Datumsformat der Tagebucheinträge",
@@ -5059,7 +5066,8 @@
   },
   "page_menu": {
     "button": "Weitere Optionen",
-    "split_view": "Geteilte Ansicht"
+    "split_view": "Geteilte Ansicht",
+    "markdown_view": "Markdown-Ansicht (Vorschau, live, geteilt)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Tastenkürzel",

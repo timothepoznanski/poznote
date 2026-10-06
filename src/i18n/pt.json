@@ -452,6 +452,7 @@
       "main_font": "Escolha a fonte usada em todo o aplicativo.",
       "markdown_font": "Escolha a fonte usada no editor markdown.",
       "markdown_default_view_mode": "Escolha se as notas markdown abrem em pré-visualização, edição ou vista dividida.",
+      "markdown_new_note_view_mode": "Escolha se uma nota markdown nova abre em vista dividida, em edição ou com renderização em tempo real. A renderização em tempo real é então ativada também para as outras notas. No celular, uma nota nova nunca abre em vista dividida.",
       "font_size": "Ajuste o tamanho da fonte das notas, da barra lateral, dos blocos de código e da página de configurações.",
       "index_icon_scale": "Ajuste o tamanho dos ícones na lista de notas.",
       "icon_rail_scale": "Ajuste o tamanho dos ícones da barra de ícones.",
@@ -809,6 +810,7 @@
       "main_font": "Fonte do aplicativo",
       "markdown_font": "Fonte do editor markdown",
       "markdown_default_view_mode": "Modo de abertura",
+      "markdown_new_note_view_mode": "Modo de abertura de notas novas",
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte",
       "note_age_filter": "Filtro de antiguidade",
@@ -1171,6 +1173,10 @@
       "create_linked_note": "Criar atalho",
       "open_in_new_tab": "Abrir em nova aba",
       "split_view": "Alternar vista dividida",
+      "view_cycle_live": "Mudar para renderização em tempo real",
+      "view_cycle_split": "Mudar para vista dividida",
+      "view_cycle_preview": "Voltar ao modo de pré-visualização",
+      "view_cycle_edit": "Voltar ao modo de edição",
       "search_replace": "Pesquisar e substituir",
       "save_now": "Salvar agora",
       "go_back": "Voltar",
@@ -1717,9 +1723,10 @@
         "edit": "Edição",
         "split": "Vista dividida (editor e pré-visualização lado a lado)",
         "split_short": "Vista dividida",
-        "last": "Último modo usado"
+        "last": "Último modo usado",
+        "live": "Renderização em tempo real"
       },
-      "hint": "Uma nota que você mudar para outro modo abre novamente no modo padrão. Notas novas sempre abrem em vista dividida."
+      "hint": "Uma nota que você mudar para outro modo abre novamente no modo padrão."
     },
     "diary_date_format": {
       "title": "Formato de data das entradas do diário",
@@ -5060,7 +5067,8 @@
   },
   "page_menu": {
     "button": "Mais opções",
-    "split_view": "Vista dividida"
+    "split_view": "Vista dividida",
+    "markdown_view": "Vista Markdown (pré-visualização, tempo real, dividida)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Atalhos de teclado",

@@ -492,6 +492,76 @@ function downloadImageFromUrl(imageSrc, filename) {
     document.body.removeChild(link);
 }
 
+/**
+ * Back from the Excalidraw editor (js/excalidraw-editor.js leaves the note
+ * and diagram ids in sessionStorage): scroll the note to the diagram that was
+ * being edited, instead of leaving the reader at the top of a long note.
+ *
+ * The note is still settling when the page loads (Markdown rendering, the
+ * tab's own scroll restore, pictures taking their height), so the diagram is
+ * looked for and brought into view a few times over the first seconds. The
+ * Markdown editor only draws the lines near its viewport: there the block is
+ * found in the source and the editor scrolls to it first.
+ */
+function showReturnedExcalidrawDiagram() {
+    var context = null;
+    try {
+        context = JSON.parse(sessionStorage.getItem('excalidraw_return') || 'null');
+        sessionStorage.removeItem('excalidraw_return');
+    } catch (e) {
+        context = null;
+    }
+    if (!context || !context.noteId || !context.diagramId) return;
+    // A stale entry (the editor tab was closed, the note opened later) is ignored
+    if (!context.at || Date.now() - context.at > 60000) return;
+
+    function findDiagram(noteEntry) {
+        var found = null;
+        Array.prototype.forEach.call(noteEntry.querySelectorAll('.excalidraw-container'), function (container) {
+            if (!found && container.id === context.diagramId && container.offsetParent !== null) {
+                found = container;
+            }
+        });
+        return found;
+    }
+
+    function revealInMarkdownEditor(noteEntry) {
+        var api = window.PoznoteMarkdownCodeMirror;
+        var editorDiv = noteEntry.querySelector('.markdown-editor');
+        if (!api || !editorDiv || editorDiv.offsetParent === null) return;
+        if (typeof api.isCodeMirrorEditor !== 'function' || !api.isCodeMirrorEditor(editorDiv)) return;
+
+        var marker = String(api.getValue(editorDiv) || '').indexOf('id="' + context.diagramId + '"');
+        if (marker !== -1 && typeof api.revealPos === 'function') {
+            api.revealPos(editorDiv, marker, 'center');
+        }
+    }
+
+    function show() {
+        var noteEntry = document.getElementById('entry' + context.noteId);
+        if (!noteEntry) return;
+
+        var diagram = findDiagram(noteEntry);
+        if (!diagram) {
+            revealInMarkdownEditor(noteEntry);
+            diagram = findDiagram(noteEntry);
+        }
+        if (diagram) {
+            diagram.scrollIntoView({ block: 'center', inline: 'nearest' });
+        }
+    }
+
+    [150, 500, 1000, 1800].forEach(function (delay) {
+        setTimeout(show, delay);
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', showReturnedExcalidrawDiagram);
+} else {
+    showReturnedExcalidrawDiagram();
+}
+
 // Make functions globally available
 window.openExcalidrawNote = openExcalidrawNote;
 window.downloadExcalidrawImage = downloadExcalidrawImage;

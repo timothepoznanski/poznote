@@ -74,6 +74,13 @@
         noteentry.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
+    // The Markdown editor's live rendering draws the same toggle on its code
+    // blocks (build/markdown-editor/src/live-preview.js)
+    window.poznoteCodeBlockLineNumberIcons = {
+        on: LINE_NUMBERS_ICON_SVG,
+        off: LINE_NUMBERS_OFF_ICON_SVG
+    };
+
     function setCopyIcon(btn) {
         btn.innerHTML = COPY_ICON_SVG;
     }

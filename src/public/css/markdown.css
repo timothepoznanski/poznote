@@ -92,6 +92,34 @@
     vertical-align: top;
 }
 
+/* The diagram, carried by the placeholder as the markup the preview shows for
+   it (markdown editor bundle): only live rendering shows it, in place of the
+   summary, and the image menu then works on it as it does in the preview. */
+.markdown-codemirror-host .markdown-excalidraw-render {
+    display: none;
+}
+
+.markdown-codemirror-host .cm-live-preview .markdown-excalidraw-render {
+    /* flow-root keeps the container's margins inside the widget, whose
+       height the editor measures */
+    display: flow-root;
+}
+
+.markdown-codemirror-host .cm-live-preview .markdown-excalidraw-render img {
+    max-width: 100%;
+    height: auto;
+}
+
+.markdown-codemirror-host .cm-live-preview .markdown-excalidraw-placeholder.has-image {
+    padding: 0;
+    overflow: visible;
+    user-select: auto;
+}
+
+.markdown-codemirror-host .cm-live-preview .markdown-excalidraw-placeholder.has-image::before {
+    display: none;
+}
+
 html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::before {
     color: var(--pz-text);
 }
@@ -280,6 +308,452 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 .markdown-codemirror-host .poznote-cm-invalid {
     background-color: var(--poznote-cm-invalid-bg);
     color: var(--poznote-cm-invalid);
+}
+
+/* Live rendering: no pencil while the editor is up, there is no preview to go
+   back to (js/markdown-view-modes.js). Heavier than the phone rule that forces
+   the toolbar buttons to show (css/index-mobile.css). */
+.note-edit-toolbar .toolbar-btn.markdown-view-mode-btn.is-live-hidden {
+    display: none !important;
+}
+
+/* The editor is a flex item as wide as its longest line: with live rendering
+   it takes the note's width, so that heading rules, separators and quote
+   bars span it as they do in the preview. */
+.markdown-codemirror-host.markdown-live-editing {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* Live rendering in the editor (discussion 1582, markdown_live_editing setting).
+   build/markdown-editor/src/live-preview.js puts .cm-live-preview on the
+   editor, hides the syntax away from the caret and tags what is left with the
+   classes below, which borrow the look of .markdown-preview. Code blocks and
+   tables stay as source. */
+/* The unmatched #id inside :is() only lifts these sizes above the forced note
+   font size of notes/noteentry.css, which reaches every element of the editor. */
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-heading {
+    font-weight: var(--pz-weight-bold);
+    line-height: 1.3;
+    padding-top: 0.35em;
+    padding-bottom: 0.15em;
+}
+
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-live-size-boost, .cm-live-h1) {
+    font-size: 2em !important;
+    border-bottom: 2px solid var(--pz-border);
+}
+
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-live-size-boost, .cm-live-h2) {
+    font-size: 1.5em !important;
+    border-bottom: 1px solid var(--pz-border);
+}
+
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-live-size-boost, .cm-live-h3) {
+    font-size: 1.25em !important;
+}
+
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-live-size-boost, .cm-live-h5) {
+    font-size: 0.875em !important;
+}
+
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-live-size-boost, .cm-live-h6) {
+    font-size: 0.75em !important;
+    color: var(--pz-text-muted);
+}
+
+/* What sits inside a heading line follows its size */
+.markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-line.cm-live-heading) * {
+    font-size: inherit !important;
+}
+
+/* Headings take the text colour, as in the preview, unless the colored
+   markdown setting gives each level its own (--poznote-cm-headingN below). */
+body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-cm-heading {
+    color: inherit;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-quote {
+    border-left: 4px solid var(--pz-border);
+    padding-left: 16px;
+    color: var(--pz-text-muted);
+    font-style: italic;
+}
+
+/* Callouts (css/tasks.css draws the preview's): the quote's bar, icon and
+   title in the colour of its type, the text in the text colour. An unknown
+   type keeps the accent, as it does in the preview. */
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-callout {
+    --cm-live-callout-color: var(--pz-accent-text);
+    border-left: 3px solid var(--cm-live-callout-color);
+    padding-left: 12px;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-callout-tip {
+    --cm-live-callout-color: var(--pz-success-text-hover);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-callout-important {
+    --cm-live-callout-color: var(--pz-color-purple);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-callout-warning {
+    --cm-live-callout-color: var(--pz-warning-strong);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-callout-caution {
+    --cm-live-callout-color: var(--pz-danger-text-hover);
+}
+
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-callout-title, .cm-live-callout-title *) {
+    color: var(--cm-live-callout-color);
+    font-weight: var(--pz-weight-semibold);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-callout-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    vertical-align: -3px;
+    opacity: 0.75;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-callout-icon svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    fill: var(--cm-live-callout-color);
+}
+
+/* A ticked task, struck through as in the preview */
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-task-done, .cm-live-task-done *) {
+    text-decoration: line-through !important;
+    color: var(--pz-text-muted);
+}
+
+/* The marker of a task takes one width, ticked or not ([ ] and [x] differ in
+   a proportional font), so that the texts of a list line up */
+.markdown-codemirror-host .cm-live-preview .cm-live-task {
+    display: inline-block;
+    width: 1.35em;
+    overflow: hidden;
+    vertical-align: bottom;
+    white-space: pre;
+}
+
+/* Audio and video players, embedded videos (YouTube...): the element the
+   preview shows, styled by the preview's own rules further down */
+.markdown-codemirror-host .cm-live-preview .cm-live-media {
+    /* The line's width, as in the preview: shrunk to fit, the audio player's
+       frame collapsed to a stub */
+    display: block;
+    max-width: 100%;
+}
+
+/* Tables and Mermaid diagrams, rendered by the preview's parser and standing
+   in for their source until the caret enters them. The table rules of this
+   file reach them through .noteentry; a click anywhere in the block brings
+   its source back. */
+.markdown-codemirror-host .cm-live-preview .cm-live-block {
+    padding: 4px 0;
+    cursor: text;
+    overflow-x: auto;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-block-folded {
+    display: none;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-block-mermaid .mermaid {
+    text-align: center;
+}
+
+/* Formulas ($...$ and $$...$$): the spans and the styles of the preview
+   (.math-inline, .math-block, at the end of this file) */
+.markdown-codemirror-host .cm-live-preview .cm-live-math-display {
+    display: block;
+}
+
+/* Paragraphs aligned from the toolbar (<p align="...">) */
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-align-left {
+    text-align: left;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-align-center {
+    text-align: center;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-align-right {
+    text-align: right;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-align-justify {
+    text-align: justify;
+}
+
+/* Toggles (<details> blocks; css/tasks.css draws the preview's): a triangle
+   and the title in place of the tags, the body under it. The lines that held
+   only <details> or </details> shrink to nothing, and so does the body of a
+   folded toggle; all of it is back as text once the caret is in the block. */
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-toggle-header {
+    font-weight: var(--pz-weight-semibold);
+    padding-top: 6px;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-toggle-header::before {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-right: 10px;
+    vertical-align: 1px;
+    border-left: 5px solid currentColor;
+    border-top: 4px solid transparent;
+    border-bottom: 4px solid transparent;
+    transition: transform 0.2s ease;
+    opacity: 0.5;
+    /* Only the triangle folds: a click on the title edits it */
+    cursor: pointer;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-toggle-open::before {
+    transform: rotate(90deg);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line:is(.cm-live-toggle-edge, .cm-live-toggle-folded) {
+    height: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-hr {
+    background: linear-gradient(var(--pz-border), var(--pz-border)) center / 100% 2px no-repeat;
+}
+
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-hr-text, .cm-live-hr-text *) {
+    color: transparent !important;
+}
+
+/* Code blocks keep their source and take the frame of the preview's
+   (css/code-blocks.css, css/syntax-highlight.css): same ground and border, the
+   language badge in the corner in place of the opening fence, a copy button,
+   and an empty line where the closing fence is. Both fences come back as text
+   once the caret is in the block. An indented block has no frame there
+   either, and gets none here. */
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-code {
+    background-color: var(--pz-surface-hover);
+    border: solid var(--pz-border-light);
+    border-width: 0 1px;
+    padding: 0 30px;
+}
+
+/* Plain code reads in the text colour, as in the preview; highlighted
+   languages keep their token colours. */
+.markdown-codemirror-host .cm-live-preview .cm-md-code-line .poznote-cm-monospace {
+    color: inherit;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-code-open {
+    position: relative;
+    border-top-width: 1px;
+    border-radius: var(--pz-radius-sm) var(--pz-radius-sm) 0 0;
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-code-close {
+    border-bottom-width: 1px;
+    border-radius: 0 0 var(--pz-radius-sm) var(--pz-radius-sm);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-code-lang {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 2px 8px;
+    line-height: 1.4;
+    color: var(--pz-text-muted);
+    background: rgba(var(--pz-shadow-rgb), 0.05);
+    border-bottom-right-radius: var(--pz-radius-sm);
+    text-transform: uppercase;
+    font-weight: var(--pz-weight-medium);
+}
+
+.markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-live-code-lang) {
+    font-size: 0.75em !important;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-code-lang {
+    cursor: pointer;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-code-lang:hover {
+    background: rgba(var(--pz-shadow-rgb), 0.1);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-code-actions {
+    position: absolute;
+    top: 2px;
+    right: 8px;
+    display: flex;
+    gap: 4px;
+}
+
+/* Line numbers: one per source line, in the gutter the preview draws */
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-code-numbered {
+    position: relative;
+    padding-left: calc(30px + var(--cm-live-code-digits, 2ch) + 1.4em);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-code-numbered::before {
+    content: attr(data-code-line);
+    position: absolute;
+    left: 30px;
+    top: 0;
+    width: var(--cm-live-code-digits, 2ch);
+    text-align: right;
+    color: var(--pz-text-subtle);
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-code-copy, .cm-live-code-lines) {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    color: var(--pz-text-secondary);
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s ease;
+}
+
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-code-copy, .cm-live-code-lines):hover {
+    opacity: 1;
+    color: var(--pz-text-strong);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-code-copy i {
+    color: inherit;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-code-lines svg {
+    width: 14px;
+    height: 14px;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-inline-code {
+    background-color: var(--pz-surface-hover);
+    padding: 2px 4px;
+    border-radius: var(--pz-radius-sm);
+}
+
+.markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-live-inline-code) {
+    font-size: 0.9em !important;
+}
+
+.markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-live-inline-code) * {
+    font-size: inherit !important;
+}
+
+/* Same #id specificity boost as the code block lines above */
+.markdown-editor .cm-live-preview :is(#poznote-md-code-font-boost, .cm-live-inline-code),
+.markdown-editor .cm-live-preview :is(#poznote-md-code-font-boost, .cm-live-inline-code) span {
+    font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
+}
+
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-link, .cm-live-link *) {
+    color: var(--pz-accent-text);
+    text-decoration: none !important;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-image-wrap {
+    display: inline-block;
+    max-width: 100%;
+    vertical-align: bottom;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-image {
+    max-width: 100%;
+    height: auto;
+    vertical-align: bottom;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-image:not(.img-with-border):not(.img-with-border-no-padding) {
+    border-radius: var(--pz-radius-sm);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-mark {
+    background-color: var(--pz-color-yellow-soft);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-underline {
+    text-decoration: underline;
+}
+
+/* Bullets and task boxes are drawn over the marker, which keeps its width
+   (the hanging indent is measured on it) and its caret positions. */
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-bullet, .cm-live-task, .cm-live-task-bullet),
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-bullet, .cm-live-task, .cm-live-task-bullet) * {
+    color: transparent !important;
+}
+
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-bullet, .cm-live-task) {
+    position: relative;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-bullet::before {
+    content: '\2022';
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    color: var(--pz-text-muted);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-task {
+    cursor: pointer;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-task::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 0.95em;
+    height: 0.95em;
+    transform: translateY(-50%);
+    box-sizing: border-box;
+    border: 1.5px solid var(--pz-text-muted);
+    border-radius: var(--pz-radius-sm);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-task-checked::before {
+    background-color: var(--pz-accent);
+    border-color: var(--pz-accent);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-task-checked::after {
+    content: '';
+    position: absolute;
+    left: 0.33em;
+    top: 50%;
+    width: 0.28em;
+    height: 0.52em;
+    transform: translateY(-60%) rotate(45deg);
+    box-sizing: border-box;
+    border: solid var(--pz-text-inverse);
+    border-width: 0 2px 2px 0;
 }
 
 .cm-tooltip {
@@ -489,19 +963,25 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
     text-decoration: underline;
 }
 
+/* The .cm-live-media twins below are the same elements shown by the Markdown
+   editor's live rendering (audio and video players, YouTube and other allowed
+   embeds), which the preview's parser builds for it: one look for both. */
 .markdown-preview img,
-.markdown-preview iframe {
+.markdown-preview iframe,
+.markdown-codemirror-host .cm-live-media iframe {
     max-width: 100%;
     height: auto;
     border-radius: var(--pz-radius-sm);
     margin: 0;
 }
 
-.markdown-preview iframe {
+.markdown-preview iframe,
+.markdown-codemirror-host .cm-live-media iframe {
     border: none;
 }
 
-.markdown-preview video {
+.markdown-preview video,
+.markdown-codemirror-host .cm-live-media video {
     max-width: 100%;
     height: auto;
     border-radius: var(--pz-radius-lg);
@@ -511,7 +991,9 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 }
 
 .markdown-preview audio,
-.markdown-preview .note-audio-embed {
+.markdown-preview .note-audio-embed,
+.markdown-codemirror-host .cm-live-media audio,
+.markdown-codemirror-host .cm-live-media .note-audio-embed {
     max-width: 280px;
     display: block;
     margin: 8px 0;
@@ -522,12 +1004,15 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 @media screen and (max-width: 768px) {
 
     .markdown-preview audio,
-    .markdown-preview .note-audio-embed {
+    .markdown-preview .note-audio-embed,
+    .markdown-codemirror-host .cm-live-media audio,
+    .markdown-codemirror-host .cm-live-media .note-audio-embed {
         max-width: 240px;
     }
 }
 
-.markdown-preview iframe[data-is-audio] {
+.markdown-preview iframe[data-is-audio],
+.markdown-codemirror-host .cm-live-media iframe[data-is-audio] {
     max-width: 280px;
     width: 100%;
     height: 54px;
@@ -552,7 +1037,8 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 }
 
 @media screen and (max-width: 768px) {
-    .markdown-preview iframe[data-is-audio] {
+    .markdown-preview iframe[data-is-audio],
+    .markdown-codemirror-host .cm-live-media iframe[data-is-audio] {
         max-width: 240px;
     }
 

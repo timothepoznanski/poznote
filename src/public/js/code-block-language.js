@@ -278,7 +278,24 @@
     /**
      * Retag a block. An empty language turns it into a plain block.
      */
+    /**
+     * A block that is not a rendered <pre>: the Markdown editor's live
+     * rendering opens the modal for a fence of its own, handing over the
+     * language written on it and a function that rewrites it
+     * (build/markdown-editor/src/live-preview.js).
+     */
+    function isLanguageTarget(block) {
+        return !!(block && typeof block.apply === 'function' && !block.tagName);
+    }
+
     function applyLanguage(block, lang) {
+        if (isLanguageTarget(block)) {
+            var chosen = String(lang || '').trim();
+            // 'code' is the modal's plain-block entry, not a markdown language
+            block.apply(chosen.toLowerCase() === 'code' ? '' : chosen);
+            return;
+        }
+
         var pre = getPreElement(block);
         if (!pre) return;
 
@@ -492,6 +509,8 @@
      * rather than the badge, which shows "CODE" for every plain language.
      */
     function getSelectedLanguage(block) {
+        if (isLanguageTarget(block)) return String(block.language || '');
+
         if (!block) return '';
         return getMarkdownPreview(block)
             ? getMarkdownBlockLanguage(block)
@@ -605,6 +624,7 @@
     });
 
     window.refreshCodeBlockLanguageButtons = refreshAllLanguageButtons;
+    window.openCodeBlockLanguageModal = openModal;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function () {
