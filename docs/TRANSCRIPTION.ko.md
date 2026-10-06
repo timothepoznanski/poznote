@@ -70,7 +70,7 @@ docker compose exec webserver curl -X POST http://speaches:8000/v1/models/Systra
 
 몇 초 뒤 `Model 'Systran/faster-whisper-small' downloaded`로 응답합니다(약 480 MB). 모델은 `speaches-cache` 볼륨에 저장되어 재시작 후에도 유지됩니다.
 
-**4. Poznote를 설정하세요.** **설정 → 관리 도구 → 음성 텍스트 변환 (STT)**에서 다음을 진행합니다.
+**4. Poznote를 설정하세요.** **설정 > 관리자 도구 > 음성 텍스트 변환 (STT)**에서 다음을 진행합니다.
 
 - **음성 텍스트 변환 활성화** 켜기
 - **Speaches(로컬)** 선택 후 URL에 `http://speaches:8000` 입력
@@ -112,7 +112,7 @@ docker compose exec webserver curl -X POST http://speaches:8000/v1/models/Systra
 
 ## 설정
 
-모든 설정은 관리자 전용 **설정 → 관리 도구 → 음성 텍스트 변환 (STT)**에 있습니다.
+모든 설정은 관리자 전용 **설정 > 관리자 도구 > 음성 텍스트 변환 (STT)**에 있습니다.
 
 | 설정 | 기능 |
 |---|---|

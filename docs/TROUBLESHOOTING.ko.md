@@ -192,7 +192,7 @@ volumes:
 <summary><strong>관리자 비밀번호 분실</strong></summary>
 <br>
 
-다른 관리자가 로그인할 수 있으면 **설정 > 관리 도구 > 사용자 관리**에서 새 비밀번호를 지정할 수 있습니다. 그렇지 않으면 마스터 DB에서 직접 초기화하세요. 호스트의 Poznote 디렉터리에서 실행합니다. `sqlite3` 명령줄 도구는 호스트에 설치해야 하며 Poznote 이미지에 포함되지 않습니다.
+다른 관리자가 로그인할 수 있으면 **설정 > 관리자 도구 > 사용자 관리**에서 새 비밀번호를 지정할 수 있습니다. 그렇지 않으면 마스터 DB에서 직접 초기화하세요. 호스트의 Poznote 디렉터리에서 실행합니다. `sqlite3` 명령줄 도구는 호스트에 설치해야 하며 Poznote 이미지에 포함되지 않습니다.
 
 ```bash
 sudo sqlite3 data/master.db "UPDATE users SET password_hash=NULL, password_login_disabled=0 WHERE id=1;"
@@ -209,7 +209,7 @@ sudo sqlite3 data/master.db "UPDATE users SET password_hash=NULL, password_login
 <summary><strong>2단계 인증으로 로그인 불가(기기와 복구 코드 분실)</strong></summary>
 <br>
 
-활성화 때 받은 복구 코드는 각각 한 번 로그인할 수 있습니다. 코드 화면에서 **복구 코드 사용**을 선택하세요. 코드가 없으면 관리자가 **설정 > 관리 도구 > 사용자 관리**의 해당 계정 비밀번호 창에서 2단계 인증을 끌 수 있습니다.
+활성화 때 받은 복구 코드는 각각 한 번 로그인할 수 있습니다. 코드 화면에서 **복구 코드 사용**을 선택하세요. 코드가 없으면 관리자가 **설정 > 관리자 도구 > 사용자 관리**의 해당 계정 비밀번호 창에서 2단계 인증을 끌 수 있습니다.
 
 유일한 관리자라면 마스터 DB에서 두 번째 인증 요소를 직접 제거하세요. 호스트의 Poznote 디렉터리에서 실행하며 `sqlite3`가 설치되어 있어야 합니다.
 
