@@ -283,7 +283,15 @@ function poznoteHtmlToMarkdown(string $html): string {
             $code = strip_tags($code);
             return "\n\n```\n" . trim($code) . "\n```\n\n";
         }
-        return "`" . html_entity_decode(strip_tags($code), ENT_QUOTES | ENT_HTML5, 'UTF-8') . "`";
+        $code = html_entity_decode(strip_tags($code), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        if (strpos($code, '`') === false) {
+            return '`' . $code . '`';
+        }
+        // Code holding backticks takes a longer run around it, padded with a
+        // space so the run does not merge with a backtick at either end
+        preg_match_all('/`+/', $code, $runs);
+        $ticks = str_repeat('`', max(array_map('strlen', $runs[0])) + 1);
+        return $ticks . ' ' . $code . ' ' . $ticks;
     }, $md);
     
     // Links

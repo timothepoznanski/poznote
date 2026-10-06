@@ -448,10 +448,17 @@ function parseMarkdown($text) {
 
     $protectedInlineCode = [];
     $inlineCodeIndex = 0;
-    $text = preg_replace_callback('/(?<!\\\\)`([^`\n]+?)(?<!\\\\)`/', function($matches) use (&$protectedInlineCode, &$inlineCodeIndex, &$placeholderSources) {
+    // A span opens on a run of backticks and closes on the next run of the same
+    // length, so a longer run can hold backticks: `` `code` ``. One space on each
+    // side is dropped, which is what lets the content start or end with a backtick.
+    $text = preg_replace_callback('/(?<![\\\\`])(`+)(?!`)([^\n]*?[^`\n])\1(?!`)/', function($matches) use (&$protectedInlineCode, &$inlineCodeIndex, &$placeholderSources) {
         $placeholder = "\x00RAWCODE" . $inlineCodeIndex . "\x00";
         $placeholderSources[$placeholder] = $matches[0];
-        $protectedInlineCode[$inlineCodeIndex] = $matches[1];
+        $code = $matches[2];
+        if (strlen($code) > 2 && $code[0] === ' ' && substr($code, -1) === ' ' && trim($code) !== '') {
+            $code = substr($code, 1, -1);
+        }
+        $protectedInlineCode[$inlineCodeIndex] = $code;
         $inlineCodeIndex++;
         return $placeholder;
     }, $text);

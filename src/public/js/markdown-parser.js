@@ -1044,8 +1044,14 @@ function parseMarkdown(text) {
     // Protect inline code spans so their content is not consumed by math regexes
     let protectedRawCode = [];
     let rawCodeIndex = 0;
-    text = text.replace(/(?<!\\)`([^`\n]+?)(?<!\\)`/g, function (match, code) {
+    // A span opens on a run of backticks and closes on the next run of the same
+    // length, so a longer run can hold backticks: `` `code` ``. One space on each
+    // side is dropped, which is what lets the content start or end with a backtick.
+    text = text.replace(/(?<![\\`])(`+)(?!`)([^\n]*?[^`\n])\1(?!`)/g, function (match, ticks, code) {
         let placeholder = '\x00RAWCODE' + rawCodeIndex + '\x00';
+        if (code.length > 2 && code.charAt(0) === ' ' && code.charAt(code.length - 1) === ' ' && code.trim() !== '') {
+            code = code.slice(1, -1);
+        }
         protectedRawCode[rawCodeIndex] = code;
         rawCodeIndex++;
         return rememberPlaceholderSource(placeholder, match);
