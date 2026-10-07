@@ -105,6 +105,7 @@
             'sidebar_offline_marks',
             'markdown_split_card_view',
             'markdown_split_preview_left',
+            'markdown_heading_underline',
             'markdown_default_view_mode',
             'markdown_new_note_view_mode',
             'markdown_colored',
@@ -669,7 +670,7 @@
 
         initInlineControl('markdown-new-note-view-mode-select', {
             load: loadSettingValue('markdown_new_note_view_mode', function (value) {
-                return value === 'edit' || value === 'live' ? value : 'split';
+                return ['edit', 'live', 'rich'].indexOf(value) !== -1 ? value : 'split';
             }),
             save: saveSettingValue('markdown_new_note_view_mode')
         });
@@ -2986,6 +2987,7 @@
         setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false, true);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
         setupToggleCard('markdown-split-preview-left-card', 'markdown-split-preview-left-status', 'markdown_split_preview_left', false, false);
+        setupToggleCard('markdown-heading-underline-card', 'markdown-heading-underline-status', 'markdown_heading_underline', false, true);
         refreshMarkdownColoredBadge();
         setupToggleCard('code-wrap-card', 'code-wrap-status', 'code_block_word_wrap', false, true);
         setupToggleCard('code-line-numbers-card', 'code-line-numbers-status', 'code_block_line_numbers', false, false);

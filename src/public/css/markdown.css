@@ -378,6 +378,15 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
     font-size: inherit !important;
 }
 
+/* Rich text: an empty heading (just inserted from a menu, its marker hidden)
+   shows where its title goes */
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-heading-empty::after {
+    content: attr(data-placeholder);
+    color: var(--pz-text-subtle);
+    font-weight: var(--pz-weight-medium);
+    pointer-events: none;
+}
+
 /* Headings take the text colour, as in the preview, unless the colored
    markdown setting gives each level its own (--poznote-cm-headingN below). */
 body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-cm-heading {
@@ -485,6 +494,54 @@ body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-
    (.math-inline, .math-block, at the end of this file) */
 .markdown-codemirror-host .cm-live-preview .cm-live-math-display {
     display: block;
+}
+
+/* Syntax that is never shown (markdown_live_show_syntax off): still in the
+   line as text, which the editor steps over as one piece, but not laid out. */
+.markdown-codemirror-host .cm-live-preview .cm-live-squeezed {
+    display: none;
+}
+
+/* Rich text: the empty pair of markers a formatting command wrote around the
+   caret ("**|**"), until its text is typed. Text of no size rather than
+   display: none, so that the caret has a place between the two halves. The
+   #id is the same boost as the other sizes of this block. */
+/* Same for a hidden marker that ends its line (the closing ` of inline code
+   typed last): it keeps a place after it for the caret. */
+.markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-live-empty-pair, .cm-live-squeezed-tail),
+.markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-live-empty-pair, .cm-live-squeezed-tail) * {
+    font-size: 0 !important;
+    letter-spacing: 0;
+}
+
+/* In the middle of that empty pair: something of the line's height for the
+   caret to be drawn against, of no width for bold, italic or strikethrough,
+   and for inline code the start of its grey ground, so that the place where
+   the code goes can be seen before a character is typed. */
+.markdown-codemirror-host .cm-live-preview .cm-live-pair-strut {
+    display: inline-block;
+    width: 0;
+    height: 1.2em;
+    vertical-align: text-bottom;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-pair-code {
+    width: 0.9em;
+    background-color: var(--pz-surface-hover);
+    border-radius: var(--pz-radius-sm);
+    box-shadow: inset 0 0 0 1px var(--pz-border);
+}
+
+/* Rich text: a link is followed on a plain click, and says so */
+body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .cm-live-link {
+    cursor: pointer;
+}
+
+/* A colour or a highlight chosen with nothing selected: a short mark in that
+   colour where the text will go (the style comes from the tag itself) */
+.markdown-codemirror-host .cm-live-preview .cm-live-pair-color {
+    width: 0.5em;
+    border-bottom: 2px solid currentColor;
 }
 
 /* Paragraphs aligned from the toolbar (<p align="...">) */
@@ -1753,6 +1810,14 @@ body.markdown-split-card-view .noteentry.markdown-split-mode {
 body.markdown-split-card-view .noteentry.markdown-split-mode > .markdown-split-resizer {
     margin: 0 8px;
     border-right-color: transparent;
+}
+
+/* Heading underline turned off (discussion 1589, setting
+   markdown_heading_underline): no line under the H1 and H2 of the preview nor
+   of the live rendering. The id in :is() matches the one of the rules above. */
+body.markdown-no-heading-underline .markdown-preview :is(h1, h2),
+body.markdown-no-heading-underline .markdown-editor .cm-live-preview .cm-line:is(#poznote-md-live-size-boost, .cm-live-h1, .cm-live-h2) {
+    border-bottom: none;
 }
 
 /* Preview on the left (discussion 1502, setting markdown_split_preview_left).

@@ -149,6 +149,7 @@
       "note_width": "Adjust the maximum width of the note content, as a percentage of the note column.",
       "markdown_split_card_view": "Display markdown notes in a framed split view with editor and preview.",
       "markdown_split_preview_left": "In split mode, show the preview on the left and the editor on the right.",
+      "markdown_heading_underline": "Draw a line under the level 1 and level 2 headings of markdown notes.",
       "markdown_colored": "Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.",
       "code_wrap": "Wrap long lines in code blocks instead of scrolling horizontally.",
       "code_line_numbers": "Show line numbers in code blocks in the markdown preview.",
@@ -476,6 +477,7 @@
       "note_content_width": "Note content width",
       "markdown_split_card_view": "Framed markdown",
       "markdown_split_preview_left": "Preview on the left",
+      "markdown_heading_underline": "Heading underline",
       "markdown_colored": "Colored markdown",
       "code_block_word_wrap": "Code block word wrap",
       "code_block_line_numbers": "Code block line numbers",
@@ -1245,7 +1247,8 @@
         "split": "Split (editor and preview side by side)",
         "split_short": "Split",
         "last": "Last used mode",
-        "live": "Live rendering"
+        "live": "Live preview",
+        "rich": "Rich text"
       },
       "hint": "A note you switch to another mode opens again in the default mode next time."
     },
@@ -1966,7 +1969,8 @@
       "create_linked_note": "Create shortcut",
       "search_replace": "Search and replace",
       "split_view": "Toggle split view",
-      "view_cycle_live": "Switch to live rendering",
+      "view_cycle_live": "Switch to live preview",
+      "view_cycle_rich": "Switch to rich text",
       "view_cycle_split": "Switch to split view",
       "view_cycle_preview": "Back to preview mode",
       "view_cycle_edit": "Back to edit mode",
@@ -4903,7 +4907,7 @@
   "page_menu": {
     "button": "More options",
     "split_view": "Split view",
-    "markdown_view": "Markdown view (preview, live, split)"
+    "markdown_view": "Markdown view (classic, live preview, rich text, split)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Keyboard shortcuts",

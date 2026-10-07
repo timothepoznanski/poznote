@@ -270,7 +270,7 @@ class SettingsController {
 
         if ($key === 'markdown_new_note_view_mode') {
             $normalized = trim((string) $value);
-            if (!in_array($normalized, ['split', 'edit', 'live'], true)) {
+            if (!in_array($normalized, ['split', 'edit', 'live', 'rich'], true)) {
                 throw new InvalidArgumentException('invalid markdown new note view mode', 400);
             }
             return $normalized;

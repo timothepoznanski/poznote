@@ -77,6 +77,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-width-card" checked><span><?php echo t_h('display.cards.note_content_width', [], 'Note content width'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-preview-left-card" checked><span><?php echo t_h('display.cards.markdown_split_preview_left', [], 'Preview on the left'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-heading-underline-card" checked><span><?php echo t_h('display.cards.markdown_heading_underline', [], 'Heading underline'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-colored-card" checked><span><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-line-numbers-card" checked><span><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span></label>
@@ -304,7 +305,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-icons" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard"><input type="checkbox" data-ui-key="card:edgeAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeFocusModeBtn" checked><span><?php echo t_h('focus_mode.button', [], 'Focus mode'); ?></span></label>
-    <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeSplitViewBtn" checked><span><?php echo t_h('page_menu.markdown_view', [], 'Markdown view (preview, live, split)'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeSplitViewBtn" checked><span><?php echo t_h('page_menu.markdown_view', [], 'Markdown view (classic, live preview, rich text, split)'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeMenuNoteWidth" checked><span><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeMenuNoteInfo" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeMenuShortcuts" checked><span><?php echo t_h('keyboard_shortcuts.menu_item', [], 'Keyboard shortcuts'); ?></span></label>

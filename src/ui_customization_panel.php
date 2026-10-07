@@ -121,23 +121,27 @@ require_once __DIR__ . '/markdown_syntax_content.php';
          (note_display.php) sit under it, see css/ui-customization-panel.css. -->
     <div class="pz-edge-stack">
         <?php if ($uiCustomizationPanelPage === 'notes'): ?>
-        <!-- View of a Markdown note, one button cycling through its three
-             states: classic (preview, with the pencil to edit), live rendering
-             in the editor (discussion 1582, the account's markdown_live_editing
-             setting) and split view (discussion 1482). It shows the icon of
-             the state it is in, lit outside the classic one, and its title
-             says where a click leads; the last one goes back to where the
-             cycle started, the preview or the classic editor. Hidden until a
-             Markdown note is open.
-             All from js/ui-customization-panel.js; the cycle itself is
+        <!-- View of a Markdown note, one button cycling through its four
+             states: classic (preview, with the pencil to edit), live preview
+             (the editor shows the note formatted, the syntax comes back under
+             the caret; discussion 1582), rich text (same, but the syntax is
+             never shown and typed text is never read as Markdown) and split
+             view (discussion 1482). The two live views are the account's
+             markdown_live_editing and markdown_live_show_syntax settings. The
+             button shows the icon of the state it is in, lit outside the
+             classic one, and its title says where a click leads; the last one
+             goes back to where the cycle started, the preview or the classic
+             editor. Hidden until a Markdown note is open. All from
+             js/ui-customization-panel.js; the cycle itself is
              cycleMarkdownView() in js/markdown-view-modes.js. A phone has no
-             split view and goes classic, live, classic. -->
+             split view and goes classic, live preview, rich text, classic. -->
         <button type="button" id="edgeSplitViewBtn" class="pz-edge-btn pz-edge-view-btn" data-action="cycle-markdown-view" hidden
-            data-label-live="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live rendering'); ?>"
+            data-label-live="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live preview'); ?>"
+            data-label-rich="<?php echo t_h('editor.toolbar.view_cycle_rich', [], 'Switch to rich text'); ?>"
             data-label-split="<?php echo t_h('editor.toolbar.view_cycle_split', [], 'Switch to split view'); ?>"
             data-label-preview="<?php echo t_h('editor.toolbar.view_cycle_preview', [], 'Back to preview mode'); ?>"
             data-label-edit="<?php echo t_h('editor.toolbar.view_cycle_edit', [], 'Back to edit mode'); ?>"
-            title="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live rendering'); ?>" aria-label="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live rendering'); ?>">
+            title="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live preview'); ?>" aria-label="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live preview'); ?>">
             <i class="lucide lucide-file-text"></i>
         </button>
         <?php endif; ?>

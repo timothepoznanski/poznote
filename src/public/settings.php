@@ -119,6 +119,7 @@ $settingsPageUserKeys = [
     'sidebar_offline_marks',
     'markdown_split_card_view',
     'markdown_split_preview_left',
+    'markdown_heading_underline',
     'markdown_default_view_mode',
     'markdown_new_note_view_mode',
     'markdown_colored',
@@ -1222,7 +1223,7 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- View mode of a new, empty note (split / edit / live rendering) -->
+            <!-- View mode of a new, empty note (split / edit / live preview / rich text) -->
             <div class="home-card settings-inline-card" id="markdown-new-note-view-mode-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_new_note_view_mode', [], 'Choose whether a new markdown note opens in split, edit or live rendering mode. Live rendering is then turned on for the other notes too. On a phone a new note never opens in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-file-plus"></i></div>
@@ -1231,7 +1232,8 @@ if ($canUseUserWebhooks) {
                     <select id="markdown-new-note-view-mode-select" class="settings-inline-control settings-inline-select" data-control="markdown-new-note-view-mode-select">
                         <option value="split"><?php echo t_h('modals.markdown_default_view_mode.options.split_short', [], 'Split'); ?></option>
                         <option value="edit"><?php echo t_h('modals.markdown_default_view_mode.options.edit', [], 'Edit'); ?></option>
-                        <option value="live"><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live rendering'); ?></option>
+                        <option value="live"><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live preview'); ?></option>
+                        <option value="rich"><?php echo t_h('modals.markdown_default_view_mode.options.rich', [], 'Rich text'); ?></option>
                     </select>
                 </div>
             </div>
@@ -1284,6 +1286,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_preview_left', [], 'Preview on the left'); ?></span>
                     <span id="markdown-split-preview-left-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Line under the H1 and H2 headings (discussion 1589) -->
+            <div class="home-card" id="markdown-heading-underline-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_heading_underline', [], 'Draw a line under the level 1 and level 2 headings of markdown notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-underline"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_heading_underline', [], 'Heading underline'); ?></span>
+                    <span id="markdown-heading-underline-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
 
