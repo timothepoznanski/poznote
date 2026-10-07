@@ -470,6 +470,7 @@
       "note_width": "Ajustez la largeur maximale du contenu des notes, en pourcentage de la colonne de note.",
       "markdown_split_card_view": "Affichez les notes markdown dans une vue scindée encadrée avec éditeur et aperçu.",
       "markdown_split_preview_left": "En mode scindé, affiche l'aperçu à gauche et l'éditeur à droite.",
+      "markdown_heading_underline": "Trace une ligne sous les titres de niveau 1 et 2 des notes markdown.",
       "markdown_colored": "Colorez les notes markdown : choisissez une couleur pour chaque niveau de titre, le code en ligne, le fond des blocs de code, les citations, les en-têtes de tableaux et les séparateurs.",
       "code_wrap": "Renvoyez à la ligne les longues lignes des blocs de code au lieu de défiler horizontalement.",
       "code_line_numbers": "Affichez les numéros de ligne dans les blocs de code de l'aperçu markdown.",
@@ -833,6 +834,7 @@
       "note_content_width": "Largeur du contenu de la note",
       "markdown_split_card_view": "Markdown encadré",
       "markdown_split_preview_left": "Aperçu à gauche",
+      "markdown_heading_underline": "Soulignement des titres",
       "markdown_colored": "Markdown coloré",
       "code_block_word_wrap": "Retour à la ligne des blocs de code",
       "code_block_line_numbers": "Numéros de ligne des blocs de code",
@@ -1164,7 +1166,8 @@
       "create_linked_note": "Créer un raccourci",
       "open_in_new_tab": "Ouvrir dans un nouvel onglet",
       "split_view": "Activer/désactiver la vue divisée",
-      "view_cycle_live": "Passer au rendu en direct",
+      "view_cycle_live": "Passer à l'aperçu en direct",
+      "view_cycle_rich": "Passer au texte enrichi",
       "view_cycle_split": "Passer à la vue divisée",
       "view_cycle_preview": "Revenir au mode aperçu",
       "view_cycle_edit": "Revenir au mode édition",
@@ -1730,7 +1733,8 @@
         "split": "Vue partagée (éditeur et aperçu côte à côte)",
         "split_short": "Vue partagée",
         "last": "Dernier mode utilisé",
-        "live": "Rendu en direct"
+        "live": "Aperçu en direct",
+        "rich": "Texte enrichi"
       },
       "hint": "Une note passée dans un autre mode se rouvre ensuite dans le mode par défaut."
     },
@@ -5172,7 +5176,7 @@
   "page_menu": {
     "button": "Plus d'options",
     "split_view": "Vue divisée",
-    "markdown_view": "Vue Markdown (aperçu, direct, divisée)"
+    "markdown_view": "Vue Markdown (classique, aperçu en direct, texte enrichi, divisée)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Raccourcis clavier",

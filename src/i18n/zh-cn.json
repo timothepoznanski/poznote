@@ -470,6 +470,7 @@
       "note_width": "调整笔记内容的最大宽度，以笔记栏宽度的百分比表示。",
       "markdown_split_card_view": "以带边框的分栏视图（编辑器和预览）显示 Markdown 笔记。",
       "markdown_split_preview_left": "在分栏模式下，将预览显示在左侧，编辑器显示在右侧。",
+      "markdown_heading_underline": "在 Markdown 笔记的一级和二级标题下方显示一条线。",
       "markdown_colored": "为 Markdown 笔记上色：为每级标题、行内代码、代码块背景、引用、表格表头和分隔线分别选择颜色。",
       "code_wrap": "代码块中的长行自动换行，而不是水平滚动。",
       "code_line_numbers": "在 markdown 预览的代码块中显示行号。",
@@ -830,6 +831,7 @@
       "note_content_width": "笔记内容宽度",
       "markdown_split_card_view": "带边框的 Markdown",
       "markdown_split_preview_left": "预览在左侧",
+      "markdown_heading_underline": "标题下划线",
       "markdown_colored": "彩色 Markdown",
       "code_block_word_wrap": "代码块自动换行",
       "code_block_line_numbers": "代码块行号",
@@ -1172,7 +1174,8 @@
       "open_in_new_tab": "在新标签页中打开",
       "search_replace": "查找替换",
       "split_view": "切换分屏视图",
-      "view_cycle_live": "切换到实时渲染",
+      "view_cycle_live": "切换到实时预览",
+      "view_cycle_rich": "切换到富文本",
       "view_cycle_split": "切换到分屏视图",
       "view_cycle_preview": "返回预览模式",
       "view_cycle_edit": "返回编辑模式",
@@ -1716,7 +1719,8 @@
         "split": "分栏（编辑器与预览并排）",
         "split_short": "分栏",
         "last": "上次使用的模式",
-        "live": "实时渲染"
+        "live": "实时预览",
+        "rich": "富文本"
       },
       "hint": "切换到其他模式的笔记，下次打开时会恢复为默认模式。"
     },
@@ -5164,7 +5168,7 @@
   "page_menu": {
     "button": "更多选项",
     "split_view": "分屏视图",
-    "markdown_view": "Markdown 视图（预览、实时、分屏）"
+    "markdown_view": "Markdown 视图（经典、实时预览、富文本、分屏）"
   },
   "keyboard_shortcuts": {
     "menu_item": "键盘快捷键",

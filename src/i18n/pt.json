@@ -471,6 +471,7 @@
       "note_width": "Ajuste a largura máxima do conteúdo das notas, como porcentagem da coluna da nota.",
       "markdown_split_card_view": "Exiba notas markdown em uma visão dividida emoldurada com editor e pré-visualização.",
       "markdown_split_preview_left": "No modo dividido, mostra a pré-visualização à esquerda e o editor à direita.",
+      "markdown_heading_underline": "Desenha uma linha sob os títulos de nível 1 e 2 das notas markdown.",
       "markdown_colored": "Adicione cor às notas markdown: escolha uma cor para cada nível de título, código embutido, fundo dos blocos de código, citações, cabeçalhos de tabela e separadores.",
       "code_wrap": "Quebre linhas longas nos blocos de código em vez de rolar horizontalmente.",
       "code_line_numbers": "Mostre os números de linha nos blocos de código na pré-visualização de markdown.",
@@ -831,6 +832,7 @@
       "note_content_width": "Largura do conteúdo da nota",
       "markdown_split_card_view": "Markdown com moldura",
       "markdown_split_preview_left": "Pré-visualização à esquerda",
+      "markdown_heading_underline": "Sublinhado dos títulos",
       "markdown_colored": "Markdown colorido",
       "code_block_word_wrap": "Quebra de linha em blocos de código",
       "code_block_line_numbers": "Números de linha em blocos de código",
@@ -1173,7 +1175,8 @@
       "create_linked_note": "Criar atalho",
       "open_in_new_tab": "Abrir em nova aba",
       "split_view": "Alternar vista dividida",
-      "view_cycle_live": "Mudar para renderização em tempo real",
+      "view_cycle_live": "Mudar para pré-visualização em tempo real",
+      "view_cycle_rich": "Mudar para texto formatado",
       "view_cycle_split": "Mudar para vista dividida",
       "view_cycle_preview": "Voltar ao modo de pré-visualização",
       "view_cycle_edit": "Voltar ao modo de edição",
@@ -1724,7 +1727,8 @@
         "split": "Vista dividida (editor e pré-visualização lado a lado)",
         "split_short": "Vista dividida",
         "last": "Último modo usado",
-        "live": "Renderização em tempo real"
+        "live": "Pré-visualização em tempo real",
+        "rich": "Texto formatado"
       },
       "hint": "Uma nota que você mudar para outro modo abre novamente no modo padrão."
     },
@@ -5068,7 +5072,7 @@
   "page_menu": {
     "button": "Mais opções",
     "split_view": "Vista dividida",
-    "markdown_view": "Vista Markdown (pré-visualização, tempo real, dividida)"
+    "markdown_view": "Vista Markdown (clássica, pré-visualização em tempo real, texto formatado, dividida)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Atalhos de teclado",
