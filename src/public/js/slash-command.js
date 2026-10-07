@@ -6069,8 +6069,25 @@
                     || !!(savedNoteEntry && savedNoteEntry.getAttribute('data-note-type') === 'markdown');
                 activeCommands = getClipboardPasteCommands(isMarkdown).concat(activeCommands || []);
                 updateMenuContent();
+                // The menu was placed before these rows were added: it is
+                // taller now, and its foot went under the window's edge
+                keepSlashMenuInViewport();
             }
         }
+    }
+
+    // Moves the open menu up when rows added after it was positioned push its
+    // foot out of the window (its height is capped by CSS, so it always fits).
+    // The top comes from the style, not from the box: the menu slides in
+    // through a transform while it opens.
+    function keepSlashMenuInViewport() {
+        if (!slashMenuElement) return;
+        const padding = 8;
+        const top = parseFloat(slashMenuElement.style.top);
+        if (!isFinite(top)) return;
+        const height = slashMenuElement.getBoundingClientRect().height;
+        const highest = Math.max(padding, window.innerHeight - height - padding);
+        if (top > highest) slashMenuElement.style.top = highest + 'px';
     }
 
     // Nothing selected under the pointer: move the caret to the click and open
