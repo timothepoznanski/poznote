@@ -119,6 +119,7 @@ $settingsPageUserKeys = [
     'sidebar_offline_marks',
     'markdown_split_card_view',
     'markdown_split_preview_left',
+    'markdown_heading_underline',
     'markdown_default_view_mode',
     'markdown_new_note_view_mode',
     'markdown_colored',
@@ -1285,6 +1286,16 @@ if ($canUseUserWebhooks) {
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_split_preview_left', [], 'Preview on the left'); ?></span>
                     <span id="markdown-split-preview-left-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Line under the H1 and H2 headings (discussion 1589) -->
+            <div class="home-card" id="markdown-heading-underline-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_heading_underline', [], 'Draw a line under the level 1 and level 2 headings of markdown notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-underline"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_heading_underline', [], 'Heading underline'); ?></span>
+                    <span id="markdown-heading-underline-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
 

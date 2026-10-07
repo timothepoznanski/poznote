@@ -1798,6 +1798,14 @@ body.markdown-split-card-view .noteentry.markdown-split-mode > .markdown-split-r
     border-right-color: transparent;
 }
 
+/* Heading underline turned off (discussion 1589, setting
+   markdown_heading_underline): no line under the H1 and H2 of the preview nor
+   of the live rendering. The id in :is() matches the one of the rules above. */
+body.markdown-no-heading-underline .markdown-preview :is(h1, h2),
+body.markdown-no-heading-underline .markdown-editor .cm-live-preview .cm-line:is(#poznote-md-live-size-boost, .cm-live-h1, .cm-live-h2) {
+    border-bottom: none;
+}
+
 /* Preview on the left (discussion 1502, setting markdown_split_preview_left).
  *
  * The DOM keeps the editor first, the panes only swap places on screen: the
