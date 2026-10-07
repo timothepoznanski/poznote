@@ -453,7 +453,7 @@
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
       "markdown_default_view_mode": "Elige si las notas markdown se abren en vista previa, edición o vista dividida.",
       "markdown_new_note_view_mode": "Elige si una nota markdown nueva se abre en vista dividida, en edición o con renderizado en vivo. El renderizado en vivo se activa entonces también para las demás notas. En el móvil una nota nueva nunca se abre en vista dividida.",
-      "markdown_live_show_syntax": "En el renderizado en vivo, muestra la sintaxis Markdown del elemento donde está el cursor (el # de un título, los ** de la negrita, la dirección de un enlace). Desactívalo para no ver nunca la sintaxis: el formato se aplica entonces desde la barra de herramientas, los menús y los atajos. Las tablas, los diagramas y las fórmulas siguen abriendo su código al hacer clic, la única forma de editarlos.",
+      "markdown_live_show_syntax": "En el renderizado en vivo, muestra la sintaxis Markdown del elemento donde está el cursor (el # de un título, los ** de la negrita, la dirección de un enlace). Desactívalo para no ver nunca la sintaxis: el formato se aplica entonces desde la barra de herramientas, los menús y los atajos. Las tablas, los diagramas y las fórmulas siguen abriendo su código al hacer clic, la única forma de editarlos. Desactivado, lo que escribes también queda como texto: un # o un * tecleado no se interpreta como Markdown.",
       "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "icon_rail_scale": "Ajusta el tamaño de los iconos de la barra de iconos.",

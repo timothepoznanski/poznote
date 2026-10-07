@@ -131,7 +131,7 @@
       "markdown_font": "Choose the font used in the markdown editor.",
       "markdown_default_view_mode": "Choose whether markdown notes open in preview, edit or split mode.",
       "markdown_new_note_view_mode": "Choose whether a new markdown note opens in split, edit or live rendering mode. Live rendering is then turned on for the other notes too. On a phone a new note never opens in split mode.",
-      "markdown_live_show_syntax": "In live rendering, show the Markdown syntax of the element the cursor is on (the # of a heading, the ** of bold text, the address of a link). Turn it off to never see the syntax: formatting is then done from the toolbar, the menus and the shortcuts. Tables, diagrams and formulas still open their source when clicked, which is the only way to edit them.",
+      "markdown_live_show_syntax": "In live rendering, show the Markdown syntax of the element the cursor is on (the # of a heading, the ** of bold text, the address of a link). Turn it off to never see the syntax: formatting is then done from the toolbar, the menus and the shortcuts. Tables, diagrams and formulas still open their source when clicked, which is the only way to edit them. When it is off, what you type also stays plain text: a # or a * typed on the keyboard is not read as Markdown.",
       "font_size": "Adjust the font size of notes, sidebar, code blocks and the settings page.",
       "index_icon_scale": "Adjust the size of the icons in the note list.",
       "icon_rail_scale": "Adjust the size of the icons in the icon sidebar.",

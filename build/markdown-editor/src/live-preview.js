@@ -14,7 +14,7 @@
 // Mermaid diagrams are whole blocks: the preview's own parser renders them
 // (renderedBlocksField below), nothing of js/markdown-parser.js is redone here.
 import { syntaxTree } from '@codemirror/language'
-import { RangeSet, RangeValue, StateEffect, StateField } from '@codemirror/state'
+import { Prec, RangeSet, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType } from '@codemirror/view'
 
 const refreshLivePreviewEffect = StateEffect.define()
@@ -547,14 +547,17 @@ function buildLivePreviewDecorations(view) {
   // squeezed to nothing by CSS: Firefox cannot hold a caret next to an
   // uneditable inline element, and the arrow keys stuck in front of a bold
   // word when the markers were replaced.
+  // atomicTo widens what the caret steps over as one piece beyond what is
+  // hidden: an escaped character goes with its backslash, or the caret could
+  // stop between the two and typing there would split the pair.
   const neverShown = []
-  const hide = (from, to) => {
+  const hide = (from, to, atomicTo) => {
     if (to <= from) return
     if (revealSyntax) {
       decorations.push(hiddenMarker.range(from, to))
     } else {
       decorations.push(squeezedMarker.range(from, to))
-      neverShown.push(squeezedMarker.range(from, to))
+      neverShown.push(squeezedMarker.range(from, Math.max(to, atomicTo || 0)))
     }
   }
   const skipSpaces = pos => {
@@ -962,7 +965,7 @@ function buildLivePreviewDecorations(view) {
           }
 
           case 'Escape':
-            if (!touches(node.from, node.to)) hide(node.from, node.from + 1)
+            if (!touches(node.from, node.to)) hide(node.from, node.from + 1, node.to)
             return
 
           case 'FencedCode':
@@ -1156,6 +1159,124 @@ const renderedBlocksField = StateField.define({
   },
   provide: field => EditorView.decorations.from(field)
 })
+
+// Literal typing, the other half of "the syntax is never shown"
+// (markdown_live_show_syntax off): what is typed is text, never formatting.
+// A character Markdown would read as syntax where it is typed goes into the
+// source behind a backslash, which the note then shows as the plain character
+// (the backslash itself is hidden with the rest of the syntax). Formatting
+// comes from the toolbar, the shortcuts, the slash menu and the right-click
+// menu, which write their Markdown themselves and do not come through here;
+// nor does pasted text, which keeps its Markdown.
+function isSyntaxRevealed() {
+  return !!document.body && document.body.getAttribute('data-markdown-live-syntax') === '1'
+}
+
+// Places where what is typed is the source itself: code, the source of a
+// table or of a formula while it is open for editing
+function isRawTypingContext(state, pos) {
+  for (let node = syntaxTree(state).resolveInner(pos, -1); node; node = node.parent) {
+    if (['FencedCode', 'CodeBlock', 'InlineCode', 'CodeText'].includes(node.name)) return true
+  }
+  if (getRenderedBlocks(state.doc).some(block => pos >= block.from && pos <= block.to)) return true
+
+  const line = state.doc.lineAt(pos)
+  const offset = pos - line.from
+  for (const regex of [DISPLAY_MATH_REGEX, INLINE_MATH_REGEX]) {
+    regex.lastIndex = 0
+    let match
+    while ((match = regex.exec(line.text))) {
+      if (offset > match.index && offset < match.index + match[0].length) return true
+    }
+  }
+  return false
+}
+
+const LINE_PREFIX_REGEX = /^\s*(?:(?:[-*+]|\d+[.)])\s+|>\s?)*\s*$/
+
+// `before` is the text of the line up to the character being typed
+function needsEscape(character, before) {
+  const previous = before.slice(-1)
+  const lineStart = LINE_PREFIX_REGEX.test(before)
+
+  switch (character) {
+    case '*':
+    case '`':
+    case '[':
+    case '<':
+    case '$':
+    case '\\':
+      return true
+    case '_':
+      // snake_case is not emphasis: only an underscore that could open one
+      return !/[A-Za-z0-9]/.test(previous)
+    case '~':
+      return previous === '~'
+    case '=':
+      return previous === '=' || lineStart
+    case '#':
+    case '>':
+    case '-':
+    case '+':
+    case '|':
+      return lineStart
+    case '.':
+    case ')':
+      // "1." and "1)" open a numbered list
+      return /^\s*\d{1,9}$/.test(before)
+    default:
+      return false
+  }
+}
+
+const literalTypingInput = Prec.highest(EditorView.inputHandler.of((view, from, to, text) => {
+  if (isSyntaxRevealed() || view.state.readOnly || !text) return false
+
+  // The caret can sit in front of a line's hidden marker ("## " of a heading
+  // just inserted on an empty line, "> " of a quote): the browser cannot tell
+  // the two sides of text that is not drawn apart. Nobody means to type in
+  // front of a marker they cannot see: the text goes after it.
+  let redirected = false
+  if (from === to) {
+    const marker = syntaxTree(view.state).resolveInner(from, 1)
+    if ((marker.name === 'HeaderMark' || marker.name === 'QuoteMark') && marker.from === from) {
+      let after = marker.to
+      while (after < view.state.doc.lineAt(from).to && view.state.doc.sliceString(after, after + 1) === ' ') after++
+      from = to = after
+      redirected = true
+    }
+  }
+
+  if (isRawTypingContext(view.state, from)) return false
+
+  const line = view.state.doc.lineAt(from)
+  let before = line.text.slice(0, from - line.from)
+  let insert = ''
+  let escaped = false
+  for (const character of text) {
+    if (character === '\n') {
+      before = ''
+    } else if (needsEscape(character, before)) {
+      insert += '\\'
+      escaped = true
+    }
+    insert += character
+    if (character !== '\n') before += character
+  }
+
+  // The editor's own pairing of * _ ~ ` would turn one typed marker into an
+  // empty pair of them, and its HTML support closes a tag on ">": these go
+  // in as typed, past the other input handlers
+  if (!escaped && !redirected && !/[*_~`>]/.test(text)) return false
+
+  view.dispatch({
+    changes: { from, to, insert },
+    selection: { anchor: from + insert.length },
+    userEvent: 'input.type',
+    scrollIntoView: true
+  })
+  return true
+}))
 
 function findTaskMarkerAt(state, pos) {
   for (let node = syntaxTree(state).resolveInner(pos, 1); node; node = node.parent) {
@@ -1367,6 +1488,7 @@ export const livePreview = [
   codeLineNumbersField,
   toggleOpenField,
   renderedBlocksField,
+  literalTypingInput,
   livePreviewPlugin,
   EditorView.atomicRanges.of(view => {
     const plugin = view.plugin(livePreviewPlugin)

@@ -452,7 +452,7 @@
       "markdown_font": "Choisissez la police utilisée dans l'éditeur markdown.",
       "markdown_default_view_mode": "Choisir si les notes markdown s'ouvrent en aperçu, en édition ou en vue partagée.",
       "markdown_new_note_view_mode": "Choisir si une nouvelle note markdown s'ouvre en vue partagée, en édition ou en rendu en direct. Le rendu en direct est alors activé aussi pour les autres notes. Sur téléphone, une nouvelle note ne s'ouvre jamais en vue partagée.",
-      "markdown_live_show_syntax": "En rendu en direct, affiche la syntaxe Markdown de l'élément où se trouve le curseur (le # d'un titre, les ** du gras, l'adresse d'un lien). Désactivez pour ne jamais voir la syntaxe : la mise en forme se fait alors depuis la barre d'outils, les menus et les raccourcis. Les tableaux, diagrammes et formules ouvrent toujours leur source au clic, seul moyen de les modifier.",
+      "markdown_live_show_syntax": "En rendu en direct, affiche la syntaxe Markdown de l'élément où se trouve le curseur (le # d'un titre, les ** du gras, l'adresse d'un lien). Désactivez pour ne jamais voir la syntaxe : la mise en forme se fait alors depuis la barre d'outils, les menus et les raccourcis. Les tableaux, diagrammes et formules ouvrent toujours leur source au clic, seul moyen de les modifier. Désactivé, ce que vous tapez reste aussi du texte : un # ou un * saisi au clavier n'est pas interprété comme du Markdown.",
       "font_size": "Ajustez la taille de police des notes, de la barre latérale, des blocs de code et de la page des paramètres.",
       "index_icon_scale": "Ajustez la taille des icônes dans la liste des notes.",
       "icon_rail_scale": "Ajustez la taille des icônes de la barre d'icônes.",
