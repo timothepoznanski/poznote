@@ -434,7 +434,15 @@ function initializeMarkdownNote(noteId) {
         startInEditMode = false;
     } else if (isEmpty && !isMobileViewportCheck) {
         // New notes on desktop: split mode, or the editor alone
-        var newNoteMode = (document.body && document.body.getAttribute('data-markdown-new-note-mode')) || 'split';
+        var newNoteMode = (document.body && document.body.getAttribute('data-markdown-new-note-mode')) || '';
+        // No choice made in Settings: the split view, unless the account's
+        // notes are in a live view (live preview or rich text). The new note
+        // then opens in that same view: in the split view its editor shows
+        // the Markdown source, stars and all, which is not what someone who
+        // works in rich text expects of a note just created.
+        if (!newNoteMode) {
+            newNoteMode = (document.body && document.body.getAttribute('data-markdown-live-editing') === '1') ? 'edit' : 'split';
+        }
         if (newNoteMode === 'live' || newNoteMode === 'rich') {
             _mdSetLiveSyntax(newNoteMode === 'live');
             _mdSetLiveEditing(true);

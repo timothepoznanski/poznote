@@ -12,11 +12,11 @@ function changeFontSize(triggerButton) {
   const selection = window.getSelection();
   const savedRange = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
 
-  // Check if we have selected text
+  // Selected text, or a bare caret in a note: a heading is a whole line, so
+  // the caret's line is enough to say which one. (The button of the bar above
+  // a phone's keyboard is pressed with nothing selected, and did nothing.)
   const hasSelection = savedRange && !savedRange.collapsed;
-
-  if (!hasSelection) {
-    // No selection - silently return
+  if (!savedRange || (!hasSelection && !getEditorFromRange(savedRange))) {
     return;
   }
 

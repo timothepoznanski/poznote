@@ -382,16 +382,45 @@
         };
     }
 
+    // A table, a fenced block, a rule, a toggle or an embedded player is a
+    // block of its own: asked for on a line that has text, it goes under that
+    // line, whole, instead of cutting it at the caret (which, in the middle of
+    // a bold word, left one half of the markers on each side of the block).
+    // Returns where to insert and the text to insert, with the line breaks
+    // that takes.
+    function placeMarkdownBlock(api, editor, from, to, insertText) {
+        const placed = { from: from, to: to, text: insertText };
+        if (!/^(?:\||```|\n---\n$|\n\n<details\b|<(?:video|audio|iframe)\b)/.test(insertText) || !api || typeof api.getValue !== 'function') return placed;
+        const value = api.getValue(editor) || '';
+        const lineStart = value.lastIndexOf('\n', from - 1) + 1;
+        let lineEnd = value.indexOf('\n', to);
+        if (lineEnd === -1) lineEnd = value.length;
+        // (a rule right under a line of text would make it a heading)
+        const isRule = insertText.charAt(0) === '\n' && insertText.charAt(1) === '-';
+        const isToggle = insertText.charAt(1) === '\n';
+        if (from === to && value.slice(lineStart, lineEnd).trim() !== '') {
+            placed.from = placed.to = lineEnd;
+            if (!isToggle) placed.text = (isRule ? '\n' : '\n\n') + insertText;
+        } else if (isRule) {
+            const previousStart = value.lastIndexOf('\n', lineStart - 2) + 1;
+            const previousBlank = lineStart === 0 || value.slice(previousStart, lineStart - 1).trim() === '';
+            if (previousBlank) placed.text = insertText.slice(1);
+        }
+        return placed;
+    }
+
     function insertMarkdownAtContext(context, markdown, caretDeltaFromInsertEnd) {
         const api = getMarkdownCodeMirrorApi();
         const snapshot = context && context.codeMirrorSelection;
-        const insertText = String(markdown || '');
+        let insertText = String(markdown || '');
         const caretDelta = typeof caretDeltaFromInsertEnd === 'number' ? caretDeltaFromInsertEnd : 0;
 
         if (snapshot && api && isMarkdownCodeMirrorEditor(snapshot.editor) && typeof api.replaceRange === 'function') {
+            const placed = placeMarkdownBlock(api, snapshot.editor, Math.min(snapshot.start, snapshot.end), Math.max(snapshot.start, snapshot.end), insertText);
+            const from = placed.from;
+            const to = placed.to;
+            insertText = placed.text;
             const caretOffsetWithinInsert = Math.max(0, Math.min(insertText.length, insertText.length + caretDelta));
-            const from = Math.min(snapshot.start, snapshot.end);
-            const to = Math.max(snapshot.start, snapshot.end);
             const caretPos = from + caretOffsetWithinInsert;
 
             api.replaceRange(snapshot.editor, from, to, insertText);
@@ -638,11 +667,13 @@
             const selectionOffsets = api.getSelectionOffsets(editor);
             if (!selectionOffsets) return;
 
-            const insertText = String(text || '');
+            let insertText = String(text || '');
             const caretDelta = typeof caretDeltaFromInsertEnd === 'number' ? caretDeltaFromInsertEnd : 0;
+            const placed = placeMarkdownBlock(api, editor, Math.min(selectionOffsets.start, selectionOffsets.end), Math.max(selectionOffsets.start, selectionOffsets.end), insertText);
+            const from = placed.from;
+            const to = placed.to;
+            insertText = placed.text;
             const caretOffsetWithinInsert = Math.max(0, Math.min(insertText.length, insertText.length + caretDelta));
-            const from = Math.min(selectionOffsets.start, selectionOffsets.end);
-            const to = Math.max(selectionOffsets.start, selectionOffsets.end);
             const caretPos = from + caretOffsetWithinInsert;
 
             api.replaceRange(editor, from, to, insertText);
@@ -689,15 +720,41 @@
 
         const api = getMarkdownCodeMirrorApi();
         if (isMarkdownCodeMirrorEditor(editor) && api && typeof api.getSelectionOffsets === 'function' && typeof api.replaceRange === 'function') {
+            // Inline code cannot hold formatting: asked for inside it, the
+            // format starts right after the code
+            if (prefix !== '`' && typeof window.leaveMarkdownInlineCodeAtCaret === 'function') {
+                window.leaveMarkdownInlineCodeAtCaret();
+            }
+            // The editor formats a selection itself, one line at a time and
+            // around the words (wrapSelectionChanges in the bundle)
+            if (typeof api.wrapSelection === 'function') {
+                api.wrapSelection(editor, prefix, suffix);
+                return;
+            }
             const selectionOffsets = api.getSelectionOffsets(editor);
             if (!selectionOffsets) return;
 
             const fullText = typeof api.getValue === 'function' ? api.getValue(editor) : '';
-            const from = Math.min(selectionOffsets.start, selectionOffsets.end);
-            const to = Math.max(selectionOffsets.start, selectionOffsets.end);
-            const selectedText = fullText.slice(from, to);
+            let from = Math.min(selectionOffsets.start, selectionOffsets.end);
+            let to = Math.max(selectionOffsets.start, selectionOffsets.end);
+            let selectedText = fullText.slice(from, to);
+            // The markers go against the words, never against a space
+            // ("**word **" is not bold)
+            if (selectedText && !selectedText.trim()) return;
+            const edges = /^(\s*)[\s\S]*?(\s*)$/.exec(selectedText);
+            if (selectedText.trim() && (edges[1] || edges[2])) {
+                from += edges[1].length;
+                to -= edges[2].length;
+                selectedText = fullText.slice(from, to);
+            }
 
             if (!selectedText) {
+                // Bold asked for while writing in bold: that is leaving it
+                if (typeof api.isInInlineFormat === 'function' && typeof api.leaveInlineFormat === 'function'
+                    && api.isInInlineFormat(editor, prefix)) {
+                    api.leaveInlineFormat(editor, prefix);
+                    return;
+                }
                 const replacement = prefix + suffix;
                 const caretInside = typeof emptyInnerCaretOffset === 'number' ? emptyInnerCaretOffset : prefix.length;
                 const caretPos = from + Math.max(0, Math.min(replacement.length, caretInside));
@@ -757,10 +814,45 @@
     }
 
     // Insert a prefix at the start of the current line in Markdown
+    // A heading, a list item, a quote or a callout is a kind of line: the
+    // prefix goes at the start of the caret's line, wherever in the line the
+    // menu was asked for, and replaces the prefix of the same family the line
+    // already had (a heading of another level, another kind of list item).
+    // The caret stays on the text it was on.
     function insertMarkdownPrefixAtLineStart(prefix) {
-        // For Markdown, the slash command is typically typed at the insertion point.
-        // Inserting at cursor is more reliable than trying to compute line starts across contentEditable lines.
-        insertMarkdownAtCursor(prefix, 0);
+        const editor = getCurrentMarkdownEditorFromSelection();
+        const api = getMarkdownCodeMirrorApi();
+        const offsets = editor && api && isMarkdownCodeMirrorEditor(editor) && typeof api.getSelectionOffsets === 'function'
+            ? api.getSelectionOffsets(editor)
+            : null;
+        if (!offsets || typeof api.getValue !== 'function' || typeof api.replaceRange !== 'function') {
+            // The plain contentEditable editor: at the caret, as it always was
+            insertMarkdownAtCursor(prefix, 0);
+            return;
+        }
+
+        const value = api.getValue(editor) || '';
+        const caret = Math.max(offsets.start, offsets.end);
+        const lineStart = value.lastIndexOf('\n', caret - 1) + 1;
+        let lineEnd = value.indexOf('\n', caret);
+        if (lineEnd === -1) lineEnd = value.length;
+        const line = value.slice(lineStart, lineEnd);
+
+        const indent = /^[ \t]*/.exec(line)[0];
+        let family;
+        if (/^#{1,6} $/.test(prefix)) family = /^#{1,6}[ \t]+/;
+        else if (/^(?:[-*+]|\d+[.)]) /.test(prefix)) family = /^(?:[-*+]|\d+[.)])[ \t]+(?:\[[ xX]\][ \t]+)?/;
+        else family = /^>[ \t]?(?:\[![^\]\n]*\][^\n]*$)?/;
+        const rest = line.slice(indent.length);
+        const existing = family.exec(rest);
+        const oldPrefixLength = indent.length + (existing ? existing[0].length : 0);
+        const text = line.slice(oldPrefixLength);
+        const newPrefix = (/^#/.test(prefix) ? '' : indent) + prefix;
+
+        api.replaceRange(editor, lineStart, lineEnd, newPrefix + text);
+        const column = Math.max(0, caret - lineStart - oldPrefixLength);
+        const position = lineStart + newPrefix.length + Math.min(column, text.length);
+        if (typeof api.setSelection === 'function') api.setSelection(editor, position, position);
     }
 
     // True when the caret sits in an editable rich-text note
@@ -3236,7 +3328,24 @@
     function getMarkdownSlashCommands() {
         const t = window.t || ((key, params, fallback) => fallback);
         var common = getCommonSlashCommands();
-        return filterSlashCommands([
+        // "Back to normal text" comes first, and only while writing in some
+        // formatting (bold, a colour, inline code...), as in an HTML note. The
+        // editor reads it from the Markdown around the caret, and leaving
+        // puts the caret past the closing marker.
+        var markdownApi = getMarkdownCodeMirrorApi();
+        var markdownEditor = getCurrentMarkdownEditorFromSelection();
+        var inFormat = !!(markdownApi && markdownEditor && isMarkdownCodeMirrorEditor(markdownEditor)
+            && typeof markdownApi.isInInlineFormat === 'function' && markdownApi.isInInlineFormat(markdownEditor));
+        var backToNormal = inFormat ? [{
+            id: 'normal',
+            icon: 'lucide-align-left',
+            label: t('slash_menu.back_to_normal', null, 'Back to normal text'),
+            action: function () {
+                var editor = getCurrentMarkdownEditorFromSelection() || markdownEditor;
+                if (typeof markdownApi.leaveInlineFormat === 'function') markdownApi.leaveInlineFormat(editor);
+            }
+        }] : [];
+        return filterSlashCommands(backToNormal.concat([
             {
                 id: 'title',
                 icon: 'lucide-text-height',
@@ -3328,7 +3437,7 @@
                         var title = t(c.labelKey, null, c.fallback);
                         prefix = '> [!' + c.fallback + '] ' + title + '\n> ';
                     }
-                    return { id: c.id, icon: c.icon, iconColor: c.iconColor, label: t(c.labelKey, null, c.fallback), action: function () { insertMarkdownAtCursor(prefix, 0); } };
+                    return { id: c.id, icon: c.icon, iconColor: c.iconColor, label: t(c.labelKey, null, c.fallback), action: function () { insertMarkdownPrefixAtLineStart(prefix); } };
                 })
             },
             {
@@ -3570,7 +3679,7 @@
             },
             getTemplateSlashCommand(),
             common.cancel
-        ]);
+        ]));
     }
 
     // Slash menu opened on a text selection (issue #1410): only the commands

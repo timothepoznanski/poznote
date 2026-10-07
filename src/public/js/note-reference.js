@@ -427,7 +427,28 @@
      */
     function insertMarkdownReference(heading, noteId) {
         const referenceText = `[${heading}](index.php?note=${noteId})`;
-        
+
+        // The CodeMirror editor is written to through its own API: a text
+        // node put into its DOM is read back as typed text, which the rich
+        // text view takes literally (it escaped the link's bracket)
+        const api = window.PoznoteMarkdownCodeMirror;
+        const selectionNow = window.getSelection();
+        let host = selectionNow && selectionNow.anchorNode
+            ? (selectionNow.anchorNode.nodeType === 1 ? selectionNow.anchorNode : selectionNow.anchorNode.parentElement)
+            : null;
+        while (host && !(api && api.isCodeMirrorEditor(host))) host = host.parentElement;
+        if (host && typeof api.getSelectionOffsets === 'function' && typeof api.replaceRange === 'function') {
+            const offsets = api.getSelectionOffsets(host);
+            if (offsets) {
+                const from = Math.min(offsets.start, offsets.end);
+                api.replaceRange(host, from, Math.max(offsets.start, offsets.end), referenceText);
+                if (typeof api.setSelection === 'function') {
+                    api.setSelection(host, from + referenceText.length, from + referenceText.length);
+                }
+                return;
+            }
+        }
+
         // Use DOM insertion for precise positioning
         try {
             const selection = window.getSelection();

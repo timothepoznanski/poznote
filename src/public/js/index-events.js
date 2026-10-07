@@ -660,10 +660,23 @@
                     }
                 }
                 break;
-            case 'exec-remove-format':
-                // For markdown, this doesn't make much sense, but we keep it
+            case 'exec-remove-format': {
+                // Markdown, a bare caret in some formatting (the bar above a
+                // phone's keyboard): out of it, what is typed next is plain.
+                // Same as "Back to normal text" in the command menu.
+                var clearApi = window.PoznoteMarkdownCodeMirror;
+                var clearSelection = window.getSelection();
+                var clearNode = clearSelection && clearSelection.rangeCount ? clearSelection.getRangeAt(0).startContainer : null;
+                if (clearNode && clearNode.nodeType === 3) clearNode = clearNode.parentElement;
+                var clearHost = clearNode && clearNode.closest ? clearNode.closest('.markdown-editor') : null;
+                if (clearHost && clearSelection.isCollapsed && clearApi && typeof clearApi.leaveInlineFormat === 'function' &&
+                    clearApi.isCodeMirrorEditor(clearHost)) {
+                    clearApi.leaveInlineFormat(clearHost);
+                    break;
+                }
                 clearHtmlFormatting();
                 break;
+            }
 
             // Toolbar functions
             case 'add-link':
