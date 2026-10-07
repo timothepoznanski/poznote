@@ -7,14 +7,25 @@
     display: none !important;
 }
 
+/* The left padding is the note's text inset (css/notes/noteentry.css), so the
+   first column of text stands under the title icon as it does in an HTML
+   note. Outside a note (no .innernote) the panes keep their 10px. */
 .markdown-preview {
-    padding: 10px 10px 24px;
+    padding: 10px 10px 24px var(--pz-note-text-inset, 10px);
     box-sizing: border-box;
     min-height: 100px;
 }
 
+/* In a note the blanket `.noteentry div { padding: 0 }` reset
+   (css/notes/noteentry.css) takes the padding above away from the preview
+   shown on its own: the inset is given back here. The split view pads its
+   panes itself, below. */
+.noteentry:not(.markdown-split-mode) .markdown-preview {
+    padding-left: var(--pz-note-text-inset, 0px);
+}
+
 .markdown-editor {
-    padding: 10px 10px 24px;
+    padding: 10px 10px 24px var(--pz-note-text-inset, 10px);
     box-sizing: border-box;
     min-height: 100px;
     font-family: 'Courier New', Courier, monospace;
@@ -172,7 +183,7 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 
 .markdown-codemirror-host .cm-content {
     min-height: 100px;
-    padding: 10px 10px 24px;
+    padding: 10px 10px 24px var(--pz-note-text-inset, 10px);
     caret-color: currentColor;
 }
 
@@ -718,6 +729,9 @@ body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-
     left: 0;
     width: 100%;
     text-align: center;
+    /* The line's hanging indent is inherited and would draw the dot that far
+       left of its marker, out of the pane. */
+    text-indent: 0;
     color: var(--pz-text-muted);
 }
 
@@ -1514,7 +1528,7 @@ html[data-theme='dark'] .katex {
 }
 
 .noteentry.markdown-split-mode .markdown-editor {
-    padding: 10px 20px 44px 10px !important;
+    padding: 10px 20px 44px var(--pz-note-text-inset, 10px) !important;
 }
 
 .noteentry.markdown-split-mode .markdown-codemirror-host {
@@ -1536,7 +1550,7 @@ html[data-theme='dark'] .katex {
 
 .noteentry.markdown-split-mode .markdown-codemirror-host .cm-content {
     min-height: var(--markdown-split-pane-height, calc(100vh - 200px));
-    padding: 10px 20px 44px 10px;
+    padding: 10px 20px 44px var(--pz-note-text-inset, 10px);
     box-sizing: border-box;
 }
 
@@ -1765,7 +1779,7 @@ body.markdown-split-preview-left .noteentry.markdown-split-mode > .markdown-edit
 /* The unframed panes pad the seam side more than the column edge: mirror it.
    Framed panes pad all four sides alike and need nothing. */
 body.markdown-split-preview-left:not(.markdown-split-card-view) .noteentry.markdown-split-mode .markdown-preview {
-    padding: 10px 24px 44px 10px !important;
+    padding: 10px 24px 44px var(--pz-note-text-inset, 10px) !important;
 }
 
 body.markdown-split-preview-left:not(.markdown-split-card-view) .noteentry.markdown-split-mode .markdown-editor:not(.markdown-codemirror-host) {

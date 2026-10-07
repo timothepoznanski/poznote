@@ -56,6 +56,24 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     position: relative;
 }
 
+/* Where the note's text starts, from the left edge of the column. The body
+   lines up with what stands above it: the drawing of the title icon, which
+   sits 3px inside its box, or without an icon the line under the title
+   (css/notes/subline.css gives that line the same two offsets). The markdown
+   panes read it too (css/markdown.css). */
+.innernote {
+    --pz-note-text-inset: 1px;
+}
+
+.innernote:has(> .note-title-heading .note-title-icon) {
+    --pz-note-text-inset: 3px;
+}
+
+.innernote:not([data-markdown-note="true"]):not([data-tasklist-note="true"]) > .noteentry {
+    padding-left: var(--pz-note-text-inset);
+    box-sizing: border-box;
+}
+
 /* A gutter on the right for the floating buttons (discussion 1482).
    The stack of css/ui-customization-panel.css and the scroll arrows below are
    pinned 10px from the right of the note column (--pz-docked-*, below), and
