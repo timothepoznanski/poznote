@@ -284,7 +284,7 @@ $settings = [
     'folder_tree_dim_level' => '',
     'markdown_default_view_mode' => 'preview',
     'markdown_new_note_view_mode' => 'split',
-    'markdown_live_show_syntax' => '0',
+    'markdown_live_show_syntax' => '1',
     'sidebar_offline_marks' => '1',
     'favorites_sort' => POZNOTE_FAVORITES_SORT_DEFAULT,
     'favorites_icon_color' => ''
@@ -496,20 +496,21 @@ $markdown_default_view_mode = trim((string)$settings['markdown_default_view_mode
 if (!in_array($markdown_default_view_mode, ['preview', 'edit', 'split', 'last'], true)) {
     $markdown_default_view_mode = 'preview';
 }
-// Mode a new, empty markdown note opens in: split view, the editor, or the
-// editor with live rendering turned on (a phone has no split view and gets
-// the editor instead): <body data-markdown-new-note-mode>
+// Mode a new, empty markdown note opens in: split view, the editor, or one
+// of the two live views, which is then turned on (a phone has no split view
+// and gets the editor instead): <body data-markdown-new-note-mode>
 $markdown_new_note_view_mode = trim((string)$settings['markdown_new_note_view_mode']);
-if (!in_array($markdown_new_note_view_mode, ['split', 'edit', 'live'], true)) {
+if (!in_array($markdown_new_note_view_mode, ['split', 'edit', 'live', 'rich'], true)) {
     $markdown_new_note_view_mode = 'split';
 }
 // Live rendering in the Markdown editor (discussion 1582): read from <body
 // data-markdown-live-editing> by js/markdown-editor.js
 $markdown_live_editing = poznoteSettingEnabled($settings['markdown_live_editing'], false);
-// Whether live rendering brings the syntax back under the caret, or never
-// shows it (the default): <body data-markdown-live-syntax>, read by the
-// editor bundle
-$markdown_live_show_syntax = poznoteSettingEnabled($settings['markdown_live_show_syntax'], false);
+// Which of the two live views the account is in: "Live preview" (the syntax
+// comes back under the caret) or "Rich text" (it never does, and typed text
+// is never read as Markdown). Chosen from the note's view button, kept here:
+// <body data-markdown-live-syntax>, read by the editor bundle
+$markdown_live_show_syntax = poznoteSettingEnabled($settings['markdown_live_show_syntax'], true);
 // Colored markdown ('0' = off, 'custom' = per-element colors chosen by the
 // user): body class + --mdc-* colours, lib/markdown-colored.php (diary.php
 // builds its <body> the same way for the journal view)

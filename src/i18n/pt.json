@@ -453,7 +453,6 @@
       "markdown_font": "Escolha a fonte usada no editor markdown.",
       "markdown_default_view_mode": "Escolha se as notas markdown abrem em pré-visualização, edição ou vista dividida.",
       "markdown_new_note_view_mode": "Escolha se uma nota markdown nova abre em vista dividida, em edição ou com renderização em tempo real. A renderização em tempo real é então ativada também para as outras notas. No celular, uma nota nova nunca abre em vista dividida.",
-      "markdown_live_show_syntax": "Na renderização em tempo real, mostra a sintaxe Markdown do elemento onde está o cursor (o # de um título, os ** do negrito, o endereço de um link). Desative para nunca ver a sintaxe: a formatação é então feita pela barra de ferramentas, pelos menus e pelos atalhos. Tabelas, diagramas e fórmulas continuam abrindo seu código ao clicar, a única forma de editá-los. Desativado, o que você digita também permanece texto: um # ou um * digitado não é interpretado como Markdown.",
       "font_size": "Ajuste o tamanho da fonte das notas, da barra lateral, dos blocos de código e da página de configurações.",
       "index_icon_scale": "Ajuste o tamanho dos ícones na lista de notas.",
       "icon_rail_scale": "Ajuste o tamanho dos ícones da barra de ícones.",
@@ -812,7 +811,6 @@
       "markdown_font": "Fonte do editor markdown",
       "markdown_default_view_mode": "Modo de abertura",
       "markdown_new_note_view_mode": "Modo de abertura de notas novas",
-      "markdown_live_show_syntax": "Mostrar a sintaxe Markdown no cursor",
       "login_display": "Título da Página de Login",
       "note_font_size": "Tamanho da Fonte",
       "note_age_filter": "Filtro de antiguidade",
@@ -1175,7 +1173,8 @@
       "create_linked_note": "Criar atalho",
       "open_in_new_tab": "Abrir em nova aba",
       "split_view": "Alternar vista dividida",
-      "view_cycle_live": "Mudar para renderização em tempo real",
+      "view_cycle_live": "Mudar para pré-visualização em tempo real",
+      "view_cycle_rich": "Mudar para texto formatado",
       "view_cycle_split": "Mudar para vista dividida",
       "view_cycle_preview": "Voltar ao modo de pré-visualização",
       "view_cycle_edit": "Voltar ao modo de edição",
@@ -1726,7 +1725,8 @@
         "split": "Vista dividida (editor e pré-visualização lado a lado)",
         "split_short": "Vista dividida",
         "last": "Último modo usado",
-        "live": "Renderização em tempo real"
+        "live": "Pré-visualização em tempo real",
+        "rich": "Texto formatado"
       },
       "hint": "Uma nota que você mudar para outro modo abre novamente no modo padrão."
     },
@@ -5070,7 +5070,7 @@
   "page_menu": {
     "button": "Mais opções",
     "split_view": "Vista dividida",
-    "markdown_view": "Vista Markdown (pré-visualização, tempo real, dividida)"
+    "markdown_view": "Vista Markdown (clássica, pré-visualização em tempo real, texto formatado, dividida)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Atalhos de teclado",

@@ -15,9 +15,9 @@
 // (renderedBlocksField below), nothing of js/markdown-parser.js is redone here.
 import { syntaxTree } from '@codemirror/language'
 import { Prec, RangeSet, RangeValue, StateEffect, StateField } from '@codemirror/state'
-import { Decoration, EditorView, ViewPlugin, WidgetType } from '@codemirror/view'
+import { Decoration, EditorView, ViewPlugin, WidgetType, keymap } from '@codemirror/view'
 
-const refreshLivePreviewEffect = StateEffect.define()
+export const refreshLivePreviewEffect = StateEffect.define()
 
 // Line numbers of a code block: shown by the code_block_line_numbers setting
 // (body.code-block-line-numbers) on blocks that name a language, and switched
@@ -261,6 +261,8 @@ const POINTER_SETTLE_DELAY = 300
 
 const hiddenMarker = Decoration.replace({})
 const squeezedMarker = Decoration.mark({ class: 'cm-live-squeezed' })
+const emptyPairMarker = Decoration.mark({ class: 'cm-live-empty-pair' })
+const squeezedTailMarker = Decoration.mark({ class: 'cm-live-squeezed-tail' })
 const CODE_CONTEXT_NODES = ['FencedCode', 'CodeBlock', 'InlineCode', 'CodeText', 'HTMLBlock', 'CommentBlock', 'Comment']
 
 const HEADING_LINE_DECORATIONS = [1, 2, 3, 4, 5, 6].map(level =>
@@ -524,7 +526,7 @@ class ImageWidget extends WidgetType {
   }
 }
 
-function buildLivePreviewDecorations(view) {
+function buildLivePreviewDecorations(view, armedPair) {
   const { state } = view
   const doc = state.doc
   const selection = state.selection.ranges
@@ -533,15 +535,20 @@ function buildLivePreviewDecorations(view) {
 
   // Nothing is revealed while the editor is not the one being typed in
   const focused = view.hasFocus
-  // The markdown_live_show_syntax setting (index.php renders it as <body
-  // data-markdown-live-syntax>): on, the syntax comes back under the caret;
-  // off, which is the default, it never does, and what is written is
-  // formatted from the toolbar, the shortcuts and the menus. A formula has no other way of being edited
+  // The two live views of the note's view button (js/markdown-view-modes.js),
+  // told apart by <body data-markdown-live-syntax>, the account's
+  // markdown_live_show_syntax setting. "Live preview" ('1'): the syntax comes
+  // back under the caret. "Rich text" ('0'): it never does, and what is
+  // written is formatted from the toolbar, the shortcuts and the menus. A formula has no other way of being edited
   // than its source, so it keeps coming back either way (touchesContent).
   const revealSyntax = !!document.body && document.body.getAttribute('data-markdown-live-syntax') === '1'
   const touchesContent = (from, to) => focused && selection.some(range => range.from <= to && range.to >= from)
   const touches = (from, to) => revealSyntax && touchesContent(from, to)
   const touchesLines = (from, to) => touches(doc.lineAt(from).from, doc.lineAt(to).to)
+  // Rich text: the empty pair of markers a formatting command just wrote
+  // around the caret, see findEmptyMarkerPair()
+  const emptyPair = revealSyntax ? null : (armedPair || null)
+  const holdsEmptyPair = node => !!emptyPair && doc.lineAt(node.from).number <= emptyPair.line && doc.lineAt(node.to).number >= emptyPair.line
   // Syntax that comes back under the caret is taken out of the line (a
   // replace decoration). Syntax that never comes back stays in the line,
   // squeezed to nothing by CSS: Firefox cannot hold a caret next to an
@@ -556,7 +563,12 @@ function buildLivePreviewDecorations(view) {
     if (revealSyntax) {
       decorations.push(hiddenMarker.range(from, to))
     } else {
-      decorations.push(squeezedMarker.range(from, to))
+      // A marker that ends its line (the closing ` of inline code, ** of bold
+      // typed last) keeps a place in the layout, at a size of nothing: taken
+      // out of it, the browser had no "after the marker" left to put the
+      // caret in, and there was no way to type past the end of the code
+      const marker = to === doc.lineAt(to).to ? squeezedTailMarker : squeezedMarker
+      decorations.push(marker.range(from, to))
       neverShown.push(squeezedMarker.range(from, Math.max(to, atomicTo || 0)))
     }
   }
@@ -589,6 +601,18 @@ function buildLivePreviewDecorations(view) {
         decorations.push(HEADING_LINE_DECORATIONS[level - 1].range(line.from))
       }
       if (line.number >= lastLine.number) break
+    }
+
+    // Rich text: a heading just inserted from a menu is a line with nothing
+    // to see on it, its "## " being hidden. A placeholder at the heading's
+    // size says where the title goes, until the first character is typed.
+    if (!revealSyntax && !setext && !/[^#\s]/.test(doc.sliceString(node.from, node.to))) {
+      const fallback = 'Heading ' + level
+      const label = typeof window.t === 'function' ? window.t('slash_menu.heading_' + level, null, fallback) : fallback
+      decorations.push(Decoration.line({
+        class: 'cm-live-heading-empty',
+        attributes: { 'data-placeholder': label }
+      }).range(doc.lineAt(node.from).from))
     }
   }
 
@@ -874,6 +898,8 @@ function buildLivePreviewDecorations(view) {
 
         const heading = /^(?:ATX|Setext)Heading([1-6])$/.exec(name)
         if (heading) {
+          // "====" being typed under a paragraph is not its underline yet
+          if (name.startsWith('Setext') && emptyPair && doc.lineAt(node.to).number === emptyPair.line) return
           decorateHeading(node, Number(heading[1]))
           return
         }
@@ -958,7 +984,7 @@ function buildLivePreviewDecorations(view) {
           }
 
           case 'HorizontalRule': {
-            if (touchesLines(node.from, node.to)) return
+            if (touchesLines(node.from, node.to) || holdsEmptyPair(node)) return
             decorations.push(ruleLineDecoration.range(doc.lineAt(node.from).from))
             decorations.push(ruleTextDecoration.range(node.from, node.to))
             return
@@ -969,6 +995,8 @@ function buildLivePreviewDecorations(view) {
             return
 
           case 'FencedCode':
+            // "~~~~" being typed is not a code block yet
+            if (emptyPair && doc.lineAt(node.from).number === emptyPair.line) return false
             // A Mermaid block is drawn as its diagram while the caret is away
             // (renderedBlocksField); its source needs no frame of its own then
             decorateFencedCode(node)
@@ -995,6 +1023,16 @@ function buildLivePreviewDecorations(view) {
       }
       pos = line.to + 1
     }
+  }
+
+  // The empty pair itself: out of sight, the caret staying in its middle.
+  // Not taken out of the layout like the rest of the hidden syntax: a line
+  // holding nothing else would then have no place for a caret at all, and the
+  // browser sent what was typed to the line above. Text of no size keeps one.
+  if (emptyPair) {
+    decorations.push(emptyPairMarker.range(emptyPair.from, emptyPair.pos))
+    decorations.push(Decoration.widget({ widget: new EmptyPairWidget(emptyPair.marker), side: 1 }).range(emptyPair.pos))
+    decorations.push(emptyPairMarker.range(emptyPair.pos, emptyPair.to))
   }
 
   // With the syntax never shown, the hidden text must not be a place the
@@ -1160,8 +1198,61 @@ const renderedBlocksField = StateField.define({
   provide: field => EditorView.decorations.from(field)
 })
 
-// Literal typing, the other half of "the syntax is never shown"
-// (markdown_live_show_syntax off): what is typed is text, never formatting.
+// Rich text: Bold, Italic, Strikethrough... with nothing selected write an
+// empty pair of markers and leave the caret in the middle ("**|**"), for the
+// text to come. Until that text is typed the pair is not what it will be:
+// "****" alone on a line is a horizontal rule to Markdown, "~~~~" opens a code
+// block, "====" under a paragraph turns it into a heading, and "**" is two
+// stars. The pair around the caret is found here, so that it can be kept out
+// of sight and out of the block rules while it is empty, and taken back out
+// of the note if the caret leaves without anything having been typed.
+function findEmptyMarkerPair(state) {
+  const selection = state.selection
+  if (selection.ranges.length !== 1 || !selection.main.empty) return null
+  const pos = selection.main.head
+  const line = state.doc.lineAt(pos)
+  const offset = pos - line.from
+  const marker = line.text.charAt(offset - 1)
+  if (!marker || '*_~=`'.indexOf(marker) === -1 || line.text.charAt(offset) !== marker) return null
+
+  let before = 0
+  while (offset - 1 - before >= 0 && line.text.charAt(offset - 1 - before) === marker) before++
+  let after = 0
+  while (offset + after < line.text.length && line.text.charAt(offset + after) === marker) after++
+  if (before !== after) return null
+  if ((marker === '~' || marker === '=') ? before !== 2 : before > 3) return null
+
+  return { from: pos - before, to: pos + after, pos, line: line.number, marker, text: marker.repeat(before * 2) }
+}
+
+// What stands in the middle of an empty pair until its text is typed. The
+// two halves of the pair are text of no size, and a caret drawn between them
+// had no height: this gives it one. For inline code it is also the start of
+// the code's grey ground, so that one sees where the code will go.
+class EmptyPairWidget extends WidgetType {
+  constructor(marker) {
+    super()
+    this.marker = marker
+  }
+
+  eq(other) {
+    return other.marker === this.marker
+  }
+
+  toDOM() {
+    const strut = document.createElement('span')
+    strut.className = 'cm-live-pair-strut' + (this.marker === '`' ? ' cm-live-pair-code' : '')
+    strut.setAttribute('aria-hidden', 'true')
+    return strut
+  }
+
+  ignoreEvent() {
+    return false
+  }
+}
+
+// Literal typing, the other half of the "Rich text" view (the syntax is never
+// shown, markdown_live_show_syntax off): what is typed is text, never formatting.
 // A character Markdown would read as syntax where it is typed goes into the
 // source behind a backslash, which the note then shows as the plain character
 // (the backslash itself is hidden with the rest of the syntax). Formatting
@@ -1229,8 +1320,110 @@ function needsEscape(character, before) {
   }
 }
 
+// Rich text, in a code block whose fences are not shown.
+function findClosedFence(state, pos) {
+  for (const side of [-1, 1]) {
+    for (let node = syntaxTree(state).resolveInner(pos, side); node; node = node.parent) {
+      if (node.name !== 'FencedCode') continue
+      const marks = node.getChildren('CodeMark')
+      const first = state.doc.lineAt(node.from)
+      const last = state.doc.lineAt(node.to)
+      if (marks.length > 1 && last.number > first.number && marks[marks.length - 1].from >= last.from) {
+        return { first, last }
+      }
+      return null
+    }
+  }
+  return null
+}
+
+// Out of the block, onto the line under it, made if there is none (or if the
+// one there has text on it)
+function leaveFenceChanges(state, fence) {
+  const doc = state.doc
+  const next = fence.last.number < doc.lines ? doc.line(fence.last.number + 1) : null
+  if (next && !next.text.trim()) return { changes: [], target: next.from }
+  return { changes: [{ from: fence.last.to, insert: '\n' }], target: fence.last.to + 1 }
+}
+
+// Enter on an empty last line of the block, or on the (invisible) line of its
+// closing fence, leaves the block: without it Enter only ever adds lines of
+// code, and a block ending the note could not be left at all.
+function leaveCodeBlockOnEnter(view) {
+  if (isSyntaxRevealed() || view.state.readOnly) return false
+  const { state } = view
+  const main = state.selection.main
+  if (!main.empty) return false
+  const fence = findClosedFence(state, main.head)
+  if (!fence) return false
+
+  const line = state.doc.lineAt(main.head)
+  const onClosingFence = line.number === fence.last.number
+  const onEmptyLastLine = line.number === fence.last.number - 1 && line.number > fence.first.number && !line.text.trim()
+  if (!onClosingFence && !onEmptyLastLine) return false
+
+  const leave = leaveFenceChanges(state, fence)
+  const changes = leave.changes.slice()
+  // The empty line that asked to leave goes, unless it is all the block holds
+  if (onEmptyLastLine && line.number - 1 > fence.first.number) {
+    changes.push({ from: line.from - 1, to: line.to })
+  }
+  const transaction = state.update({ changes })
+  view.dispatch({
+    changes,
+    selection: { anchor: transaction.changes.mapPos(leave.target, 1) },
+    userEvent: 'input',
+    scrollIntoView: true
+  })
+  return true
+}
+
+// Arrow down from the last line of a block that ends the note
+function leaveCodeBlockOnArrowDown(view) {
+  if (isSyntaxRevealed() || view.state.readOnly) return false
+  const { state } = view
+  const main = state.selection.main
+  if (!main.empty) return false
+  const fence = findClosedFence(state, main.head)
+  if (!fence || fence.last.number < state.doc.lines) return false
+  if (state.doc.lineAt(main.head).number < fence.last.number - 1) return false
+
+  view.dispatch({
+    changes: { from: fence.last.to, insert: '\n' },
+    selection: { anchor: fence.last.to + 1 },
+    userEvent: 'input',
+    scrollIntoView: true
+  })
+  return true
+}
+
+const richTextKeymap = Prec.highest(keymap.of([
+  { key: 'Enter', run: leaveCodeBlockOnEnter },
+  { key: 'ArrowDown', run: leaveCodeBlockOnArrowDown }
+]))
+
 const literalTypingInput = Prec.highest(EditorView.inputHandler.of((view, from, to, text) => {
   if (isSyntaxRevealed() || view.state.readOnly || !text) return false
+
+  // On a fence line of a code block (the badge's line, or the empty line that
+  // closes the block) nothing typed may land in the fence itself: it goes to
+  // the code, as a first or as a new last line
+  if (from === to) {
+    const fence = findClosedFence(view.state, from)
+    const fenceLine = fence ? view.state.doc.lineAt(from).number : 0
+    if (fence && (fenceLine === fence.first.number || fenceLine === fence.last.number)) {
+      const at = fenceLine === fence.first.number ? fence.first.to + 1 : fence.last.from
+      const empty = fence.last.number === fence.first.number + 1
+      const insert = fenceLine === fence.first.number && !empty ? text : text + '\n'
+      view.dispatch({
+        changes: { from: at, insert },
+        selection: { anchor: at + text.length },
+        userEvent: 'input.type',
+        scrollIntoView: true
+      })
+      return true
+    }
+  }
 
   // The caret can sit in front of a line's hidden marker ("## " of a heading
   // just inserted on an empty line, "> " of a quote): the browser cannot tell
@@ -1245,6 +1438,15 @@ const literalTypingInput = Prec.highest(EditorView.inputHandler.of((view, from, 
       from = to = after
       redirected = true
     }
+  }
+
+  // Same for the empty pair of markers a formatting command just wrote: the
+  // text goes in its middle, wherever in the pair the caret was reported
+  const livePlugin = view.plugin(livePreviewPlugin)
+  const pair = livePlugin ? livePlugin.emptyPair : null
+  if (pair && from === to && from >= pair.from && from <= pair.to && from !== pair.pos) {
+    from = to = pair.pos
+    redirected = true
   }
 
   if (isRawTypingContext(view.state, from)) return false
@@ -1291,6 +1493,7 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
     this.view = view
     this.pointerDown = false
     this.stale = false
+    this.emptyPair = null
     this.rebuild(view)
 
     // Markers stay as they are while a pointer selection is being dragged:
@@ -1314,6 +1517,34 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
   }
 
   update(update) {
+    // An empty pair counts from the change that wrote it, not when the caret
+    // merely walks into four stars that were already in the note (a rule)
+    if (update.docChanged) {
+      this.emptyPair = isSyntaxRevealed() ? null : findEmptyMarkerPair(update.state)
+      this.changedAt = Date.now()
+    } else if (!this.emptyPair && update.selectionSet && Date.now() - (this.changedAt || 0) < 400 && !isSyntaxRevealed()) {
+      // The toolbar and the menus write the pair, then place the caret in it
+      // in a second step
+      this.emptyPair = findEmptyMarkerPair(update.state)
+    }
+
+    // The caret left an empty pair of markers without typing in it: the pair
+    // goes, or it would stay in the note as a rule, a fence or stray stars
+    if (this.emptyPair && update.selectionSet && !update.docChanged) {
+      const pair = this.emptyPair
+      const main = update.state.selection.main
+      // (anywhere in the pair: the browser cannot hold a caret between two
+      // stretches of text that are not drawn, and reports its start instead)
+      if (!(main.empty && main.head >= pair.from && main.head <= pair.to)) {
+        this.emptyPair = null
+        setTimeout(() => {
+          const state = this.view.state
+          if (pair.to > state.doc.length || state.sliceDoc(pair.from, pair.to) !== pair.text) return
+          this.view.dispatch({ changes: { from: pair.from, to: pair.to }, userEvent: 'delete' })
+        }, 0)
+      }
+    }
+
     const treeChanged = syntaxTree(update.startState) !== syntaxTree(update.state)
     const refreshed = update.transactions.some(transaction =>
       transaction.effects.some(effect => effect.is(refreshLivePreviewEffect) || effect.is(setCodeLineNumbersEffect) || effect.is(setToggleOpenEffect))
@@ -1335,7 +1566,7 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
   }
 
   rebuild(view) {
-    const built = buildLivePreviewDecorations(view)
+    const built = buildLivePreviewDecorations(view, this.emptyPair)
     this.decorations = built.decorations
     this.atomic = built.atomic
   }
@@ -1489,6 +1720,7 @@ export const livePreview = [
   toggleOpenField,
   renderedBlocksField,
   literalTypingInput,
+  richTextKeymap,
   livePreviewPlugin,
   EditorView.atomicRanges.of(view => {
     const plugin = view.plugin(livePreviewPlugin)

@@ -121,7 +121,6 @@ $settingsPageUserKeys = [
     'markdown_split_preview_left',
     'markdown_default_view_mode',
     'markdown_new_note_view_mode',
-    'markdown_live_show_syntax',
     'markdown_colored',
     'markdown_colored_custom',
     'code_block_word_wrap',
@@ -1223,7 +1222,7 @@ if ($canUseUserWebhooks) {
                 </div>
             </div>
 
-            <!-- View mode of a new, empty note (split / edit / live rendering) -->
+            <!-- View mode of a new, empty note (split / edit / live preview / rich text) -->
             <div class="home-card settings-inline-card" id="markdown-new-note-view-mode-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_new_note_view_mode', [], 'Choose whether a new markdown note opens in split, edit or live rendering mode. Live rendering is then turned on for the other notes too. On a phone a new note never opens in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-file-plus"></i></div>
@@ -1232,18 +1231,9 @@ if ($canUseUserWebhooks) {
                     <select id="markdown-new-note-view-mode-select" class="settings-inline-control settings-inline-select" data-control="markdown-new-note-view-mode-select">
                         <option value="split"><?php echo t_h('modals.markdown_default_view_mode.options.split_short', [], 'Split'); ?></option>
                         <option value="edit"><?php echo t_h('modals.markdown_default_view_mode.options.edit', [], 'Edit'); ?></option>
-                        <option value="live"><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live rendering'); ?></option>
+                        <option value="live"><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live preview'); ?></option>
+                        <option value="rich"><?php echo t_h('modals.markdown_default_view_mode.options.rich', [], 'Rich text'); ?></option>
                     </select>
-                </div>
-            </div>
-
-            <!-- Live rendering: syntax back under the caret, or never shown -->
-            <div class="home-card" id="markdown-live-show-syntax-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_live_show_syntax', [], 'In live rendering, show the Markdown syntax of the element the cursor is on (the # of a heading, the ** of bold text, the address of a link). Turn it off to never see the syntax: formatting is then done from the toolbar, the menus and the shortcuts. Tables, diagrams and formulas still open their source when clicked, which is the only way to edit them. When it is off, what you type also stays plain text: a # or a * typed on the keyboard is not read as Markdown.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                <div class="home-card-icon"><i class="lucide lucide-type"></i></div>
-                <div class="home-card-content">
-                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_live_show_syntax', [], 'Show Markdown syntax at the cursor'); ?></span>
-                    <span id="markdown-live-show-syntax-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

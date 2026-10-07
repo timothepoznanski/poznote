@@ -435,12 +435,17 @@ function initializeMarkdownNote(noteId) {
     } else if (isEmpty && !isMobileViewportCheck) {
         // New notes on desktop: split mode, or the editor alone
         var newNoteMode = (document.body && document.body.getAttribute('data-markdown-new-note-mode')) || 'split';
-        if (newNoteMode === 'live') _mdSetLiveEditing(true);
+        if (newNoteMode === 'live' || newNoteMode === 'rich') {
+            _mdSetLiveSyntax(newNoteMode === 'live');
+            _mdSetLiveEditing(true);
+        }
         startInSplitMode = newNoteMode === 'split';
         startInEditMode = newNoteMode !== 'split';
     } else if (isEmpty) {
         // New notes on mobile: start in edit mode
-        if (document.body && document.body.getAttribute('data-markdown-new-note-mode') === 'live') {
+        var mobileNewNoteMode = document.body ? document.body.getAttribute('data-markdown-new-note-mode') : '';
+        if (mobileNewNoteMode === 'live' || mobileNewNoteMode === 'rich') {
+            _mdSetLiveSyntax(mobileNewNoteMode === 'live');
             _mdSetLiveEditing(true);
         }
         startInEditMode = true;
@@ -1292,9 +1297,40 @@ function _mdSetLiveEditing(enabled) {
     });
 }
 
-// The three views of a Markdown note, in the order their button of the
+// The two live views share the editor's live rendering and differ in one
+// thing, kept as the account's markdown_live_show_syntax setting and as
+// <body data-markdown-live-syntax>: "live preview" brings the Markdown syntax
+// back under the caret, "rich text" never shows it and takes typed text
+// literally (build/markdown-editor/src/live-preview.js).
+function _mdIsRichText() {
+    return _mdIsLiveEditing() && !!document.body && document.body.getAttribute('data-markdown-live-syntax') === '0';
+}
+
+function _mdSetLiveSyntax(shown) {
+    var value = shown ? '1' : '0';
+    if (!document.body || document.body.getAttribute('data-markdown-live-syntax') === value) return;
+    document.body.setAttribute('data-markdown-live-syntax', value);
+
+    fetch('/api/v1/settings/markdown_live_show_syntax', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ value: value })
+    }).catch(function (error) {
+        console.warn('Could not save the live view setting:', error);
+    });
+
+    // Editors already drawing live take the new rule at once
+    var api = window.PoznoteMarkdownCodeMirror;
+    if (!api || typeof api.refreshLivePreview !== 'function') return;
+    document.querySelectorAll('.noteentry[data-note-type="markdown"] .markdown-editor').forEach(function (editorDiv) {
+        api.refreshLivePreview(editorDiv);
+    });
+}
+
+// The four views of a Markdown note, in the order their button of the
 // floating stack goes through them: classic (the preview, with the pencil to
-// edit), live rendering in the editor, split view. A phone has no split view.
+// edit), live preview, rich text, split view. A phone has no split view.
 function getNextMarkdownViewState(state) {
     var isMobileViewport = false;
     try {
@@ -1303,7 +1339,8 @@ function getNextMarkdownViewState(state) {
         isMobileViewport = false;
     }
     if (state === 'classic') return 'live';
-    if (state === 'live' && !isMobileViewport) return 'split';
+    if (state === 'live') return 'rich';
+    if (state === 'rich' && !isMobileViewport) return 'split';
     return 'classic';
 }
 
@@ -1327,12 +1364,18 @@ function cycleMarkdownView(noteId) {
     if (!noteEntry) return;
 
     var isSplit = noteEntry.classList.contains('markdown-split-mode');
-    var next = getNextMarkdownViewState(isSplit ? 'split' : (_mdIsLiveEditing() ? 'live' : 'classic'));
+    var current = isSplit ? 'split' : (_mdIsLiveEditing() ? (_mdIsRichText() ? 'rich' : 'live') : 'classic');
+    var next = getNextMarkdownViewState(current);
+    var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
+    var mode = viewModeBtn ? viewModeBtn.getAttribute('data-current-mode') : '';
 
-    if (next === 'live') {
-        var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
-        var mode = viewModeBtn ? viewModeBtn.getAttribute('data-current-mode') : '';
+    if (next === 'rich') {
+        // Same editor, the syntax no longer comes back under the caret
+        _mdSetLiveSyntax(false);
+        if (mode) updateViewModeButton(noteId, mode);
+    } else if (next === 'live') {
         noteEntry.setAttribute('data-markdown-classic-mode', mode === 'edit' ? 'edit' : 'preview');
+        _mdSetLiveSyntax(true);
         _mdSetLiveEditing(true);
         if (mode === 'preview') {
             // The editor is the place to be now, see _mdIsLiveEditing()
@@ -1342,8 +1385,8 @@ function cycleMarkdownView(noteId) {
             updateViewModeButton(noteId, mode);
         }
     } else if (next === 'split') {
-        // Live rendering stays the account's setting under the split, whose
-        // editor shows the raw source: a note opened next comes up live
+        // The live view stays the account's setting under the split, whose
+        // editor shows the raw source: a note opened next comes up in it
         switchToSplitMode(noteId);
     } else {
         // Back to where the cycle started, and to the pencil
@@ -1416,6 +1459,7 @@ window.exitSplitMode = exitSplitMode;
 window.toggleMarkdownSplitView = toggleMarkdownSplitView;
 window.cycleMarkdownView = cycleMarkdownView;
 window.getNextMarkdownViewState = getNextMarkdownViewState;
+window.isMarkdownRichText = _mdIsRichText;
 window.getMarkdownClassicReturnMode = getMarkdownClassicReturnMode;
 window.getMarkdownContent = getMarkdownContent;
 window.getMarkdownContentForNote = getMarkdownContentForNote;

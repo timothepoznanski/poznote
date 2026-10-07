@@ -131,7 +131,6 @@
       "markdown_font": "마크다운 편집기에서 사용되는 글꼴을 선택하세요.",
       "markdown_default_view_mode": "마크다운 노트가 미리보기, 편집 또는 분할 모드에서 열릴지 선택하세요.",
       "markdown_new_note_view_mode": "새 마크다운 노트를 분할, 편집 또는 실시간 렌더링 모드 중 어느 것으로 열지 선택하세요. 실시간 렌더링을 선택하면 다른 노트에도 적용됩니다. 휴대폰에서는 새 노트가 분할 모드로 열리지 않습니다.",
-      "markdown_live_show_syntax": "실시간 렌더링에서 커서가 있는 요소의 마크다운 문법(제목의 #, 굵은 글씨의 **, 링크 주소)을 표시합니다. 끄면 문법이 전혀 보이지 않으며, 서식은 도구 모음, 메뉴, 단축키로 적용합니다. 표, 다이어그램, 수식은 클릭하면 여전히 원본이 열리며, 이것이 편집할 수 있는 유일한 방법입니다. 끄면 입력한 내용도 일반 텍스트로 유지됩니다. 키보드로 입력한 #이나 *는 마크다운으로 해석되지 않습니다.",
       "font_size": "노트, 사이드바, 코드 블록 및 설정 페이지의 글꼴 크기를 조정합니다.",
       "index_icon_scale": "노트 목록의 아이콘 크기를 조정합니다.",
       "icon_rail_scale": "아이콘 사이드바의 아이콘 크기를 조절합니다.",
@@ -455,7 +454,6 @@
       "markdown_font": "마크다운 편집기 글꼴",
       "markdown_default_view_mode": "기본 보기 모드",
       "markdown_new_note_view_mode": "새 노트 보기 모드",
-      "markdown_live_show_syntax": "커서 위치의 마크다운 문법 표시",
       "login_display": "로그인 페이지 제목",
       "note_font_size": "글꼴 크기",
       "note_age_filter": "노트 날짜 필터",
@@ -1247,7 +1245,8 @@
         "split": "분할(편집기와 미리보기 나란히)",
         "split_short": "분할",
         "last": "마지막으로 사용한 모드",
-        "live": "실시간 렌더링"
+        "live": "실시간 미리보기",
+        "rich": "서식 있는 텍스트"
       },
       "hint": "다른 모드로 전환한 노트는 다음에 기본 모드로 다시 열립니다."
     },
@@ -1968,7 +1967,8 @@
       "create_linked_note": "바로가기 만들기",
       "search_replace": "검색 및 바꾸기",
       "split_view": "분할 보기 전환",
-      "view_cycle_live": "실시간 렌더링으로 전환",
+      "view_cycle_live": "실시간 미리보기로 전환",
+      "view_cycle_rich": "서식 있는 텍스트로 전환",
       "view_cycle_split": "분할 보기로 전환",
       "view_cycle_preview": "미리보기 모드로 돌아가기",
       "view_cycle_edit": "편집 모드로 돌아가기",
@@ -4905,7 +4905,7 @@
   "page_menu": {
     "button": "추가 옵션",
     "split_view": "분할 보기",
-    "markdown_view": "Markdown 보기 (미리보기, 실시간, 분할)"
+    "markdown_view": "Markdown 보기 (기본, 실시간 미리보기, 서식 있는 텍스트, 분할)"
   },
   "keyboard_shortcuts": {
     "menu_item": "키보드 단축키",

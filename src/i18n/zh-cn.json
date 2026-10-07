@@ -452,7 +452,6 @@
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
       "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。",
       "markdown_new_note_view_mode": "选择新建的 Markdown 笔记以分栏、编辑还是实时渲染模式打开。选择实时渲染后，其他笔记也会启用实时渲染。在手机上新笔记不会以分栏模式打开。",
-      "markdown_live_show_syntax": "在实时渲染中，显示光标所在元素的 Markdown 语法（标题的 #、粗体的 **、链接的地址）。关闭后将不再显示语法：格式通过工具栏、菜单和快捷键设置。表格、图表和公式仍会在点击时打开源码，这是编辑它们的唯一方式。关闭后，输入的内容也保持为纯文本：键盘输入的 # 或 * 不会被当作 Markdown。",
       "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "icon_rail_scale": "调整图标侧边栏中图标的大小。",
@@ -811,7 +810,6 @@
       "markdown_font": "Markdown 编辑器字体",
       "markdown_default_view_mode": "默认打开模式",
       "markdown_new_note_view_mode": "新笔记打开模式",
-      "markdown_live_show_syntax": "在光标处显示 Markdown 语法",
       "login_display": "登录页面标题",
       "note_font_size": "字体大小",
       "note_age_filter": "笔记时间筛选",
@@ -1174,7 +1172,8 @@
       "open_in_new_tab": "在新标签页中打开",
       "search_replace": "查找替换",
       "split_view": "切换分屏视图",
-      "view_cycle_live": "切换到实时渲染",
+      "view_cycle_live": "切换到实时预览",
+      "view_cycle_rich": "切换到富文本",
       "view_cycle_split": "切换到分屏视图",
       "view_cycle_preview": "返回预览模式",
       "view_cycle_edit": "返回编辑模式",
@@ -1718,7 +1717,8 @@
         "split": "分栏（编辑器与预览并排）",
         "split_short": "分栏",
         "last": "上次使用的模式",
-        "live": "实时渲染"
+        "live": "实时预览",
+        "rich": "富文本"
       },
       "hint": "切换到其他模式的笔记，下次打开时会恢复为默认模式。"
     },
@@ -5166,7 +5166,7 @@
   "page_menu": {
     "button": "更多选项",
     "split_view": "分屏视图",
-    "markdown_view": "Markdown 视图（预览、实时、分屏）"
+    "markdown_view": "Markdown 视图（经典、实时预览、富文本、分屏）"
   },
   "keyboard_shortcuts": {
     "menu_item": "键盘快捷键",

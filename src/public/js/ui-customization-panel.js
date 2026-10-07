@@ -397,7 +397,8 @@
         var viewButton = document.getElementById('edgeSplitViewBtn');
         if (viewButton) {
             var isLive = typeof window.isMarkdownLiveEditingEnabled === 'function' && window.isMarkdownLiveEditingEnabled();
-            var viewState = isSplit ? 'split' : (isLive ? 'live' : 'classic');
+            var isRich = isLive && typeof window.isMarkdownRichText === 'function' && window.isMarkdownRichText();
+            var viewState = isSplit ? 'split' : (isLive ? (isRich ? 'rich' : 'live') : 'classic');
             var nextState = typeof window.getNextMarkdownViewState === 'function'
                 ? window.getNextMarkdownViewState(viewState)
                 : 'classic';
@@ -423,6 +424,7 @@
                 viewIcon.className = {
                     classic: 'lucide lucide-file-text',
                     live: 'devicon-markdown',
+                    rich: 'lucide lucide-type',
                     split: 'lucide lucide-columns-2'
                 }[viewState];
             }

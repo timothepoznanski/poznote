@@ -26,7 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
-import { livePreview } from './live-preview.js'
+import { livePreview, refreshLivePreviewEffect } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -1092,6 +1092,15 @@ function setLivePreview(host, enabled) {
   return true
 }
 
+// The page switched between "Live preview" and "Rich text" (<body
+// data-markdown-live-syntax>): draw the editor again under the new rule
+function refreshLivePreview(host) {
+  const instance = getInstance(host)
+  if (!instance || !instance.livePreview) return false
+  instance.view.dispatch({ effects: refreshLivePreviewEffect.of(null) })
+  return true
+}
+
 function isLivePreview(host) {
   const instance = getInstance(host)
   return !!(instance && instance.livePreview)
@@ -1528,6 +1537,7 @@ window.PoznoteMarkdownCodeMirror = {
   setReadOnly,
   setLivePreview,
   isLivePreview,
+  refreshLivePreview,
   focus,
   hasFocus,
   getSelectionOffsets,

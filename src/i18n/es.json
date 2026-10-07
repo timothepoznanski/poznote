@@ -453,7 +453,6 @@
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
       "markdown_default_view_mode": "Elige si las notas markdown se abren en vista previa, edición o vista dividida.",
       "markdown_new_note_view_mode": "Elige si una nota markdown nueva se abre en vista dividida, en edición o con renderizado en vivo. El renderizado en vivo se activa entonces también para las demás notas. En el móvil una nota nueva nunca se abre en vista dividida.",
-      "markdown_live_show_syntax": "En el renderizado en vivo, muestra la sintaxis Markdown del elemento donde está el cursor (el # de un título, los ** de la negrita, la dirección de un enlace). Desactívalo para no ver nunca la sintaxis: el formato se aplica entonces desde la barra de herramientas, los menús y los atajos. Las tablas, los diagramas y las fórmulas siguen abriendo su código al hacer clic, la única forma de editarlos. Desactivado, lo que escribes también queda como texto: un # o un * tecleado no se interpreta como Markdown.",
       "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "icon_rail_scale": "Ajusta el tamaño de los iconos de la barra de iconos.",
@@ -812,7 +811,6 @@
       "markdown_font": "Fuente del editor markdown",
       "markdown_default_view_mode": "Modo de apertura",
       "markdown_new_note_view_mode": "Modo de apertura de notas nuevas",
-      "markdown_live_show_syntax": "Mostrar la sintaxis Markdown en el cursor",
       "login_display": "Título de página de inicio de sesión",
       "note_font_size": "Tamaño de fuente",
       "note_age_filter": "Filtro de antigüedad",
@@ -1175,7 +1173,8 @@
       "create_linked_note": "Crear atajo",
       "open_in_new_tab": "Abrir en nueva pestaña",
       "split_view": "Alternar vista dividida",
-      "view_cycle_live": "Cambiar a renderizado en vivo",
+      "view_cycle_live": "Cambiar a vista previa en vivo",
+      "view_cycle_rich": "Cambiar a texto enriquecido",
       "view_cycle_split": "Cambiar a vista dividida",
       "view_cycle_preview": "Volver al modo vista previa",
       "view_cycle_edit": "Volver al modo edición",
@@ -1726,7 +1725,8 @@
         "split": "Vista dividida (editor y vista previa lado a lado)",
         "split_short": "Vista dividida",
         "last": "Último modo usado",
-        "live": "Renderizado en vivo"
+        "live": "Vista previa en vivo",
+        "rich": "Texto enriquecido"
       },
       "hint": "Una nota que cambies a otro modo se vuelve a abrir en el modo predeterminado."
     },
@@ -5070,7 +5070,7 @@
   "page_menu": {
     "button": "Más opciones",
     "split_view": "Vista dividida",
-    "markdown_view": "Vista Markdown (vista previa, en vivo, dividida)"
+    "markdown_view": "Vista Markdown (clásica, vista previa en vivo, texto enriquecido, dividida)"
   },
   "keyboard_shortcuts": {
     "menu_item": "Atajos de teclado",
