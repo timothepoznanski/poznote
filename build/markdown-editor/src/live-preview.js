@@ -695,6 +695,8 @@ function buildLivePreviewDecorations(view, armedPair) {
         }
 
         if (from > opening.to) decorations.push(decoration.range(opening.to, from))
+        // An empty pair just written around the caret is handled as one, below
+        if (emptyPair && opening.from === emptyPair.from) continue
         if (!touches(opening.from, to)) {
           hide(opening.from, opening.to)
           hide(from, to)
@@ -1031,7 +1033,7 @@ function buildLivePreviewDecorations(view, armedPair) {
   // browser sent what was typed to the line above. Text of no size keeps one.
   if (emptyPair) {
     decorations.push(emptyPairMarker.range(emptyPair.from, emptyPair.pos))
-    decorations.push(Decoration.widget({ widget: new EmptyPairWidget(emptyPair.marker), side: 1 }).range(emptyPair.pos))
+    decorations.push(Decoration.widget({ widget: new EmptyPairWidget(emptyPair.marker, emptyPair.style), side: 1 }).range(emptyPair.pos))
     decorations.push(emptyPairMarker.range(emptyPair.pos, emptyPair.to))
   }
 
@@ -1212,6 +1214,26 @@ function findEmptyMarkerPair(state) {
   const pos = selection.main.head
   const line = state.doc.lineAt(pos)
   const offset = pos - line.from
+
+  // The pair of tags Color, Highlight and Underline write when nothing is
+  // selected: <span style="color: ...">|</span>, <u>|</u>
+  const opening = /<(u|span)\b([^<>]*)>$/i.exec(line.text.slice(0, offset))
+  if (opening) {
+    const closing = new RegExp('^</' + opening[1] + '\\s*>', 'i').exec(line.text.slice(offset))
+    if (closing) {
+      const styleMatch = /\bstyle\s*=\s*(["'])(.*?)\1/i.exec(opening[2])
+      return {
+        from: pos - opening[0].length,
+        to: pos + closing[0].length,
+        pos,
+        line: line.number,
+        marker: 'tag',
+        style: styleMatch ? sanitizeSpanStyle(styleMatch[2]) : '',
+        text: opening[0] + closing[0]
+      }
+    }
+  }
+
   const marker = line.text.charAt(offset - 1)
   if (!marker || '*_~=`'.indexOf(marker) === -1 || line.text.charAt(offset) !== marker) return null
 
@@ -1225,24 +1247,41 @@ function findEmptyMarkerPair(state) {
   return { from: pos - before, to: pos + after, pos, line: line.number, marker, text: marker.repeat(before * 2) }
 }
 
+// A link to another note opens in the app, like the same link in the preview
+// (js/note-reference.js); any other opens in a new tab.
+function followLink(href) {
+  const internal = /(?:^|\/)index\.php\?[^#\s]*\bnote=(\d+)\b|^\?[^#\s]*\bnote=(\d+)\b/.exec(href)
+  if (internal && typeof window.navigateToNote === 'function') {
+    window.navigateToNote(internal[1] || internal[2])
+    return
+  }
+  window.open(href, '_blank', 'noopener')
+}
+
 // What stands in the middle of an empty pair until its text is typed. The
 // two halves of the pair are text of no size, and a caret drawn between them
 // had no height: this gives it one. For inline code it is also the start of
 // the code's grey ground, so that one sees where the code will go.
 class EmptyPairWidget extends WidgetType {
-  constructor(marker) {
+  constructor(marker, style) {
     super()
     this.marker = marker
+    this.style = style || ''
   }
 
   eq(other) {
-    return other.marker === this.marker
+    return other.marker === this.marker && other.style === this.style
   }
 
   toDOM() {
     const strut = document.createElement('span')
     strut.className = 'cm-live-pair-strut' + (this.marker === '`' ? ' cm-live-pair-code' : '')
     strut.setAttribute('aria-hidden', 'true')
+    // A colour or a highlight about to be typed in: a mark in that colour
+    if (this.style) {
+      strut.classList.add('cm-live-pair-color')
+      strut.setAttribute('style', this.style)
+    }
     return strut
   }
 
@@ -1668,15 +1707,14 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
         return true
       }
 
-      // Ctrl/Cmd + click follows a link; a plain click edits it
+      // Live preview: Ctrl/Cmd + click follows a link, a plain click edits it.
+      // Rich text: there is no address to edit under the caret, a plain click
+      // follows the link as it does in the preview. Either way the click
+      // handler below does the opening; this keeps the caret where it is.
       const link = target.closest('[data-live-href]')
-      if (link && (event.ctrlKey || event.metaKey)) {
-        const href = link.getAttribute('data-live-href')
-        if (isSafeUrl(href)) {
-          window.open(href, '_blank', 'noopener')
-          event.preventDefault()
-          return true
-        }
+      if (link && (event.ctrlKey || event.metaKey || !isSyntaxRevealed()) && isSafeUrl(link.getAttribute('data-live-href'))) {
+        event.preventDefault()
+        return true
       }
 
       clearTimeout(this.refreshTimer)
@@ -1686,6 +1724,16 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
 
     click(event, view) {
       const target = event.target && event.target.nodeType === 1 ? event.target : event.target && event.target.parentElement
+
+      const link = target && event.button === 0 ? target.closest('[data-live-href]') : null
+      if (link && (event.ctrlKey || event.metaKey || !isSyntaxRevealed())) {
+        const href = link.getAttribute('data-live-href')
+        if (isSafeUrl(href)) {
+          followLink(href)
+          event.preventDefault()
+          return true
+        }
+      }
       const badge = target && event.button === 0 ? target.closest('.cm-live-code-lang') : null
       if (!badge || view.state.readOnly || typeof window.openCodeBlockLanguageModal !== 'function') return false
 

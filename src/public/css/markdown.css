@@ -521,6 +521,18 @@ body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-
     box-shadow: inset 0 0 0 1px var(--pz-border);
 }
 
+/* Rich text: a link is followed on a plain click, and says so */
+body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .cm-live-link {
+    cursor: pointer;
+}
+
+/* A colour or a highlight chosen with nothing selected: a short mark in that
+   colour where the text will go (the style comes from the tag itself) */
+.markdown-codemirror-host .cm-live-preview .cm-live-pair-color {
+    width: 0.5em;
+    border-bottom: 2px solid currentColor;
+}
+
 /* Paragraphs aligned from the toolbar (<p align="...">) */
 .markdown-codemirror-host .cm-live-preview .cm-line.cm-live-align-left {
     text-align: left;
