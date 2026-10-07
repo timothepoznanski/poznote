@@ -26,7 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
-import { livePreview, refreshLivePreviewEffect } from './live-preview.js'
+import { armPendingFormat, isFormatActiveAt, findInlineFormatEnd, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -409,6 +409,73 @@ const codeLanguages = [
   LanguageDescription.of({ name: 'Markdown', alias: ['md'], extensions: ['md'], load: () => Promise.resolve(markdown({ base: markdownLanguage })) })
 ]
 
+// A line aligned from the menus, <p align="center">text</p>, is a paragraph:
+// the text between its tags is Markdown (bold, links...), which is how the
+// preview renders it. The grammar would read the line as a block of HTML,
+// where nothing is formatted, and live rendering showed the stars of a bold
+// word as soon as its line was centred.
+const ALIGNED_PARAGRAPH_LINE = /^<p\s+align\s*=\s*["']?(?:left|center|right|justify)["']?\s*>.*<\/p>\s*$/i
+const alignedParagraphSyntax = {
+  parseBlock: [{
+    name: 'AlignedParagraph',
+    before: 'HTMLBlock',
+    parse(cx, line) {
+      if (line.indent > 3 || line.next !== 60) return false
+      const text = line.text.slice(line.pos)
+      if (!ALIGNED_PARAGRAPH_LINE.test(text)) return false
+      const from = cx.lineStart + line.pos
+      const content = cx.parser.parseInline(text, from)
+      cx.nextLine()
+      cx.addElement(cx.elt('Paragraph', from, from + text.length, content))
+      return true
+    },
+    endLeaf(cx, line) {
+      return line.indent <= 3 && line.next === 60 && ALIGNED_PARAGRAPH_LINE.test(line.text.slice(line.pos))
+    }
+  }]
+}
+
+// An address pasted over selected words makes them a link to it. The
+// grammar's own version of this writes "[" and "](address)" as two changes
+// around the selection, and the note ended up with "[[words]](address)": one
+// change here, the selection replaced by the whole link.
+const NON_PLAIN_TEXT_NODE = /code|horizontalrule|html|link|comment|processing|escape|entity|image|mark|url/i
+const pasteUrlOverSelection = EditorView.domEventHandlers({
+  paste(event, view) {
+    const main = view.state.selection.main
+    if (main.empty || view.state.selection.ranges.length !== 1 || view.state.readOnly) return false
+    let link = event.clipboardData ? event.clipboardData.getData('text/plain').trim() : ''
+    if (!link || /\s/.test(link) || !/^(https?:\/\/|mailto:|www\.)/i.test(link)) return false
+    if (/^www\./i.test(link)) link = 'https://' + link
+    const selected = view.state.sliceDoc(main.from, main.to)
+    if (/[\n\[\]]/.test(selected)) return false
+
+    // Plain text only: nothing starts or ends inside the selection
+    let crossesNode = false
+    syntaxTree(view.state).iterate({
+      from: main.from,
+      to: main.to,
+      enter(node) {
+        if (node.from > main.from || NON_PLAIN_TEXT_NODE.test(node.name)) crossesNode = true
+      },
+      leave(node) {
+        if (node.to < main.to) crossesNode = true
+      }
+    })
+    if (crossesNode) return false
+
+    const insert = '[' + selected + '](' + link.replace(/[()<>]/g, encodeURIComponent) + ')'
+    view.dispatch({
+      changes: { from: main.from, to: main.to, insert },
+      selection: EditorSelection.cursor(main.from + insert.length),
+      userEvent: 'input.paste',
+      scrollIntoView: true
+    })
+    event.preventDefault()
+    return true
+  }
+})
+
 const CODE_BLOCK_LANGUAGES = [
   'javascript', 'typescript', 'python', 'html', 'css', 'json', 'bash', 'powershell',
   'sql', 'php', 'java', 'csharp', 'cpp', 'go', 'rust', 'ruby', 'yaml', 'xml',
@@ -551,41 +618,51 @@ function markdownCompletionSource(context) {
 
 function wrapSelection(prefix, suffix) {
   return function run(view) {
+    // Italic in the middle of a bold word: remembered, written with the
+    // first character typed (./live-preview.js armPendingFormat)
+    if (view.state.selection.ranges.length === 1 && view.state.selection.main.empty &&
+        findInlineFormatEnd(view.state, prefix) === null && !findUntypedPair(view.state) &&
+        armPendingFormat(view, prefix, suffix)) {
+      return true
+    }
     view.dispatch(view.state.changeByRange(range => {
       // Caret only: insert the marker pair and place the caret between,
       // like the HTML notes' shortcuts do
       if (range.empty) {
+        // The shortcut again, while writing in that format: out of it. And
+        // again on the pair it just wrote, nothing typed yet: the pair goes.
+        if (view.state.selection.ranges.length === 1) {
+          const pair = findUntypedPair(view.state)
+          if (pair && pair.text === prefix + suffix) {
+            return { changes: { from: pair.from, to: pair.to }, range: EditorSelection.cursor(pair.from) }
+          }
+          const end = findInlineFormatEnd(view.state, prefix)
+          if (end !== null) return { range: EditorSelection.cursor(end) }
+          // Inline code cannot hold formatting: the format starts after it
+          const codeEnd = prefix === '`' ? null : findInlineFormatEnd(view.state, '`')
+          if (codeEnd !== null) {
+            return {
+              changes: { from: codeEnd, insert: prefix + suffix },
+              range: EditorSelection.cursor(codeEnd + prefix.length)
+            }
+          }
+        }
         return {
           changes: { from: range.from, insert: prefix + suffix },
           range: EditorSelection.cursor(range.from + prefix.length)
         }
       }
 
-      const selected = view.state.sliceDoc(range.from, range.to)
-
-      // Toggle off when the selection is already wrapped, whether the
-      // markers sit inside the selection or just around it
-      if (selected.length >= prefix.length + suffix.length &&
-          selected.startsWith(prefix) && selected.endsWith(suffix)) {
-        const inner = selected.slice(prefix.length, selected.length - suffix.length)
-        return {
-          changes: { from: range.from, to: range.to, insert: inner },
-          range: EditorSelectionRange(range.from, range.from + inner.length)
-        }
-      }
-      const before = view.state.sliceDoc(Math.max(0, range.from - prefix.length), range.from)
-      const after = view.state.sliceDoc(range.to, Math.min(view.state.doc.length, range.to + suffix.length))
-      if (before === prefix && after === suffix) {
-        return {
-          changes: { from: range.from - prefix.length, to: range.to + suffix.length, insert: selected },
-          range: EditorSelectionRange(range.from - prefix.length, range.from - prefix.length + selected.length)
-        }
-      }
-
-      const insert = prefix + selected + suffix
+      // Per line, around the words: see wrapSelectionChanges()
+      const whole = view.state.sliceDoc(range.from, range.to)
+      // (nothing but spaces selected: nothing to format)
+      if (!whole.trim() || view.state.selection.ranges.length !== 1) return { range }
+      const wrapped = wrapSelectionChanges(view.state, range.from, range.to, prefix, suffix)
+      if (!wrapped) return { range }
+      const changeSet = view.state.changes(wrapped.changes)
       return {
-        changes: { from: range.from, to: range.to, insert },
-        range: EditorSelectionRange(range.from + prefix.length, range.from + prefix.length + selected.length)
+        changes: wrapped.changes,
+        range: EditorSelectionRange(changeSet.mapPos(wrapped.from, 1), changeSet.mapPos(wrapped.to, -1))
       }
     }))
     return true
@@ -639,6 +716,17 @@ function toggleFencedCodeBlock(view) {
           ],
           range: EditorSelectionRange(clamp(range.from), clamp(range.to))
         }
+      }
+    }
+
+    // A bare caret on a line of text: the block goes under that line, whole,
+    // instead of cutting it in two at the caret
+    const caretLine = doc.lineAt(range.from)
+    if (range.empty && caretLine.text.trim()) {
+      const opening = '\n\n' + fence + '\n'
+      return {
+        changes: { from: caretLine.to, insert: opening + '\n' + fence },
+        range: EditorSelection.cursor(caretLine.to + opening.length)
       }
     }
 
@@ -1101,6 +1189,60 @@ function refreshLivePreview(host) {
   return true
 }
 
+// For the command menus' "Back to normal text" (./live-preview.js)
+// With `marker` ("**", "*", "~~", "`", "=="): in that very format
+function isInInlineFormat(host, marker) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  const state = instance.view.state
+  if (marker) return findInlineFormatEnd(state, marker) !== null
+  return findInlineFormatEnd(state) !== null || !!findUntypedPair(state)
+}
+
+function leaveInlineFormatAt(host, marker) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  const left = leaveInlineFormat(instance.view, marker)
+  instance.view.focus()
+  notifyFormatStateChanged()
+  return left
+}
+
+// The toolbar and the menus format a selection through here too
+function wrapSelectionAt(host, prefix, suffix) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  wrapSelection(prefix, suffix)(instance.view)
+  instance.view.focus()
+  notifyFormatStateChanged()
+  return true
+}
+
+// The buttons that show a format as on (the bar above a phone's keyboard,
+// js/events-text-selection.js) follow the selection; a format can also turn
+// on or off with the caret staying where it is
+function notifyFormatStateChanged() {
+  try {
+    document.dispatchEvent(new Event('selectionchange'))
+  } catch (error) {
+    // (nothing listens, nothing to refresh)
+  }
+}
+
+// The toolbar's Code block button: the shortcut's own toggle
+function toggleCodeBlockAt(host) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  toggleFencedCodeBlock(instance.view)
+  instance.view.focus()
+  return true
+}
+
+function isFormatActive(host, prefix, suffix) {
+  const instance = getInstance(host)
+  return !!instance && isFormatActiveAt(instance.view, prefix, suffix || prefix)
+}
+
 function isLivePreview(host) {
   const instance = getInstance(host)
   return !!(instance && instance.livePreview)
@@ -1419,8 +1561,12 @@ function createEditor(host, options = {}) {
       markdown({
         base: markdownLanguage,
         codeLanguages,
+        extensions: [alignedParagraphSyntax],
+        // (pasteUrlOverSelection below does it)
+        pasteURLAsLink: false,
         addKeymap: false
       }),
+      pasteUrlOverSelection,
       markdownLanguage.data.of({
         autocomplete: markdownCompletionSource
       }),
@@ -1538,6 +1684,11 @@ window.PoznoteMarkdownCodeMirror = {
   setLivePreview,
   isLivePreview,
   refreshLivePreview,
+  isInInlineFormat,
+  wrapSelection: wrapSelectionAt,
+  isFormatActive,
+  toggleCodeBlock: toggleCodeBlockAt,
+  leaveInlineFormat: leaveInlineFormatAt,
   focus,
   hasFocus,
   getSelectionOffsets,

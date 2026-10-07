@@ -1402,16 +1402,24 @@ function parseMarkdown(text) {
 
     // Helper function to apply inline styles (bold, italic, code, etc.)
     function applyInlineStyles(text) {
+        // A bare address becomes a link, and is set aside until the end: the
+        // "*" and "_" an address can hold (a Teams or SharePoint link) are
+        // part of it, not emphasis, and the passes below would otherwise cut
+        // the link in two with an <em>. The emphasis markers that close a
+        // format right behind the address ("**see https://x.y**") are not
+        // part of it.
+        var protectedUrls = [];
         function linkifyPlainUrls(input) {
             var urlRegex = /(^|[\s(])((?:https?:\/\/)[^\s<]+)/g;
             return input.replace(urlRegex, function (match, prefix, url) {
                 var trailing = '';
-                while (/[),.;!?]$/.test(url)) {
+                while (/[),.;!?*_~]$/.test(url)) {
                     trailing = url.slice(-1) + trailing;
                     url = url.slice(0, -1);
                 }
                 if (!url) return match;
-                return prefix + '<a href="' + _mdEscapeAttributeQuotes(url) + '" target="_blank" rel="noopener">' + url + '</a>' + trailing;
+                protectedUrls.push('<a href="' + _mdEscapeAttributeQuotes(url) + '" target="_blank" rel="noopener">' + url + '</a>');
+                return prefix + '\x00URL' + (protectedUrls.length - 1) + '\x00' + trailing;
             });
         }
 
@@ -1427,8 +1435,12 @@ function parseMarkdown(text) {
 
         // Handle angle bracket URLs <https://example.com>
         text = text.replace(/&lt;(https?:\/\/[^>]+)&gt;/g, function (match, url) {
-            return '<a href="' + _mdEscapeAttributeQuotes(url) + '" target="_blank" rel="noopener">' + url + '</a>';
+            protectedUrls.push('<a href="' + _mdEscapeAttributeQuotes(url) + '" target="_blank" rel="noopener">' + url + '</a>');
+            return '\x00URL' + (protectedUrls.length - 1) + '\x00';
         });
+
+        // Auto-link plain URLs like GitHub-style markdown behavior
+        text = linkifyPlainUrls(text);
 
         // Bold and italic
         text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
@@ -1444,8 +1456,10 @@ function parseMarkdown(text) {
         // Highlight
         text = text.replace(/==([^=]+)==/g, '<mark>$1</mark>');
 
-        // Auto-link plain URLs like GitHub-style markdown behavior
-        text = linkifyPlainUrls(text);
+        // The addresses set aside above, as links
+        text = text.replace(/\x00URL(\d+)\x00/g, function (match, index) {
+            return protectedUrls[parseInt(index, 10)] || match;
+        });
 
         // Support for <br> in markdown preview while keeping the source text clean
         text = text.replace(/&lt;br\s*\/??&gt;/gi, '<br>');

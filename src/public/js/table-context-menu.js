@@ -990,6 +990,15 @@
             }
         }
 
+        // The menu was opened from the editor (a table drawn in the rich text
+        // view): the editor takes the focus back, so that Ctrl+Z undoes the
+        // change just made
+        var codeMirrorApi = window.PoznoteMarkdownCodeMirror;
+        if (editorDiv && editorDiv.offsetParent !== null && codeMirrorApi && typeof codeMirrorApi.focus === 'function' &&
+            typeof codeMirrorApi.isLivePreview === 'function' && codeMirrorApi.isLivePreview(editorDiv)) {
+            codeMirrorApi.focus(editorDiv);
+        }
+
         markMdTableActionAsModified(noteId);
         restoreMdTableScrollStateAfterLayout(scrollState);
     }

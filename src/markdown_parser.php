@@ -974,8 +974,39 @@ function parseMarkdown($text) {
             return $placeholder;
         }, $text);
         
+        // A bare address becomes a link, and is set aside until the end: the
+        // "*" and "_" an address can hold (a Teams or SharePoint link) are
+        // part of it, not emphasis, and the passes below would otherwise cut
+        // the link in two with an <em>. Same in js/markdown-parser.js.
+        $protectedUrls = [];
+
         // Auto-link URLs in angle brackets: <https://example.com>
-        $text = preg_replace('/&lt;(https?:\/\/[^>]+)&gt;/', '<a href="$1" target="_blank" rel="noopener">$1</a>', $text);
+        $text = preg_replace_callback('/&lt;(https?:\/\/[^>]+)&gt;/', function($matches) use (&$protectedUrls) {
+            $protectedUrls[] = '<a href="' . $matches[1] . '" target="_blank" rel="noopener">' . $matches[1] . '</a>';
+            return "\x00URL" . (count($protectedUrls) - 1) . "\x00";
+        }, $text);
+
+        // Auto-link plain URLs like GitHub-style markdown behavior
+        $text = preg_replace_callback('/(^|[\s(])((?:https?:\/\/)[^\s<]+)/m', function($matches) use (&$protectedUrls) {
+            $prefix = $matches[1];
+            $url = $matches[2];
+            $trailing = '';
+
+            // (the emphasis markers closing a format right behind the address
+            // are not part of it: "**see https://x.y**")
+            while ($url !== '' && preg_match('/[),.;!?*_~]$/', $url)) {
+                $trailing = substr($url, -1) . $trailing;
+                $url = substr($url, 0, -1);
+            }
+
+            if ($url === '') {
+                return $matches[0];
+            }
+
+            $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
+            $protectedUrls[] = '<a href="' . $safeUrl . '" target="_blank" rel="noopener">' . $safeUrl . '</a>';
+            return $prefix . "\x00URL" . (count($protectedUrls) - 1) . "\x00" . $trailing;
+        }, $text);
         
         // Bold and italic (handling nesting better by avoiding [^*] which stops at the first asterisk)
         // Triple formatting (Bold + Italic)
@@ -993,27 +1024,14 @@ function parseMarkdown($text) {
         // Strikethrough: ~~text~~
         $text = preg_replace('/~~(.*?)~~/s', '<del>$1</del>', $text);
 
-        // Auto-link plain URLs like GitHub-style markdown behavior
-        $text = preg_replace_callback('/(^|[\s(])((?:https?:\/\/)[^\s<]+)/m', function($matches) {
-            $prefix = $matches[1];
-            $url = $matches[2];
-            $trailing = '';
-
-            while ($url !== '' && preg_match('/[),.;!?]$/', $url)) {
-                $trailing = substr($url, -1) . $trailing;
-                $url = substr($url, 0, -1);
-            }
-
-            if ($url === '') {
-                return $matches[0];
-            }
-
-            $safeUrl = htmlspecialchars($url, ENT_QUOTES, 'UTF-8');
-            return $prefix . '<a href="' . $safeUrl . '" target="_blank" rel="noopener">' . $safeUrl . '</a>' . $trailing;
-        }, $text);
-        
         // Highlights: ==text==
         $text = preg_replace('/==(.*?)==/s', '<mark>$1</mark>', $text);
+
+        // The addresses set aside above, as links
+        $text = preg_replace_callback('/\x00URL(\d+)\x00/', function($matches) use ($protectedUrls) {
+            $index = (int)$matches[1];
+            return isset($protectedUrls[$index]) ? $protectedUrls[$index] : $matches[0];
+        }, $text);
 
         // Support for <br> (already protected in STEP 4, this ensures literal <br> or <br/> works)
         $text = str_replace(['&lt;br&gt;', '&lt;br/&gt;', '&lt;br /&gt;'], '<br>', $text);

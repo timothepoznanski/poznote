@@ -277,7 +277,30 @@
     /**
      * Wrap selected text with markdown syntax
      */
+    function wrapMarkdownSelectionInEditor(editor, prefix, suffix) {
+        var api = window.PoznoteMarkdownCodeMirror;
+        if (!api || !editor || typeof api.wrapSelection !== 'function' || !api.isCodeMirrorEditor(editor)) return false;
+        return api.wrapSelection(editor, prefix, suffix);
+    }
+
+    // Colour or highlight asked for at a bare caret (the bar above a phone's
+    // keyboard, no text selected): inside text of that kind it turns it off,
+    // the caret stepping out of it; anywhere else it starts it, and what is
+    // typed next takes it. `kinds` lists what counts as "that kind".
+    function toggleMarkdownSpanAtCaret(editor, kinds, prefix, suffix) {
+        var api = window.PoznoteMarkdownCodeMirror;
+        if (!api || !editor || typeof api.isFormatActive !== 'function' || !api.isCodeMirrorEditor(editor)) return false;
+        for (var i = 0; i < kinds.length; i++) {
+            if (api.isFormatActive(editor, kinds[i], kinds[i])) {
+                api.leaveInlineFormat(editor, kinds[i]);
+                return true;
+            }
+        }
+        return api.wrapSelection(editor, prefix, suffix);
+    }
+
     function wrapSelectionWithMarkdown(prefix, suffix) {
+        if (prefix !== '`') leaveMarkdownInlineCodeAtCaret();
         var context = getCurrentMarkdownEditContext();
         var sel = context.selection;
         var range = context.range;
@@ -289,9 +312,23 @@
             ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end)
             : (sel ? sel.toString() : '');
 
+        // The CodeMirror editor formats a selection itself, one line at a
+        // time and around the words (wrapSelectionChanges in the bundle)
+        if (wrapMarkdownSelectionInEditor(editor, prefix, suffix)) return;
+
         if (editor && offsets) {
             var fullText = getMarkdownEditorValue(editor);
             selectedText = fullText.slice(offsets.start, offsets.end);
+            // The markers go against the words, never against a space: a
+            // double-click selects the word with the space after it, and
+            // "**word **" is not bold to Markdown, it is stars
+            // (nothing but spaces selected: nothing to format)
+            if (selectedText && !selectedText.trim()) return;
+            var edges = /^(\s*)[\s\S]*?(\s*)$/.exec(selectedText);
+            if (selectedText.trim() && (edges[1] || edges[2])) {
+                offsets = { start: offsets.start + edges[1].length, end: offsets.end - edges[2].length };
+                selectedText = fullText.slice(offsets.start, offsets.end);
+            }
 
             if (!selectedText) {
                 var marker = prefix + suffix;
@@ -605,6 +642,21 @@
     /**
      * Apply markdown underline formatting using inline HTML
      */
+    // Inline code cannot hold formatting (its content is shown as typed): a
+    // colour, a highlight or bold asked for with the caret inside some code
+    // starts right after the code instead of writing its markers into it.
+    function leaveMarkdownInlineCodeAtCaret() {
+        var api = window.PoznoteMarkdownCodeMirror;
+        var context = getCurrentMarkdownEditContext();
+        var editor = context.editor;
+        var offsets = context.offsets;
+        if (!api || !editor || !offsets || offsets.start !== offsets.end) return false;
+        if (typeof api.isInInlineFormat !== 'function' || typeof api.leaveInlineFormat !== 'function') return false;
+        if (!api.isCodeMirrorEditor(editor) || !api.isInInlineFormat(editor, '`')) return false;
+        return api.leaveInlineFormat(editor, '`');
+    }
+    window.leaveMarkdownInlineCodeAtCaret = leaveMarkdownInlineCodeAtCaret;
+
     function applyMarkdownUnderline() {
         wrapSelectionWithMarkdown('<u>', '</u>');
     }
@@ -628,6 +680,15 @@
 
         if (!editor || !offsets) {
             wrapSelectionWithMarkdown(prefix, suffix);
+            return;
+        }
+
+        // The CodeMirror editor has its own toggle (Ctrl+Shift+B): pressed
+        // again inside the block it takes the fences off, and at a bare caret
+        // the block goes under the line instead of cutting it in two
+        var codeApi = window.PoznoteMarkdownCodeMirror;
+        if (codeApi && typeof codeApi.toggleCodeBlock === 'function' && codeApi.isCodeMirrorEditor(editor) &&
+            codeApi.toggleCodeBlock(editor)) {
             return;
         }
 
@@ -732,6 +793,12 @@
         }
 
         if (editor && offsets) {
+            // The spaces at the edges of the selection (a double-click takes
+            // the one after the word) stay around the link
+            var linkEdges = /^(\s*)[\s\S]*?(\s*)$/.exec(selectedText);
+            if (selectedText.trim() && (linkEdges[1] || linkEdges[2])) {
+                offsets = { start: offsets.start + linkEdges[1].length, end: offsets.end - linkEdges[2].length };
+            }
             replaceMarkdownRangeAndSelect(
                 editor,
                 offsets.start,
@@ -835,28 +902,60 @@
         var offsets = context.offsets;
         if ((!sel || sel.rangeCount === 0) && !editor) return;
 
-        var selectedText = offsets && editor
-            ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end)
-            : (sel ? sel.toString() : '');
-        if (!selectedText) return;
-
+        // A heading is a whole line: the level goes to every line the
+        // selection touches (or to the caret's line), replacing the level a
+        // line already had, and the selection stays on the text it was on.
+        // Prefixing the selected words where they stood left "## " in the
+        // middle of a sentence.
         if (editor && offsets) {
+            var level = style === 'normal' ? 0 : parseInt(style, 10);
+            if (style !== 'normal' && (!level || level < 1 || level > 6)) return;
+            var prefix = level ? '#'.repeat(level) + ' ' : '';
+
             var fullText = getMarkdownEditorValue(editor);
-            selectedText = fullText.slice(offsets.start, offsets.end);
+            var start = Math.min(offsets.start, offsets.end);
+            var end = Math.max(offsets.start, offsets.end);
+            var lastTouched = end > start && fullText.charAt(end - 1) === '\n' ? end - 1 : end;
+            var lineStart = fullText.lastIndexOf('\n', start - 1) + 1;
+            var lineEnd = fullText.indexOf('\n', lastTouched);
+            if (lineEnd === -1) lineEnd = fullText.length;
 
-            if (style === 'normal') {
-                var cleanText = selectedText.replace(/^ {0,3}#{1,6}\s+/, '');
-                replaceMarkdownRangeAndSelect(editor, offsets.start, offsets.end, cleanText, offsets.start, offsets.start + cleanText.length);
-                return;
-            }
+            var newStart = start;
+            var newEnd = end;
+            var oldOffset = lineStart;
+            var newOffset = lineStart;
+            var original = fullText.slice(lineStart, lineEnd);
+            var updated = original.split('\n').map(function (line) {
+                var existing = /^ {0,3}#{1,6}\s+/.exec(line);
+                var oldPrefixLength = existing ? existing[0].length : 0;
+                var result = line;
+                var newPrefixLength = oldPrefixLength;
+                if (line.trim() !== '' || start === end) {
+                    result = prefix + (existing || level ? line.slice(existing ? oldPrefixLength : /^ {0,3}/.exec(line)[0].length) : line);
+                    newPrefixLength = existing || level ? prefix.length : 0;
+                    if (!existing && !level) oldPrefixLength = 0;
+                    else if (!existing) oldPrefixLength = line.length - (result.length - prefix.length);
+                }
+                var carry = function (position) {
+                    if (position < oldOffset || position > oldOffset + line.length) return null;
+                    return newOffset + newPrefixLength + Math.max(0, position - oldOffset - oldPrefixLength);
+                };
+                var carriedStart = carry(start);
+                var carriedEnd = carry(end);
+                if (carriedStart !== null) newStart = carriedStart;
+                if (carriedEnd !== null) newEnd = carriedEnd;
+                oldOffset += line.length + 1;
+                newOffset += result.length + 1;
+                return result;
+            }).join('\n');
 
-            var level = parseInt(style, 10);
-            if (!level || level < 1 || level > 6) return;
-
-            var replacement = '#'.repeat(level) + ' ' + selectedText;
-            replaceMarkdownRangeAndSelect(editor, offsets.start, offsets.end, replacement, offsets.start + replacement.length, offsets.start + replacement.length);
+            if (updated === original) return;
+            replaceMarkdownRangeAndSelect(editor, lineStart, lineEnd, updated, newStart, newEnd);
             return;
         }
+
+        var selectedText = sel ? sel.toString() : '';
+        if (!selectedText) return;
 
         if (!range) return;
         
@@ -956,21 +1055,53 @@
         });
 
         var original = fullText.slice(lineStart, lineEnd);
+        // The caret's own empty line is aligned too: the text to come is
+        // typed inside the wrapper. Empty lines of a selection are left alone.
+        var alignEmptyLine = start === end;
+        // The caret, or the selection, stays on the text it was on: each end
+        // is carried from its place in the old line to the same place in the
+        // new one, past the tag written in front of it.
+        var newStart = start;
+        var newEnd = end;
+        var oldOffset = lineStart;
+        var newOffset = lineStart;
         var updated = original.split('\n').map(function (line) {
+            var result = line;
+            var oldInnerStart = 0;
+            var newInnerStart = 0;
+            var innerLength = line.length;
+
             if (/^\s*```/.test(line)) {
                 inFence = !inFence;
-                return line;
+            } else if (!inFence && (line.trim() !== '' || alignEmptyLine)) {
+                var aligned = line.match(MARKDOWN_ALIGNED_LINE);
+                if (aligned || !MARKDOWN_NON_PARAGRAPH_LINE.test(line)) {
+                    var indent = aligned ? aligned[1] : '';
+                    var inner = aligned ? aligned[3] : line;
+                    var opening = align === 'left' ? '' : '<p align="' + align + '">';
+                    result = indent + opening + inner + (opening ? '</p>' : '');
+                    oldInnerStart = aligned ? line.indexOf('>') + 1 : 0;
+                    newInnerStart = indent.length + opening.length;
+                    innerLength = inner.length;
+                }
             }
-            if (inFence || line.trim() === '') return line;
-            var aligned = line.match(MARKDOWN_ALIGNED_LINE);
-            var indent = aligned ? aligned[1] : '';
-            var inner = aligned ? aligned[3] : line;
-            if (!aligned && MARKDOWN_NON_PARAGRAPH_LINE.test(line)) return line;
-            return align === 'left' ? indent + inner : indent + '<p align="' + align + '">' + inner + '</p>';
+
+            var carry = function (position) {
+                if (position < oldOffset || position > oldOffset + line.length) return null;
+                var column = Math.max(0, Math.min(position - oldOffset - oldInnerStart, innerLength));
+                return newOffset + newInnerStart + column;
+            };
+            var carriedStart = carry(start);
+            var carriedEnd = carry(end);
+            if (carriedStart !== null) newStart = carriedStart;
+            if (carriedEnd !== null) newEnd = carriedEnd;
+            oldOffset += line.length + 1;
+            newOffset += result.length + 1;
+            return result;
         }).join('\n');
 
         if (updated === original) return;
-        replaceMarkdownRangeAndSelect(editor, lineStart, lineEnd, updated, lineStart, lineStart + updated.length);
+        replaceMarkdownRangeAndSelect(editor, lineStart, lineEnd, updated, newStart, newEnd);
     }
 
     /**
@@ -979,6 +1110,7 @@
     function applyMarkdownColor(color) {
         if (!color) return;
         
+        leaveMarkdownInlineCodeAtCaret();
         var context = getCurrentMarkdownEditContext();
         var sel = context.selection;
         var editor = context.editor;
@@ -990,7 +1122,11 @@
             : (sel ? sel.toString() : '');
         
         // If no selection, do nothing
-        if (!selectedText) return;
+        if (!selectedText) {
+            toggleMarkdownSpanAtCaret(editor, ['color'], '<span style="color:' + color + '">', '</span>');
+            return;
+        }
+        if (wrapMarkdownSelectionInEditor(editor, '<span style="color:' + color + '">', '</span>')) return;
         if (editor && offsets) {
             selectedText = getMarkdownEditorValue(editor).slice(offsets.start, offsets.end);
             var coloredText = '<span style="color:' + color + '">' + selectedText + '</span>';
@@ -1018,6 +1154,15 @@
             applyMarkdownBackgroundSpan(color);
             return;
         }
+        // (the caret in a coloured highlight: yellow asked for turns it off too)
+        var caretContext = getCurrentMarkdownEditContext();
+        var caretApi = window.PoznoteMarkdownCodeMirror;
+        if (caretContext.editor && caretContext.offsets && caretContext.offsets.start === caretContext.offsets.end &&
+            caretApi && typeof caretApi.isFormatActive === 'function' && caretApi.isCodeMirrorEditor(caretContext.editor) &&
+            caretApi.isFormatActive(caretContext.editor, 'background-color', 'background-color')) {
+            caretApi.leaveInlineFormat(caretContext.editor, 'background-color');
+            return;
+        }
         wrapSelectionWithMarkdown('==', '==');
     }
 
@@ -1025,6 +1170,7 @@
      * Wrap the current markdown selection in an inline background-color span.
      */
     function applyMarkdownBackgroundSpan(color) {
+        leaveMarkdownInlineCodeAtCaret();
         var context = getCurrentMarkdownEditContext();
         var sel = context.selection;
         var editor = context.editor;
@@ -1035,7 +1181,11 @@
             ? getMarkdownEditorValue(editor).slice(offsets.start, offsets.end)
             : (sel ? sel.toString() : '');
 
-        if (!selectedText) return;
+        if (!selectedText) {
+            toggleMarkdownSpanAtCaret(editor, ['background-color', '=='], '<span style="background-color:' + color + '">', '</span>');
+            return;
+        }
+        if (wrapMarkdownSelectionInEditor(editor, '<span style="background-color:' + color + '">', '</span>')) return;
 
         var styledText = '<span style="background-color:' + color + '">' + selectedText + '</span>';
         if (editor && offsets) {

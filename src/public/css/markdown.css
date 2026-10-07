@@ -544,6 +544,24 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .
     border-bottom: 2px solid currentColor;
 }
 
+/* Rich text: the cell of a drawn table being typed in (live-preview.js,
+   setupTableEditing). The cell holds its own Markdown as plain text. */
+.markdown-codemirror-host .cm-live-preview .cm-live-block-table td,
+.markdown-codemirror-host .cm-live-preview .cm-live-block-table th {
+    cursor: text;
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-block-table .cm-live-cell-editing {
+    outline: 2px solid var(--pz-accent);
+    outline-offset: -2px;
+    white-space: pre-wrap;
+}
+
+/* An embedded task list is a block of its own, as wide as the note */
+.markdown-codemirror-host .cm-live-preview .cm-live-tasklist-embed {
+    display: block;
+}
+
 /* Paragraphs aligned from the toolbar (<p align="...">) */
 .markdown-codemirror-host .cm-live-preview .cm-line.cm-live-align-left {
     text-align: left;

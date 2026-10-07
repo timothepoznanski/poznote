@@ -491,7 +491,19 @@ function initTextSelectionHandlers() {
             { selector: '.btn-italic',        action: 'exec-italic',        md: ['*',  '*' ],    rte: 'italic'        },
             { selector: '.btn-underline',     action: 'exec-underline',     md: ['<u>', '</u>'], rte: 'underline'     },
             { selector: '.btn-strikethrough', action: 'exec-strikethrough', md: ['~~', '~~'],    rte: 'strikeThrough' },
+            // (Markdown only: the editor says whether the caret is in them)
+            { selector: '.btn-inline-code',   action: 'toggle-inline-code',      md: ['`', '`'],   rte: '' },
+            { selector: '.btn-highlight',     action: 'toggle-yellow-highlight', md: ['==', '=='], also: 'background-color', rte: '' },
+            { selector: '.btn-color',         action: 'toggle-red-color',        md: ['color', 'color'], rte: '' },
         ];
+
+        // The CodeMirror editor answers for a Markdown note, for a selection
+        // and for a bare caret alike (isFormatActiveAt in the bundle)
+        var markdownApi = window.PoznoteMarkdownCodeMirror;
+        var markdownHost = isMarkdown && editableElement.closest ? editableElement.closest('.markdown-editor') : null;
+        if (markdownHost && !(markdownApi && typeof markdownApi.isFormatActive === 'function' && markdownApi.isCodeMirrorEditor(markdownHost))) {
+            markdownHost = null;
+        }
 
         formats.forEach(function (fmt) {
             var btn = document.querySelector(fmt.selector + '.show-on-selection');
@@ -500,7 +512,12 @@ function initTextSelectionHandlers() {
             if (!btn && !(barButton && isMobileFormattingViewport())) return;
 
             var isActive = false;
-            if (isMarkdown && typeof window.isMarkdownSelectionWrapped === 'function') {
+            if (markdownHost) {
+                isActive = markdownApi.isFormatActive(markdownHost, fmt.md[0], fmt.md[1])
+                    || (!!fmt.also && markdownApi.isFormatActive(markdownHost, fmt.also, fmt.also));
+            } else if (!fmt.rte) {
+                isActive = false;
+            } else if (isMarkdown && typeof window.isMarkdownSelectionWrapped === 'function') {
                 isActive = window.isMarkdownSelectionWrapped(fmt.md[0], fmt.md[1]);
                 // Single * also matches inside **: treat italic as active only when not bold
                 if (fmt.md[0] === '*' && isActive) {
@@ -517,6 +534,15 @@ function initTextSelectionHandlers() {
         // The Title button, lit in a heading like Bold on bold text (issue
         // #1580). Rich-text notes: a Markdown heading is a "#" in the source.
         var inHeading = !isMarkdown && typeof getHtmlSelectionHeading === 'function' && !!getHtmlSelectionHeading();
+        // Markdown: the caret's line starts with one to six "#"
+        if (markdownHost && typeof markdownApi.getSelectionOffsets === 'function' && typeof markdownApi.getValue === 'function') {
+            var headingOffsets = markdownApi.getSelectionOffsets(markdownHost);
+            var headingSource = markdownApi.getValue(markdownHost) || '';
+            if (headingOffsets) {
+                var headingLineStart = headingSource.lastIndexOf('\n', headingOffsets.start - 1) + 1;
+                inHeading = /^ {0,3}#{1,6}[ \t]/.test(headingSource.slice(headingLineStart, headingLineStart + 10));
+            }
+        }
         var titleBtn = document.querySelector('.btn-text-height.show-on-selection');
         var titleBarButton = document.querySelector('#mobileEditorBar [data-action="change-font-size"]');
         if (titleBtn) titleBtn.classList.toggle('is-format-active', inHeading);
@@ -524,8 +550,26 @@ function initTextSelectionHandlers() {
     }
 
     function clearFormatActiveStates() {
-        document.querySelectorAll('.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough, .btn-text-height, #mobileEditorBar .is-format-active')
+        document.querySelectorAll('.btn-bold, .btn-italic, .btn-underline, .btn-strikethrough, .btn-inline-code, .btn-highlight, .btn-color, .btn-text-height, #mobileEditorBar .is-format-active')
             .forEach(function (btn) { btn.classList.remove('is-format-active'); });
+    }
+
+    // A phone, the caret in a note with nothing selected: the buttons of the
+    // bar above the keyboard still say which formats the caret is writing in.
+    // Bold pressed there turns bold on for what is typed next, and the lit
+    // button is how one sees it, and what one presses again to turn it off.
+    // Returns false when there is no such caret to speak for.
+    function updateCaretFormatActiveStates() {
+        if (!isMobileFormattingViewport() || !document.getElementById('mobileEditorBar')) return false;
+        var selection = window.getSelection();
+        var node = selection && selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
+        if (node && node.nodeType === 3) node = node.parentElement;
+        if (!node || !node.closest) return false;
+        var editable = node.closest('.markdown-editor')
+            || node.closest('.noteentry[contenteditable="true"], .noteentry [contenteditable="true"]');
+        if (!editable || node.closest('.markdown-preview, .task-list-container')) return false;
+        updateFormatActiveStates(editable);
+        return true;
     }
 
     // Floating formatting toolbar (format_toolbar_mode = 'floating', #1420).
@@ -1020,7 +1064,7 @@ function initTextSelectionHandlers() {
                 for (var i = 0; i < noteActionButtons.length; i++) {
                     noteActionButtons[i].classList.remove('hide-on-selection');
                 }
-                clearFormatActiveStates();
+                if (!updateCaretFormatActiveStates()) clearFormatActiveStates();
                 hideFloatingFormatToolbar();
                 setMobileEditorBarSelectionRule(null);
                 setMobileFormattingToolbarActive(false);
