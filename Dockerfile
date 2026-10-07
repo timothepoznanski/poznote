@@ -53,6 +53,11 @@ ARG APP_VERSION=unknown
 LABEL build_date="${BUILD_DATE}"
 LABEL version="${VERSION}"
 
+# Pull in the Alpine security updates published since the base image was
+# built. Placed after the BUILD_DATE argument on purpose: its value changes
+# at every release, which keeps this layer out of the build cache.
+RUN apk upgrade --no-cache
+
 WORKDIR /var/www/html
 
 # Copy initialization script and write the build-time version marker.
