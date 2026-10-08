@@ -760,6 +760,10 @@ function oidc_is_auto_create_users_enabled() {
     return defined('OIDC_AUTO_CREATE_USERS') && OIDC_AUTO_CREATE_USERS === true;
 }
 
+function oidc_is_email_sync_enabled() {
+    return !defined('OIDC_SYNC_EMAIL') || OIDC_SYNC_EMAIL === true;
+}
+
 /**
  * Cap on the total number of profiles auto-creation may reach. 0 = unlimited.
  */
@@ -1014,7 +1018,10 @@ function oidc_find_or_provision_user($claims) {
         }
     }
 
-    if (is_string($email) && $email !== '' && ($user['email'] ?? '') !== $email) {
+    // With the sync turned off, the provider's email still fills a profile
+    // that has none, but never replaces the one already stored.
+    $oidcMaySetEmail = oidc_is_email_sync_enabled() || trim((string)($user['email'] ?? '')) === '';
+    if ($oidcMaySetEmail && is_string($email) && $email !== '' && ($user['email'] ?? '') !== $email) {
         // Only auto-sync email when target email is unused or already on this same user.
         $existingByEmail = getUserProfileByEmail($email);
         if (!$existingByEmail || (int)$existingByEmail['id'] === (int)$user['id']) {

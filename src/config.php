@@ -297,6 +297,10 @@ define('OIDC_DISABLE_BASIC_AUTH', _oidcBool('oidc_disable_basic_auth', false));
 define('OIDC_GROUPS_CLAIM', trim(_oidc('oidc_groups_claim', 'groups')));
 define('OIDC_ALLOWED_GROUPS', _oidc('oidc_allowed_groups', ''));
 define('OIDC_AUTO_CREATE_USERS', _oidcBool('oidc_auto_create_users', false));
+// Copy the provider's email claim onto the profile at each login. On by
+// default; turned off when the provider sends an address that cannot receive
+// mail, so the one set in the Users page is kept.
+define('OIDC_SYNC_EMAIL', _oidcBool('oidc_sync_email', true));
 define('OIDC_ALLOWED_USERS', _oidc('oidc_allowed_users', ''));
 // Cap on how many user profiles auto-creation may bring the instance to.
 // 0 (the default) means unlimited. Existing profiles, however they were
