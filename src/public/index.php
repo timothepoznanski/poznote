@@ -521,6 +521,10 @@ if (empty($markdown_new_note_view_mode_chosen)) {
 // Live rendering in the Markdown editor (discussion 1582): read from <body
 // data-markdown-live-editing> by js/markdown-editor.js
 $markdown_live_editing = poznoteSettingEnabled($settings['markdown_live_editing'], false);
+// Browser spell checker in the notes: the HTML notes get it from
+// note_display.php, the Markdown editor reads <body data-spellcheck>
+// (js/markdown-editor.js)
+$spellcheck_notes = poznoteSettingEnabled($settings['spellcheck_html_notes'], false);
 // Which of the two live views the account is in: "Live preview" (the syntax
 // comes back under the caret) or "Rich text" (it never does, and typed text
 // is never read as Markdown). Chosen from the note's view button, kept here:
@@ -569,7 +573,7 @@ $body_classes = trim($extra_body_classes);
 $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-new-note-mode="<?php echo htmlspecialchars($markdown_new_note_view_mode, ENT_QUOTES); ?>" data-markdown-live-editing="<?php echo $markdown_live_editing ? '1' : '0'; ?>" data-markdown-live-syntax="<?php echo $markdown_live_show_syntax ? '1' : '0'; ?>">
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-new-note-mode="<?php echo htmlspecialchars($markdown_new_note_view_mode, ENT_QUOTES); ?>" data-markdown-live-editing="<?php echo $markdown_live_editing ? '1' : '0'; ?>" data-markdown-live-syntax="<?php echo $markdown_live_show_syntax ? '1' : '0'; ?>" data-spellcheck="<?php echo $spellcheck_notes ? '1' : '0'; ?>" data-spellcheck-lang="<?php echo htmlspecialchars(getUserLanguage(), ENT_QUOTES); ?>">
     <script>
     (function () {
         try {

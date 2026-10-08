@@ -481,7 +481,7 @@
       "backlinks_at_bottom": "Mostre a seção de backlinks na parte inferior das notas em vez do topo.",
       "note_virtual_space": "Deixa um espaço vazio abaixo da última linha de uma nota, para poder subir o fim do texto até ao meio do ecrã em vez de o manter mesmo em baixo.",
       "default_image_border": "Exiba por padrão as imagens das notas com borda e sem preenchimento.",
-      "spellcheck_html_notes": "Ative o corretor ortográfico do navegador nas notas de texto formatado.",
+      "spellcheck_html_notes": "Ative o corretor ortográfico do navegador nas notas de texto formatado e Markdown.",
       "slash_menu_trigger": "No computador, escolha se o menu de comandos abre digitando /, com Alt + / ou sem nenhuma tecla. Um clique com o botão direito numa nota abre-o seja qual for esta definição.",
       "slash_menu_trigger_mobile": "No telemóvel, escolha se o menu de comandos abre digitando /, com Alt + / a partir de um teclado físico ou sem nenhuma tecla.",
       "icon_sidebar_order": "Altere a ordem e a cor dos botões da barra de ícones e coloque separadores entre eles.",

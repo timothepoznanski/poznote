@@ -481,7 +481,7 @@
       "backlinks_at_bottom": "Muestra la sección de retroenlaces en la parte inferior de las notas en lugar de arriba.",
       "note_virtual_space": "Deja un espacio vacío bajo la última línea de una nota, para poder subir el final del texto hasta el centro de la pantalla en lugar de dejarlo abajo del todo.",
       "default_image_border": "Muestra por defecto las imágenes de las notas con borde y sin relleno.",
-      "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas de texto enriquecido.",
+      "spellcheck_html_notes": "Activa el corrector ortográfico del navegador en las notas de texto enriquecido y Markdown.",
       "slash_menu_trigger": "En el ordenador, elige si el menú de comandos se abre escribiendo /, con Alt + / o sin ninguna tecla. Un clic derecho en una nota lo abre sea cual sea este ajuste.",
       "slash_menu_trigger_mobile": "En el móvil, elige si el menú de comandos se abre escribiendo /, con Alt + / desde un teclado físico o sin ninguna tecla.",
       "icon_sidebar_order": "Cambie el orden y el color de los botones de la barra de iconos y coloque separadores entre ellos.",

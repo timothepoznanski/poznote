@@ -44,6 +44,17 @@ function isMarkdownLiveEditingEnabled() {
     }
 }
 
+// The browser spell checker in the Markdown editor (issue 1594): the account's
+// Spell check setting, rendered by index.php as <body data-spellcheck> with the
+// user's language in <body data-spellcheck-lang>.
+function isMarkdownSpellcheckEnabled() {
+    try {
+        return !!document.body && document.body.getAttribute('data-spellcheck') === '1';
+    } catch (e) {
+        return false;
+    }
+}
+
 function syncMarkdownLiveEditing(noteEntry) {
     var api = getMarkdownCodeMirrorApi();
     if (!api || !noteEntry || typeof api.setLivePreview !== 'function') return;
@@ -66,6 +77,8 @@ function initializeCodeMirrorMarkdownEditor(editorDiv, markdownContent, readOnly
             value: String(markdownContent || ''),
             placeholder: editorDiv.getAttribute('data-ph') || '',
             readOnly: !!readOnly,
+            spellcheck: isMarkdownSpellcheckEnabled(),
+            lang: (document.body && document.body.getAttribute('data-spellcheck-lang')) || '',
             livePreview: isMarkdownLiveEditingEnabled() && !editorDiv.closest('.markdown-split-mode')
         });
     } catch (error) {

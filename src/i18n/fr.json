@@ -480,7 +480,7 @@
       "backlinks_at_bottom": "Affichez la section des rétroliens en bas des notes plutôt qu'en haut.",
       "note_virtual_space": "Laisse un espace vide sous la dernière ligne d'une note, pour pouvoir remonter la fin du texte au milieu de l'écran au lieu de la garder tout en bas.",
       "default_image_border": "Affichez par défaut les images des notes avec une bordure et sans marge intérieure.",
-      "spellcheck_html_notes": "Activez le correcteur orthographique du navigateur dans les notes en texte enrichi.",
+      "spellcheck_html_notes": "Activez le correcteur orthographique du navigateur dans les notes en texte enrichi et Markdown.",
       "slash_menu_trigger": "Sur ordinateur, choisissez si le menu de commandes s'ouvre en tapant /, avec Alt + /, ou avec aucune touche. Un clic droit dans une note l'ouvre quel que soit ce réglage.",
       "slash_menu_trigger_mobile": "Sur mobile, choisissez si le menu de commandes s'ouvre en tapant /, avec Alt + / depuis un clavier physique, ou avec aucune touche.",
       "icon_sidebar_order": "Modifiez l'ordre et la couleur des boutons de la barre d'icônes et placez des séparateurs entre eux.",

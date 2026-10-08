@@ -159,7 +159,7 @@
       "backlinks_at_bottom": "Show the backlinks section at the bottom of notes instead of the top.",
       "note_virtual_space": "Leave empty room under the last line of a note, so the end of the text can be scrolled up to the middle of the screen instead of staying at the very bottom.",
       "default_image_border": "Display images in notes with a border and no padding by default.",
-      "spellcheck_html_notes": "Enable the browser spell checker in rich text notes.",
+      "spellcheck_html_notes": "Enable the browser spell checker in rich text and Markdown notes.",
       "slash_menu_trigger": "On a computer, choose whether the command menu opens by typing /, with Alt + /, or not from the keyboard at all. A right-click in a note opens it whatever this is set to.",
       "slash_menu_trigger_mobile": "On mobile, choose whether the command menu opens by typing /, with Alt + / from a hardware keyboard, or not from the keyboard at all.",
       "icon_sidebar_order": "Change the order and the color of the buttons in the icon sidebar and place separators between them.",

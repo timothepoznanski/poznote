@@ -480,7 +480,7 @@
       "backlinks_at_bottom": "将反向链接区域显示在笔记底部而不是顶部。",
       "note_virtual_space": "在笔记最后一行下方留出空白，这样可以把文本末尾滚动到屏幕中间，而不是停在最底部。",
       "default_image_border": "默认以带边框且无内边距的方式显示笔记中的图片。",
-      "spellcheck_html_notes": "在富文本笔记中启用浏览器拼写检查。",
+      "spellcheck_html_notes": "在富文本和 Markdown 笔记中启用浏览器拼写检查。",
       "slash_menu_trigger": "在电脑上，选择通过输入 /、Alt + / 还是完全不用键盘打开命令菜单。无论此设置为何，在笔记中点击右键都会打开它。",
       "slash_menu_trigger_mobile": "在移动设备上，选择通过输入 /、使用实体键盘按 Alt + / 还是完全不用键盘打开命令菜单。",
       "icon_sidebar_order": "更改图标侧边栏中按钮的顺序和颜色，并在按钮之间放置分隔线。",

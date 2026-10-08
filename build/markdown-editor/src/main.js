@@ -128,7 +128,12 @@ const markdownTableLinePlugin = ViewPlugin.fromClass(class {
 // defaults to it). Every line of a fenced or indented code block, including the
 // ``` markers and the blank lines inside, is tagged with a class that
 // markdown.css switches to monospace.
-const markdownCodeLineDecoration = Decoration.line({ class: 'cm-md-code-line' })
+// spellcheck="false" keeps the browser spell checker (options.spellcheck) off
+// the code: it has no effect while the editor itself is not spell checked.
+const markdownCodeLineDecoration = Decoration.line({
+  class: 'cm-md-code-line',
+  attributes: { spellcheck: 'false' }
+})
 
 function buildMarkdownCodeLineDecorations(view) {
   const builder = new RangeSetBuilder()
@@ -1545,11 +1550,21 @@ function createEditor(host, options = {}) {
   // src/emoji-test.html).
   const isWindows = /Win/.test((navigator && (navigator.platform || navigator.userAgent)) || '')
 
+  // CodeMirror also sets spellcheck="false" on its contenteditable. The
+  // account's Spell check setting turns the browser spell checker back on
+  // (issue 1594), with the same lang hint as the HTML notes.
+  const spellcheckAttributes = options.spellcheck
+    ? Object.assign({ spellcheck: 'true' }, options.lang ? { lang: String(options.lang) } : {})
+    : null
+
   const state = EditorState.create({
     doc: String(options.value || ''),
     extensions: [
       ...(isWindows
         ? [EditorView.contentAttributes.of({ autocorrect: 'on' })]
+        : []),
+      ...(spellcheckAttributes
+        ? [EditorView.contentAttributes.of(spellcheckAttributes)]
         : []),
       history(),
       drawSelection(),
