@@ -57,7 +57,6 @@ function initMermaid(retryCount) {
         }
         return;
     }
-    var _mdEscapeHtml = _mdEscapeHtml;
 
     function renderMermaidError(node, err, source) {
         var msg = 'Mermaid: syntax error.';

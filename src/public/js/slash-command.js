@@ -839,15 +839,25 @@
         const line = value.slice(lineStart, lineEnd);
 
         const indent = /^[ \t]*/.exec(line)[0];
-        let family;
-        if (/^#{1,6} $/.test(prefix)) family = /^#{1,6}[ \t]+/;
-        else if (/^(?:[-*+]|\d+[.)]) /.test(prefix)) family = /^(?:[-*+]|\d+[.)])[ \t]+(?:\[[ xX]\][ \t]+)?/;
-        else family = /^>[ \t]?(?:\[![^\]\n]*\][^\n]*$)?/;
         const rest = line.slice(indent.length);
-        const existing = family.exec(rest);
-        const oldPrefixLength = indent.length + (existing ? existing[0].length : 0);
+        const isHeading = /^#{1,6} $/.test(prefix);
+        const isList = /^(?:[-*+]|\d+[.)]) /.test(prefix);
+        let oldPrefixLength;
+        let newPrefix;
+        if (isHeading || isList) {
+            // A line is a heading or a list item, not both ("# - item" shows
+            // its dash, "- [ ] ## Title" its hashes): one takes the place of
+            // the other. A quote is a frame around either, and stays.
+            const quote = /^(?:>[ \t]?)*/.exec(rest)[0];
+            const block = /^(?:(?:[-*+]|\d+[.)])[ \t]+(?:\[[ xX]\][ \t]+)?)?(?:#{1,6}[ \t]+)?/.exec(rest.slice(quote.length))[0];
+            oldPrefixLength = indent.length + quote.length + block.length;
+            newPrefix = (isHeading && !quote ? '' : indent) + (quote && !/[ \t]$/.test(quote) ? quote + ' ' : quote) + prefix;
+        } else {
+            const existing = /^>[ \t]?(?:\[![^\]\n]*\][^\n]*$)?/.exec(rest);
+            oldPrefixLength = indent.length + (existing ? existing[0].length : 0);
+            newPrefix = indent + prefix;
+        }
         const text = line.slice(oldPrefixLength);
-        const newPrefix = (/^#/.test(prefix) ? '' : indent) + prefix;
 
         api.replaceRange(editor, lineStart, lineEnd, newPrefix + text);
         const column = Math.max(0, caret - lineStart - oldPrefixLength);
@@ -3446,7 +3456,19 @@
                 label: t('slash_menu.color', null, 'Color'),
                 submenu: paletteColorItems(function (value) {
                     wrapMarkdownSelection('<span style="color:' + value + '">', '</span>');
-                })
+                }).concat([
+                    // (as in an HTML note: the colour leaves the selection, or
+                    // the caret leaves the coloured text)
+                    {
+                        id: 'default',
+                        icon: 'lucide-circle',
+                        iconColor: 'var(--pz-text)',
+                        label: t('colors.default', null, 'Default'),
+                        action: function () {
+                            if (typeof window.applyMarkdownColor === 'function') window.applyMarkdownColor('none');
+                        }
+                    }
+                ])
             },
             {
                 id: 'highlight',
@@ -3473,7 +3495,8 @@
                         label: t('slash_menu.toggle', null, 'Toggle'),
                         action: function () {
                             // Automatically add empty lines before and after for better spacing
-                            insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -17);
+                            // (the caret at the end of the title, as in an HTML note)
+                            insertMarkdownAtCursor('\n\n<details class="toggle-block" open>\n<summary class="toggle-header">Toggle</summary>\n\n...\n\n</details>\n\n', -29);
                         }
                     },
                     common.recordAudio,
@@ -3541,7 +3564,22 @@
                                     }
                                 }
 
-                                window.showLinkModal('https://', selectedText, function (url, linkText) {
+                                // The caret or the selection inside a link: that one is
+                                // edited (or removed), not a second one written in it
+                                const linkAround = savedOffsets && typeof window.findMarkdownLinkAround === 'function'
+                                    ? window.findMarkdownLinkAround(editor, savedOffsets)
+                                    : null;
+                                if (linkAround) {
+                                    savedOffsets = { start: linkAround.start, end: linkAround.end };
+                                    selectedText = linkAround.text;
+                                }
+
+                                window.showLinkModal(linkAround ? linkAround.url : 'https://', selectedText, function (url, linkText) {
+                                    if (url === null && linkAround && editor) {
+                                        focusEditableElement(editor);
+                                        replaceMarkdownRange(editor, savedOffsets.start, savedOffsets.end, linkAround.text);
+                                        return;
+                                    }
                                     if (!url) return;
 
                                     const safeDestination = normalizeMarkdownDestination(url);

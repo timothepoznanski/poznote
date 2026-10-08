@@ -674,6 +674,12 @@
                     clearApi.leaveInlineFormat(clearHost);
                     break;
                 }
+                // Markdown, a selection: its inline formats go (bold, italic,
+                // colours, code...), the text and its links stay
+                if (clearHost && clearApi && typeof clearApi.clearSpanFormat === 'function' && clearApi.isCodeMirrorEditor(clearHost)) {
+                    clearApi.clearSpanFormat(clearHost, '');
+                    break;
+                }
                 clearHtmlFormatting();
                 break;
             }

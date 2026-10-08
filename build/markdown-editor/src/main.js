@@ -26,7 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
-import { armPendingFormat, isFormatActiveAt, findInlineFormatEnd, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect } from './live-preview.js'
+import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -623,6 +623,10 @@ function markdownCompletionSource(context) {
 
 function wrapSelection(prefix, suffix) {
   return function run(view) {
+    // A space waiting behind a word of that format: the format is left
+    if (view.state.selection.ranges.length === 1 && leavePendingSpace(view, prefix)) return true
+    // Or the format carried over from the line above, nothing typed yet
+    if (view.state.selection.ranges.length === 1 && dropPendingFormat(view, prefix)) return true
     // Italic in the middle of a bold word: remembered, written with the
     // first character typed (./live-preview.js armPendingFormat)
     if (view.state.selection.ranges.length === 1 && view.state.selection.main.empty &&
@@ -641,7 +645,7 @@ function wrapSelection(prefix, suffix) {
           if (pair && pair.text === prefix + suffix) {
             return { changes: { from: pair.from, to: pair.to }, range: EditorSelection.cursor(pair.from) }
           }
-          const end = findInlineFormatEnd(view.state, prefix)
+          const end = findInlineFormatExit(view.state, prefix)
           if (end !== null) return { range: EditorSelection.cursor(end) }
           // Inline code cannot hold formatting: the format starts after it
           const codeEnd = prefix === '`' ? null : findInlineFormatEnd(view.state, '`')
@@ -1223,6 +1227,27 @@ function wrapSelectionAt(host, prefix, suffix) {
   return true
 }
 
+// "None" of the colour and highlight palettes: property is 'color' or
+// 'background-color'
+function clearSpanFormatAt(host, property) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  const { view } = instance
+  const main = view.state.selection.main
+  const cleared = main.empty ? null : clearSpanChanges(view.state, main.from, main.to, property)
+  if (cleared) {
+    const changeSet = view.state.changes(cleared.changes)
+    view.dispatch({
+      changes: cleared.changes,
+      selection: EditorSelection.range(changeSet.mapPos(cleared.from, 1), changeSet.mapPos(cleared.to, -1)),
+      userEvent: 'input'
+    })
+  }
+  view.focus()
+  notifyFormatStateChanged()
+  return !!cleared
+}
+
 // The buttons that show a format as on (the bar above a phone's keyboard,
 // js/events-text-selection.js) follow the selection; a format can also turn
 // on or off with the caret staying where it is
@@ -1285,6 +1310,8 @@ function redoEdit(host) {
 function indent(host, less) {
   const instance = getInstance(host)
   if (!instance || instance.view.composing) return false
+  // Rich text, a line of text: what the Tab key does there (./live-preview.js)
+  if (less ? swallowShiftTabInText(instance.view) : insertTabSpacesInText(instance.view)) return true
   return runMarkdownOrderedListTab(host, !!less)(instance.view)
 }
 
@@ -1702,6 +1729,7 @@ window.PoznoteMarkdownCodeMirror = {
   isInInlineFormat,
   wrapSelection: wrapSelectionAt,
   isFormatActive,
+  clearSpanFormat: clearSpanFormatAt,
   toggleCodeBlock: toggleCodeBlockAt,
   leaveInlineFormat: leaveInlineFormatAt,
   focus,

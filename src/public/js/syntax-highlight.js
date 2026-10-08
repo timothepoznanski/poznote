@@ -537,6 +537,11 @@
     function applyCodeLineNumbers(container) {
         var root = (container && container.querySelectorAll) ? container : document;
 
+        // (the choices made on the blocks of a Markdown preview, js/copy-code-on-focus.js)
+        if (typeof window.restoreMarkdownPreviewLineNumbers === 'function') {
+            window.restoreMarkdownPreviewLineNumbers(root);
+        }
+
         root.querySelectorAll('.noteentry pre > code').forEach(function(codeEl) {
             if (shouldNumberCodeBlock(codeEl)) {
                 applyCodeLineNumbersToElement(codeEl);

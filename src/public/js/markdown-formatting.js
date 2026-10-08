@@ -540,7 +540,10 @@
                 nonEmptyLines.forEach(function (idx) {
                     if (taskLinePattern.test(lines[idx])) return;
                     var indent = lines[idx].match(/^[\s]*/)[0];
+                    // (a heading turned into a task is no longer a heading:
+                    // "- [ ] ## Title" would show its hashes)
                     var rest = lines[idx].trimStart()
+                        .replace(/^#{1,6}\s+/, '')
                         .replace(/^[-*+]\s+/, '')
                         .replace(/^\d+(?:\.\d+)*\.\s+/, '');
                     lines[idx] = indent + '- [ ] ' + rest;
@@ -567,6 +570,7 @@
                     }
                     // Strip any other list marker first so line types convert instead of nesting
                     var rest = lines[i].trimStart()
+                        .replace(/^#{1,6}\s+/, '')
                         .replace(/^[-*+]\s+\[[ xX]\]\s*/, '')
                         .replace(/^[-*+]\s+/, '')
                         .replace(/^\d+(?:\.\d+)*\.\s+/, '');
@@ -926,15 +930,21 @@
             var newOffset = lineStart;
             var original = fullText.slice(lineStart, lineEnd);
             var updated = original.split('\n').map(function (line) {
-                var existing = /^ {0,3}#{1,6}\s+/.exec(line);
-                var oldPrefixLength = existing ? existing[0].length : 0;
+                // A quote is a frame around the line and stays in front. A
+                // list marker goes when the line becomes a heading (a line is
+                // one or the other: "# - item" would show its dash).
+                var quote = /^ {0,3}(?:>[ \t]?)+/.exec(line);
+                var frame = quote ? quote[0] : '';
+                var body = line.slice(frame.length);
+                var block = /^ {0,3}((?:[-*+]|\d+[.)])[ \t]+(?:\[[ xX]\][ \t]+)?)?(#{1,6}\s+)?/.exec(body);
                 var result = line;
-                var newPrefixLength = oldPrefixLength;
-                if (line.trim() !== '' || start === end) {
-                    result = prefix + (existing || level ? line.slice(existing ? oldPrefixLength : /^ {0,3}/.exec(line)[0].length) : line);
-                    newPrefixLength = existing || level ? prefix.length : 0;
-                    if (!existing && !level) oldPrefixLength = 0;
-                    else if (!existing) oldPrefixLength = line.length - (result.length - prefix.length);
+                var oldPrefixLength = 0;
+                var newPrefixLength = 0;
+                if ((line.trim() !== '' || start === end) && (level || block[2])) {
+                    var kept = level ? '' : block[0].slice(0, block[0].length - block[2].length);
+                    result = frame + kept + prefix + body.slice(block[0].length);
+                    oldPrefixLength = frame.length + block[0].length;
+                    newPrefixLength = frame.length + kept.length + prefix.length;
                 }
                 var carry = function (position) {
                     if (position < oldOffset || position > oldOffset + line.length) return null;
@@ -1104,12 +1114,34 @@
         replaceMarkdownRangeAndSelect(editor, lineStart, lineEnd, updated, newStart, newEnd);
     }
 
+    // "None" in the colour or the highlight palette: the colour leaves the
+    // selection (kind 'color' or 'background-color', the latter covering
+    // ==text== too); at a bare caret, the caret leaves the coloured text.
+    function clearMarkdownSpanFormat(kind) {
+        var context = getCurrentMarkdownEditContext();
+        var editor = context.editor;
+        var api = window.PoznoteMarkdownCodeMirror;
+        if (!editor || !api || typeof api.clearSpanFormat !== 'function' || !api.isCodeMirrorEditor(editor)) return false;
+        var offsets = context.offsets;
+        if (offsets && offsets.start === offsets.end) {
+            var kinds = kind === 'background-color' ? ['background-color', '=='] : [kind];
+            for (var i = 0; i < kinds.length; i++) {
+                if (api.isFormatActive(editor, kinds[i], kinds[i])) api.leaveInlineFormat(editor, kinds[i]);
+            }
+            return true;
+        }
+        api.clearSpanFormat(editor, kind);
+        return true;
+    }
+
     /**
      * Apply text color using HTML inline in markdown
      */
     function applyMarkdownColor(color) {
         if (!color) return;
-        
+        // ("none" used to wrap the text in one more span, color:inherit)
+        if ((color === 'none' || color === 'inherit') && clearMarkdownSpanFormat('color')) return;
+
         leaveMarkdownInlineCodeAtCaret();
         var context = getCurrentMarkdownEditContext();
         var sel = context.selection;
@@ -1149,6 +1181,7 @@
         // default for the standard yellow highlight and for "none". <mark> is
         // painted with --pz-color-yellow-soft, so both follow the theme.
         var yellow = window.PoznoteColorPalette ? window.PoznoteColorPalette.highlightColor('yellow') : '';
+        if (color === 'none' && clearMarkdownSpanFormat('background-color')) return;
         if (color && color !== 'none' && color !== yellow &&
             typeof applyMarkdownBackgroundSpan === 'function') {
             applyMarkdownBackgroundSpan(color);

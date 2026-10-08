@@ -1,5 +1,36 @@
 // Toolbar: link insertion.
 
+// The Markdown link the caret or the selection of a CodeMirror editor lies
+// in: { start, end, text, url } over the source, or null. `offsets` defaults
+// to the editor's current selection.
+function findMarkdownLinkAround(markdownEditor, offsets) {
+  const cmApi = window.PoznoteMarkdownCodeMirror;
+  if (!markdownEditor || !cmApi || typeof cmApi.isCodeMirrorEditor !== 'function' || !cmApi.isCodeMirrorEditor(markdownEditor)) return null;
+  const cmOffsets = offsets || cmApi.getSelectionOffsets(markdownEditor);
+  if (!cmOffsets) return null;
+  const source = String(cmApi.getValue(markdownEditor) || '');
+  const from = Math.min(cmOffsets.start, cmOffsets.end);
+  const to = Math.max(cmOffsets.start, cmOffsets.end);
+  const lineStart = source.lastIndexOf('\n', from - 1) + 1;
+  let lineEnd = source.indexOf('\n', to);
+  if (lineEnd === -1) lineEnd = source.length;
+  const line = source.slice(lineStart, lineEnd);
+  // (not an image, not an escaped bracket)
+  const linkInLine = /(^|[^!\\])\[((?:[^\]\\\n]|\\.)*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g;
+  let found;
+  while ((found = linkInLine.exec(line))) {
+    const linkStart = lineStart + found.index + found[1].length;
+    const linkEnd = lineStart + found.index + found[0].length;
+    if (from >= linkStart && to <= linkEnd) {
+      // (the text as the note shows it: without the backslashes in front
+      // of its brackets and of what rich text typed as plain characters)
+      return { start: linkStart, end: linkEnd, text: found[2].replace(/\\([!-\/:-@\[-`{-~])/g, '$1'), url: found[3] };
+    }
+  }
+  return null;
+}
+window.findMarkdownLinkAround = findMarkdownLinkAround;
+
 // Link insertion functionality
 function addLinkToNote() {
   try {
@@ -14,7 +45,7 @@ function addLinkToNote() {
     // For markdown, handle differently
     if (inMarkdown) {
       const markdownEditor = getMarkdownEditorFromRange(activeRange);
-      const markdownOffsets = markdownEditor && activeRange
+      let markdownOffsets = markdownEditor && activeRange
         ? getRangeOffsetsWithinEditor(markdownEditor, activeRange)
         : null;
 
@@ -28,6 +59,17 @@ function addLinkToNote() {
       if (match) {
         existingText = match[1];
         existingUrl = match[2];
+      }
+
+      // The caret or the selection inside a link: that link is the one to
+      // edit or remove. Where its syntax is not shown (the live views) the
+      // selection is never "[text](url)" itself, only some of its text, and
+      // a link written there would have ended up inside the first one.
+      const linkAround = match ? null : findMarkdownLinkAround(markdownEditor);
+      if (linkAround) {
+        existingText = linkAround.text;
+        existingUrl = linkAround.url;
+        markdownOffsets = { start: linkAround.start, end: linkAround.end };
       }
 
       // Save range for markdown mode too

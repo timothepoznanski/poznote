@@ -214,9 +214,8 @@
                     }
                     echo '<button type="button" class="toolbar-btn btn-code text-format-btn" title="' . t_h('editor.toolbar.code_block') . '" data-action="toggle-code-block"><i class="lucide lucide-code"></i></button>';
                     echo '<button type="button" class="toolbar-btn btn-inline-code text-format-btn" title="' . t_h('editor.toolbar.inline_code') . '" data-action="toggle-inline-code"><i class="lucide lucide-terminal"></i></button>';
-                    if ($note_type !== 'markdown') {
-                        echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" data-action="exec-remove-format"><i class="lucide lucide-eraser"></i></button>';
-                    }
+                    // (Markdown notes too: the formats of the selection go, js/index-events.js)
+                    echo '<button type="button" class="toolbar-btn btn-eraser text-format-btn" title="' . t_h('editor.toolbar.clear_formatting') . '" data-action="exec-remove-format"><i class="lucide lucide-eraser"></i></button>';
                     // Search and replace: kept last in the selection formatting toolbar
                     if ($note_type === 'note' || $note_type === 'markdown') {
                         echo '<button type="button" class="toolbar-btn btn-search-replace-format text-format-btn" title="' . t_h('editor.toolbar.search_replace', [], 'Search and replace') . '" data-action="open-search-replace-modal" data-note-id="'.$row['id'].'"><i class="lucide lucide-search"></i></button>';
