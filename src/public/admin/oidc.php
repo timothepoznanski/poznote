@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = t('oidc_admin.error_csrf', [], 'Invalid form submission. Please try again.');
     } else {
         // Save each setting
-        $booleanKeys = ['oidc_enabled', 'oidc_disable_basic_auth', 'oidc_auto_create_users'];
+        $booleanKeys = ['oidc_enabled', 'oidc_disable_basic_auth', 'oidc_auto_create_users', 'oidc_sync_email'];
         $textKeys = ['oidc_provider_name', 'oidc_issuer', 'oidc_scopes', 'oidc_api_audience', 'oidc_discovery_url', 'oidc_redirect_uri', 'oidc_end_session_endpoint', 'oidc_post_logout_redirect_uri', 'oidc_groups_claim', 'oidc_allowed_groups', 'oidc_allowed_users', 'oidc_max_users'];
 
         $allOk = true;
@@ -106,6 +106,7 @@ $settings = [
     'oidc_groups_claim' => getOidcSetting('oidc_groups_claim', 'groups'),
     'oidc_allowed_groups' => getOidcSetting('oidc_allowed_groups', ''),
     'oidc_auto_create_users' => getOidcSettingBool('oidc_auto_create_users', false),
+    'oidc_sync_email' => getOidcSettingBool('oidc_sync_email', true),
     'oidc_allowed_users' => getOidcSetting('oidc_allowed_users', ''),
     'oidc_max_users' => getOidcSetting('oidc_max_users', '0'),
 ];
@@ -563,6 +564,14 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
                             <label for="oidc_auto_create_users"><?php echo t_h('oidc_admin.fields.auto_create_users', [], 'Auto-create user profiles on first OIDC login'); ?></label>
                         </div>
                         <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.auto_create_users', [], 'Recommended when using group-based access control'); ?></span>
+                    </div>
+
+                    <div class="oidc-field">
+                        <div class="oidc-toggle">
+                            <input type="checkbox" id="oidc_sync_email" name="oidc_sync_email" value="1" <?php echo $settings['oidc_sync_email'] ? 'checked' : ''; ?>>
+                            <label for="oidc_sync_email"><?php echo t_h('oidc_admin.fields.sync_email', [], 'Update the account email from the provider at each login'); ?></label>
+                        </div>
+                        <span class="oidc-hint"><?php echo t_h('oidc_admin.hints.sync_email', [], 'Turn this off when your provider sends an address that cannot receive mail. The email set in the Users page is then kept, and Poznote sends its emails there.'); ?></span>
                     </div>
 
                     <div class="oidc-field">
