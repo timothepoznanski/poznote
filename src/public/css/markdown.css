@@ -632,7 +632,8 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .
    once the caret is in the block. An indented block has no frame there
    either, and gets none here. */
 .markdown-codemirror-host .cm-live-preview .cm-line.cm-live-code {
-    background-color: var(--pz-surface-hover);
+    /* (the ground of the code blocks of an HTML note, css/code-blocks.css) */
+    background-color: var(--pz-code-bg);
     border: solid var(--pz-border-light);
     border-width: 0 1px;
     padding: 0 30px;
@@ -708,7 +709,7 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .
     -webkit-user-select: none;
 }
 
-.markdown-codemirror-host .cm-live-preview :is(.cm-live-code-copy, .cm-live-code-lines) {
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-code-copy, .cm-live-code-lines, .cm-live-code-delete) {
     width: 28px;
     height: 28px;
     padding: 0;
@@ -724,7 +725,7 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .
     transition: opacity 0.2s ease;
 }
 
-.markdown-codemirror-host .cm-live-preview :is(.cm-live-code-copy, .cm-live-code-lines):hover {
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-code-copy, .cm-live-code-lines, .cm-live-code-delete):hover {
     opacity: 1;
     color: var(--pz-text-strong);
 }
@@ -733,6 +734,13 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .
     color: inherit;
 }
 
+/* The bin, red as on the code blocks of an HTML note (css/code-blocks.css) */
+.markdown-codemirror-host .cm-live-preview .cm-live-code-delete,
+.markdown-codemirror-host .cm-live-preview .cm-live-code-delete:hover {
+    color: var(--pz-danger-text);
+}
+
+.markdown-codemirror-host .cm-live-preview .cm-live-code-delete svg,
 .markdown-codemirror-host .cm-live-preview .cm-live-code-lines svg {
     width: 14px;
     height: 14px;
@@ -807,7 +815,14 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .
     /* The line's hanging indent is inherited and would draw the dot that far
        left of its marker, out of the pane. */
     text-indent: 0;
-    color: var(--pz-text-muted);
+    /* (the colour of the text, as the bullets of the preview and of an HTML note) */
+    color: var(--pz-text);
+}
+
+/* Same for the numbers, which the editor's highlighting paints as syntax */
+.markdown-codemirror-host .cm-live-preview .cm-live-list-number,
+.markdown-codemirror-host .cm-live-preview .cm-live-list-number * {
+    color: var(--pz-text) !important;
 }
 
 .markdown-codemirror-host .cm-live-preview .cm-live-task {
@@ -949,7 +964,8 @@ body.slash-menu-cursor-hidden * {
 }
 
 .markdown-preview pre {
-    background-color: var(--pz-surface-hover);
+    /* (the ground of the code blocks of an HTML note, css/code-blocks.css) */
+    background-color: var(--pz-code-bg);
     padding: 12px;
     border-radius: var(--pz-radius-sm);
     overflow-x: auto;

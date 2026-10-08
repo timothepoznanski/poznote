@@ -134,6 +134,15 @@
             }
             var from = Math.min(offsets.start, offsets.end);
             var to = Math.max(offsets.start, offsets.end);
+            // Blocks (a heading, a list, a table, several lines) pasted
+            // behind the text of a line would stay there as plain "## text":
+            // they start on a line of their own.
+            if (typeof api.getValue === 'function' &&
+                (/\n/.test(markdown.trim()) || /^(?:#{1,6} |[-*+] |\d+[.)] |> ?|\||```)/.test(markdown))) {
+                var current = String(api.getValue(editorDiv) || '');
+                var lineStart = current.lastIndexOf('\n', from - 1) + 1;
+                if (current.slice(lineStart, from).trim() !== '') markdown = '\n\n' + markdown;
+            }
             // replaceRange dispatches with userEvent 'input', so autosave fires.
             api.replaceRange(editorDiv, from, to, markdown);
             closeModal();

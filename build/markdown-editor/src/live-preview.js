@@ -14,7 +14,7 @@
 // Mermaid diagrams are whole blocks: the preview's own parser renders them
 // (renderedBlocksField below), nothing of js/markdown-parser.js is redone here.
 import { syntaxTree } from '@codemirror/language'
-import { EditorSelection, EditorState, Prec, RangeSet, RangeValue, StateEffect, StateField } from '@codemirror/state'
+import { EditorSelection, EditorState, Prec, findClusterBreak, RangeSet, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, keymap } from '@codemirror/view'
 
 export const refreshLivePreviewEffect = StateEffect.define()
@@ -263,6 +263,79 @@ const toggleFoldedLineDecoration = Decoration.line({ class: 'cm-live-toggle-fold
 const toggleHeaderOpenDecoration = Decoration.line({ class: 'cm-live-toggle-header cm-live-toggle-open' })
 const toggleHeaderClosedDecoration = Decoration.line({ class: 'cm-live-toggle-header' })
 
+// The choice made on a block is also kept in the browser, per note: closing
+// the note's tab, or reloading, no longer loses it. A block is known by its
+// rank among the note's code blocks (nothing is written in the source).
+const CODE_LINE_NUMBERS_KEY = 'markdown_code_line_numbers'
+
+function codeFenceStarts(doc) {
+  const starts = []
+  let open = null
+  for (let number = 1; number <= doc.lines; number++) {
+    const line = doc.line(number)
+    const fence = /^( {0,3})(`{3,}|~{3,})/.exec(line.text)
+    if (!fence) continue
+    if (!open) {
+      open = fence[2]
+      // (a Mermaid fence is a diagram, not a code block: the preview does
+      // not count it either)
+      if (!/^mermaid\b/i.test(line.text.slice(fence[0].length).trim())) starts.push(line.from + fence[1].length)
+    } else if (fence[2].charAt(0) === open.charAt(0) && fence[2].length >= open.length && line.text.slice(fence[0].length).trim() === '') {
+      open = null
+    }
+  }
+  return starts
+}
+
+function readStoredCodeLineNumbers() {
+  try {
+    const storage = window.__poznoteUserStorage || window.localStorage
+    const parsed = JSON.parse(storage.getItem(CODE_LINE_NUMBERS_KEY) || '{}')
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch (error) {
+    return {}
+  }
+}
+
+function noteIdOfView(view) {
+  const entry = view.dom.closest ? view.dom.closest('.noteentry') : null
+  const id = entry ? (entry.getAttribute('data-note-id') || String(entry.id || '').replace(/^entry/, '')) : ''
+  return /^\d+$/.test(id) ? id : ''
+}
+
+function storeCodeLineNumbers(view, blockFrom, on) {
+  const noteId = noteIdOfView(view)
+  const rank = codeFenceStarts(view.state.doc).indexOf(blockFrom)
+  if (!noteId || rank === -1) return
+  try {
+    const all = readStoredCodeLineNumbers()
+    const note = all[noteId] && typeof all[noteId] === 'object' ? all[noteId] : {}
+    note[rank] = on ? 1 : 0
+    // (most recently touched note last; the oldest go past 300 notes)
+    delete all[noteId]
+    all[noteId] = note
+    const ids = Object.keys(all)
+    ids.slice(0, Math.max(0, ids.length - 300)).forEach(id => { delete all[id] })
+    const storage = window.__poznoteUserStorage || window.localStorage
+    storage.setItem(CODE_LINE_NUMBERS_KEY, JSON.stringify(all))
+  } catch (error) {
+    // (private mode, full storage: the choice then lasts as long as the note is open)
+  }
+}
+
+function restoreCodeLineNumbers(view) {
+  const noteId = noteIdOfView(view)
+  const note = noteId ? readStoredCodeLineNumbers()[noteId] : null
+  if (!note || typeof note !== 'object') return
+  const starts = codeFenceStarts(view.state.doc)
+  const effects = []
+  Object.keys(note).forEach(rank => {
+    const pos = starts[Number(rank)]
+    if (pos !== undefined) effects.push(setCodeLineNumbersEffect.of({ pos, on: !!note[rank] }))
+  })
+  if (effects.length) view.dispatch({ effects })
+}
+
 function areCodeLineNumbersOn(state, blockFrom, language) {
   let choice = null
   state.field(codeLineNumbersField).between(blockFrom, blockFrom, (from, to, value) => {
@@ -289,6 +362,7 @@ const ruleLineDecoration = Decoration.line({ class: 'cm-live-hr' })
 const ruleTextDecoration = Decoration.mark({ class: 'cm-live-hr-text' })
 const inlineCodeDecoration = Decoration.mark({ class: 'cm-live-inline-code' })
 const bulletDecoration = Decoration.mark({ class: 'cm-live-bullet' })
+const listNumberDecoration = Decoration.mark({ class: 'cm-live-list-number' })
 const taskBulletDecoration = Decoration.mark({ class: 'cm-live-task-bullet' })
 const taskDecoration = Decoration.mark({ class: 'cm-live-task' })
 const taskCheckedDecoration = Decoration.mark({ class: 'cm-live-task cm-live-task-checked' })
@@ -407,7 +481,7 @@ class CodeLanguageWidget extends WidgetType {
   }
 }
 
-// The buttons in the corner of a block: line numbers, then copy
+// The buttons in the corner of a block: line numbers, copy, delete
 class CodeActionsWidget extends WidgetType {
   constructor(numbered) {
     super()
@@ -453,6 +527,24 @@ class CodeActionsWidget extends WidgetType {
     icon.className = 'lucide lucide-copy'
     button.appendChild(icon)
     actions.appendChild(button)
+
+    // Then the bin, as on the code blocks of an HTML note (Ctrl+Z brings the
+    // block back)
+    const remove = document.createElement('button')
+    const removeLabel = translate('editor.code_block_delete.title', 'Delete code block')
+    remove.type = 'button'
+    remove.className = 'cm-live-code-delete'
+    remove.tabIndex = -1
+    remove.title = removeLabel
+    remove.setAttribute('aria-label', removeLabel)
+    if (window.poznoteCodeBlockDeleteIcon) {
+      remove.innerHTML = window.poznoteCodeBlockDeleteIcon
+    } else {
+      const removeIcon = document.createElement('i')
+      removeIcon.className = 'lucide lucide-trash-2'
+      remove.appendChild(removeIcon)
+    }
+    actions.appendChild(remove)
 
     return actions
   }
@@ -548,6 +640,7 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
   const selection = state.selection.ranges
   const tree = syntaxTree(state)
   const decorations = []
+  const indentedListLines = new Set()
 
   // Nothing is revealed while the editor is not the one being typed in
   const focused = view.hasFocus
@@ -1051,6 +1144,26 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
             // instead of the space alone (which left "-text").
             if (!revealSyntax && list && doc.lineAt(node.from).to > node.to) {
               neverShown.push(squeezedMarker.range(node.from, skipSpaces(node.to)))
+            }
+            // Set in from the margin like the lists of the preview and of an
+            // HTML note, each level 24px further (the source indents a
+            // level by two or three spaces only)
+            if (list) {
+              let depth = 0
+              for (let parent = list.parent; parent; parent = parent.parent) {
+                if (parent.name === 'BulletList' || parent.name === 'OrderedList') depth++
+              }
+              const lineFrom = doc.lineAt(node.from).from
+              if (!indentedListLines.has(lineFrom)) {
+                indentedListLines.add(lineFrom)
+                // (the base depends on how wide the marker itself is; items
+                // are spaced as the <li> of the preview are)
+                const base = list.name === 'OrderedList' ? 13 : (item.getChild('Task') ? 22 : 19)
+                decorations.push(Decoration.line({
+                  attributes: { style: 'margin-left:' + (base + depth * 16) + 'px;padding-top:3px;padding-bottom:3px' }
+                }).range(lineFrom))
+              }
+              if (list.name === 'OrderedList') decorations.push(listNumberDecoration.range(node.from, node.to))
             }
             if (!list || list.name !== 'BulletList') return
             const isTask = !!item.getChild('Task')
@@ -1873,11 +1986,49 @@ function spanStyleProperty(tag) {
 const INLINE_FORMAT_NODES = ['Emphasis', 'StrongEmphasis', 'Strikethrough', 'InlineCode']
 const INLINE_FORMAT_MARKERS = { '**': 'StrongEmphasis', '__': 'StrongEmphasis', '*': 'Emphasis', '_': 'Emphasis', '~~': 'Strikethrough', '`': 'InlineCode' }
 
+// The stars that close bold and italic together ("***word***"), around the
+// caret: { from, to } of that run, or null. A caret inside the run is where
+// one of the two was left and the other goes on: what is typed there takes
+// the format of the stars still to its right.
+function closingEmphasisRun(state, pos) {
+  const line = state.doc.lineAt(pos)
+  const text = line.text
+  const at = pos - line.from
+  const star = text.charAt(at) || text.charAt(at - 1)
+  if (star !== '*' && star !== '_') return null
+  let from = at
+  let to = at
+  while (from > 0 && text.charAt(from - 1) === star) from--
+  while (to < text.length && text.charAt(to) === star) to++
+  if (to - from !== 3 || from === 0 || /\s/.test(text.charAt(from - 1))) return null
+  if (syntaxTree(state).resolveInner(line.from + from, 1).name !== 'EmphasisMark') return null
+  return { from: line.from + from, to: line.from + to }
+}
+
+// Where the caret goes to leave `marker` (bold, italic...) and nothing else:
+// past the end of that format, or, at the end of text both bold and italic,
+// past the stars of the one that is left only
+export function findInlineFormatExit(state, marker) {
+  const main = state.selection.main
+  if (main.empty && /^[*_]{1,2}$/.test(marker || '')) {
+    const run = closingEmphasisRun(state, main.head)
+    if (run && main.head === run.from) return main.head + marker.length
+  }
+  return findInlineFormatEnd(state, marker)
+}
+
 // With `marker`, only that format counts (is the caret in bold?)
 export function findInlineFormatEnd(state, marker) {
   const main = state.selection.main
   if (!main.empty) return null
   const pos = main.head
+  if (/^[*_]{1,2}$/.test(marker || '')) {
+    const run = closingEmphasisRun(state, pos)
+    if (run && pos > run.from && pos < run.to) {
+      const left = run.to - pos
+      return (marker.length === 2 ? left >= 2 : left % 2 === 1) ? run.to : null
+    }
+  }
   let end = -1
   const take = (from, to) => {
     if (from < pos && pos < to && to > end) end = to
@@ -1984,7 +2135,7 @@ function moveStrandedSpaceOut(view, stranded) {
 export function leaveInlineFormat(view, marker) {
   let done = false
   if (marker) {
-    const markerEnd = findInlineFormatEnd(view.state, marker)
+    const markerEnd = findInlineFormatExit(view.state, marker)
     if (markerEnd === null) return false
     view.dispatch({ selection: { anchor: markerEnd }, scrollIntoView: true })
     return true
@@ -2102,9 +2253,13 @@ function alignedLineAtCaret(view) {
 
 // Enter: the text behind the caret goes to a new line, aligned the same way
 function splitAlignedLineOnEnter(view) {
-  const aligned = alignedLineAtCaret(view)
-  if (!aligned) return false
-  const head = view.state.selection.main.head
+  // (in live preview too, where the tags are in sight: a line broken between
+  // them is no longer an aligned line, and the note shows the tags as text)
+  const main = view.state.selection.main
+  if (view.state.readOnly || !main.empty) return false
+  const aligned = findAlignedLine(view.state, main.head)
+  if (!aligned || main.head < aligned.innerFrom || main.head > aligned.innerTo) return false
+  const head = main.head
   const insert = '</p>\n' + aligned.opening
   view.dispatch({
     changes: { from: head, insert },
@@ -2423,17 +2578,48 @@ export function armPendingFormat(view, prefix, suffix) {
 // pressing it again leaves the format), or does the selection lie in it.
 // Counts the pair a command just wrote and the format waiting for its first
 // character, both of which are "on" as far as the person typing can tell.
+// The space typed at the end of a bold word waits outside the markers for the
+// next word (literalTypingInput), which takes it back in: until then the
+// format is still the one being written, for the buttons and the shortcuts
+function heldPendingSpace(view) {
+  const livePlugin = view.plugin(livePreviewPlugin)
+  const pending = livePlugin ? livePlugin.pendingSpace : null
+  const main = view.state.selection.main
+  if (!pending || !main.empty || main.head !== pending.to) return null
+  return view.state.sliceDoc(pending.from, pending.to) === pending.marks + pending.spaces ? pending : null
+}
+
+function closingMarksHold(marks, prefix) {
+  if (/^[*_]{1,3}$/.test(prefix)) {
+    const width = (marks.match(/[*_]/g) || []).length
+    return prefix.length === 3 ? width === 3 : (prefix.length === 2 ? width >= 2 : width % 2 === 1)
+  }
+  if (prefix === '<u>') return marks.toLowerCase().indexOf('</u>') !== -1
+  return /^(?:~~|==|`)$/.test(prefix) && marks.indexOf(prefix) !== -1
+}
+
+// The shortcut or button of a format whose word ends with such a waiting
+// space: out of the format, the space stays where it is
+export function leavePendingSpace(view, prefix) {
+  const pending = heldPendingSpace(view)
+  if (!pending || !closingMarksHold(pending.marks, prefix)) return false
+  view.plugin(livePreviewPlugin).pendingSpace = null
+  return true
+}
+
 export function isFormatActiveAt(view, prefix, suffix) {
   const { state } = view
   const main = state.selection.main
   const livePlugin = view.plugin(livePreviewPlugin)
   const spanKind = prefix === 'color' || prefix === 'background-color' ? prefix : ''
   if (main.empty) {
+    const held = heldPendingSpace(view)
+    if (held && closingMarksHold(held.marks, prefix)) return true
     const waiting = livePlugin ? livePlugin.pendingFormat : null
     if (waiting && waiting.pos === main.head) {
-      // "*" italic, "**" bold, "***" both
-      if (waiting.prefix === prefix) return true
-      if (waiting.prefix.length === 3 && /^[*_]{1,2}$/.test(prefix)) return true
+      // "*" italic, "**" bold, "***" both; several formats carried over a
+      // line break wait together ("**<u>")
+      if (waiting.prefix === prefix || pendingFormatHolds(waiting, prefix)) return true
     }
     const pair = findUntypedPair(state)
     if (pair && pair.marker === 'tag') {
@@ -2461,7 +2647,72 @@ export function isFormatActiveAt(view, prefix, suffix) {
 
 const SPAN_PROPERTY_REGEX = /^<span\s+style\s*=\s*["']\s*(background-color|color)\s*:/i
 
+// What a piece colours: 'color' for a colour span, 'background-color' for a
+// highlight, which is written either as a span or as ==text==
+function spanFamilyOf(state, construct) {
+  const opening = state.sliceDoc(construct.from, construct.openTo)
+  if (opening === '==') return 'background-color'
+  const match = SPAN_PROPERTY_REGEX.exec(opening)
+  return match ? match[1].toLowerCase() : ''
+}
+
+// The selection is the whole piece: its markers are not shown, so it may
+// start and end on either side of them
+function selectsWholeConstruct(construct, start, end) {
+  return start >= construct.from && start <= construct.openTo && end >= construct.closeFrom && end <= construct.to
+}
+
+// "None" in the colour palettes: the colour (or the highlight) leaves the
+// selected text, and only it. A coloured stretch the selection cuts into
+// closes before the selection and opens again after it.
+export function clearSpanChanges(state, from, to, property) {
+  const changes = []
+  const firstLine = state.doc.lineAt(from).number
+  const lastLine = state.doc.lineAt(to).number
+  if (lastLine - firstLine > 2000) return null
+  for (let number = firstLine; number <= lastLine; number++) {
+    const line = state.doc.line(number)
+    const start = Math.max(from, line.from)
+    const end = Math.min(to, line.to)
+    if (start >= end) continue
+    for (const construct of findInlineConstructs(state, line)) {
+      // (no property: every inline format goes, "Clear formatting"; a link
+      // is not a format)
+      if (property ? spanFamilyOf(state, construct) !== property : construct.kind === 'link') continue
+      if (construct.to <= start || construct.from >= end) continue
+      const opening = state.sliceDoc(construct.from, construct.openTo)
+      const closing = state.sliceDoc(construct.closeFrom, construct.to)
+      const fromInside = start > construct.openTo
+      const toInside = end < construct.closeFrom
+      // (markers never against a space on their inner side: Markdown would
+      // not read "**one **" as bold)
+      let closeAt = start
+      while (closeAt > construct.openTo && /\s/.test(state.sliceDoc(closeAt - 1, closeAt))) closeAt--
+      let openAt = end
+      while (openAt < construct.closeFrom && /\s/.test(state.sliceDoc(openAt, openAt + 1))) openAt++
+      if (fromInside && closeAt > construct.openTo) changes.push({ from: closeAt, insert: closing })
+      else changes.push({ from: construct.from, to: construct.openTo })
+      if (toInside && openAt < construct.closeFrom) changes.push({ from: openAt, insert: opening })
+      else changes.push({ from: construct.closeFrom, to: construct.to })
+    }
+  }
+  if (!changes.length) return null
+  changes.sort((a, b) => a.from - b.from || (a.to || a.from) - (b.to || b.from))
+  return { changes, from, to }
+}
+
+// Over several lines the format goes on or off for all of them: off when
+// every line already has it, on otherwise (the lines that have it are left
+// as they are), instead of each line toggling on its own
 export function wrapSelectionChanges(state, from, to, prefix, suffix) {
+  const wrapped = wrapSelectionLines(state, from, to, prefix, suffix, false)
+  if (wrapped && wrapped.off && wrapped.on) return wrapSelectionLines(state, from, to, prefix, suffix, true)
+  return wrapped
+}
+
+function wrapSelectionLines(state, from, to, prefix, suffix, onOnly) {
+  let off = 0
+  let on = 0
   // (underline toggles like the markers do)
   const isMarker = (prefix === suffix && /^(?:\*{1,3}|_{1,3}|~~|==|`)$/.test(prefix)) || (prefix === '<u>' && suffix === '</u>')
   const spanMatch = SPAN_PROPERTY_REGEX.exec(prefix)
@@ -2498,11 +2749,20 @@ export function wrapSelectionChanges(state, from, to, prefix, suffix) {
     let handled = false
     // A colour over text that already has one replaces it: the spans of the
     // same kind that lie inside the selection go
-    if (spanProperty) {
+    // (a highlight is one thing, whether ==yellow== or a span of another
+    // colour: either replaces the other. And the piece goes too when the
+    // selection is its text, between markers that are not shown.)
+    const family = spanProperty || (prefix === '==' ? 'background-color' : '')
+    if (family) {
       for (const construct of constructs) {
-        const opening = SPAN_PROPERTY_REGEX.exec(state.sliceDoc(construct.from, construct.openTo))
-        if (!opening || opening[1].toLowerCase() !== spanProperty) continue
-        if (construct.from < start || construct.to > end) continue
+        if (spanFamilyOf(state, construct) !== family) continue
+        if (prefix === '==' && state.sliceDoc(construct.from, construct.openTo) === '==') continue
+        const whole = selectsWholeConstruct(construct, start, end)
+        if (!whole && (construct.from < start || construct.to > end)) continue
+        if (whole) {
+          start = construct.from
+          end = construct.to
+        }
         changes.push({ from: construct.from, to: construct.openTo }, { from: construct.closeFrom, to: construct.to })
         construct.melted = true
       }
@@ -2511,9 +2771,16 @@ export function wrapSelectionChanges(state, from, to, prefix, suffix) {
       const same = constructs.filter(construct =>
         state.sliceDoc(construct.from, construct.openTo).toLowerCase() === prefix && state.sliceDoc(construct.closeFrom, construct.to).toLowerCase() === suffix)
       // The selection with its own markers, or text inside the format: off
-      const exact = same.find(construct => construct.from === start && construct.to === end)
+      // (its markers are not shown: the selection may start or end on either
+      // side of them, it is the whole piece all the same)
+      const exact = same.find(construct =>
+        start >= construct.from && start <= construct.openTo && end >= construct.closeFrom && end <= construct.to)
       const inside = exact || same.find(construct => construct.openTo <= start && end <= construct.closeFrom)
-      if (inside) {
+      if (inside && onOnly) {
+        stretches.push({ from: start, to: end })
+        handled = true
+      } else if (inside) {
+        off++
         const innerStart = exact ? inside.openTo : start
         const innerEnd = exact ? inside.closeFrom : end
         if (innerStart === inside.openTo) changes.push({ from: inside.from, to: inside.openTo })
@@ -2565,10 +2832,11 @@ export function wrapSelectionChanges(state, from, to, prefix, suffix) {
     }
     changes.push({ from: start, insert: prefix }, { from: end, insert: suffix })
     stretches.push({ from: start, to: end })
+    on++
   }
   if (!stretches.length) return null
   changes.sort((a, b) => a.from - b.from || (a.to || a.from) - (b.to || b.from))
-  return { changes, from: stretches[0].from, to: stretches[stretches.length - 1].to }
+  return { changes, from: stretches[0].from, to: stretches[stretches.length - 1].to, off, on }
 }
 
 // Cut, and a paste or a drop over a selection, delete without going through
@@ -2625,21 +2893,112 @@ function deleteSelectionSafely(view) {
   return true
 }
 
+// Enter in a list item, in front of a space: the space would open the new
+// item ("-  rest"), where the marker and its spaces are one piece and what is
+// typed lands behind them, stuck to the next word. It goes, as the editor's
+// own Enter does on a plain line.
+function dropSpacesAfterCaretOnEnter(view) {
+  const { state } = view
+  const main = state.selection.main
+  if (state.readOnly || !main.empty) return false
+  const line = state.doc.lineAt(main.head)
+  const prefix = LIST_ITEM_PREFIX_REGEX.exec(line.text)
+  if (!prefix || main.head < line.from + prefix[0].length) return false
+  if (syntaxTree(state).resolveInner(line.from + prefix[1].length, 1).name !== 'ListMark') return false
+  let end = main.head
+  while (end < line.to && /[ \t]/.test(state.sliceDoc(end, end + 1))) end++
+  if (end > main.head && end < line.to) view.dispatch({ changes: { from: main.head, to: end }, userEvent: 'delete' })
+  return false
+}
+
 // Enter inside a bold word (or a link, a colour, some inline code): the line
 // is about to be cut there, by the editor or by one of the handlers above,
 // and each half needs its own markers: "- **bo|ld**" would otherwise become
 // "- **bo" and "- ld**", two lines of stars. At the edge of a word the caret
 // simply steps outside it first.
+function carryFormatsOverEnter(view, format) {
+  setTimeout(() => {
+    const livePlugin = view.plugin(livePreviewPlugin)
+    const main = view.state.selection.main
+    if (!livePlugin || !main.empty || view.state.readOnly) return
+    livePlugin.pendingFormat = { pos: main.head, prefix: format.prefix, suffix: format.suffix }
+    view.dispatch({ effects: refreshLivePreviewEffect.of(null) })
+  }, 0)
+}
+
+// The format waiting at the caret for its first character is asked for
+// again: it is turned off
+export function dropPendingFormat(view, prefix) {
+  const livePlugin = view.plugin(livePreviewPlugin)
+  const waiting = livePlugin ? livePlugin.pendingFormat : null
+  const main = view.state.selection.main
+  if (!waiting || !main.empty || waiting.pos !== main.head || !pendingFormatHolds(waiting, prefix)) return false
+  // (the other formats waiting with it stay)
+  const kept = []
+  for (const piece of splitPendingFormat(waiting)) {
+    if (/^[*_]{1,3}$/.test(piece.prefix) && /^[*_]{1,2}$/.test(prefix)) {
+      const left = piece.prefix.length - prefix.length
+      if (left > 0) kept.push({ prefix: piece.prefix.slice(0, left), suffix: piece.suffix.slice(0, left) })
+    } else if (!pendingFormatHolds({ prefix: piece.prefix }, prefix)) {
+      kept.push(piece)
+    }
+  }
+  livePlugin.pendingFormat = kept.length
+    ? { pos: waiting.pos, prefix: kept.map(piece => piece.prefix).join(''), suffix: kept.slice().reverse().map(piece => piece.suffix).join('') }
+    : null
+  view.dispatch({ effects: refreshLivePreviewEffect.of(null) })
+  return true
+}
+
+// "**<u>" + "</u>**" as its formats, outermost first
+function splitPendingFormat(waiting) {
+  const pieces = []
+  const openings = waiting.prefix.match(/<[^<>]+>|\*{1,3}|_{1,3}|~~|==|`/g) || []
+  const closings = (waiting.suffix.match(/<\/[^<>]+>|\*{1,3}|_{1,3}|~~|==|`/g) || []).reverse()
+  openings.forEach((prefix, index) => pieces.push({ prefix, suffix: closings[index] || '' }))
+  return pieces
+}
+
+function pendingFormatHolds(waiting, prefix) {
+  if (prefix === 'color' || prefix === 'background-color') {
+    return (waiting.prefix.match(/<span\b[^<>]*>/gi) || []).some(tag => spanStyleProperty(tag) === prefix)
+  }
+  if (/^[*_]{1,3}$/.test(prefix)) {
+    const stars = (waiting.prefix.match(/[*_]/g) || []).length
+    return prefix.length === 3 ? stars === 3 : (prefix.length === 2 ? stars >= 2 : stars % 2 === 1)
+  }
+  return waiting.prefix.toLowerCase().indexOf(prefix.toLowerCase()) !== -1
+}
+
 function splitInlineFormatsOnEnter(view) {
-  if (isSyntaxRevealed() || view.state.readOnly) return false
+  // (in live preview too: the stars are in sight there, but a bold word cut
+  // over two list items is no more wanted)
+  if (view.state.readOnly) return false
   const { state } = view
   const main = state.selection.main
-  if (!main.empty || isRawTypingContext(state, main.head)) return false
+  if (!main.empty) return false
+  const waitingPlugin = view.plugin(livePreviewPlugin)
+  const waitingFormat = waitingPlugin ? waitingPlugin.pendingFormat : null
+  if (waitingFormat && waitingFormat.pos === main.head && !isSyntaxRevealed() &&
+      state.doc.lineAt(main.head).text.replace(LIST_ITEM_PREFIX_REGEX, '').trim() === '' && !LIST_ITEM_PREFIX_REGEX.test(state.doc.lineAt(main.head).text)) {
+    carryFormatsOverEnter(view, waitingFormat)
+    return false
+  }
+  // Raw places are left alone, inline code excepted: it is one of the
+  // formats found below, and cannot run over two lines either
+  let inInlineCode = false
+  for (let node = syntaxTree(state).resolveInner(main.head, -1); node; node = node.parent) {
+    if (node.name === 'FencedCode' || node.name === 'CodeBlock') return false
+    if (node.name === 'InlineCode') inInlineCode = true
+  }
+  if (!inInlineCode && isRawTypingContext(state, main.head)) return false
   const line = state.doc.lineAt(main.head)
   const constructs = findInlineConstructs(state, line)
   if (!constructs.length) return false
 
   let pos = main.head
+  // (the formats whose text ends at the caret, innermost first)
+  const ended = []
   for (let moved = true; moved;) {
     moved = false
     for (const construct of constructs) {
@@ -2648,6 +3007,7 @@ function splitInlineFormatsOnEnter(view) {
         moved = true
       } else if (construct.closeFrom === pos && construct.openTo < pos) {
         pos = construct.to
+        ended.push(construct)
         moved = true
       }
     }
@@ -2657,6 +3017,16 @@ function splitInlineFormatsOnEnter(view) {
     .sort((a, b) => a.from - b.from)
   if (!around.length) {
     if (pos !== main.head) view.dispatch({ selection: { anchor: pos } })
+    // Rich text: bold typed up to the end of the line goes on on the next
+    // one, as it does in an HTML note. Nothing is written until a character
+    // is typed (armPendingFormat), so a line left empty stays empty.
+    const carried = ended.filter(construct => construct.kind === 'mark')
+    if (carried.length && !isSyntaxRevealed()) {
+      carryFormatsOverEnter(view, {
+        prefix: carried.slice().reverse().map(construct => state.sliceDoc(construct.from, construct.openTo)).join(''),
+        suffix: carried.map(construct => state.sliceDoc(construct.closeFrom, construct.to)).join('')
+      })
+    }
     return false
   }
   const closing = around.slice().reverse().map(construct => state.sliceDoc(construct.closeFrom, construct.to)).join('')
@@ -2841,6 +3211,92 @@ function dropArmedPairOnArrow(view) {
   return true
 }
 
+// Rich text, the arrow keys along a line: the two sides of markers that are
+// not drawn are one place on the screen, and an arrow pressed there moved
+// nothing. In the middle of a line they are now one stop, as in any rich
+// text editor: at the end of a bold word the caret is in the bold (what is
+// typed there is bold), in front of it the caret is outside. At the very end
+// of a line the stop outside is kept: Arrow right there is the way out of the
+// format when nothing follows it.
+function hiddenMarkerStops(state, line) {
+  const constructs = findInlineConstructs(state, line)
+  const walk = (pos, from, to) => {
+    for (let moved = true; moved;) {
+      moved = false
+      for (const construct of constructs) {
+        if (construct[from] === pos && construct[to] !== pos) {
+          pos = construct[to]
+          moved = true
+        }
+      }
+    }
+    return pos
+  }
+  return {
+    pastClosing: pos => walk(pos, 'closeFrom', 'to'),
+    pastOpening: pos => walk(pos, 'from', 'openTo'),
+    beforeClosing: pos => walk(pos, 'to', 'closeFrom'),
+    beforeOpening: pos => walk(pos, 'openTo', 'from')
+  }
+}
+
+// (raw places keep the editor's own arrows; inline code is not one of them
+// here, its backticks are hidden like any other marker)
+function arrowsLeftAlone(state, pos) {
+  if (!isRawTypingContext(state, pos)) return false
+  for (const side of [-1, 1]) {
+    for (let node = syntaxTree(state).resolveInner(pos, side); node; node = node.parent) {
+      if (node.name === 'FencedCode' || node.name === 'CodeBlock') return true
+      if (node.name === 'InlineCode') return false
+    }
+  }
+  return true
+}
+
+function arrowRightOverHiddenMarkers(view) {
+  if (isSyntaxRevealed()) return false
+  const { state } = view
+  const main = state.selection.main
+  if (!main.empty) return false
+  const line = state.doc.lineAt(main.head)
+  if (main.head === line.to || arrowsLeftAlone(state, main.head)) return false
+  const stops = hiddenMarkerStops(state, line)
+  let pos = stops.pastClosing(main.head)
+  // (end of the line: the stop outside the format stays)
+  if (pos > main.head && pos === line.to) return false
+  pos = stops.pastOpening(pos)
+  if (pos === main.head || pos === line.to) return false
+  // The editor's own arrow then moves one character from there
+  view.dispatch({ selection: { anchor: pos } })
+  return false
+}
+
+function arrowLeftOverHiddenMarkers(view) {
+  if (isSyntaxRevealed()) return false
+  const { state } = view
+  const main = state.selection.main
+  if (!main.empty) return false
+  const line = state.doc.lineAt(main.head)
+  if (main.head === line.from || arrowsLeftAlone(state, main.head)) return false
+  const stops = hiddenMarkerStops(state, line)
+  // On the far side of markers already: same place as their near side
+  const here = stops.beforeOpening(stops.beforeClosing(main.head))
+  if (here < main.head) {
+    if (here === line.from) {
+      view.dispatch({ selection: { anchor: here }, scrollIntoView: true, userEvent: 'select' })
+      return true
+    }
+    view.dispatch({ selection: { anchor: here } })
+    return false
+  }
+  // One character to the left, then through the markers found there
+  const before = line.from + findClusterBreak(line.text, main.head - line.from, false)
+  const target = stops.beforeOpening(stops.beforeClosing(before))
+  if (target === before) return false
+  view.dispatch({ selection: { anchor: target }, scrollIntoView: true, userEvent: 'select' })
+  return true
+}
+
 // Backspace in the empty pair a formatting command just wrote takes the
 // pair back
 function deleteArmedPairOnBackspace(view) {
@@ -2914,7 +3370,76 @@ function deletePendingSpaceOnBackspace(view) {
 
 const SPACES_REGEX = /^[ \t\u00a0]+$/
 
+// Rich text, Tab on a line of text: four spaces at the caret, as in an HTML
+// note (non-breaking ones in turn, or Markdown shows a single space). The
+// editor's own Tab indents the line, and a line indented twice is read as a
+// code block. In a list, in code and in a table Tab keeps its own meaning.
+export function insertTabSpacesInText(view) {
+  if (isSyntaxRevealed() || view.state.readOnly || !view.plugin(livePreviewPlugin)) return false
+  const { state } = view
+  const main = state.selection.main
+  if (!main.empty) return false
+  const line = state.doc.lineAt(main.head)
+  if (LIST_ITEM_PREFIX_REGEX.test(line.text) || /^\s*\|/.test(line.text)) return false
+  if (isRawTypingContext(state, main.head)) return false
+  const insert = '\u00a0 \u00a0 '
+  view.dispatch({ changes: { from: main.head, insert }, selection: { anchor: main.head + insert.length }, userEvent: 'input.type', scrollIntoView: true })
+  return true
+}
+
+export function swallowShiftTabInText(view) {
+  if (isSyntaxRevealed() || view.state.readOnly || !view.plugin(livePreviewPlugin)) return false
+  const line = view.state.doc.lineAt(view.state.selection.main.head)
+  if (LIST_ITEM_PREFIX_REGEX.test(line.text) || /^\s*\|/.test(line.text) || isRawTypingContext(view.state, view.state.selection.main.head)) return false
+  return true
+}
+
+// Where the text of a line starts, past the bullet, number, task box, "#" or
+// ">" that rich text never shows
+function lineTextStart(state, line) {
+  const item = LIST_ITEM_PREFIX_REGEX.exec(line.text)
+  if (item && syntaxTree(state).resolveInner(line.from + item[1].length, 1).name === 'ListMark') return line.from + item[0].length
+  const block = /^ {0,3}(?:#{1,6}[ \t]+|(?:>[ \t]?)+)/.exec(line.text)
+  if (block) {
+    const name = syntaxTree(state).resolveInner(line.from + /^ */.exec(line.text)[0].length, 1).name
+    if (name === 'HeaderMark' || name === 'QuoteMark') return line.from + block[0].length
+  }
+  return line.from
+}
+
+// Home goes to the start of the text, not in front of a marker that is not
+// drawn (where Backspace would glue the line to the one above, marker and all)
+function homeToTextStart(view, extend) {
+  if (isSyntaxRevealed()) return false
+  const { state } = view
+  const main = state.selection.main
+  const line = state.doc.lineAt(main.head)
+  const start = lineTextStart(state, line)
+  // (only where the editor's own Home would end up in front of the marker:
+  // on a wrapped line it goes to the start of the row the caret is on)
+  if (start === line.from || main.head <= start || view.moveToLineBoundary(main, false).head >= start) return false
+  view.dispatch({ selection: extend ? EditorSelection.range(main.anchor, start) : EditorSelection.cursor(start), scrollIntoView: true, userEvent: 'select' })
+  return true
+}
+
+// Backspace with the caret in front of such a marker acts on the item, as if
+// the caret stood at the start of its text
+function backspaceBeforeHiddenMarker(view) {
+  if (isSyntaxRevealed() || view.state.readOnly) return false
+  const { state } = view
+  const main = state.selection.main
+  if (!main.empty) return false
+  const line = state.doc.lineAt(main.head)
+  const start = lineTextStart(state, line)
+  if (start === line.from || main.head >= start) return false
+  view.dispatch({ selection: { anchor: start } })
+  return false
+}
+
 const richTextKeymap = Prec.highest(keymap.of([
+  { key: 'Tab', run: insertTabSpacesInText, shift: swallowShiftTabInText },
+  { key: 'Home', run: view => homeToTextStart(view, false), shift: view => homeToTextStart(view, true) },
+  { key: 'Backspace', run: backspaceBeforeHiddenMarker },
   { key: 'Backspace', run: guardTableOnBackspace },
   { key: 'Delete', run: guardTableOnDelete },
   { key: 'Enter', run: leaveTableOnEnter },
@@ -2923,9 +3448,12 @@ const richTextKeymap = Prec.highest(keymap.of([
   { key: 'Backspace', run: deleteArmedPairOnBackspace },
   { key: 'ArrowLeft', run: dropArmedPairOnArrow },
   { key: 'ArrowRight', run: dropArmedPairOnArrow },
+  { key: 'ArrowLeft', run: arrowLeftOverHiddenMarkers },
+  { key: 'ArrowRight', run: arrowRightOverHiddenMarkers },
   { key: 'Backspace', run: deletePendingSpaceOnBackspace },
   { key: 'Mod-Backspace', run: view => deleteWordSafely(view, false) },
   { key: 'Mod-Delete', run: view => deleteWordSafely(view, true) },
+  { key: 'Enter', run: dropSpacesAfterCaretOnEnter },
   { key: 'Enter', run: openLineAboveHeadingOnEnter },
   { key: 'Enter', run: splitInlineFormatsOnEnter },
   { key: 'Enter', run: splitAlignedLineOnEnter },
@@ -3198,6 +3726,14 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
     this.pendingSpace = null
     this.pendingFormat = null
     this.rebuild(view)
+    // (once the editor sits in its note: the choices are kept per note)
+    setTimeout(() => {
+      try {
+        restoreCodeLineNumbers(this.view)
+      } catch (error) {
+        // (the editor was closed in the meantime)
+      }
+    }, 0)
 
     // Markers stay as they are while a pointer selection is being dragged:
     // revealing them mid-drag would move the text under the pointer. They
@@ -3272,6 +3808,20 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
           this.view.dispatch({ changes: { from: pair.from, to: pair.to }, userEvent: 'delete' })
         }, 0)
       }
+    }
+
+    // Same when the editor itself is left (the title, another note): the
+    // caret never moves then. A menu that takes the focus for a moment and
+    // gives it back keeps its pair.
+    if (this.emptyPair && update.focusChanged && !update.view.hasFocus) {
+      const pair = this.emptyPair
+      setTimeout(() => {
+        const state = this.view.state
+        if (this.view.hasFocus || this.emptyPair !== pair || state.readOnly) return
+        if (pair.to > state.doc.length || state.sliceDoc(pair.from, pair.to) !== pair.text) return
+        this.emptyPair = null
+        this.view.dispatch({ changes: { from: pair.from, to: pair.to }, userEvent: 'delete' })
+      }, 300)
     }
 
     const treeChanged = syntaxTree(update.startState) !== syntaxTree(update.state)
@@ -3368,12 +3918,31 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
         if (block) {
           const info = block.getChild('CodeInfo')
           const language = info ? view.state.doc.sliceString(info.from, info.to).trim().split(/\s+/)[0] : ''
-          view.dispatch({
-            effects: setCodeLineNumbersEffect.of({
-              pos: block.from,
-              on: !areCodeLineNumbersOn(view.state, block.from, language)
-            })
-          })
+          const numbered = !areCodeLineNumbersOn(view.state, block.from, language)
+          view.dispatch({ effects: setCodeLineNumbersEffect.of({ pos: block.from, on: numbered }) })
+          storeCodeLineNumbers(view, block.from, numbered)
+        }
+        event.preventDefault()
+        return true
+      }
+
+      // The bin of a code block: the block goes, with the line it stood on
+      const remove = target.closest('.cm-live-code-delete')
+      if (remove) {
+        const block = view.state.readOnly ? null : findFencedCodeAt(view.state, view.posAtDOM(remove))
+        if (block) {
+          const doc = view.state.doc
+          const from = doc.lineAt(block.from).from
+          let to = doc.lineAt(block.to).to
+          if (to < doc.length) to++
+          else if (from > 0) {
+            view.dispatch({ changes: { from: from - 1, to }, selection: { anchor: from - 1 }, userEvent: 'delete', scrollIntoView: true })
+            view.focus()
+            event.preventDefault()
+            return true
+          }
+          view.dispatch({ changes: { from, to }, selection: { anchor: from }, userEvent: 'delete', scrollIntoView: true })
+          view.focus()
         }
         event.preventDefault()
         return true

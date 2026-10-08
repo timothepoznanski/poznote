@@ -46,6 +46,73 @@
         btn.setAttribute('aria-pressed', visible ? 'true' : 'false');
     }
 
+    // The preview of a Markdown note is redrawn from the source, which holds
+    // no such choice: it is kept in the browser instead, per note, a block
+    // being known by its rank among the note's code blocks. Same store as the
+    // live editor's (build/markdown-editor/src/live-preview.js), so the two
+    // views of a note agree.
+    var MARKDOWN_LINE_NUMBERS_KEY = 'markdown_code_line_numbers';
+
+    function readStoredMarkdownLineNumbers() {
+        try {
+            var storage = window.__poznoteUserStorage || window.localStorage;
+            var parsed = JSON.parse(storage.getItem(MARKDOWN_LINE_NUMBERS_KEY) || '{}');
+            return parsed && typeof parsed === 'object' ? parsed : {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function markdownPreviewBlocks(preview) {
+        return Array.prototype.filter.call(preview.querySelectorAll('pre'), function (pre) {
+            return !!pre.querySelector('code');
+        });
+    }
+
+    function markdownPreviewNoteId(preview) {
+        var entry = preview.closest ? preview.closest('.noteentry') : null;
+        var id = entry ? (entry.getAttribute('data-note-id') || String(entry.id || '').replace(/^entry/, '')) : '';
+        return /^\d+$/.test(id) ? id : '';
+    }
+
+    function storeMarkdownPreviewLineNumbers(pre, visible) {
+        var preview = pre.closest ? pre.closest('.markdown-preview') : null;
+        if (!preview) return;
+        var noteId = markdownPreviewNoteId(preview);
+        var rank = markdownPreviewBlocks(preview).indexOf(pre);
+        if (!noteId || rank === -1) return;
+        try {
+            var all = readStoredMarkdownLineNumbers();
+            var note = all[noteId] && typeof all[noteId] === 'object' ? all[noteId] : {};
+            note[rank] = visible ? 1 : 0;
+            delete all[noteId];
+            all[noteId] = note;
+            var ids = Object.keys(all);
+            ids.slice(0, Math.max(0, ids.length - 300)).forEach(function (id) { delete all[id]; });
+            (window.__poznoteUserStorage || window.localStorage).setItem(MARKDOWN_LINE_NUMBERS_KEY, JSON.stringify(all));
+        } catch (e) {
+            // (private mode, full storage: the choice lasts until the next redraw)
+        }
+    }
+
+    // Called before the gutters are drawn (js/syntax-highlight.js)
+    window.restoreMarkdownPreviewLineNumbers = function (container) {
+        var root = (container && container.querySelectorAll) ? container : document;
+        var previews = Array.prototype.slice.call(root.querySelectorAll('.markdown-preview'));
+        if (root.classList && root.classList.contains('markdown-preview')) previews.push(root);
+        if (!previews.length && root.closest && root.closest('.markdown-preview')) previews.push(root.closest('.markdown-preview'));
+        if (!previews.length) return;
+        var all = readStoredMarkdownLineNumbers();
+        previews.forEach(function (preview) {
+            var note = all[markdownPreviewNoteId(preview)];
+            if (!note || typeof note !== 'object') return;
+            markdownPreviewBlocks(preview).forEach(function (pre, rank) {
+                if (note[rank] === undefined || pre.hasAttribute('data-line-numbers')) return;
+                pre.setAttribute('data-line-numbers', note[rank] ? '1' : '0');
+            });
+        });
+    };
+
     /**
      * Write the per-block override and redraw the gutter. The attribute is
      * always written explicitly (never removed) so the choice survives a
@@ -57,6 +124,7 @@
 
         var next = !areLineNumbersVisible(pre);
         pre.setAttribute('data-line-numbers', next ? '1' : '0');
+        storeMarkdownPreviewLineNumbers(pre, next);
 
         var noteentry = pre.closest ? pre.closest('.noteentry') : null;
 
@@ -76,6 +144,7 @@
 
     // The Markdown editor's live rendering draws the same toggle on its code
     // blocks (build/markdown-editor/src/live-preview.js)
+    window.poznoteCodeBlockDeleteIcon = DELETE_ICON_SVG;
     window.poznoteCodeBlockLineNumberIcons = {
         on: LINE_NUMBERS_ICON_SVG,
         off: LINE_NUMBERS_OFF_ICON_SVG
