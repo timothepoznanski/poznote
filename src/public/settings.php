@@ -1654,6 +1654,24 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                     </div>
                 </div>
 
+                <!-- Local scheduled backups (instance-wide configuration) -->
+                <div class="home-card settings-card-clickable" id="local-backup-card" data-href="local_backup_settings.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.local_backup', [], 'Save complete backup archives into a folder of the server, manually or on a schedule, and keep only the most recent ones.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-hard-drive"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.local_backup', [], 'Local Backups'); ?></span>
+                        <?php
+                        require_once __DIR__ . '/../LocalBackupService.php';
+                        $localBackupEnabledCard = LocalBackupService::getConfig()['auto_enabled'];
+                        ?>
+                        <span class="setting-status <?php echo $localBackupEnabledCard ? 'enabled' : 'disabled'; ?>">
+                            <?php echo $localBackupEnabledCard ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
+                        </span>
+                    </div>
+                </div>
+
                 <!-- Script and executable attachments (instance-wide) -->
                 <div class="home-card" id="executable-attachments-card">
                     <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.allow_executable_attachments', [], 'Allow scripts and executables (.sh, .ps1, .bat, .exe, .py, ...) to be attached to notes, for every account on this instance. Poznote never runs them, it only stores and serves them. File types a web server could execute, such as .php, stay blocked.'); ?>"><i class="lucide lucide-help-circle"></i></span>

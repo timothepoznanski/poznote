@@ -517,7 +517,8 @@
       "workspace_activity_emails": "Receba um e-mail quando outra pessoa alterar uma nota em um espaço de trabalho que você compartilha ou em um compartilhado com você. Ele lista as notas criadas, editadas e excluídas, nunca o conteúdo delas, e é enviado para o endereço de e-mail do seu perfil. Conforme as alterações: alguns minutos após a última alteração. Resumo diário: às 8:00. Resumo semanal: na segunda-feira às 8:00, no seu fuso horário.",
       "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails.",
       "custom_fonts": "Envie arquivos de fonte para oferecê-los a todos os usuários nas listas de fonte do aplicativo e do editor Markdown.",
-      "structured_export": "Exporte suas notas como arquivos, organizados em pastas como no Poznote."
+      "structured_export": "Exporte suas notas como arquivos, organizados em pastas como no Poznote.",
+      "local_backup": "Salve arquivos de backup completos em uma pasta do servidor, manualmente ou conforme um agendamento, mantendo apenas os mais recentes."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -632,7 +633,8 @@
       "api_rest": "API REST",
       "custom_fonts": "Fontes personalizadas",
       "restore_direct_copy": "Restauração por cópia direta",
-      "import_notes": "Importar notas"
+      "import_notes": "Importar notas",
+      "local_backup": "Backups locais"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -3957,7 +3959,8 @@
     "destinations": {
       "download": "transferência",
       "s3": "S3",
-      "server": "servidor"
+      "server": "servidor",
+      "local": "pasta local"
     },
     "sources": {
       "upload": "carregamento",
@@ -5002,6 +5005,31 @@
     "users_badge_inactive": "Inativo",
     "users_count": "{{selected}} de {{total}} utilizador(es) selecionado(s)",
     "users_count_filtered": "{{selected}} de {{total}} utilizador(es) selecionado(s), {{shown}} apresentado(s)"
+  },
+  "local_backup": {
+    "title": "Backups locais",
+    "description": "Salve arquivos de backup completos (um ZIP por usuário, idêntico ao download do backup completo) em uma pasta do servidor, manualmente ou automaticamente conforme um agendamento.",
+    "description_scope": "A configuração se aplica a todos os usuários desta instância.",
+    "enable_description": "Faz o backup dos usuários selecionados na pasta conforme o agendamento abaixo. Os backups manuais desta página funcionam mesmo com esta opção desativada.",
+    "directory_label": "Pasta de backup",
+    "directory_description": "Caminho absoluto no servidor (dentro do contêiner com Docker). Deixe vazio para usar {{default}}. Para guardar os backups em outro lugar, monte um volume e informe o caminho aqui.",
+    "retention_description": "Os arquivos mais antigos são excluídos da pasta após cada backup. 0 mantém tudo.",
+    "manual_description": "Faz o backup dos usuários selecionados na pasta agora mesmo, um usuário por vez.",
+    "confirm_run": "Fazer agora o backup dos usuários selecionados na pasta de backup?",
+    "run_done": "Backup concluído: backup feito de {{saved}}/{{total}} usuário(s).",
+    "user_ok": "{{username}}: salvo ({{size}})",
+    "last_run": "Última execução ({{trigger}}): {{date}}, backup feito de {{saved}}/{{total}} usuário(s).",
+    "next_run": "Próximo backup automático: {{date}}.",
+    "list_title": "Backups na pasta",
+    "list_empty": "Ainda não há nenhum backup na pasta.",
+    "list_error": "Não foi possível listar os backups: {{error}}",
+    "confirm_delete": "Excluir o backup {{filename}} da pasta?",
+    "footer_note": "Os arquivos são armazenados sob {id do usuário}/ na pasta de backup e podem ser restaurados com a página padrão «Restaurar / Importar».",
+    "messages": {
+      "not_absolute": "A pasta de backup deve ser um caminho absoluto, por exemplo /backups.",
+      "inside_app": "A pasta de backup não pode ficar dentro da aplicação, exceto em data/backups.",
+      "not_writable": "A pasta de backup não pode ser criada ou o servidor web não tem permissão de escrita nela: {{path}}"
+    }
   },
   "tasklist_embed": {
     "unavailable": "Esta lista de tarefas não está mais disponível.",

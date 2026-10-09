@@ -432,6 +432,17 @@ function poznoteCssManifest(): array
             '@theme',
             '@icon-sidebar',
         ],
+        'local_backup_settings' => [
+            'css/lucide.css',
+            '@components',
+            '@home',
+            'css/settings.css',
+            'css/git-sync.css',
+            'css/modal-alerts.css',
+            '@settings-shell',
+            '@theme',
+            '@icon-sidebar',
+        ],
         's3_settings' => [
             'css/lucide.css',
             '@components',

@@ -516,7 +516,8 @@
       "workspace_activity_emails": "当其他人更改了您共享的工作区或与您共享的工作区中的笔记时，接收邮件通知。邮件会列出新建、修改和删除的笔记，但不包含笔记内容，并发送到您个人资料中的邮箱地址。有更改时：在最后一次更改后几分钟发送。每日摘要：8:00 发送。每周摘要：每周一 8:00 发送，以您的时区为准。",
       "workspace_activity_emails_no_address": "请在个人资料中添加邮箱地址以接收这些邮件。",
       "custom_fonts": "上传字体文件，让所有用户都能在“应用字体”和“Markdown 编辑器字体”列表中选用。",
-      "structured_export": "将笔记导出为文件，并按 Poznote 中的文件夹结构整理。"
+      "structured_export": "将笔记导出为文件，并按 Poznote 中的文件夹结构整理。",
+      "local_backup": "将完整备份归档保存到服务器上的文件夹，可手动或按计划执行，并且只保留最新的几份。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -631,7 +632,8 @@
       "api_rest": "REST API",
       "custom_fonts": "自定义字体",
       "restore_direct_copy": "通过直接复制恢复",
-      "import_notes": "导入笔记"
+      "import_notes": "导入笔记",
+      "local_backup": "本地备份"
     },
     "default_credentials": {
       "both": "此账户仍在使用默认的用户名和密码。任何能访问此实例的人都可以登录。",
@@ -4053,7 +4055,8 @@
     "destinations": {
       "download": "下载",
       "s3": "S3",
-      "server": "服务器"
+      "server": "服务器",
+      "local": "本地文件夹"
     },
     "sources": {
       "upload": "上传",
@@ -5098,6 +5101,31 @@
     "users_badge_inactive": "已停用",
     "users_count": "已选择 {{selected}}/{{total}} 位用户",
     "users_count_filtered": "已选择 {{selected}}/{{total}} 位用户，显示 {{shown}} 位"
+  },
+  "local_backup": {
+    "title": "本地备份",
+    "description": "将完整备份归档（每位用户一个 ZIP，与“完整备份”下载的内容相同）保存到服务器上的文件夹，可手动执行或按计划自动执行。",
+    "description_scope": "此设置适用于本实例的所有用户。",
+    "enable_description": "按下方计划将所选用户备份到该文件夹。即使此开关关闭，也可以在本页面手动备份。",
+    "directory_label": "备份文件夹",
+    "directory_description": "服务器上的绝对路径（使用 Docker 时为容器内的路径）。留空则使用 {{default}}。如需将备份存放到其他位置，请挂载一个卷并在此填写其路径。",
+    "retention_description": "每次备份后，较旧的归档会从文件夹中删除。0 表示全部保留。",
+    "manual_description": "立即将所选用户备份到该文件夹，每次一位用户。",
+    "confirm_run": "现在将所选用户备份到备份文件夹吗？",
+    "run_done": "备份完成：已备份 {{saved}}/{{total}} 位用户。",
+    "user_ok": "{{username}}：已保存（{{size}}）",
+    "last_run": "上次运行（{{trigger}}）：{{date}}，已备份 {{saved}}/{{total}} 位用户。",
+    "next_run": "下次自动备份：{{date}}。",
+    "list_title": "文件夹中的备份",
+    "list_empty": "文件夹中还没有备份。",
+    "list_error": "无法列出备份：{{error}}",
+    "confirm_delete": "从文件夹中删除备份 {{filename}} 吗？",
+    "footer_note": "归档存放在备份文件夹的 {用户 ID}/ 下，可通过标准的“恢复 / 导入”页面恢复。",
+    "messages": {
+      "not_absolute": "备份文件夹必须是绝对路径，例如 /backups。",
+      "inside_app": "备份文件夹不能位于应用程序目录内，data/backups 除外。",
+      "not_writable": "无法创建备份文件夹，或 Web 服务器对其没有写入权限：{{path}}"
+    }
   },
   "tasklist_embed": {
     "unavailable": "此任务列表已不可用。",
