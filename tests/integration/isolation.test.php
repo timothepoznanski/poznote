@@ -235,6 +235,8 @@ function routeTable(): array
         // --- System ------------------------------------------------------
         'GET /system/version' => [SCOPED],
         'GET /system/updates' => [SCOPED],
+        'GET /system/whats-new' => [SCOPED],
+        'POST /system/whats-new/seen' => [SCOPED],
         'GET /system/i18n' => [SCOPED],
 
         // --- Git sync ----------------------------------------------------

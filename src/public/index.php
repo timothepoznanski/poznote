@@ -571,9 +571,19 @@ $note_list_order_by = $allowed_sorts[$note_list_sort_type];
 $body_classes = trim($extra_body_classes);
 // Per-user CSS variables that cannot live in a stylesheet
 $body_inline_style = trim($folder_tree_dim_style . $markdown_colored_style);
+// "What's new" popup (js/whats-new.js): asked for only when this user's last
+// seen version is not the installed one, the API then decides what to show
+$whats_new_pending = getSetting('whats_new_seen_version', '') !== getAppVersion();
+// Preview for whoever works on the popup: with an empty file named
+// whats_new_preview in the data directory, it opens at every load with the
+// notes of the installed version, and nothing is recorded as seen. A version
+// number written in the file shows everything released after that version.
+$whats_new_preview_file = __DIR__ . '/../data/whats_new_preview';
+$whats_new_preview = is_file($whats_new_preview_file);
+$whats_new_preview_since = $whats_new_preview ? trim((string)@file_get_contents($whats_new_preview_file)) : '';
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-new-note-mode="<?php echo htmlspecialchars($markdown_new_note_view_mode, ENT_QUOTES); ?>" data-markdown-live-editing="<?php echo $markdown_live_editing ? '1' : '0'; ?>" data-markdown-live-syntax="<?php echo $markdown_live_show_syntax ? '1' : '0'; ?>" data-spellcheck="<?php echo $spellcheck_notes ? '1' : '0'; ?>" data-spellcheck-lang="<?php echo htmlspecialchars(getUserLanguage(), ENT_QUOTES); ?>">
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-new-note-mode="<?php echo htmlspecialchars($markdown_new_note_view_mode, ENT_QUOTES); ?>" data-markdown-live-editing="<?php echo $markdown_live_editing ? '1' : '0'; ?>" data-markdown-live-syntax="<?php echo $markdown_live_show_syntax ? '1' : '0'; ?>" data-spellcheck="<?php echo $spellcheck_notes ? '1' : '0'; ?>" data-spellcheck-lang="<?php echo htmlspecialchars(getUserLanguage(), ENT_QUOTES); ?>"<?php echo $whats_new_preview ? ' data-whats-new="preview" data-whats-new-since="' . htmlspecialchars($whats_new_preview_since, ENT_QUOTES) . '"' : ($whats_new_pending ? ' data-whats-new="1"' : ''); ?>>
     <script>
     (function () {
         try {

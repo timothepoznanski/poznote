@@ -103,6 +103,7 @@
             'notes_without_folders_after_folders',
             'folder_icon_opens_kanban',
             'sidebar_offline_marks',
+            'whats_new_popup',
             'markdown_split_card_view',
             'markdown_split_preview_left',
             'markdown_heading_underline',
@@ -2985,6 +2986,7 @@
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('folder-icon-kanban-card', 'folder-icon-kanban-status', 'folder_icon_opens_kanban', false, false);
         setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false, true);
+        setupToggleCard('whats-new-card', 'whats-new-status', 'whats_new_popup', false, true);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);
         setupToggleCard('markdown-split-preview-left-card', 'markdown-split-preview-left-status', 'markdown_split_preview_left', false, false);
         setupToggleCard('markdown-heading-underline-card', 'markdown-heading-underline-status', 'markdown_heading_underline', false, true);

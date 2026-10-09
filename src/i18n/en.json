@@ -196,7 +196,8 @@
       "workspace_activity_emails_no_address": "Add an email address to your profile to receive these emails.",
       "custom_fonts": "Upload font files to offer them to every user in the App font and Markdown editor font lists.",
       "structured_export": "Export your notes as files, organized in folders like in Poznote.",
-      "local_backup": "Save complete backup archives into a folder of the server, manually or on a schedule, and keep only the most recent ones."
+      "local_backup": "Save complete backup archives into a folder of the server, manually or on a schedule, and keep only the most recent ones.",
+      "whats_new": "After an update, show the release notes of the new version once when you open your notes."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -292,7 +293,8 @@
       "custom_fonts": "Custom fonts",
       "restore_direct_copy": "Restore by direct copy",
       "import_notes": "Import notes",
-      "local_backup": "Local Backups"
+      "local_backup": "Local Backups",
+      "whats_new": "What's new after updates"
     },
     "default_credentials": {
       "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
@@ -5266,5 +5268,18 @@
   },
   "share_errors": {
     "public_folder_create_error": "Failed to create public folder link: {{error}}"
+  },
+  "whats_new": {
+    "title": "What's new in Poznote",
+    "subtitle": "Poznote was updated to version {{version}}.",
+    "community": "Questions or ideas? Join the community on Discord",
+    "more": "Earlier releases not shown here: {{count}}. See all release notes",
+    "star": "Star on GitHub",
+    "donate": "Support Poznote",
+    "never": "Do not show this after updates",
+    "save_note": "Save as note",
+    "saved": "Saved in your notes",
+    "note_title": "What's new in Poznote {{version}}",
+    "versions": "Versions"
   }
 }

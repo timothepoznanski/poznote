@@ -894,6 +894,15 @@ $router->get('/system/updates', function($params) use ($systemController) {
     echo json_encode($systemController->checkUpdates());
 });
 
+// Release notes this user has not seen yet (popup after an update)
+$router->get('/system/whats-new', function($params) use ($systemController) {
+    echo json_encode($systemController->whatsNew());
+});
+
+$router->post('/system/whats-new/seen', function($params) use ($systemController) {
+    echo json_encode($systemController->whatsNewSeen());
+});
+
 // Get translations
 $router->get('/system/i18n', function($params) use ($systemController) {
     echo json_encode($systemController->i18n());

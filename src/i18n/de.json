@@ -518,7 +518,8 @@
       "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten.",
       "custom_fonts": "Laden Sie Schriftdateien hoch, um sie allen Benutzern in den Listen App-Schriftart und Markdown-Editor-Schriftart anzubieten.",
       "structured_export": "Exportieren Sie Ihre Notizen als Dateien, in Ordnern wie in Poznote organisiert.",
-      "local_backup": "Speichern Sie vollständige Sicherungsarchive in einem Ordner des Servers, manuell oder nach Zeitplan, und behalten Sie nur die neuesten."
+      "local_backup": "Speichern Sie vollständige Sicherungsarchive in einem Ordner des Servers, manuell oder nach Zeitplan, und behalten Sie nur die neuesten.",
+      "whats_new": "Nach einem Update die Versionshinweise der neuen Version einmal beim Öffnen deiner Notizen anzeigen."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -634,7 +635,8 @@
       "custom_fonts": "Benutzerdefinierte Schriftarten",
       "restore_direct_copy": "Wiederherstellung per Direktkopie",
       "import_notes": "Notizen importieren",
-      "local_backup": "Lokale Sicherungen"
+      "local_backup": "Lokale Sicherungen",
+      "whats_new": "Neuigkeiten nach Updates"
     },
     "default_credentials": {
       "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
@@ -5421,5 +5423,18 @@
     "zoom_out": "Verkleinern",
     "fit": "An Bildschirm anpassen",
     "actual_size": "Originalgröße"
+  },
+  "whats_new": {
+    "title": "Neu in Poznote",
+    "subtitle": "Poznote wurde auf Version {{version}} aktualisiert.",
+    "community": "Fragen oder Ideen? Tritt der Community auf Discord bei",
+    "more": "Hier nicht angezeigte frühere Versionen: {{count}}. Alle Versionshinweise ansehen",
+    "star": "Stern auf GitHub vergeben",
+    "donate": "Poznote unterstützen",
+    "never": "Nach Updates nicht mehr anzeigen",
+    "save_note": "Als Notiz speichern",
+    "saved": "In deinen Notizen gespeichert",
+    "note_title": "Neu in Poznote {{version}}",
+    "versions": "Versionen"
   }
 }
