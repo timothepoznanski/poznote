@@ -245,6 +245,16 @@
     color: var(--pz-accent-text-hover);
 }
 
+/* Touch: a long press on a tag opens its menu (js/clickable-tags.js). It must
+   not also select the tag's text and bring up the browser's copy bar. */
+@media (hover: none) {
+    .clickable-tag-wrapper {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+    }
+}
+
 /* Color dot for tags that have a color set (see js/clickable-tags.js).
    Mirrors .tag-color-dot in css/list_tags.css, which the notes page does not load. */
 .clickable-tag .tag-color-dot {

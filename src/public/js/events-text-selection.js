@@ -7,6 +7,10 @@
 function initTextSelectionHandlers() {
     var selectionTimeout;
     var wasMobileKeyboardOpen = false;
+    var lastMobileKeyboardViewportHeight = 0;
+    var pendingMobileCaretRevealTimer = null;
+    // Room kept under the caret once it is brought above the keyboard
+    var MOBILE_CARET_REVEAL_MARGIN = 24;
     var pendingKeyboardCloseBlurTimer = null;
     var plainCodeBlockedButtonClasses = ['btn-link', 'btn-text-height', 'btn-inline-code', 'btn-code'];
 
@@ -434,7 +438,78 @@ function initTextSelectionHandlers() {
         if (wasMobileKeyboardOpen && !isKeyboardOpen && isMobileFormattingViewport()) {
             scheduleMobileEditorBlurOnKeyboardClose();
         }
+        // The keyboard takes the bottom of the screen, where the caret may be
+        if (isKeyboardOpen && (!wasMobileKeyboardOpen || viewportHeight < lastMobileKeyboardViewportHeight)) {
+            scheduleMobileCaretReveal();
+        }
+        lastMobileKeyboardViewportHeight = isKeyboardOpen ? viewportHeight : 0;
         wasMobileKeyboardOpen = isKeyboardOpen;
+    }
+
+    /**
+     * Where the caret of the note being edited is drawn, or null. A collapsed
+     * range on an empty line has no rectangle of its own: its element is used.
+     */
+    function getMobileCaretRect() {
+        var selection = window.getSelection ? window.getSelection() : null;
+        if (!selection || !selection.rangeCount) return null;
+
+        var node = selection.focusNode;
+        var element = node && node.nodeType === 1 ? node : (node ? node.parentElement : null);
+        if (!element || !element.closest || !element.closest('.noteentry')) return null;
+
+        var range = selection.getRangeAt(0).cloneRange();
+        range.collapse(selection.focusNode === range.startContainer && selection.focusOffset === range.startOffset);
+        var rects = range.getClientRects();
+        var rect = rects.length ? rects[rects.length - 1] : null;
+        if (!rect || (!rect.height && !rect.width)) {
+            var child = node.nodeType === 1 ? node.childNodes[selection.focusOffset] : null;
+            rect = (child && child.nodeType === 1 ? child : element).getBoundingClientRect();
+        }
+        return { rect: rect, element: element };
+    }
+
+    /**
+     * Scroll the note so the caret shows above the keyboard. The browser brings
+     * the caret into view as the keyboard opens, but #right_pane only shrinks to
+     * the visual viewport afterwards (css/index-mobile.css), which leaves a
+     * caret placed low on the screen under the keyboard and the editor bar.
+     */
+    function revealMobileCaretAboveKeyboard() {
+        if (!document.body.classList.contains('mobile-keyboard-open')) return;
+
+        var caret = getMobileCaretRect();
+        if (!caret) return;
+
+        var scroller = caret.element;
+        while (scroller && scroller !== document.body) {
+            var overflowY = window.getComputedStyle(scroller).overflowY;
+            if ((overflowY === 'auto' || overflowY === 'scroll') && scroller.scrollHeight > scroller.clientHeight) break;
+            scroller = scroller.parentElement;
+        }
+        if (!scroller || scroller === document.body) return;
+
+        var visualViewport = window.visualViewport;
+        var visibleBottom = scroller.getBoundingClientRect().bottom;
+        if (visualViewport) {
+            visibleBottom = Math.min(visibleBottom, visualViewport.offsetTop + visualViewport.height);
+        }
+
+        var overflow = caret.rect.bottom + MOBILE_CARET_REVEAL_MARGIN - visibleBottom;
+        if (overflow > 0) {
+            scroller.scrollTop += overflow;
+        }
+    }
+
+    function scheduleMobileCaretReveal() {
+        if (pendingMobileCaretRevealTimer) {
+            clearTimeout(pendingMobileCaretRevealTimer);
+        }
+        // Once the keyboard has settled and the editor bar has taken its place
+        pendingMobileCaretRevealTimer = setTimeout(function () {
+            pendingMobileCaretRevealTimer = null;
+            revealMobileCaretAboveKeyboard();
+        }, 150);
     }
 
     function syncMobileNoteHeaderMetrics() {

@@ -694,6 +694,9 @@ function findEnclosingFencedCode(state, from, to) {
 
 function toggleFencedCodeBlock(view) {
   const fence = '```'
+  // Tagged "code" like the slash menu's "Code block": a bare fence is the
+  // plain block, which the line numbers setting leaves out
+  const openFence = fence + 'code'
   view.dispatch(view.state.changeByRange(range => {
     const doc = view.state.doc
     const selected = doc.sliceString(range.from, range.to)
@@ -732,7 +735,7 @@ function toggleFencedCodeBlock(view) {
     // instead of cutting it in two at the caret
     const caretLine = doc.lineAt(range.from)
     if (range.empty && caretLine.text.trim()) {
-      const opening = '\n\n' + fence + '\n'
+      const opening = '\n\n' + openFence + '\n'
       return {
         changes: { from: caretLine.to, insert: opening + '\n' + fence },
         range: EditorSelection.cursor(caretLine.to + opening.length)
@@ -743,14 +746,14 @@ function toggleFencedCodeBlock(view) {
     // selection does not already start/end at a line boundary
     const startLine = doc.lineAt(range.from)
     const endLine = doc.lineAt(range.to)
-    const prefix = (range.from === startLine.from ? '' : '\n') + fence + '\n'
+    const prefix = (range.from === startLine.from ? '' : '\n') + openFence + '\n'
     const suffix = '\n' + fence + (range.to === endLine.to ? '' : '\n')
     const insert = prefix + selected + suffix
+    // The caret ends after the wrapped text: left selected, the next key
+    // (Enter on a phone) replaced it
     return {
       changes: { from: range.from, to: range.to, insert },
-      range: range.empty
-        ? EditorSelection.cursor(range.from + prefix.length)
-        : EditorSelectionRange(range.from + prefix.length, range.from + prefix.length + selected.length)
+      range: EditorSelection.cursor(range.from + prefix.length + selected.length)
     }
   }))
   return true

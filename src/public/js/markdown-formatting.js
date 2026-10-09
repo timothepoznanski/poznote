@@ -679,7 +679,9 @@
         var context = getCurrentMarkdownEditContext();
         var editor = context.editor;
         var offsets = context.offsets;
-        var prefix = '\n```\n';
+        // Tagged "code" like the slash menu's "Code block": a bare fence is
+        // the plain block, which the line numbers setting leaves out
+        var prefix = '\n```code\n';
         var suffix = '\n```\n';
 
         if (!editor || !offsets) {
