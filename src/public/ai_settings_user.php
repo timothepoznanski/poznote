@@ -103,7 +103,7 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
-    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('ai_settings_user.title', [], 'My AI Assistant')]); ?>
+    <?php poznoteSettingsShellOpen(['section' => 'settings-integrations-section-grid', 'title' => t('ai_settings_user.title', [], 'My AI Assistant')]); ?>
     <div class="home-container git-sync-container">
 
         <div class="git-sync-header">

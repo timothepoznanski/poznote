@@ -515,7 +515,8 @@
       "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle.",
       "workspace_activity_emails": "Recevez un email quand quelqu'un d'autre modifie une note dans un espace de travail que vous partagez, ou dans un espace partagé avec vous. Il liste les notes créées, modifiées et supprimées, jamais leur contenu, et il est envoyé à l'adresse email de votre profil. Au fil des modifications : quelques minutes après la dernière modification. Résumé quotidien : à 8 h. Résumé hebdomadaire : le lundi à 8 h, dans votre fuseau horaire.",
       "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails.",
-      "custom_fonts": "Importez des fichiers de police pour les proposer à tous les utilisateurs dans les listes Police de l'application et Police de l'éditeur Markdown."
+      "custom_fonts": "Importez des fichiers de police pour les proposer à tous les utilisateurs dans les listes Police de l'application et Police de l'éditeur Markdown.",
+      "structured_export": "Exportez vos notes sous forme de fichiers, rangés dans des dossiers comme dans Poznote."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -529,7 +530,11 @@
       "pinned": "Épinglés",
       "account": "Mon compte",
       "workspaces": "Espaces de travail",
-      "actions": "Actions",
+      "backup_restore": "Sauvegarde et restauration",
+      "export_import": "Export et import",
+      "sync_history": "Synchronisation et historique",
+      "integrations": "Intégrations",
+      "apps": "Applications",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
       "ui_customization": "Visibilité des éléments",
@@ -549,14 +554,16 @@
       "storage_limits": "Stockage et limites",
       "appearance": "Apparence",
       "maintenance": "Maintenance",
-      "backup_sync": "Sauvegardes et synchronisation",
       "editing": "Édition",
-      "apps": "Applications",
       "profile_sign_in": "Profil et connexion",
       "language_region": "Langue et région",
       "storage": "Stockage",
       "layout": "Mise en page",
-      "preferences": "Préférences"
+      "preferences": "Préférences",
+      "backup": "Sauvegarde",
+      "export": "Export",
+      "restore": "Restauration",
+      "import": "Import"
     },
     "sections": {
       "account_display": "Compte & Affichage",
@@ -622,7 +629,9 @@
       "s3_backup": "Sauvegardes S3",
       "stt": "Transcription",
       "api_rest": "API REST",
-      "custom_fonts": "Polices personnalisées"
+      "custom_fonts": "Polices personnalisées",
+      "restore_direct_copy": "Restauration par copie directe",
+      "import_notes": "Importer des notes"
     },
     "default_credentials": {
       "both": "Ce compte utilise encore le login et le mot de passe livrés par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",

@@ -516,7 +516,8 @@
       "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt.",
       "workspace_activity_emails": "Erhalten Sie eine E-Mail, wenn jemand anderes eine Notiz in einem Arbeitsbereich ändert, den Sie teilen oder der mit Ihnen geteilt wird. Sie listet die erstellten, bearbeiteten und gelöschten Notizen auf, nie deren Inhalt, und geht an die E-Mail-Adresse Ihres Profils. Bei Änderungen: einige Minuten nach der letzten Änderung. Tägliche Zusammenfassung: um 8:00 Uhr. Wöchentliche Zusammenfassung: montags um 8:00 Uhr, in Ihrer Zeitzone.",
       "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten.",
-      "custom_fonts": "Laden Sie Schriftdateien hoch, um sie allen Benutzern in den Listen App-Schriftart und Markdown-Editor-Schriftart anzubieten."
+      "custom_fonts": "Laden Sie Schriftdateien hoch, um sie allen Benutzern in den Listen App-Schriftart und Markdown-Editor-Schriftart anzubieten.",
+      "structured_export": "Exportieren Sie Ihre Notizen als Dateien, in Ordnern wie in Poznote organisiert."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -530,7 +531,11 @@
       "pinned": "Angepinnt",
       "account": "Mein Konto",
       "workspaces": "Arbeitsbereiche",
-      "actions": "Aktionen",
+      "backup_restore": "Sicherung und Wiederherstellung",
+      "export_import": "Export und Import",
+      "sync_history": "Synchronisierung und Verlauf",
+      "integrations": "Integrationen",
+      "apps": "Apps",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
       "ui_customization": "Sichtbarkeit von Elementen",
@@ -550,14 +555,16 @@
       "storage_limits": "Speicher und Limits",
       "appearance": "Erscheinungsbild",
       "maintenance": "Wartung",
-      "backup_sync": "Sicherungen und Synchronisierung",
       "editing": "Bearbeitung",
-      "apps": "Apps",
       "profile_sign_in": "Profil und Anmeldung",
       "language_region": "Sprache und Region",
       "storage": "Speicher",
       "layout": "Layout",
-      "preferences": "Präferenzen"
+      "preferences": "Präferenzen",
+      "backup": "Sicherung",
+      "export": "Export",
+      "restore": "Wiederherstellung",
+      "import": "Import"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -623,7 +630,9 @@
       "s3_backup": "S3-Sicherungen",
       "stt": "Transkription",
       "api_rest": "REST-API",
-      "custom_fonts": "Benutzerdefinierte Schriftarten"
+      "custom_fonts": "Benutzerdefinierte Schriftarten",
+      "restore_direct_copy": "Wiederherstellung per Direktkopie",
+      "import_notes": "Notizen importieren"
     },
     "default_credentials": {
       "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",

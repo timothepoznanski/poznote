@@ -438,7 +438,7 @@ if ($canUseUserWebhooks) {
 
         <!-- MY ACCOUNT CATEGORY: identity and access for the signed-in
              user (profile, password, API credentials, storage, deletion).
-             Kept apart from Actions, which holds app-wide tools. -->
+             Kept apart from the sections below, which hold app-wide tools. -->
         <h2 class="settings-category-title" id="settings-account-section-title"><?php echo t_h('settings.categories.account', [], 'My Account'); ?></h2>
         <div class="home-grid settings-grouped" id="settings-account-section-grid">
 
@@ -641,190 +641,302 @@ if ($canUseUserWebhooks) {
             </div>
         </div>
 
-        <!-- ACTIONS CATEGORY: what leaves the notes or reaches them from
-             outside (backups, sync, integrations, apps). Snapshots and
-             Offline notes came from the former "Other" section: both decide
-             which copies of the notes are kept, and where. -->
-        <h2 class="settings-category-title" id="settings-actions-section-title"><?php echo t_h('settings.categories.actions'); ?></h2>
-        <div class="home-grid settings-grouped" id="settings-actions-section-grid">
+        <!-- The cards of the two sections below each open one part of
+             backup_export.php or restore_import.php (?part=), which then
+             shows that part alone. With Sync & history, Integrations and
+             Apps, they are the sections the former "Actions" section was
+             split into. -->
+<?php
+require_once __DIR__ . '/../S3BackupService.php';
+$s3BackupCardVisible = S3BackupService::isEnabled()
+    && (isCurrentUserAdmin() || !in_array('user_s3_backups', TENANT_ISOLATION_FEATURES, true))
+    && !poznoteIsUiElementHidden('card:s3-user-backup-section');
+$s3RestoreCardVisible = S3BackupService::isEnabled()
+    && (isCurrentUserAdmin() || !in_array('user_s3_restore', TENANT_ISOLATION_FEATURES, true))
+    && !poznoteIsUiElementHidden('card:s3RestoreSection');
+?>
 
-            <div class="settings-group-title"><?php echo t_h('settings.groups.backup_sync', [], 'Backups & sync'); ?></div>
+        <!-- BACKUP & RESTORE CATEGORY: the whole account, out and back in -->
+        <h2 class="settings-category-title" id="settings-backup-restore-section-title"><?php echo t_h('settings.categories.backup_restore', [], 'Backup & restore'); ?></h2>
+        <div class="home-grid settings-grouped" id="settings-backup-restore-section-grid">
+
+            <div class="settings-group-title"><?php echo t_h('settings.groups.backup', [], 'Backup'); ?></div>
             <div class="settings-group">
 
-                <!-- Backup / Export -->
-                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="backup-export-card" title="<?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?>">
+                <!-- Complete backup -->
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=backup" class="home-card" id="backup-export-card" title="<?php echo t_h('backup_export.sections.complete_backup.title', [], 'Complete Backup'); ?>">
                     <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backup_export', [], 'Download your notes, attachments and database as a backup.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
                         <i class="lucide lucide-upload"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('backup_export.sections.complete_backup.title', [], 'Complete Backup'); ?></span>
                     </div>
                 </a>
 
-                <!-- Restore / Import -->
-                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>" class="home-card" id="restore-import-card" title="<?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?>">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.restore_import', [], 'Restore a backup or import notes into this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <?php if ($s3BackupCardVisible): ?>
+                <!-- S3 backups of the own account: same rule as the part of the page it opens -->
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=s3" class="home-card" id="s3-backup-card" title="<?php echo t_h('backup_export.sections.s3_backup.title', [], 'S3 Backups'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('backup_export.sections.s3_backup.description', [], 'Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-cloud"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('backup_export.sections.s3_backup.title', [], 'S3 Backups'); ?></span>
+                    </div>
+                </a>
+                <?php endif; ?>
+            </div>
+
+            <!-- The question that headed this part of restore_import.php
+                 tells Restore and Import apart; same under Import below -->
+            <div class="settings-group-title"><?php echo t_h('settings.groups.restore', [], 'Restore'); ?><span class="settings-group-hint"><?php echo t_h('restore_import.sections.restore_from_backup.title', [], 'Do you want to restore from a Poznote ZIP backup file?'); ?></span></div>
+            <div class="settings-group">
+
+                <!-- Standard restore, from an uploaded backup -->
+                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=restore-standard" class="home-card" id="restore-import-card" title="<?php echo t_h('restore_import.sections.standard_restore.title', [], 'Standard Restore'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('restore_import.sections.restore_from_backup.description', [], 'Restore your Poznote database from a complete backup'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
                         <i class="lucide lucide-download"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('restore_import.sections.standard_restore.title', [], 'Standard Restore'); ?></span>
                     </div>
                 </a>
 
-                <!-- Git Sync (available to all users) -->
-                <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync', [], 'Back up your notes to a Git repository and view the synchronization history.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <?php if (!poznoteIsUiElementHidden('card:directCopyRestoreCard')): ?>
+                <!-- Restore from an archive copied onto the server -->
+                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=restore-direct-copy" class="home-card" id="restore-direct-copy-card" title="<?php echo t_h('settings.cards.restore_direct_copy', [], 'Restore by direct copy'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('restore_import.sections.direct_copy_restore.title', [], 'Restore by direct copy (if you have SSH access to the server)'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
-                        <?php
-                        require_once __DIR__ . '/../GitSync.php';
-                        $gitSyncSettings = new GitSync($con ?? null, $_SESSION['user_id'] ?? null);
-                        $settingsGitProvider = $gitSyncSettings->getProvider();
-                        $gitSyncIsConfigured = $gitSyncSettings->isConfigured();
-                        $gitSyncIsEnabled = GitSync::isEnabled();
-                        ?>
-                        <i class="<?php echo ($settingsGitProvider === 'forgejo') ? 'lucide lucide-git-branch' : (($settingsGitProvider === 'gitlab') ? 'lucide lucide-gitlab' : 'lucide lucide-github'); ?>"></i>
+                        <i class="lucide lucide-terminal"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
-                        <span id="git-sync-status-badge" class="setting-status <?php echo (!$gitSyncIsEnabled) ? 'disabled' : ($gitSyncIsConfigured ? 'enabled' : 'disabled'); ?>">
-                            <?php
-                            if (!$gitSyncIsEnabled) {
-                                echo t_h('common.disabled', [], 'Disabled');
-                            } elseif ($gitSyncIsConfigured) {
-                                echo t_h('git_sync.config.token_set', [], 'Configured');
-                            } else {
-                                echo t_h('git_sync.config.not_configured', [], 'Not configured');
-                            }
-                            ?>
-                        </span>
+                        <span class="home-card-title"><?php echo t_h('settings.cards.restore_direct_copy', [], 'Restore by direct copy'); ?></span>
                     </div>
-                </div>
-
-                <!-- Snapshots -->
-                <div class="home-card" id="snapshots-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.snapshots', [], 'Choose for how many days one automatic revision per day is kept, and how many safety revisions (taken before an AI or MCP change) are kept per note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon"><i class="lucide lucide-history"></i></div>
-                    <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('display.cards.snapshots', [], 'Revisions'); ?></span>
-                        <span id="snapshots-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                    </div>
-                </div>
-
-                <!-- Offline notes: kept in the browser by js/offline-sync.js -->
-                <div class="home-card" id="offline-notes-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('offline.settings.help', [], 'Keep the notes you modified recently in your browser, to open and edit them without a network.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon"><i class="lucide lucide-wifi-off"></i></div>
-                    <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></span>
-                        <span id="offline-notes-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="settings-group-title"><?php echo t_h('settings.groups.integrations', [], 'Integrations'); ?></div>
-            <div class="settings-group">
-
-                <!-- User Webhooks (per account; tenant isolation can block non-admins) -->
-                <?php if ($canUseUserWebhooks): ?>
-                <div class="home-card settings-card-clickable" id="user-webhooks-card" data-href="user-webhooks.php">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('webhooks_user.card_help', [], 'Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon">
-                        <i class="lucide lucide-webhook"></i>
-                    </div>
-                    <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span>
-                        <span class="setting-status <?php echo $active_user_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
-                            <?php echo $active_user_webhooks_count > 0 ? $active_user_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
-                        </span>
-                    </div>
-                </div>
+                </a>
                 <?php endif; ?>
 
-                <!-- My AI Assistant (personal provider and API key) -->
-                <div class="home-card settings-card-clickable" id="ai-assistant-user-card" data-href="ai_settings_user.php">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('ai_settings_user.card_help', [], 'Use the AI assistant with your own provider and API key.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <?php if ($s3RestoreCardVisible): ?>
+                <!-- Restore from the S3 backups of the own account: same rule as the part it opens -->
+                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=restore-s3" class="home-card" id="restore-s3-card" title="<?php echo t_h('restore_import.sections.s3_restore.title', [], 'Restore from S3'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('restore_import.sections.s3_restore.description', [], 'Restore your account directly from one of the backup archives stored in the S3 bucket of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
-                        <i class="lucide lucide-bot"></i>
+                        <i class="lucide lucide-cloud"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('ai_settings_user.card', [], 'My AI Assistant'); ?></span>
-                        <?php
-                        require_once __DIR__ . '/../ai_config.php';
-                        $aiUserKeysAllowedCard = poznoteAiUserKeysAllowed();
-                        $aiUserConfigCard = poznoteAiUserConfig($con);
-                        $aiUserHasConfigCard = $aiUserConfigCard['url'] !== '' && $aiUserConfigCard['model'] !== '';
-                        $aiUserActiveCard = $aiUserKeysAllowedCard && poznoteAiConfigUsable($aiUserConfigCard);
-                        ?>
-                        <span class="setting-status <?php echo $aiUserActiveCard ? 'enabled' : 'disabled'; ?>">
-                            <?php
-                            if ($aiUserActiveCard) {
-                                echo t_h('common.enabled', [], 'Enabled');
-                            } elseif ($aiUserKeysAllowedCard && !$aiUserHasConfigCard) {
-                                echo t_h('git_sync.config.not_configured', [], 'Not configured');
-                            } else {
-                                echo t_h('common.disabled', [], 'Disabled');
-                            }
-                            ?>
-                        </span>
+                        <span class="home-card-title"><?php echo t_h('restore_import.sections.s3_restore.title', [], 'Restore from S3'); ?></span>
                     </div>
-                </div>
-
-                <!-- My transcription server (personal speech-to-text server) -->
-                <div class="home-card settings-card-clickable" id="stt-user-card" data-href="stt_settings_user.php">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('stt_settings_user.card_help', [], 'Send your dictation to your own speech-to-text server.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon">
-                        <i class="lucide lucide-mic"></i>
-                    </div>
-                    <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span>
-                        <?php
-                        require_once __DIR__ . '/../stt_config.php';
-                        $sttUserKeysAllowedCard = poznoteSttUserKeysAllowed();
-                        $sttUserConfigCard = poznoteSttUserConfig($con);
-                        $sttUserHasConfigCard = $sttUserConfigCard['url'] !== '' && $sttUserConfigCard['model'] !== '';
-                        $sttUserActiveCard = $sttUserKeysAllowedCard && poznoteSttConfigUsable($sttUserConfigCard);
-                        ?>
-                        <span class="setting-status <?php echo $sttUserActiveCard ? 'enabled' : 'disabled'; ?>">
-                            <?php
-                            if ($sttUserActiveCard) {
-                                echo t_h('common.enabled', [], 'Enabled');
-                            } elseif ($sttUserKeysAllowedCard && !$sttUserHasConfigCard) {
-                                echo t_h('git_sync.config.not_configured', [], 'Not configured');
-                            } else {
-                                echo t_h('common.disabled', [], 'Disabled');
-                            }
-                            ?>
-                        </span>
-                    </div>
-                </div>
+                </a>
+                <?php endif; ?>
             </div>
+        </div>
 
-            <div class="settings-group-title"><?php echo t_h('settings.groups.apps', [], 'Apps'); ?></div>
+        <!-- EXPORT & IMPORT CATEGORY: notes and attachments as plain files -->
+        <h2 class="settings-category-title" id="settings-export-import-section-title"><?php echo t_h('settings.categories.export_import', [], 'Export & import'); ?></h2>
+        <div class="home-grid settings-grouped" id="settings-export-import-section-grid">
+
+            <div class="settings-group-title"><?php echo t_h('settings.groups.export', [], 'Export'); ?></div>
             <div class="settings-group">
 
-                <!-- Browser Extension -->
-                <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <!-- Structured export -->
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=structured-export" class="home-card" id="structured-export-card" title="<?php echo t_h('backup_export.sections.structured_export.title', [], 'Structured Export'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.structured_export', [], 'Export your notes as files, organized in folders like in Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
-                        <i class="lucide lucide-chrome"></i>
+                        <i class="lucide lucide-folder-tree"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('backup_export.sections.structured_export.title', [], 'Structured Export'); ?></span>
                     </div>
                 </a>
 
-                <!-- Install App -->
-                <div class="home-card" id="install-app-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.install_app', [], 'Install Poznote as an application on your device (PWA).'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <!-- Attachments export -->
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=attachments-export" class="home-card" id="attachments-export-card" title="<?php echo t_h('backup_export.sections.attachments_export.title', [], 'Attachments Export'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('backup_export.sections.attachments_export.description', [], 'Download all the attachments of your account in a single ZIP archive.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
-                        <i class="lucide lucide-smartphone"></i>
+                        <i class="lucide lucide-paperclip"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span>
-                        <span id="install-app-status" class="setting-status disabled"><?php echo t_h('settings.install_app.status.unavailable', [], 'Unavailable'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('backup_export.sections.attachments_export.title', [], 'Attachments Export'); ?></span>
                     </div>
+                </a>
+            </div>
+
+            <div class="settings-group-title"><?php echo t_h('settings.groups.import', [], 'Import'); ?><span class="settings-group-hint"><?php echo t_h('restore_import.sections.individual_notes.title', [], 'Do you want to import HTML, Markdown, text files or ZIP archives?'); ?></span></div>
+            <div class="settings-group">
+
+                <!-- Import of individual notes -->
+                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=import" class="home-card" id="import-notes-card" title="<?php echo t_h('settings.cards.import_notes', [], 'Import notes'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('restore_import.sections.individual_notes.description', [], 'Import individual notes (HTML, Markdown or ZIP) to a specific workspace and folder'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-file-plus"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.import_notes', [], 'Import notes'); ?></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- SYNC & HISTORY CATEGORY: the copies kept along the way, with no
+             file to download (Git, revisions, the browser's offline copy). -->
+        <h2 class="settings-category-title" id="settings-sync-history-section-title"><?php echo t_h('settings.categories.sync_history', [], 'Sync & history'); ?></h2>
+        <div class="home-grid" id="settings-sync-history-section-grid">
+
+            <!-- Git Sync (available to all users) -->
+            <div class="home-card settings-card-clickable" id="git-sync-card" data-href="git_sync.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.git_sync', [], 'Back up your notes to a Git repository and view the synchronization history.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <?php
+                    require_once __DIR__ . '/../GitSync.php';
+                    $gitSyncSettings = new GitSync($con ?? null, $_SESSION['user_id'] ?? null);
+                    $settingsGitProvider = $gitSyncSettings->getProvider();
+                    $gitSyncIsConfigured = $gitSyncSettings->isConfigured();
+                    $gitSyncIsEnabled = GitSync::isEnabled();
+                    ?>
+                    <i class="<?php echo ($settingsGitProvider === 'forgejo') ? 'lucide lucide-git-branch' : (($settingsGitProvider === 'gitlab') ? 'lucide lucide-gitlab' : 'lucide lucide-github'); ?>"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span>
+                    <span id="git-sync-status-badge" class="setting-status <?php echo (!$gitSyncIsEnabled) ? 'disabled' : ($gitSyncIsConfigured ? 'enabled' : 'disabled'); ?>">
+                        <?php
+                        if (!$gitSyncIsEnabled) {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        } elseif ($gitSyncIsConfigured) {
+                            echo t_h('git_sync.config.token_set', [], 'Configured');
+                        } else {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        }
+                        ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Snapshots -->
+            <div class="home-card" id="snapshots-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.snapshots', [], 'Choose for how many days one automatic revision per day is kept, and how many safety revisions (taken before an AI or MCP change) are kept per note.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-history"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.snapshots', [], 'Revisions'); ?></span>
+                    <span id="snapshots-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+
+            <!-- Offline notes: kept in the browser by js/offline-sync.js -->
+            <div class="home-card" id="offline-notes-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('offline.settings.help', [], 'Keep the notes you modified recently in your browser, to open and edit them without a network.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-wifi-off"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></span>
+                    <span id="offline-notes-badge" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- INTEGRATIONS CATEGORY: the outside services this account talks
+             to (webhooks, AI provider, transcription server). -->
+        <h2 class="settings-category-title" id="settings-integrations-section-title"><?php echo t_h('settings.categories.integrations', [], 'Integrations'); ?></h2>
+        <div class="home-grid" id="settings-integrations-section-grid">
+
+            <!-- User Webhooks (per account; tenant isolation can block non-admins) -->
+            <?php if ($canUseUserWebhooks): ?>
+            <div class="home-card settings-card-clickable" id="user-webhooks-card" data-href="user-webhooks.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('webhooks_user.card_help', [], 'Send events about your own notes (reminder triggered, note created or shared) to external services such as ntfy or n8n via webhooks.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-webhook"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('webhooks_user.card', [], 'User Webhooks'); ?></span>
+                    <span class="setting-status <?php echo $active_user_webhooks_count > 0 ? 'enabled' : 'disabled'; ?>">
+                        <?php echo $active_user_webhooks_count > 0 ? $active_user_webhooks_count : t_h('webhooks_admin.status.none', [], 'None'); ?>
+                    </span>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- My AI Assistant (personal provider and API key) -->
+            <div class="home-card settings-card-clickable" id="ai-assistant-user-card" data-href="ai_settings_user.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('ai_settings_user.card_help', [], 'Use the AI assistant with your own provider and API key.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-bot"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('ai_settings_user.card', [], 'My AI Assistant'); ?></span>
+                    <?php
+                    require_once __DIR__ . '/../ai_config.php';
+                    $aiUserKeysAllowedCard = poznoteAiUserKeysAllowed();
+                    $aiUserConfigCard = poznoteAiUserConfig($con);
+                    $aiUserHasConfigCard = $aiUserConfigCard['url'] !== '' && $aiUserConfigCard['model'] !== '';
+                    $aiUserActiveCard = $aiUserKeysAllowedCard && poznoteAiConfigUsable($aiUserConfigCard);
+                    ?>
+                    <span class="setting-status <?php echo $aiUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                        <?php
+                        if ($aiUserActiveCard) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif ($aiUserKeysAllowedCard && !$aiUserHasConfigCard) {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        } else {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        }
+                        ?>
+                    </span>
+                </div>
+            </div>
+
+            <!-- My transcription server (personal speech-to-text server) -->
+            <div class="home-card settings-card-clickable" id="stt-user-card" data-href="stt_settings_user.php">
+                <span class="setting-help" data-tooltip="<?php echo t_h('stt_settings_user.card_help', [], 'Send your dictation to your own speech-to-text server.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-mic"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span>
+                    <?php
+                    require_once __DIR__ . '/../stt_config.php';
+                    $sttUserKeysAllowedCard = poznoteSttUserKeysAllowed();
+                    $sttUserConfigCard = poznoteSttUserConfig($con);
+                    $sttUserHasConfigCard = $sttUserConfigCard['url'] !== '' && $sttUserConfigCard['model'] !== '';
+                    $sttUserActiveCard = $sttUserKeysAllowedCard && poznoteSttConfigUsable($sttUserConfigCard);
+                    ?>
+                    <span class="setting-status <?php echo $sttUserActiveCard ? 'enabled' : 'disabled'; ?>">
+                        <?php
+                        if ($sttUserActiveCard) {
+                            echo t_h('common.enabled', [], 'Enabled');
+                        } elseif ($sttUserKeysAllowedCard && !$sttUserHasConfigCard) {
+                            echo t_h('git_sync.config.not_configured', [], 'Not configured');
+                        } else {
+                            echo t_h('common.disabled', [], 'Disabled');
+                        }
+                        ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- APPS CATEGORY: Poznote outside the browser tab (extension, PWA). -->
+        <h2 class="settings-category-title" id="settings-apps-section-title"><?php echo t_h('settings.categories.apps', [], 'Apps'); ?></h2>
+        <div class="home-grid" id="settings-apps-section-grid">
+
+            <!-- Browser Extension -->
+            <a href="https://chromewebstore.google.com/detail/poznote-url-saver/bmjclfamahegmgillaghhmnbkjebipbh" target="_blank" rel="noopener noreferrer" class="home-card" id="extension-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.extension', [], 'Install the browser extension to save web pages into Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-chrome"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span>
+                </div>
+            </a>
+
+            <!-- Install App -->
+            <div class="home-card" id="install-app-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.install_app', [], 'Install Poznote as an application on your device (PWA).'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon">
+                    <i class="lucide lucide-smartphone"></i>
+                </div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span>
+                    <span id="install-app-status" class="setting-status disabled"><?php echo t_h('settings.install_app.status.unavailable', [], 'Unavailable'); ?></span>
                 </div>
             </div>
         </div>

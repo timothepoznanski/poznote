@@ -26,6 +26,30 @@ $s3BackupSectionVisible = S3BackupService::isEnabled()
     && (isCurrentUserAdmin() || !in_array('user_s3_backups', TENANT_ISOLATION_FEATURES, true))
     && !poznoteIsUiElementHidden('card:s3-user-backup-section');
 
+// ?part= shows one part of the page alone, under its own title: the cards of
+// Settings > Backup & restore and Export & import each open one. Without it the page shows them all.
+$backupExportParts = [
+    'backup' => ['id' => 'complete-backup-section', 'title' => t('backup_export.sections.complete_backup.title', [], 'Complete Backup')],
+    'structured-export' => ['id' => 'structured-export-section', 'title' => t('backup_export.sections.structured_export.title', [], 'Structured Export')],
+    'attachments-export' => ['id' => 'attachments-export-section', 'title' => t('backup_export.sections.attachments_export.title', [], 'Attachments Export')],
+];
+if ($s3BackupSectionVisible) {
+    $backupExportParts['s3'] = ['id' => 's3-user-backup-section', 'title' => t('backup_export.sections.s3_backup.title', [], 'S3 Backups')];
+}
+$backupExportPart = (string)($_GET['part'] ?? '');
+if (!isset($backupExportParts[$backupExportPart])) {
+    $backupExportPart = '';
+}
+// The exports belong to Export & import, the rest to Backup & restore
+$backupExportSection = in_array($backupExportPart, ['structured-export', 'attachments-export'], true)
+    ? 'settings-export-import-section-grid'
+    : 'settings-backup-restore-section-grid';
+$backupExportTitle = $backupExportPart !== '' ? $backupExportParts[$backupExportPart]['title'] : t('settings.cards.backup_export', [], 'Backup / Export');
+// The hidden attribute of the parts left out
+$backupPartHidden = function (string $id) use ($backupExportParts, $backupExportPart): string {
+    return ($backupExportPart !== '' && $backupExportParts[$backupExportPart]['id'] !== $id) ? ' hidden' : '';
+};
+
 $message = '';
 $error = '';
 
@@ -127,11 +151,11 @@ function createBackup() {
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
-    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('settings.cards.backup_export', [], 'Backup / Export')]); ?>
-    <div class="backup-container">
+    <?php poznoteSettingsShellOpen(['section' => $backupExportSection, 'title' => $backupExportTitle]); ?>
+    <div class="backup-container<?php echo $backupExportPart !== '' ? ' backup-part-view' : ''; ?>">
 
         <!-- Complete Backup Section -->
-        <div class="backup-section" id="complete-backup-section">
+        <div class="backup-section" id="complete-backup-section"<?php echo $backupPartHidden('complete-backup-section'); ?>>
             <h3><?php echo t_h('backup_export.sections.complete_backup.title'); ?></h3>
             <?php if (!empty($message)): ?>
                 <div class="alert alert-success">
@@ -222,7 +246,7 @@ function createBackup() {
         </div>
         
         <!-- Structured Export Section -->
-        <div class="backup-section" id="structured-export-section">
+        <div class="backup-section" id="structured-export-section"<?php echo $backupPartHidden('structured-export-section'); ?>>
             <h3><?php echo t_h('backup_export.sections.structured_export.title'); ?></h3>
             <p>
                 <?php echo t_h('backup_export.sections.structured_export.description'); ?>
@@ -254,7 +278,7 @@ function createBackup() {
         </div>
 
         <!-- Attachments Export Section -->
-        <div class="backup-section" id="attachments-export-section">
+        <div class="backup-section" id="attachments-export-section"<?php echo $backupPartHidden('attachments-export-section'); ?>>
             <h3><?php echo t_h('backup_export.sections.attachments_export.title', [], 'Attachments Export'); ?></h3>
             <p>
                 <?php echo t_h('backup_export.sections.attachments_export.description', [], 'Download all the attachments of your account in a single ZIP archive.'); ?>
@@ -270,7 +294,7 @@ function createBackup() {
 
         <?php if ($s3BackupSectionVisible): ?>
         <!-- S3 Backups Section (own account) -->
-        <div class="backup-section" id="s3-user-backup-section">
+        <div class="backup-section" id="s3-user-backup-section"<?php echo $backupPartHidden('s3-user-backup-section'); ?>>
             <h3><?php echo t_h('backup_export.sections.s3_backup.title', [], 'S3 Backups'); ?></h3>
             <p><?php echo t_h('backup_export.sections.s3_backup.description', [], 'Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.'); ?></p>
             <p id="s3SelfBackupPolicy" class="s3-self-policy" hidden></p>

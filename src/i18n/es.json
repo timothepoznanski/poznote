@@ -516,7 +516,8 @@
       "format_toolbar_mode": "En un ordenador, elija dónde aparecen los botones de formato al seleccionar texto en una nota: en la barra de herramientas de la nota, en lugar de las acciones de la nota, o en un menú flotante sobre la selección, que deja la barra de herramientas de la nota tal como está.",
       "workspace_activity_emails": "Recibe un correo cuando otra persona cambia una nota en un espacio de trabajo que compartes o en uno compartido contigo. Enumera las notas creadas, editadas y eliminadas, nunca su contenido, y se envía a la dirección de correo de tu perfil. A medida que hay cambios: unos minutos después del último cambio. Resumen diario: a las 8:00. Resumen semanal: el lunes a las 8:00, en tu zona horaria.",
       "workspace_activity_emails_no_address": "Añade una dirección de correo a tu perfil para recibir estos correos.",
-      "custom_fonts": "Sube archivos de fuente para ofrecerlos a todos los usuarios en las listas Fuente de la aplicación y Fuente del editor Markdown."
+      "custom_fonts": "Sube archivos de fuente para ofrecerlos a todos los usuarios en las listas Fuente de la aplicación y Fuente del editor Markdown.",
+      "structured_export": "Exporta tus notas como archivos, organizados en carpetas como en Poznote."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -530,7 +531,11 @@
       "pinned": "Fijados",
       "account": "Mi cuenta",
       "workspaces": "Espacios de trabajo",
-      "actions": "Acciones",
+      "backup_restore": "Copia de seguridad y restauración",
+      "export_import": "Exportación e importación",
+      "sync_history": "Sincronización e historial",
+      "integrations": "Integraciones",
+      "apps": "Aplicaciones",
       "admin_tools": "Herramientas de administración",
       "display": "Pantalla",
       "ui_customization": "Visibilidad de los elementos",
@@ -550,14 +555,16 @@
       "storage_limits": "Almacenamiento y límites",
       "appearance": "Apariencia",
       "maintenance": "Mantenimiento",
-      "backup_sync": "Copias de seguridad y sincronización",
       "editing": "Edición",
-      "apps": "Aplicaciones",
       "profile_sign_in": "Perfil e inicio de sesión",
       "language_region": "Idioma y región",
       "storage": "Almacenamiento",
       "layout": "Diseño",
-      "preferences": "Preferencias"
+      "preferences": "Preferencias",
+      "backup": "Copia de seguridad",
+      "export": "Exportación",
+      "restore": "Restauración",
+      "import": "Importación"
     },
     "sections": {
       "account_display": "Cuenta y Visualización",
@@ -623,7 +630,9 @@
       "s3_backup": "Copias de seguridad S3",
       "stt": "Transcripción",
       "api_rest": "API REST",
-      "custom_fonts": "Fuentes personalizadas"
+      "custom_fonts": "Fuentes personalizadas",
+      "restore_direct_copy": "Restauración por copia directa",
+      "import_notes": "Importar notas"
     },
     "default_credentials": {
       "both": "Esta cuenta sigue usando el nombre de usuario y la contraseña predeterminados. Cualquiera que pueda acceder a esta instancia puede iniciar sesión.",

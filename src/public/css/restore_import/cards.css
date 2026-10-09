@@ -15,7 +15,9 @@
     overflow: hidden;
 }
 
-.card-container:hover {
+/* Not in a part view (?part=): the card is the page there, with nothing to
+   open, so it does not react to the pointer */
+.backup-container:not(.backup-part-view) .card-container:hover {
     box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.12);
     border-color: var(--pz-accent);
     transform: translateY(-2px);
@@ -152,3 +154,35 @@
     margin-top: 12px;
 }
 
+
+/* One half shown alone (?part=), already open: the frame's title names it,
+   and its header would only fold it */
+.backup-part-view .card-container > .card-header {
+    display: none;
+}
+
+/* One restore sub-card shown alone (?part=restore-*): same for its header,
+   and it drops its own ground and frame, the card around it being enough */
+.backup-subpart-view .sub-card > .sub-card-header {
+    display: none;
+}
+
+.backup-subpart-view .sub-card {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    /* With no padding left, a full-width field would be cut at the edge */
+    overflow: visible;
+}
+
+.backup-subpart-view .sub-card-content.open {
+    overflow: visible;
+}
+
+.backup-subpart-view .sub-card-content.open {
+    padding: 0;
+}
+
+.backup-subpart-view .sub-card-content > *:first-child {
+    margin-top: 0;
+}

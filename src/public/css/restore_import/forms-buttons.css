@@ -18,6 +18,8 @@
 
 .form-group input[type="file"] {
     width: 100%;
+    /* Padding and border inside the 100%, or the field sticks out on the right */
+    box-sizing: border-box;
     padding: 8px;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-sm);
