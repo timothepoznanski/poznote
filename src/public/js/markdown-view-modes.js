@@ -570,6 +570,8 @@ function initializeMarkdownNote(noteId) {
     noteEntry.appendChild(editorContainer);
     noteEntry.appendChild(previewDiv);
     noteEntry.contentEditable = false;
+    // The source the server wrote is gone, the entry can show (note_display.php)
+    noteEntry.classList.remove('markdown-pending');
 
     initializeCodeMirrorMarkdownEditor(
         editorDiv,

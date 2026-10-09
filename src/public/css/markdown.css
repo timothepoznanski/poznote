@@ -7,6 +7,22 @@
     display: none !important;
 }
 
+/* A markdown note comes from the server as its source, which the scripts
+   replace with the preview and the editor (initializeMarkdownNote()). Kept out
+   of sight until then: the source showed for a moment as one block of
+   characters each time a note opened (issue #1498). The animation is the way
+   out if the scripts never get to it, the text then shows after all. */
+.noteentry.markdown-pending {
+    visibility: hidden;
+    animation: markdown-pending-reveal 0s linear 4s forwards;
+}
+
+@keyframes markdown-pending-reveal {
+    to {
+        visibility: visible;
+    }
+}
+
 /* The left padding is the note's text inset (css/notes/noteentry.css), so the
    first column of text stands under the title icon as it does in an HTML
    note. Outside a note (no .innernote) the panes keep their 10px. */
