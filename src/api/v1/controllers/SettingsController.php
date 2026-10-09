@@ -256,6 +256,11 @@ class SettingsController {
             return json_encode($colors);
         }
 
+        // "What's new" popup after an update (js/whats-new.js)
+        if ($key === 'whats_new_popup') {
+            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
+        }
+
         if ($key === 'attachment_previews_in_note') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }

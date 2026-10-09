@@ -100,6 +100,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/utils-note-create.js',
         'js/utils-folders.js',
         'js/utils-updates.js',
+        'js/whats-new.js',
         'js/utils-move-folder.js',
         'js/utils-folder-tree.js',
         'js/utils-move-note.js',

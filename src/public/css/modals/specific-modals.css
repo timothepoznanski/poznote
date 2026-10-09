@@ -1235,3 +1235,210 @@
     font-size: 12px;
     line-height: 1.4;
 }
+
+/* ============================================
+   What's new (#whatsNewModal), js/whats-new.js
+   ============================================ */
+
+#whatsNewModal .whats-new-content {
+    display: flex;
+    flex-direction: column;
+    max-width: 680px;
+    /* The blanket `.modal-content { margin: 5% auto 0 }` from responsive.css
+       would push a dialog this tall below the viewport */
+    margin: 0 auto;
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
+    padding: 24px;
+}
+
+#whatsNewModal .whats-new-header h3 {
+    margin: 0 0 6px;
+    font-size: 20px;
+    color: var(--pz-text);
+}
+
+#whatsNewModal .whats-new-subtitle {
+    margin: 0 0 10px;
+    font-size: 14px;
+    color: var(--pz-text-secondary);
+}
+
+#whatsNewModal .whats-new-community,
+#whatsNewModal .whats-new-links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--pz-accent-text);
+    text-decoration: none;
+}
+
+#whatsNewModal .whats-new-community:hover span,
+#whatsNewModal .whats-new-links a:hover span {
+    text-decoration: underline;
+}
+
+#whatsNewModal .whats-new-versions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 6px;
+    margin-top: 12px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+#whatsNewModal .whats-new-versions[hidden] {
+    display: none;
+}
+
+#whatsNewModal .whats-new-version {
+    flex: 0 0 auto;
+    padding: 4px 10px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+    background-color: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--pz-text-secondary);
+    cursor: pointer;
+}
+
+#whatsNewModal .whats-new-version.is-current {
+    border-color: var(--pz-accent);
+    color: var(--pz-accent-text);
+}
+
+#whatsNewModal .whats-new-versions + .whats-new-body {
+    margin-top: 10px;
+}
+
+#whatsNewModal .whats-new-body {
+    flex: 1 1 auto;
+    min-height: 120px;
+    overflow-y: auto;
+    margin: 14px 0;
+    padding: 4px 16px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background-color: var(--pz-surface);
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--pz-text);
+    text-align: left;
+}
+
+#whatsNewModal .whats-new-release + .whats-new-release {
+    margin-top: 18px;
+    padding-top: 6px;
+    border-top: 1px solid var(--pz-border);
+}
+
+#whatsNewModal .whats-new-release-title {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin: 14px 0 4px;
+}
+
+#whatsNewModal .whats-new-release-title a {
+    font-size: 17px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-accent-text);
+    text-decoration: none;
+}
+
+#whatsNewModal .whats-new-release-title a:hover {
+    text-decoration: underline;
+}
+
+#whatsNewModal .whats-new-release-date,
+#whatsNewModal .whats-new-more {
+    font-size: 12px;
+    color: var(--pz-text-muted);
+}
+
+#whatsNewModal .whats-new-more {
+    margin: 16px 0 0;
+}
+
+#whatsNewModal .whats-new-notes h2 {
+    margin: 16px 0 6px;
+    font-size: 15px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
+}
+
+#whatsNewModal .whats-new-notes h3,
+#whatsNewModal .whats-new-notes h4 {
+    margin: 12px 0 4px !important;
+    font-size: 14px;
+    font-weight: var(--pz-weight-semibold);
+    color: var(--pz-text);
+}
+
+#whatsNewModal .whats-new-notes p {
+    margin: 6px 0;
+}
+
+#whatsNewModal .whats-new-notes ul,
+#whatsNewModal .whats-new-notes ol {
+    margin: 6px 0;
+    padding-left: 22px;
+}
+
+#whatsNewModal .whats-new-notes li {
+    margin: 4px 0;
+}
+
+#whatsNewModal .whats-new-notes a {
+    color: var(--pz-accent-text);
+    overflow-wrap: anywhere;
+}
+
+#whatsNewModal .whats-new-notes img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-sm);
+}
+
+#whatsNewModal .whats-new-notes code {
+    padding: 1px 4px;
+    border-radius: var(--pz-radius-sm);
+    background-color: var(--pz-bg);
+    font-size: 13px;
+}
+
+#whatsNewModal .whats-new-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 20px;
+}
+
+#whatsNewModal .whats-new-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin-top: 14px;
+}
+
+#whatsNewModal .whats-new-never {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--pz-text-secondary);
+    cursor: pointer;
+}
+
+#whatsNewModal .whats-new-footer .modal-buttons {
+    margin: 0;
+    padding: 0;
+    border-top: none;
+}

@@ -5,11 +5,14 @@
  * Endpoints:
  *   GET  /api/v1/system/version       - Get current version info
  *   GET  /api/v1/system/updates       - Check for updates
+ *   GET  /api/v1/system/whats-new     - Release notes not seen yet by this user
+ *   POST /api/v1/system/whats-new/seen - Mark the installed version as seen
  *   GET  /api/v1/system/i18n          - Get translations
  *   GET  /api/v1/shared               - List shared notes
  */
 
 require_once dirname(__DIR__, 3) . '/share_passwords.php';
+require_once dirname(__DIR__, 3) . '/lib/whats-new.php';
 
 class SystemController {
     private $con;
@@ -62,6 +65,130 @@ class SystemController {
         return $result;
     }
     
+    private function currentVersion(): string {
+        $versionFile = __DIR__ . '/../../../version.txt';
+        return file_exists($versionFile) ? trim((string)file_get_contents($versionFile)) : '';
+    }
+
+    private function readUserSetting(string $key): string {
+        $stmt = $this->con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute([$key]);
+        $value = $stmt->fetchColumn();
+        return $value === false ? '' : (string)$value;
+    }
+
+    private function writeUserSetting(string $key, string $value): void {
+        $stmt = $this->con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        $stmt->execute([$key, $value]);
+    }
+
+    /**
+     * Someone working in an account they were given access to neither sees
+     * its owner's popup nor marks anything as seen in the owner's place.
+     */
+    private function whatsNewBelongsToCaller(): bool {
+        return !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
+    }
+
+    /**
+     * GET /api/v1/system/whats-new
+     * Release notes of the versions installed since this user last looked.
+     * ?force=1 returns the notes of the installed version whatever was seen,
+     * or with ?since=<version> everything released after that version.
+     */
+    public function whatsNew() {
+        $current = $this->currentVersion();
+        $result = [
+            'success' => true,
+            'show' => false,
+            'current_version' => $current,
+            'releases' => [],
+            'more' => 0,
+        ];
+        if ($current === '' || !$this->whatsNewBelongsToCaller()) {
+            return $result;
+        }
+
+        $force = !empty($_GET['force']);
+        $seen = $this->readUserSetting('whats_new_seen_version');
+
+        if (!$force) {
+            $enabled = !in_array($this->readUserSetting('whats_new_popup'), ['0', 'false'], true);
+            // Nothing to tell a new account, or an account that runs this
+            // feature for the first time, about the versions before it. With
+            // the popup off the version is still recorded, so that turning it
+            // back on does not replay everything installed in between.
+            if ($seen === '' || !$enabled || version_compare($seen, $current, '>=')) {
+                if ($seen !== $current) {
+                    $this->writeUserSetting('whats_new_seen_version', $current);
+                }
+                return $result;
+            }
+        }
+
+        $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+
+        // GitHub can take seconds to answer: do not hold the session lock,
+        // the page that asked has other requests waiting on it.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
+        $gaveUp = false;
+        $releases = poznoteWhatsNewLoadReleases($current, $gaveUp);
+        if ($releases === null) {
+            // No way to GitHub from this instance: the page stops asking
+            // for this version
+            if ($gaveUp && !$force) {
+                $this->writeUserSetting('whats_new_seen_version', $current);
+            }
+            $result['error'] = 'Release notes are not available (no network or GitHub unreachable)';
+            return $result;
+        }
+
+        $since = isset($_GET['since']) && is_string($_GET['since']) ? trim($_GET['since']) : '';
+        if ($force && preg_match('/^\d+(\.\d+){1,3}(-[a-z0-9.]+)?$/i', $since)) {
+            // As if the user had last seen version ?since=
+            $selection = poznoteWhatsNewSelectReleases($releases, $since, $current);
+        } elseif ($force) {
+            $selection = poznoteWhatsNewSelectReleases($releases, '', $current, 1);
+            $selection['more'] = 0;
+        } else {
+            $selection = poznoteWhatsNewSelectReleases($releases, $seen, $current);
+        }
+
+        require_once __DIR__ . '/../../../markdown_parser.php';
+        foreach ($selection['releases'] as $release) {
+            $markdown = poznoteWhatsNewImagesToMarkdown(poznoteWhatsNewCleanBody($release['body'], $isAdmin));
+            if ($markdown === '') {
+                continue;
+            }
+            $result['releases'][] = [
+                'version' => $release['version'],
+                'date' => $release['date'],
+                'url' => $release['url'],
+                'markdown' => $markdown,
+                'html' => parseMarkdown($markdown),
+            ];
+        }
+        $result['more'] = $selection['more'];
+        $result['show'] = !empty($result['releases']);
+
+        return $result;
+    }
+
+    /**
+     * POST /api/v1/system/whats-new/seen
+     * The popup was closed: the installed version is the last one seen.
+     */
+    public function whatsNewSeen() {
+        $current = $this->currentVersion();
+        if ($current !== '' && $this->whatsNewBelongsToCaller()) {
+            $this->writeUserSetting('whats_new_seen_version', $current);
+        }
+        return ['success' => true, 'seen_version' => $current];
+    }
+
     /**
      * GET /api/v1/system/updates
      */

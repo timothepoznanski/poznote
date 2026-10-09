@@ -4428,6 +4428,80 @@ paths:
                   remote_version:
                     type: string
 
+  /system/whats-new:
+    get:
+      tags: [System]
+      summary: Release notes not seen yet
+      description: >-
+        Release notes of the versions installed since the user last closed the
+        "What's new" popup, newest first. Administrators get the full notes,
+        other users get them without the "Fixed" section. Nothing is returned
+        for a new account, or when the user turned the popup off (setting
+        `whats_new_popup`).
+      parameters:
+        - name: force
+          in: query
+          schema:
+            type: integer
+            enum: [1]
+          description: Return the notes of the installed version whatever was already seen
+        - name: since
+          in: query
+          schema:
+            type: string
+            example: 6.110.0
+          description: With force, return everything released after this version instead
+      responses:
+        '200':
+          description: Release notes to show
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  show:
+                    type: boolean
+                  current_version:
+                    type: string
+                  more:
+                    type: integer
+                    description: Older unseen releases left out of the list
+                  releases:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                        date:
+                          type: string
+                          example: '2026-10-09'
+                        url:
+                          type: string
+                        markdown:
+                          type: string
+                        html:
+                          type: string
+
+  /system/whats-new/seen:
+    post:
+      tags: [System]
+      summary: Mark the installed version as seen
+      responses:
+        '200':
+          description: Version recorded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  seen_version:
+                    type: string
+
   /system/i18n:
     get:
       tags: [System]

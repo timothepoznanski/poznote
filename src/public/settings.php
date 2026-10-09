@@ -117,6 +117,7 @@ $settingsPageUserKeys = [
     'notes_without_folders_after_folders',
     'folder_icon_opens_kanban',
     'sidebar_offline_marks',
+    'whats_new_popup',
     'markdown_split_card_view',
     'markdown_split_preview_left',
     'markdown_heading_underline',
@@ -1837,6 +1838,16 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.version', [], 'Version'); ?></span>
                     <span class="setting-status enabled"><?php echo $app_version_display; ?></span>
+                </div>
+            </div>
+
+            <!-- "What's new" popup after an update (js/whats-new.js) -->
+            <div class="home-card" id="whats-new-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.whats_new', [], 'After an update, show the release notes of the new version once when you open your notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-star"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.whats_new', [], "What's new after updates"); ?></span>
+                    <span id="whats-new-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
 
