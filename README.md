@@ -77,6 +77,7 @@ https://discord.gg/fuEV6uqf4N
 - [AI Assistant](#ai-assistant)
 - [Transcription (speech to text)](#transcription-speech-to-text)
 - [MCP Server](#mcp-server)
+- [Applications](#applications)
 - [Chrome Extension](#chrome-extension)
 - [Share to Poznote on Android](#share-to-poznote-on-android)
 - [API Documentation](#api-documentation)
@@ -1362,6 +1363,17 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 - "Update note 42 with new information"
 
 The MCP server ships with the official `docker-compose.yml` and is published on `127.0.0.1` only, so nothing outside your machine can reach it by default. Setup, client configuration, port and debug overrides, and how to protect it with `POZNOTE_MCP_AUTH_TOKEN` when you expose it further are covered in the [MCP Server documentation](docs/MCP-SERVER.md).
+
+## Applications
+
+Poznote runs in any browser, and can also be installed from the browser as a web app (PWA): it then gets its own icon and its own window, like a native application.
+
+*   **Android and computer:** open your Poznote instance in Chrome or Edge and choose **Install** in the browser menu.
+*   **iPhone and iPad:** open your Poznote instance in Safari, tap **Share**, then **Add to Home Screen**.
+
+> Installing the web app requires Poznote to be served over HTTPS (`http://localhost` also works).
+
+The [Apps page](https://poznote.com/apps.html) of the website lists everything available: the web app, the Chrome extension and the mobile apps built by the community.
 
 ## Chrome Extension
 

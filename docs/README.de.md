@@ -77,6 +77,7 @@ https://discord.gg/fuEV6uqf4N
 - [KI-Assistent](#ki-assistent)
 - [Transkription (Sprache zu Text)](#transkription-sprache-zu-text)
 - [MCP-Server](#mcp-server)
+- [Apps](#apps)
 - [Chrome-Erweiterung](#chrome-erweiterung)
 - [Unter Android an Poznote teilen](#unter-android-an-poznote-teilen)
 - [API-Dokumentation](#api-dokumentation)
@@ -1362,6 +1363,17 @@ Poznote enthält einen Model-Context-Protocol-Server (MCP), über den KI-Assiste
 - „Aktualisiere Notiz 42 mit neuen Informationen“
 
 Der MCP-Server ist Teil der offiziellen `docker-compose.yml` und wird nur auf `127.0.0.1` veröffentlicht, sodass ihn standardmäßig nichts außerhalb Ihres Rechners erreichen kann. Einrichtung, Client-Konfiguration, Überschreibungen für Port und Debug sowie der Schutz mit `POZNOTE_MCP_AUTH_TOKEN`, wenn Sie ihn weiter freigeben, sind in der [Dokumentation zum MCP-Server](MCP-SERVER.de.md) beschrieben.
+
+## Apps
+
+Poznote läuft in jedem Browser und lässt sich außerdem aus dem Browser heraus als Web-App (PWA) installieren: Es erhält dann ein eigenes Symbol und ein eigenes Fenster, wie eine native Anwendung.
+
+*   **Android und Computer:** Öffnen Sie Ihre Poznote-Instanz in Chrome oder Edge und wählen Sie im Browsermenü **Installieren**.
+*   **iPhone und iPad:** Öffnen Sie Ihre Poznote-Instanz in Safari, tippen Sie auf **Teilen** und dann auf **Zum Home-Bildschirm**.
+
+> Für die Installation der Web-App muss Poznote über HTTPS ausgeliefert werden (`http://localhost` funktioniert ebenfalls).
+
+Die [Apps-Seite](https://poznote.com/apps.html) der Website führt alles Verfügbare auf: die Web-App, die Chrome-Erweiterung und die von der Community entwickelten mobilen Apps.
 
 ## Chrome-Erweiterung
 

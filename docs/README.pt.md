@@ -77,6 +77,7 @@ https://discord.gg/fuEV6uqf4N
 - [Assistente IA](#assistente-ia)
 - [Transcrição (fala para texto)](#transcrição-fala-para-texto)
 - [Servidor MCP](#servidor-mcp)
+- [Aplicativos](#aplicativos)
 - [Extensão do Chrome](#extensão-do-chrome)
 - [Compartilhar com o Poznote no Android](#compartilhar-com-o-poznote-no-android)
 - [Documentação da API](#documentação-da-api)
@@ -1362,6 +1363,17 @@ O Poznote inclui um servidor Model Context Protocol (MCP) que permite a assisten
 - "Atualize a nota 42 com novas informações"
 
 O servidor MCP vem com o `docker-compose.yml` oficial e é publicado apenas em `127.0.0.1`, então, por padrão, nada fora da sua máquina consegue acessá-lo. A instalação, a configuração dos clientes, as substituições de porta e de depuração, e como protegê-lo com `POZNOTE_MCP_AUTH_TOKEN` quando você o expõe mais estão descritos na [documentação do Servidor MCP](MCP-SERVER.pt.md).
+
+## Aplicativos
+
+O Poznote funciona em qualquer navegador e também pode ser instalado a partir do navegador como aplicativo web (PWA): ele passa a ter seu próprio ícone e sua própria janela, como um aplicativo nativo.
+
+*   **Android e computador:** abra sua instância do Poznote no Chrome ou no Edge e escolha **Instalar** no menu do navegador.
+*   **iPhone e iPad:** abra sua instância do Poznote no Safari, toque em **Compartilhar** e depois em **Adicionar à Tela de Início**.
+
+> Para instalar o aplicativo web, o Poznote precisa ser servido por HTTPS (`http://localhost` também funciona).
+
+A [página Aplicativos](https://poznote.com/apps.html) do site reúne tudo o que está disponível: o aplicativo web, a extensão do Chrome e os aplicativos móveis criados pela comunidade.
 
 ## Extensão do Chrome
 

@@ -77,6 +77,7 @@ https://discord.gg/fuEV6uqf4N
 - [AI 助手](#ai-助手)
 - [转录（语音转文字）](#转录语音转文字)
 - [MCP 服务器](#mcp-服务器)
+- [应用](#应用)
 - [Chrome 扩展](#chrome-扩展)
 - [在 Android 上分享到 Poznote](#在-android-上分享到-poznote)
 - [API 文档](#api-文档)
@@ -1362,6 +1363,17 @@ Poznote 包含一个 Model Context Protocol (MCP) 服务器，让 GitHub Copilot
 - “用新信息更新笔记 42”
 
 MCP 服务器随官方 `docker-compose.yml` 一起提供，并且只发布在 `127.0.0.1` 上，因此默认情况下，您机器之外的任何设备都无法访问它。安装、客户端配置、端口和调试的覆盖参数，以及在进一步暴露它时如何用 `POZNOTE_MCP_AUTH_TOKEN` 加以保护，请参阅 [MCP 服务器文档](MCP-SERVER.zh-cn.md)。
+
+## 应用
+
+Poznote 可在任何浏览器中运行，也可以从浏览器安装为 Web 应用（PWA）：安装后它拥有自己的图标和独立窗口，就像原生应用一样。
+
+*   **Android 和电脑：** 在 Chrome 或 Edge 中打开您的 Poznote 实例，然后在浏览器菜单中选择 **安装**。
+*   **iPhone 和 iPad：** 在 Safari 中打开您的 Poznote 实例，轻点 **分享**，然后选择 **添加到主屏幕**。
+
+> 安装 Web 应用要求 Poznote 通过 HTTPS 提供服务（`http://localhost` 也可以）。
+
+网站的[应用页面](https://poznote.com/apps.html)列出了所有可用的应用：Web 应用、Chrome 扩展以及社区开发的移动应用。
 
 ## Chrome 扩展
 

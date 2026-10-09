@@ -77,6 +77,7 @@ https://discord.gg/fuEV6uqf4N
 - [AI 어시스턴트](#ai-어시스턴트)
 - [음성 텍스트 변환](#음성-텍스트-변환)
 - [MCP 서버](#mcp-서버)
+- [앱](#앱)
 - [Chrome 확장 프로그램](#chrome-확장-프로그램)
 - [Android에서 Poznote로 공유](#android에서-poznote로-공유)
 - [API 문서](#api-문서)
@@ -1379,6 +1380,17 @@ Server: my-server.com
 - “42번 노트에 새 정보를 추가해줘.”
 
 공식 `docker-compose.yml`에 포함되며 `127.0.0.1`에만 공개되어 기본적으로 외부에서 접근할 수 없습니다. 설치, 클라이언트, 포트·디버그 설정, 접근 범위를 넓힐 때의 `POZNOTE_MCP_AUTH_TOKEN` 보호는 [MCP 서버 문서](MCP-SERVER.ko.md)를 참고하세요.
+
+## 앱
+
+Poznote는 모든 브라우저에서 동작하며, 브라우저에서 웹 앱(PWA)으로 설치할 수도 있습니다. 설치하면 네이티브 앱처럼 자체 아이콘과 창을 갖게 됩니다.
+
+*   **Android 및 컴퓨터:** Chrome 또는 Edge에서 Poznote 인스턴스를 열고 브라우저 메뉴에서 **설치**를 선택하세요.
+*   **iPhone 및 iPad:** Safari에서 Poznote 인스턴스를 열고 **공유**를 탭한 다음 **홈 화면에 추가**를 선택하세요.
+
+> 웹 앱을 설치하려면 Poznote가 HTTPS로 제공되어야 합니다(`http://localhost`도 가능).
+
+웹사이트의 [앱 페이지](https://poznote.com/apps.html)에서 웹 앱, Chrome 확장 프로그램, 커뮤니티가 만든 모바일 앱을 모두 확인할 수 있습니다.
 
 ## Chrome 확장 프로그램
 
