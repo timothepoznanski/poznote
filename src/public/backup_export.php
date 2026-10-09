@@ -746,6 +746,10 @@ function createBackup() {
         // Chevron on each section header collapses the content below it.
         // State is per user (same storage wrapper as the settings page) and
         // keyed by section so the layout survives a reload.
+        // A part shown alone (?part=) has its title hidden, so nothing could
+        // open it again: it stays open whatever was stored.
+        if (document.querySelector('.backup-part-view')) return;
+
         var store = window.__poznoteUserStorage || window.localStorage;
         var STORAGE_KEY = 'backupExportCollapsedSections';
 
