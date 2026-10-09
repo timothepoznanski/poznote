@@ -69,7 +69,6 @@ https://discord.gg/fuEV6uqf4N
 - [Webhooks](#webhooks)
 - [Git Synchronization](#git-synchronization)
 - [S3 Attachment Storage](#s3-attachment-storage)
-- [S3 Backups](#s3-backups)
 - [Backup / Export](#backup--export)
 - [Restore / Import](#restore--import)
 - [Offline](#offline)
@@ -77,6 +76,7 @@ https://discord.gg/fuEV6uqf4N
 - [AI Assistant](#ai-assistant)
 - [Transcription (speech to text)](#transcription-speech-to-text)
 - [MCP Server](#mcp-server)
+- [Applications](#applications)
 - [Chrome Extension](#chrome-extension)
 - [Share to Poznote on Android](#share-to-poznote-on-android)
 - [API Documentation](#api-documentation)
@@ -904,6 +904,7 @@ data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
 ├── fonts/                       # Custom fonts uploaded by an administrator
+├── backups/                     # Scheduled local backups, one folder per user ID
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database
@@ -1010,34 +1011,15 @@ Restoring a backup that is missing some of the attachment files it references is
 
 </details>
 
-## S3 Backups
-
-Administrators can send complete backup archives (one ZIP per user, identical to the Complete Backup download) to an S3-compatible bucket, manually or automatically on a schedule. The configuration is independent from the S3 Attachment Storage one, so backups can target a different bucket or provider.
-
-<details>
-<summary><strong>How to configure S3 backups</strong></summary>
-<br>
-
-Configure it in **Settings > S3 Backups** (administrators only).
-
-- **Master switch**: A toggle at the top of the page enables or disables the whole feature. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user (the self-service actions are refused server-side too).
-- **Configuration**: Endpoint URL, region, bucket, access key, secret key, and path-style addressing, with a built-in connection test.
-- **User selection**: Checkboxes choose which users are covered by the backups. Everyone is checked by default, and while everyone is checked, new accounts are included automatically.
-- **Manual backups**: A "Back up now" button uploads a fresh archive for each selected user, one user at a time, with per-user progress. It works as soon as the connection is configured, even when automatic backups are off.
-- **Automatic backups**: When enabled, a background worker backs up the selected users on the chosen frequency (daily, weekly, or monthly). The first run happens within a few minutes of enabling, the next ones after the chosen interval.
-- **Retention**: Only the most recent N archives are kept per user, older ones are deleted from the bucket after each backup (0 keeps everything).
-- **Browsing**: The page lists the archives currently in the bucket, with download and delete actions.
-- **Restore**: Archives are stored under `backups/{user id}/` in the bucket and can be restored with the standard [Restore / Import](#restore--import) page.
-- **Self-service**: Once the bucket is configured, every user gets an "S3 Backups" section on their Backup / Export page to upload a fresh archive of their own account, and to download or delete their existing archives. A "Restore from S3" section on the Restore / Import page restores their account directly from one of those archives.
-- **Tenant isolation**: Two options ("S3 backups on the Backup page" and "S3 restore on the Restore page") disable these self-service sections for non-admin users. They are enforced server-side, so the blocked actions are refused even when called directly.
-
-When attachments are stored in S3 (S3 Attachment Storage), they are included in the archives by default, fetched from the bucket on the fly. An option lets you leave them out of the backups for lighter archives and faster runs.
-
-</details>
-
 ## Backup / Export
 
-Poznote includes built-in Backup / Export functionality accessible through Settings.
+Poznote can back up an account in several ways. They all produce the same ZIP archive (database, notes and attachments, with an `index.html` at the root for offline browsing), and the [Restore / Import](#restore--import) page accepts all of them:
+
+- **Manually**, as a download from Settings > Backup / Export.
+- **On a schedule**, to a folder of the server or to an S3-compatible bucket, configured by an administrator.
+- **From a script**, through the REST API, for example with the bash script below.
+
+Each option is detailed below, and individual notes can also be exported on their own.
 
 <a id="complete-backup"></a>
 <details>
@@ -1054,22 +1036,9 @@ The archive is built in the background by a worker process, not during the reque
 
 #### Per-User vs Complete Backups
 
-Poznote provides flexible backup options:
+All the methods above produce **per-user backups**: an archive contains only the data belonging to one account (its database, notes and attachments). Every user can back up and restore their own account, administrators can pick any account.
 
-**Via Web Interface (Settings > Backup/Export):**
-- **All users** can backup and restore their own profile
-- **Admins** can select which user profile to backup or restore
-- Backups contain the user's database, notes, and attachments
-
-**Via API/Script (Administrators only):**
-- Automated backups using the `backup-poznote.sh` script
-- Programmatic access via REST API v1
-- Requires admin credentials
-
-**Backup Scopes:**
-
-1. **Per-User Backups**: Created from Settings or via API. Contains *only* the data belonging to a specific user (their database, notes, and attachments).
-2. **Complete System Backup**: Created manually by backing up the entire `/data` directory. This is the only way to backup the master configuration and all users' data at once.
+A **complete system backup**, including the master configuration (accounts, global settings, shared links) and every user at once, is made by copying the entire `/data` directory:
 
 ```bash
 # Complete system backup via CLI
@@ -1078,16 +1047,59 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 </details>
 
-<a id="export-individual-notes"></a>
+<a id="local-backups"></a>
 <details>
-<summary><strong>Export Individual Notes</strong></summary>
+<summary><strong>Scheduled backups to a local folder</strong></summary>
 <br>
 
-Export individual notes using the **Export** button in the note toolbar:
+Administrators can have complete backup archives (one ZIP per user, identical to the Complete Backup download) saved into a folder of the server, manually or automatically on a schedule, with only the most recent ones kept. It needs nothing outside Poznote: no bucket, no cron job, no script.
 
-  - **Rich text notes:** Export to HTML, or to a single HTML file with the images embedded
-  - **Markdown notes:** Export to Markdown, to HTML, or to a single HTML file with the images embedded
-  - **Task lists:** the same options, plus a raw JSON export of the list
+Configure it in **Settings > Local Backups** (administrators only).
+
+- **Backup folder**: An absolute path on the server (inside the container with Docker). Left empty, the archives go to `data/backups`, which is already part of the data volume. The folder is created if needed and must be writable by the web server user.
+- **User selection**: Checkboxes choose which users are covered by the backups. Everyone is checked by default, and while everyone is checked, new accounts are included automatically.
+- **Manual backups**: A "Back up now" button saves a fresh archive for each selected user, one user at a time, with per-user progress. It works even when automatic backups are off.
+- **Automatic backups**: When enabled, a background worker backs up the selected users on the chosen frequency (daily, weekly, or monthly). The first run happens within a few minutes of enabling, the next ones after the chosen interval. The page shows the result of the last run and the date of the next one.
+- **Retention**: Only the most recent N archives are kept per user, older ones are deleted from the folder after each backup (0 keeps everything).
+- **Browsing**: The page lists the archives currently in the folder, with download and delete actions.
+- **Restore**: Archives are stored under `{user id}/` in the backup folder and can be restored with the standard [Restore / Import](#restore--import) page.
+- **Account deletion**: Deleting an account also deletes its archives from the backup folder.
+
+To keep the backups on another disk or on a network share, mount it in the container and enter the container path (`/backups` in this example) as the backup folder:
+
+```yaml
+services:
+  webserver:
+    volumes:
+      - "./data:/var/www/html/data"
+      - "/mnt/nas/poznote-backups:/backups"
+```
+
+A folder inside the application itself is refused, apart from `data/backups`. When attachments are stored in S3 (S3 Attachment Storage), they are included in the archives, fetched from the bucket on the fly.
+
+</details>
+
+<a id="s3-backups"></a>
+<details>
+<summary><strong>Scheduled backups to an S3 bucket</strong></summary>
+<br>
+
+Administrators can send complete backup archives (one ZIP per user, identical to the Complete Backup download) to an S3-compatible bucket, manually or automatically on a schedule. The configuration is independent from the S3 Attachment Storage one, so backups can target a different bucket or provider.
+
+Configure it in **Settings > S3 Backups** (administrators only).
+
+- **Master switch**: A toggle at the top of the page enables or disables the whole feature. When disabled, automatic backups stop and the S3 backup and restore sections disappear for every user (the self-service actions are refused server-side too).
+- **Configuration**: Endpoint URL, region, bucket, access key, secret key, and path-style addressing, with a built-in connection test.
+- **User selection**: Checkboxes choose which users are covered by the backups. Everyone is checked by default, and while everyone is checked, new accounts are included automatically.
+- **Manual backups**: A "Back up now" button uploads a fresh archive for each selected user, one user at a time, with per-user progress. It works as soon as the connection is configured, even when automatic backups are off.
+- **Automatic backups**: When enabled, a background worker backs up the selected users on the chosen frequency (daily, weekly, or monthly). The first run happens within a few minutes of enabling, the next ones after the chosen interval.
+- **Retention**: Only the most recent N archives are kept per user, older ones are deleted from the bucket after each backup (0 keeps everything).
+- **Browsing**: The page lists the archives currently in the bucket, with download and delete actions.
+- **Restore**: Archives are stored under `backups/{user id}/` in the bucket and can be restored with the standard [Restore / Import](#restore--import) page.
+- **Self-service**: Once the bucket is configured, every user gets an "S3 Backups" section on their Backup / Export page to upload a fresh archive of their own account, and to download or delete their existing archives. A "Restore from S3" section on the Restore / Import page restores their account directly from one of those archives.
+- **Tenant isolation**: Two options ("S3 backups on the Backup page" and "S3 restore on the Restore page") disable these self-service sections for non-admin users. They are enforced server-side, so the blocked actions are refused even when called directly.
+
+When attachments are stored in S3 (S3 Attachment Storage), they are included in the archives by default, fetched from the bucket on the fly. An option lets you leave them out of the backups for lighter archives and faster runs.
 
 </details>
 
@@ -1148,6 +1160,18 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 
 </details>
 
+<a id="export-individual-notes"></a>
+<details>
+<summary><strong>Export Individual Notes</strong></summary>
+<br>
+
+Export individual notes using the **Export** button in the note toolbar:
+
+  - **Rich text notes:** Export to HTML, or to a single HTML file with the images embedded
+  - **Markdown notes:** Export to Markdown, to HTML, or to a single HTML file with the images embedded
+  - **Task lists:** the same options, plus a raw JSON export of the list
+
+</details>
 
 ## Restore / Import
 
@@ -1292,7 +1316,7 @@ The notes you modified in the last 5 days are kept in each browser where you use
 *   **Keep offline:** favorites are always kept, and **Keep offline** in the menu of a note or of a folder (subfolders included) keeps it whatever its date, with all its attachments (PDF, audio, files) up to 25 MB each. The same menu of a note says whether it is available offline in this browser, and the Notes and Folders pages mark the notes and folders available offline in this browser. The Notes page can also keep several notes offline at once (or stop), from its bulk actions, and the Folders page has **Keep offline** in the menu of each folder.
 *   **Offline page:** the **Offline** button of the icon sidebar lists the notes and folders kept offline, like the Shares page: folders as a tree with their notes, why each note is kept (kept offline, in a folder kept offline, favorite, modified recently), a filter, and a button to keep a note offline or stop. A warning icon marks a note this browser does not hold yet.
 *   **Back online:** the changes are sent automatically. If a note was also changed on the server in the meantime, both versions are merged when possible, otherwise your offline version is kept as a separate note named "... (offline copy)". A note deleted on the server in the meantime is created again.
-*   **Settings:** **Settings > Actions > Offline notes** sets how many days of notes are kept (5 by default, up to 30, 0 turns offline notes off) and shows what the current browser holds.
+*   **Settings:** **Settings > Sync & history > Offline notes** sets how many days of notes are kept (5 by default, up to 30, 0 turns offline notes off) and shows what the current browser holds.
 *   **Limits:** at most 300 notes and 50 MB of text, the most recently modified first. Files are kept too: the pictures shown in these notes, and every attachment (PDF, audio, files) of the favorites and the notes kept with **Keep offline**, up to 25 MB each, 400 files and 200 MB in total, and never more than half the free space of the browser. A larger file stays online only, and the note says so when it is opened offline.
 *   **Requirements:** Poznote must be served over HTTPS (browsers keep pages offline only on a secure connection, `http://localhost` also works) and opened once online in the browser, after signing in, for the copy to be made.
 *   **Privacy:** only the notes of your own account are kept, not those of an account or a workspace shared with you. They are stored unencrypted in the browser. Signing out removes them from the browser (changes not sent yet too, after a warning that lists them): on a shared computer, sign out when you leave. Signing out also works without a network, from the offline page: the notes are removed at once, and the session on the server ends the next time Poznote opens online.
@@ -1362,6 +1386,17 @@ Poznote includes a Model Context Protocol (MCP) server that enables AI assistant
 - "Update note 42 with new information"
 
 The MCP server ships with the official `docker-compose.yml` and is published on `127.0.0.1` only, so nothing outside your machine can reach it by default. Setup, client configuration, port and debug overrides, and how to protect it with `POZNOTE_MCP_AUTH_TOKEN` when you expose it further are covered in the [MCP Server documentation](docs/MCP-SERVER.md).
+
+## Applications
+
+Poznote runs in any browser, and can also be installed from the browser as a web app (PWA): it then gets its own icon and its own window, like a native application.
+
+*   **Android and computer:** open your Poznote instance in Chrome or Edge and choose **Install** in the browser menu.
+*   **iPhone and iPad:** open your Poznote instance in Safari, tap **Share**, then **Add to Home Screen**.
+
+> Installing the web app requires Poznote to be served over HTTPS (`http://localhost` also works).
+
+The [Apps page](https://poznote.com/apps.html) of the website lists everything available: the web app, the Chrome extension and the mobile apps built by the community.
 
 ## Chrome Extension
 

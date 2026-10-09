@@ -4398,8 +4398,16 @@
             // choice, then the first listed section.
             var initialKey = deepLinkSectionGridId();
             var hashKey = null;
+            // The former "Actions" section, split into Backup & restore, Export &
+            // import, Sync & history, Integrations and Apps: a link or a saved choice naming it opens
+            // the first of the three.
+            var renamedSections = {
+                'settings-actions-section-grid': 'settings-backup-restore-section-grid',
+                'settings-actions-section-title': 'settings-backup-restore-section-grid'
+            };
             if (!initialKey && window.location.hash) {
                 var hashId = decodeURIComponent(window.location.hash.slice(1)).replace(/^section=/, '');
+                hashId = renamedSections[hashId] || hashId;
                 navSections.forEach(function (section) {
                     if (section.key === hashId || section.grid.id === hashId || section.title.id === hashId) {
                         hashKey = section.key;
@@ -4413,6 +4421,7 @@
             }
             if (!initialKey) {
                 try { initialKey = navStore.getItem(NAV_STATE_KEY); } catch (e) { /* storage unavailable */ }
+                initialKey = renamedSections[initialKey] || initialKey;
             }
             if (!initialKey || !activateSection(initialKey, false)) refreshNav();
 

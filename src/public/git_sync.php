@@ -198,7 +198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
-    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('settings.cards.git_sync', [], 'Git Sync')]); ?>
+    <?php poznoteSettingsShellOpen(['section' => 'settings-sync-history-section-grid', 'title' => t('settings.cards.git_sync', [], 'Git Sync')]); ?>
     <div class="home-container git-sync-container">
 
 

@@ -529,6 +529,17 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     color: var(--pz-text-muted);
 }
 
+/* A line under a sub-heading that says what its cards are for (the
+   questions of Restore and Import), in plain text */
+.settings-group-hint {
+    display: block;
+    margin-top: 3px;
+    font-size: calc(0.86rem * var(--settings-font-scale, 1));
+    font-weight: var(--pz-weight-normal);
+    letter-spacing: normal;
+    text-transform: none;
+}
+
 .home-container.settings-filtering .settings-group-title {
     display: none;
 }

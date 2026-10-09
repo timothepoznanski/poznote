@@ -334,7 +334,7 @@ html[data-theme='dark'] .card-container {
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
-html[data-theme='dark'] .card-container:hover {
+html[data-theme='dark'] .backup-container:not(.backup-part-view) .card-container:hover {
     box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.4);
     border-color: var(--pz-accent);
 }
@@ -363,6 +363,10 @@ html[data-theme='dark'] .card-content {
 html[data-theme='dark'] .sub-card {
     background-color: var(--pz-surface);
     border-color: var(--pz-border);
+}
+
+html[data-theme='dark'] .backup-subpart-view .sub-card {
+    background-color: transparent;
 }
 
 html[data-theme='dark'] .sub-card-header {

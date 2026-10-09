@@ -185,7 +185,7 @@ foreach ($eventHelpDefaults as $eventName => $default) {
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo user_webhooks_h($pageWorkspace); ?>">
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
-<?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('webhooks_user.card', [], 'User Webhooks')]); ?>
+<?php poznoteSettingsShellOpen(['section' => 'settings-integrations-section-grid', 'title' => t('webhooks_user.card', [], 'User Webhooks')]); ?>
 <div class="settings-container webhooks-page">
 
 

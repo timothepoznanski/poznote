@@ -97,7 +97,7 @@ $effective = poznoteResolveSttConfig($con, (int)(getAuthenticatedUserId() ?? 0))
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
-    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('stt_settings_user.title', [], 'My transcription server')]); ?>
+    <?php poznoteSettingsShellOpen(['section' => 'settings-integrations-section-grid', 'title' => t('stt_settings_user.title', [], 'My transcription server')]); ?>
     <div class="home-container git-sync-container">
 
         <div class="git-sync-header">

@@ -58,10 +58,16 @@
     padding: 10px;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-sm);
-    overflow-x: auto;
+    /* The whole command in view, with no bar to drag: small enough for one
+       line on a computer, and wrapped where the screen is narrower (copying
+       it still gives a single line) */
+    font-size: 13px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
 }
 
 .direct-copy-command code {
+    font-size: inherit;
     color: inherit;
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
 }

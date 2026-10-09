@@ -69,7 +69,6 @@ https://discord.gg/fuEV6uqf4N
 - [Webhooks](#webhooks)
 - [Git-Synchronisierung](#git-synchronisierung)
 - [S3-Speicher für Anhänge](#s3-speicher-für-anhänge)
-- [S3-Sicherungen](#s3-sicherungen)
 - [Sicherung / Export](#sicherung--export)
 - [Wiederherstellen / Importieren](#wiederherstellen--importieren)
 - [Offline](#offline)
@@ -77,6 +76,7 @@ https://discord.gg/fuEV6uqf4N
 - [KI-Assistent](#ki-assistent)
 - [Transkription (Sprache zu Text)](#transkription-sprache-zu-text)
 - [MCP-Server](#mcp-server)
+- [Apps](#apps)
 - [Chrome-Erweiterung](#chrome-erweiterung)
 - [Unter Android an Poznote teilen](#unter-android-an-poznote-teilen)
 - [API-Dokumentation](#api-dokumentation)
@@ -904,6 +904,7 @@ data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
 ├── fonts/                       # Custom fonts uploaded by an administrator
+├── backups/                     # Scheduled local backups, one folder per user ID
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database
@@ -1010,34 +1011,15 @@ Das Wiederherstellen einer Sicherung, in der einige der referenzierten Anhangsda
 
 </details>
 
-## S3-Sicherungen
-
-Administratoren können vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit dem Download der vollständigen Sicherung) manuell oder automatisch nach Zeitplan an einen S3-kompatiblen Bucket senden. Die Konfiguration ist unabhängig von der des S3-Speichers für Anhänge, sodass Sicherungen einen anderen Bucket oder Anbieter nutzen können.
-
-<details>
-<summary><strong>S3-Sicherungen konfigurieren</strong></summary>
-<br>
-
-Konfigurieren Sie sie unter **Einstellungen > S3-Sicherungen** (nur Administratoren).
-
-- **Hauptschalter**: Ein Schalter oben auf der Seite aktiviert oder deaktiviert die gesamte Funktion. Ist er deaktiviert, stoppen die automatischen Sicherungen, und die Bereiche für S3-Sicherung und -Wiederherstellung verschwinden für alle Benutzer (die Self-Service-Aktionen werden auch serverseitig abgelehnt).
-- **Konfiguration**: Endpunkt-URL, Region, Bucket, Access Key, Secret Key und Path-Style-Adressierung, mit integriertem Verbindungstest.
-- **Benutzerauswahl**: Über Kontrollkästchen wählen Sie, welche Benutzer gesichert werden. Standardmäßig sind alle ausgewählt, und solange alle ausgewählt sind, werden neue Konten automatisch einbezogen.
-- **Manuelle Sicherungen**: Die Schaltfläche „Jetzt sichern“ lädt für jeden ausgewählten Benutzer ein neues Archiv hoch, einen Benutzer nach dem anderen, mit Fortschrittsanzeige pro Benutzer. Sie funktioniert, sobald die Verbindung konfiguriert ist, auch wenn die automatischen Sicherungen ausgeschaltet sind.
-- **Automatische Sicherungen**: Wenn aktiviert, sichert ein Hintergrundprozess die ausgewählten Benutzer im gewählten Rhythmus (täglich, wöchentlich oder monatlich). Der erste Durchlauf erfolgt wenige Minuten nach dem Aktivieren, die folgenden nach dem gewählten Intervall.
-- **Aufbewahrung**: Pro Benutzer werden nur die N neuesten Archive aufbewahrt, ältere werden nach jeder Sicherung aus dem Bucket gelöscht (0 bewahrt alles auf).
-- **Durchsuchen**: Die Seite listet die aktuell im Bucket vorhandenen Archive mit Aktionen zum Herunterladen und Löschen auf.
-- **Wiederherstellung**: Archive werden im Bucket unter `backups/{user id}/` gespeichert und können über die normale Seite [Wiederherstellen / Importieren](#wiederherstellen--importieren) wiederhergestellt werden.
-- **Self-Service**: Sobald der Bucket konfiguriert ist, erhält jeder Benutzer auf seiner Seite **Sicherung / Export** einen Bereich „S3-Sicherungen“, um ein neues Archiv seines eigenen Kontos hochzuladen und seine vorhandenen Archive herunterzuladen oder zu löschen. Ein Bereich „Aus S3 wiederherstellen“ auf der Seite **Wiederherstellen / Importieren** stellt sein Konto direkt aus einem dieser Archive wieder her.
-- **Mandantentrennung**: Zwei Optionen („S3-Sicherungen auf der Sicherungsseite“ und „S3-Wiederherstellung auf der Wiederherstellungsseite“) deaktivieren diese Self-Service-Bereiche für Benutzer ohne Administratorrechte. Sie werden serverseitig durchgesetzt, sodass die gesperrten Aktionen auch bei direktem Aufruf abgelehnt werden.
-
-Werden Anhänge in S3 gespeichert (S3-Speicher für Anhänge), sind sie standardmäßig in den Archiven enthalten und werden dabei direkt aus dem Bucket geholt. Mit einer Option können Sie sie für schlankere Archive und schnellere Durchläufe aus den Sicherungen herauslassen.
-
-</details>
-
 ## Sicherung / Export
 
-Poznote enthält eine integrierte Funktion für Sicherung und Export, die über die Einstellungen erreichbar ist.
+Poznote kann ein Konto auf mehrere Arten sichern. Alle erzeugen dasselbe ZIP-Archiv (Datenbank, Notizen und Anhänge, mit einer `index.html` im Stammverzeichnis zum Offline-Lesen), und die Seite [Wiederherstellen / Importieren](#wiederherstellen--importieren) nimmt sie alle an:
+
+- **Manuell**, als Download unter Einstellungen > Sicherung / Export.
+- **Nach Zeitplan**, in einen Ordner des Servers oder in einen S3-kompatiblen Bucket, von einem Administrator konfiguriert.
+- **Per Skript**, über die REST-API, zum Beispiel mit dem Bash-Skript unten.
+
+Jede Option wird unten beschrieben, und einzelne Notizen lassen sich auch für sich exportieren.
 
 <a id="complete-backup"></a>
 <details>
@@ -1054,22 +1036,9 @@ Das Archiv wird im Hintergrund von einem Worker-Prozess erstellt, nicht während
 
 #### Sicherungen pro Benutzer und vollständige Sicherungen
 
-Poznote bietet flexible Sicherungsoptionen:
+Alle oben genannten Methoden erzeugen **Sicherungen pro Benutzer**: Ein Archiv enthält nur die Daten eines einzelnen Kontos (seine Datenbank, Notizen und Anhänge). Jeder Benutzer kann sein eigenes Konto sichern und wiederherstellen, Administratoren können jedes Konto auswählen.
 
-**Über die Weboberfläche (Einstellungen > Sicherung / Export):**
-- **Alle Benutzer** können ihr eigenes Profil sichern und wiederherstellen
-- **Administratoren** können auswählen, welches Benutzerprofil gesichert oder wiederhergestellt wird
-- Sicherungen enthalten die Datenbank, die Notizen und die Anhänge des Benutzers
-
-**Über API/Skript (nur Administratoren):**
-- Automatisierte Sicherungen mit dem Skript `backup-poznote.sh`
-- Programmatischer Zugriff über die REST-API v1
-- Erfordert Administrator-Zugangsdaten
-
-**Umfang der Sicherungen:**
-
-1. **Sicherungen pro Benutzer**: Werden in den Einstellungen oder über die API erstellt. Enthalten *nur* die Daten eines bestimmten Benutzers (seine Datenbank, Notizen und Anhänge).
-2. **Vollständige Systemsicherung**: Wird manuell durch Sichern des gesamten Verzeichnisses `/data` erstellt. Nur so lassen sich die Master-Konfiguration und die Daten aller Benutzer auf einmal sichern.
+Eine **vollständige Systemsicherung**, die die Master-Konfiguration (Konten, globale Einstellungen, geteilte Links) und alle Benutzer auf einmal umfasst, erfolgt durch Kopieren des gesamten Verzeichnisses `/data`:
 
 ```bash
 # Vollständige Systemsicherung über die Kommandozeile
@@ -1078,16 +1047,59 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 </details>
 
-<a id="export-individual-notes"></a>
+<a id="local-backups"></a>
 <details>
-<summary><strong>Einzelne Notizen exportieren</strong></summary>
+<summary><strong>Geplante Sicherungen in einen lokalen Ordner</strong></summary>
 <br>
 
-Exportieren Sie einzelne Notizen über die Schaltfläche **Exportieren** in der Werkzeugleiste der Notiz:
+Administratoren können vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit dem Download der vollständigen Sicherung) manuell oder automatisch nach Zeitplan in einem Ordner des Servers speichern lassen, wobei nur die neuesten aufbewahrt werden. Außer Poznote wird nichts benötigt: kein Bucket, kein Cronjob, kein Skript.
 
-  - **Rich-Text-Notizen:** Export als HTML oder als einzelne HTML-Datei mit eingebetteten Bildern
-  - **Markdown-Notizen:** Export als Markdown, als HTML oder als einzelne HTML-Datei mit eingebetteten Bildern
-  - **Aufgabenlisten:** dieselben Optionen, dazu ein JSON-Rohexport der Liste
+Konfigurieren Sie sie unter **Einstellungen > Lokale Sicherungen** (nur Administratoren).
+
+- **Sicherungsordner**: Ein absoluter Pfad auf dem Server (mit Docker: im Container). Bleibt das Feld leer, landen die Archive in `data/backups`, das bereits zum Daten-Volume gehört. Der Ordner wird bei Bedarf angelegt und muss für den Benutzer des Webservers beschreibbar sein.
+- **Benutzerauswahl**: Kontrollkästchen legen fest, welche Benutzer gesichert werden. Standardmäßig sind alle ausgewählt, und solange alle ausgewählt sind, werden neue Konten automatisch einbezogen.
+- **Manuelle Sicherungen**: Die Schaltfläche „Jetzt sichern“ speichert für jeden ausgewählten Benutzer ein neues Archiv, einen Benutzer nach dem anderen, mit Fortschritt pro Benutzer. Sie funktioniert auch, wenn die automatischen Sicherungen aus sind.
+- **Automatische Sicherungen**: Sind sie aktiviert, sichert ein Hintergrund-Worker die ausgewählten Benutzer in der gewählten Häufigkeit (täglich, wöchentlich oder monatlich). Der erste Lauf erfolgt wenige Minuten nach dem Aktivieren, die nächsten nach dem gewählten Intervall. Die Seite zeigt das Ergebnis des letzten Laufs und das Datum des nächsten.
+- **Aufbewahrung**: Pro Benutzer werden nur die N neuesten Archive behalten, ältere werden nach jeder Sicherung aus dem Ordner gelöscht (0 behält alles).
+- **Durchsuchen**: Die Seite listet die Archive im Ordner auf, mit Aktionen zum Herunterladen und Löschen.
+- **Wiederherstellung**: Archive werden im Sicherungsordner unter `{Benutzer-ID}/` gespeichert und können mit der Standardseite [Wiederherstellen / Importieren](#wiederherstellen--importieren) wiederhergestellt werden.
+- **Kontolöschung**: Beim Löschen eines Kontos werden auch dessen Archive aus dem Sicherungsordner gelöscht.
+
+Um die Sicherungen auf einer anderen Festplatte oder einer Netzwerkfreigabe abzulegen, binden Sie diese in den Container ein und geben Sie den Pfad im Container (`/backups` in diesem Beispiel) als Sicherungsordner an:
+
+```yaml
+services:
+  webserver:
+    volumes:
+      - "./data:/var/www/html/data"
+      - "/mnt/nas/poznote-backups:/backups"
+```
+
+Ein Ordner innerhalb der Anwendung selbst wird abgelehnt, außer `data/backups`. Wenn Anhänge in S3 gespeichert sind (S3-Speicher für Anhänge), sind sie in den Archiven enthalten und werden direkt aus dem Bucket abgerufen.
+
+</details>
+
+<a id="s3-backups"></a>
+<details>
+<summary><strong>Geplante Sicherungen in einen S3-Bucket</strong></summary>
+<br>
+
+Administratoren können vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit dem Download der vollständigen Sicherung) manuell oder automatisch nach Zeitplan an einen S3-kompatiblen Bucket senden. Die Konfiguration ist unabhängig von der des S3-Speichers für Anhänge, sodass Sicherungen einen anderen Bucket oder Anbieter nutzen können.
+
+Konfigurieren Sie sie unter **Einstellungen > S3-Sicherungen** (nur Administratoren).
+
+- **Hauptschalter**: Ein Schalter oben auf der Seite aktiviert oder deaktiviert die gesamte Funktion. Ist er deaktiviert, stoppen die automatischen Sicherungen, und die Bereiche für S3-Sicherung und -Wiederherstellung verschwinden für alle Benutzer (die Self-Service-Aktionen werden auch serverseitig abgelehnt).
+- **Konfiguration**: Endpunkt-URL, Region, Bucket, Access Key, Secret Key und Path-Style-Adressierung, mit integriertem Verbindungstest.
+- **Benutzerauswahl**: Über Kontrollkästchen wählen Sie, welche Benutzer gesichert werden. Standardmäßig sind alle ausgewählt, und solange alle ausgewählt sind, werden neue Konten automatisch einbezogen.
+- **Manuelle Sicherungen**: Die Schaltfläche „Jetzt sichern“ lädt für jeden ausgewählten Benutzer ein neues Archiv hoch, einen Benutzer nach dem anderen, mit Fortschrittsanzeige pro Benutzer. Sie funktioniert, sobald die Verbindung konfiguriert ist, auch wenn die automatischen Sicherungen ausgeschaltet sind.
+- **Automatische Sicherungen**: Wenn aktiviert, sichert ein Hintergrundprozess die ausgewählten Benutzer im gewählten Rhythmus (täglich, wöchentlich oder monatlich). Der erste Durchlauf erfolgt wenige Minuten nach dem Aktivieren, die folgenden nach dem gewählten Intervall.
+- **Aufbewahrung**: Pro Benutzer werden nur die N neuesten Archive aufbewahrt, ältere werden nach jeder Sicherung aus dem Bucket gelöscht (0 bewahrt alles auf).
+- **Durchsuchen**: Die Seite listet die aktuell im Bucket vorhandenen Archive mit Aktionen zum Herunterladen und Löschen auf.
+- **Wiederherstellung**: Archive werden im Bucket unter `backups/{user id}/` gespeichert und können über die normale Seite [Wiederherstellen / Importieren](#wiederherstellen--importieren) wiederhergestellt werden.
+- **Self-Service**: Sobald der Bucket konfiguriert ist, erhält jeder Benutzer auf seiner Seite **Sicherung / Export** einen Bereich „S3-Sicherungen“, um ein neues Archiv seines eigenen Kontos hochzuladen und seine vorhandenen Archive herunterzuladen oder zu löschen. Ein Bereich „Aus S3 wiederherstellen“ auf der Seite **Wiederherstellen / Importieren** stellt sein Konto direkt aus einem dieser Archive wieder her.
+- **Mandantentrennung**: Zwei Optionen („S3-Sicherungen auf der Sicherungsseite“ und „S3-Wiederherstellung auf der Wiederherstellungsseite“) deaktivieren diese Self-Service-Bereiche für Benutzer ohne Administratorrechte. Sie werden serverseitig durchgesetzt, sodass die gesperrten Aktionen auch bei direktem Aufruf abgelehnt werden.
+
+Werden Anhänge in S3 gespeichert (S3-Speicher für Anhänge), sind sie standardmäßig in den Archiven enthalten und werden dabei direkt aus dem Bucket geholt. Mit einer Option können Sie sie für schlankere Archive und schnellere Durchläufe aus den Sicherungen herauslassen.
 
 </details>
 
@@ -1148,6 +1160,18 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 
 </details>
 
+<a id="export-individual-notes"></a>
+<details>
+<summary><strong>Einzelne Notizen exportieren</strong></summary>
+<br>
+
+Exportieren Sie einzelne Notizen über die Schaltfläche **Exportieren** in der Werkzeugleiste der Notiz:
+
+  - **Rich-Text-Notizen:** Export als HTML oder als einzelne HTML-Datei mit eingebetteten Bildern
+  - **Markdown-Notizen:** Export als Markdown, als HTML oder als einzelne HTML-Datei mit eingebetteten Bildern
+  - **Aufgabenlisten:** dieselben Optionen, dazu ein JSON-Rohexport der Liste
+
+</details>
 
 ## Wiederherstellen / Importieren
 
@@ -1165,7 +1189,7 @@ Laden Sie die vollständige Sicherungs-ZIP hoch, um alles wiederherzustellen:
 
 Es gibt praktisch keine Größenbeschränkung. Das Archiv wird in Teilstücken hochgeladen (ein fehlgeschlagenes Teilstück wird erneut gesendet, statt den gesamten Upload zu verlieren), auf dem Server wieder zusammengesetzt und anschließend von einem Hintergrundprozess entpackt und wiederhergestellt, sodass weder der Browser noch ein vorgeschalteter Reverse Proxy die Wiederherstellung durch ein Timeout abbrechen kann. Ein Fortschrittsbalken deckt den gesamten Ablauf ab: Upload, Entpacken, Datenbank, Notizen, dann Anhänge. Nach Abschluss der Wiederherstellung fragt Poznote, welchen Arbeitsbereich Sie öffnen möchten.
 
-Die Wiederherstellung aus einem S3-Bucket (siehe [S3-Sicherungen](#s3-sicherungen)) läuft als derselbe Hintergrundauftrag, sodass auch das Abrufen eines großen Archivs aus dem Bucket und seine Wiederherstellung nicht davon abhängen, dass eine Anfrage bestehen bleibt.
+Die Wiederherstellung aus einem S3-Bucket (siehe [S3-Sicherungen](#s3-backups)) läuft als derselbe Hintergrundauftrag, sodass auch das Abrufen eines großen Archivs aus dem Bucket und seine Wiederherstellung nicht davon abhängen, dass eine Anfrage bestehen bleibt.
 
 Ist ein Upload überhaupt nicht möglich, bietet die Seite **Wiederherstellen / Importieren** zusätzlich eine Alternative per Direktkopie: Kopieren Sie das Archiv per SSH in den Poznote-Container, genau nach `/tmp/backup_restore.zip`, laden Sie die Seite neu und stellen Sie von dort aus wieder her.
 
@@ -1292,7 +1316,7 @@ Die in den letzten 5 Tagen geänderten Notizen werden in jedem Browser aufbewahr
 *   **Offline behalten:** Favoriten werden immer aufbewahrt, und **Offline behalten** im Menü einer Notiz oder eines Ordners (Unterordner eingeschlossen) bewahrt sie unabhängig vom Datum auf, mit allen Anhängen (PDF, Audio, Dateien) bis 25 MB pro Datei. Dasselbe Menü einer Notiz zeigt an, ob sie in diesem Browser offline verfügbar ist, und die Seiten Notizen und Ordner markieren die in diesem Browser offline verfügbaren Notizen und Ordner. Auf der Seite Notizen lassen sich über die Sammelaktionen auch mehrere Notizen auf einmal offline behalten (oder nicht mehr), und die Seite Ordner bietet **Offline behalten** im Menü jedes Ordners.
 *   **Offline-Seite:** Die Schaltfläche **Offline** der Symbolleiste listet die offline behaltenen Notizen und Ordner auf, wie die Seite Freigaben: Ordner als Baum mit ihren Notizen, der Grund, warum jede Notiz behalten wird (offline behalten, in einem offline behaltenen Ordner, Favorit, kürzlich geändert), ein Filter und eine Schaltfläche, um eine Notiz offline zu behalten oder damit aufzuhören. Ein Warnsymbol markiert eine Notiz, die dieser Browser noch nicht hat.
 *   **Wieder online:** Die Änderungen werden automatisch gesendet. Wurde eine Notiz inzwischen auch auf dem Server geändert, werden beide Fassungen nach Möglichkeit zusammengeführt, andernfalls wird Ihre Offline-Fassung als eigene Notiz mit dem Namen „... (Offline-Kopie)“ behalten. Eine inzwischen auf dem Server gelöschte Notiz wird neu angelegt.
-*   **Einstellungen:** **Einstellungen > Aktionen > Offline-Notizen** legt fest, wie viele Tage an Notizen aufbewahrt werden (standardmäßig 5, bis zu 30, 0 schaltet Offline-Notizen aus), und zeigt, was der aktuelle Browser enthält.
+*   **Einstellungen:** **Einstellungen > Synchronisierung und Verlauf > Offline-Notizen** legt fest, wie viele Tage an Notizen aufbewahrt werden (standardmäßig 5, bis zu 30, 0 schaltet Offline-Notizen aus), und zeigt, was der aktuelle Browser enthält.
 *   **Grenzen:** höchstens 300 Notizen und 50 MB Text, die zuletzt geänderten zuerst. Auch Dateien werden aufbewahrt: die in diesen Notizen angezeigten Bilder und alle Anhänge (PDF, Audio, Dateien) der Favoriten und der mit **Offline behalten** markierten Notizen, bis zu 25 MB pro Datei, 400 Dateien und 200 MB insgesamt, und nie mehr als die Hälfte des freien Speicherplatzes des Browsers. Eine größere Datei bleibt nur online, und die Notiz weist offline darauf hin.
 *   **Voraussetzungen:** Poznote muss über HTTPS bereitgestellt werden (Browser halten Seiten nur über eine sichere Verbindung offline bereit, `http://localhost` funktioniert ebenfalls) und nach der Anmeldung einmal online im Browser geöffnet worden sein, damit die Kopie angelegt wird.
 *   **Datenschutz:** Nur die Notizen Ihres eigenen Kontos werden aufbewahrt, nicht die eines mit Ihnen geteilten Kontos oder Arbeitsbereichs. Sie werden unverschlüsselt im Browser gespeichert. Die Abmeldung entfernt sie aus dem Browser (auch noch nicht gesendete Änderungen, nach einer Warnung, die sie auflistet): Melden Sie sich an einem gemeinsam genutzten Computer ab, wenn Sie gehen. Die Abmeldung funktioniert auch ohne Netzwerk über die Offline-Seite: Die Notizen werden sofort entfernt, und die Sitzung auf dem Server endet, sobald Poznote das nächste Mal online geöffnet wird.
@@ -1362,6 +1386,17 @@ Poznote enthält einen Model-Context-Protocol-Server (MCP), über den KI-Assiste
 - „Aktualisiere Notiz 42 mit neuen Informationen“
 
 Der MCP-Server ist Teil der offiziellen `docker-compose.yml` und wird nur auf `127.0.0.1` veröffentlicht, sodass ihn standardmäßig nichts außerhalb Ihres Rechners erreichen kann. Einrichtung, Client-Konfiguration, Überschreibungen für Port und Debug sowie der Schutz mit `POZNOTE_MCP_AUTH_TOKEN`, wenn Sie ihn weiter freigeben, sind in der [Dokumentation zum MCP-Server](MCP-SERVER.de.md) beschrieben.
+
+## Apps
+
+Poznote läuft in jedem Browser und lässt sich außerdem aus dem Browser heraus als Web-App (PWA) installieren: Es erhält dann ein eigenes Symbol und ein eigenes Fenster, wie eine native Anwendung.
+
+*   **Android und Computer:** Öffnen Sie Ihre Poznote-Instanz in Chrome oder Edge und wählen Sie im Browsermenü **Installieren**.
+*   **iPhone und iPad:** Öffnen Sie Ihre Poznote-Instanz in Safari, tippen Sie auf **Teilen** und dann auf **Zum Home-Bildschirm**.
+
+> Für die Installation der Web-App muss Poznote über HTTPS ausgeliefert werden (`http://localhost` funktioniert ebenfalls).
+
+Die [Apps-Seite](https://poznote.com/apps.html) der Website führt alles Verfügbare auf: die Web-App, die Chrome-Erweiterung und die von der Community entwickelten mobilen Apps.
 
 ## Chrome-Erweiterung
 

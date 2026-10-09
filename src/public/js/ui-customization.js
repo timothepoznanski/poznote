@@ -299,8 +299,14 @@
         syncSectionVisibility('settings-account-section-title', 'settings-account-section-grid');
     }
 
-    function syncSettingsActionsSection() {
-        syncSectionVisibility('settings-actions-section-title', 'settings-actions-section-grid');
+    // Backup & restore, Export & import, Sync & history, Integrations, Apps:
+    // the sections that replaced the former "Actions" one
+    function syncSettingsActionsSections() {
+        syncSectionVisibility('settings-backup-restore-section-title', 'settings-backup-restore-section-grid');
+        syncSectionVisibility('settings-export-import-section-title', 'settings-export-import-section-grid');
+        syncSectionVisibility('settings-sync-history-section-title', 'settings-sync-history-section-grid');
+        syncSectionVisibility('settings-integrations-section-title', 'settings-integrations-section-grid');
+        syncSectionVisibility('settings-apps-section-title', 'settings-apps-section-grid');
     }
 
     function syncSettingsDisplaySection() {
@@ -375,7 +381,7 @@
             syncHomeDashboardSection();
             syncHomeActionsSection();
             syncSettingsAccountSection();
-            syncSettingsActionsSection();
+            syncSettingsActionsSections();
             syncSettingsDisplaySection();
             syncSettingsGroupTitles();
             syncSettingsSidebarSection();

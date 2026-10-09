@@ -510,6 +510,28 @@ try {
     <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="<?php echo $iconSidebarClass; ?>" data-action="<?php echo htmlspecialchars($iconSidebarItem['action'], ENT_QUOTES, 'UTF-8'); ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
         <?php echo poznoteRenderIconSidebarIcon($iconSidebarItem['icon'], $iconSidebarItem['id']); ?>
     </button>
+    <?php
+    // Which theme is applied only the browser knows, so the button is rendered
+    // with the dark theme's icon. Swapped here, before the rail paints:
+    // js/theme-manager.js only gets to it once the page is parsed, and every
+    // other theme showed the moon first on each page (issue #1498).
+    $iconSidebarThemeIcons = function_exists('poznoteThemeListForClient')
+        ? array_column(poznoteThemeListForClient(), 'icon', 'id')
+        : [];
+    ?>
+    <?php if ($iconSidebarThemeIcons): ?>
+    <script>
+    (function () {
+        var icons = <?php echo json_encode($iconSidebarThemeIcons, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+        var icon = document.querySelector('#<?php echo $iconSidebarItem['id']; ?> i');
+        var wanted = window.__poznoteCurrentThemeId ? icons[window.__poznoteCurrentThemeId()] : '';
+        if (icon && wanted) {
+            icon.classList.remove('<?php echo $iconSidebarItem['icon']; ?>');
+            icon.classList.add(wanted);
+        }
+    })();
+    </script>
+    <?php endif; ?>
     <?php else: ?>
     <a href="<?php echo htmlspecialchars($iconSidebarItem['url'], ENT_QUOTES, 'UTF-8'); ?>"
        id="<?php echo $iconSidebarItem['id']; ?>"
@@ -548,6 +570,28 @@ try {
     <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="<?php echo $iconSidebarClass; ?>" data-theme-toggle title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
         <?php echo poznoteRenderIconSidebarIcon($iconSidebarItem['icon'], $iconSidebarItem['id']); ?>
     </button>
+    <?php
+    // Which theme is applied only the browser knows, so the button is rendered
+    // with the dark theme's icon. Swapped here, before the rail paints:
+    // js/theme-manager.js only gets to it once the page is parsed, and every
+    // other theme showed the moon first on each page (issue #1498).
+    $iconSidebarThemeIcons = function_exists('poznoteThemeListForClient')
+        ? array_column(poznoteThemeListForClient(), 'icon', 'id')
+        : [];
+    ?>
+    <?php if ($iconSidebarThemeIcons): ?>
+    <script>
+    (function () {
+        var icons = <?php echo json_encode($iconSidebarThemeIcons, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
+        var icon = document.querySelector('#<?php echo $iconSidebarItem['id']; ?> i');
+        var wanted = window.__poznoteCurrentThemeId ? icons[window.__poznoteCurrentThemeId()] : '';
+        if (icon && wanted) {
+            icon.classList.remove('<?php echo $iconSidebarItem['icon']; ?>');
+            icon.classList.add(wanted);
+        }
+    })();
+    </script>
+    <?php endif; ?>
     <?php else: ?>
     <a href="<?php echo htmlspecialchars($iconSidebarItem['url'], ENT_QUOTES, 'UTF-8'); ?>"
        id="<?php echo $iconSidebarItem['id']; ?>"

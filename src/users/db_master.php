@@ -1733,6 +1733,10 @@ function deleteUserProfile(int $id, bool $deleteData = false): array {
             $s3Errors[] = 'backups: ' . $backups['error'];
         }
 
+        // Same for the archives of the scheduled local backups
+        require_once __DIR__ . '/../LocalBackupService.php';
+        LocalBackupService::deleteAllUserBackups($id);
+
         // Delete user's shared links from global registry
         $stmt = $con->prepare("DELETE FROM shared_links WHERE user_id = ?");
         $stmt->execute([$id]);

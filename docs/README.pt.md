@@ -69,7 +69,6 @@ https://discord.gg/fuEV6uqf4N
 - [Webhooks](#webhooks)
 - [Sincronização Git](#sincronização-git)
 - [Armazenamento de anexos no S3](#armazenamento-de-anexos-no-s3)
-- [Backups S3](#backups-s3)
 - [Backup / Exportar](#backup--exportar)
 - [Restaurar / Importar](#restaurar--importar)
 - [Offline](#offline)
@@ -77,6 +76,7 @@ https://discord.gg/fuEV6uqf4N
 - [Assistente IA](#assistente-ia)
 - [Transcrição (fala para texto)](#transcrição-fala-para-texto)
 - [Servidor MCP](#servidor-mcp)
+- [Aplicativos](#aplicativos)
 - [Extensão do Chrome](#extensão-do-chrome)
 - [Compartilhar com o Poznote no Android](#compartilhar-com-o-poznote-no-android)
 - [Documentação da API](#documentação-da-api)
@@ -904,6 +904,7 @@ data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
 ├── fonts/                       # Custom fonts uploaded by an administrator
+├── backups/                     # Scheduled local backups, one folder per user ID
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database
@@ -1010,34 +1011,15 @@ Restaurar um backup em que faltam alguns dos arquivos de anexo que ele referenci
 
 </details>
 
-## Backups S3
-
-Os administradores podem enviar arquivos de backup completos (um ZIP por usuário, idêntico ao download do Backup Completo) para um bucket compatível com S3, manualmente ou automaticamente de acordo com uma programação. A configuração é independente da do Armazenamento de anexos no S3, então os backups podem ir para outro bucket ou provedor.
-
-<details>
-<summary><strong>Como configurar os backups S3</strong></summary>
-<br>
-
-Configure isso em **Configurações > Backups S3** (somente administradores).
-
-- **Chave geral**: uma opção no topo da página ativa ou desativa o recurso inteiro. Quando desativado, os backups automáticos param e as seções de backup e restauração S3 somem para todos os usuários (as ações de autoatendimento também são recusadas no servidor).
-- **Configuração**: URL do endpoint, região, bucket, chave de acesso, chave secreta e endereçamento path-style, com um teste de conexão integrado.
-- **Seleção de usuários**: caixas de seleção definem quais usuários são cobertos pelos backups. Todos vêm marcados por padrão e, enquanto todos estiverem marcados, as novas contas são incluídas automaticamente.
-- **Backups manuais**: um botão "Fazer backup agora" envia um arquivo novo para cada usuário selecionado, um usuário por vez, com o progresso de cada um. Ele funciona assim que a conexão estiver configurada, mesmo com os backups automáticos desligados.
-- **Backups automáticos**: quando ativados, um processo em segundo plano faz o backup dos usuários selecionados na frequência escolhida (diária, semanal ou mensal). A primeira execução acontece poucos minutos após a ativação, e as seguintes depois do intervalo escolhido.
-- **Retenção**: apenas os N arquivos mais recentes são mantidos por usuário; os mais antigos são excluídos do bucket após cada backup (0 mantém tudo).
-- **Navegação**: a página lista os arquivos que estão no bucket no momento, com ações de download e exclusão.
-- **Restauração**: os arquivos ficam em `backups/{user id}/` no bucket e podem ser restaurados pela página padrão de [Restaurar / Importar](#restaurar--importar).
-- **Autoatendimento**: depois que o bucket é configurado, cada usuário ganha uma seção "Backups S3" na página Backup / Exportar para enviar um arquivo novo da própria conta e para baixar ou excluir os arquivos existentes. Uma seção "Restaurar do S3" na página Restaurar / Importar restaura a conta diretamente a partir de um desses arquivos.
-- **Isolamento de contas**: duas opções ("Backups S3 na página de backup" e "Restauração S3 na página de restauração") desativam essas seções de autoatendimento para usuários que não são administradores. Elas são aplicadas no servidor, então as ações bloqueadas são recusadas mesmo quando chamadas diretamente.
-
-Quando os anexos estão armazenados no S3 (Armazenamento de anexos no S3), eles são incluídos nos arquivos por padrão, buscados no bucket na hora. Uma opção permite deixá-los de fora dos backups para arquivos mais leves e execuções mais rápidas.
-
-</details>
-
 ## Backup / Exportar
 
-O Poznote inclui funções integradas de Backup / Exportar, acessíveis pelas Configurações.
+O Poznote pode fazer backup de uma conta de várias formas. Todas produzem o mesmo arquivo ZIP (banco de dados, notas e anexos, com um `index.html` na raiz para consulta offline), e a página [Restaurar / Importar](#restaurar--importar) aceita todas elas:
+
+- **Manualmente**, como download em Configurações > Backup / Exportar.
+- **De forma agendada**, em uma pasta do servidor ou em um bucket compatível com S3, configurada por um administrador.
+- **Por script**, pela API REST, por exemplo com o script bash abaixo.
+
+Cada opção é detalhada abaixo, e as notas também podem ser exportadas uma a uma.
 
 <a id="complete-backup"></a>
 <details>
@@ -1054,22 +1036,9 @@ O arquivo é montado em segundo plano por um processo de trabalho, e não durant
 
 #### Backups por usuário e backups completos
 
-O Poznote oferece opções de backup flexíveis:
+Todos os métodos acima produzem **backups por usuário**: um arquivo contém apenas os dados de uma conta (banco de dados, notas e anexos dela). Cada usuário pode fazer backup e restaurar a própria conta, e os administradores podem escolher qualquer conta.
 
-**Pela interface web (Configurações > Backup / Exportar):**
-- **Todos os usuários** podem fazer backup e restaurar o próprio perfil
-- **Administradores** podem escolher de qual perfil de usuário fazer backup ou restauração
-- Os backups contêm o banco de dados, as notas e os anexos do usuário
-
-**Pela API/script (somente administradores):**
-- Backups automatizados com o script `backup-poznote.sh`
-- Acesso programático pela API REST v1
-- Exige credenciais de administrador
-
-**Abrangência dos backups:**
-
-1. **Backups por usuário**: criados nas Configurações ou pela API. Contêm *apenas* os dados de um usuário específico (banco de dados, notas e anexos dele).
-2. **Backup completo do sistema**: criado manualmente fazendo o backup de todo o diretório `/data`. É a única forma de fazer backup da configuração mestre e dos dados de todos os usuários de uma só vez.
+Um **backup completo do sistema**, que inclui a configuração mestre (contas, configurações globais, links compartilhados) e todos os usuários de uma só vez, é feito copiando todo o diretório `/data`:
 
 ```bash
 # Backup completo do sistema pela linha de comando
@@ -1078,16 +1047,59 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 </details>
 
-<a id="export-individual-notes"></a>
+<a id="local-backups"></a>
 <details>
-<summary><strong>Exportar notas individuais</strong></summary>
+<summary><strong>Backups agendados em uma pasta local</strong></summary>
 <br>
 
-Exporte notas individuais com o botão **Exportar** da barra de ferramentas da nota:
+Os administradores podem fazer com que arquivos de backup completos (um ZIP por usuário, idêntico ao download do backup completo) sejam salvos em uma pasta do servidor, manualmente ou automaticamente conforme um agendamento, mantendo apenas os mais recentes. Nada além do Poznote é necessário: nem bucket, nem tarefa cron, nem script.
 
-  - **Notas de texto formatado:** exportação para HTML, ou para um único arquivo HTML com as imagens incorporadas
-  - **Notas Markdown:** exportação para Markdown, para HTML, ou para um único arquivo HTML com as imagens incorporadas
-  - **Listas de tarefas:** as mesmas opções, além de uma exportação JSON bruta da lista
+Configure em **Configurações > Backups locais** (somente administradores).
+
+- **Pasta de backup**: um caminho absoluto no servidor (dentro do contêiner com Docker). Se ficar vazio, os arquivos vão para `data/backups`, que já faz parte do volume de dados. A pasta é criada se necessário e o usuário do servidor web precisa ter permissão de escrita nela.
+- **Seleção de usuários**: caixas de seleção escolhem quais usuários são cobertos pelos backups. Todos vêm marcados por padrão e, enquanto todos estiverem marcados, as novas contas são incluídas automaticamente.
+- **Backups manuais**: um botão "Fazer backup agora" salva um novo arquivo para cada usuário selecionado, um usuário por vez, com progresso por usuário. Funciona mesmo com os backups automáticos desativados.
+- **Backups automáticos**: quando ativados, um worker em segundo plano faz o backup dos usuários selecionados na frequência escolhida (diária, semanal ou mensal). A primeira execução ocorre poucos minutos após a ativação, as seguintes após o intervalo escolhido. A página mostra o resultado da última execução e a data da próxima.
+- **Retenção**: apenas os N arquivos mais recentes são mantidos por usuário, os mais antigos são excluídos da pasta após cada backup (0 mantém tudo).
+- **Navegação**: a página lista os arquivos presentes na pasta, com ações de download e exclusão.
+- **Restauração**: os arquivos são armazenados sob `{id do usuário}/` na pasta de backup e podem ser restaurados com a página padrão [Restaurar / Importar](#restaurar--importar).
+- **Exclusão de conta**: excluir uma conta também exclui os arquivos dela da pasta de backup.
+
+Para manter os backups em outro disco ou em um compartilhamento de rede, monte-o no contêiner e informe o caminho no contêiner (`/backups` neste exemplo) como pasta de backup:
+
+```yaml
+services:
+  webserver:
+    volumes:
+      - "./data:/var/www/html/data"
+      - "/mnt/nas/poznote-backups:/backups"
+```
+
+Uma pasta dentro da própria aplicação é recusada, exceto `data/backups`. Quando os anexos ficam no S3 (armazenamento de anexos no S3), eles são incluídos nos arquivos, obtidos do bucket na hora.
+
+</details>
+
+<a id="s3-backups"></a>
+<details>
+<summary><strong>Backups agendados em um bucket S3</strong></summary>
+<br>
+
+Os administradores podem enviar arquivos de backup completos (um ZIP por usuário, idêntico ao download do Backup Completo) para um bucket compatível com S3, manualmente ou automaticamente de acordo com uma programação. A configuração é independente da do Armazenamento de anexos no S3, então os backups podem ir para outro bucket ou provedor.
+
+Configure isso em **Configurações > Backups S3** (somente administradores).
+
+- **Chave geral**: uma opção no topo da página ativa ou desativa o recurso inteiro. Quando desativado, os backups automáticos param e as seções de backup e restauração S3 somem para todos os usuários (as ações de autoatendimento também são recusadas no servidor).
+- **Configuração**: URL do endpoint, região, bucket, chave de acesso, chave secreta e endereçamento path-style, com um teste de conexão integrado.
+- **Seleção de usuários**: caixas de seleção definem quais usuários são cobertos pelos backups. Todos vêm marcados por padrão e, enquanto todos estiverem marcados, as novas contas são incluídas automaticamente.
+- **Backups manuais**: um botão "Fazer backup agora" envia um arquivo novo para cada usuário selecionado, um usuário por vez, com o progresso de cada um. Ele funciona assim que a conexão estiver configurada, mesmo com os backups automáticos desligados.
+- **Backups automáticos**: quando ativados, um processo em segundo plano faz o backup dos usuários selecionados na frequência escolhida (diária, semanal ou mensal). A primeira execução acontece poucos minutos após a ativação, e as seguintes depois do intervalo escolhido.
+- **Retenção**: apenas os N arquivos mais recentes são mantidos por usuário; os mais antigos são excluídos do bucket após cada backup (0 mantém tudo).
+- **Navegação**: a página lista os arquivos que estão no bucket no momento, com ações de download e exclusão.
+- **Restauração**: os arquivos ficam em `backups/{user id}/` no bucket e podem ser restaurados pela página padrão de [Restaurar / Importar](#restaurar--importar).
+- **Autoatendimento**: depois que o bucket é configurado, cada usuário ganha uma seção "Backups S3" na página Backup / Exportar para enviar um arquivo novo da própria conta e para baixar ou excluir os arquivos existentes. Uma seção "Restaurar do S3" na página Restaurar / Importar restaura a conta diretamente a partir de um desses arquivos.
+- **Isolamento de contas**: duas opções ("Backups S3 na página de backup" e "Restauração S3 na página de restauração") desativam essas seções de autoatendimento para usuários que não são administradores. Elas são aplicadas no servidor, então as ações bloqueadas são recusadas mesmo quando chamadas diretamente.
+
+Quando os anexos estão armazenados no S3 (Armazenamento de anexos no S3), eles são incluídos nos arquivos por padrão, buscados no bucket na hora. Uma opção permite deixá-los de fora dos backups para arquivos mais leves e execuções mais rápidas.
 
 </details>
 
@@ -1148,6 +1160,18 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 
 </details>
 
+<a id="export-individual-notes"></a>
+<details>
+<summary><strong>Exportar notas individuais</strong></summary>
+<br>
+
+Exporte notas individuais com o botão **Exportar** da barra de ferramentas da nota:
+
+  - **Notas de texto formatado:** exportação para HTML, ou para um único arquivo HTML com as imagens incorporadas
+  - **Notas Markdown:** exportação para Markdown, para HTML, ou para um único arquivo HTML com as imagens incorporadas
+  - **Listas de tarefas:** as mesmas opções, além de uma exportação JSON bruta da lista
+
+</details>
 
 ## Restaurar / Importar
 
@@ -1165,7 +1189,7 @@ Envie o ZIP do backup completo para restaurar tudo:
 
 Não há limite de tamanho na prática. O arquivo é enviado em partes (uma parte que falha é reenviada, em vez de perder o envio inteiro), remontado no servidor e depois extraído e restaurado por um processo em segundo plano, de modo que nem o navegador nem um proxy reverso na frente da instância conseguem interromper a restauração por tempo limite. Uma barra de progresso cobre todo o processo: envio, extração, banco de dados, notas e, por fim, anexos. Ao terminar a restauração, o Poznote pergunta qual espaço de trabalho você quer abrir.
 
-A restauração a partir de um bucket S3 (veja [Backups S3](#backups-s3)) é executada pela mesma tarefa em segundo plano, então buscar um arquivo grande no bucket e restaurá-lo também não depende de uma requisição continuar ativa.
+A restauração a partir de um bucket S3 (veja [Backups S3](#s3-backups)) é executada pela mesma tarefa em segundo plano, então buscar um arquivo grande no bucket e restaurá-lo também não depende de uma requisição continuar ativa.
 
 Se o envio não for possível de forma alguma, a página Restaurar / Importar também oferece uma alternativa por cópia direta: copie o arquivo para dentro do contêiner do Poznote exatamente em `/tmp/backup_restore.zip` via SSH, recarregue a página e restaure a partir dali.
 
@@ -1292,7 +1316,7 @@ As notas que você modificou nos últimos 5 dias são mantidas em cada navegador
 *   **Manter offline:** os favoritos são sempre mantidos, e **Manter offline** no menu de uma nota ou de uma pasta (subpastas incluídas) a mantém seja qual for a data, com todos os anexos (PDF, áudio, arquivos) de até 25 MB cada. O mesmo menu de uma nota indica se ela está disponível offline neste navegador, e as páginas Notas e Pastas marcam as notas e pastas disponíveis offline neste navegador. A página Notas também permite manter várias notas offline de uma vez (ou deixar de manter) pelas ações em lote, e a página Pastas oferece **Manter offline** no menu de cada pasta.
 *   **Página Offline:** o botão **Offline** da barra de ícones lista as notas e pastas mantidas offline, como a página Compartilhamentos: as pastas em árvore com suas notas, o motivo pelo qual cada nota é mantida (mantida offline, em uma pasta mantida offline, favorito, modificada recentemente), um filtro e um botão para manter uma nota offline ou deixar de o fazer. Um ícone de aviso assinala uma nota que este navegador ainda não tem.
 *   **De volta online:** as alterações são enviadas automaticamente. Se uma nota também foi alterada no servidor nesse meio-tempo, as duas versões são mescladas quando possível; caso contrário, sua versão offline é mantida como uma nota separada chamada "... (cópia offline)". Uma nota excluída no servidor nesse meio-tempo é criada novamente.
-*   **Configuração:** **Configurações > Ações > Notas offline** define quantos dias de notas são mantidos (5 por padrão, até 30, 0 desativa as notas offline) e mostra o que o navegador atual contém.
+*   **Configuração:** **Configurações > Sincronização e histórico > Notas offline** define quantos dias de notas são mantidos (5 por padrão, até 30, 0 desativa as notas offline) e mostra o que o navegador atual contém.
 *   **Limites:** no máximo 300 notas e 50 MB de texto, primeiro as modificadas mais recentemente. Os arquivos também são mantidos: as imagens exibidas nessas notas e todos os anexos (PDF, áudio, arquivos) dos favoritos e das notas mantidas com **Manter offline**, até 25 MB cada, 400 arquivos e 200 MB no total, e nunca mais da metade do espaço livre do navegador. Um arquivo maior fica apenas online, e a nota avisa quando é aberta offline.
 *   **Requisitos:** o Poznote precisa ser servido por HTTPS (os navegadores só mantêm páginas offline em uma conexão segura, `http://localhost` também funciona) e ter sido aberto uma vez online no navegador, após o login, para que a cópia seja feita.
 *   **Privacidade:** apenas as notas da sua própria conta são mantidas, não as de uma conta ou de um espaço de trabalho compartilhado com você. Elas ficam armazenadas sem criptografia no navegador. Sair da conta as remove do navegador (inclusive as alterações ainda não enviadas, depois de um aviso que as lista): em um computador compartilhado, saia da conta ao ir embora. Sair da conta também funciona sem rede, pela página offline: as notas são removidas na hora, e a sessão no servidor termina na próxima vez que o Poznote for aberto online.
@@ -1362,6 +1386,17 @@ O Poznote inclui um servidor Model Context Protocol (MCP) que permite a assisten
 - "Atualize a nota 42 com novas informações"
 
 O servidor MCP vem com o `docker-compose.yml` oficial e é publicado apenas em `127.0.0.1`, então, por padrão, nada fora da sua máquina consegue acessá-lo. A instalação, a configuração dos clientes, as substituições de porta e de depuração, e como protegê-lo com `POZNOTE_MCP_AUTH_TOKEN` quando você o expõe mais estão descritos na [documentação do Servidor MCP](MCP-SERVER.pt.md).
+
+## Aplicativos
+
+O Poznote funciona em qualquer navegador e também pode ser instalado a partir do navegador como aplicativo web (PWA): ele passa a ter seu próprio ícone e sua própria janela, como um aplicativo nativo.
+
+*   **Android e computador:** abra sua instância do Poznote no Chrome ou no Edge e escolha **Instalar** no menu do navegador.
+*   **iPhone e iPad:** abra sua instância do Poznote no Safari, toque em **Compartilhar** e depois em **Adicionar à Tela de Início**.
+
+> Para instalar o aplicativo web, o Poznote precisa ser servido por HTTPS (`http://localhost` também funciona).
+
+A [página Aplicativos](https://poznote.com/apps.html) do site reúne tudo o que está disponível: o aplicativo web, a extensão do Chrome e os aplicativos móveis criados pela comunidade.
 
 ## Extensão do Chrome
 

@@ -179,10 +179,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $restoreImportAction = $_POST['action'] ?? '';
 $directCopyRestoreSubmitted = $restoreImportPostAllowed && $restoreImportAction === 'restore_cli_upload';
-$restoreBackupContentOpen = $restoreImportPostAllowed && in_array($restoreImportAction, ['complete_restore', 'check_cli_upload', 'restore_cli_upload', 'restore_s3_backup'], true);
-$standardRestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'complete_restore';
-$directCopyRestoreContentOpen = $directCopyRestoreSubmitted || ($restoreImportPostAllowed && $restoreImportAction === 'check_cli_upload');
-$s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'restore_s3_backup';
+// ?part= shows one part of the page alone, opened, under its own title: the
+// cards of Settings > Backup & restore and Export & import open one each. The three restore-*
+// parts are the sub-cards of the restore card; a part that is not offered to
+// this account shows the whole page instead.
+$restoreImportParts = [
+    'restore-standard' => t('restore_import.sections.standard_restore.title', [], 'Standard Restore'),
+    'import' => t('settings.cards.import_notes', [], 'Import notes'),
+];
+if (!poznoteIsUiElementHidden('card:directCopyRestoreCard')) {
+    $restoreImportParts['restore-direct-copy'] = t('settings.cards.restore_direct_copy', [], 'Restore by direct copy');
+}
+if ($s3RestoreSectionVisible) {
+    $restoreImportParts['restore-s3'] = t('restore_import.sections.s3_restore.title', [], 'Restore from S3');
+}
+$restoreImportPart = (string)($_GET['part'] ?? '');
+if (!isset($restoreImportParts[$restoreImportPart])) {
+    $restoreImportPart = '';
+}
+$restoreImportTitle = $restoreImportPart !== '' ? $restoreImportParts[$restoreImportPart] : t('settings.cards.restore_import', [], 'Restore / Import');
+$restoreImportIsRestorePart = $restoreImportPart !== '' && $restoreImportPart !== 'import';
+// The hidden attribute of the restore sub-cards left out
+$restoreSubCardHidden = function (string $part) use ($restoreImportPart, $restoreImportIsRestorePart): string {
+    return ($restoreImportIsRestorePart && $restoreImportPart !== $part) ? ' hidden' : '';
+};
+
+$restoreBackupContentOpen = $restoreImportIsRestorePart
+    || ($restoreImportPostAllowed && in_array($restoreImportAction, ['complete_restore', 'check_cli_upload', 'restore_cli_upload', 'restore_s3_backup'], true));
+$standardRestoreContentOpen = $restoreImportPart === 'restore-standard' || ($restoreImportPostAllowed && $restoreImportAction === 'complete_restore');
+$directCopyRestoreContentOpen = $restoreImportPart === 'restore-direct-copy' || $directCopyRestoreSubmitted || ($restoreImportPostAllowed && $restoreImportAction === 'check_cli_upload');
+$s3RestoreContentOpen = $restoreImportPart === 'restore-s3' || $restoreImportPostAllowed && $restoreImportAction === 'restore_s3_backup';
 ?>
 
 <!DOCTYPE html>
@@ -199,8 +225,8 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
 </head>
 <body class="has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php include __DIR__ . '/../icon_sidebar.php'; ?>
-    <?php poznoteSettingsShellOpen(['section' => 'settings-actions-section-grid', 'title' => t('settings.cards.restore_import', [], 'Restore / Import')]); ?>
-    <div class="backup-container">
+    <?php poznoteSettingsShellOpen(['section' => $restoreImportPart === 'import' ? 'settings-export-import-section-grid' : 'settings-backup-restore-section-grid', 'title' => $restoreImportTitle]); ?>
+    <div class="backup-container<?php echo $restoreImportPart !== '' ? ' backup-part-view' : ''; ?><?php echo $restoreImportIsRestorePart ? ' backup-subpart-view' : ''; ?>">
 
         
         <!-- Global Messages Section - Always visible at the top -->
@@ -254,7 +280,9 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
         
         <!-- Restore From Backup Card -->
         <div class="backup-section">
-            <div class="card-container">
+            <!-- The import card below sits inside this section: the part
+                 view hides the restore card, not the section around both -->
+            <div class="card-container"<?php echo $restoreImportPart === 'import' ? ' hidden' : ''; ?>>
                 <div class="card-header" data-action="toggle-card" data-target="restoreBackupContent">
                     <h3>
                         <?php echo t_h('restore_import.sections.restore_from_backup.title'); ?>
@@ -263,7 +291,7 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
                 <div class="card-content<?php echo $restoreBackupContentOpen ? ' open' : ''; ?>" id="restoreBackupContent">
             
         <!-- Standard Complete Restore Section -->
-        <div class="sub-card">
+        <div class="sub-card"<?php echo $restoreSubCardHidden('restore-standard'); ?>>
             <div class="sub-card-header" data-action="toggle-sub-card" data-target="standardRestoreContent">
                 <h4>
                     <?php echo t_h('restore_import.sections.standard_restore.title'); ?>
@@ -297,7 +325,7 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
         <!-- Direct Copy Restore Section (hideable via UI customization, per
              user or enforced instance-wide by the admin) -->
         <?php if (!poznoteIsUiElementHidden('card:directCopyRestoreCard')): ?>
-        <div class="sub-card" id="directCopyRestoreCard">
+        <div class="sub-card" id="directCopyRestoreCard"<?php echo $restoreSubCardHidden('restore-direct-copy'); ?>>
             <div class="sub-card-header" data-action="toggle-sub-card" data-target="directCopyRestoreContent">
                 <h4>
                     <?php echo t_h('restore_import.sections.direct_copy_restore.title'); ?>
@@ -365,7 +393,7 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
 
         <?php if ($s3RestoreSectionVisible): ?>
         <!-- Restore From S3 Section -->
-        <div class="sub-card" id="s3RestoreSection">
+        <div class="sub-card" id="s3RestoreSection"<?php echo $restoreSubCardHidden('restore-s3'); ?>>
             <div class="sub-card-header" data-action="toggle-sub-card" data-target="s3RestoreContent">
                 <h4>
                     <?php echo t_h('restore_import.sections.s3_restore.title', [], 'Restore from S3'); ?>
@@ -495,14 +523,14 @@ $s3RestoreContentOpen = $restoreImportPostAllowed && $restoreImportAction === 'r
         </div>
 
         <!-- Individual Notes Import Card -->
-        <div class="backup-section">
+        <div class="backup-section"<?php echo $restoreImportIsRestorePart ? ' hidden' : ''; ?>>
             <div class="card-container">
                 <div class="card-header" data-action="toggle-card" data-target="individualNotesContent">
                     <h3>
                         <?php echo t_h('restore_import.sections.individual_notes.title'); ?>
                     </h3>
                 </div>
-                <div class="card-content" id="individualNotesContent">
+                <div class="card-content<?php echo $restoreImportPart === 'import' ? ' open' : ''; ?>" id="individualNotesContent">
 
             <form method="post" enctype="multipart/form-data" id="individualNotesForm">
                 <input type="hidden" name="action" value="import_individual_notes">

@@ -194,7 +194,9 @@
       "format_toolbar_mode": "컴퓨터에서 노트에서 텍스트를 선택할 때 서식 지정 버튼이 표시되는 위치를 선택합니다. 노트 도구 모음, 노트 작업 대신 또는 노트 도구 모음을 그대로 유지하는 선택 항목 위에 떠 있는 메뉴에서 선택합니다.",
       "workspace_activity_emails": "내가 공유했거나 나와 공유된 작업 공간에서 다른 사용자가 노트를 변경하면 프로필의 이메일 주소로 알림을 받습니다. 이메일에는 생성·수정·삭제된 노트 목록만 포함되며, 노트 본문은 포함되지 않습니다. 변경 시 알림은 마지막 변경 후 몇 분 뒤, 일일 요약은 매일 오전 8시, 주간 요약은 월요일 오전 8시에 설정한 시간대를 기준으로 발송됩니다.",
       "workspace_activity_emails_no_address": "이 이메일을 받으려면 프로필에 이메일 주소를 추가하세요.",
-      "custom_fonts": "글꼴 파일을 업로드하면 모든 사용자가 앱 글꼴과 마크다운 편집기 글꼴 목록에서 선택할 수 있습니다."
+      "custom_fonts": "글꼴 파일을 업로드하면 모든 사용자가 앱 글꼴과 마크다운 편집기 글꼴 목록에서 선택할 수 있습니다.",
+      "structured_export": "노트를 Poznote와 같은 폴더 구조의 파일로 내보냅니다.",
+      "local_backup": "전체 백업 아카이브를 서버의 폴더에 수동으로 또는 일정에 따라 저장하고 최신 백업만 보관합니다."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "모바일에서는 이 설정과 관계없이 키보드 위 도구 모음의 + 버튼으로 같은 메뉴를 열 수 있습니다."
@@ -208,7 +210,11 @@
       "pinned": "고정됨",
       "account": "내 계정",
       "workspaces": "작업 공간",
-      "actions": "작업",
+      "backup_restore": "백업 및 복원",
+      "export_import": "내보내기 및 가져오기",
+      "sync_history": "동기화 및 기록",
+      "integrations": "연동",
+      "apps": "앱",
       "admin_tools": "관리자 도구",
       "display": "화면 표시",
       "ui_customization": "화면 요소 표시",
@@ -228,14 +234,16 @@
       "storage_limits": "저장용량 및 한도",
       "appearance": "모양",
       "maintenance": "유지보수",
-      "backup_sync": "백업 및 동기화",
       "editing": "편집",
-      "apps": "앱",
       "profile_sign_in": "프로필 및 로그인",
       "language_region": "언어 및 지역",
       "storage": "저장 공간",
       "layout": "레이아웃",
-      "preferences": "환경설정"
+      "preferences": "환경설정",
+      "backup": "백업",
+      "export": "내보내기",
+      "restore": "복원",
+      "import": "가져오기"
     },
     "cards": {
       "tenant_isolation": "사용자 기능 제한",
@@ -281,7 +289,10 @@
       "s3_backup": "S3 백업",
       "stt": "음성 텍스트 변환 (STT)",
       "api_rest": "API REST",
-      "custom_fonts": "사용자 지정 글꼴"
+      "custom_fonts": "사용자 지정 글꼴",
+      "restore_direct_copy": "직접 복사로 복원",
+      "import_notes": "노트 가져오기",
+      "local_backup": "로컬 백업"
     },
     "default_credentials": {
       "both": "이 계정은 원래 제공된 사용자 이름과 비밀번호를 계속 사용합니다. 이 인스턴스에 접근할 수 있는 사람은 누구나 로그인할 수 있습니다.",
@@ -3446,7 +3457,8 @@
     "destinations": {
       "download": "다운로드",
       "s3": "S3",
-      "server": "서버"
+      "server": "서버",
+      "local": "로컬 폴더"
     },
     "sources": {
       "upload": "업로드",
@@ -3893,6 +3905,7 @@
     },
     "test": {
       "button": "테스트 이메일 보내기",
+      "recipient": "테스트 이메일은 계정의 이메일 주소({{email}})로 전송됩니다. 다른 주소로 보내려면 사용자 페이지에서 이 주소를 변경하세요.",
       "success": "SMTP 설정이 저장되었으며 관리자가 계정에 대해 설정한 이메일 주소 {{email}}로 테스트 이메일이 전송되었습니다.",
       "error": "SMTP 설정이 저장되었지만 테스트 이메일이 실패했습니다: {{error}}",
       "no_account_email": "계정에는 이메일 주소가 설정되어 있지 않습니다. 프로필에 추가하려면 관리자에게 문의하세요.",
@@ -4664,6 +4677,31 @@
     "users_badge_inactive": "비활성",
     "users_count": "{{total}} 사용자 중 {{selected}}가 선택됨",
     "users_count_filtered": "{{total}} 사용자 중 {{selected}}가 선택됨, {{shown}}가 표시됨"
+  },
+  "local_backup": {
+    "title": "로컬 백업",
+    "description": "전체 백업 아카이브(사용자당 ZIP 하나, 전체 백업 다운로드와 동일)를 서버의 폴더에 수동으로 또는 일정에 따라 자동으로 저장합니다.",
+    "description_scope": "이 설정은 이 인스턴스의 모든 사용자에게 적용됩니다.",
+    "enable_description": "아래 일정에 따라 선택한 사용자를 폴더에 백업합니다. 이 스위치가 꺼져 있어도 이 페이지에서 수동 백업을 실행할 수 있습니다.",
+    "directory_label": "백업 폴더",
+    "directory_description": "서버의 절대 경로입니다(Docker를 사용하는 경우 컨테이너 내부 경로). 비워 두면 {{default}}을(를) 사용합니다. 백업을 다른 곳에 저장하려면 볼륨을 마운트하고 그 경로를 여기에 입력하세요.",
+    "retention_description": "백업할 때마다 오래된 아카이브가 폴더에서 삭제됩니다. 0은 모두 보관합니다.",
+    "manual_description": "선택한 사용자를 지금 바로 한 명씩 폴더에 백업합니다.",
+    "confirm_run": "선택한 사용자를 지금 백업 폴더에 백업할까요?",
+    "run_done": "백업 완료: 사용자 {{saved}}/{{total}}명을 백업했습니다.",
+    "user_ok": "{{username}}: 저장됨 ({{size}})",
+    "last_run": "마지막 실행({{trigger}}): {{date}}, 사용자 {{saved}}/{{total}}명 백업됨.",
+    "next_run": "다음 자동 백업: {{date}}.",
+    "list_title": "폴더의 백업",
+    "list_empty": "폴더에 아직 백업이 없습니다.",
+    "list_error": "백업 목록을 가져올 수 없습니다: {{error}}",
+    "confirm_delete": "폴더에서 백업 {{filename}}을(를) 삭제할까요?",
+    "footer_note": "아카이브는 백업 폴더의 {user id}/ 아래에 저장되며 표준 \"복원/가져오기\" 페이지를 통해 복원할 수 있습니다.",
+    "messages": {
+      "not_absolute": "백업 폴더는 절대 경로여야 합니다(예: /backups).",
+      "inside_app": "백업 폴더는 data/backups를 제외하고 애플리케이션 내부에 둘 수 없습니다.",
+      "not_writable": "백업 폴더를 만들 수 없거나 웹 서버가 쓸 수 없습니다: {{path}}"
+    }
   },
   "tasklist_embed": {
     "unavailable": "이 할 일 목록은 더 이상 사용할 수 없습니다.",

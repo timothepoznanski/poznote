@@ -447,9 +447,15 @@ function poznoteGetCustomCssHref() {
  *
  * There is exactly one such element per page, and it is the only place a custom
  * stylesheet is applied: the global one is its default href, and a user who
- * picked a custom theme in the rail gets that theme's file instead. The script
- * that follows it does the swap while the head is still parsing, so the default
- * sheet never flashes before the chosen one.
+ * picked a custom theme in the rail gets that theme's file instead.
+ *
+ * Which of the two it is only the browser knows (the theme is kept in
+ * localStorage), so the tag is written by a script, with its final href. It
+ * used to be a plain <link> whose href a script changed right after, and
+ * Firefox does not hold the first paint for a stylesheet that gets its href
+ * that way: every page showed up in the plain dark or light theme, then
+ * switched to the custom one when its file arrived (issue #1498). A link the
+ * parser inserts already pointing at its file blocks rendering everywhere.
  *
  * The element is rendered even with no global stylesheet, as long as the theme
  * list offers one: the browser needs something to point at.
@@ -460,14 +466,19 @@ function poznoteRenderCustomCssLinkTag() {
         return '';
     }
 
-    $attributes = ' id="poznote-custom-css" data-poznote-custom-css="1"';
-    if ($href !== '') {
-        $escaped = htmlspecialchars($href, ENT_QUOTES, 'UTF-8');
-        $attributes .= ' href="' . $escaped . '" data-poznote-default-href="' . $escaped . '"';
+    $json = json_encode($href, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+    if ($json === false) {
+        $json = '""';
     }
 
-    return '<link rel="stylesheet"' . $attributes . '>'
-        . '<script>window.__poznoteApplyCustomTheme&&window.__poznoteApplyCustomTheme();</script>';
+    // js/theme-init.js writes the tag on the pages that load it. The others
+    // have no per-user theme, they get the global stylesheet as it is.
+    return '<script data-poznote-custom-css="1">(function(h){'
+        . 'if(window.__poznoteWriteCustomCssLink){window.__poznoteWriteCustomCssLink(h);return;}'
+        . 'var l=document.createElement("link");l.rel="stylesheet";l.id="poznote-custom-css";'
+        . 'if(h){l.href=h;l.setAttribute("data-poznote-default-href",h);}'
+        . 'if(document.readyState==="loading"){document.write(l.outerHTML);}else{document.head.appendChild(l);}'
+        . '})(' . $json . ');</script>';
 }
 
 /**

@@ -42,8 +42,11 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:delete-account-card" checked><span><?php echo t_h('settings.cards.delete_account', [], 'Delete Account'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:default-workspace-card" checked><span><?php echo t_h('workspaces.default.title', [], 'Default Workspace'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-card" checked><span><?php echo t_h('settings.cards.git_sync', [], 'Git Sync'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backup-export-card" checked><span><?php echo t_h('settings.cards.backup_export', [], 'Backup / Export'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:restore-import-card" checked><span><?php echo t_h('settings.cards.restore_import', [], 'Restore / Import'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:backup-export-card" checked><span><?php echo t_h('backup_export.sections.complete_backup.title', [], 'Complete Backup'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:structured-export-card" checked><span><?php echo t_h('backup_export.sections.structured_export.title', [], 'Structured Export'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:attachments-export-card" checked><span><?php echo t_h('backup_export.sections.attachments_export.title', [], 'Attachments Export'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:restore-import-card" checked><span><?php echo t_h('restore_import.sections.standard_restore.title', [], 'Standard Restore'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-notes-card" checked><span><?php echo t_h('settings.cards.import_notes', [], 'Import notes'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-user-card" checked><span><?php echo t_h('settings.cards.storage_stats_user', [], 'User Storage statistics'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:extension-card" checked><span><?php echo t_h('settings.cards.install_extension', [], 'Install extension'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:install-app-card" checked><span><?php echo t_h('settings.cards.install_app', [], 'Install application'); ?></span></label>
@@ -99,6 +102,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:stt-user-card" checked><span><?php echo t_h('stt_settings_user.card', [], 'My transcription server'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-storage-card" checked><span><?php echo t_h('settings.cards.s3_storage', [], 'S3 Attachments'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-backup-card" checked><span><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:local-backup-card" checked><span><?php echo t_h('settings.cards.local_backup', [], 'Local Backups'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:executable-attachments-card" checked><span><?php echo t_h('settings.cards.allow_executable_attachments', [], 'Script and executable attachments'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tenant-isolation-card" checked><span><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span></label>

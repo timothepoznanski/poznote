@@ -515,7 +515,9 @@
       "format_toolbar_mode": "Sur ordinateur, choisissez où s'affichent les boutons de mise en forme quand vous sélectionnez du texte dans une note : dans la barre d'outils de la note, à la place des actions de la note, ou dans un menu flottant au-dessus de la sélection, qui laisse la barre d'outils de la note telle quelle.",
       "workspace_activity_emails": "Recevez un email quand quelqu'un d'autre modifie une note dans un espace de travail que vous partagez, ou dans un espace partagé avec vous. Il liste les notes créées, modifiées et supprimées, jamais leur contenu, et il est envoyé à l'adresse email de votre profil. Au fil des modifications : quelques minutes après la dernière modification. Résumé quotidien : à 8 h. Résumé hebdomadaire : le lundi à 8 h, dans votre fuseau horaire.",
       "workspace_activity_emails_no_address": "Ajoutez une adresse email à votre profil pour recevoir ces emails.",
-      "custom_fonts": "Importez des fichiers de police pour les proposer à tous les utilisateurs dans les listes Police de l'application et Police de l'éditeur Markdown."
+      "custom_fonts": "Importez des fichiers de police pour les proposer à tous les utilisateurs dans les listes Police de l'application et Police de l'éditeur Markdown.",
+      "structured_export": "Exportez vos notes sous forme de fichiers, rangés dans des dossiers comme dans Poznote.",
+      "local_backup": "Enregistrez des archives de sauvegarde complètes dans un dossier du serveur, manuellement ou selon une planification, en ne conservant que les plus récentes."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -529,7 +531,11 @@
       "pinned": "Épinglés",
       "account": "Mon compte",
       "workspaces": "Espaces de travail",
-      "actions": "Actions",
+      "backup_restore": "Sauvegarde et restauration",
+      "export_import": "Export et import",
+      "sync_history": "Synchronisation et historique",
+      "integrations": "Intégrations",
+      "apps": "Applications",
       "admin_tools": "Outils d'administration",
       "display": "Affichage",
       "ui_customization": "Visibilité des éléments",
@@ -549,14 +555,16 @@
       "storage_limits": "Stockage et limites",
       "appearance": "Apparence",
       "maintenance": "Maintenance",
-      "backup_sync": "Sauvegardes et synchronisation",
       "editing": "Édition",
-      "apps": "Applications",
       "profile_sign_in": "Profil et connexion",
       "language_region": "Langue et région",
       "storage": "Stockage",
       "layout": "Mise en page",
-      "preferences": "Préférences"
+      "preferences": "Préférences",
+      "backup": "Sauvegarde",
+      "export": "Export",
+      "restore": "Restauration",
+      "import": "Import"
     },
     "sections": {
       "account_display": "Compte & Affichage",
@@ -622,7 +630,10 @@
       "s3_backup": "Sauvegardes S3",
       "stt": "Transcription",
       "api_rest": "API REST",
-      "custom_fonts": "Polices personnalisées"
+      "custom_fonts": "Polices personnalisées",
+      "restore_direct_copy": "Restauration par copie directe",
+      "import_notes": "Importer des notes",
+      "local_backup": "Sauvegardes locales"
     },
     "default_credentials": {
       "both": "Ce compte utilise encore le login et le mot de passe livrés par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",
@@ -4052,7 +4063,8 @@
     "destinations": {
       "download": "téléchargement",
       "s3": "S3",
-      "server": "serveur"
+      "server": "serveur",
+      "local": "dossier local"
     },
     "sources": {
       "upload": "téléversement",
@@ -4366,6 +4378,7 @@
     },
     "test": {
       "button": "Envoyer un mail de test",
+      "recipient": "L'email de test est envoyé à l'adresse mail de votre compte : {{email}}. Pour l'envoyer ailleurs, modifiez cette adresse dans la page Utilisateurs.",
       "success": "Configuration SMTP enregistrée et email de test envoyé à l'adresse mail {{email}} configurée pour votre compte par l'administrateur.",
       "error": "Configuration SMTP enregistrée, mais l’email de test a échoué : {{error}}",
       "no_account_email": "Votre compte n'a pas d'adresse mail configurée. Contactez un administrateur pour qu'il en ajoute une à votre profil.",
@@ -5096,6 +5109,31 @@
     "users_badge_inactive": "Inactif",
     "users_count": "{{selected}} utilisateur(s) sélectionné(s) sur {{total}}",
     "users_count_filtered": "{{selected}} utilisateur(s) sélectionné(s) sur {{total}}, {{shown}} affiché(s)"
+  },
+  "local_backup": {
+    "title": "Sauvegardes locales",
+    "description": "Enregistrez des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement de la sauvegarde complète) dans un dossier du serveur, manuellement ou automatiquement selon une planification.",
+    "description_scope": "Ce réglage s'applique à tous les utilisateurs de cette instance.",
+    "enable_description": "Sauvegarde les utilisateurs sélectionnés dans le dossier selon la planification ci-dessous. Les sauvegardes manuelles depuis cette page fonctionnent même si cet interrupteur est désactivé.",
+    "directory_label": "Dossier de sauvegarde",
+    "directory_description": "Chemin absolu sur le serveur (dans le conteneur avec Docker). Laissez vide pour utiliser {{default}}. Pour stocker les sauvegardes ailleurs, montez un volume et saisissez son chemin ici.",
+    "retention_description": "Les archives plus anciennes sont supprimées du dossier après chaque sauvegarde. 0 conserve tout.",
+    "manual_description": "Sauvegarde les utilisateurs sélectionnés dans le dossier immédiatement, un utilisateur à la fois.",
+    "confirm_run": "Sauvegarder maintenant les utilisateurs sélectionnés dans le dossier de sauvegarde ?",
+    "run_done": "Sauvegarde terminée : {{saved}}/{{total}} utilisateur(s) sauvegardé(s).",
+    "user_ok": "{{username}} : enregistré ({{size}})",
+    "last_run": "Dernière exécution ({{trigger}}) : {{date}}, {{saved}}/{{total}} utilisateur(s) sauvegardé(s).",
+    "next_run": "Prochaine sauvegarde automatique : {{date}}.",
+    "list_title": "Sauvegardes dans le dossier",
+    "list_empty": "Aucune sauvegarde dans le dossier pour le moment.",
+    "list_error": "Impossible de lister les sauvegardes : {{error}}",
+    "confirm_delete": "Supprimer la sauvegarde {{filename}} du dossier ?",
+    "footer_note": "Les archives sont stockées sous {id utilisateur}/ dans le dossier de sauvegarde et peuvent être restaurées avec la page « Restauration / Import » standard.",
+    "messages": {
+      "not_absolute": "Le dossier de sauvegarde doit être un chemin absolu, par exemple /backups.",
+      "inside_app": "Le dossier de sauvegarde ne peut pas se trouver dans l'application, hormis dans data/backups.",
+      "not_writable": "Le dossier de sauvegarde ne peut pas être créé ou n'est pas accessible en écriture par le serveur web : {{path}}"
+    }
   },
   "tasklist_embed": {
     "unavailable": "Cette liste de tâches n'est plus disponible.",

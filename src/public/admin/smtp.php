@@ -391,6 +391,9 @@ $notifyCandidates = listNewUserNotificationCandidates();
             margin-bottom: 6px;
             line-height: 1.4;
         }
+        .smtp-hint.smtp-test-recipient {
+            margin: -10px 0 16px;
+        }
         .smtp-field input[type="text"],
         .smtp-field input[type="email"],
         .smtp-field input[type="number"],
@@ -574,6 +577,9 @@ $notifyCandidates = listNewUserNotificationCandidates();
             <?php echo t_h('smtp_admin.test.button', [], 'Send test email'); ?>
         </button>
     </div>
+    <?php if (filter_var($currentAccountEmail, FILTER_VALIDATE_EMAIL)): ?>
+        <span class="smtp-hint smtp-test-recipient"><?php echo t_h('smtp_admin.test.recipient', ['email' => $currentAccountEmail], 'The test email is sent to the email address of your account: {{email}}. To send it elsewhere, change that address in the Users page.'); ?></span>
+    <?php endif; ?>
 
     <?php if ($success || $error): ?>
         <div class="alert-with-margin alert <?php echo $success ? 'alert-success' : 'alert-danger'; ?>">

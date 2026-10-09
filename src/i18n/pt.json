@@ -516,7 +516,9 @@
       "format_toolbar_mode": "Num computador, escolha onde aparecem os botões de formatação quando seleciona texto numa nota: na barra de ferramentas da nota, no lugar das ações da nota, ou num menu flutuante acima da seleção, que deixa a barra de ferramentas da nota como está.",
       "workspace_activity_emails": "Receba um e-mail quando outra pessoa alterar uma nota em um espaço de trabalho que você compartilha ou em um compartilhado com você. Ele lista as notas criadas, editadas e excluídas, nunca o conteúdo delas, e é enviado para o endereço de e-mail do seu perfil. Conforme as alterações: alguns minutos após a última alteração. Resumo diário: às 8:00. Resumo semanal: na segunda-feira às 8:00, no seu fuso horário.",
       "workspace_activity_emails_no_address": "Adicione um endereço de e-mail ao seu perfil para receber estes e-mails.",
-      "custom_fonts": "Envie arquivos de fonte para oferecê-los a todos os usuários nas listas de fonte do aplicativo e do editor Markdown."
+      "custom_fonts": "Envie arquivos de fonte para oferecê-los a todos os usuários nas listas de fonte do aplicativo e do editor Markdown.",
+      "structured_export": "Exporte suas notas como arquivos, organizados em pastas como no Poznote.",
+      "local_backup": "Salve arquivos de backup completos em uma pasta do servidor, manualmente ou conforme um agendamento, mantendo apenas os mais recentes."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -530,7 +532,11 @@
       "pinned": "Fixados",
       "account": "Minha conta",
       "workspaces": "Espaços de trabalho",
-      "actions": "Ações",
+      "backup_restore": "Backup e restauração",
+      "export_import": "Exportação e importação",
+      "sync_history": "Sincronização e histórico",
+      "integrations": "Integrações",
+      "apps": "Aplicativos",
       "admin_tools": "Ferramentas de administração",
       "display": "Tela",
       "ui_customization": "Visibilidade dos elementos",
@@ -550,14 +556,16 @@
       "storage_limits": "Armazenamento e limites",
       "appearance": "Aparência",
       "maintenance": "Manutenção",
-      "backup_sync": "Backups e sincronização",
       "editing": "Edição",
-      "apps": "Aplicativos",
       "profile_sign_in": "Perfil e login",
       "language_region": "Idioma e região",
       "storage": "Armazenamento",
       "layout": "Layout",
-      "preferences": "Preferências"
+      "preferences": "Preferências",
+      "backup": "Backup",
+      "export": "Exportação",
+      "restore": "Restauração",
+      "import": "Importação"
     },
     "sections": {
       "account_display": "Conta e Exibição",
@@ -623,7 +631,10 @@
       "s3_backup": "Backups S3",
       "stt": "Transcrição",
       "api_rest": "API REST",
-      "custom_fonts": "Fontes personalizadas"
+      "custom_fonts": "Fontes personalizadas",
+      "restore_direct_copy": "Restauração por cópia direta",
+      "import_notes": "Importar notas",
+      "local_backup": "Backups locais"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -3948,7 +3959,8 @@
     "destinations": {
       "download": "transferência",
       "s3": "S3",
-      "server": "servidor"
+      "server": "servidor",
+      "local": "pasta local"
     },
     "sources": {
       "upload": "carregamento",
@@ -4262,6 +4274,7 @@
     },
     "test": {
       "button": "Enviar e-mail de teste",
+      "recipient": "O e-mail de teste é enviado para o endereço de e-mail da sua conta: {{email}}. Para o enviar para outro endereço, altere-o na página Utilizadores.",
       "success": "Configuração SMTP guardada e e-mail de teste enviado para o endereço de e-mail {{email}} configurado para a sua conta pelo administrador.",
       "error": "Configuração SMTP guardada, mas o e-mail de teste falhou: {{error}}",
       "no_account_email": "A sua conta não tem um endereço de e-mail configurado. Contacte um administrador para adicionar um ao seu perfil.",
@@ -4992,6 +5005,31 @@
     "users_badge_inactive": "Inativo",
     "users_count": "{{selected}} de {{total}} utilizador(es) selecionado(s)",
     "users_count_filtered": "{{selected}} de {{total}} utilizador(es) selecionado(s), {{shown}} apresentado(s)"
+  },
+  "local_backup": {
+    "title": "Backups locais",
+    "description": "Salve arquivos de backup completos (um ZIP por usuário, idêntico ao download do backup completo) em uma pasta do servidor, manualmente ou automaticamente conforme um agendamento.",
+    "description_scope": "A configuração se aplica a todos os usuários desta instância.",
+    "enable_description": "Faz o backup dos usuários selecionados na pasta conforme o agendamento abaixo. Os backups manuais desta página funcionam mesmo com esta opção desativada.",
+    "directory_label": "Pasta de backup",
+    "directory_description": "Caminho absoluto no servidor (dentro do contêiner com Docker). Deixe vazio para usar {{default}}. Para guardar os backups em outro lugar, monte um volume e informe o caminho aqui.",
+    "retention_description": "Os arquivos mais antigos são excluídos da pasta após cada backup. 0 mantém tudo.",
+    "manual_description": "Faz o backup dos usuários selecionados na pasta agora mesmo, um usuário por vez.",
+    "confirm_run": "Fazer agora o backup dos usuários selecionados na pasta de backup?",
+    "run_done": "Backup concluído: backup feito de {{saved}}/{{total}} usuário(s).",
+    "user_ok": "{{username}}: salvo ({{size}})",
+    "last_run": "Última execução ({{trigger}}): {{date}}, backup feito de {{saved}}/{{total}} usuário(s).",
+    "next_run": "Próximo backup automático: {{date}}.",
+    "list_title": "Backups na pasta",
+    "list_empty": "Ainda não há nenhum backup na pasta.",
+    "list_error": "Não foi possível listar os backups: {{error}}",
+    "confirm_delete": "Excluir o backup {{filename}} da pasta?",
+    "footer_note": "Os arquivos são armazenados sob {id do usuário}/ na pasta de backup e podem ser restaurados com a página padrão «Restaurar / Importar».",
+    "messages": {
+      "not_absolute": "A pasta de backup deve ser um caminho absoluto, por exemplo /backups.",
+      "inside_app": "A pasta de backup não pode ficar dentro da aplicação, exceto em data/backups.",
+      "not_writable": "A pasta de backup não pode ser criada ou o servidor web não tem permissão de escrita nela: {{path}}"
+    }
   },
   "tasklist_embed": {
     "unavailable": "Esta lista de tarefas não está mais disponível.",

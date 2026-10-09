@@ -69,7 +69,6 @@ https://discord.gg/fuEV6uqf4N
 - [Webhooks](#webhooks)
 - [Synchronisation Git](#synchronisation-git)
 - [Stockage des pièces jointes sur S3](#stockage-des-pièces-jointes-sur-s3)
-- [Sauvegardes S3](#sauvegardes-s3)
 - [Sauvegarde / Export](#sauvegarde--export)
 - [Restauration / Import](#restauration--import)
 - [Hors ligne](#hors-ligne)
@@ -77,6 +76,7 @@ https://discord.gg/fuEV6uqf4N
 - [Assistant IA](#assistant-ia)
 - [Transcription (reconnaissance vocale)](#transcription-reconnaissance-vocale)
 - [Serveur MCP](#serveur-mcp)
+- [Applications](#applications)
 - [Extension Chrome](#extension-chrome)
 - [Partager vers Poznote sur Android](#partager-vers-poznote-sur-android)
 - [Documentation de l'API](#documentation-de-lapi)
@@ -904,6 +904,7 @@ data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
 ├── fonts/                       # Custom fonts uploaded by an administrator
+├── backups/                     # Scheduled local backups, one folder per user ID
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database
@@ -1010,34 +1011,15 @@ La restauration d'une sauvegarde à laquelle manquent certains des fichiers de p
 
 </details>
 
-## Sauvegardes S3
-
-Les administrateurs peuvent envoyer des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement de la sauvegarde complète) vers un bucket compatible S3, manuellement ou automatiquement selon une planification. Cette configuration est indépendante de celle du stockage des pièces jointes sur S3 : les sauvegardes peuvent donc cibler un autre bucket ou un autre fournisseur.
-
-<details>
-<summary><strong>Configurer les sauvegardes S3</strong></summary>
-<br>
-
-Configurez-les dans **Paramètres > Sauvegardes S3** (administrateurs uniquement).
-
-- **Interrupteur principal** : un interrupteur en haut de la page active ou désactive toute la fonctionnalité. Lorsqu'il est désactivé, les sauvegardes automatiques s'arrêtent et les sections de sauvegarde et de restauration S3 disparaissent pour tous les utilisateurs (les actions en libre-service sont aussi refusées côté serveur).
-- **Configuration** : URL du endpoint, région, bucket, clé d'accès, clé secrète et adressage path-style, avec un test de connexion intégré.
-- **Sélection des utilisateurs** : des cases à cocher déterminent les utilisateurs couverts par les sauvegardes. Tout le monde est coché par défaut et, tant que tout le monde est coché, les nouveaux comptes sont inclus automatiquement.
-- **Sauvegardes manuelles** : un bouton « Sauvegarder maintenant » envoie une archive fraîche pour chaque utilisateur sélectionné, un utilisateur à la fois, avec la progression de chacun. Il fonctionne dès que la connexion est configurée, même si les sauvegardes automatiques sont désactivées.
-- **Sauvegardes automatiques** : une fois activées, un processus en arrière-plan sauvegarde les utilisateurs sélectionnés selon la fréquence choisie (quotidienne, hebdomadaire ou mensuelle). La première exécution a lieu dans les minutes qui suivent l'activation, les suivantes après l'intervalle choisi.
-- **Rétention** : seules les N archives les plus récentes sont conservées par utilisateur, les plus anciennes sont supprimées du bucket après chaque sauvegarde (0 conserve tout).
-- **Consultation** : la page liste les archives actuellement présentes dans le bucket, avec des actions de téléchargement et de suppression.
-- **Restauration** : les archives sont stockées sous `backups/{user id}/` dans le bucket et peuvent être restaurées avec la page standard [Restauration / Import](#restauration--import).
-- **Libre-service** : une fois le bucket configuré, chaque utilisateur dispose d'une section « Sauvegardes S3 » sur sa page Sauvegarde / Export pour envoyer une archive fraîche de son propre compte, et télécharger ou supprimer ses archives existantes. Une section « Restauration depuis S3 » sur la page Restauration / Import restaure directement son compte à partir de l'une de ces archives.
-- **Isolation des comptes** : deux options (« Sauvegardes S3 sur la page Sauvegarde » et « Restauration S3 sur la page Restauration ») désactivent ces sections en libre-service pour les utilisateurs non administrateurs. Elles sont appliquées côté serveur : les actions bloquées sont refusées même lorsqu'elles sont appelées directement.
-
-Lorsque les pièces jointes sont stockées dans S3 (stockage des pièces jointes sur S3), elles sont incluses par défaut dans les archives, récupérées à la volée depuis le bucket. Une option permet de les exclure des sauvegardes pour obtenir des archives plus légères et des exécutions plus rapides.
-
-</details>
-
 ## Sauvegarde / Export
 
-Poznote intègre une fonctionnalité de sauvegarde et d'export accessible depuis les Paramètres.
+Poznote peut sauvegarder un compte de plusieurs façons. Toutes produisent la même archive ZIP (base de données, notes et pièces jointes, avec un `index.html` à la racine pour une consultation hors ligne), et la page [Restauration / Import](#restauration--import) les accepte toutes :
+
+- **Manuellement**, en téléchargement depuis Paramètres > Sauvegarde / Export.
+- **Selon une planification**, dans un dossier du serveur ou vers un bucket compatible S3, configurée par un administrateur.
+- **Depuis un script**, via l'API REST, par exemple avec le script bash ci-dessous.
+
+Chaque option est détaillée ci-dessous, et les notes peuvent aussi être exportées individuellement.
 
 <a id="complete-backup"></a>
 <details>
@@ -1054,22 +1036,9 @@ L'archive est construite en arrière-plan par un processus dédié, et non penda
 
 #### Sauvegardes par utilisateur et sauvegardes complètes
 
-Poznote propose des options de sauvegarde flexibles :
+Toutes les méthodes ci-dessus produisent des **sauvegardes par utilisateur** : une archive ne contient que les données d'un seul compte (sa base de données, ses notes et ses pièces jointes). Chaque utilisateur peut sauvegarder et restaurer son propre compte, les administrateurs peuvent choisir n'importe quel compte.
 
-**Via l'interface web (Paramètres > Sauvegarde / Export) :**
-- **Tous les utilisateurs** peuvent sauvegarder et restaurer leur propre profil
-- **Les administrateurs** peuvent choisir le profil utilisateur à sauvegarder ou à restaurer
-- Les sauvegardes contiennent la base de données, les notes et les pièces jointes de l'utilisateur
-
-**Via l'API ou un script (administrateurs uniquement) :**
-- Sauvegardes automatisées avec le script `backup-poznote.sh`
-- Accès programmatique via l'API REST v1
-- Nécessite des identifiants administrateur
-
-**Portée des sauvegardes :**
-
-1. **Sauvegardes par utilisateur** : créées depuis les Paramètres ou via l'API. Elles contiennent *uniquement* les données d'un utilisateur donné (sa base de données, ses notes et ses pièces jointes).
-2. **Sauvegarde complète du système** : réalisée manuellement en sauvegardant tout le répertoire `/data`. C'est le seul moyen de sauvegarder en une fois la configuration maîtresse et les données de tous les utilisateurs.
+Une **sauvegarde complète du système**, qui inclut la configuration maîtresse (comptes, réglages globaux, liens partagés) et tous les utilisateurs en une fois, se fait en copiant tout le répertoire `/data` :
 
 ```bash
 # Sauvegarde complète du système en ligne de commande
@@ -1078,16 +1047,59 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 </details>
 
-<a id="export-individual-notes"></a>
+<a id="local-backups"></a>
 <details>
-<summary><strong>Exporter des notes individuelles</strong></summary>
+<summary><strong>Sauvegardes planifiées dans un dossier local</strong></summary>
 <br>
 
-Exportez des notes individuelles avec le bouton **Exporter** de la barre d'outils de la note :
+Les administrateurs peuvent faire enregistrer des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement de la sauvegarde complète) dans un dossier du serveur, manuellement ou automatiquement selon une planification, en ne conservant que les plus récentes. Rien d'autre que Poznote n'est nécessaire : ni bucket, ni tâche cron, ni script.
 
-  - **Notes en texte enrichi :** export en HTML, ou en un fichier HTML unique avec les images intégrées
-  - **Notes Markdown :** export en Markdown, en HTML, ou en un fichier HTML unique avec les images intégrées
-  - **Listes de tâches :** les mêmes options, plus un export JSON brut de la liste
+Configurez-les dans **Paramètres > Sauvegardes locales** (administrateurs uniquement).
+
+- **Dossier de sauvegarde** : un chemin absolu sur le serveur (dans le conteneur avec Docker). Laissé vide, les archives vont dans `data/backups`, qui fait déjà partie du volume de données. Le dossier est créé si nécessaire et doit être accessible en écriture par l'utilisateur du serveur web.
+- **Sélection des utilisateurs** : des cases à cocher choisissent les utilisateurs couverts par les sauvegardes. Tout le monde est coché par défaut, et tant que tout le monde est coché, les nouveaux comptes sont inclus automatiquement.
+- **Sauvegardes manuelles** : un bouton « Sauvegarder maintenant » enregistre une nouvelle archive pour chaque utilisateur sélectionné, un utilisateur à la fois, avec une progression par utilisateur. Il fonctionne même lorsque les sauvegardes automatiques sont désactivées.
+- **Sauvegardes automatiques** : une fois activées, un worker en arrière-plan sauvegarde les utilisateurs sélectionnés à la fréquence choisie (quotidienne, hebdomadaire ou mensuelle). La première exécution a lieu dans les minutes qui suivent l'activation, les suivantes après l'intervalle choisi. La page affiche le résultat de la dernière exécution et la date de la prochaine.
+- **Rétention** : seules les N archives les plus récentes sont conservées par utilisateur, les plus anciennes sont supprimées du dossier après chaque sauvegarde (0 conserve tout).
+- **Parcourir** : la page liste les archives présentes dans le dossier, avec des actions de téléchargement et de suppression.
+- **Restauration** : les archives sont stockées sous `{id utilisateur}/` dans le dossier de sauvegarde et peuvent être restaurées avec la page standard [Restauration / Import](#restauration--import).
+- **Suppression de compte** : supprimer un compte supprime aussi ses archives du dossier de sauvegarde.
+
+Pour conserver les sauvegardes sur un autre disque ou sur un partage réseau, montez-le dans le conteneur et saisissez le chemin côté conteneur (`/backups` dans cet exemple) comme dossier de sauvegarde :
+
+```yaml
+services:
+  webserver:
+    volumes:
+      - "./data:/var/www/html/data"
+      - "/mnt/nas/poznote-backups:/backups"
+```
+
+Un dossier situé dans l'application elle-même est refusé, hormis `data/backups`. Lorsque les pièces jointes sont stockées sur S3 (stockage des pièces jointes sur S3), elles sont incluses dans les archives, récupérées à la volée depuis le bucket.
+
+</details>
+
+<a id="s3-backups"></a>
+<details>
+<summary><strong>Sauvegardes planifiées vers un bucket S3</strong></summary>
+<br>
+
+Les administrateurs peuvent envoyer des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement de la sauvegarde complète) vers un bucket compatible S3, manuellement ou automatiquement selon une planification. Cette configuration est indépendante de celle du stockage des pièces jointes sur S3 : les sauvegardes peuvent donc cibler un autre bucket ou un autre fournisseur.
+
+Configurez-les dans **Paramètres > Sauvegardes S3** (administrateurs uniquement).
+
+- **Interrupteur principal** : un interrupteur en haut de la page active ou désactive toute la fonctionnalité. Lorsqu'il est désactivé, les sauvegardes automatiques s'arrêtent et les sections de sauvegarde et de restauration S3 disparaissent pour tous les utilisateurs (les actions en libre-service sont aussi refusées côté serveur).
+- **Configuration** : URL du endpoint, région, bucket, clé d'accès, clé secrète et adressage path-style, avec un test de connexion intégré.
+- **Sélection des utilisateurs** : des cases à cocher déterminent les utilisateurs couverts par les sauvegardes. Tout le monde est coché par défaut et, tant que tout le monde est coché, les nouveaux comptes sont inclus automatiquement.
+- **Sauvegardes manuelles** : un bouton « Sauvegarder maintenant » envoie une archive fraîche pour chaque utilisateur sélectionné, un utilisateur à la fois, avec la progression de chacun. Il fonctionne dès que la connexion est configurée, même si les sauvegardes automatiques sont désactivées.
+- **Sauvegardes automatiques** : une fois activées, un processus en arrière-plan sauvegarde les utilisateurs sélectionnés selon la fréquence choisie (quotidienne, hebdomadaire ou mensuelle). La première exécution a lieu dans les minutes qui suivent l'activation, les suivantes après l'intervalle choisi.
+- **Rétention** : seules les N archives les plus récentes sont conservées par utilisateur, les plus anciennes sont supprimées du bucket après chaque sauvegarde (0 conserve tout).
+- **Consultation** : la page liste les archives actuellement présentes dans le bucket, avec des actions de téléchargement et de suppression.
+- **Restauration** : les archives sont stockées sous `backups/{user id}/` dans le bucket et peuvent être restaurées avec la page standard [Restauration / Import](#restauration--import).
+- **Libre-service** : une fois le bucket configuré, chaque utilisateur dispose d'une section « Sauvegardes S3 » sur sa page Sauvegarde / Export pour envoyer une archive fraîche de son propre compte, et télécharger ou supprimer ses archives existantes. Une section « Restauration depuis S3 » sur la page Restauration / Import restaure directement son compte à partir de l'une de ces archives.
+- **Isolation des comptes** : deux options (« Sauvegardes S3 sur la page Sauvegarde » et « Restauration S3 sur la page Restauration ») désactivent ces sections en libre-service pour les utilisateurs non administrateurs. Elles sont appliquées côté serveur : les actions bloquées sont refusées même lorsqu'elles sont appelées directement.
+
+Lorsque les pièces jointes sont stockées dans S3 (stockage des pièces jointes sur S3), elles sont incluses par défaut dans les archives, récupérées à la volée depuis le bucket. Une option permet de les exclure des sauvegardes pour obtenir des archives plus légères et des exécutions plus rapides.
 
 </details>
 
@@ -1148,6 +1160,18 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 
 </details>
 
+<a id="export-individual-notes"></a>
+<details>
+<summary><strong>Exporter des notes individuelles</strong></summary>
+<br>
+
+Exportez des notes individuelles avec le bouton **Exporter** de la barre d'outils de la note :
+
+  - **Notes en texte enrichi :** export en HTML, ou en un fichier HTML unique avec les images intégrées
+  - **Notes Markdown :** export en Markdown, en HTML, ou en un fichier HTML unique avec les images intégrées
+  - **Listes de tâches :** les mêmes options, plus un export JSON brut de la liste
+
+</details>
 
 ## Restauration / Import
 
@@ -1165,7 +1189,7 @@ Téléversez le ZIP de sauvegarde complète pour tout restaurer :
 
 Il n'y a pas de limite de taille en pratique. L'archive est téléversée par tranches (une tranche qui échoue est renvoyée au lieu de faire perdre tout le téléversement), réassemblée sur le serveur, puis extraite et restaurée par un processus en arrière-plan : ni le navigateur ni un reverse proxy placé devant l'instance ne peuvent faire expirer la restauration. Une barre de progression couvre l'ensemble du traitement : téléversement, extraction, base de données, notes, puis pièces jointes. Une fois la restauration terminée, Poznote vous demande quel espace de travail ouvrir.
 
-La restauration depuis un bucket S3 (voir [Sauvegardes S3](#sauvegardes-s3)) s'exécute comme la même tâche en arrière-plan : récupérer une grosse archive depuis le bucket et la restaurer ne dépend donc pas non plus du maintien d'une requête.
+La restauration depuis un bucket S3 (voir [Sauvegardes S3](#s3-backups)) s'exécute comme la même tâche en arrière-plan : récupérer une grosse archive depuis le bucket et la restaurer ne dépend donc pas non plus du maintien d'une requête.
 
 Si le téléversement est tout simplement impossible, la page Restauration / Import propose aussi une solution de repli par copie directe : copiez l'archive dans le conteneur Poznote exactement à l'emplacement `/tmp/backup_restore.zip` via SSH, rechargez la page et lancez la restauration depuis celle-ci.
 
@@ -1292,7 +1316,7 @@ Les notes modifiées ces 5 derniers jours sont conservées dans chaque navigateu
 *   **Garder hors ligne :** les favoris sont toujours conservés, et **Garder hors ligne** dans le menu d'une note ou d'un dossier (sous-dossiers compris) la conserve quelle que soit sa date, avec toutes ses pièces jointes (PDF, audio, fichiers) jusqu'à 25 Mo chacune. Le même menu d'une note indique si elle est disponible hors ligne dans ce navigateur, et les pages Notes et Dossiers signalent les notes et dossiers disponibles hors ligne dans ce navigateur. La page Notes permet aussi de garder plusieurs notes hors ligne d'un coup (ou d'arrêter), depuis ses actions groupées, et la page Dossiers propose **Garder hors ligne** dans le menu de chaque dossier.
 *   **Page Hors ligne :** le bouton **Hors ligne** de la barre d'icônes liste les notes et dossiers gardés hors ligne, comme la page Partages : les dossiers en arborescence avec leurs notes, la raison pour laquelle chaque note est gardée (gardée hors ligne, dans un dossier gardé hors ligne, favori, modifiée récemment), un filtre, et un bouton pour garder une note hors ligne ou arrêter. Une icône d'avertissement signale une note que ce navigateur ne détient pas encore.
 *   **Retour du réseau :** les modifications sont envoyées automatiquement. Si une note a aussi été modifiée sur le serveur entre-temps, les deux versions sont fusionnées quand c'est possible, sinon votre version hors ligne est gardée dans une note à part nommée « ... (copie hors ligne) ». Une note supprimée sur le serveur entre-temps est recréée.
-*   **Réglages :** **Paramètres > Actions > Notes hors ligne** définit combien de jours de notes sont conservés (5 par défaut, jusqu'à 30, 0 désactive les notes hors ligne) et indique ce que contient le navigateur utilisé.
+*   **Réglages :** **Paramètres > Synchronisation et historique > Notes hors ligne** définit combien de jours de notes sont conservés (5 par défaut, jusqu'à 30, 0 désactive les notes hors ligne) et indique ce que contient le navigateur utilisé.
 *   **Limites :** 300 notes et 50 Mo de texte au plus, les plus récemment modifiées d'abord. Les fichiers sont conservés aussi : les images affichées dans ces notes, et toutes les pièces jointes (PDF, audio, fichiers) des favoris et des notes gardées avec **Garder hors ligne**, jusqu'à 25 Mo chacun, 400 fichiers et 200 Mo au total, et jamais plus de la moitié de l'espace libre du navigateur. Un fichier plus gros reste en ligne uniquement, et la note le signale quand elle est ouverte hors ligne.
 *   **Prérequis :** Poznote doit être servi en HTTPS (les navigateurs ne gardent des pages hors ligne que sur une connexion sécurisée, `http://localhost` fonctionne aussi) et avoir été ouvert une fois en ligne dans le navigateur, après connexion, pour que la copie soit faite.
 *   **Confidentialité :** seules les notes de votre propre compte sont conservées, pas celles d'un compte ou d'un espace de travail partagé avec vous. Elles sont stockées sans chiffrement dans le navigateur. La déconnexion les supprime du navigateur (les modifications pas encore envoyées aussi, après un avertissement qui les liste) : sur un ordinateur partagé, déconnectez-vous en partant. La déconnexion fonctionne aussi sans réseau, depuis la page hors ligne : les notes sont supprimées tout de suite, et la session sur le serveur se termine à la prochaine ouverture de Poznote en ligne.
@@ -1362,6 +1386,17 @@ Poznote intègre un serveur Model Context Protocol (MCP) qui permet à des assis
 - « Mets à jour la note 42 avec de nouvelles informations »
 
 Le serveur MCP est fourni avec le `docker-compose.yml` officiel et n'est publié que sur `127.0.0.1` : par défaut, rien en dehors de votre machine ne peut l'atteindre. L'installation, la configuration des clients, les surcharges de port et de débogage, et la protection par `POZNOTE_MCP_AUTH_TOKEN` lorsque vous l'exposez davantage sont décrites dans la [documentation du serveur MCP](MCP-SERVER.fr.md).
+
+## Applications
+
+Poznote fonctionne dans n'importe quel navigateur, et peut aussi s'installer depuis le navigateur comme une application web (PWA) : il dispose alors de sa propre icône et de sa propre fenêtre, comme une application native.
+
+*   **Android et ordinateur :** ouvrez votre instance Poznote dans Chrome ou Edge et choisissez **Installer** dans le menu du navigateur.
+*   **iPhone et iPad :** ouvrez votre instance Poznote dans Safari, touchez **Partager**, puis **Sur l'écran d'accueil**.
+
+> L'installation de l'application web nécessite que Poznote soit servi en HTTPS (`http://localhost` fonctionne aussi).
+
+La [page Applications](https://poznote.com/apps.html) du site recense tout ce qui est disponible : l'application web, l'extension Chrome et les applications mobiles créées par la communauté.
 
 ## Extension Chrome
 

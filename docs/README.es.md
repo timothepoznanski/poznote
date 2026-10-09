@@ -69,7 +69,6 @@ https://discord.gg/fuEV6uqf4N
 - [Webhooks](#webhooks)
 - [Sincronización Git](#sincronización-git)
 - [Almacenamiento de adjuntos en S3](#almacenamiento-de-adjuntos-en-s3)
-- [Copias de seguridad S3](#copias-de-seguridad-s3)
 - [Copia de seguridad / Exportar](#copia-de-seguridad--exportar)
 - [Restaurar / Importar](#restaurar--importar)
 - [Sin conexión](#sin-conexión)
@@ -77,6 +76,7 @@ https://discord.gg/fuEV6uqf4N
 - [Asistente IA](#asistente-ia)
 - [Transcripción (voz a texto)](#transcripción-voz-a-texto)
 - [Servidor MCP](#servidor-mcp)
+- [Aplicaciones](#aplicaciones)
 - [Extensión de Chrome](#extensión-de-chrome)
 - [Compartir con Poznote en Android](#compartir-con-poznote-en-android)
 - [Documentación de la API](#documentación-de-la-api)
@@ -904,6 +904,7 @@ data/
 ├── master.db                    # Profiles, global settings, shared links, account access, edit locks
 ├── css/                         # Custom CSS files uploaded by an administrator
 ├── fonts/                       # Custom fonts uploaded by an administrator
+├── backups/                     # Scheduled local backups, one folder per user ID
 └── users/
     ├── 1/                       # User ID 1 (default admin)
     │   ├── database/poznote.db  # User's notes database
@@ -1010,34 +1011,15 @@ Mientras el almacenamiento S3 está activado, se rechaza la restauración de una
 
 </details>
 
-## Copias de seguridad S3
-
-Los administradores pueden enviar archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga de Copia de seguridad completa) a un bucket compatible con S3, manualmente o de forma automática según una programación. La configuración es independiente de la del almacenamiento de adjuntos en S3, así que las copias de seguridad pueden ir a otro bucket u otro proveedor.
-
-<details>
-<summary><strong>Cómo configurar las copias de seguridad S3</strong></summary>
-<br>
-
-Configúralo en **Configuración > Copias de seguridad S3** (solo administradores).
-
-- **Interruptor general**: un interruptor en la parte superior de la página activa o desactiva toda la función. Cuando está desactivada, las copias automáticas se detienen y las secciones de copia de seguridad y restauración S3 desaparecen para todos los usuarios (el servidor también rechaza las acciones de autoservicio).
-- **Configuración**: URL del endpoint, región, bucket, clave de acceso, clave secreta y direccionamiento de tipo path-style, con una prueba de conexión integrada.
-- **Selección de usuarios**: unas casillas eligen qué usuarios cubren las copias de seguridad. Todos están marcados por defecto y, mientras todos lo estén, las cuentas nuevas se incluyen automáticamente.
-- **Copias manuales**: un botón «Respaldar ahora» sube un archivo nuevo para cada usuario seleccionado, un usuario tras otro, con el progreso de cada uno. Funciona en cuanto la conexión está configurada, aunque las copias automáticas estén desactivadas.
-- **Copias automáticas**: cuando están activadas, un proceso en segundo plano hace la copia de seguridad de los usuarios seleccionados con la frecuencia elegida (diaria, semanal o mensual). La primera ejecución tiene lugar a los pocos minutos de activarlas, las siguientes tras el intervalo elegido.
-- **Conservación**: solo se conservan los N archivos más recientes por usuario, los más antiguos se eliminan del bucket después de cada copia (0 lo conserva todo).
-- **Exploración**: la página lista los archivos que hay actualmente en el bucket, con acciones de descarga y eliminación.
-- **Restauración**: los archivos se guardan en `backups/{user id}/` dentro del bucket y pueden restaurarse con la página estándar de [Restaurar / Importar](#restaurar--importar).
-- **Autoservicio**: una vez configurado el bucket, cada usuario tiene una sección «Copias de seguridad S3» en su página de Copia de seguridad / Exportar para subir un archivo nuevo de su propia cuenta, y para descargar o eliminar sus archivos existentes. Una sección «Restaurar desde S3» en la página de Restaurar / Importar restaura su cuenta directamente desde uno de esos archivos.
-- **Aislamiento de cuentas**: dos opciones («Copias S3 en la página de copias de seguridad» y «Restauración S3 en la página de restauración») desactivan estas secciones de autoservicio para los usuarios que no son administradores. Se aplican en el servidor, así que las acciones bloqueadas se rechazan incluso cuando se llaman directamente.
-
-Cuando los adjuntos se guardan en S3 (almacenamiento de adjuntos en S3), se incluyen por defecto en los archivos, obtenidos del bucket sobre la marcha. Una opción permite dejarlos fuera de las copias de seguridad para obtener archivos más ligeros y ejecuciones más rápidas.
-
-</details>
-
 ## Copia de seguridad / Exportar
 
-Poznote incluye una función integrada de Copia de seguridad / Exportar, accesible desde Configuración.
+Poznote puede hacer la copia de seguridad de una cuenta de varias formas. Todas producen el mismo archivo ZIP (base de datos, notas y adjuntos, con un `index.html` en la raíz para consultarlo sin conexión), y la página [Restaurar / Importar](#restaurar--importar) acepta todas:
+
+- **Manualmente**, como descarga desde Configuración > Copia de seguridad / Exportar.
+- **De forma programada**, en una carpeta del servidor o en un bucket compatible con S3, configurada por un administrador.
+- **Desde un script**, mediante la API REST, por ejemplo con el script bash de más abajo.
+
+Cada opción se detalla a continuación, y las notas también se pueden exportar de una en una.
 
 <a id="complete-backup"></a>
 <details>
@@ -1054,22 +1036,9 @@ El archivo lo genera en segundo plano un proceso de trabajo, no la petición que
 
 #### Copias por usuario frente a copias completas
 
-Poznote ofrece opciones de copia de seguridad flexibles:
+Todos los métodos anteriores producen **copias de seguridad por usuario**: un archivo contiene solo los datos de una cuenta (su base de datos, sus notas y sus adjuntos). Cada usuario puede hacer una copia de su propia cuenta y restaurarla, los administradores pueden elegir cualquier cuenta.
 
-**Desde la interfaz web (Configuración > Copia de seguridad / Exportar):**
-- **Todos los usuarios** pueden hacer copias de seguridad de su propio perfil y restaurarlo
-- **Los administradores** pueden elegir de qué perfil de usuario hacer la copia de seguridad o cuál restaurar
-- Las copias de seguridad contienen la base de datos, las notas y los adjuntos del usuario
-
-**Mediante API o script (solo administradores):**
-- Copias de seguridad automatizadas con el script `backup-poznote.sh`
-- Acceso programático mediante la API REST v1
-- Requiere credenciales de administrador
-
-**Alcance de las copias de seguridad:**
-
-1. **Copias de seguridad por usuario**: se crean desde Configuración o mediante la API. Contienen *solo* los datos de un usuario concreto (su base de datos, sus notas y sus adjuntos).
-2. **Copia de seguridad completa del sistema**: se crea manualmente copiando todo el directorio `/data`. Es la única forma de hacer a la vez una copia de la configuración maestra y de los datos de todos los usuarios.
+Una **copia de seguridad completa del sistema**, que incluye la configuración maestra (cuentas, ajustes globales, enlaces compartidos) y todos los usuarios a la vez, se hace copiando todo el directorio `/data`:
 
 ```bash
 # Copia de seguridad completa del sistema desde la línea de comandos
@@ -1078,16 +1047,59 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 </details>
 
-<a id="export-individual-notes"></a>
+<a id="local-backups"></a>
 <details>
-<summary><strong>Exportar notas individuales</strong></summary>
+<summary><strong>Copias de seguridad programadas en una carpeta local</strong></summary>
 <br>
 
-Exporta notas individuales con el botón **Exportar** de la barra de herramientas de la nota:
+Los administradores pueden hacer que se guarden archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga de la copia de seguridad completa) en una carpeta del servidor, manualmente o automáticamente según una programación, conservando solo los más recientes. No hace falta nada fuera de Poznote: ni bucket, ni tarea cron, ni script.
 
-  - **Notas de texto enriquecido:** exportar a HTML, o a un único archivo HTML con las imágenes integradas
-  - **Notas Markdown:** exportar a Markdown, a HTML, o a un único archivo HTML con las imágenes integradas
-  - **Listas de tareas:** las mismas opciones, más una exportación JSON en bruto de la lista
+Configúralas en **Configuración > Copias de seguridad locales** (solo administradores).
+
+- **Carpeta de copias de seguridad**: una ruta absoluta en el servidor (dentro del contenedor con Docker). Si se deja vacía, los archivos van a `data/backups`, que ya forma parte del volumen de datos. La carpeta se crea si es necesario y el usuario del servidor web debe poder escribir en ella.
+- **Selección de usuarios**: unas casillas eligen qué usuarios cubren las copias. Todos están marcados por defecto y, mientras todos lo estén, las cuentas nuevas se incluyen automáticamente.
+- **Copias manuales**: un botón «Respaldar ahora» guarda un archivo nuevo para cada usuario seleccionado, un usuario cada vez, con el progreso por usuario. Funciona aunque las copias automáticas estén desactivadas.
+- **Copias automáticas**: cuando están activadas, un worker en segundo plano copia los usuarios seleccionados con la frecuencia elegida (diaria, semanal o mensual). La primera ejecución se produce a los pocos minutos de activarlas, las siguientes tras el intervalo elegido. La página muestra el resultado de la última ejecución y la fecha de la siguiente.
+- **Retención**: solo se conservan los N archivos más recientes por usuario, los más antiguos se eliminan de la carpeta tras cada copia (0 lo conserva todo).
+- **Exploración**: la página lista los archivos presentes en la carpeta, con acciones de descarga y eliminación.
+- **Restauración**: los archivos se almacenan bajo `{id de usuario}/` en la carpeta de copias de seguridad y pueden restaurarse con la página estándar [Restaurar / Importar](#restaurar--importar).
+- **Eliminación de cuentas**: al eliminar una cuenta también se eliminan sus archivos de la carpeta de copias de seguridad.
+
+Para guardar las copias en otro disco o en un recurso de red, móntalo en el contenedor e introduce la ruta del contenedor (`/backups` en este ejemplo) como carpeta de copias de seguridad:
+
+```yaml
+services:
+  webserver:
+    volumes:
+      - "./data:/var/www/html/data"
+      - "/mnt/nas/poznote-backups:/backups"
+```
+
+Una carpeta situada dentro de la propia aplicación se rechaza, salvo `data/backups`. Cuando los adjuntos se almacenan en S3 (almacenamiento de adjuntos en S3), se incluyen en los archivos, obtenidos del bucket sobre la marcha.
+
+</details>
+
+<a id="s3-backups"></a>
+<details>
+<summary><strong>Copias de seguridad programadas en un bucket S3</strong></summary>
+<br>
+
+Los administradores pueden enviar archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga de Copia de seguridad completa) a un bucket compatible con S3, manualmente o de forma automática según una programación. La configuración es independiente de la del almacenamiento de adjuntos en S3, así que las copias de seguridad pueden ir a otro bucket u otro proveedor.
+
+Configúralo en **Configuración > Copias de seguridad S3** (solo administradores).
+
+- **Interruptor general**: un interruptor en la parte superior de la página activa o desactiva toda la función. Cuando está desactivada, las copias automáticas se detienen y las secciones de copia de seguridad y restauración S3 desaparecen para todos los usuarios (el servidor también rechaza las acciones de autoservicio).
+- **Configuración**: URL del endpoint, región, bucket, clave de acceso, clave secreta y direccionamiento de tipo path-style, con una prueba de conexión integrada.
+- **Selección de usuarios**: unas casillas eligen qué usuarios cubren las copias de seguridad. Todos están marcados por defecto y, mientras todos lo estén, las cuentas nuevas se incluyen automáticamente.
+- **Copias manuales**: un botón «Respaldar ahora» sube un archivo nuevo para cada usuario seleccionado, un usuario tras otro, con el progreso de cada uno. Funciona en cuanto la conexión está configurada, aunque las copias automáticas estén desactivadas.
+- **Copias automáticas**: cuando están activadas, un proceso en segundo plano hace la copia de seguridad de los usuarios seleccionados con la frecuencia elegida (diaria, semanal o mensual). La primera ejecución tiene lugar a los pocos minutos de activarlas, las siguientes tras el intervalo elegido.
+- **Conservación**: solo se conservan los N archivos más recientes por usuario, los más antiguos se eliminan del bucket después de cada copia (0 lo conserva todo).
+- **Exploración**: la página lista los archivos que hay actualmente en el bucket, con acciones de descarga y eliminación.
+- **Restauración**: los archivos se guardan en `backups/{user id}/` dentro del bucket y pueden restaurarse con la página estándar de [Restaurar / Importar](#restaurar--importar).
+- **Autoservicio**: una vez configurado el bucket, cada usuario tiene una sección «Copias de seguridad S3» en su página de Copia de seguridad / Exportar para subir un archivo nuevo de su propia cuenta, y para descargar o eliminar sus archivos existentes. Una sección «Restaurar desde S3» en la página de Restaurar / Importar restaura su cuenta directamente desde uno de esos archivos.
+- **Aislamiento de cuentas**: dos opciones («Copias S3 en la página de copias de seguridad» y «Restauración S3 en la página de restauración») desactivan estas secciones de autoservicio para los usuarios que no son administradores. Se aplican en el servidor, así que las acciones bloqueadas se rechazan incluso cuando se llaman directamente.
+
+Cuando los adjuntos se guardan en S3 (almacenamiento de adjuntos en S3), se incluyen por defecto en los archivos, obtenidos del bucket sobre la marcha. Una opción permite dejarlos fuera de las copias de seguridad para obtener archivos más ligeros y ejecuciones más rápidas.
 
 </details>
 
@@ -1148,6 +1160,18 @@ bash backup-poznote.sh '<poznote_url>' '<admin_username>' '<admin_password>' '<t
 
 </details>
 
+<a id="export-individual-notes"></a>
+<details>
+<summary><strong>Exportar notas individuales</strong></summary>
+<br>
+
+Exporta notas individuales con el botón **Exportar** de la barra de herramientas de la nota:
+
+  - **Notas de texto enriquecido:** exportar a HTML, o a un único archivo HTML con las imágenes integradas
+  - **Notas Markdown:** exportar a Markdown, a HTML, o a un único archivo HTML con las imágenes integradas
+  - **Listas de tareas:** las mismas opciones, más una exportación JSON en bruto de la lista
+
+</details>
 
 ## Restaurar / Importar
 
@@ -1165,7 +1189,7 @@ Sube el ZIP de la copia de seguridad completa para restaurarlo todo:
 
 No hay límite de tamaño en la práctica. El archivo se sube por fragmentos (un fragmento que falla se reintenta en lugar de perder toda la subida), se vuelve a ensamblar en el servidor y después lo extrae y restaura un proceso en segundo plano, así que ni el navegador ni un proxy inverso delante de la instancia pueden interrumpir la restauración por tiempo de espera. Una barra de progreso cubre todo el proceso: subida, extracción, base de datos, notas y, por último, adjuntos. Cuando termina la restauración, Poznote te pregunta qué espacio de trabajo quieres abrir.
 
-La restauración desde un bucket S3 (consulta [Copias de seguridad S3](#copias-de-seguridad-s3)) se ejecuta como el mismo trabajo en segundo plano, así que obtener un archivo grande del bucket y restaurarlo tampoco depende de que una petición siga activa.
+La restauración desde un bucket S3 (consulta [Copias de seguridad S3](#s3-backups)) se ejecuta como el mismo trabajo en segundo plano, así que obtener un archivo grande del bucket y restaurarlo tampoco depende de que una petición siga activa.
 
 Si la subida no es posible en absoluto, la página de Restaurar / Importar también ofrece una alternativa de copia directa: copia el archivo en el contenedor de Poznote exactamente en `/tmp/backup_restore.zip` por SSH, recarga la página y restaura desde ahí.
 
@@ -1292,7 +1316,7 @@ Las notas que modificaste en los últimos 5 días se guardan en cada navegador d
 *   **Guardar sin conexión:** los favoritos siempre se guardan, y **Guardar sin conexión** en el menú de una nota o de una carpeta (subcarpetas incluidas) la guarda sea cual sea su fecha, con todos sus adjuntos (PDF, audio, archivos) de hasta 25 MB cada uno. El mismo menú de una nota indica si está disponible sin conexión en este navegador, y las páginas Notas y Carpetas señalan las notas y carpetas disponibles sin conexión en este navegador. La página Notas también permite guardar varias notas sin conexión a la vez (o dejar de hacerlo) desde sus acciones en bloque, y la página Carpetas ofrece **Guardar sin conexión** en el menú de cada carpeta.
 *   **Página Sin conexión:** el botón **Sin conexión** de la barra de iconos muestra las notas y carpetas guardadas sin conexión, como la página Compartidos: las carpetas en árbol con sus notas, por qué se guarda cada nota (guardada sin conexión, en una carpeta guardada sin conexión, favorito, modificada recientemente), un filtro y un botón para guardar una nota sin conexión o dejar de hacerlo. Un icono de advertencia señala una nota que este navegador aún no tiene.
 *   **De vuelta en línea:** los cambios se envían automáticamente. Si una nota también se modificó en el servidor mientras tanto, las dos versiones se combinan cuando es posible; si no, tu versión sin conexión se guarda como una nota aparte llamada "... (copia sin conexión)". Una nota eliminada en el servidor mientras tanto se vuelve a crear.
-*   **Ajustes:** **Configuración > Acciones > Notas sin conexión** define cuántos días de notas se guardan (5 por defecto, hasta 30, 0 desactiva las notas sin conexión) y muestra lo que contiene el navegador actual.
+*   **Ajustes:** **Configuración > Sincronización e historial > Notas sin conexión** define cuántos días de notas se guardan (5 por defecto, hasta 30, 0 desactiva las notas sin conexión) y muestra lo que contiene el navegador actual.
 *   **Límites:** como máximo 300 notas y 50 MB de texto, primero las modificadas más recientemente. También se guardan archivos: las imágenes que muestran estas notas y todos los adjuntos (PDF, audio, archivos) de los favoritos y de las notas guardadas con **Guardar sin conexión**, hasta 25 MB cada uno, 400 archivos y 200 MB en total, y nunca más de la mitad del espacio libre del navegador. Un archivo más grande solo está en línea, y la nota lo indica cuando se abre sin conexión.
 *   **Requisitos:** Poznote debe servirse por HTTPS (los navegadores solo guardan páginas sin conexión en una conexión segura, `http://localhost` también funciona) y haberse abierto una vez en línea en el navegador, tras iniciar sesión, para que se haga la copia.
 *   **Privacidad:** solo se guardan las notas de tu propia cuenta, no las de una cuenta o un espacio de trabajo compartidos contigo. Se almacenan sin cifrar en el navegador. Cerrar sesión las elimina del navegador (también los cambios aún no enviados, tras un aviso que los enumera): en un ordenador compartido, cierra sesión al irte. Cerrar sesión también funciona sin red, desde la página sin conexión: las notas se eliminan al momento y la sesión en el servidor termina la próxima vez que Poznote se abra en línea.
@@ -1362,6 +1386,17 @@ Poznote incluye un servidor Model Context Protocol (MCP) que permite a asistente
 - «Actualiza la nota 42 con nueva información»
 
 El servidor MCP viene con el `docker-compose.yml` oficial y solo se publica en `127.0.0.1`, así que por defecto nada fuera de tu máquina puede alcanzarlo. La instalación, la configuración de los clientes, los cambios de puerto y de depuración, y cómo protegerlo con `POZNOTE_MCP_AUTH_TOKEN` cuando lo expones más allá se describen en la [documentación del Servidor MCP](MCP-SERVER.es.md).
+
+## Aplicaciones
+
+Poznote funciona en cualquier navegador, y también se puede instalar desde el navegador como aplicación web (PWA): pasa a tener su propio icono y su propia ventana, como una aplicación nativa.
+
+*   **Android y ordenador:** abre tu instancia de Poznote en Chrome o Edge y elige **Instalar** en el menú del navegador.
+*   **iPhone y iPad:** abre tu instancia de Poznote en Safari, toca **Compartir** y luego **Añadir a pantalla de inicio**.
+
+> Para instalar la aplicación web, Poznote debe servirse por HTTPS (`http://localhost` también funciona).
+
+La [página Aplicaciones](https://poznote.com/apps.html) del sitio web reúne todo lo disponible: la aplicación web, la extensión de Chrome y las aplicaciones móviles creadas por la comunidad.
 
 ## Extensión de Chrome
 

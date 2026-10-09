@@ -194,7 +194,9 @@
       "format_toolbar_mode": "On a computer, choose where the formatting buttons show when you select text in a note: in the note toolbar, in place of the note actions, or in a menu floating above the selection, which leaves the note toolbar as it is.",
       "workspace_activity_emails": "Receive an email when someone else changes a note in a workspace you share, or in one shared with you. It lists the notes created, edited and deleted, never their content, and is sent to the email address of your profile. As changes happen: a few minutes after the last change. Daily summary: at 8:00. Weekly summary: on Monday at 8:00, in your timezone.",
       "workspace_activity_emails_no_address": "Add an email address to your profile to receive these emails.",
-      "custom_fonts": "Upload font files to offer them to every user in the App font and Markdown editor font lists."
+      "custom_fonts": "Upload font files to offer them to every user in the App font and Markdown editor font lists.",
+      "structured_export": "Export your notes as files, organized in folders like in Poznote.",
+      "local_backup": "Save complete backup archives into a folder of the server, manually or on a schedule, and keep only the most recent ones."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -208,7 +210,11 @@
       "pinned": "Pinned",
       "account": "My Account",
       "workspaces": "Workspaces",
-      "actions": "Actions",
+      "backup_restore": "Backup & restore",
+      "export_import": "Export & import",
+      "sync_history": "Sync & history",
+      "integrations": "Integrations",
+      "apps": "Apps",
       "admin_tools": "Admin Tools",
       "display": "Display",
       "ui_customization": "Element visibility",
@@ -228,14 +234,16 @@
       "storage_limits": "Storage & limits",
       "appearance": "Appearance",
       "maintenance": "Maintenance",
-      "backup_sync": "Backups & sync",
       "editing": "Editing",
-      "apps": "Apps",
       "profile_sign_in": "Profile & sign-in",
       "language_region": "Language & region",
       "storage": "Storage",
       "layout": "Layout",
-      "preferences": "Preferences"
+      "preferences": "Preferences",
+      "backup": "Backup",
+      "export": "Export",
+      "restore": "Restore",
+      "import": "Import"
     },
     "cards": {
       "tenant_isolation": "Tenant isolation",
@@ -281,7 +289,10 @@
       "s3_backup": "S3 Backups",
       "stt": "Transcription",
       "api_rest": "API REST",
-      "custom_fonts": "Custom fonts"
+      "custom_fonts": "Custom fonts",
+      "restore_direct_copy": "Restore by direct copy",
+      "import_notes": "Import notes",
+      "local_backup": "Local Backups"
     },
     "default_credentials": {
       "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
@@ -3446,7 +3457,8 @@
     "destinations": {
       "download": "download",
       "s3": "S3",
-      "server": "server"
+      "server": "server",
+      "local": "local folder"
     },
     "sources": {
       "upload": "upload",
@@ -3893,6 +3905,7 @@
     },
     "test": {
       "button": "Send test email",
+      "recipient": "The test email is sent to the email address of your account: {{email}}. To send it elsewhere, change that address in the Users page.",
       "success": "SMTP configuration saved and test email sent to the email address {{email}} configured for your account by the administrator.",
       "error": "SMTP configuration saved, but the test email failed: {{error}}",
       "no_account_email": "Your account does not have an email address configured. Contact an administrator to add one to your profile.",
@@ -4664,6 +4677,31 @@
     "users_badge_inactive": "Inactive",
     "users_count": "{{selected}} of {{total}} user(s) selected",
     "users_count_filtered": "{{selected}} of {{total}} user(s) selected, {{shown}} shown"
+  },
+  "local_backup": {
+    "title": "Local Backups",
+    "description": "Save complete backup archives (one ZIP per user, identical to the Complete Backup download) into a folder of the server, manually or automatically on a schedule.",
+    "description_scope": "The setting applies to all users of this instance.",
+    "enable_description": "Back up the selected users into the folder on the schedule below. Manual backups from this page work even with this switch off.",
+    "directory_label": "Backup folder",
+    "directory_description": "Absolute path on the server (inside the container with Docker). Leave empty to use {{default}}. To store the backups somewhere else, mount a volume and enter its path here.",
+    "retention_description": "Older archives are deleted from the folder after each backup. 0 keeps everything.",
+    "manual_description": "Back up the selected users into the folder right now, one user at a time.",
+    "confirm_run": "Back up the selected users into the backup folder now?",
+    "run_done": "Backup finished: {{saved}}/{{total}} user(s) backed up.",
+    "user_ok": "{{username}}: saved ({{size}})",
+    "last_run": "Last run ({{trigger}}): {{date}}, {{saved}}/{{total}} user(s) backed up.",
+    "next_run": "Next automatic backup: {{date}}.",
+    "list_title": "Backups in the folder",
+    "list_empty": "No backup in the folder yet.",
+    "list_error": "Cannot list the backups: {{error}}",
+    "confirm_delete": "Delete the backup {{filename}} from the folder?",
+    "footer_note": "Archives are stored under {user id}/ in the backup folder and can be restored with the standard \"Restore / Import\" page.",
+    "messages": {
+      "not_absolute": "The backup folder must be an absolute path, for example /backups.",
+      "inside_app": "The backup folder cannot be inside the application, apart from data/backups.",
+      "not_writable": "The backup folder cannot be created or is not writable by the web server: {{path}}"
+    }
   },
   "tasklist_embed": {
     "unavailable": "This task list is no longer available.",

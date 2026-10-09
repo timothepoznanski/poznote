@@ -230,3 +230,7 @@ body {
 .section-bottom-spacer {
     padding-bottom: 50px;
 }
+/* One part shown alone (?part=): the frame's title already names it */
+.backup-part-view > .backup-section > h3 {
+    display: none;
+}

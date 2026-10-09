@@ -516,7 +516,9 @@
       "format_toolbar_mode": "Wählen Sie auf einem Computer, wo die Formatierungsschaltflächen erscheinen, wenn Sie Text in einer Notiz markieren: in der Notiz-Symbolleiste anstelle der Notizaktionen oder in einem schwebenden Menü über der Auswahl, das die Notiz-Symbolleiste unverändert lässt.",
       "workspace_activity_emails": "Erhalten Sie eine E-Mail, wenn jemand anderes eine Notiz in einem Arbeitsbereich ändert, den Sie teilen oder der mit Ihnen geteilt wird. Sie listet die erstellten, bearbeiteten und gelöschten Notizen auf, nie deren Inhalt, und geht an die E-Mail-Adresse Ihres Profils. Bei Änderungen: einige Minuten nach der letzten Änderung. Tägliche Zusammenfassung: um 8:00 Uhr. Wöchentliche Zusammenfassung: montags um 8:00 Uhr, in Ihrer Zeitzone.",
       "workspace_activity_emails_no_address": "Fügen Sie Ihrem Profil eine E-Mail-Adresse hinzu, um diese E-Mails zu erhalten.",
-      "custom_fonts": "Laden Sie Schriftdateien hoch, um sie allen Benutzern in den Listen App-Schriftart und Markdown-Editor-Schriftart anzubieten."
+      "custom_fonts": "Laden Sie Schriftdateien hoch, um sie allen Benutzern in den Listen App-Schriftart und Markdown-Editor-Schriftart anzubieten.",
+      "structured_export": "Exportieren Sie Ihre Notizen als Dateien, in Ordnern wie in Poznote organisiert.",
+      "local_backup": "Speichern Sie vollständige Sicherungsarchive in einem Ordner des Servers, manuell oder nach Zeitplan, und behalten Sie nur die neuesten."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -530,7 +532,11 @@
       "pinned": "Angepinnt",
       "account": "Mein Konto",
       "workspaces": "Arbeitsbereiche",
-      "actions": "Aktionen",
+      "backup_restore": "Sicherung und Wiederherstellung",
+      "export_import": "Export und Import",
+      "sync_history": "Synchronisierung und Verlauf",
+      "integrations": "Integrationen",
+      "apps": "Apps",
       "admin_tools": "Admin-Werkzeuge",
       "display": "Anzeige",
       "ui_customization": "Sichtbarkeit von Elementen",
@@ -550,14 +556,16 @@
       "storage_limits": "Speicher und Limits",
       "appearance": "Erscheinungsbild",
       "maintenance": "Wartung",
-      "backup_sync": "Sicherungen und Synchronisierung",
       "editing": "Bearbeitung",
-      "apps": "Apps",
       "profile_sign_in": "Profil und Anmeldung",
       "language_region": "Sprache und Region",
       "storage": "Speicher",
       "layout": "Layout",
-      "preferences": "Präferenzen"
+      "preferences": "Präferenzen",
+      "backup": "Sicherung",
+      "export": "Export",
+      "restore": "Wiederherstellung",
+      "import": "Import"
     },
     "sections": {
       "account_display": "Konto & Anzeige",
@@ -623,7 +631,10 @@
       "s3_backup": "S3-Sicherungen",
       "stt": "Transkription",
       "api_rest": "REST-API",
-      "custom_fonts": "Benutzerdefinierte Schriftarten"
+      "custom_fonts": "Benutzerdefinierte Schriftarten",
+      "restore_direct_copy": "Wiederherstellung per Direktkopie",
+      "import_notes": "Notizen importieren",
+      "local_backup": "Lokale Sicherungen"
     },
     "default_credentials": {
       "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
@@ -3947,7 +3958,8 @@
     "destinations": {
       "download": "Download",
       "s3": "S3",
-      "server": "Server"
+      "server": "Server",
+      "local": "lokaler Ordner"
     },
     "sources": {
       "upload": "Upload",
@@ -4261,6 +4273,7 @@
     },
     "test": {
       "button": "Test-E-Mail senden",
+      "recipient": "Die Test-E-Mail wird an die E-Mail-Adresse Ihres Kontos gesendet: {{email}}. Um sie an eine andere Adresse zu senden, ändern Sie diese Adresse auf der Seite Benutzer.",
       "success": "SMTP-Konfiguration gespeichert und Test-E-Mail an die von Ihrem Administrator für Ihr Konto konfigurierte E-Mail-Adresse {{email}} gesendet.",
       "error": "SMTP-Konfiguration gespeichert, aber die Test-E-Mail ist fehlgeschlagen: {{error}}",
       "no_account_email": "Ihr Konto hat keine E-Mail-Adresse konfiguriert. Wenden Sie sich an einen Administrator, damit er Ihrem Profil eine hinzufügt.",
@@ -4991,6 +5004,31 @@
     "users_badge_inactive": "Inaktiv",
     "users_count": "{{selected}} von {{total}} Benutzer(n) ausgewählt",
     "users_count_filtered": "{{selected}} von {{total}} Benutzer(n) ausgewählt, {{shown}} angezeigt"
+  },
+  "local_backup": {
+    "title": "Lokale Sicherungen",
+    "description": "Speichern Sie vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit dem Download der vollständigen Sicherung) in einem Ordner des Servers, manuell oder automatisch nach Zeitplan.",
+    "description_scope": "Die Einstellung gilt für alle Benutzer dieser Instanz.",
+    "enable_description": "Sichert die ausgewählten Benutzer nach dem untenstehenden Zeitplan in den Ordner. Manuelle Sicherungen von dieser Seite funktionieren auch, wenn dieser Schalter aus ist.",
+    "directory_label": "Sicherungsordner",
+    "directory_description": "Absoluter Pfad auf dem Server (mit Docker: im Container). Leer lassen, um {{default}} zu verwenden. Um die Sicherungen woanders abzulegen, binden Sie ein Volume ein und geben Sie dessen Pfad hier ein.",
+    "retention_description": "Ältere Archive werden nach jeder Sicherung aus dem Ordner gelöscht. 0 behält alles.",
+    "manual_description": "Sichert die ausgewählten Benutzer sofort in den Ordner, einen Benutzer nach dem anderen.",
+    "confirm_run": "Die ausgewählten Benutzer jetzt in den Sicherungsordner sichern?",
+    "run_done": "Sicherung abgeschlossen: {{saved}}/{{total}} Benutzer gesichert.",
+    "user_ok": "{{username}}: gespeichert ({{size}})",
+    "last_run": "Letzter Lauf ({{trigger}}): {{date}}, {{saved}}/{{total}} Benutzer gesichert.",
+    "next_run": "Nächste automatische Sicherung: {{date}}.",
+    "list_title": "Sicherungen im Ordner",
+    "list_empty": "Noch keine Sicherung im Ordner.",
+    "list_error": "Die Sicherungen können nicht aufgelistet werden: {{error}}",
+    "confirm_delete": "Die Sicherung {{filename}} aus dem Ordner löschen?",
+    "footer_note": "Archive werden im Sicherungsordner unter {Benutzer-ID}/ gespeichert und können mit der Standardseite „Wiederherstellen / Importieren“ wiederhergestellt werden.",
+    "messages": {
+      "not_absolute": "Der Sicherungsordner muss ein absoluter Pfad sein, zum Beispiel /backups.",
+      "inside_app": "Der Sicherungsordner darf nicht innerhalb der Anwendung liegen, außer in data/backups.",
+      "not_writable": "Der Sicherungsordner kann nicht erstellt werden oder ist für den Webserver nicht beschreibbar: {{path}}"
+    }
   },
   "tasklist_embed": {
     "unavailable": "Diese Aufgabenliste ist nicht mehr verfügbar.",

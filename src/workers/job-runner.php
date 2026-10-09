@@ -28,6 +28,10 @@ declare(strict_types=1);
  * s3_backup        Builds the target user's complete backup zip and uploads
  *                  it to the backup bucket (S3BackupService::backupUser),
  *                  for the manual runs triggered from the settings pages.
+ *
+ * local_backup     Builds the target user's complete backup zip and stores it
+ *                  in the local backup folder (LocalBackupService::backupUser),
+ *                  for the manual runs triggered from the settings page.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -83,6 +87,9 @@ try {
             break;
         case POZNOTE_JOB_TYPE_S3_BACKUP:
             runS3BackupJob($userId, $jobId, $payload);
+            break;
+        case POZNOTE_JOB_TYPE_LOCAL_BACKUP:
+            runLocalBackupJob($userId, $jobId, $payload);
             break;
         default:
             throw new RuntimeException('Unknown job type');
@@ -442,5 +449,44 @@ function runRestoreOfArchive(int $userId, string $jobId, string $zipPath, string
         'phase' => '',
         'message' => (string)($result['message'] ?? ''),
         'finished_at' => time(),
+    ]);
+}
+
+/**
+ * Build the target user's backup zip and store it in the local backup folder.
+ *
+ * Same shape as runS3BackupJob(): the admin check happened when the job was
+ * created, and the build of a large account outlives a proxied HTTP request.
+ */
+function runLocalBackupJob(int $userId, string $jobId, array $payload): void {
+    require_once __DIR__ . '/../functions.php';
+    require_once __DIR__ . '/../users/db_master.php';
+    require_once __DIR__ . '/../users/UserDataManager.php';
+    require_once __DIR__ . '/../storage/AttachmentStorage.php';
+    require_once __DIR__ . '/../LocalBackupService.php';
+
+    $targetUserId = (int)($payload['target_user_id'] ?? $userId);
+
+    poznoteJobUpdate($userId, $jobId, ['phase' => 'building', 'stage' => 'building']);
+    poznoteJobInstallProgressHook($userId, $jobId);
+
+    $result = LocalBackupService::backupUser($targetUserId);
+    unset($GLOBALS['poznote_restore_progress_hook']);
+
+    if (empty($result['success'])) {
+        throw new RuntimeException((string)($result['error'] ?? 'Backup failed'));
+    }
+
+    $job = poznoteJobRead($userId, $jobId);
+    $jobPayload = is_array($job['payload'] ?? null) ? $job['payload'] : [];
+    $jobPayload['filename'] = (string)($result['filename'] ?? '');
+    $jobPayload['size'] = (int)($result['size'] ?? 0);
+    poznoteJobUpdate($userId, $jobId, [
+        'status' => 'done',
+        'phase' => '',
+        // A failed prune does not fail the backup; surface it as a note
+        'message' => (string)($result['error'] ?? ''),
+        'finished_at' => time(),
+        'payload' => $jobPayload,
     ]);
 }

@@ -273,11 +273,9 @@ window.__poznoteClearUserStorage = function (userId) {
 
         window.__poznoteCurrentThemeId = currentThemeId;
 
-        // Point the single custom stylesheet link (injected by config.php right
-        // before </head>) at the theme in use: the file of a custom theme, or
-        // the instance-wide stylesheet an admin applied to everyone. Called
-        // from the head while it is still parsing, and again by
-        // theme-manager.js on every theme change.
+        // Point the single custom stylesheet link at the theme in use: the
+        // file of a custom theme, or the instance-wide stylesheet an admin
+        // applied to everyone. Called by theme-manager.js on every theme change.
         window.__poznoteApplyCustomTheme = function (themeId) {
             var link = document.getElementById('poznote-custom-css');
             if (!link) return;
@@ -288,6 +286,33 @@ window.__poznoteClearUserStorage = function (userId) {
                 if (link.getAttribute('href') !== href) link.setAttribute('href', href);
             } else if (link.hasAttribute('href')) {
                 link.removeAttribute('href');
+            }
+        };
+
+        // Write that link, called by the script config.php injects right before
+        // </head>. The tag goes through document.write so the parser inserts it
+        // with its final href: Firefox only holds the first paint for such a
+        // link, not for one whose href a script sets afterwards, and the page
+        // then showed the plain dark theme until the custom file arrived
+        // (issue #1498).
+        window.__poznoteWriteCustomCssLink = function (defaultHref) {
+            if (document.getElementById('poznote-custom-css')) {
+                window.__poznoteApplyCustomTheme();
+                return;
+            }
+
+            var custom = findCustomTheme(currentThemeId());
+            var href = custom ? custom.href : (defaultHref || '');
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.id = 'poznote-custom-css';
+            if (defaultHref) link.setAttribute('data-poznote-default-href', defaultHref);
+            if (href) link.setAttribute('href', href);
+
+            if (document.readyState === 'loading') {
+                document.write(link.outerHTML);
+            } else {
+                document.head.appendChild(link);
             }
         };
 
@@ -308,7 +333,12 @@ window.__poznoteClearUserStorage = function (userId) {
         }
         // Painted inline so the page is not white for a frame. theme-manager.js
         // removes it once the stylesheets are in, so a theme can own the canvas.
-        r.style.backgroundColor = palette.contentBg;
+        // Not for a custom theme: its colours are in its stylesheet, which the
+        // first paint waits for, and this inline value outranks it until
+        // theme-manager.js runs, so the page came up in the plain dark or light
+        // palette first (issue #1498). color-scheme above keeps the canvas from
+        // being white in the meantime.
+        if (!customTheme) r.style.backgroundColor = palette.contentBg;
 
         // One variant class at a time, in both modes: the named themes are
         // variants of light or dark, exactly as theme-black always was.
@@ -325,7 +355,14 @@ window.__poznoteClearUserStorage = function (userId) {
         if (isDark) {
             r.classList.add('theme-dark');
             r.classList.remove('theme-light');
+        } else {
+            r.classList.add('theme-light');
+            r.classList.remove('theme-dark');
+        }
 
+        // Same exception as the canvas above: these rules are !important, so
+        // they would hold the plain dark palette over a custom theme.
+        if (isDark && !customTheme) {
             // Inject critical CSS to prevent white flash on all key elements
             var style = document.createElement('style');
             style.id = 'theme-init-critical-css';
@@ -341,9 +378,6 @@ window.__poznoteClearUserStorage = function (userId) {
                 '.css-title { background-color: ' + palette.contentBg + ' !important; color: ' + palette.text + ' !important; }'
             ].join(' ');
             document.head.appendChild(style);
-        } else {
-            r.classList.add('theme-light');
-            r.classList.remove('theme-dark');
         }
     } catch (e) {
         // Fallback silently if localStorage unavailable
