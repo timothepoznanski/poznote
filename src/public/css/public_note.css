@@ -666,14 +666,23 @@ body.public-note-page {
     font-size: 2em;
     font-weight: var(--pz-weight-bold);
     margin: 0.67em 0;
-    border-bottom: 2px solid var(--pz-border);
-    padding-bottom: 0.3em;
 }
 
 .public-note .content h2 {
     font-size: 1.5em;
     font-weight: var(--pz-weight-bold);
     margin: 0.75em 0;
+}
+
+/* Line under H1 and H2: markdown notes only, like in the app, where HTML
+   notes have none. The owner's "Heading underline" setting
+   (markdown_heading_underline) turns it off here too (discussion 1602). */
+body:not(.markdown-no-heading-underline) .public-note .content.public-note-markdown h1 {
+    border-bottom: 2px solid var(--pz-border);
+    padding-bottom: 0.3em;
+}
+
+body:not(.markdown-no-heading-underline) .public-note .content.public-note-markdown h2 {
     border-bottom: 1px solid var(--pz-border);
     padding-bottom: 0.3em;
 }
