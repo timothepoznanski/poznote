@@ -549,7 +549,7 @@ body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-
 }
 
 /* Rich text: a link is followed on a plain click, and says so */
-body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .cm-live-link {
+body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :is(.cm-live-link, .cm-live-note-missing) {
     cursor: pointer;
 }
 
@@ -785,6 +785,12 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview .
 .markdown-codemirror-host .cm-live-preview :is(.cm-live-link, .cm-live-link *) {
     color: var(--pz-accent-text);
     text-decoration: none !important;
+}
+
+/* [[A note that does not exist]]: as the preview shows it (.note-link-broken) */
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-note-missing, .cm-live-note-missing *) {
+    color: var(--pz-danger);
+    text-decoration: line-through !important;
 }
 
 .markdown-codemirror-host .cm-live-preview .cm-live-image-wrap {
