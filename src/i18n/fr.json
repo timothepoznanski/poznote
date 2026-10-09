@@ -4375,6 +4375,7 @@
     },
     "test": {
       "button": "Envoyer un mail de test",
+      "recipient": "L'email de test est envoyé à l'adresse mail de votre compte : {{email}}. Pour l'envoyer ailleurs, modifiez cette adresse dans la page Utilisateurs.",
       "success": "Configuration SMTP enregistrée et email de test envoyé à l'adresse mail {{email}} configurée pour votre compte par l'administrateur.",
       "error": "Configuration SMTP enregistrée, mais l’email de test a échoué : {{error}}",
       "no_account_email": "Votre compte n'a pas d'adresse mail configurée. Contactez un administrateur pour qu'il en ajoute une à votre profil.",

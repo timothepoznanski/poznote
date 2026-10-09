@@ -3902,6 +3902,7 @@
     },
     "test": {
       "button": "Send test email",
+      "recipient": "The test email is sent to the email address of your account: {{email}}. To send it elsewhere, change that address in the Users page.",
       "success": "SMTP configuration saved and test email sent to the email address {{email}} configured for your account by the administrator.",
       "error": "SMTP configuration saved, but the test email failed: {{error}}",
       "no_account_email": "Your account does not have an email address configured. Contact an administrator to add one to your profile.",

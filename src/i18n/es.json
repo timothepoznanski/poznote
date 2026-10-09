@@ -4271,6 +4271,7 @@
     },
     "test": {
       "button": "Enviar correo de prueba",
+      "recipient": "El correo de prueba se envía a la dirección de correo de su cuenta: {{email}}. Para enviarlo a otra dirección, cámbiela en la página Usuarios.",
       "success": "Configuración SMTP guardada y correo de prueba enviado a la dirección de correo {{email}} configurada para su cuenta por el administrador.",
       "error": "Configuración SMTP guardada, pero el correo de prueba falló: {{error}}",
       "no_account_email": "Su cuenta no tiene una dirección de correo configurada. Póngase en contacto con un administrador para que añada una a su perfil.",

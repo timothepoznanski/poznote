@@ -4271,6 +4271,7 @@
     },
     "test": {
       "button": "Enviar e-mail de teste",
+      "recipient": "O e-mail de teste é enviado para o endereço de e-mail da sua conta: {{email}}. Para o enviar para outro endereço, altere-o na página Utilizadores.",
       "success": "Configuração SMTP guardada e e-mail de teste enviado para o endereço de e-mail {{email}} configurado para a sua conta pelo administrador.",
       "error": "Configuração SMTP guardada, mas o e-mail de teste falhou: {{error}}",
       "no_account_email": "A sua conta não tem um endereço de e-mail configurado. Contacte um administrador para adicionar um ao seu perfil.",

@@ -4270,6 +4270,7 @@
     },
     "test": {
       "button": "Test-E-Mail senden",
+      "recipient": "Die Test-E-Mail wird an die E-Mail-Adresse Ihres Kontos gesendet: {{email}}. Um sie an eine andere Adresse zu senden, ändern Sie diese Adresse auf der Seite Benutzer.",
       "success": "SMTP-Konfiguration gespeichert und Test-E-Mail an die von Ihrem Administrator für Ihr Konto konfigurierte E-Mail-Adresse {{email}} gesendet.",
       "error": "SMTP-Konfiguration gespeichert, aber die Test-E-Mail ist fehlgeschlagen: {{error}}",
       "no_account_email": "Ihr Konto hat keine E-Mail-Adresse konfiguriert. Wenden Sie sich an einen Administrator, damit er Ihrem Profil eine hinzufügt.",
