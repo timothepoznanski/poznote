@@ -1159,12 +1159,14 @@
         if (running) return;
         var workspace = currentWorkspace();
         var jobs = [];
+        var noteIds = [];
 
         (targets || []).forEach(function (item) {
             if (item.type === 'note') {
                 if (document.querySelector('.folder-header[data-folder="Favorites"] .links_arbo_left[data-note-db-id="' + item.id + '"]')) return;
                 jobs.push(function () {
-                    return api('POST', '/api/v1/notes/' + encode(item.id) + '/favorite?workspace=' + encode(workspace), { workspace: workspace });
+                    return api('POST', '/api/v1/notes/' + encode(item.id) + '/favorite?workspace=' + encode(workspace), { workspace: workspace })
+                        .then(function () { noteIds.push(item.id); });
                 });
             } else if (item.type === 'folder') {
                 var toggle = document.querySelector('.folder-actions-toggle[data-folder-id="' + item.id + '"]');
@@ -1185,20 +1187,31 @@
         sequence(jobs, function (job) {
             return job().then(function () { done++; });
         }).then(function () {
-            rememberFolderOpen('favorites');
-            toastAfterReload(tr('tree_selection.favorited_items', 'Added {{count}} items to favorites', { count: done }));
-            reloadTree([]);
+            showFavorited(noteIds);
+            toast(tr('tree_selection.favorited_items', 'Added {{count}} items to favorites', { count: done }));
         }).catch(function (error) {
             var message = tr('tree_selection.favorite_failed', 'Could not update favorites: {{error}}', { error: error.message });
+            errorToast(message);
             if (!done) {
                 running = false;
-                errorToast(message);
                 return;
             }
-            rememberFolderOpen('favorites');
-            errorToastAfterReload(message);
-            reloadTree([]);
+            showFavorited(noteIds);
         });
+    }
+
+    // Favorites redrawn in place, with the toolbar star of the notes added
+    function showFavorited(noteIds) {
+        running = false;
+        if (typeof window.refreshTreeAfterFavoriteChange !== 'function') {
+            rememberFolderOpen('favorites');
+            reloadTree([]);
+            return;
+        }
+        noteIds.forEach(function (id) {
+            if (typeof window.paintFavoriteButtons === 'function') window.paintFavoriteButtons(id, true);
+        });
+        window.refreshTreeAfterFavoriteChange(true);
     }
 
     // ============================================

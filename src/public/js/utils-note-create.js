@@ -570,6 +570,36 @@ function startDownload() {
     window.location = 'api_export_entries.php';
 }
 
+// The star of the note toolbar, for one note or for all of them (no id)
+function paintFavoriteButtons(noteId, isFavorite) {
+    var selector = '.btn-favorite[data-action="toggle-favorite"]' + (noteId ? '[data-note-id="' + noteId + '"]' : '');
+    var tr = window.t || function (key, vars, fallback) { return fallback; };
+    var title = isFavorite
+        ? tr('index.toolbar.favorite_remove', {}, 'Remove from favorites')
+        : tr('index.toolbar.favorite_add', {}, 'Add to favorites');
+
+    document.querySelectorAll(selector).forEach(function (button) {
+        button.classList.toggle('is-favorite', !!isFavorite);
+        button.setAttribute('title', title);
+    });
+}
+
+// The tree is built server side: Favorites follows from a rebuild of the
+// sidebar, the note pane left as it is. Pages without the tree reload.
+function refreshTreeAfterFavoriteChange(openFavorites) {
+    if (!document.getElementById('left_col') || typeof window.refreshNotesListAfterFolderAction !== 'function') {
+        if (openFavorites) {
+            localStorage.setItem('folder_folder-favorites', 'open');
+        }
+        window.location.reload();
+        return Promise.resolve();
+    }
+    return Promise.resolve(window.refreshNotesListAfterFolderAction(openFavorites ? 'favorites' : null));
+}
+
+window.paintFavoriteButtons = paintFavoriteButtons;
+window.refreshTreeAfterFavoriteChange = refreshTreeAfterFavoriteChange;
+
 function toggleFavorite(noteId) {
     // Auto-save handles any pending changes automatically
     performFavoriteToggle(noteId);
@@ -597,13 +627,9 @@ function performFavoriteToggle(noteId) {
                     window.setNeedsAutoPush(true);
                 }
                 
-                // If note was added to favorites (is_favorite = 1), open the Favorites folder
-                if (data.is_favorite === 1) {
-                    localStorage.setItem('folder_folder-favorites', 'open');
-                }
-                setTimeout(function () {
-                    window.location.reload();
-                }, 50);
+                // The Favorites folder opens on what was just added to it
+                paintFavoriteButtons(noteId, data.is_favorite === 1);
+                refreshTreeAfterFavoriteChange(data.is_favorite === 1);
             } else {
                 showNotificationPopup('Error: ' + (data.message || 'Unknown error'), 'error');
             }
@@ -682,7 +708,7 @@ function toggleFolderFavorite(folderId) {
         })
         .then(function (data) {
             if (data.success) {
-                window.location.reload();
+                refreshTreeAfterFavoriteChange(!isFavorite);
             } else {
                 showNotificationPopup('Error: ' + (data.message || 'Unknown error'), 'error');
             }

@@ -150,9 +150,11 @@
                 body: JSON.stringify({ workspace: workspace })
             }).then(function (response) {
                 if (!response.ok) throw new Error('HTTP ' + response.status);
-                // A reload, as after any favorite toggle: the star of the open
-                // note's toolbar has to follow too
-                window.location.reload();
+                // The star of the open note's toolbar has to follow too
+                if (typeof window.paintFavoriteButtons === 'function') {
+                    window.paintFavoriteButtons(null, false);
+                }
+                refreshTree();
             }).catch(function (error) {
                 console.error('favorites-menu: clearing Favorites failed', error);
                 showError();
