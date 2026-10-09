@@ -525,7 +525,9 @@
     function getFilteredNotes() {
         return getActiveNotes().map(function (note) {
             var heading = (note.heading || '').toLowerCase();
-            var folder = (note.folder || '').toLowerCase();
+            // The whole path, so a parent folder's name finds the notes of
+            // its subfolders at any depth
+            var folder = (note.folder_path || note.folder || '').toLowerCase();
             var noteMatchesText = !filterText || heading.includes(filterText) || folder.includes(filterText);
 
             var tasks = note.tasks.filter(function (task) {
@@ -681,7 +683,7 @@
             // The folder the note sits in, not the path that leads to it. The
             // name stays on one line and ellipsizes (css/tasks-page.css), so
             // the full name goes in the tooltip.
-            var folderName = lastFolderName(note.folder);
+            var folderName = lastFolderName(note.folder_path || note.folder);
             if (folderName) {
                 var badge = document.createElement('span');
                 badge.className = 'folder-badge';

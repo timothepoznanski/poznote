@@ -1226,6 +1226,7 @@ Aggregate the tasks of every non-trashed tasklist note, used by the tasks page (
       "heading": "Groceries",
       "folder": "Home",
       "folder_id": 4,
+      "folder_path": "Family/Home",
       "workspace": "Poznote",
       "updated": "2026-08-10 09:12:00",
       "favorite": false,

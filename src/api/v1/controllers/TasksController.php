@@ -32,9 +32,9 @@ class TasksController
      * Returns every non-trash tasklist note of the workspace with its
      * decoded task array, plus the checklist items found in regular notes:
      *   { success: true,
-     *     notes:      [{ id, heading, folder, workspace, updated, tasks: [...] }],
+     *     notes:      [{ id, heading, folder, folder_path, workspace, updated, tasks: [...] }],
      *                 (a task with subtasks carries subtasks: [{ id, text, completed }])
-     *     checklists: [{ id, heading, folder, workspace, updated, type, tasks: [{ id, text, completed }] }] }
+     *     checklists: [{ id, heading, folder, folder_path, workspace, updated, type, tasks: [{ id, text, completed }] }] }
      *
      * A checklist task's id is the item's position in the note source (see
      * extractNoteChecklistItems), not a task id: checklist items are toggled
@@ -76,6 +76,7 @@ class TasksController
                     'heading'   => (string) ($row['heading'] ?? ''),
                     'folder'    => (string) ($row['folder'] ?? ''),
                     'folder_id' => $row['folder_id'] !== null ? (int) $row['folder_id'] : null,
+                    'folder_path' => $this->folderPath($row['folder_id']),
                     'workspace' => (string) ($row['workspace'] ?? ''),
                     'updated'   => (string) ($row['updated'] ?? ''),
                     'favorite'  => (int) ($row['favorite'] ?? 0) === 1,
@@ -92,6 +93,19 @@ class TasksController
             http_response_code(500);
             echo json_encode(['success' => false, 'error' => 'Failed to load tasks']);
         }
+    }
+
+    /**
+     * Every folder from the root down to the note's own, e.g. "Diary/2026/10".
+     * The stored `folder` column only names the folder the note sits in, so
+     * the Tasks page filters on this to reach the parent folders (#1600).
+     */
+    private function folderPath($folderId): string
+    {
+        if ($folderId === null || (int) $folderId === 0) {
+            return '';
+        }
+        return getFolderPath((int) $folderId, $this->con);
     }
 
     /**
@@ -138,6 +152,7 @@ class TasksController
                 'heading'   => (string) ($row['heading'] ?? ''),
                 'folder'    => (string) ($row['folder'] ?? ''),
                 'folder_id' => $row['folder_id'] !== null ? (int) $row['folder_id'] : null,
+                'folder_path' => $this->folderPath($row['folder_id']),
                 'workspace' => (string) ($row['workspace'] ?? ''),
                 'updated'   => (string) ($row['updated'] ?? ''),
                 'favorite'  => (int) ($row['favorite'] ?? 0) === 1,
