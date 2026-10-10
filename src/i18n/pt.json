@@ -4416,6 +4416,7 @@
       "repeat_yearly": "Anualmente",
       "repeat_custom": "Personalizado...",
       "repeat_hint": "O próximo lembrete é agendado quando você fecha a notificação.",
+      "task_repeat_hint": "A próxima ocorrência é adicionada à lista quando você conclui a tarefa. Fechar a notificação move a tarefa para a próxima data.",
       "repeat_every": "A cada",
       "repeat_minutes": "minuto(s)",
       "repeat_hours": "hora(s)",

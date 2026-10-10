@@ -253,7 +253,8 @@ class TasksController
      * PATCH /api/v1/notes/{id}/tasks/{taskId}
      *
      * Update one task. Only the provided fields change; passing due_at as null
-     * clears the due date and its pending reminder.
+     * clears the due date and its pending reminder. Completing a task that
+     * repeats adds its next occurrence to the list, returned as next_task.
      */
     public function updateForNote(string $id, string $taskId): void
     {
@@ -290,6 +291,17 @@ class TasksController
         $previous = $tasks[$index];
         $task = array_merge($previous, $fields);
 
+        // Completing a repeating task opens its next occurrence, which takes
+        // the place the task had among the open ones and carries the repeat.
+        $nextTask = null;
+        if (!empty($task['completed']) && empty($previous['completed'])) {
+            $nextTask = poznoteNextTaskOccurrence($task);
+            if ($nextTask !== null) {
+                $nextTask = ['id' => $this->generateTaskId($tasks)] + $nextTask;
+                unset($task['dueRecurrence']);
+            }
+        }
+
         // Completing a task retires its pending reminder, mirroring the UI.
         if (!empty($task['completed'])) {
             $task['dueReminder'] = false;
@@ -299,7 +311,7 @@ class TasksController
             return;
         }
 
-        $tasks[$index] = $task;
+        array_splice($tasks, $index, 1, $nextTask !== null ? [$nextTask, $task] : [$task]);
         $tasks = $this->regroupTasks($tasks);
 
         if (!$this->persistTasks($note['id'], $tasks)) {
@@ -308,8 +320,15 @@ class TasksController
         if ($this->reminderNeedsSync($previous, $task)) {
             $this->syncTaskReminder($note['id'], $task);
         }
+        if ($nextTask !== null && !empty($nextTask['dueReminder'])) {
+            $this->syncTaskReminder($note['id'], $nextTask);
+        }
 
-        $this->sendSuccess(['note_id' => $note['id'], 'task' => $task]);
+        $response = ['note_id' => $note['id'], 'task' => $task];
+        if ($nextTask !== null) {
+            $response['next_task'] = $nextTask;
+        }
+        $this->sendSuccess($response);
     }
 
     /**

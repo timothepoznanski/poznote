@@ -1514,11 +1514,31 @@
             note.tasks = reorderTasksAfterToggle(note.tasks, task);
         };
 
+        // Completing a repeating task opens its next occurrence, which takes
+        // the place the task had among the open ones and carries the repeat
+        var nextTask = null;
+        var position = note.tasks.indexOf(task);
+
         applyToggle(task, newCompleted, regroup, function () {
             return mutateTaskInNote(note, task, function (target) {
                 target.completed = newCompleted;
+                nextTask = (newCompleted && typeof window.buildNextTaskOccurrence === 'function')
+                    ? window.buildNextTaskOccurrence(target)
+                    : null;
                 if (clearReminder) target.dueReminder = false;
-            }, reorderTasksAfterToggle).then(function () {
+                if (nextTask) delete target.dueRecurrence;
+            }, function (tasks, target) {
+                if (nextTask) tasks.splice(tasks.indexOf(target), 0, nextTask);
+                return reorderTasksAfterToggle(tasks, target);
+            }).then(function () {
+                if (nextTask) {
+                    task.dueRecurrence = null;
+                    // The completed task has left for the completed group,
+                    // so its former index is where the new one goes
+                    note.tasks.splice(Math.min(Math.max(position, 0), note.tasks.length), 0, nextTask);
+                    window.materializeTaskReminder(note.id, nextTask);
+                    render();
+                }
                 if (!clearReminder) return;
                 task.dueReminder = false;
                 // Completing a task cancels its pending reminder

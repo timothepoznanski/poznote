@@ -385,8 +385,9 @@ components:
         dueRecurrence:
           type: string
           description: >
-            Repeat interval of the reminder, "<count><unit>" with unit
-            i/h/d/w/m/y. Only present when set.
+            Repeat interval of the task, "<count><unit>" with unit
+            i/h/d/w/m/y. Only present when set. Completing the task adds
+            its next occurrence to the list, which carries the repeat.
           example: "1w"
         subtasks:
           type: array
@@ -2150,6 +2151,12 @@ paths:
                     type: integer
                   task:
                     $ref: '#/components/schemas/Task'
+                  next_task:
+                    allOf:
+                      - $ref: '#/components/schemas/Task'
+                    description: >
+                      Next occurrence added to the list, only present when
+                      this update completed a task that repeats.
         '400':
           description: Invalid body, due_at or recurrence, or not a task list
           content:

@@ -4416,6 +4416,7 @@
       "repeat_yearly": "Anualmente",
       "repeat_custom": "Personalizado...",
       "repeat_hint": "El próximo recordatorio se programa al cerrar la notificación.",
+      "task_repeat_hint": "La siguiente repetición se añade a la lista al completar la tarea. Al cerrar la notificación, la tarea pasa a su próxima fecha.",
       "repeat_every": "Cada",
       "repeat_minutes": "minuto(s)",
       "repeat_hours": "hora(s)",

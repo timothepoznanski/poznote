@@ -1367,6 +1367,15 @@ function aiToolUpdateTask($con, array $args, $chatWorkspace, $actorUserId): stri
     if (empty($changed)) {
         return json_encode(['error' => 'Nothing to change: pass completed, important, text, due_at or reminder']);
     }
+    // Completing a repeating task opens its next occurrence, which carries the repeat
+    $nextTask = null;
+    if (!empty($task['completed']) && empty($previous['completed'])) {
+        $nextTask = poznoteNextTaskOccurrence($task);
+        if ($nextTask !== null) {
+            $nextTask = ['id' => aiGenerateTaskId($tasks)] + $nextTask;
+            unset($task['dueRecurrence']);
+        }
+    }
     // Completing a task retires its pending reminder, mirroring the UI
     if (!empty($task['completed'])) {
         $task['dueReminder'] = false;
@@ -1374,9 +1383,14 @@ function aiToolUpdateTask($con, array $args, $chatWorkspace, $actorUserId): stri
     if (!empty($task['dueReminder']) && empty($task['dueAt'])) {
         return json_encode(['error' => 'reminder requires a due_at']);
     }
-    $tasks[$index] = $task;
+    array_splice($tasks, $index, 1, $nextTask !== null ? [$nextTask, $task] : [$task]);
     $error = aiPersistTasks($con, $noteId, aiRegroupTasks($tasks), $actorUserId);
     if ($error !== null) return $error;
+    if ($nextTask !== null) {
+        if (!empty($nextTask['dueReminder'])) aiSyncTaskReminder($con, $noteId, $nextTask);
+        aiSyncTaskReminder($con, $noteId, $task);
+        return json_encode(['ok' => true, 'note_id' => $noteId, 'title' => (string)$note['heading'], 'changed' => $changed, 'task' => aiTaskView($task), 'next_occurrence' => aiTaskView($nextTask)], JSON_UNESCAPED_UNICODE);
+    }
     foreach (['dueAt', 'dueReminder', 'dueRecurrence', 'completed', 'text'] as $key) {
         $old = $previous[$key] ?? null;
         $new = $task[$key] ?? null;
