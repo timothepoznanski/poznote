@@ -80,11 +80,24 @@ function toggleTask(taskId, noteId) {
     const taskIndex = tasks.findIndex(task => task.id === taskId);
     if (taskIndex === -1) return;
 
-    tasks[taskIndex].completed = !tasks[taskIndex].completed;
+    const toggledTask = tasks[taskIndex];
+    toggledTask.completed = !toggledTask.completed;
 
-    // Completing a task cancels its pending reminder
-    if (tasks[taskIndex].completed) {
-        clearTaskReminderIfAny(noteId, tasks[taskIndex]);
+    if (toggledTask.completed) {
+        // Completing a repeating task opens its next occurrence, which takes
+        // the place the task had among the open ones and carries the repeat
+        const nextTask = typeof window.buildNextTaskOccurrence === 'function'
+            ? window.buildNextTaskOccurrence(toggledTask)
+            : null;
+
+        // Completing a task cancels its pending reminder
+        clearTaskReminderIfAny(noteId, toggledTask);
+
+        if (nextTask) {
+            delete toggledTask.dueRecurrence;
+            tasks.splice(taskIndex, 0, nextTask);
+            window.materializeTaskReminder(noteId, nextTask);
+        }
     }
     
     // Reorder tasks to maintain grouping:
@@ -99,8 +112,6 @@ function toggleTask(taskId, noteId) {
 
     // Build groups preserving original relative order
     const { important: importantIncomplete, normal: normalIncomplete, completed: completedArr } = groupTasksByStatus(tasks);
-
-    const toggledTask = tasks[taskIndex];
 
     if (toggledTask.completed) {
         // Ensure toggled completed task is at the start of completed group when bottom-insert

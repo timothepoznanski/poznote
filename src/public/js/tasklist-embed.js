@@ -725,17 +725,30 @@
         var newCompleted = checkbox.checked;
 
         var clearReminder = false;
+        // Next occurrence of a repeating task; the mutation runs twice (shown
+        // right away, then saved), the saved pass is the one that stays
+        var nextTask = null;
         try {
             // Shown right away; the widgets fall back to the saved state if
             // the save fails
             await mutateTaskList(noteId, function (tasks) {
                 var target = requireTask(tasks, task.id);
                 target.completed = newCompleted;
+                nextTask = (newCompleted && typeof window.buildNextTaskOccurrence === 'function')
+                    ? window.buildNextTaskOccurrence(target)
+                    : null;
                 clearReminder = newCompleted && !!target.dueReminder;
                 if (clearReminder) target.dueReminder = false;
+                if (nextTask) {
+                    // It takes the place the task had among the open ones
+                    // and carries the repeat
+                    delete target.dueRecurrence;
+                    tasks.splice(tasks.indexOf(target), 0, nextTask);
+                }
                 return reorderAfterToggle(tasks, target);
             }, true);
             if (clearReminder) cancelTaskReminder(noteId, task.id);
+            if (nextTask) window.materializeTaskReminder(noteId, nextTask);
         } catch (e) {
             showEmbedError(embed);
         }

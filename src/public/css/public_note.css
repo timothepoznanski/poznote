@@ -666,14 +666,23 @@ body.public-note-page {
     font-size: 2em;
     font-weight: var(--pz-weight-bold);
     margin: 0.67em 0;
-    border-bottom: 2px solid var(--pz-border);
-    padding-bottom: 0.3em;
 }
 
 .public-note .content h2 {
     font-size: 1.5em;
     font-weight: var(--pz-weight-bold);
     margin: 0.75em 0;
+}
+
+/* Line under H1 and H2: markdown notes only, like in the app, where HTML
+   notes have none. The owner's "Heading underline" setting
+   (markdown_heading_underline) turns it off here too (discussion 1602). */
+body:not(.markdown-no-heading-underline) .public-note .content.public-note-markdown h1 {
+    border-bottom: 2px solid var(--pz-border);
+    padding-bottom: 0.3em;
+}
+
+body:not(.markdown-no-heading-underline) .public-note .content.public-note-markdown h2 {
     border-bottom: 1px solid var(--pz-border);
     padding-bottom: 0.3em;
 }
@@ -701,6 +710,72 @@ body.public-note-page {
     font-weight: var(--pz-weight-bold);
     margin: 1.67em 0;
     color: var(--pz-text-muted);
+}
+
+/* Section link after each heading (js/public-note.js): copies the page URL
+   with the heading's #id (discussion 1602). */
+.public-note .content .heading-anchor {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 0.45em;
+    vertical-align: middle;
+    font-size: 0.6em;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.5;
+}
+
+/* Desktop: the link only shows while its heading is hovered. Touch devices
+   have no hover, so it stays visible there. */
+@media screen and (min-width: 801px) and (hover: hover) {
+    .public-note .content .heading-anchor {
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .public-note .content :is(h1, h2, h3, h4, h5, h6):hover .heading-anchor {
+        opacity: 0.5;
+    }
+
+    /* Same heading scope plus the link's own state, so it outranks the
+       heading-hover rule above without !important. */
+    .public-note .content :is(h1, h2, h3, h4, h5, h6) .heading-anchor:hover,
+    .public-note .content :is(h1, h2, h3, h4, h5, h6) .heading-anchor:focus-visible {
+        opacity: 1;
+    }
+}
+
+@media print {
+    .public-note .content .heading-anchor {
+        display: none;
+    }
+}
+
+#heading-copy-toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(0.5rem);
+    background: var(--pz-text);
+    color: var(--pz-text-inverse);
+    font-size: 0.82rem;
+    padding: 0.4em 0.9em;
+    border-radius: var(--pz-radius);
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    white-space: nowrap;
+}
+
+#heading-copy-toast.heading-copy-toast--visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+html[data-theme='dark'] #heading-copy-toast {
+    background: var(--pz-border-strong);
+    color: var(--pz-text-strong);
 }
 
 /* Paragraphs */

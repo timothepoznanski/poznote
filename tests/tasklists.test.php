@@ -135,3 +135,48 @@ test('anything else than a list of note ids is refused', function () {
     assertSame(null, poznoteParseTasksPageHiddenNotes('[1.5]'));
     assertSame(null, poznoteParseTasksPageHiddenNotes(12));
 });
+
+test('a task that does not repeat has no next occurrence', function () {
+    assertSame(null, poznoteNextTaskOccurrence(['id' => 1, 'text' => 'a', 'dueAt' => '2026-10-10'], '2026-10-10 12:00'));
+    assertSame(null, poznoteNextTaskOccurrence(['id' => 1, 'text' => 'a', 'dueRecurrence' => '1d'], '2026-10-10 12:00'));
+    assertSame(null, poznoteNextTaskOccurrence(['id' => 1, 'dueAt' => '2026-10-10', 'dueRecurrence' => 'often'], '2026-10-10 12:00'));
+});
+
+test('the next occurrence is an open copy that keeps the repeat', function () {
+    $next = poznoteNextTaskOccurrence([
+        'id' => 1,
+        'text' => 'water the plants',
+        'completed' => true,
+        'important' => true,
+        'dueAt' => '2026-10-10T18:30',
+        'dueReminder' => true,
+        'dueRecurrence' => '1w',
+        'subtasks' => [['id' => 11, 'text' => 'balcony', 'completed' => true]],
+    ], '2026-10-10 12:00');
+
+    assertFalse(array_key_exists('id', $next));
+    assertSame('water the plants', $next['text']);
+    assertFalse($next['completed']);
+    assertTrue($next['important']);
+    assertTrue($next['dueReminder']);
+    assertSame('1w', $next['dueRecurrence']);
+    assertSame('2026-10-17T18:30', $next['dueAt']);
+    assertFalse($next['subtasks'][0]['completed']);
+});
+
+test('the next due date is the first one of the schedule still ahead', function () {
+    $due = static function (string $dueAt, string $recurrence, string $now): string {
+        return poznoteNextTaskOccurrence(['dueAt' => $dueAt, 'dueRecurrence' => $recurrence], $now)['dueAt'];
+    };
+
+    // Completed early: the occurrence after the one being ticked
+    assertSame('2026-10-12', $due('2026-10-11', '1d', '2026-10-10 12:00'));
+    // A date without a time counts as 09:00
+    assertSame('2026-10-10', $due('2026-10-09', '1d', '2026-10-10 08:00'));
+    assertSame('2026-10-11', $due('2026-10-09', '1d', '2026-10-10 15:00'));
+    // Long overdue: missed occurrences are skipped, the weekday is kept
+    assertSame('2026-10-15', $due('2026-09-03', '1w', '2026-10-10 12:00'));
+    assertSame('2026-10-10T14:00', $due('2026-10-10T08:00', '3h', '2026-10-10 12:00'));
+    assertSame('2026-11-05', $due('2026-08-05', '1m', '2026-10-10 12:00'));
+    assertSame('2027-02-01T10:00', $due('2025-02-01T10:00', '1y', '2026-10-10 12:00'));
+});

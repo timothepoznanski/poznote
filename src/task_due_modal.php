@@ -73,7 +73,7 @@ try {
                 </select>
             </div>
             <div class="reminder-repeat-hint initially-hidden" id="taskDueRepeatHint">
-                <?php echo t_h('reminder.modal.repeat_hint', [], 'The next reminder is scheduled when you dismiss the notification.'); ?>
+                <?php echo t_h('reminder.modal.task_repeat_hint', [], 'The next occurrence is added to the list when you complete the task. Dismissing the notification moves the task to its next date.'); ?>
             </div>
             <div class="reminder-email-option" id="taskDueRemindOption">
                 <label class="reminder-email-label" for="taskDueRemindInput">

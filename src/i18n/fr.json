@@ -4520,6 +4520,7 @@
       "repeat_yearly": "Tous les ans",
       "repeat_custom": "Personnalisé...",
       "repeat_hint": "Le prochain rappel est planifié lorsque vous fermez la notification.",
+      "task_repeat_hint": "La prochaine occurrence est ajoutée à la liste lorsque vous terminez la tâche. Fermer la notification reporte la tâche à sa prochaine date.",
       "repeat_every": "Tous les",
       "repeat_minutes": "minute(s)",
       "repeat_hours": "heure(s)",

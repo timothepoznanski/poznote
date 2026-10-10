@@ -4047,6 +4047,7 @@
       "repeat_yearly": "Yearly",
       "repeat_custom": "Custom...",
       "repeat_hint": "The next reminder is scheduled when you dismiss the notification.",
+      "task_repeat_hint": "The next occurrence is added to the list when you complete the task. Dismissing the notification moves the task to its next date.",
       "repeat_every": "Every",
       "repeat_minutes": "minute(s)",
       "repeat_hours": "hour(s)",

@@ -1374,7 +1374,8 @@ window.outlinePanel = {
         }
     },
     extractHeadings: extractHeadings,
-    renderOutline: renderOutline
+    renderOutline: renderOutline,
+    scrollToElement: scrollToElement
 };
 
 // Refresh the outline toggle after the asynchronous dictionary has loaded.

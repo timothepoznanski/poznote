@@ -57,6 +57,135 @@
     }
 
     /**
+     * Section links (discussion 1602): every heading of the note gets a link
+     * icon that copies the page URL with the heading's #id, and a URL opened
+     * with such a hash scrolls to its heading. The ids come from the outline
+     * (js/outline-panel.js), which sets them in JS: the browser's own jump to
+     * the hash has nothing to land on while the page loads. Display only:
+     * the public editor is rebuilt from the server HTML, so an icon can never
+     * be saved into the note.
+     */
+    function getSectionLinkLabel(key, fallback) {
+        return typeof window.t === 'function' ? window.t(key, null, fallback) : fallback;
+    }
+
+    function addHeadingSectionLinks() {
+        const content = document.querySelector('.public-note .content');
+        const outline = window.outlinePanel;
+        if (!content || !outline || typeof outline.extractHeadings !== 'function') return;
+
+        const label = getSectionLinkLabel('common.outline.copy_section_link', 'Copy section link');
+        outline.extractHeadings(content).forEach(function (heading) {
+            const element = heading.element;
+            if (!element || !element.id || element.querySelector('.heading-anchor')) return;
+            const anchor = document.createElement('a');
+            anchor.className = 'heading-anchor';
+            anchor.href = '#' + encodeURIComponent(element.id);
+            anchor.title = label;
+            anchor.setAttribute('aria-label', label);
+            // The icon is a CSS mask, without text of its own: the heading
+            // keeps the same text for the outline.
+            const icon = document.createElement('i');
+            icon.className = 'lucide lucide-link';
+            icon.setAttribute('aria-hidden', 'true');
+            anchor.appendChild(icon);
+            element.appendChild(anchor);
+        });
+    }
+
+    let sectionLinkToastTimer = null;
+
+    function showSectionLinkCopied() {
+        let toast = document.getElementById('heading-copy-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'heading-copy-toast';
+            toast.setAttribute('role', 'status');
+            document.body.appendChild(toast);
+        }
+        toast.textContent = getSectionLinkLabel('common.link_copied', 'Link copied');
+        toast.classList.add('heading-copy-toast--visible');
+        clearTimeout(sectionLinkToastTimer);
+        sectionLinkToastTimer = setTimeout(function () {
+            toast.classList.remove('heading-copy-toast--visible');
+        }, 2000);
+    }
+
+    function handleSectionLinkClick(e) {
+        const anchor = e.target.closest ? e.target.closest('.public-note .content .heading-anchor') : null;
+        if (!anchor) return;
+        const heading = anchor.closest('h1, h2, h3, h4, h5, h6');
+        if (!heading || !heading.id) return;
+
+        e.preventDefault();
+        const url = window.location.href.split('#')[0] + '#' + encodeURIComponent(heading.id);
+        // The address bar carries the link too: the clipboard is only there
+        // on a secure origin.
+        history.replaceState(history.state, '', url);
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(url).then(showSectionLinkCopied).catch(function (err) {
+                console.debug('public-note: section link copy failed:', err);
+            });
+        }
+    }
+
+    function findHeadingForHash() {
+        const content = document.querySelector('.public-note .content');
+        if (!content || window.location.hash.length < 2) return null;
+
+        let id = window.location.hash.slice(1);
+        try {
+            id = decodeURIComponent(id);
+        } catch (_error) {
+            // A stray % in the hash: keep it as typed.
+        }
+
+        const target = document.getElementById(id);
+        if (target && content.contains(target)) return target;
+
+        // An id starts with the heading's position in the note
+        // (heading-3-setup): a link copied before a heading was added above
+        // still finds its section by the text part.
+        const match = id.match(/^heading-\d+-(.*[a-z0-9].*)$/);
+        if (!match) return null;
+        const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        for (let i = 0; i < headings.length; i++) {
+            if (headings[i].id.replace(/^heading-\d+-/, '') === match[1]) return headings[i];
+        }
+        return null;
+    }
+
+    function scrollToHashHeading() {
+        const target = findHeadingForHash();
+        if (!target) return;
+        const outline = window.outlinePanel;
+        if (outline && typeof outline.scrollToElement === 'function') {
+            outline.scrollToElement(target);
+        } else {
+            target.scrollIntoView({ block: 'start' });
+        }
+    }
+
+    function initHeadingSectionLinks() {
+        addHeadingSectionLinks();
+        document.addEventListener('click', handleSectionLinkClick);
+        window.addEventListener('hashchange', scrollToHashHeading);
+        // After the images have their size, or the heading moves once the
+        // scroll is done.
+        if (document.readyState === 'complete') {
+            scrollToHashHeading();
+        } else {
+            window.addEventListener('load', scrollToHashHeading, { once: true });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initHeadingSectionLinks, { once: true });
+    } else {
+        initHeadingSectionLinks();
+    }
+
+    /**
      * Get Mermaid configuration for the given theme
      * Uses 'base' theme for dark mode with custom colors for better integration
      */

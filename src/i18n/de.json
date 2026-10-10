@@ -4415,6 +4415,7 @@
       "repeat_yearly": "Jährlich",
       "repeat_custom": "Benutzerdefiniert...",
       "repeat_hint": "Die nächste Erinnerung wird geplant, wenn Sie die Benachrichtigung schließen.",
+      "task_repeat_hint": "Das nächste Vorkommen wird der Liste hinzugefügt, wenn Sie die Aufgabe abschließen. Beim Schließen der Benachrichtigung wird die Aufgabe auf ihr nächstes Datum verschoben.",
       "repeat_every": "Alle",
       "repeat_minutes": "Minute(n)",
       "repeat_hours": "Stunde(n)",

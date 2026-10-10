@@ -355,6 +355,76 @@ function resolveTasklistStoredContent($primaryContent, $fallbackContent = '') {
 }
 
 /**
+ * Next occurrence of a repeating task that is being completed: an open copy
+ * of it (subtasks unticked) due on the first date of its own schedule that
+ * is still ahead. The copy carries the repeat, so the caller drops
+ * dueRecurrence from the completed task and gives the copy an id.
+ * Dates are the naive local ones stored in the task, a date without a time
+ * counting as 09:00 like its reminder. Mirrors
+ * window.buildNextTaskOccurrence() in js/task-due-modal.js.
+ *
+ * @param array       $task     The task, with the reminder flag it had while open.
+ * @param string|null $nowLocal 'Y-m-d H:i' in the user's timezone, now by default.
+ * @return array|null The copy without an id, null when the task does not repeat.
+ */
+function poznoteNextTaskOccurrence(array $task, ?string $nowLocal = null): ?array {
+    $recurrence = $task['dueRecurrence'] ?? null;
+    $dueAt = $task['dueAt'] ?? null;
+    if (!is_string($recurrence) || !preg_match('/^([1-9]\d{0,2})([ihdwmy])$/', $recurrence, $rule)) {
+        return null;
+    }
+    if (!is_string($dueAt) || !preg_match('/^(\d{4}-\d{2}-\d{2})(?:T(\d{2}:\d{2}))?$/', $dueAt, $parts)) {
+        return null;
+    }
+    $hasTime = isset($parts[2]);
+
+    // Wall-clock arithmetic: both datetimes are read as UTC so a daylight
+    // saving change never shifts the time of day
+    $utc = new DateTimeZone('UTC');
+    try {
+        if ($nowLocal === null) {
+            $timezone = new DateTimeZone(function_exists('getUserTimezone') ? getUserTimezone() : 'UTC');
+            $nowLocal = (new DateTime('now', $timezone))->format('Y-m-d H:i');
+        }
+        $due = new DateTime($parts[1] . 'T' . ($hasTime ? $parts[2] : '09:00') . ':00', $utc);
+        $nowTs = (new DateTime($nowLocal, $utc))->getTimestamp();
+    } catch (Exception $e) {
+        return null;
+    }
+
+    $count = (int) $rule[1];
+    $seconds = ['i' => 60, 'h' => 3600, 'd' => 86400, 'w' => 604800];
+    if (isset($seconds[$rule[2]])) {
+        $step = $count * $seconds[$rule[2]];
+        $steps = max(1, (int) floor(($nowTs - $due->getTimestamp()) / $step) + 1);
+        $due->setTimestamp($due->getTimestamp() + $steps * $step);
+    } else {
+        $step = '+' . $count . ' ' . ($rule[2] === 'm' ? 'month' : 'year');
+        $guard = 0;
+        do {
+            $due->modify($step);
+        } while ($due->getTimestamp() <= $nowTs && ++$guard < 1000);
+        if ($due->getTimestamp() <= $nowTs) {
+            return null;
+        }
+    }
+
+    $next = $task;
+    unset($next['id']);
+    $next['completed'] = false;
+    $next['dueAt'] = $due->format($hasTime ? 'Y-m-d\TH:i' : 'Y-m-d');
+    if (isset($next['subtasks']) && is_array($next['subtasks'])) {
+        foreach ($next['subtasks'] as $key => $subtask) {
+            if (is_array($subtask)) {
+                $next['subtasks'][$key]['completed'] = false;
+            }
+        }
+    }
+
+    return $next;
+}
+
+/**
  * Note ids the user left out of the Tasks page (the eye button of a group
  * header in js/tasks-page.js), as stored in the tasks_page_hidden_notes
  * setting: a JSON array of note ids, tasklist notes and notes holding

@@ -1198,7 +1198,7 @@ To manage a single task without rewriting the array, use the per-task endpoints 
 | `dueAt` | string or null | Due date as `YYYY-MM-DD`, or `YYYY-MM-DDTHH:MM` when a time is set (local time, no timezone) |
 | `dueReminder` | boolean | Whether a reminder is scheduled for the due date |
 | `dueReminderEmail` | boolean | Whether that reminder also sends an email. Only present once configured; defaults to enabled otherwise |
-| `dueRecurrence` | string | Repeat interval of the reminder as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` (e.g. `1w` weekly). Only present when set. Dismissing the notification schedules the next one and advances `dueAt` by the same interval |
+| `dueRecurrence` | string | Repeat interval of the reminder as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` (e.g. `1w` weekly). Only present when set. Completing the task adds its next occurrence to the list: an open copy, due on the next date of the schedule, that carries the repeat (the completed task loses it). Dismissing the notification without completing the task schedules the next one and advances `dueAt` by the same interval |
 | `subtasks` | array | Subtasks of the task, one level deep, each `{ "id": number, "text": string, "completed": boolean }`. Only present when the task has some. A subtask has no due date, reminder or important flag, and ticking it does not complete its task. The per-task endpoints return subtasks and keep them on every write; the subtask endpoints below add, rename, tick or remove one at a time |
 
 ### List All Tasks
@@ -1226,6 +1226,7 @@ Aggregate the tasks of every non-trashed tasklist note, used by the tasks page (
       "heading": "Groceries",
       "folder": "Home",
       "folder_id": 4,
+      "folder_path": "Family/Home",
       "workspace": "Poznote",
       "updated": "2026-08-10 09:12:00",
       "favorite": false,
@@ -1325,7 +1326,7 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 PATCH /notes/{id}/tasks/{taskId}
 ```
 
-Update one task. Only the provided fields change. Completing a task clears its pending reminder, and setting `due_at` to `null` clears the due date and its reminder.
+Update one task. Only the provided fields change. Completing a task clears its pending reminder, and setting `due_at` to `null` clears the due date and its reminder. Completing a task that repeats also adds its next occurrence to the list, returned as `next_task`.
 
 **Request Body (JSON):**
 

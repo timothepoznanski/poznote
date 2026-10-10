@@ -911,7 +911,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
     <script src="<?php echo poznoteAsset('js/highlight/powershell.min.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/syntax-highlight.js'); ?>"></script>
 </head>
-<body class="public-note-page" data-task-access-mode="<?php echo htmlspecialchars($taskAccessMode, ENT_QUOTES); ?>">
+<body class="public-note-page<?php echo in_array(getSetting('markdown_heading_underline', '1'), ['0', 'false'], true) ? ' markdown-no-heading-underline' : ''; ?>" data-task-access-mode="<?php echo htmlspecialchars($taskAccessMode, ENT_QUOTES); ?>">
     <div class="public-note-layout">
         <div class="public-note-main" id="publicNoteMain">
             <div class="public-note">

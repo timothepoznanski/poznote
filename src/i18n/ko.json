@@ -4047,6 +4047,7 @@
       "repeat_yearly": "매년",
       "repeat_custom": "사용자 지정...",
       "repeat_hint": "알림을 닫으면 다음 알림이 예약됩니다.",
+      "task_repeat_hint": "작업을 완료하면 다음 반복 작업이 목록에 추가됩니다. 알림을 닫으면 작업이 다음 날짜로 이동합니다.",
       "repeat_every": "매",
       "repeat_minutes": "분",
       "repeat_hours": "시간",

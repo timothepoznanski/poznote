@@ -358,4 +358,75 @@
     };
 
     window.closeTaskDueModal = closeTaskDueModal;
+
+    /**
+     * Next occurrence of a repeating task that is being completed: an open
+     * copy of it (new id, subtasks unticked) due on the first date of its
+     * own schedule that is still ahead, or null when the task does not
+     * repeat. The copy carries the repeat, so the caller drops dueRecurrence
+     * from the completed task. Call it before the reminder flag of the task
+     * is cleared. Mirrors poznoteNextTaskOccurrence() in lib/tasklists.php.
+     */
+    window.buildNextTaskOccurrence = function (task) {
+        const rule = /^([1-9]\d{0,2})([ihdwmy])$/.exec(String((task && task.dueRecurrence) || ''));
+        const due = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?$/.exec(normalizeDue(task && task.dueAt) || '');
+        if (!rule || !due) return null;
+
+        // Wall-clock arithmetic: both datetimes are read as UTC so a daylight
+        // saving change never shifts the time of day. A date without a time
+        // counts as 09:00, like its reminder.
+        const hasTime = due[4] !== undefined;
+        const next = new Date(Date.UTC(+due[1], +due[2] - 1, +due[3], hasTime ? +due[4] : 9, hasTime ? +due[5] : 0));
+        const now = new Date();
+        const nowTs = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+
+        const count = parseInt(rule[1], 10);
+        const stepMs = { i: 60000, h: 3600000, d: 86400000, w: 604800000 }[rule[2]];
+        if (stepMs) {
+            const step = count * stepMs;
+            next.setTime(next.getTime() + Math.max(1, Math.floor((nowTs - next.getTime()) / step) + 1) * step);
+        } else {
+            let guard = 0;
+            do {
+                if (rule[2] === 'm') next.setUTCMonth(next.getUTCMonth() + count);
+                else next.setUTCFullYear(next.getUTCFullYear() + count);
+            } while (next.getTime() <= nowTs && ++guard < 1000);
+            if (next.getTime() <= nowTs) return null;
+        }
+
+        const day = next.getUTCFullYear() + '-' + pad2(next.getUTCMonth() + 1) + '-' + pad2(next.getUTCDate());
+        const copy = Object.assign({}, task, {
+            id: Date.now() + Math.random(),
+            completed: false,
+            dueAt: hasTime ? (day + 'T' + pad2(next.getUTCHours()) + ':' + pad2(next.getUTCMinutes())) : day
+        });
+        if (Array.isArray(task.subtasks)) {
+            copy.subtasks = task.subtasks.map(function (subtask) {
+                return (subtask && typeof subtask === 'object') ? Object.assign({}, subtask, { completed: false }) : subtask;
+            });
+        }
+        return copy;
+    };
+
+    // Pending notification of a task, written from its due date (09:00 for a
+    // date without a time). Nothing happens for a task without a reminder.
+    window.materializeTaskReminder = function (noteId, task) {
+        const dueAt = normalizeDue(task && task.dueAt);
+        if (!task || !task.dueReminder || !dueAt) return Promise.resolve();
+        const trigger = dateFromParts(dueAt.substring(0, 10), dueAt.length > 10 ? dueAt.substring(11, 16) : '09:00');
+        return fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/task-reminder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                task_id: String(task.id),
+                reminder_at: trigger.toISOString(),
+                message: task.text || '',
+                email_enabled: !!task.dueReminderEmail,
+                recurrence: task.dueRecurrence || null
+            })
+        }).catch(function (e) {
+            console.debug('task-due-modal: materializeTaskReminder() failed:', e);
+        });
+    };
 })();

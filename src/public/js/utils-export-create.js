@@ -84,9 +84,15 @@ function exportNoteToPrint(noteId, noteType) {
     }
 
     printWindow.onload = function () {
-        setTimeout(function () {
-            printWindow.print();
-        }, 250);
+        // A markdown note draws its diagrams and formulas once loaded, and the
+        // page says when they are in (poznotePrintReady, api_export_note.php)
+        var ready = printWindow.poznotePrintReady || Promise.resolve();
+        var print = function () {
+            setTimeout(function () {
+                printWindow.print();
+            }, 250);
+        };
+        ready.then(print, print);
     };
 }
 

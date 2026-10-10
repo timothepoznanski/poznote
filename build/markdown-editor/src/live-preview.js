@@ -1036,6 +1036,43 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
     }
   }
 
+  // [[Title]]: the title reads as a link to the note of that name, struck
+  // through when there is none (a click then offers to create it)
+  function decorateNoteReferences(line) {
+    const text = line.text
+    if (text.indexOf('[[') === -1) return
+    NOTE_REFERENCE_REGEX.lastIndex = 0
+    let match
+    while ((match = NOTE_REFERENCE_REGEX.exec(text))) {
+      const title = match[1].trim()
+      const from = line.from + match.index
+      const to = from + match[0].length
+      if (!title || text.charAt(match.index - 1) === '\\' || isInsideCode(from)) continue
+      let skipped = false
+      for (let node = tree.resolveInner(from + 2, 1); node; node = node.parent) {
+        if (node.name === 'Image' || node.name === 'Autolink' || node.name === 'HTMLTag' || node.name === 'URL') skipped = true
+      }
+      if (skipped) continue
+
+      // Not asked while the caret is in it: every letter typed would be a
+      // request of its own
+      const reference = lookupNoteReference(view, title, !touchesContent(from, to))
+      let mark
+      if (reference && reference.status === 'missing') {
+        mark = Decoration.mark({ class: 'cm-live-note-missing', attributes: { 'data-live-missing-note': title } })
+      } else if (reference && reference.status === 'found') {
+        mark = Decoration.mark({ class: 'cm-live-link', attributes: { 'data-live-href': 'index.php?note=' + reference.id } })
+      } else {
+        mark = Decoration.mark({ class: 'cm-live-link' })
+      }
+      decorations.push(mark.range(from + 2, to - 2))
+      if (!touches(from, to)) {
+        hide(from, from + 2)
+        hide(to - 2, to)
+      }
+    }
+  }
+
   const decoratedToggleLines = new Set()
   let lastHtmlLine = -1
 
@@ -1223,6 +1260,7 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
         decorateMath(line)
         decorateInlineHtml(line)
         decorateBareUrls(line)
+        decorateNoteReferences(line)
         lastHtmlLine = line.number
       }
       pos = line.to + 1
@@ -1720,6 +1758,82 @@ export function findEmptyMarkerPair(state) {
     text: marker.repeat(before * 2)
   }
 }
+
+// [[Title of a note]]: a link to that note, as in the preview
+// (processNoteReferences in js/note-reference.js). Whether a note answers to
+// the title is asked of the same route the preview asks, and remembered for a
+// while: the decorations are rebuilt on every keystroke.
+const NOTE_REFERENCE_REGEX = /\[\[([^\]]+)\]\]/g
+const NOTE_REFERENCE_FOUND_TTL = 60000
+const NOTE_REFERENCE_MISSING_TTL = 15000
+const noteReferences = new Map()
+const noteReferenceViews = new Set()
+
+function refreshNoteReferenceViews(views) {
+  views.forEach(view => {
+    try {
+      if (view.dom.isConnected) view.dispatch({ effects: refreshLivePreviewEffect.of(null) })
+    } catch (error) {
+      // (the editor was closed in the meantime)
+    }
+  })
+}
+
+// Returns { status: 'found', id }, { status: 'missing' } or null while the
+// answer is not known. mayAsk is false while the title is still being typed.
+function lookupNoteReference(view, title, mayAsk) {
+  const workspace = typeof window.getSelectedWorkspace === 'function' ? (window.getSelectedWorkspace() || '') : ''
+  const key = workspace + '\n' + title
+  let entry = noteReferences.get(key)
+  const age = entry && entry.at ? Date.now() - entry.at : 0
+  const expired = !!entry && !!entry.status && age > (entry.status === 'found' ? NOTE_REFERENCE_FOUND_TTL : NOTE_REFERENCE_MISSING_TTL)
+
+  if ((!entry || expired) && !mayAsk) return entry && entry.status ? entry : null
+  if (!entry) {
+    entry = { status: null, id: null, at: 0, asking: false, views: new Set() }
+    noteReferences.set(key, entry)
+  }
+  if ((!entry.status || expired) && !entry.asking) {
+    entry.asking = true
+    entry.views.add(view)
+    fetch('/api/v1/notes/resolve?reference=' + encodeURIComponent(title) + '&workspace=' + encodeURIComponent(workspace))
+      .then(response => response.json().catch(() => null).then(data => {
+        const before = entry.status + ':' + entry.id
+        if (data && data.success && data.id) {
+          entry.status = 'found'
+          entry.id = String(data.id)
+        } else if (response.status === 404) {
+          entry.status = 'missing'
+          entry.id = null
+        } else if (!entry.status) {
+          // A server error says nothing about the note: asked again later
+          noteReferences.delete(key)
+        }
+        entry.at = Date.now()
+        return before !== entry.status + ':' + entry.id
+      }))
+      .catch(() => {
+        if (!entry.status) noteReferences.delete(key)
+        return false
+      })
+      .then(changed => {
+        entry.asking = false
+        const views = entry.views
+        entry.views = new Set()
+        if (changed) refreshNoteReferenceViews(views)
+      })
+  } else if (entry.asking) {
+    entry.views.add(view)
+  }
+  return entry.status ? entry : null
+}
+
+// A note was created from a missing reference, or found again on a click
+// (js/note-reference.js): what was remembered no longer holds
+document.addEventListener('poznote:note-references-changed', () => {
+  noteReferences.clear()
+  refreshNoteReferenceViews(noteReferenceViews)
+})
 
 // A link to another note opens in the app, like the same link in the preview
 // (js/note-reference.js); any other opens in a new tab.
@@ -3725,6 +3839,7 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
     this.emptyPair = null
     this.pendingSpace = null
     this.pendingFormat = null
+    noteReferenceViews.add(view)
     this.rebuild(view)
     // (once the editor sits in its note: the choices are kept per note)
     setTimeout(() => {
@@ -3851,6 +3966,7 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
   }
 
   destroy() {
+    noteReferenceViews.delete(this.view)
     clearTimeout(this.refreshTimer)
     document.removeEventListener('mouseup', this.onPointerUp, true)
     document.removeEventListener('dragend', this.onPointerUp, true)
@@ -3976,6 +4092,12 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
         return true
       }
 
+      // A reference to a note that does not exist, under the same rule
+      if (target.closest('[data-live-missing-note]') && (event.ctrlKey || event.metaKey || !isSyntaxRevealed())) {
+        event.preventDefault()
+        return true
+      }
+
       clearTimeout(this.refreshTimer)
       this.pointerDown = true
       return false
@@ -3992,6 +4114,14 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
           event.preventDefault()
           return true
         }
+      }
+      // [[A note that does not exist]]: the preview's own dialog offers to
+      // create it (js/note-reference.js)
+      const missing = target && event.button === 0 ? target.closest('[data-live-missing-note]') : null
+      if (missing && (event.ctrlKey || event.metaKey || !isSyntaxRevealed()) && typeof window.openBrokenNoteReference === 'function') {
+        window.openBrokenNoteReference(missing.getAttribute('data-live-missing-note'), view.dom.closest('.noteentry[data-note-id]'))
+        event.preventDefault()
+        return true
       }
       const badge = target && event.button === 0 ? target.closest('.cm-live-code-lang') : null
       if (!badge || view.state.readOnly || typeof window.openCodeBlockLanguageModal !== 'function') return false

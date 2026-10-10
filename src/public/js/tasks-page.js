@@ -525,7 +525,9 @@
     function getFilteredNotes() {
         return getActiveNotes().map(function (note) {
             var heading = (note.heading || '').toLowerCase();
-            var folder = (note.folder || '').toLowerCase();
+            // The whole path, so a parent folder's name finds the notes of
+            // its subfolders at any depth
+            var folder = (note.folder_path || note.folder || '').toLowerCase();
             var noteMatchesText = !filterText || heading.includes(filterText) || folder.includes(filterText);
 
             var tasks = note.tasks.filter(function (task) {
@@ -681,7 +683,7 @@
             // The folder the note sits in, not the path that leads to it. The
             // name stays on one line and ellipsizes (css/tasks-page.css), so
             // the full name goes in the tooltip.
-            var folderName = lastFolderName(note.folder);
+            var folderName = lastFolderName(note.folder_path || note.folder);
             if (folderName) {
                 var badge = document.createElement('span');
                 badge.className = 'folder-badge';
@@ -1512,11 +1514,31 @@
             note.tasks = reorderTasksAfterToggle(note.tasks, task);
         };
 
+        // Completing a repeating task opens its next occurrence, which takes
+        // the place the task had among the open ones and carries the repeat
+        var nextTask = null;
+        var position = note.tasks.indexOf(task);
+
         applyToggle(task, newCompleted, regroup, function () {
             return mutateTaskInNote(note, task, function (target) {
                 target.completed = newCompleted;
+                nextTask = (newCompleted && typeof window.buildNextTaskOccurrence === 'function')
+                    ? window.buildNextTaskOccurrence(target)
+                    : null;
                 if (clearReminder) target.dueReminder = false;
-            }, reorderTasksAfterToggle).then(function () {
+                if (nextTask) delete target.dueRecurrence;
+            }, function (tasks, target) {
+                if (nextTask) tasks.splice(tasks.indexOf(target), 0, nextTask);
+                return reorderTasksAfterToggle(tasks, target);
+            }).then(function () {
+                if (nextTask) {
+                    task.dueRecurrence = null;
+                    // The completed task has left for the completed group,
+                    // so its former index is where the new one goes
+                    note.tasks.splice(Math.min(Math.max(position, 0), note.tasks.length), 0, nextTask);
+                    window.materializeTaskReminder(note.id, nextTask);
+                    render();
+                }
                 if (!clearReminder) return;
                 task.dueReminder = false;
                 // Completing a task cancels its pending reminder

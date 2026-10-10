@@ -4512,6 +4512,7 @@
       "repeat_yearly": "每年",
       "repeat_custom": "自定义...",
       "repeat_hint": "下一次提醒将在您关闭通知后安排。",
+      "task_repeat_hint": "完成任务后，下一次任务会添加到列表中。关闭通知会将任务移至下一个日期。",
       "repeat_every": "每",
       "repeat_minutes": "分钟",
       "repeat_hours": "小时",

@@ -1085,6 +1085,7 @@
 
             activateBrokenLinks(title, data.note.id, data.note.heading, workspace);
             persistRepointedLinks(deadId, data.note.id, sourceEntry);
+            notifyReferencesChanged();
 
             // Open the new note (refreshes the notes list on desktop)
             if (typeof window.navigateToCreatedNoteInInternalTab === 'function') {
@@ -1111,6 +1112,25 @@
         // Dead id-based anchor: remember the old id to patch the source content
         const deadId = el.tagName === 'A' ? extractInternalNoteId(el) : null;
         const sourceEntry = el.closest('.noteentry[data-note-id]');
+        await offerBrokenReference(title, deadId, sourceEntry);
+    }
+
+    /**
+     * The same, for a reference that is not an element of the page: a
+     * [[Title]] in the live Markdown editor (live-preview.js).
+     */
+    window.openBrokenNoteReference = function(title, sourceEntry) {
+        title = String(title || '').trim();
+        if (!title) return;
+        offerBrokenReference(title, null, sourceEntry || null);
+    };
+
+    // The live Markdown editor remembers which titles have a note
+    function notifyReferencesChanged() {
+        document.dispatchEvent(new CustomEvent('poznote:note-references-changed'));
+    }
+
+    async function offerBrokenReference(title, deadId, sourceEntry) {
         const workspace = getCurrentWorkspace();
 
         // The note may exist by now (stale span persisted in HTML content,
@@ -1119,6 +1139,7 @@
         if (resolved.success) {
             activateBrokenLinks(title, resolved.id, resolved.heading, workspace);
             persistRepointedLinks(deadId, resolved.id, sourceEntry);
+            notifyReferencesChanged();
             navigateToNote(resolved.id);
             return;
         }
