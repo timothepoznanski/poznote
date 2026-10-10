@@ -193,8 +193,16 @@ try {
         // actually shipped in an attachments/ folder next to the page
         $headerAttachments = $isZipExport ? buildExportAttachmentList($note) : [];
 
+        $referenceResolver = buildExportNoteReferenceResolver($con, $noteId);
+
+        // A markdown note sent to the print dialog is laid out by the app's
+        // own stylesheets, so the paper matches the note as it is read
+        if ($disposition === 'inline' && $format === 'html' && $noteType === 'markdown') {
+            exportAsHtml(generatePrintHtml($content, $note, $referenceResolver), $note['heading'], 'inline');
+        }
+
         // Generate styled HTML
-        $htmlContent = generateStyledHtml($content, $note['heading'], $noteType, $note['tags'], $headerAttachments);
+        $htmlContent = generateStyledHtml($content, $note['heading'], $noteType, $note['tags'], $headerAttachments, $referenceResolver);
 
         if ($isZipExport) {
             exportAsHtmlZip($htmlContent, $note, $con);
@@ -414,6 +422,376 @@ function stripExportAttachmentLinks($html) {
 }
 
 /**
+ * Strip the editing affordances from rendered note content and link its
+ * [[Note Title]] references, for a page nobody edits.
+ */
+function cleanExportContent($content, $referenceResolver = null) {
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true);
+    // Prefix an XML encoding header to avoid mojibake without depending on mbstring
+    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+
+    $xpath = new DOMXPath($dom);
+    // Code block UI affordances (copy / delete / language badge / line numbers)
+    $actionButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn') or contains(@class, 'code-block-delete-btn') or contains(@class, 'code-block-lang-btn') or contains(@class, 'code-block-line-numbers-btn')]");
+    foreach ($actionButtons as $button) {
+        $button->parentNode->removeChild($button);
+    }
+
+    if ($referenceResolver !== null && strpos($content, '[[') !== false) {
+        linkExportNoteReferences($dom, $xpath, $referenceResolver);
+    }
+
+    // Save the body content only to avoid XML header or duplicate body/html tags
+    $body = $dom->getElementsByTagName('body')->item(0);
+    if (!$body) {
+        // Strip the xml processing instruction added above for UTF-8 handling
+        return preg_replace('/^<\?xml[^>]*\?>\s*/', '', $dom->saveHTML());
+    }
+    $cleanContent = '';
+    foreach ($body->childNodes as $child) {
+        $cleanContent .= $dom->saveHTML($child);
+    }
+    return $cleanContent;
+}
+
+/**
+ * Page handed to the browser's print dialog for a markdown note. It loads the
+ * stylesheets of index.php around the markup the note has there, so headings,
+ * lists, quotes, code and callouts print as they read in the app, in the light
+ * theme whatever theme the app is in. Diagrams, formulas and code colours are
+ * drawn by the same libraries, and window.poznotePrintReady resolves once
+ * they are in.
+ */
+function generatePrintHtml($content, $note, $referenceResolver = null) {
+    require_once __DIR__ . '/../version_helper.php';
+    require_once __DIR__ . '/index_css.php';
+
+    $noteId = (int)$note['id'];
+    $cleanContent = cleanExportContent($content, $referenceResolver);
+    // The server marks a code block without a language as "CODE", which the
+    // stylesheets would print as a badge the app does not show
+    $cleanContent = str_replace(' data-language="CODE"', '', $cleanContent);
+
+    $v = poznoteBuildAssetCacheVersion(getAppVersion());
+    $indexCssVersion = poznoteGetIndexCssAssetVersion();
+    if ($indexCssVersion !== '') {
+        $v .= '-' . $indexCssVersion;
+    }
+    $v = rawurlencode($v);
+
+    $fontSize = (int)getSetting('note_font_size', '15');
+    if ($fontSize < 8 || $fontSize > 40) {
+        $fontSize = 15;
+    }
+
+    // The settings that change how a note reads, as index.php passes them on
+    $settingOff = function ($key, $default) {
+        return in_array(getSetting($key, $default), ['0', 'false'], true);
+    };
+    $bodyClasses = 'note-print-page';
+    if ($settingOff('code_block_word_wrap', '1')) {
+        $bodyClasses .= ' code-block-no-wrap';
+    }
+    if (!$settingOff('code_block_line_numbers', '0')) {
+        $bodyClasses .= ' code-block-line-numbers';
+    }
+    if ($settingOff('markdown_heading_underline', '1')) {
+        $bodyClasses .= ' markdown-no-heading-underline';
+    }
+    $bodyStyle = '';
+    $markdownColored = getSetting('markdown_colored', '0');
+    if (poznoteMarkdownColoredEnabled($markdownColored)) {
+        $bodyClasses .= ' markdown-colored';
+        $bodyStyle = poznoteMarkdownColoredStyle($markdownColored, getSetting('markdown_colored_custom', ''));
+    }
+
+    $tagsHtml = '';
+    $tagsList = empty($note['tags']) ? [] : array_filter(array_map('trim', explode(',', $note['tags'])));
+    if (!empty($tagsList)) {
+        $tagsHtml = '<div class="note-print-tags">';
+        foreach ($tagsList as $tag) {
+            $tagsHtml .= '<span class="note-print-tag">' . htmlspecialchars($tag) . '</span>';
+        }
+        $tagsHtml .= '</div>';
+    }
+
+    $title = htmlspecialchars((string)$note['heading']);
+
+    return '<!DOCTYPE html>
+<html lang="' . htmlspecialchars(getUserLanguage(), ENT_QUOTES) . '" data-theme="light" class="theme-light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <title>' . $title . '</title>
+    <link rel="stylesheet" href="index_css.php?group=core&amp;v=' . $v . '">
+    <link rel="stylesheet" href="index_css.php?group=modals&amp;v=' . $v . '">
+    <link rel="stylesheet" href="js/katex/katex.min.css?v=' . $v . '">
+    <link rel="stylesheet" href="css/syntax-highlight.css?v=' . $v . '">
+    <style>
+        :root { --note-font-size: ' . $fontSize . 'px; }
+
+        /* The app is a fixed frame with panes that scroll: on paper the note
+           is the whole page and runs over as many sheets as it needs */
+        html, body.note-print-page {
+            height: auto;
+            min-height: 0;
+            overflow: visible;
+            background: #fff;
+        }
+
+        body.note-print-page {
+            display: block;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .note-print-page #right_pane,
+        .note-print-page #right_col,
+        .note-print-page .notecard,
+        .note-print-page .innernote,
+        .note-print-page .noteentry {
+            position: static;
+            display: block;
+            width: auto;
+            max-width: none;
+            height: auto;
+            min-height: 0;
+            max-height: none;
+            margin: 0;
+            padding: 0;
+            overflow: visible;
+            border: 0;
+            box-shadow: none;
+            background: transparent;
+        }
+
+        .note-print-header {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .note-print-title {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.25;
+            color: #1a1a1a;
+        }
+
+        .note-print-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .note-print-tag {
+            padding: 3px 10px;
+            border: 1px solid #d0d0d0;
+            border-radius: 12px;
+            background: #f0f0f0;
+            font-size: 12px;
+            color: #555;
+        }
+
+        /* Nothing is clicked on paper */
+        .note-print-page .code-block-copy-btn,
+        .note-print-page .mermaid-zoom-btn {
+            display: none !important;
+        }
+
+        @page {
+            margin: 2cm;
+        }
+
+        @media print {
+            body.note-print-page {
+                max-width: none;
+                padding: 0;
+            }
+
+            .note-print-header {
+                break-after: avoid;
+            }
+
+            .note-print-page :is(pre, blockquote, table, img, .callout, .mermaid, .math-block) {
+                break-inside: avoid;
+            }
+
+            .note-print-page :is(h1, h2, h3, h4, h5, h6) {
+                break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body class="' . $bodyClasses . '"' . ($bodyStyle !== '' ? ' style="' . htmlspecialchars($bodyStyle, ENT_QUOTES) . '"' : '') . '>
+    <div id="right_pane"><div id="right_col"><div class="notecard" id="note' . $noteId . '"><div class="innernote">
+        <div class="note-print-header">
+            <div class="note-print-title">' . $title . '</div>' . $tagsHtml . '
+        </div>
+        <div class="noteentry" id="entry' . $noteId . '" data-note-id="' . $noteId . '" data-note-type="markdown"><div class="markdown-preview">' . $cleanContent . '</div></div>
+    </div></div></div></div>
+    <script src="js/highlight/highlight.min.js?v=' . $v . '"></script>
+    <script src="js/highlight/powershell.min.js?v=' . $v . '"></script>
+    <script src="js/syntax-highlight.js?v=' . $v . '"></script>
+    <script src="js/math-renderer.js?v=' . $v . '"></script>
+    <script src="js/mermaid-theme.js?v=' . $v . '"></script>
+    <script>
+        (function () {
+            var v = "' . $v . '";
+            var entry = document.querySelector(".noteentry");
+
+            function load(src) {
+                return new Promise(function (resolve) {
+                    var script = document.createElement("script");
+                    script.src = src + "?v=" + v;
+                    script.onload = resolve;
+                    // A library that fails to load leaves its blocks as text
+                    script.onerror = resolve;
+                    document.head.appendChild(script);
+                });
+            }
+
+            function renderMath() {
+                if (!entry.querySelector(".math-block, .math-inline")) return Promise.resolve();
+                return load("js/katex/katex.min.js").then(function () {
+                    if (typeof window.renderMathInElement === "function") window.renderMathInElement(entry);
+                });
+            }
+
+            function renderDiagrams() {
+                var nodes = entry.querySelectorAll(".mermaid");
+                if (!nodes.length) return Promise.resolve();
+                return load("js/mermaid/mermaid.min.js").then(function () {
+                    if (typeof mermaid === "undefined") return;
+                    var config = { startOnLoad: false };
+                    try {
+                        if (typeof window.poznoteMermaidTheme === "function") config = window.poznoteMermaidTheme().config;
+                    } catch (e) {}
+                    mermaid.initialize(config);
+                    return mermaid.run({ nodes: nodes, suppressErrors: true });
+                }).catch(function () {});
+            }
+
+            // A folded callout would print as its title alone: open them all
+            // for the print, then fold back the ones that were closed.
+            var folded = [];
+            window.addEventListener("beforeprint", function () {
+                Array.prototype.forEach.call(document.querySelectorAll("details.callout:not([open])"), function (el) {
+                    el.open = true;
+                    folded.push(el);
+                });
+            });
+            window.addEventListener("afterprint", function () {
+                folded.forEach(function (el) { el.open = false; });
+                folded = [];
+            });
+
+            window.poznotePrintReady = Promise.all([
+                renderMath(),
+                renderDiagrams(),
+                document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()
+            ]);
+        })();
+    </script>
+</body>
+</html>';
+}
+
+/**
+ * Returns the lookup used to turn a [[Note Title]] of the exported note into
+ * a link. It answers like GET /api/v1/notes/resolve: the most recently
+ * updated note of the same workspace whose title contains the reference.
+ */
+function buildExportNoteReferenceResolver($con, $noteId) {
+    $workspace = null;
+    try {
+        $stmt = $con->prepare('SELECT workspace FROM entries WHERE id = ?');
+        $stmt->execute([$noteId]);
+        $workspace = $stmt->fetchColumn();
+    } catch (Exception $e) {
+        error_log('api_export_note: workspace lookup failed: ' . $e->getMessage());
+    }
+    $workspace = ($workspace === false || $workspace === null) ? '' : (string)$workspace;
+    $cache = [];
+
+    return function ($reference) use ($con, $workspace, &$cache) {
+        if (array_key_exists($reference, $cache)) {
+            return $cache[$reference];
+        }
+        $found = null;
+        try {
+            if (is_numeric($reference)) {
+                $sql = 'SELECT id, heading, workspace FROM entries WHERE trash = 0 AND id = ?';
+                $params = [intval($reference)];
+            } else {
+                $sql = 'SELECT id, heading, workspace FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?)';
+                $params = ['%' . $reference . '%'];
+            }
+            if ($workspace !== '') {
+                $sql .= ' AND workspace = ?';
+                $params[] = $workspace;
+            }
+            $stmt = $con->prepare($sql . ' ORDER BY updated DESC LIMIT 1');
+            $stmt->execute($params);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($row) {
+                $found = $row;
+            }
+        } catch (Exception $e) {
+            error_log('api_export_note: note reference lookup failed: ' . $e->getMessage());
+        }
+        $cache[$reference] = $found;
+        return $found;
+    };
+}
+
+/**
+ * Turn the [[Note Title]] references of the exported content into links, as
+ * note-reference.js does in the app once a note is rendered. Code is left
+ * alone, and a title that matches no note is marked as a broken link.
+ */
+function linkExportNoteReferences($dom, $xpath, $referenceResolver) {
+    $textNodes = [];
+    foreach ($xpath->query("//text()[contains(., '[[') and not(ancestor::code) and not(ancestor::pre)]") as $textNode) {
+        $textNodes[] = $textNode;
+    }
+
+    foreach ($textNodes as $textNode) {
+        $parts = preg_split('/\[\[([^\]]+)\]\]/', $textNode->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
+        if ($parts === false || count($parts) < 3) {
+            continue;
+        }
+        $fragment = $dom->createDocumentFragment();
+        foreach ($parts as $index => $part) {
+            // Odd entries are the captured titles
+            if ($index % 2 === 0) {
+                if ($part !== '') {
+                    $fragment->appendChild($dom->createTextNode($part));
+                }
+                continue;
+            }
+            $target = $referenceResolver($part);
+            if ($target) {
+                $link = $dom->createElement('a');
+                $link->setAttribute('href', 'index.php?note=' . intval($target['id']) . '&workspace=' . rawurlencode((string)$target['workspace']));
+                $link->setAttribute('class', 'note-internal-link');
+            } else {
+                $link = $dom->createElement('span');
+                $link->setAttribute('class', 'note-internal-link note-link-broken');
+            }
+            $link->appendChild($dom->createTextNode($part));
+            $fragment->appendChild($link);
+        }
+        $textNode->parentNode->replaceChild($fragment, $textNode);
+    }
+}
+
+/**
  * Build the "Attachments" section appended to an exported Markdown note.
  * Only files added to the ZIP are listed, and images already embedded in the
  * body are skipped, mirroring the HTML export header row.
@@ -546,38 +924,14 @@ function buildExportAttachmentLinks($attachments, $content) {
     return '<div class="note-attachments">' . implode(' ', $links) . '</div>';
 }
 
-function generateStyledHtml($content, $title, $noteType, $tags, $attachments = []) {
+function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [], $referenceResolver = null) {
     // Parse tags (stored as comma-separated string)
     $tagsList = [];
     if (!empty($tags)) {
         $tagsList = array_filter(array_map('trim', explode(',', $tags)));
     }
     
-    // Clean content: remove copy buttons
-    $dom = new DOMDocument();
-    libxml_use_internal_errors(true);
-    // Prefix an XML encoding header to avoid mojibake without depending on mbstring
-    $dom->loadHTML('<?xml encoding="utf-8" ?>' . $content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-    libxml_clear_errors();
-    
-    $xpath = new DOMXPath($dom);
-    // Code block UI affordances (copy / delete / language badge / line numbers)
-    $actionButtons = $xpath->query("//*[contains(@class, 'code-block-copy-btn') or contains(@class, 'code-block-delete-btn') or contains(@class, 'code-block-lang-btn') or contains(@class, 'code-block-line-numbers-btn')]");
-    foreach ($actionButtons as $button) {
-        $button->parentNode->removeChild($button);
-    }
-    
-    // Save the body content only to avoid XML header or duplicate body/html tags
-    $body = $dom->getElementsByTagName('body')->item(0);
-    $cleanContent = '';
-    if ($body) {
-        foreach ($body->childNodes as $child) {
-            $cleanContent .= $dom->saveHTML($child);
-        }
-    } else {
-        // Strip the xml processing instruction added above for UTF-8 handling
-        $cleanContent = preg_replace('/^<\?xml[^>]*\?>\s*/', '', $dom->saveHTML());
-    }
+    $cleanContent = cleanExportContent($content, $referenceResolver);
     
     // Build HTML document
     $html = '<!DOCTYPE html>
@@ -736,6 +1090,12 @@ function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [
             text-decoration: underline;
         }
         
+        /* A [[Note Title]] that matches no note, as the app shows it */
+        .note-link-broken {
+            color: #dc3545;
+            text-decoration: line-through;
+        }
+
         /* Blockquotes */
         blockquote {
             border-left: 4px solid #ddd;
@@ -846,7 +1206,79 @@ function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [
             color: #c62828;
             font-weight: 600;
         }
-        
+
+        /* Callouts (Note, Tip, Important, Warning, Caution). This page is
+           standalone, so the rules of tasks.css are repeated here with the
+           light theme colours. Unknown types keep the note blue. */
+        .callout {
+            display: block;
+            border-left: 3px solid #007db8;
+            padding: 8px 0 8px 12px;
+            margin: 12px 0;
+        }
+
+        .callout .callout-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            color: #007db8;
+        }
+
+        .callout .callout-body {
+            line-height: 1.45;
+        }
+
+        .callout .callout-body hr {
+            border: 0;
+            border-top: 1px solid currentColor;
+            opacity: 0.25;
+            margin: 0.85em 0;
+        }
+
+        .callout .callout-icon-svg {
+            flex: 0 0 16px;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            fill: currentColor;
+            opacity: 0.75;
+        }
+
+        details.callout > summary.callout-title {
+            list-style: none;
+        }
+
+        details.callout > summary.callout-title::-webkit-details-marker {
+            display: none;
+        }
+
+        .callout .callout-fold-icon {
+            flex: 0 0 12px;
+            width: 12px;
+            height: 12px;
+            fill: currentColor;
+            opacity: 0.6;
+        }
+
+        details.callout:not([open]) > summary.callout-title {
+            margin-bottom: 0;
+        }
+
+        details.callout:not([open]) .callout-fold-icon {
+            transform: rotate(-90deg);
+        }
+
+        .callout-tip { border-left-color: #218838; }
+        .callout-tip .callout-title { color: #218838; }
+        .callout-important { border-left-color: #9333ea; }
+        .callout-important .callout-title { color: #9333ea; }
+        .callout-warning { border-left-color: #856404; }
+        .callout-warning .callout-title { color: #856404; }
+        .callout-caution { border-left-color: #c82333; }
+        .callout-caution .callout-title { color: #c82333; }
+
         /* Blank lines to preserve spacing in markdown */
         p.blank-line {
             margin: 0;
@@ -869,7 +1301,7 @@ function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [
             }
             
             /* Avoid breaking inside elements */
-            pre, blockquote, table {
+            pre, blockquote, table, .callout {
                 page-break-inside: avoid;
             }
             
@@ -905,6 +1337,23 @@ function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [
     <div class="note-content">
         ' . $cleanContent . '
     </div>
+    <script>
+        // A folded callout would print as its title alone: open them all for
+        // the print, then fold back the ones that were closed.
+        (function () {
+            var folded = [];
+            window.addEventListener("beforeprint", function () {
+                Array.prototype.forEach.call(document.querySelectorAll("details.callout:not([open])"), function (el) {
+                    el.open = true;
+                    folded.push(el);
+                });
+            });
+            window.addEventListener("afterprint", function () {
+                folded.forEach(function (el) { el.open = false; });
+                folded = [];
+            });
+        })();
+    </script>
 </body>
 </html>';
     

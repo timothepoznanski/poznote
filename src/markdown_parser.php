@@ -1288,7 +1288,7 @@ function parseMarkdown($text) {
             }
 
             // Detect GitHub-style callouts (e.g. Note, Tip, Important, Warning, Caution)
-            $firstLine = isset($blockquoteLines[0]) ? trim($blockquoteLines[0]) : '';
+            $firstLine = isset($blockquoteLines[0]) ? trimMarkdownTableWhitespace($blockquoteLines[0]) : '';
             $calloutType = null;
             $calloutRemainder = '';
             $calloutCustomTitle = null;
@@ -1301,7 +1301,7 @@ function parseMarkdown($text) {
             if (preg_match('/^\s*\[!([A-Za-z][A-Za-z0-9_-]*)\]([+-])?\s*(.*)$/', $firstLine, $lm)) {
                 $calloutType = strtolower($lm[1]);
                 $calloutFold = (isset($lm[2]) && $lm[2] !== '') ? $lm[2] : null;
-                $customTitle = isset($lm[3]) ? trim($lm[3]) : '';
+                $customTitle = isset($lm[3]) ? trimMarkdownTableWhitespace($lm[3]) : '';
                 if ($customTitle !== '') {
                     $calloutCustomTitle = $customTitle;
                 }
@@ -1310,7 +1310,7 @@ function parseMarkdown($text) {
             // Here any trailing text is the body, matching the previous behaviour.
             elseif (preg_match('/^\s*(?:\*\*|__)?(Note|Tip|Important|Warning|Caution)(?:\*\*|__)?(?:[:\s\-]+(.*))?$/i', $firstLine, $lm)) {
                 $calloutType = strtolower($lm[1]);
-                $calloutRemainder = isset($lm[2]) ? trim($lm[2]) : '';
+                $calloutRemainder = isset($lm[2]) ? trimMarkdownTableWhitespace($lm[2]) : '';
             }
 
             if ($calloutType) {
@@ -1495,7 +1495,7 @@ function parseMarkdown($text) {
                         if ($contIndent > $baseIndent) {
                             $lastIdx = count($listItems) - 1;
                             $listItems[$lastIdx] = preg_replace('/<\/li>$/', '', $listItems[$lastIdx])
-                                . ' ' . $applyInlineStyles(trim($currentLine)) . '</li>';
+                                . ' ' . $applyInlineStyles(trimMarkdownTableWhitespace($currentLine)) . '</li>';
                             $currentIndex++;
                             continue;
                         }
