@@ -1392,6 +1392,7 @@ El servidor MCP viene con el `docker-compose.yml` oficial y solo se publica en `
 Poznote funciona en cualquier navegador, y también se puede instalar desde el navegador como aplicación web (PWA): pasa a tener su propio icono y su propia ventana, como una aplicación nativa.
 
 *   **Android y ordenador:** abre tu instancia de Poznote en Chrome o Edge y elige **Instalar** en el menú del navegador.
+*   **Firefox en Android:** abre tu instancia de Poznote en Firefox y elige **Añadir a la pantalla de inicio** en el menú del navegador.
 *   **iPhone y iPad:** abre tu instancia de Poznote en Safari, toca **Compartir** y luego **Añadir a pantalla de inicio**.
 
 > Para instalar la aplicación web, Poznote debe servirse por HTTPS (`http://localhost` también funciona).
