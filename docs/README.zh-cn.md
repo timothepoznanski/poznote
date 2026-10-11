@@ -1392,6 +1392,7 @@ MCP 服务器随官方 `docker-compose.yml` 一起提供，并且只发布在 `1
 Poznote 可在任何浏览器中运行，也可以从浏览器安装为 Web 应用（PWA）：安装后它拥有自己的图标和独立窗口，就像原生应用一样。
 
 *   **Android 和电脑：** 在 Chrome 或 Edge 中打开您的 Poznote 实例，然后在浏览器菜单中选择 **安装**。
+*   **Android 上的 Firefox：** 在 Firefox 中打开您的 Poznote 实例，然后在浏览器菜单中选择 **添加到主屏幕**。
 *   **iPhone 和 iPad：** 在 Safari 中打开您的 Poznote 实例，轻点 **分享**，然后选择 **添加到主屏幕**。
 
 > 安装 Web 应用要求 Poznote 通过 HTTPS 提供服务（`http://localhost` 也可以）。

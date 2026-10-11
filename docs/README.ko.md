@@ -1409,6 +1409,7 @@ Server: my-server.com
 Poznote는 모든 브라우저에서 동작하며, 브라우저에서 웹 앱(PWA)으로 설치할 수도 있습니다. 설치하면 네이티브 앱처럼 자체 아이콘과 창을 갖게 됩니다.
 
 *   **Android 및 컴퓨터:** Chrome 또는 Edge에서 Poznote 인스턴스를 열고 브라우저 메뉴에서 **설치**를 선택하세요.
+*   **Android의 Firefox:** Firefox에서 Poznote 인스턴스를 열고 브라우저 메뉴에서 **홈 화면에 추가**를 선택하세요.
 *   **iPhone 및 iPad:** Safari에서 Poznote 인스턴스를 열고 **공유**를 탭한 다음 **홈 화면에 추가**를 선택하세요.
 
 > 웹 앱을 설치하려면 Poznote가 HTTPS로 제공되어야 합니다(`http://localhost`도 가능).
