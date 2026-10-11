@@ -1512,6 +1512,53 @@ function clearSearch(host) {
   return true
 }
 
+// Chromium only spell checks the text an editable already holds once the
+// browser itself has focused it (a click or Tab it handled). CodeMirror takes
+// the mousedown and focuses its content from script, so the mistakes already
+// in a note stayed unmarked until their line was edited (issue 1594). The first
+// plain click on the text of an editor is therefore left to the browser:
+// CodeMirror never sees it and reads the caret back from the DOM selection.
+// Firefox checks the text by itself.
+const spellcheckNeedsNativeFocus = /Chrom(e|ium)\//.test((navigator && navigator.userAgent) || '')
+
+function leaveFirstClickToBrowser(host, view) {
+  let pending = true
+  // the rest of a double or triple click the browser started
+  let nativeClicks = false
+
+  const onMouseDown = event => {
+    const content = view.contentDOM
+    const target = event.target instanceof Element ? event.target : (event.target && event.target.parentElement)
+    const blocker = target ? target.closest('[contenteditable="false"]') : null
+    const onText = !!target && content.contains(target) && content.contentEditable === 'true' &&
+      !(blocker && content.contains(blocker))
+    const plain = event.button === 0 && !event.shiftKey && !event.altKey && !event.ctrlKey && !event.metaKey
+    // on a phone the keyboard does the spell checking
+    const touch = !!(event.sourceCapabilities && event.sourceCapabilities.firesTouchEvents)
+
+    if (!onText || !plain || touch) {
+      nativeClicks = false
+      return
+    }
+    if (pending && event.detail === 1) {
+      pending = false
+      nativeClicks = true
+      // already focused from script: the browser has to focus it again
+      if (document.activeElement === content) content.blur()
+      event.stopPropagation()
+      return
+    }
+    if (nativeClicks && event.detail > 1) {
+      event.stopPropagation()
+      return
+    }
+    nativeClicks = false
+  }
+
+  host.addEventListener('mousedown', onMouseDown, true)
+  return () => host.removeEventListener('mousedown', onMouseDown, true)
+}
+
 function createEditor(host, options = {}) {
   if (!host) return null
 
@@ -1672,9 +1719,13 @@ function createEditor(host, options = {}) {
     themeCompartment,
     livePreviewCompartment,
     livePreview: !!options.livePreview,
-    themeObserver: null
+    themeObserver: null,
+    removeNativeFocusListener: null
   }
   instance.themeObserver = observeThemeChanges(instance)
+  if (spellcheckAttributes && spellcheckNeedsNativeFocus) {
+    instance.removeNativeFocusListener = leaveFirstClickToBrowser(host, view)
+  }
 
   instances.set(host, instance)
   host.setAttribute('data-codemirror-value', state.doc.toString())
@@ -1688,6 +1739,9 @@ function destroyEditor(host) {
   if (!instance) return false
   if (instance.themeObserver) {
     instance.themeObserver.disconnect()
+  }
+  if (instance.removeNativeFocusListener) {
+    instance.removeNativeFocusListener()
   }
   instance.view.destroy()
   instances.delete(host)
