@@ -48,14 +48,14 @@ class SettingsController {
     
     /**
      * Per-user settings that hold a credential (a Git token, a personal AI or
-     * speech-to-text API key), stored encrypted under the instance key by the
-     * page that owns them (git_sync.php, ai_settings_user.php,
-     * stt_settings_user.php). This API never hands them out, like
+     * speech-to-text API key, the keys of the MCP servers connected to the
+     * assistant), stored encrypted under the instance key by the page that
+     * owns them (git_sync.php, ai_settings_user.php, stt_settings_user.php). This API never hands them out, like
      * smtp_password: reads are open to someone borrowing the account or
      * working in a workspace shared with them, and a stored value copied into
      * another account would be decrypted there.
      */
-    private const SECRET_SETTINGS = ['git_token', 'ai_user_api_key', 'ai_user_headers', 'stt_user_api_key'];
+    private const SECRET_SETTINGS = ['git_token', 'ai_user_api_key', 'ai_user_headers', 'ai_user_mcp_servers', 'stt_user_api_key'];
 
     public function __construct($con) {
         $this->con = $con;

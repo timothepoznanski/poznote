@@ -644,19 +644,14 @@ function aiSetHtmlChecklistItem(string $html, int $index, bool $completed): ?str
 }
 
 /**
- * Dispatches one tool call from the assistant.
- *
- * This used to be a single 760-line function: 22 `if ($name === ...)` branches
- * in a row. Each branch is now its own handler below, and the map is explicit
- * on purpose: $name comes from the model's tool call, so it must never be able
- * to select a function by itself.
+ * Every tool of the assistant and the handler behind it. The map is explicit
+ * on purpose: the name comes from the model's tool call, so it must never be
+ * able to select a function by itself. The settings page lists these names
+ * for the user to turn tools off (ai_settings_user.php).
  */
-function aiExecuteTool($con, $name, $args, $chatWorkspace)
+function aiToolHandlers(): array
 {
-    if (!is_array($args)) $args = [];
-    $actorUserId = $_SESSION['user_id'] ?? null;
-
-    static $handlers = [
+    return [
         'search_notes' => 'aiToolSearchNotes',
         'get_note' => 'aiToolGetNote',
         'list_recent_notes' => 'aiToolListRecentNotes',
@@ -683,6 +678,25 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace)
         'delete_subtask' => 'aiToolDeleteSubtask',
         'set_checklist_item' => 'aiToolSetChecklistItem',
     ];
+}
+
+/** The tools that only read: every other one changes the user's data. */
+function aiReadOnlyToolNames(): array
+{
+    return ['search_notes', 'get_note', 'list_recent_notes', 'list_tags', 'list_folders'];
+}
+
+/**
+ * Dispatches one tool call from the assistant.
+ *
+ * This used to be a single 760-line function: 22 `if ($name === ...)` branches
+ * in a row. Each branch is now its own handler below.
+ */
+function aiExecuteTool($con, $name, $args, $chatWorkspace)
+{
+    if (!is_array($args)) $args = [];
+    $actorUserId = $_SESSION['user_id'] ?? null;
+    $handlers = aiToolHandlers();
 
     if (!isset($handlers[$name])) {
         return json_encode(['error' => 'Unknown tool: ' . $name]);

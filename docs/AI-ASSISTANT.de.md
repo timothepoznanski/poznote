@@ -44,7 +44,7 @@ Bevor der Assistent den Inhalt einer Notiz ändert (Neuschreiben, Kontrollkästc
 
 Der Assistent ist **auf den aktuellen Arbeitsbereich beschränkt**: Er sieht, durchsucht und bearbeitet nur die Notizen des Arbeitsbereichs, in dem Sie den Chat geöffnet haben, und neue Notizen werden dort erstellt. Um Fragen zu einem anderen Arbeitsbereich zu stellen, wechseln Sie zuerst dorthin. Auf einem Dashboard, das mehrere Arbeitsbereiche anzeigt, gibt der erste Klick auf die Schaltfläche an, in welchem Arbeitsbereich der Assistent arbeiten wird, und fragt, ob Sie fortfahren möchten.
 
-Die Unterhaltung bleibt erhalten, solange Ihr Browser-Tab geöffnet ist (auch über ein Neuladen der Seite hinweg), und kann jederzeit mit der Papierkorb-Schaltfläche in der Kopfzeile des Panels gelöscht werden.
+Unterhaltungen werden auf dem Poznote-Server gespeichert, in Ihrer eigenen Datenbank neben Ihren Notizen, und gehören nur Ihnen: Wer in einem Arbeitsbereich arbeitet, den Sie mit ihm geteilt haben, hat seine eigenen. In der Kopfzeile des Panels startet die Plus-Schaltfläche eine neue Unterhaltung, und die Verlauf-Schaltfläche listet die letzten zehn des Arbeitsbereichs auf, um eine davon fortzusetzen oder zu löschen; die Papierkorb-Schaltfläche löscht die angezeigte Unterhaltung. Der Verlauf folgt Ihnen von einem Browser oder Gerät zum anderen, und ein Neuladen der Seite bringt die Unterhaltung zurück, die im Tab geöffnet war.
 
 ## Assistenten aktivieren
 
@@ -95,6 +95,18 @@ Jede Anfrage trägt außerdem `User-Agent: Poznote/<version>`, damit die Protoko
 ## Eigene Anweisungen
 
 Jeder Benutzer kann dem Assistenten unter **Einstellungen → Mein KI-Assistent → Eigene Anweisungen** dauerhafte Anweisungen geben, zum Beispiel „Wenn du eine Notiz auf Englisch schreibst, füge darunter die russische Übersetzung hinzu, und umgekehrt“. Der Text (bis zu 4000 Zeichen) wird mit jeder Nachricht an das Modell gesendet, unabhängig davon, welche Konfiguration antwortet, die der Instanz oder Ihre eigene. Nutzen Sie ihn für dauerhafte Vorgaben wie Ton, Sprache oder das Format der Notizen, die der Assistent schreibt. Er ändert nicht, was der Assistent tun darf: Notizen werden weiterhin nur geändert, wenn Sie darum bitten. Lassen Sie das Feld leer, um nichts zu senden.
+
+## Externe Tools (MCP-Server)
+
+Der Assistent kann neben seinen eigenen Tools auch Tools aufrufen, die entfernte [MCP](https://modelcontextprotocol.io)-Server anbieten, zum Beispiel einen Websuchdienst, um aktuelle Informationen nachzuschlagen, bevor er antwortet oder eine Notiz schreibt. Das ist die umgekehrte Richtung des [Poznote-MCP-Servers](MCP-SERVER.de.md), über den andere Assistenten auf Ihre Notizen zugreifen.
+
+Die Funktion ist standardmäßig ausgeschaltet. Ein Administrator schaltet sie unter **Einstellungen → Admin-Werkzeuge → KI-Assistent** im Abschnitt **Externe Tools** mit **Externe Tools erlauben** ein und fügt dort Server hinzu: einen Namen, die URL des MCP-Endpunkts (zum Beispiel `https://mcp.exa.ai/mcp`), einen optionalen API-Schlüssel, der als Bearer-Token gesendet wird, und optionale benutzerdefinierte Header für Server, die ihren Schlüssel anders erwarten. Poznote verbindet sich mit dem Server, liest die angebotenen Tools ein und listet sie jeweils mit einem Kontrollkästchen auf, sodass Sie auswählen, welche der Assistent aufrufen darf. Diese Server stehen den Benutzern zur Verfügung, die den Assistenten der Instanz verwenden dürfen. Mit **Benutzern erlauben, eigene Server zu verbinden** erhält jeder Benutzer außerdem einen Abschnitt **Externe Tools** unter **Einstellungen → Mein KI-Assistent**, für Server, die nur in seinen eigenen Unterhaltungen verwendet werden.
+
+Unterstützt werden nur Server, die über HTTP (Transport Streamable HTTP) mit einem API-Schlüssel oder benutzerdefinierten Headern erreichbar sind: Server, die als lokaler Prozess gestartet werden (stdio, `npx ...`), und Server, die OAuth verlangen, werden nicht unterstützt. Wie der KI-Server wird auch ein MCP-Server vom Poznote-Server aus aufgerufen, seine URL muss also aus dem Container heraus erreichbar sein. Die Tools werden beim Hinzufügen eines Servers und beim Klick auf **Prüfen und Tools aktualisieren** eingelesen: Ein Tool, das der Server später hinzufügt oder umformuliert, wird erst nach einer Aktualisierung verwendet.
+
+Sobald ein Server verbunden ist, erscheint neben dem Eingabefeld des Chats eine Globus-Schaltfläche. Sie schaltet die externen Tools ein und aus, und die Wahl wird in Ihrem Browser gespeichert. Jeder Aufruf wird in der Unterhaltung mit dem Server, dem Tool und dem Gesendeten angezeigt.
+
+Was ein externes Tool zurückgibt, stammt von außerhalb von Poznote, etwa von einer Webseite, und kann Text enthalten, der das Modell in die Irre führen soll. Der Assistent ist angewiesen, es als Daten zu behandeln, und vor jeder Änderung einer Notiz wird eine Version gespeichert, aber eine Anweisung ist keine Garantie. Um ungewollte Änderungen auszuschließen, öffnen Sie **Einstellungen → Mein KI-Assistent**, Abschnitt **Tools des Assistenten**, und entfernen Sie die Häkchen bei den Tools der Liste **Ihre Notizen ändern**: Der Assistent kann Ihre Notizen dann weiterhin lesen und im Web suchen, aber nichts mehr ändern. Bedenken Sie außerdem, dass das, was der Assistent an ein externes Tool sendet, Ihre Instanz verlässt.
 
 ## Lokale Server und Docker-Netzwerk
 
@@ -224,4 +236,4 @@ Ein Fehler, der auftritt, nachdem die Antwort bereits zu streamen begonnen hat, 
 
 ## Datenschutz
 
-Der KI-Server wird vom Poznote-Server aus aufgerufen, niemals von Ihrem Browser. Mit einer lokalen Ollama- oder LM Studio-Instanz verlassen Ihre Notizen und Unterhaltungen nie Ihren Rechner. Mit einem Cloud-Anbieter werden die Teile Ihrer Notizen, die der Assistent zum Beantworten liest, an diesen Anbieter gesendet.
+Der KI-Server wird vom Poznote-Server aus aufgerufen, niemals von Ihrem Browser. Mit einer lokalen Ollama- oder LM Studio-Instanz verlassen Ihre Notizen und Unterhaltungen nie Ihren Rechner. Mit einem Cloud-Anbieter werden die Teile Ihrer Notizen, die der Assistent zum Beantworten liest, an diesen Anbieter gesendet. Sind externe Tools eingeschaltet, geht das, was der Assistent ihnen sendet, etwa eine Suchanfrage, an die von Ihnen verbundenen Server.

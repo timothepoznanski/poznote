@@ -1366,7 +1366,7 @@ Poznote 内置 AI 聊天功能，可以连接本地的 [Ollama](https://ollama.c
 
 管理员在 **设置 → 管理工具 → AI 助手** 中启用后，每个资料的左侧图标栏中都会出现 **AI 助手** 按钮。AI 服务器由 Poznote 服务器调用，绝不会从您的浏览器调用，因此使用本地 Ollama 实例时，您的笔记永远不会离开您的机器。
 
-助手能做什么、如何选择提供商和模型、个人 API 密钥，以及如何从 Poznote 容器连接本地服务器，请参阅 [AI 助手文档](AI-ASSISTANT.zh-cn.md)。如果想让外部 AI 助手（VS Code Copilot、Claude CLI 等）来管理您的笔记，请参阅下文的 [MCP 服务器](#mcp-服务器)。
+助手能做什么、如何选择提供商和模型、个人 API 密钥、网页搜索等外部工具（远程 MCP 服务器），以及如何从 Poznote 容器连接本地服务器，请参阅 [AI 助手文档](AI-ASSISTANT.zh-cn.md)。如果想让外部 AI 助手（VS Code Copilot、Claude CLI 等）来管理您的笔记，请参阅下文的 [MCP 服务器](#mcp-服务器)。
 
 ## 转录（语音转文字）
 
@@ -1448,7 +1448,7 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
 
 Poznote 注重简洁和可移植性：没有复杂的框架，没有沉重的依赖，只使用直接、可靠的 Web 技术，确保您的笔记始终可访问并由您掌控。
 
-**隐私优先的架构：** Poznote 完全在本地运行，其功能不需要任何外部连接。所有库（Excalidraw、Mermaid、KaTeX）都已打包，并由您自己的实例提供。开箱即用时，唯一的出站连接是每天一次的更新检查；除此之外，只有您自行开启的可选功能（Git 同步、S3、AI 提供商、Webhook、SMTP、OIDC）才会产生出站连接。
+**隐私优先的架构：** Poznote 完全在本地运行，其功能不需要任何外部连接。所有库（Excalidraw、Mermaid、KaTeX）都已打包，并由您自己的实例提供。开箱即用时，唯一的出站连接是每天一次的更新检查；除此之外，只有您自行开启的可选功能（Git 同步、S3、AI 提供商及您为其连接的外部工具、Webhook、SMTP、OIDC）才会产生出站连接。
 
 <details>
 <summary>如果您对构建 Poznote 所用的技术栈感兴趣，<strong>请点击这里查看。</strong></summary>

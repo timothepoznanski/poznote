@@ -1366,7 +1366,7 @@ Poznote enthält einen integrierten KI-Chat, der sich mit einer lokalen [Ollama]
 
 Ein Administrator aktiviert ihn unter **Einstellungen → Admin-Werkzeuge → KI-Assistent**, danach erhält jedes Profil eine Schaltfläche **KI-Assistent** in der linken Symbolleiste. Der KI-Server wird vom Poznote-Server aus aufgerufen, nie aus Ihrem Browser, sodass Ihre Notizen mit einer lokalen Ollama-Instanz nie Ihren Rechner verlassen.
 
-Was der Assistent kann, die Wahl eines Anbieters und eines Modells, persönliche API-Schlüssel und die Anbindung eines lokalen Servers aus dem Poznote-Container heraus sind in der [Dokumentation zum KI-Assistenten](AI-ASSISTANT.de.md) beschrieben. Wenn stattdessen ein externer KI-Assistent (VS Code Copilot, Claude CLI...) Ihre Notizen verwalten soll, lesen Sie weiter unten den Abschnitt [MCP-Server](#mcp-server).
+Was der Assistent kann, die Wahl eines Anbieters und eines Modells, persönliche API-Schlüssel, externe Tools wie eine Websuche (entfernte MCP-Server) und die Anbindung eines lokalen Servers aus dem Poznote-Container heraus sind in der [Dokumentation zum KI-Assistenten](AI-ASSISTANT.de.md) beschrieben. Wenn stattdessen ein externer KI-Assistent (VS Code Copilot, Claude CLI...) Ihre Notizen verwalten soll, lesen Sie weiter unten den Abschnitt [MCP-Server](#mcp-server).
 
 ## Transkription (Sprache zu Text)
 
@@ -1448,7 +1448,7 @@ Rufen Sie die **Swagger UI** direkt in Poznote unter `Einstellungen > Über > AP
 
 Poznote setzt auf Einfachheit und Portabilität: keine komplexen Frameworks, keine schweren Abhängigkeiten. Nur geradlinige, zuverlässige Webtechnologien, die dafür sorgen, dass Ihre Notizen zugänglich und unter Ihrer Kontrolle bleiben.
 
-**Architektur mit Fokus auf Datenschutz:** Poznote arbeitet vollständig lokal und benötigt für seine Funktionen keine externen Verbindungen. Alle Bibliotheken (Excalidraw, Mermaid, KaTeX) sind gebündelt und werden von Ihrer eigenen Instanz ausgeliefert. Im Auslieferungszustand ist die einzige ausgehende Verbindung eine tägliche Prüfung auf Updates; die optionalen Funktionen, die Sie selbst einschalten (Git-Synchronisierung, S3, ein KI-Anbieter, Webhooks, SMTP, OIDC), sind die einzigen weiteren.
+**Architektur mit Fokus auf Datenschutz:** Poznote arbeitet vollständig lokal und benötigt für seine Funktionen keine externen Verbindungen. Alle Bibliotheken (Excalidraw, Mermaid, KaTeX) sind gebündelt und werden von Ihrer eigenen Instanz ausgeliefert. Im Auslieferungszustand ist die einzige ausgehende Verbindung eine tägliche Prüfung auf Updates; die optionalen Funktionen, die Sie selbst einschalten (Git-Synchronisierung, S3, ein KI-Anbieter und die externen Tools, die Sie mit ihm verbinden, Webhooks, SMTP, OIDC), sind die einzigen weiteren.
 
 <details>
 <summary>Wenn Sie sich für den Technologie-Stack interessieren, auf dem Poznote aufbaut, <strong>werfen Sie hier einen Blick darauf.</strong></summary>

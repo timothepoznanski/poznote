@@ -397,6 +397,10 @@ if ($_POST) {
                     $upd = $con->prepare('UPDATE folders SET workspace = ? WHERE workspace = ?');
                     $upd->execute([$new_name, $name]);
 
+                    // The AI assistant's conversations of the workspace follow it
+                    require_once __DIR__ . '/../lib/ai-conversations.php';
+                    aiConversationsRenameWorkspace($con, $name, $new_name);
+
                     // Update workspace references in settings
                     try {
                         $updateSettingsStmt = $con->prepare('UPDATE settings SET value = ? WHERE key IN (?, ?) AND value = ?');

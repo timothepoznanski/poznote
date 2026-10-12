@@ -15,6 +15,7 @@
 
 require_once __DIR__ . '/users/db_master.php';
 require_once __DIR__ . '/lib/ai-upstream.php';
+require_once __DIR__ . '/lib/ai-mcp.php';
 
 /** Providers offered by both settings pages. */
 function poznoteAiProviders(): array {
@@ -304,6 +305,99 @@ function poznoteSaveAiCustomInstructions(?PDO $con, string $instructions): bool 
         return true;
     } catch (Exception $e) {
         error_log('Failed to save AI custom instructions: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * External tools (discussion #1611): remote MCP servers whose tools the
+ * assistant may call next to its own, see lib/ai-mcp.php. Off until an
+ * administrator turns them on. Servers come from two places, like the
+ * configurations above: the instance ones (master.db), offered to the users
+ * allowed to use the instance assistant, and the user's own (their
+ * database), when the administrator lets users add some. Both lists are
+ * stored encrypted, as they hold API keys.
+ */
+function poznoteAiMcpEnabled(): bool {
+    return (string)getGlobalSetting('ai_chat_mcp_enabled', '0') === '1';
+}
+
+/** True when users may connect servers of their own. */
+function poznoteAiMcpUserServersAllowed(): bool {
+    return poznoteAiMcpEnabled() && (string)getGlobalSetting('ai_chat_mcp_user_servers_enabled', '0') === '1';
+}
+
+function poznoteAiMcpInstanceServers(): array {
+    return aiMcpDecodeServers(poznoteAiDecryptSecret((string)getGlobalSetting('ai_chat_mcp_servers', '')));
+}
+
+function poznoteSaveAiMcpInstanceServers(array $servers): bool {
+    return setGlobalSetting('ai_chat_mcp_servers', poznoteAiEncryptSecret(aiMcpEncodeServers($servers)));
+}
+
+function poznoteAiMcpUserServers(?PDO $con): array {
+    return aiMcpDecodeServers(poznoteAiDecryptSecret(poznoteAiUserSetting($con, 'ai_user_mcp_servers')));
+}
+
+function poznoteSaveAiMcpUserServers(?PDO $con, array $servers): bool {
+    return poznoteSaveAiUserSetting($con, 'ai_user_mcp_servers', poznoteAiEncryptSecret(aiMcpEncodeServers($servers)));
+}
+
+/**
+ * The servers whose tools a chat request of this user may call: the enabled
+ * ones the user has a right to, the instance ones first.
+ */
+function poznoteAiMcpServersForChat(?PDO $con, ?int $userId): array {
+    if (!poznoteAiMcpEnabled()) {
+        return [];
+    }
+    $servers = isAiChatAllowedForUser($userId) ? poznoteAiMcpInstanceServers() : [];
+    if (poznoteAiMcpUserServersAllowed()) {
+        $servers = array_merge($servers, poznoteAiMcpUserServers($con));
+    }
+    return array_values(array_filter($servers, function (array $server): bool {
+        return $server['enabled'] && in_array(true, array_column($server['tools'], 'enabled'), true);
+    }));
+}
+
+/**
+ * Names of the assistant's own tools this user turned off (the names of
+ * aiToolHandlers() in lib/ai-tools.php), for instance every tool that
+ * changes a note while external tools are connected.
+ */
+function poznoteAiDisabledTools(?PDO $con): array {
+    $names = json_decode(poznoteAiUserSetting($con, 'ai_user_disabled_tools'), true);
+    return is_array($names) ? array_values(array_filter($names, 'is_string')) : [];
+}
+
+function poznoteSaveAiDisabledTools(?PDO $con, array $names): bool {
+    return poznoteSaveAiUserSetting($con, 'ai_user_disabled_tools', (string)json_encode(array_values($names)));
+}
+
+/** One value of the user's own settings table, '' when it is not set. */
+function poznoteAiUserSetting(?PDO $con, string $key): string {
+    if (!$con) {
+        return '';
+    }
+    try {
+        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute([$key]);
+        return (string)($stmt->fetchColumn() ?: '');
+    } catch (Exception $e) {
+        error_log('ai_config: poznoteAiUserSetting() failed: ' . $e->getMessage());
+        return '';
+    }
+}
+
+function poznoteSaveAiUserSetting(?PDO $con, string $key, string $value): bool {
+    if (!$con) {
+        return false;
+    }
+    try {
+        $stmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        return $stmt->execute([$key, $value]);
+    } catch (Exception $e) {
+        error_log('ai_config: poznoteSaveAiUserSetting() failed: ' . $e->getMessage());
         return false;
     }
 }

@@ -21,6 +21,7 @@ requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../ai_config.php';
+require_once __DIR__ . '/../ai_mcp_settings.php';
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
@@ -82,6 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     } else {
         $error = t('ai_settings.messages.save_error', [], 'Failed to save configuration.');
     }
+}
+
+// The Assistant tools and External tools sections have forms of their own
+$aiMcpState = poznoteAiMcpHandlePost('user', $con);
+if ($aiMcpState !== null) {
+    $message = $aiMcpState['message'];
+    $error = $aiMcpState['error'];
 }
 
 $aiConfig = poznoteAiUserConfig($con);
@@ -272,6 +280,10 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
                 </div>
             </form>
         </div>
+
+        <?php poznoteAiMcpRenderBuiltinTools($con); ?>
+
+        <?php poznoteAiMcpRenderSection('user', $con, $aiMcpState); ?>
 
         <div class="git-sync-footer-note">
             <?php echo t_h('ai_settings.footer_note', [], 'The AI server is called from the Poznote server, not from your browser. Chat conversations are sent to the configured server; with a local Ollama instance nothing leaves your machine.'); ?>

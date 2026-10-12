@@ -267,6 +267,10 @@ class WorkspacesController {
             
             $stmt = $this->con->prepare("UPDATE folders SET workspace = ? WHERE workspace = ?");
             $stmt->execute([$newName, $name]);
+
+            // The AI assistant's conversations of the workspace follow it
+            require_once dirname(__DIR__, 3) . '/lib/ai-conversations.php';
+            aiConversationsRenameWorkspace($this->con, $name, $newName);
             
             // Update default_workspace setting if it references the old name
             try {

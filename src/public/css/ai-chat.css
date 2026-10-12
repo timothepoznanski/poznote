@@ -122,6 +122,88 @@ a.ai-chat-header-btn {
     gap: 10px;
 }
 
+/* The history takes the place of the messages while it is open */
+.ai-chat-messages[hidden],
+.ai-chat-history[hidden] {
+    display: none;
+}
+
+.ai-chat-history {
+    flex: 1;
+    overflow-y: auto;
+    padding: 4px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ai-chat-history-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+}
+
+/* The conversation on screen */
+.ai-chat-history-current {
+    border-color: var(--pz-accent-text);
+}
+
+.ai-chat-history-open {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 4px 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ai-chat-history-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ai-chat-history-date {
+    font-size: 11.5px;
+    color: var(--pz-text-muted);
+}
+
+.ai-chat-history-delete {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    margin-right: 6px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--pz-text-subtle);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.ai-chat-history-delete:hover,
+.ai-chat-history-delete:focus-visible {
+    color: var(--pz-accent-text);
+}
+
+/* The history button stays lit while the list is open */
+.ai-chat-header-btn[aria-pressed="true"] {
+    color: var(--pz-accent-text);
+}
+
 .ai-chat-empty {
     color: var(--pz-text-muted);
     font-size: 13px;
@@ -154,6 +236,29 @@ a.ai-chat-header-btn {
     color: var(--pz-text);
     border: 1px solid var(--pz-border);
     border-bottom-left-radius: var(--pz-radius-sm);
+}
+
+/* Copy button under a question or an answer, on the side of its bubble and
+   tucked against it (the list spaces its children 10px apart) */
+.ai-chat-copy {
+    align-self: flex-start;
+    margin-top: -6px;
+    padding: 2px 4px;
+    border: none;
+    background: transparent;
+    color: var(--pz-text-subtle);
+    cursor: pointer;
+    display: inline-flex;
+    font-size: 13px;
+}
+
+.ai-chat-copy-user {
+    align-self: flex-end;
+}
+
+.ai-chat-copy:hover,
+.ai-chat-copy:focus-visible {
+    color: var(--pz-accent-text);
 }
 
 /* Assistant bubbles rendered as markdown: block elements provide the
@@ -367,6 +472,35 @@ a.ai-chat-header-btn {
     padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--pz-border);
     background: var(--pz-chrome-bg);
+}
+
+/* External tools on/off (discussion #1611): two flat looks, accent when on
+   and subtle when off, and no hover look of its own, so that the pointer
+   resting on the button after a click does not show a third colour */
+.ai-chat-external-btn {
+    width: 28px;
+    height: 34px;
+    flex-shrink: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--pz-text-subtle);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.ai-chat-external-btn[aria-pressed="true"] {
+    color: var(--pz-accent-text);
+}
+
+/* icons.css enlarges any lucide icon under the pointer (its hover colour is
+   already ruled out for the whole panel, further down) */
+#ai-chat-panel .ai-chat-external-btn [class*="lucide-"]:hover,
+#ai-chat-panel .ai-chat-copy [class*="lucide-"]:hover {
+    transform: none;
 }
 
 #ai-chat-input {

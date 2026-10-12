@@ -1383,7 +1383,7 @@ Server: my-server.com
 
 관리자가 **설정 > 관리자 도구 > AI 어시스턴트**를 켜면 모든 프로필의 사이드바에 버튼이 나타납니다. 브라우저가 아닌 Poznote 서버에서 호출하므로 로컬 Ollama를 같은 컴퓨터에서 실행하면 노트가 컴퓨터 밖으로 나가지 않습니다.
 
-기능, 제공업체·모델 선택, 개인 API 키, 컨테이너의 로컬 서버 연결은 [AI 어시스턴트 문서](AI-ASSISTANT.ko.md)를 참고하세요. VS Code Copilot, Claude CLI 등 외부 어시스턴트는 아래 [MCP 서버](#mcp-서버)를 참고하세요.
+기능, 제공업체·모델 선택, 개인 API 키, 웹 검색 같은 외부 도구(원격 MCP 서버), 컨테이너의 로컬 서버 연결은 [AI 어시스턴트 문서](AI-ASSISTANT.ko.md)를 참고하세요. VS Code Copilot, Claude CLI 등 외부 어시스턴트는 아래 [MCP 서버](#mcp-서버)를 참고하세요.
 
 ## 음성 텍스트 변환
 
@@ -1465,7 +1465,7 @@ Poznote의 `Settings > About > API REST`에서 **Swagger UI**를 열어 엔드�
 
 복잡한 프레임워크나 무거운 의존성보다 단순하고 옮기기 쉬운 구성을 우선합니다. 표준 웹 기술로 노트를 계속 접근 가능하고 직접 관리할 수 있게 합니다.
 
-**개인정보 우선 구조:** 기본 기능은 외부 연결 없이 로컬에서 작동합니다. Excalidraw, Mermaid, KaTeX는 인스턴스에 포함해 직접 제공합니다. 기본 외부 연결은 하루 한 번 업데이트 확인이며, 직접 켜는 Git 동기화·S3·AI·웹훅·SMTP·OIDC만 추가로 연결합니다.
+**개인정보 우선 구조:** 기본 기능은 외부 연결 없이 로컬에서 작동합니다. Excalidraw, Mermaid, KaTeX는 인스턴스에 포함해 직접 제공합니다. 기본 외부 연결은 하루 한 번 업데이트 확인이며, 직접 켜는 Git 동기화·S3·AI와 여기에 연결한 외부 도구·웹훅·SMTP·OIDC만 추가로 연결합니다.
 
 <details>
 <summary>Poznote의 기술 구성에 관심이 있다면 <strong>여기를 확인하세요.</strong></summary>
