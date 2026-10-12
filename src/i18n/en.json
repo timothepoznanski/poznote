@@ -1618,6 +1618,7 @@
     "numbered_list": "Numbered list",
     "lettered_list": "Lettered list",
     "roman_list": "Roman numeral list",
+    "dash_list": "Dash list",
     "checklist": "Checklist",
     "done": "Done",
     "image": "Image",

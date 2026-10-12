@@ -1490,6 +1490,18 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                     </div>
                 </div>
 
+                <!-- Open without login (instance-wide) -->
+                <div class="home-card" id="login-disabled-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.login_disabled', [], 'Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-lock-open"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.login_disabled', [], 'Open without login'); ?></span>
+                        <span id="login-disabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+
                 <!-- Tenant isolation (SaaS mode) -->
                 <div class="home-card" id="tenant-isolation-card">
                     <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tenant_isolation', [], 'SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1683,18 +1695,6 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                     <div class="home-card-content">
                         <span class="home-card-title"><?php echo t_h('settings.cards.allow_executable_attachments', [], 'Script and executable attachments'); ?></span>
                         <span id="executable-attachments-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                    </div>
-                </div>
-
-                <!-- Open without login (instance-wide) -->
-                <div class="home-card" id="login-disabled-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.login_disabled', [], 'Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon">
-                        <i class="lucide lucide-lock-open"></i>
-                    </div>
-                    <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.login_disabled', [], 'Open without login'); ?></span>
-                        <span id="login-disabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
 

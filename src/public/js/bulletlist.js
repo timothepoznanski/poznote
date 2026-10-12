@@ -134,7 +134,8 @@
   /**
    * Create a new list of the same type as the parent. A lettered list
    * (a, b, c) nests roman numerals (i, ii, iii), the usual outline order;
-   * the other marker types carry over as they are (#1429).
+   * the other marker types carry over as they are (#1429), and so does the
+   * dash of a dash list (#1606).
    * @param {HTMLElement} parentList - The parent list to match type
    * @returns {HTMLElement} A new ul or ol element
    */
@@ -144,6 +145,9 @@
     const markerType = tagName === 'OL' ? parentList.getAttribute('type') : null;
     if (markerType) {
       list.setAttribute('type', markerType.toLowerCase() === 'a' ? 'i' : markerType);
+    }
+    if (tagName === 'UL' && parentList.classList.contains('dash-list')) {
+      list.className = 'dash-list';
     }
     list.style.marginTop = '0';
     list.style.marginBottom = '0';
@@ -296,6 +300,77 @@
     handleTabKey(event);
   }
 
+  // ===== DASH LIST FROM THE KEYBOARD (#1606) =====
+
+  /**
+   * Whether the caret sits right after a "-" that is alone at the start of
+   * its line, in an HTML note and outside a list, a code block or a heading.
+   * @returns {Text|null} The text node holding the dash
+   */
+  function findLineStartDash() {
+    const selection = window.getSelection();
+    if (!selection || !selection.rangeCount || !selection.isCollapsed) return null;
+    const range = selection.getRangeAt(0);
+    const textNode = range.startContainer;
+    if (textNode.nodeType !== Node.TEXT_NODE || range.startOffset !== 1 || textNode.data !== '-') return null;
+
+    const parent = textNode.parentElement;
+    const noteentry = parent ? parent.closest('.noteentry') : null;
+    if (!noteentry || (noteentry.dataset.noteType && noteentry.dataset.noteType !== 'note')) return null;
+    if (parent.closest('li, pre, code, h1, h2, h3, h4, h5, h6, table, .cm-editor, [contenteditable="false"]')) return null;
+
+    // Alone on its line: nothing before it up to the block, nothing after
+    // it but a line break
+    const blocks = /^(DIV|P|BLOCKQUOTE|UL|OL|TABLE|PRE|H[1-6]|HR|DETAILS|SUMMARY)$/;
+    let node = textNode;
+    while (node !== noteentry) {
+      const previous = node.previousSibling;
+      if (previous && previous.nodeName !== 'BR' && !blocks.test(previous.nodeName)) return null;
+      const next = node.nextSibling;
+      if (next && next.nodeName !== 'BR' && !blocks.test(next.nodeName)) return null;
+      if (previous || next) break;
+      node = node.parentNode;
+      if (blocks.test(node.nodeName)) break;
+    }
+    return textNode;
+  }
+
+  /**
+   * "-" then a space at the start of a line opens a dash list, the way it is
+   * typed by hand: Enter then goes on with the next dash, and a long item
+   * wraps under its text. Both steps go through execCommand, so Ctrl+Z
+   * gives the typed dash back.
+   */
+  function handleDashListInput(event) {
+    if (event.inputType !== 'insertText' || event.data !== ' ') return;
+    const target = event.target;
+    if (!target || !target.isContentEditable) return;
+    const textNode = findLineStartDash();
+    if (!textNode) return;
+
+    event.preventDefault();
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(textNode);
+    selection.removeAllRanges();
+    selection.addRange(range);
+    document.execCommand('delete');
+
+    const made = typeof window.execHtmlListCommand === 'function'
+      ? window.execHtmlListCommand(false)
+      : document.execCommand('insertUnorderedList');
+    const item = made ? findCurrentBulletListItem() : null;
+    const list = item ? findParentList(item) : null;
+    // A line right under a bullet list joins that list and keeps its marker
+    if (list && list.tagName === 'UL' && list.children.length === 1) {
+      list.classList.add('dash-list');
+    }
+    const noteentry = getNoteEntry(item || target);
+    if (noteentry) {
+      noteentry.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  }
+
   // ===== INITIALIZATION =====
 
   /**
@@ -307,6 +382,7 @@
     
     // Use capture phase to handle Tab before other handlers (like checklists)
     document.addEventListener('keydown', handleKeyDown, true);
+    document.addEventListener('beforeinput', handleDashListInput, true);
     
     listenersInitialized = true;
   }

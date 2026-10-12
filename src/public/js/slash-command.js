@@ -1664,8 +1664,42 @@
         }
     }
 
+    // A bullet list whose marker is a dash carries this class (#1606): <ul>
+    // has no marker attribute of its own, and both sanitizers keep classes.
+    const DASH_LIST_CLASS = 'dash-list';
+
+    // The plain <ul> the caret or the selection starts in, checklists left
+    // out. The start, not the common ancestor: a double-clicked last word of
+    // an item ends in the block that follows the list.
+    function selectionBulletList() {
+        const selection = window.getSelection();
+        let node = selection && selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
+        if (node && node.nodeType === 3) node = node.parentNode;
+        const list = node && node.closest ? node.closest('ul, ol') : null;
+        if (!list || list.tagName !== 'UL' || !list.closest('.noteentry')) return null;
+        if (list.matches('.checklist, .task-list') || list.querySelector(':scope > li > input[type="checkbox"]')) return null;
+        return list;
+    }
+
+    // Bullet list or dash list on the selected lines. A bullet list already
+    // there only changes its marker, since insertUnorderedList would toggle
+    // it back to paragraphs; asking for the marker it has does toggle it.
+    function applyBulletList(dash) {
+        let list = selectionBulletList();
+        const wasDash = list ? list.classList.contains(DASH_LIST_CLASS) : null;
+        if (!list || wasDash === dash) {
+            if (!execListCommand(false)) return false;
+            list = selectionBulletList();
+            if (!list || wasDash !== null) return true;
+        }
+        list.classList.toggle(DASH_LIST_CLASS, dash);
+        if (!list.classList.length) list.removeAttribute('class');
+        return true;
+    }
+
     // Insert a list (ordered or unordered). `markerType` is the <ol> type
-    // attribute: 'a' for a lettered list, 'i' for roman numerals (#1429).
+    // attribute: 'a' for a lettered list, 'i' for roman numerals (#1429),
+    // or 'dash' for a bullet list with dashes (#1606).
     function insertList(ordered, markerType) {
         const selection = window.getSelection();
         if (!selection.rangeCount) return;
@@ -1673,7 +1707,7 @@
         // The toolbar's path: the line itself becomes the list item, outside
         // its paragraph, and Ctrl+Z takes it back (issue #1580)
         if (isCaretInHtmlNote()) dropSelectedSlashPlaceholder();
-        if (isCaretInHtmlNote() && execListCommand(ordered)) {
+        if (isCaretInHtmlNote() && (ordered ? execListCommand(true) : applyBulletList(markerType === 'dash'))) {
             if (ordered && markerType) {
                 let node = selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
                 if (node && node.nodeType === 3) node = node.parentNode;
@@ -1689,6 +1723,7 @@
         // Create new list
         const list = document.createElement(ordered ? 'ol' : 'ul');
         if (ordered && markerType) list.setAttribute('type', markerType);
+        if (!ordered && markerType === 'dash') list.className = DASH_LIST_CLASS;
         const li = document.createElement('li');
         li.appendChild(document.createElement('br'));
         list.appendChild(li);
@@ -3068,6 +3103,7 @@
                 label: t('slash_menu.list', null, 'List'),
                 submenu: [
                     { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertList(false) },
+                    { id: 'dashes', icon: 'lucide-list-dash', label: t('slash_menu.dash_list', null, 'Dash list'), aliases: ['dash', 'minus', 'hyphen'], action: () => insertList(false, 'dash') },
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertList(true) },
                     { id: 'letters', icon: 'lucide-list-lettered', label: t('slash_menu.lettered_list', null, 'Lettered list'), aliases: ['abc', 'letters'], action: () => insertList(true, 'a') },
                     { id: 'roman', icon: 'lucide-list-roman', label: t('slash_menu.roman_list', null, 'Roman numeral list'), aliases: ['roman'], action: () => insertList(true, 'i') },
@@ -3818,7 +3854,8 @@
                 return;
             }
             if (kind === 'ul') {
-                execListCommand(false);
+                applyBulletList(markerType === 'dash');
+                if (savedNoteEntry) savedNoteEntry.dispatchEvent(new Event('input', { bubbles: true }));
                 return;
             }
             let ol = selectionOrderedList();
@@ -3840,6 +3877,7 @@
                 { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => applyList('ul') },
                 { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => applyList('ol') }
             ].concat(isMarkdown ? [] : [
+                { id: 'dashes', icon: 'lucide-list-dash', label: t('slash_menu.dash_list', null, 'Dash list'), action: () => applyList('ul', 'dash') },
                 { id: 'letters', icon: 'lucide-list-lettered', label: t('slash_menu.lettered_list', null, 'Lettered list'), action: () => applyList('ol', 'a') },
                 { id: 'roman', icon: 'lucide-list-roman', label: t('slash_menu.roman_list', null, 'Roman numeral list'), action: () => applyList('ol', 'i') }
             ]).concat([
@@ -4456,7 +4494,7 @@
             const item = within('li');
             const list = item ? item.parentElement : null;
             if (list && list.tagName === 'UL' && !item.querySelector(':scope > input[type="checkbox"]')) {
-                ids.push('bullets');
+                ids.push(list.classList.contains(DASH_LIST_CLASS) ? 'dashes' : 'bullets');
             } else if (list && list.tagName === 'OL') {
                 const type = list.getAttribute('type');
                 ids.push(type === 'a' ? 'letters' : (type === 'i' ? 'roman' : 'numbers'));

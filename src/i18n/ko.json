@@ -1618,6 +1618,7 @@
     "numbered_list": "번호가 매겨진 목록",
     "lettered_list": "문자 목록",
     "roman_list": "로마 숫자 목록",
+    "dash_list": "대시 목록",
     "checklist": "체크리스트",
     "done": "완료",
     "image": "이미지",

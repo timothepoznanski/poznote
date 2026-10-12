@@ -1062,6 +1062,10 @@ function generateStyledHtml($content, $title, $noteType, $tags, $attachments = [
             margin: 8px 0;
         }
         
+        ul.dash-list {
+            list-style-type: "-\00a0\00a0";
+        }
+
         /* Tables */
         table {
             border-collapse: collapse;

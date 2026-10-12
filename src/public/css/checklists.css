@@ -163,8 +163,8 @@
 .noteentry ol>li {
     counter-increment: item;
     display: block;
-    margin-top: 6px;
-    margin-bottom: 6px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
 
 .noteentry ol>li::before {
@@ -214,8 +214,16 @@
     content: counter(item, lower-roman) ".";
 }
 
+/* ===== DASH LISTS (#1606) ===== */
+/* A bullet list whose marker is a dash: same indentation, wrapped lines stay
+   aligned under the text. Same marker on the public page (public_note.css),
+   in the journal (diary.css) and in the exports. */
+.noteentry ul.dash-list {
+    list-style-type: "-\00a0\00a0";
+}
+
 /* Add spacing to bullet list items as well (exclude checklists) */
 .noteentry ul:not(.checklist):not(.task-list)>li:not(.checklist-item):not(.task-list-item) {
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }

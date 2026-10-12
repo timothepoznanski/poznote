@@ -2105,6 +2105,7 @@
     "numbered_list": "有序列表",
     "lettered_list": "字母列表",
     "roman_list": "罗马数字列表",
+    "dash_list": "短横线列表",
     "checklist": "清单",
     "done": "已完成",
     "image": "图片",

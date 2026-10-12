@@ -473,6 +473,11 @@ body.public-note-page {
     content: counter(item, lower-roman) ".";
 }
 
+/* Dash lists, as in the editor (checklists.css, #1606) */
+.public-note .content ul.dash-list {
+    list-style-type: "-\00a0\00a0";
+}
+
 /* Task list styles */
 .public-note .content ul.task-list {
     list-style: none;

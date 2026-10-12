@@ -686,6 +686,11 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
     content: counter(item, lower-roman) ".";
 }
 
+/* Dash lists, as in the editor (checklists.css, #1606) */
+.diary-journal-body ul.dash-list {
+    list-style-type: "-\00a0\00a0";
+}
+
 .diary-journal-body :is(ul.task-list, ul.diary-journal-tasks) {
     list-style: none;
     padding-left: 0;
