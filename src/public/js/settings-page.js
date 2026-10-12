@@ -162,6 +162,9 @@
         if (document.getElementById('executable-attachments-card')) {
             keys.push('allow_executable_attachments');
         }
+        if (document.getElementById('login-disabled-card')) {
+            keys.push('login_disabled');
+        }
         if (document.getElementById('tenant-isolation-card')) {
             keys.push('tenant_isolation', 'tenant_isolation_features', 'tenant_isolation_applied_ui_keys');
         }
@@ -1453,6 +1456,20 @@
             badge.textContent = enabled ? txt.enabled : txt.disabled;
             badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
             var card = document.getElementById('executable-attachments-card');
+            if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
+        });
+    }
+
+    function refreshLoginDisabledBadge() {
+        var badge = document.getElementById('login-disabled-status');
+        if (!badge) return;
+
+        var txt = getTranslations();
+        getSetting('login_disabled', function (value) {
+            var enabled = value === '1' || value === 'true';
+            badge.textContent = enabled ? txt.enabled : txt.disabled;
+            badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
+            var card = document.getElementById('login-disabled-card');
             if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
         });
     }
@@ -3142,6 +3159,33 @@
             });
         }
 
+        // Open without login: instance-wide like the toggle above. Turning it
+        // on opens the instance to whoever can reach it, so that way asks first.
+        var loginDisabledCard = document.getElementById('login-disabled-card');
+        if (loginDisabledCard) {
+            markToggleCard(loginDisabledCard);
+            refreshLoginDisabledBadge();
+            loginDisabledCard.addEventListener('click', function () {
+                getSetting('login_disabled', function (currentValue) {
+                    var currently = currentValue === '1' || currentValue === 'true';
+                    var apply = function () {
+                        setSetting('login_disabled', currently ? '0' : '1', refreshLoginDisabledBadge);
+                    };
+                    if (currently) {
+                        apply();
+                        return;
+                    }
+                    var message = tr('settings.login_disabled.confirm', {}, 'Anyone who can reach this Poznote instance will open your account directly, with no username, password or two-factor code. Only continue if you are the only one who can reach it, or if a reverse proxy handles authentication.');
+                    if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                        window.modalAlert.confirm(message, tr('settings.cards.login_disabled', {}, 'Open without login'))
+                            .then(function (confirmed) { if (confirmed) apply(); });
+                    } else if (window.confirm(message)) {
+                        apply();
+                    }
+                });
+            });
+        }
+
         // Tenant isolation (SaaS mode) - opens the modal listing the
         // capabilities that can be blocked for non-admin users.
         var tenantIsolationCard = document.getElementById('tenant-isolation-card');
@@ -4292,6 +4336,58 @@
                 return null;
             };
 
+            // An administrator's Settings has two sides, picked from the
+            // switch above the list (settings_shell.php): their own settings,
+            // and the instance's. Admin Tools is still a section underneath,
+            // which keeps the deep links and the Back links of its pages
+            // working, but it is not listed: while it is the one open, the
+            // list shows its groups instead of the sections, one at a time.
+            var ADMIN_SECTION_KEY = 'admin-tools-grid';
+            var ADMIN_GROUP_STATE_KEY = 'settingsAdminGroup';
+            var USER_SECTION_STATE_KEY = 'settingsActiveUserSection';
+            var settingsSidebar = settingsNav.closest('.settings-sidebar');
+            var scopeSwitch = settingsSidebar ? settingsSidebar.querySelector('.settings-scope-switch') : null;
+            var adminGroups = []; // { key, item, title, panel }
+            var activeAdminGroupKey = null;
+            var lastUserSectionKey = null;
+
+            // ui-customization.js hides the title of a group left without
+            // a visible card (inline display:none).
+            var isAdminGroupAvailable = function (group) {
+                return group.title.style.display !== 'none';
+            };
+
+            var applyScope = function () {
+                if (!scopeSwitch) return;
+                var admin = activeSectionKey === ADMIN_SECTION_KEY;
+                settingsSidebar.classList.toggle('settings-scope-admin', admin);
+                homeContainer.classList.toggle('settings-scope-admin', admin);
+                homeContainer.classList.toggle('settings-scope-user', !admin);
+                scopeSwitch.querySelectorAll('.settings-scope-option').forEach(function (option) {
+                    var active = (option.getAttribute('data-scope') === 'admin') === admin;
+                    option.classList.toggle('is-active', active);
+                    option.setAttribute('aria-current', active ? 'true' : 'false');
+                });
+
+                var current = null;
+                var fallback = null;
+                adminGroups.forEach(function (group) {
+                    if (!isAdminGroupAvailable(group)) return;
+                    if (!fallback) fallback = group;
+                    if (group.key === activeAdminGroupKey) current = group;
+                });
+                current = current || fallback;
+                activeAdminGroupKey = current ? current.key : null;
+                adminGroups.forEach(function (group) {
+                    var active = group === current;
+                    group.title.classList.toggle('settings-admin-group-active', active);
+                    group.panel.classList.toggle('settings-admin-group-active', active);
+                    group.item.classList.toggle('is-active', admin && active);
+                    group.item.setAttribute('aria-current', admin && active ? 'true' : 'false');
+                    group.item.hidden = !isAdminGroupAvailable(group);
+                });
+            };
+
             // A section is listed while it has something to show: "Pinned"
             // carries the hidden attribute while empty, and
             // ui-customization.js sets an inline display:none on a section
@@ -4319,15 +4415,20 @@
                     section.item.hidden = !isSectionAvailable(section);
                 });
                 publishHiddenSections();
+                applyScope();
             };
 
             var activateSection = function (key, persist) {
                 var section = findSection(key);
                 if (!section || !isSectionAvailable(section)) return false;
                 activeSectionKey = key;
+                if (key !== ADMIN_SECTION_KEY) lastUserSectionKey = key;
                 applyActiveSection();
                 if (persist) {
-                    try { navStore.setItem(NAV_STATE_KEY, key); } catch (e) { /* storage unavailable */ }
+                    try {
+                        navStore.setItem(NAV_STATE_KEY, key);
+                        if (key !== ADMIN_SECTION_KEY) navStore.setItem(USER_SECTION_STATE_KEY, key);
+                    } catch (e) { /* storage unavailable */ }
                 }
                 return true;
             };
@@ -4367,7 +4468,8 @@
                         settingsBtn.setAttribute('aria-current', 'page');
                     }
                 }
-                url.hash = 'section=' + key;
+                url.hash = 'section=' + key
+                    + (key === ADMIN_SECTION_KEY && scopeSwitch && activeAdminGroupKey ? '&group=' + activeAdminGroupKey : '');
                 window.history.replaceState(window.history.state, '', url.toString());
             };
 
@@ -4381,16 +4483,70 @@
                 }
                 item.addEventListener('click', function (e) {
                     e.preventDefault();
-                    // Picking a section replaces the filter: its rows are
-                    // what was asked for.
-                    if (searchInput && searchInput.value !== '') {
-                        searchInput.value = '';
-                        searchInput.dispatchEvent(new Event('input'));
-                    }
+                    clearSettingsFilter();
                     if (activateSection(key, true)) syncSectionUrl(key);
                 });
                 navSections.push({ key: key, title: title, grid: grid, item: item });
             });
+
+            // Picking a section or a group replaces the filter: its rows are
+            // what was asked for.
+            var clearSettingsFilter = function () {
+                if (searchInput && searchInput.value !== '') {
+                    searchInput.value = '';
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+            };
+
+            if (scopeSwitch) {
+                var adminGrid = document.getElementById(ADMIN_SECTION_KEY);
+                settingsNav.querySelectorAll('.settings-nav-group-item[data-admin-group]').forEach(function (item) {
+                    var groupKey = item.getAttribute('data-admin-group');
+                    var title = adminGrid ? adminGrid.querySelector('.settings-group-title[data-group="' + groupKey + '"]') : null;
+                    var panel = title ? title.nextElementSibling : null;
+                    if (!title || !panel || !panel.classList.contains('settings-group')) {
+                        item.hidden = true;
+                        return;
+                    }
+                    item.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        clearSettingsFilter();
+                        activeAdminGroupKey = groupKey;
+                        try { navStore.setItem(ADMIN_GROUP_STATE_KEY, groupKey); } catch (err) { /* storage unavailable */ }
+                        if (activateSection(ADMIN_SECTION_KEY, true)) syncSectionUrl(ADMIN_SECTION_KEY);
+                    });
+                    adminGroups.push({ key: groupKey, item: item, title: title, panel: panel });
+                });
+
+                scopeSwitch.querySelectorAll('.settings-scope-option').forEach(function (option) {
+                    option.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        clearSettingsFilter();
+                        var target = null;
+                        if (option.getAttribute('data-scope') === 'admin') {
+                            target = ADMIN_SECTION_KEY;
+                            // The stacked layout of narrow screens folds its
+                            // sections: the one asked for opens.
+                            if (!isSettingsNavLayout()) {
+                                collapsibleSections.forEach(function (section) {
+                                    if (section.title.id === 'admin-tools') section.apply(false);
+                                });
+                            }
+                        } else {
+                            // Back to the section last open on that side,
+                            // or to the first one listed.
+                            var candidates = [lastUserSectionKey];
+                            try { candidates.push(navStore.getItem(USER_SECTION_STATE_KEY)); } catch (err) { /* storage unavailable */ }
+                            navSections.forEach(function (section) { candidates.push(section.key); });
+                            for (var i = 0; i < candidates.length && !target; i++) {
+                                var candidate = candidates[i] ? findSection(candidates[i]) : null;
+                                if (candidate && candidate.key !== ADMIN_SECTION_KEY && isSectionAvailable(candidate)) target = candidate.key;
+                            }
+                        }
+                        if (target && activateSection(target, true)) syncSectionUrl(target);
+                    });
+                });
+            }
 
             // Initial section: the rail's About deep link, then a #hash naming
             // a section (#section=<grid id>, which the Back link of the pages
@@ -4408,7 +4564,12 @@
                 'settings-actions-section-title': 'settings-backup-restore-section-grid'
             };
             if (!initialKey && window.location.hash) {
-                var hashId = decodeURIComponent(window.location.hash.slice(1)).replace(/^section=/, '');
+                // #section=admin-tools-grid&group=<key> also names the group
+                var hashParts = decodeURIComponent(window.location.hash.slice(1)).split('&');
+                var hashId = hashParts[0].replace(/^section=/, '');
+                hashParts.slice(1).forEach(function (part) {
+                    if (part.indexOf('group=') === 0) activeAdminGroupKey = part.slice(6);
+                });
                 hashId = renamedSections[hashId] || hashId;
                 navSections.forEach(function (section) {
                     if (section.key === hashId || section.grid.id === hashId || section.title.id === hashId) {
@@ -4416,6 +4577,9 @@
                     }
                 });
                 initialKey = hashKey;
+            }
+            if (!activeAdminGroupKey) {
+                try { activeAdminGroupKey = navStore.getItem(ADMIN_GROUP_STATE_KEY); } catch (e) { /* storage unavailable */ }
             }
             var pinnedSection = findSection('settings-pinned-section-grid');
             if (!initialKey && pinnedSection && isSectionAvailable(pinnedSection)) {
@@ -4426,6 +4590,15 @@
                 initialKey = renamedSections[initialKey] || initialKey;
             }
             if (!initialKey || !activateSection(initialKey, false)) refreshNav();
+
+            // The saved choice is the desktop list's. The stacked layout of
+            // narrow screens opens on the person's own settings unless the
+            // address asks for the administration side.
+            if (scopeSwitch && !isSettingsNavLayout() && activeSectionKey === ADMIN_SECTION_KEY && hashKey !== ADMIN_SECTION_KEY) {
+                for (var n = 0; n < navSections.length; n++) {
+                    if (navSections[n].key !== ADMIN_SECTION_KEY && isSectionAvailable(navSections[n]) && activateSection(navSections[n].key, false)) break;
+                }
+            }
 
             // The stacked layout of narrow screens has no list: a section named
             // by the #hash is opened and brought into view instead.
@@ -4443,6 +4616,9 @@
                 var navObserver = new MutationObserver(refreshNav);
                 navSections.forEach(function (section) {
                     navObserver.observe(section.title, { attributes: true, attributeFilter: ['hidden', 'style'] });
+                });
+                adminGroups.forEach(function (group) {
+                    navObserver.observe(group.title, { attributes: true, attributeFilter: ['style'] });
                 });
             }
             // Runs after the filter's own input listener: once the term is

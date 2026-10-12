@@ -519,7 +519,8 @@
       "custom_fonts": "Envie arquivos de fonte para oferecê-los a todos os usuários nas listas de fonte do aplicativo e do editor Markdown.",
       "structured_export": "Exporte suas notas como arquivos, organizados em pastas como no Poznote.",
       "local_backup": "Salve arquivos de backup completos em uma pasta do servidor, manualmente ou conforme um agendamento, mantendo apenas os mais recentes.",
-      "whats_new": "Após uma atualização, mostrar uma vez as notas da nova versão ao abrir as suas notas."
+      "whats_new": "Após uma atualização, mostrar uma vez as notas da nova versão ao abrir as suas notas.",
+      "login_disabled": "Ignora a tela de login: qualquer navegador que chegue a esta instância abre diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Ative apenas se só você consegue acessar esta instância, ou se um proxy reverso à frente dela cuida da autenticação. A API continua pedindo credenciais."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -636,7 +637,8 @@
       "restore_direct_copy": "Restauração por cópia direta",
       "import_notes": "Importar notas",
       "local_backup": "Backups locais",
-      "whats_new": "Novidades após uma atualização"
+      "whats_new": "Novidades após uma atualização",
+      "login_disabled": "Abrir sem login"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -671,6 +673,13 @@
       "attachments": "Anexos",
       "s3_attachments": "Anexos no armazenamento S3",
       "s3_backups": "Backups no armazenamento S3"
+    },
+    "login_disabled": {
+      "confirm": "Qualquer pessoa que consiga chegar a esta instância do Poznote abrirá diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Continue apenas se só você consegue acessá-la, ou se um proxy reverso cuida da autenticação."
+    },
+    "scope": {
+      "user": "Pessoal",
+      "admin": "Admin"
     }
   },
   "workspaces": {
@@ -4010,7 +4019,8 @@
     },
     "methods": {
       "password": "palavra-passe",
-      "oidc": "SSO"
+      "oidc": "SSO",
+      "auto": "sem login (tela de login desativada)"
     }
   },
   "backlinks": {

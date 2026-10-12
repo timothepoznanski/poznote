@@ -519,7 +519,8 @@
       "custom_fonts": "Sube archivos de fuente para ofrecerlos a todos los usuarios en las listas Fuente de la aplicación y Fuente del editor Markdown.",
       "structured_export": "Exporta tus notas como archivos, organizados en carpetas como en Poznote.",
       "local_backup": "Guarda archivos de copia de seguridad completos en una carpeta del servidor, manualmente o según una programación, conservando solo los más recientes.",
-      "whats_new": "Tras una actualización, mostrar una vez las notas de la nueva versión al abrir tus notas."
+      "whats_new": "Tras una actualización, mostrar una vez las notas de la nueva versión al abrir tus notas.",
+      "login_disabled": "Omite la pantalla de inicio de sesión: cualquier navegador que llegue a esta instancia abre directamente su cuenta, sin usuario, contraseña ni código de dos factores. Actívelo solo si usted es el único que puede acceder a esta instancia, o si un proxy inverso situado delante se encarga de la autenticación. La API sigue pidiendo credenciales."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -636,7 +637,8 @@
       "restore_direct_copy": "Restauración por copia directa",
       "import_notes": "Importar notas",
       "local_backup": "Copias de seguridad locales",
-      "whats_new": "Novedades tras una actualización"
+      "whats_new": "Novedades tras una actualización",
+      "login_disabled": "Abrir sin iniciar sesión"
     },
     "default_credentials": {
       "both": "Esta cuenta sigue usando el nombre de usuario y la contraseña predeterminados. Cualquiera que pueda acceder a esta instancia puede iniciar sesión.",
@@ -671,6 +673,13 @@
       "attachments": "Archivos adjuntos",
       "s3_attachments": "Archivos adjuntos en el almacenamiento S3",
       "s3_backups": "Copias de seguridad en el almacenamiento S3"
+    },
+    "login_disabled": {
+      "confirm": "Cualquiera que pueda llegar a esta instancia de Poznote abrirá directamente su cuenta, sin usuario, contraseña ni código de dos factores. Continúe solo si usted es el único que puede acceder a ella, o si un proxy inverso se encarga de la autenticación."
+    },
+    "scope": {
+      "user": "Personal",
+      "admin": "Admin"
     }
   },
   "workspaces": {
@@ -4010,7 +4019,8 @@
     },
     "methods": {
       "password": "contraseña",
-      "oidc": "SSO"
+      "oidc": "SSO",
+      "auto": "sin inicio de sesión (pantalla de inicio desactivada)"
     }
   },
   "backlinks": {

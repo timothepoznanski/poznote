@@ -21,6 +21,7 @@ class SettingsController {
         'theme_list',
         'git_sync_enabled',
         'allow_executable_attachments',
+        'login_disabled',
         'tenant_isolation',
         'tenant_isolation_features',
         'tenant_isolation_applied_ui_keys',
@@ -297,7 +298,7 @@ class SettingsController {
             return $normalized;
         }
 
-        if ($key === 'allow_executable_attachments') {
+        if ($key === 'allow_executable_attachments' || $key === 'login_disabled') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
@@ -801,6 +802,16 @@ class SettingsController {
             if ($this->isGlobalSetting($key)) {
                 $this->requireGlobalSettingsAdmin();
                 require_once dirname(__DIR__, 3) . '/users/db_master.php';
+                if ($key === 'login_disabled') {
+                    // Opening without a login opens ONE account: the
+                    // administrator turning it on, recorded here and never
+                    // taken from the request.
+                    $loginDisabledAccountId = $value === '1' ? (int)(getAuthenticatedUserId() ?? 0) : 0;
+                    if ($value === '1' && $loginDisabledAccountId <= 0) {
+                        throw new RuntimeException('no signed-in account to open without login', 400);
+                    }
+                    setGlobalSetting('login_disabled_user_id', $loginDisabledAccountId > 0 ? (string)$loginDisabledAccountId : '');
+                }
                 setGlobalSetting($key, $value);
             } else {
                 $previousLanguage = null;
