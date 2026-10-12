@@ -411,6 +411,7 @@ El servidor MCP de Poznote ofrece las siguientes herramientas:
 - `unshare_note`: desactiva el uso compartido público
 - `get_note_share_status`: obtiene el estado de uso compartido
 - `list_shared`: lista todas las notas y carpetas compartidas públicamente
+- `list_shared_with_me`: lista las notas y carpetas que otros usuarios han compartido con este perfil
 
 ### Archivos adjuntos
 - `list_attachments`: lista los archivos adjuntos de una nota

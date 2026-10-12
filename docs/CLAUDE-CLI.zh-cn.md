@@ -411,6 +411,7 @@ Poznote MCP 服务器提供以下工具：
 - `unshare_note`：禁用公开分享
 - `get_note_share_status`：获取分享状态
 - `list_shared`：列出所有公开分享的笔记和文件夹
+- `list_shared_with_me`：列出其他用户与此用户资料分享的笔记和文件夹
 
 ### 附件
 - `list_attachments`：列出笔记附件

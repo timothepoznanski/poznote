@@ -30,12 +30,14 @@ def test_calls_with_me_and_splits_by_type():
                 {"_type": "shared_with_me_note", "note_id": 4, "heading": "Infra"},
                 {"_type": "shared_with_me_folder", "folder_id": 2, "folder_name": "Docs"},
                 {"_type": "something_else", "note_id": 99},
+                "not-an-object",
             ],
         }
         with patch.object(client.client, "get", return_value=_response(payload)) as get:
             result = client.list_shared_with_me()
 
         assert get.call_args.args[0] == "/shared/with-me"
+        assert "params" not in get.call_args.kwargs
         assert [n["note_id"] for n in result["shared_notes"]] == [4]
         assert [f["folder_id"] for f in result["shared_folders"]] == [2]
     finally:

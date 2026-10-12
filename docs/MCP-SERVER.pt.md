@@ -103,6 +103,7 @@ Uma aba do Poznote aberta no navegador recebe as alterações feitas via MCP em 
 - `get_note_share_status`: obtém o status atual de compartilhamento e a URL pública de uma nota
 - `get_folder_share_status`: obtém o status atual de compartilhamento e a URL pública de uma pasta
 - `list_shared`: lista todas as notas e pastas compartilhadas publicamente
+- `list_shared_with_me`: lista as notas e pastas que outros usuários compartilharam com este perfil
 - `get_backlinks`: obtém todas as notas que apontam para (fazem referência a) uma nota específica
 - `convert_note`: converte uma nota entre os formatos HTML e Markdown
 - `rename_folder`: renomeia uma pasta existente

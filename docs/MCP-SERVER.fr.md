@@ -103,6 +103,7 @@ Un onglet Poznote ouvert dans le navigateur prend en compte les modifications fa
 - `get_note_share_status` : obtenir l'état de partage actuel et l'URL publique d'une note
 - `get_folder_share_status` : obtenir l'état de partage actuel et l'URL publique d'un dossier
 - `list_shared` : lister toutes les notes et tous les dossiers partagés publiquement
+- `list_shared_with_me` : lister les notes et dossiers que d'autres utilisateurs ont partagés avec ce profil
 - `get_backlinks` : obtenir toutes les notes qui pointent vers (référencent) une note précise
 - `convert_note` : convertir une note entre les formats HTML et Markdown
 - `rename_folder` : renommer un dossier existant

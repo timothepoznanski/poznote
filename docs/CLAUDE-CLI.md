@@ -411,6 +411,7 @@ The Poznote MCP server provides the following tools:
 - `unshare_note` - Disable public sharing
 - `get_note_share_status` - Get sharing status
 - `list_shared` - List all publicly shared notes and folders
+- `list_shared_with_me` - List notes and folders other users have shared with this profile
 
 ### Attachments
 - `list_attachments` - List note attachments

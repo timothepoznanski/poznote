@@ -103,6 +103,7 @@ Una pestaña de Poznote abierta en el navegador recoge en pocos segundos los cam
 - `get_note_share_status`: obtiene el estado actual de uso compartido y la URL pública de una nota
 - `get_folder_share_status`: obtiene el estado actual de uso compartido y la URL pública de una carpeta
 - `list_shared`: lista todas las notas y carpetas compartidas públicamente
+- `list_shared_with_me`: lista las notas y carpetas que otros usuarios han compartido con este perfil
 - `get_backlinks`: obtiene todas las notas que enlazan a (hacen referencia a) una nota concreta
 - `convert_note`: convierte una nota entre los formatos HTML y Markdown
 - `rename_folder`: renombra una carpeta existente

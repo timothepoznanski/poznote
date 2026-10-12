@@ -384,6 +384,7 @@ Der Poznote MCP-Server stellt die folgenden Tools bereit, die VS Code Copilot ve
 - `unshare_note`: Öffentliche Freigabe deaktivieren
 - `get_note_share_status`: Freigabestatus abrufen
 - `list_shared`: Alle öffentlich freigegebenen Notizen und Ordner auflisten
+- `list_shared_with_me`: Notizen und Ordner auflisten, die andere Benutzer für dieses Profil freigegeben haben
 
 ### Anhänge
 - `list_attachments`: Anhänge einer Notiz auflisten

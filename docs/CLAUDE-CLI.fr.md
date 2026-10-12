@@ -411,6 +411,7 @@ Le serveur MCP de Poznote fournit les outils suivants :
 - `unshare_note` : désactiver le partage public
 - `get_note_share_status` : obtenir l'état du partage
 - `list_shared` : lister toutes les notes et tous les dossiers partagés publiquement
+- `list_shared_with_me` : lister les notes et dossiers que d'autres utilisateurs ont partagés avec ce profil
 
 ### Pièces jointes
 - `list_attachments` : lister les pièces jointes d'une note
