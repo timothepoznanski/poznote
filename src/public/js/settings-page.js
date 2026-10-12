@@ -4195,10 +4195,33 @@
         var collapseAllBtn = document.getElementById('settingsCollapseAll');
         var collapsibleSections = [];
 
+        // The administration side of the stacked layout folds the groups of
+        // Admin Tools the way the other side folds its sections (filled
+        // further down, with the switch): the button then acts on them.
+        var ADMIN_GROUPS_STATE_KEY = 'settingsExpandedAdminGroups';
+        var adminGroupSections = []; // { key, title, apply }
+        var collapseAllTargets = function () {
+            var container = document.querySelector('.home-container');
+            return adminGroupSections.length && !isSettingsNavLayout()
+                && container && container.classList.contains('settings-scope-admin')
+                ? adminGroupSections : collapsibleSections;
+        };
+
+        var persistAdminGroupStates = function () {
+            if (!adminGroupSections.length) return;
+            var expanded = adminGroupSections.filter(function (group) {
+                return !group.title.classList.contains('section-collapsed');
+            }).map(function (group) { return group.key; });
+            try {
+                sectionStore.setItem(ADMIN_GROUPS_STATE_KEY, JSON.stringify(expanded));
+            } catch (e) { /* storage unavailable */ }
+        };
+
         var updateCollapseAllBtn = function () {
             if (!collapseAllBtn) return;
-            var allCollapsed = collapsibleSections.length > 0
-                && collapsibleSections.every(function (section) {
+            var targets = collapseAllTargets();
+            var allCollapsed = targets.length > 0
+                && targets.every(function (section) {
                     return section.title.classList.contains('section-collapsed');
                 });
             collapseAllBtn.classList.toggle('is-collapsed', allCollapsed);
@@ -4302,13 +4325,15 @@
 
         if (collapseAllBtn) {
             collapseAllBtn.addEventListener('click', function () {
-                var collapse = !collapsibleSections.every(function (section) {
+                var targets = collapseAllTargets();
+                var collapse = !targets.every(function (section) {
                     return section.title.classList.contains('section-collapsed');
                 });
-                collapsibleSections.forEach(function (section) {
+                targets.forEach(function (section) {
                     section.apply(collapse);
                 });
                 persistSectionStates();
+                persistAdminGroupStates();
                 updateCollapseAllBtn();
             });
             updateCollapseAllBtn();
@@ -4386,6 +4411,7 @@
                     group.item.setAttribute('aria-current', admin && active ? 'true' : 'false');
                     group.item.hidden = !isAdminGroupAvailable(group);
                 });
+                updateCollapseAllBtn();
             };
 
             // A section is listed while it has something to show: "Pinned"
@@ -4468,8 +4494,10 @@
                         settingsBtn.setAttribute('aria-current', 'page');
                     }
                 }
+                // The group is the one the desktop list shows: the stacked
+                // layout opens its groups one by one and keeps that itself.
                 url.hash = 'section=' + key
-                    + (key === ADMIN_SECTION_KEY && scopeSwitch && activeAdminGroupKey ? '&group=' + activeAdminGroupKey : '');
+                    + (key === ADMIN_SECTION_KEY && scopeSwitch && activeAdminGroupKey && isSettingsNavLayout() ? '&group=' + activeAdminGroupKey : '');
                 window.history.replaceState(window.history.state, '', url.toString());
             };
 
@@ -4518,6 +4546,50 @@
                     adminGroups.push({ key: groupKey, item: item, title: title, panel: panel });
                 });
 
+                // Stacked layout of narrow screens: no list to pick a group
+                // from, so each group folds under its title, like a section
+                // of the other side (css/settings.css). Collapsed unless
+                // opened before, the state kept per user.
+                var expandedAdminGroups = [];
+                try {
+                    var savedAdminGroups = JSON.parse(sectionStore.getItem(ADMIN_GROUPS_STATE_KEY) || '[]');
+                    if (Array.isArray(savedAdminGroups)) expandedAdminGroups = savedAdminGroups;
+                } catch (err) { /* storage unavailable or corrupted value */ }
+
+                adminGroups.forEach(function (group) {
+                    var toggleBtn = document.createElement('button');
+                    toggleBtn.type = 'button';
+                    toggleBtn.className = 'settings-section-toggle';
+                    toggleBtn.innerHTML = '<i class="lucide lucide-chevron-down"></i>';
+                    group.title.appendChild(toggleBtn);
+                    group.title.classList.add('settings-section-header');
+
+                    var applyGroupState = function (collapsed) {
+                        group.title.classList.toggle('section-collapsed', collapsed);
+                        group.panel.classList.toggle('section-collapsed', collapsed);
+                        toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                        var label = collapsed
+                            ? tr('settings.expand_section', {}, 'Expand section')
+                            : tr('settings.collapse_section', {}, 'Collapse section');
+                        toggleBtn.setAttribute('aria-label', label);
+                        toggleBtn.title = label;
+                    };
+                    applyGroupState(expandedAdminGroups.indexOf(group.key) === -1);
+                    sectionLabelRefreshers.push(function () {
+                        applyGroupState(group.title.classList.contains('section-collapsed'));
+                    });
+                    adminGroupSections.push({ key: group.key, title: group.title, apply: applyGroupState });
+
+                    // The button's click bubbles up here. The desktop layout
+                    // shows one group at a time, picked from the list.
+                    group.title.addEventListener('click', function () {
+                        if (isSettingsNavLayout()) return;
+                        applyGroupState(!group.title.classList.contains('section-collapsed'));
+                        persistAdminGroupStates();
+                        updateCollapseAllBtn();
+                    });
+                });
+
                 scopeSwitch.querySelectorAll('.settings-scope-option').forEach(function (option) {
                     option.addEventListener('click', function (e) {
                         e.preventDefault();
@@ -4556,6 +4628,7 @@
             // choice, then the first listed section.
             var initialKey = deepLinkSectionGridId();
             var hashKey = null;
+            var hashGroupKey = null;
             // The former "Actions" section, split into Backup & restore, Export &
             // import, Sync & history, Integrations and Apps: a link or a saved choice naming it opens
             // the first of the three.
@@ -4568,7 +4641,7 @@
                 var hashParts = decodeURIComponent(window.location.hash.slice(1)).split('&');
                 var hashId = hashParts[0].replace(/^section=/, '');
                 hashParts.slice(1).forEach(function (part) {
-                    if (part.indexOf('group=') === 0) activeAdminGroupKey = part.slice(6);
+                    if (part.indexOf('group=') === 0) activeAdminGroupKey = hashGroupKey = part.slice(6);
                 });
                 hashId = renamedSections[hashId] || hashId;
                 navSections.forEach(function (section) {
@@ -4608,8 +4681,20 @@
                     if (section.title === hashSection.title) section.apply(false);
                 });
                 persistSectionStates();
+                // On the administration side the address may name a group
+                // (the Back link of an admin page): that one opens.
+                var hashGroup = null;
+                if (hashKey === ADMIN_SECTION_KEY) {
+                    adminGroupSections.forEach(function (group) {
+                        if (group.key === hashGroupKey && group.title.style.display !== 'none') hashGroup = group;
+                    });
+                }
+                if (hashGroup) {
+                    hashGroup.apply(false);
+                    persistAdminGroupStates();
+                }
                 updateCollapseAllBtn();
-                hashSection.title.scrollIntoView({ block: 'start' });
+                (hashGroup || hashSection).title.scrollIntoView({ block: 'start' });
             }
 
             if (typeof MutationObserver !== 'undefined') {

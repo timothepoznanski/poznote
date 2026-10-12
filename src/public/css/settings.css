@@ -505,7 +505,8 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     transition: transform 0.15s ease;
 }
 
-.settings-category-title.section-collapsed .settings-section-toggle .lucide {
+.settings-category-title.section-collapsed .settings-section-toggle .lucide,
+.settings-group-title.section-collapsed .settings-section-toggle .lucide {
     transform: rotate(-90deg);
 }
 
@@ -902,7 +903,49 @@ html[data-theme='dark'] .settings-scope-option.is-active {
     .home-container.settings-scope-user:not(.settings-filtering) #admin-tools,
     .home-container.settings-scope-user:not(.settings-filtering) #admin-tools-grid,
     .home-container.settings-scope-admin:not(.settings-filtering) .settings-category-title:not(#admin-tools),
-    .home-container.settings-scope-admin:not(.settings-filtering) .home-grid:not(#admin-tools-grid) {
+    .home-container.settings-scope-admin:not(.settings-filtering) .home-grid:not(#admin-tools-grid),
+    .home-container.settings-scope-admin:not(.settings-filtering) #admin-tools {
+        display: none;
+    }
+
+    /* The administration side folds like the other one: the switch stands
+       for the Admin Tools title, and each of its groups is a section that
+       opens under its own title (settings-page.js sets .section-collapsed
+       on the group title and its panel). The grid itself stays open
+       whatever state its hidden title was left in. */
+    .home-container.settings-scope-admin:not(.settings-filtering) #admin-tools-grid.section-collapsed {
+        display: flex;
+    }
+
+    .home-container.settings-scope-admin:not(.settings-filtering) #admin-tools-grid > .settings-group-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        /* The grid's own 8px gap comes on top of these */
+        margin: calc(1.5rem - 8px) 0 calc(0.75rem - 8px) 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--pz-border);
+        font-size: calc(1.1rem * var(--settings-font-scale, 1));
+        letter-spacing: normal;
+        text-transform: none;
+        color: var(--pz-text);
+        cursor: pointer;
+        user-select: none;
+    }
+
+    /* The titles of the other side are blocks whose margins collapse, these
+       are flex items whose margins add up: a title under a folded group
+       gives back the bottom margin of the one above, and the first one the
+       bottom margin of the filter row (12px). */
+    .home-container.settings-scope-admin:not(.settings-filtering) #admin-tools-grid > .settings-group.section-collapsed + .settings-group-title {
+        margin-top: 0.75rem;
+    }
+
+    .home-container.settings-scope-admin:not(.settings-filtering) #admin-tools-grid > .settings-group-title:first-child {
+        margin-top: calc(1rem - 12px);
+    }
+
+    .home-container.settings-scope-admin:not(.settings-filtering) #admin-tools-grid > .settings-group.section-collapsed {
         display: none;
     }
 }
