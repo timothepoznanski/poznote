@@ -8,7 +8,7 @@ from urllib.parse import quote
 import os
 import logging
 
-from .auth_external import resolve_caller_profile_id
+from .auth_external import IdentityMismatch, resolve_caller_profile
 
 logger = logging.getLogger("poznote-mcp.client")
 
@@ -31,6 +31,14 @@ def _path_segment(value) -> str:
     if text in ("", ".", ".."):
         raise ValueError(f"Invalid identifier: {text!r}")
     return quote(text, safe="")
+
+
+def _as_int(value) -> int | None:
+    """Best-effort int, or None. A non-numeric user_id must not match a profile."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 class PoznoteClient:
@@ -108,18 +116,42 @@ class PoznoteClient:
 
     def _headers_for_user(self, user_id: str | int | None) -> dict:
         headers = dict(self._base_headers)
-        if user_id is not None:
-            headers["X-User-ID"] = str(user_id)
+
+        # Per-caller authentication. The caller's own verified identity decides
+        # the target profile, and an explicit user_id may only AGREE with it.
+        # Most tools expose that argument, so honouring it on its own would let
+        # any authenticated caller act as any profile, the administrator
+        # included, and the mode would give no isolation at all.
+        profile = resolve_caller_profile(self._list_profiles)
+        if profile is not None:
+            resolved = int(profile["id"])
+            if user_id is not None and _as_int(user_id) != resolved:
+                raise IdentityMismatch(
+                    f"user_id={user_id} is not the profile this token is linked to "
+                    f"(profile {resolved}). Per-caller authentication does not permit "
+                    f"acting as another profile."
+                )
+            headers["X-User-ID"] = str(resolved)
             return headers
 
-        # Per-caller authentication. When enabled, the caller's own verified
-        # identity selects the target profile. An identity with no linked
-        # profile raises rather than falling back: the default profile is the
-        # first administrator, so a silent fallback would be a privilege gain.
-        resolved = resolve_caller_profile_id(self._list_profiles)
-        if resolved is not None:
-            headers["X-User-ID"] = str(resolved)
+        if user_id is not None:
+            headers["X-User-ID"] = str(user_id)
         return headers
+
+    def caller_is_admin(self) -> bool | None:
+        """Whether the current caller's profile is an administrator.
+
+        None when per-caller authentication is off, so behaviour is unchanged.
+
+        get_system_info, list_backups, create_backup and delete_backup take no
+        user_id and so do not go through _headers_for_user(): they act as the
+        server's default profile, which has to be an administrator. Under
+        per-caller authentication that must not be every caller.
+        """
+        profile = resolve_caller_profile(self._list_profiles)
+        if profile is None:
+            return None
+        return bool(profile.get("is_admin"))
 
     def _list_profiles(self) -> list[dict]:
         """Profiles, for mapping a verified external identity to a Poznote user.

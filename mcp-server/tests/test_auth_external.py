@@ -11,6 +11,8 @@ pytest) and against a bare checkout.
 
 from __future__ import annotations
 
+import asyncio
+import os
 import time
 import unittest
 from unittest import mock
@@ -29,9 +31,9 @@ def _response(status=200, payload=None, raise_json=False):
 
 
 USERS = [
-    {"id": 1, "username": "agipson33", "email": "agipson@gmail.com", "oidc_subject": ""},
-    {"id": 11, "username": "grep", "email": "grep@ankh-labs.com", "oidc_subject": "11"},
-    {"id": 12, "username": "meridian", "email": "meridian@ankh-labs.com", "oidc_subject": "12"},
+    {"id": 1, "username": "admin", "email": "admin@example.test", "oidc_subject": "", "is_admin": 1},
+    {"id": 11, "username": "alpha", "email": "alpha@example.test", "oidc_subject": "11", "is_admin": 0},
+    {"id": 12, "username": "beta", "email": "beta@example.test", "oidc_subject": "12", "is_admin": 0},
 ]
 
 
@@ -54,10 +56,9 @@ class ConfigTests(unittest.TestCase):
             cfg = mod.ExternalAuthConfig.from_env()
         self.assertEqual(cfg.provider, "userinfo")
         self.assertEqual(cfg.url, "https://idp.example.com/userinfo")
-        self.assertEqual(
-            [(r.field, r.claim) for r in cfg.match],
-            [("oidc_subject", "sub"), ("username", "preferred_username"), ("email", "email")],
-        )
+        # Subject only. Matching on username or email is weaker than Poznote's
+        # own sign-in and has to be opted into.
+        self.assertEqual([(r.field, r.claim) for r in cfg.match], [("oidc_subject", "sub")])
 
     def test_unknown_provider_is_rejected(self):
         env = {"POZNOTE_MCP_AUTH_PROVIDER": "carrier-pigeon", "POZNOTE_MCP_AUTH_URL": "https://x/y"}
@@ -192,11 +193,11 @@ class MatchingTests(unittest.TestCase):
     ]
 
     def test_matches_on_subject_first(self):
-        found = mod.match_profile({"sub": "11", "preferred_username": "meridian"}, USERS, self.RULES)
+        found = mod.match_profile({"sub": "11", "preferred_username": "beta"}, USERS, self.RULES)
         self.assertEqual(found["id"], 11)
 
     def test_falls_back_to_username_when_sub_absent(self):
-        found = mod.match_profile({"preferred_username": "meridian"}, USERS, self.RULES)
+        found = mod.match_profile({"preferred_username": "beta"}, USERS, self.RULES)
         self.assertEqual(found["id"], 12)
 
     def test_an_empty_subject_does_not_match_an_unlinked_profile(self):
@@ -225,7 +226,7 @@ class MatchingTests(unittest.TestCase):
         self.assertFalse(mod.profile_is_active({"id": 1, "active": False}))
 
     def test_ambiguous_match_is_refused(self):
-        users = USERS + [{"id": 99, "username": "grep-clone", "email": "x@y", "oidc_subject": "11"}]
+        users = USERS + [{"id": 99, "username": "alpha-clone", "email": "x@y", "oidc_subject": "11"}]
         self.assertIsNone(mod.match_profile({"sub": "11"}, users, self.RULES))
 
     def test_list_valued_claims_are_handled(self):
@@ -326,7 +327,7 @@ class VerifierTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_valid_token_yields_claims(self):
         verifier = self._verifier()
-        with mock.patch.object(mod.httpx, "get", return_value=_response(200, {"sub": "11", "preferred_username": "grep"})):
+        with mock.patch.object(mod.httpx, "get", return_value=_response(200, {"sub": "11", "preferred_username": "alpha"})):
             token = await verifier.verify_token("secret-token")
         self.assertIsNotNone(token)
         self.assertEqual(token.claims["sub"], "11")
@@ -364,3 +365,89 @@ if __name__ == "__main__":
     unittest.main(verbosity=2)
 
 
+class DefaultMatchTests(unittest.TestCase):
+    """The default must not be weaker than the sign-in it sits beside."""
+
+    def setUp(self):
+        mod.reset_config_cache()
+        self.addCleanup(mod.reset_config_cache)
+
+    def test_default_is_subject_only(self):
+        env = {"POZNOTE_MCP_AUTH_PROVIDER": "userinfo", "POZNOTE_MCP_AUTH_URL": "https://x/y"}
+        with mock.patch.dict(os.environ, env, clear=True):
+            cfg = mod.ExternalAuthConfig.from_env()
+        self.assertEqual([(r.field, r.claim) for r in cfg.match], [("oidc_subject", "sub")])
+
+    def test_username_and_email_are_opt_in(self):
+        env = {
+            "POZNOTE_MCP_AUTH_PROVIDER": "userinfo",
+            "POZNOTE_MCP_AUTH_URL": "https://x/y",
+            "POZNOTE_MCP_IDENTITY_MATCH": "oidc_subject:sub,email:email",
+        }
+        with mock.patch.dict(os.environ, env, clear=True):
+            cfg = mod.ExternalAuthConfig.from_env()
+        self.assertIn(("email", "email"), [(r.field, r.claim) for r in cfg.match])
+
+
+class AudienceTests(unittest.TestCase):
+    """A token the same provider issued for another application must not pass."""
+
+    def setUp(self):
+        mod.reset_config_cache()
+        self.addCleanup(mod.reset_config_cache)
+
+    def _verifier(self, audience=None):
+        env = {"POZNOTE_MCP_AUTH_PROVIDER": "userinfo", "POZNOTE_MCP_AUTH_URL": "https://x/y"}
+        if audience:
+            env["POZNOTE_MCP_AUTH_AUDIENCE"] = audience
+        with mock.patch.dict(os.environ, env, clear=True):
+            cfg = mod.ExternalAuthConfig.from_env()
+        return mod.ExternalTokenVerifier(cfg)
+
+    def test_no_audience_configured_accepts_any(self):
+        verifier = self._verifier()
+        with mock.patch.object(mod.httpx, "get", return_value=_response(200, {"sub": "11", "aud": "other"})):
+            self.assertIsNotNone(asyncio.run(verifier.verify_token("tok")))
+
+    def test_matching_audience_is_accepted(self):
+        verifier = self._verifier("this-app")
+        with mock.patch.object(mod.httpx, "get", return_value=_response(200, {"sub": "11", "aud": "this-app"})):
+            self.assertIsNotNone(asyncio.run(verifier.verify_token("tok")))
+
+    def test_foreign_audience_is_refused(self):
+        verifier = self._verifier("this-app")
+        with mock.patch.object(mod.httpx, "get", return_value=_response(200, {"sub": "11", "aud": "other-app"})):
+            self.assertIsNone(asyncio.run(verifier.verify_token("tok")))
+
+    def test_absent_audience_is_refused_when_one_is_expected(self):
+        verifier = self._verifier("this-app")
+        with mock.patch.object(mod.httpx, "get", return_value=_response(200, {"sub": "11"})):
+            self.assertIsNone(asyncio.run(verifier.verify_token("tok")))
+
+
+class ProfileResolutionTests(unittest.TestCase):
+    """resolve_caller_profile returns the profile, so is_admin is available."""
+
+    def setUp(self):
+        mod.reset_config_cache()
+        mod.get_resolver().clear()
+        self.addCleanup(mod.reset_config_cache)
+
+    def _enable(self):
+        env = {"POZNOTE_MCP_AUTH_PROVIDER": "userinfo", "POZNOTE_MCP_AUTH_URL": "https://x/y"}
+        p = mock.patch.dict(os.environ, env, clear=True)
+        p.start()
+        self.addCleanup(p.stop)
+        mod.reset_config_cache()
+
+    def test_returns_the_whole_profile(self):
+        self._enable()
+        with mock.patch.object(mod, "_current_claims", return_value={"sub": "11"}):
+            profile = mod.resolve_caller_profile(lambda: USERS)
+        self.assertEqual(profile["id"], 11)
+        self.assertFalse(profile["is_admin"])
+
+    def test_id_helper_still_works(self):
+        self._enable()
+        with mock.patch.object(mod, "_current_claims", return_value={"sub": "12"}):
+            self.assertEqual(mod.resolve_caller_profile_id(lambda: USERS), 12)

@@ -200,7 +200,7 @@ docker compose up -d --force-recreate mcp-server
 
 #### Аутентификация по вызывающему (необязательно)
 
-Указанный выше `POZNOTE_MCP_AUTH_TOKEN` — это один общий секрет: все клиенты
+Указанный выше `POZNOTE_MCP_AUTH_TOKEN` это один общий секрет: все клиенты
 предъявляют один и тот же токен, и сервер действует как один профиль. Когда
 несколько человек или агентов используют один экземпляр MCP, различить их так
 нельзя.
@@ -213,28 +213,45 @@ Poznote этого вызывающего. Один экземпляр, мног
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
-| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
-| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
-| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
-| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(не задано, функция выключена)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(обязательно)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(не задано, функция выключена)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(не задано, функция выключена)* | `introspection` only, sent as HTTP Basic |
 | `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
 | `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
 
-`userinfo` выполняет `GET <url>` с bearer-токеном вызывающего — это конечная точка
+`userinfo` выполняет `GET <url>` с bearer-токеном вызывающего, это конечная точка
 UserInfo в OpenID Connect. Токен никогда не проверяется локально, поэтому
 непрозрачные токены работают так же хорошо, как JWT, и нет ни JWKS, ни
 поверхности ротации ключей, которые нужно поддерживать. `introspection`
-выполняет `POST <url>` с `token=<token>` (RFC 7662); ответ с `active: false` —
-это недействительный токен.
+выполняет `POST <url>` с `token=<token>` (RFC 7662); ответ с `active: false` это
+недействительный токен.
 
 Побеждает первое утверждение из `POZNOTE_MCP_IDENTITY_MATCH`, которое
-присутствует **и соответствует ровно одному профилю**. Поля профиля — те, что
-возвращает `GET /api/v1/admin/users`. Значение, совпадающее с двумя профилями,
-отклоняется как неоднозначное, а удостоверение без совпадающего профиля
-отклоняется сразу: оно никогда не откатывается к профилю по умолчанию, потому
-что по умолчанию это профиль 1, первый администратор. Отключённый профиль
-никогда не является кандидатом.
+присутствует **и соответствует ровно одному профилю**. Поля профиля те, что
+возвращает `GET /api/v1/admin/users`. По умолчанию сопоставление идёт только по
+субъекту. Сопоставление по `preferred_username` или `email` доступно, но слабее:
+вход в сам Poznote сопоставляет адрес электронной почты только когда он
+подтверждён, а поставщик, позволяющий пользователям править эти поля, позволил бы
+одному из них занять чужой профиль. Включайте это осознанно.
+
+Значение, совпадающее с двумя профилями, отклоняется как неоднозначное, а
+удостоверение без совпадающего профиля отклоняется сразу: оно никогда не
+откатывается к профилю по умолчанию, потому что по умолчанию это профиль 1,
+первый администратор. Отключённый профиль никогда не является кандидатом.
+
+Два следствия, о которых стоит знать до включения:
+
+- **Явный аргумент `user_id` может только совпадать с определённым профилем.**
+  Большинство инструментов принимают этот аргумент, поэтому значение с другим
+  профилем отклоняется, а не исполняется.
+- **Инструменты без `user_id`** (`get_system_info`, `list_backups`,
+  `create_backup`, `delete_backup`) действуют как профиль по умолчанию сервера,
+  поэтому они ограничены вызывающими, чей определённый профиль является
+  администратором. Значит, профиль по умолчанию должен быть администратором:
+  поиск профилей читает `GET /api/v1/admin/users`.
 
 Если `POZNOTE_MCP_AUTH_PROVIDER` задан, он имеет приоритет над
 `POZNOTE_MCP_AUTH_TOKEN`, и сервер записывает предупреждение, если этот токен

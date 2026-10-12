@@ -35,7 +35,15 @@ Identity mapping
 ----------------
 ``POZNOTE_MCP_IDENTITY_MATCH`` is an ordered, comma-separated list of
 ``<poznote-field>:<claim-name>`` pairs. The first claim that is present and
-matches exactly one profile wins::
+matches exactly one profile wins. The default is the subject alone::
+
+    oidc_subject:sub
+
+Matching on ``preferred_username`` or ``email`` is available but is NOT the
+default, because both are weaker than the sign-in this server sits beside.
+Poznote's own OIDC login matches an email only when it is verified, and a
+provider that lets users edit their own username or address would let one of
+them claim another profile. Opt in deliberately::
 
     oidc_subject:sub,username:preferred_username,email:email
 
@@ -49,6 +57,7 @@ administrator. A revoked or unrecognised token must not silently become admin.
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import logging
 import os
@@ -81,9 +90,10 @@ CLIENT_SECRET_ENV = "POZNOTE_MCP_AUTH_CLIENT_SECRET"
 TIMEOUT_ENV = "POZNOTE_MCP_AUTH_TIMEOUT"
 CACHE_TTL_ENV = "POZNOTE_MCP_AUTH_CACHE_TTL"
 MATCH_ENV = "POZNOTE_MCP_IDENTITY_MATCH"
+AUDIENCE_ENV = "POZNOTE_MCP_AUTH_AUDIENCE"
 HEADER_ENV = "POZNOTE_MCP_AUTH_HEADER"
 
-DEFAULT_MATCH = "oidc_subject:sub,username:preferred_username,email:email"
+DEFAULT_MATCH = "oidc_subject:sub"
 DEFAULT_TIMEOUT = 5.0
 DEFAULT_CACHE_TTL = 60.0
 DEFAULT_HEADER = "Authorization"
@@ -109,6 +119,7 @@ class ExternalAuthConfig:
     header: str = DEFAULT_HEADER
     client_id: str | None = None
     client_secret: str | None = None
+    audience: list[str] = field(default_factory=list)
     timeout: float = DEFAULT_TIMEOUT
     cache_ttl: float = DEFAULT_CACHE_TTL
 
@@ -123,6 +134,10 @@ class ExternalAuthConfig:
             logger.warning("Ignoring non-numeric %s=%r", name, raw)
             return default
         return value if value > 0 else default
+
+    @staticmethod
+    def _csv(raw: str | None) -> list[str]:
+        return [item.strip() for item in (raw or "").split(",") if item.strip()]
 
     @staticmethod
     def parse_match(raw: str) -> list[MatchRule]:
@@ -185,6 +200,7 @@ class ExternalAuthConfig:
             provider=provider,
             url=url,
             match=rules,
+            audience=cls._csv(os.getenv(AUDIENCE_ENV)),
             header=(os.getenv(HEADER_ENV) or DEFAULT_HEADER).strip() or DEFAULT_HEADER,
             client_id=client_id,
             client_secret=client_secret,
@@ -274,6 +290,16 @@ class IdentityProviderUnavailable(RuntimeError):
 
 class IdentityUnmapped(RuntimeError):
     """A verified caller has no Poznote profile linked to their identity."""
+
+
+class IdentityMismatch(RuntimeError):
+    """A caller asked for a profile that is not the one its token resolves to.
+
+    Raised when a tool call passes an explicit ``user_id``. Most tools accept
+    that argument, so honouring it blindly would let any authenticated caller
+    act as any profile, the administrator included, and the per-caller mode
+    would provide no isolation at all.
+    """
 
 
 # --------------------------------------------------------------------------- #
@@ -416,13 +442,29 @@ if AccessToken is not None:
                 return cached
 
             try:
-                claims = self.provider.resolve(token)
+                # to_thread, not a direct call: verify_token is async, and httpx
+                # here is synchronous, so a slow provider would otherwise block
+                # the event loop for the whole timeout.
+                claims = await asyncio.to_thread(self.provider.resolve, token)
             except IdentityProviderUnavailable as exc:
                 logger.error("Identity provider unavailable: %s", exc)
                 return None
 
             if not claims:
                 return None
+
+            # A token the same provider issued for a different application is
+            # otherwise accepted here. Optional, because not every provider puts
+            # an audience on a UserInfo response.
+            if self.config.audience:
+                presented = set(claim_values(claims, "aud"))
+                if not presented.intersection(self.config.audience):
+                    logger.warning(
+                        "Rejecting a token whose audience %s does not include %s",
+                        sorted(presented) or "(none)",
+                        self.config.audience,
+                    )
+                    return None
 
             subject = str(claims.get("sub") or claims.get("username") or "")
             access = AccessToken(
@@ -531,12 +573,12 @@ class ProfileResolver:
         self._users_cache.set("users", users)
         return users
 
-    def resolve(
+    def resolve_profile(
         self,
         claims: dict[str, Any],
         rules: "list[MatchRule]",
         fetch_users: "Callable[[], list[dict[str, Any]]]",
-    ) -> "int | None":
+    ) -> "dict[str, Any] | None":
         cache_key = "|".join(
             f"{r.field}={v}" for r in rules for v in claim_values(claims, r.claim)
         )
@@ -552,9 +594,8 @@ class ProfileResolver:
         if profile is None:
             return None
 
-        profile_id = int(profile["id"])
-        self._match_cache.set(cache_key, profile_id)
-        return profile_id
+        self._match_cache.set(cache_key, profile)
+        return profile
 
     def clear(self) -> None:
         self._users_cache.clear()
@@ -599,11 +640,12 @@ def describe_identity(claims: dict[str, Any], rules: "list[MatchRule]") -> str:
     return ", ".join(parts) or "(no configured claim present)"
 
 
-def resolve_caller_profile_id(fetch_users: "Callable[[], list[dict[str, Any]]]") -> "int | None":
-    """Return the Poznote profile id for the current caller, or None.
+def resolve_caller_profile(fetch_users: "Callable[[], list[dict[str, Any]]]") -> "dict[str, Any] | None":
+    """Return the Poznote profile for the current caller, or None.
 
-    Returns None when per-caller auth is off, so the caller can fall back to
-    upstream behaviour unchanged.
+    None means per-caller authentication is off, so the caller falls back to
+    upstream behaviour unchanged. Raises IdentityUnmapped when it is on and the
+    caller cannot be resolved.
     """
     config = get_config()
     if config is None:
@@ -615,8 +657,8 @@ def resolve_caller_profile_id(fetch_users: "Callable[[], list[dict[str, Any]]]")
         logger.error("Per-caller auth is enabled but the request carried no resolved identity")
         raise IdentityUnmapped("No verified identity on this request")
 
-    profile_id = get_resolver().resolve(claims, config.match, fetch_users)
-    if profile_id is None:
+    profile = get_resolver().resolve_profile(claims, config.match, fetch_users)
+    if profile is None:
         logger.error(
             "No Poznote profile matches the verified identity (%s)",
             describe_identity(claims, config.match),
@@ -625,6 +667,12 @@ def resolve_caller_profile_id(fetch_users: "Callable[[], list[dict[str, Any]]]")
             "Verified identity is not linked to an active Poznote profile. "
             "The profile may be missing or disabled -- ask an administrator."
         )
-    return profile_id
+    return profile
+
+
+def resolve_caller_profile_id(fetch_users: "Callable[[], list[dict[str, Any]]]") -> "int | None":
+    """Return the Poznote profile id for the current caller, or None."""
+    profile = resolve_caller_profile(fetch_users)
+    return None if profile is None else int(profile["id"])
 
 

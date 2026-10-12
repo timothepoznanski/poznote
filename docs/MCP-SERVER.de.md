@@ -212,15 +212,16 @@ zugeordnet wird. Eine Instanz, viele Aufrufer, jeder korrekt identifiziert.
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
-| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
-| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
-| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
-| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(nicht gesetzt, Funktion aus)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(erforderlich)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(nicht gesetzt, Funktion aus)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(nicht gesetzt, Funktion aus)* | `introspection` only, sent as HTTP Basic |
 | `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
 | `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
 
-`userinfo` führt `GET <url>` mit dem Bearer-Token des Aufrufers aus — den
+`userinfo` führt `GET <url>` mit dem Bearer-Token des Aufrufers aus, dem
 UserInfo-Endpunkt von OpenID Connect. Das Token wird nie lokal geprüft, daher
 funktionieren undurchsichtige Token genauso gut wie JWTs, und es gibt keine
 JWKS- oder Schlüsselrotations-Fläche zu pflegen. `introspection` führt
@@ -229,11 +230,28 @@ JWKS- oder Schlüsselrotations-Fläche zu pflegen. `introspection` führt
 
 Der erste Claim in `POZNOTE_MCP_IDENTITY_MATCH`, der vorhanden ist **und genau
 einem Profil entspricht**, gewinnt. Profilfelder sind die von
-`GET /api/v1/admin/users` zurückgegebenen. Ein Wert, der zwei Profilen
-entspricht, wird als mehrdeutig abgelehnt, und eine Identität ohne passendes
-Profil wird rundheraus abgelehnt: Sie fällt nie auf ein Standardprofil zurück,
-denn der Standard ist Profil 1, der erste Administrator. Ein deaktiviertes
-Profil ist nie ein Kandidat.
+`GET /api/v1/admin/users` zurückgegebenen. Standardmäßig wird nur anhand des
+Subjekts abgeglichen. Ein Abgleich über `preferred_username` oder `email` ist
+möglich, aber schwächer, denn die Anmeldung von Poznote selbst gleicht eine
+E-Mail nur ab, wenn sie bestätigt ist, und ein Anbieter, der diese Felder
+bearbeiten lässt, würde es einem Nutzer erlauben, ein fremdes Profil zu
+übernehmen. Aktivieren Sie das bewusst.
+
+Ein Wert, der zwei Profilen entspricht, wird als mehrdeutig abgelehnt, und eine
+Identität ohne passendes Profil wird rundheraus abgelehnt: Sie fällt nie auf ein
+Standardprofil zurück, denn der Standard ist Profil 1, der erste Administrator.
+Ein deaktiviertes Profil ist nie ein Kandidat.
+
+Zwei Konsequenzen, die man vor dem Aktivieren kennen sollte:
+
+- **Ein ausdrückliches Argument `user_id` darf nur mit dem aufgelösten Profil
+  übereinstimmen.** Die meisten Werkzeuge nehmen dieses Argument an, daher wird
+  ein abweichendes abgelehnt statt befolgt.
+- **Die Werkzeuge ohne `user_id`** (`get_system_info`, `list_backups`,
+  `create_backup`, `delete_backup`) handeln als das Standardprofil des Servers
+  und sind daher auf Aufrufer beschränkt, deren aufgelöstes Profil ein
+  Administrator ist. Das Standardprofil muss deshalb ein Administrator sein,
+  weil die Profilsuche `GET /api/v1/admin/users` liest.
 
 Ist `POZNOTE_MCP_AUTH_PROVIDER` gesetzt, hat es Vorrang vor
 `POZNOTE_MCP_AUTH_TOKEN`, und der Server protokolliert eine Warnung, wenn

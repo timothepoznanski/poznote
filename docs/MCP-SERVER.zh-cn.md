@@ -209,11 +209,12 @@ docker compose up -d --force-recreate mcp-server
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
-| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
-| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
-| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
-| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(未设置，功能关闭)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(必填)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(未设置，功能关闭)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(未设置，功能关闭)* | `introspection` only, sent as HTTP Basic |
 | `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
 | `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
 
@@ -223,10 +224,23 @@ UserInfo 端点。令牌从不在本地校验，因此不透明令牌与 JWT 同
 （RFC 7662）；响应中带有 `active: false` 表示令牌无效。
 
 `POZNOTE_MCP_IDENTITY_MATCH` 中第一个存在**且恰好匹配一个配置文件**的 claim
-胜出。配置文件字段即 `GET /api/v1/admin/users` 返回的字段。匹配到两个配置文件的
-值会因歧义而被拒绝，而不匹配任何配置文件的身份会被直接拒绝：它绝不会回退到默认
-配置文件，因为默认配置文件是配置文件 1，即第一个管理员。已停用的配置文件永远不
-会成为候选。
+胜出。配置文件字段即 `GET /api/v1/admin/users` 返回的字段。默认只比对 subject。
+按 `preferred_username` 或 `email` 比对也可用，但更弱：Poznote 自身的登录只在
+邮箱已验证时才比对邮箱，而在允许用户自行修改这些字段的提供方上，用户可能因此占用
+他人的配置文件。请有意为之再启用。
+
+匹配到两个配置文件的值会因歧义而被拒绝，而不匹配任何配置文件的身份会被直接拒绝：
+它绝不会回退到默认配置文件，因为默认配置文件是配置文件 1，即第一个管理员。已停用
+的配置文件永远不会成为候选。
+
+启用前需要了解两点后果：
+
+- **显式的 `user_id` 参数只能与解析出的配置文件一致。** 大多数工具都接受该参数，
+  因此指向其他配置文件的值会被拒绝，而不是被采纳。
+- **不带 `user_id` 的工具**（`get_system_info`、`list_backups`、`create_backup`、
+  `delete_backup`）以服务器的默认配置文件运行，因此仅限解析出的配置文件为管理员
+  的调用方使用。因此默认配置文件必须是管理员，因为配置文件查询会读取
+  `GET /api/v1/admin/users`。
 
 设置了 `POZNOTE_MCP_AUTH_PROVIDER` 时，其优先级高于
 `POZNOTE_MCP_AUTH_TOKEN`；若该令牌仍然设置，服务器会记录一条警告。

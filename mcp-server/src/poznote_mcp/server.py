@@ -2649,9 +2649,38 @@ def git_pull(user_id: Optional[int] = None) -> str:
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
+def _deny_non_admin_caller() -> str | None:
+    """Refuse a non-administrator on a tool that takes no user_id.
+
+    get_system_info, list_backups, create_backup and delete_backup do not go
+    through _headers_for_user(), so they act as the server's default profile,
+    which has to be an administrator. Under per-caller authentication that would
+    expose them to every caller, so they are limited to administrator callers.
+
+    Returns None when the caller may proceed, which includes the case where
+    per-caller authentication is off and behaviour is unchanged.
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        is_admin = client.caller_is_admin()
+    except Exception as exc:
+        return _api_error_json(exc)
+    if is_admin is False:
+        return json.dumps({
+            "error": "This tool acts as the server's default profile, and is limited "
+                     "to administrator callers when per-caller authentication is enabled.",
+        }, indent=2, ensure_ascii=False)
+    return None
+
+
 @mcp.tool()
 def get_system_info() -> str:
     """Get version information about the Poznote installation"""
+    denied = _deny_non_admin_caller()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2665,6 +2694,9 @@ def get_system_info() -> str:
 @mcp.tool()
 def list_backups() -> str:
     """List all available system backups"""
+    denied = _deny_non_admin_caller()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2678,6 +2710,9 @@ def list_backups() -> str:
 @mcp.tool()
 def create_backup() -> str:
     """Trigger the creation of a new system backup"""
+    denied = _deny_non_admin_caller()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2934,6 +2969,9 @@ def delete_backup(filename: str) -> str:
     Args:
         filename: Name of the backup file to delete (e.g., poznote_backup_2026-02-02_15-30-00.zip)
     """
+    denied = _deny_non_admin_caller()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err

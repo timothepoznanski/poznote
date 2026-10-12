@@ -212,15 +212,16 @@ instancia, muchos llamantes, cada uno identificado correctamente.
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
-| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
-| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
-| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
-| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(sin definir, función desactivada)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(obligatorio)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(sin definir, función desactivada)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(sin definir, función desactivada)* | `introspection` only, sent as HTTP Basic |
 | `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
 | `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
 
-`userinfo` realiza `GET <url>` con el token portador del llamante: el punto de
+`userinfo` realiza `GET <url>` con el token portador del llamante, el punto de
 acceso UserInfo de OpenID Connect. El token nunca se verifica localmente, así
 que los tokens opacos funcionan igual de bien que los JWT y no hay ninguna
 superficie de JWKS ni de rotación de claves que mantener. `introspection`
@@ -229,10 +230,27 @@ realiza `POST <url>` con `token=<token>` (RFC 7662); una respuesta con
 
 Gana el primer claim de `POZNOTE_MCP_IDENTITY_MATCH` que esté presente **y
 coincida con exactamente un perfil**. Los campos de perfil son los que devuelve
-`GET /api/v1/admin/users`. Un valor que coincide con dos perfiles se rechaza por
-ambiguo, y una identidad que no coincide con ningún perfil se rechaza sin más:
-nunca recae en un perfil predeterminado, porque el predeterminado es el perfil
-1, el primer administrador. Un perfil desactivado nunca es candidato.
+`GET /api/v1/admin/users`. De forma predeterminada solo se compara el sujeto.
+Comparar por `preferred_username` o `email` es posible pero más débil, porque el
+inicio de sesión de Poznote solo compara un correo cuando está verificado, y un
+proveedor que permita editar esos campos dejaría que un usuario reclamara otro
+perfil. Actívelo a propósito.
+
+Un valor que coincide con dos perfiles se rechaza por ambiguo, y una identidad
+que no coincide con ningún perfil se rechaza sin más: nunca recae en un perfil
+predeterminado, porque el predeterminado es el perfil 1, el primer
+administrador. Un perfil desactivado nunca es candidato.
+
+Dos consecuencias que conviene conocer antes de activarlo:
+
+- **Un argumento `user_id` explícito solo puede coincidir con el perfil
+  resuelto.** La mayoría de las herramientas aceptan ese argumento, así que uno
+  que nombre otro perfil se rechaza en lugar de aceptarse.
+- **Las herramientas que no llevan `user_id`** (`get_system_info`,
+  `list_backups`, `create_backup`, `delete_backup`) actúan como el perfil
+  predeterminado del servidor, por lo que se limitan a llamantes cuyo perfil
+  resuelto sea administrador. Por eso el perfil predeterminado tiene que ser
+  administrador: la búsqueda de perfiles lee `GET /api/v1/admin/users`.
 
 Si `POZNOTE_MCP_AUTH_PROVIDER` está definido, tiene prioridad sobre
 `POZNOTE_MCP_AUTH_TOKEN`, y el servidor registra un aviso si ese token sigue

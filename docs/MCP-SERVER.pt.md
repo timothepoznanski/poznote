@@ -212,27 +212,45 @@ Uma instância, muitos chamadores, cada um corretamente identificado.
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
-| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
-| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
-| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
-| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(não definido, funcionalidade desligada)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(obrigatório)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(não definido, funcionalidade desligada)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(não definido, funcionalidade desligada)* | `introspection` only, sent as HTTP Basic |
 | `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
 | `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
 
-`userinfo` executa `GET <url>` com o token bearer do chamador — o ponto de
-acesso UserInfo do OpenID Connect. O token nunca é verificado localmente, por
-isso os tokens opacos funcionam tão bem como os JWT, e não há qualquer superfície
-de JWKS ou de rotação de chaves a manter. `introspection` executa `POST <url>`
-com `token=<token>` (RFC 7662); uma resposta com `active: false` é um token
+`userinfo` executa `GET <url>` com o token bearer do chamador, o ponto de acesso
+UserInfo do OpenID Connect. O token nunca é verificado localmente, por isso os
+tokens opacos funcionam tão bem como os JWT, e não há qualquer superfície de
+JWKS ou de rotação de chaves a manter. `introspection` executa `POST <url>` com
+`token=<token>` (RFC 7662); uma resposta com `active: false` é um token
 inválido.
 
 Vence a primeira claim de `POZNOTE_MCP_IDENTITY_MATCH` que esteja presente **e
 corresponda a exatamente um perfil**. Os campos de perfil são os devolvidos por
-`GET /api/v1/admin/users`. Um valor que corresponda a dois perfis é recusado por
-ambiguidade, e uma identidade que não corresponda a nenhum perfil é recusada
-desde logo: nunca recorre a um perfil predefinido, porque o predefinido é o
-perfil 1, o primeiro administrador. Um perfil desativado nunca é candidato.
+`GET /api/v1/admin/users`. Por predefinição apenas o sujeito é comparado.
+Comparar por `preferred_username` ou `email` é possível mas mais fraco, porque o
+início de sessão do próprio Poznote só compara um email quando está verificado,
+e um fornecedor que permita editar esses campos deixaria um utilizador reclamar
+outro perfil. Ative-o deliberadamente.
+
+Um valor que corresponda a dois perfis é recusado por ambiguidade, e uma
+identidade que não corresponda a nenhum perfil é recusada desde logo: nunca
+recorre a um perfil predefinido, porque o predefinido é o perfil 1, o primeiro
+administrador. Um perfil desativado nunca é candidato.
+
+Duas consequências a conhecer antes de o ativar:
+
+- **Um argumento `user_id` explícito só pode corresponder ao perfil resolvido.**
+  A maioria das ferramentas aceita esse argumento, por isso um que nomeie outro
+  perfil é recusado em vez de obedecido.
+- **As ferramentas que não levam `user_id`** (`get_system_info`, `list_backups`,
+  `create_backup`, `delete_backup`) atuam como o perfil predefinido do servidor,
+  pelo que ficam limitadas a chamadores cujo perfil resolvido seja
+  administrador. Por isso o perfil predefinido tem de ser administrador, já que
+  a pesquisa de perfis lê `GET /api/v1/admin/users`.
 
 Com `POZNOTE_MCP_AUTH_PROVIDER` definido, tem precedência sobre
 `POZNOTE_MCP_AUTH_TOKEN`, e o servidor registra um aviso se esse token ainda
