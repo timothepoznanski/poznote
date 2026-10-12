@@ -166,13 +166,28 @@ class ExternalAuthConfig:
                 f"{MATCH_ENV} resolved to no usable rules; expected e.g. {DEFAULT_MATCH!r}"
             )
 
+        client_id = (os.getenv(CLIENT_ID_ENV) or "").strip() or None
+        client_secret = (os.getenv(CLIENT_SECRET_ENV) or "").strip() or None
+
+        # These apply to 'introspection' only: 'userinfo' sends the caller's
+        # token and nothing else. Say so rather than reading them and quietly
+        # ignoring the value, which is indistinguishable from a typo.
+        if provider != "introspection" and (client_id or client_secret):
+            logger.warning(
+                "%s / %s are set but ignored by the %r provider; they apply to "
+                "'introspection' only.",
+                CLIENT_ID_ENV,
+                CLIENT_SECRET_ENV,
+                provider,
+            )
+
         return cls(
             provider=provider,
             url=url,
             match=rules,
             header=(os.getenv(HEADER_ENV) or DEFAULT_HEADER).strip() or DEFAULT_HEADER,
-            client_id=(os.getenv(CLIENT_ID_ENV) or "").strip() or None,
-            client_secret=(os.getenv(CLIENT_SECRET_ENV) or "").strip() or None,
+            client_id=client_id,
+            client_secret=client_secret,
             timeout=cls._float(TIMEOUT_ENV, DEFAULT_TIMEOUT),
             cache_ttl=cls._float(CACHE_TTL_ENV, DEFAULT_CACHE_TTL),
         )

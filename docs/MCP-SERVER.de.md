@@ -198,6 +198,47 @@ Fügen Sie anschließend denselben Header zur Konfiguration Ihres Clients hinzu:
 
 Dieses Token ist unabhängig von `data/.mcp_token`: Jenes verwendet der MCP-Server, um *mit* der Poznote-API zu kommunizieren, dieses muss *Ihr KI-Assistent* dem MCP-Server vorlegen.
 
+#### Authentifizierung pro Aufrufer (optional)
+
+Das oben genannte `POZNOTE_MCP_AUTH_TOKEN` ist ein einziges gemeinsames
+Geheimnis: Jeder Client sendet dasselbe Token, und der Server handelt als ein
+einziges Profil. Wenn sich mehrere Personen oder Agenten eine MCP-Instanz
+teilen, lassen sie sich damit nicht unterscheiden.
+
+Mit `POZNOTE_MCP_AUTH_PROVIDER` wird auf Authentifizierung pro Aufrufer
+umgeschaltet: Jeder Client sendet **sein eigenes** Token, das gegen einen
+externen Identitätsanbieter geprüft und dem Poznote-Profil dieses Aufrufers
+zugeordnet wird. Eine Instanz, viele Aufrufer, jeder korrekt identifiziert.
+
+| variable | default | meaning |
+|---|---|---|
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
+| `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
+
+`userinfo` führt `GET <url>` mit dem Bearer-Token des Aufrufers aus — den
+UserInfo-Endpunkt von OpenID Connect. Das Token wird nie lokal geprüft, daher
+funktionieren undurchsichtige Token genauso gut wie JWTs, und es gibt keine
+JWKS- oder Schlüsselrotations-Fläche zu pflegen. `introspection` führt
+`POST <url>` mit `token=<token>` aus (RFC 7662); eine Antwort mit
+`active: false` ist ein ungültiges Token.
+
+Der erste Claim in `POZNOTE_MCP_IDENTITY_MATCH`, der vorhanden ist **und genau
+einem Profil entspricht**, gewinnt. Profilfelder sind die von
+`GET /api/v1/admin/users` zurückgegebenen. Ein Wert, der zwei Profilen
+entspricht, wird als mehrdeutig abgelehnt, und eine Identität ohne passendes
+Profil wird rundheraus abgelehnt: Sie fällt nie auf ein Standardprofil zurück,
+denn der Standard ist Profil 1, der erste Administrator. Ein deaktiviertes
+Profil ist nie ein Kandidat.
+
+Ist `POZNOTE_MCP_AUTH_PROVIDER` gesetzt, hat es Vorrang vor
+`POZNOTE_MCP_AUTH_TOKEN`, und der Server protokolliert eine Warnung, wenn
+dieses Token noch gesetzt ist.
+
 #### Debug-Modus
 
 Setzen Sie `POZNOTE_DEBUG=true` im Startbefehl, um die Log-Stufe von `INFO` auf `DEBUG` umzustellen. Für den normalen Betrieb setzen Sie den Wert wieder auf `false`. Nur die exakten Kleinschreibungswerte `true` und `false` werden erkannt. Jeder andere Wert wird als `false` behandelt, und in die MCP-Logs wird eine Warnung geschrieben. Der Webserver ist toleranter und akzeptiert auch `1`, `on` oder `yes`. Jede an die Poznote-API gesendete HTTP-Anfrage, jeder vom KI-Assistenten empfangene Tool-Aufruf und jede Antwort werden ausführlich in die Container-Logs geschrieben. Nutzen Sie den Modus, um Verbindungs- oder Authentifizierungsprobleme zu diagnostizieren:

@@ -80,6 +80,34 @@ class ConfigTests(unittest.TestCase):
         rules = mod.ExternalAuthConfig.parse_match("oidc_subject:sub, nonsense , :, ok:claim")
         self.assertEqual([(r.field, r.claim) for r in rules], [("oidc_subject", "sub"), ("ok", "claim")])
 
+    def test_introspection_only_settings_warn_when_the_provider_is_userinfo(self, caplog=None):
+        env = {
+            "POZNOTE_MCP_AUTH_PROVIDER": "userinfo",
+            "POZNOTE_MCP_AUTH_URL": "https://x/y",
+            "POZNOTE_MCP_AUTH_CLIENT_ID": "rs",
+            "POZNOTE_MCP_AUTH_CLIENT_SECRET": "s3cret",
+        }
+        with mock.patch.dict(os.environ, env, clear=True):
+            with mock.patch.object(mod.logger, "warning") as warned:
+                cfg = mod.ExternalAuthConfig.from_env()
+        # still parsed and carried, but the operator is told it does nothing here
+        self.assertEqual(cfg.client_id, "rs")
+        self.assertTrue(any("introspection" in str(c.args) for c in warned.call_args_list))
+
+    def test_no_warning_when_introspection_actually_uses_them(self):
+        env = {
+            "POZNOTE_MCP_AUTH_PROVIDER": "introspection",
+            "POZNOTE_MCP_AUTH_URL": "https://x/y",
+            "POZNOTE_MCP_AUTH_CLIENT_ID": "rs",
+            "POZNOTE_MCP_AUTH_CLIENT_SECRET": "s3cret",
+        }
+        with mock.patch.dict(os.environ, env, clear=True):
+            with mock.patch.object(mod.logger, "warning") as warned:
+                mod.ExternalAuthConfig.from_env()
+        self.assertEqual(
+            [c for c in warned.call_args_list if "introspection" in str(c.args)], []
+        )
+
     def test_cache_ttl_must_be_positive(self):
         env = {
             "POZNOTE_MCP_AUTH_PROVIDER": "userinfo",

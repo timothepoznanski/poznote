@@ -198,6 +198,42 @@ docker compose up -d --force-recreate mcp-server
 
 이 토큰은 `data/.mcp_token`과 별개입니다. 파일의 토큰은 MCP 서버가 *Poznote API에* 접속할 때 사용하며, 이 설정값은 *AI 어시스턴트*가 MCP 서버에 제시하는 토큰입니다.
 
+#### 호출자별 인증(선택 사항)
+
+위의 `POZNOTE_MCP_AUTH_TOKEN`은 하나의 공유 비밀입니다. 모든 클라이언트가 같은
+토큰을 제시하고, 서버는 단일 프로필로 동작합니다. 여러 사람이나 에이전트가 하나의
+MCP 인스턴스를 공유하면 이를 구분할 수 없습니다.
+
+`POZNOTE_MCP_AUTH_PROVIDER`를 설정하면 호출자별 인증으로 전환됩니다. 각
+클라이언트가 **자신의** 토큰을 제시하고, 이 토큰은 외부 ID 공급자에서 확인되어 그
+호출자의 Poznote 프로필에 매핑됩니다. 하나의 인스턴스, 여러 호출자, 각자 정확히
+식별됩니다.
+
+| variable | default | meaning |
+|---|---|---|
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
+| `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
+
+`userinfo`는 호출자의 Bearer 토큰으로 `GET <url>`을 수행합니다. OpenID Connect
+UserInfo 엔드포인트입니다. 토큰은 로컬에서 검증되지 않으므로 불투명 토큰도 JWT와
+똑같이 동작하며, 관리할 JWKS나 키 교체 표면이 없습니다. `introspection`은
+`token=<token>`으로 `POST <url>`을 수행합니다(RFC 7662). `active: false`를 담은
+응답은 유효하지 않은 토큰입니다.
+
+`POZNOTE_MCP_IDENTITY_MATCH`에서 존재하면서 **정확히 하나의 프로필과 일치하는**
+첫 번째 클레임이 선택됩니다. 프로필 필드는 `GET /api/v1/admin/users`가 반환하는
+것입니다. 두 프로필과 일치하는 값은 모호하므로 거부되고, 어떤 프로필과도 일치하지
+않는 ID는 그대로 거부됩니다. 기본값은 첫 번째 관리자인 프로필 1이므로 기본
+프로필로 대체되지 않습니다. 비활성화된 프로필은 후보가 되지 않습니다.
+
+`POZNOTE_MCP_AUTH_PROVIDER`가 설정되면 `POZNOTE_MCP_AUTH_TOKEN`보다 우선하며,
+그 토큰이 여전히 설정되어 있으면 서버가 경고를 기록합니다.
+
 #### 디버그 모드
 
 시작 명령에 `POZNOTE_DEBUG=true`를 지정하면 로그 수준이 `INFO`에서 `DEBUG`로 바뀝니다. 평소에는 `false`로 두세요. 소문자 `true`와 `false`만 인식하며 다른 값은 경고와 함께 `false`로 처리합니다. 웹 서버는 `1`, `on`, `yes`도 허용합니다. Poznote API에 보낸 모든 HTTP 요청, AI 어시스턴트의 도구 호출, 응답이 컨테이너 로그에 상세히 기록됩니다. 연결 및 인증 문제 진단에 사용하세요.

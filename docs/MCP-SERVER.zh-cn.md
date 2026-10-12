@@ -198,6 +198,39 @@ docker compose up -d --force-recreate mcp-server
 
 此令牌与 `data/.mcp_token` 相互独立：后者由 MCP 服务器用于与 Poznote API *通信*，前者则是*您的 AI 助手*必须向 MCP 服务器出示的令牌。
 
+#### 按调用方身份认证（可选）
+
+上文的 `POZNOTE_MCP_AUTH_TOKEN` 是单一共享密钥：所有客户端都出示同一个令牌，
+服务器以单一身份运行。当多个人或多个 agent 共用一个 MCP 实例时，无法区分彼此。
+
+设置 `POZNOTE_MCP_AUTH_PROVIDER` 即可切换到按调用方身份认证：每个客户端出示
+**自己的**令牌，该令牌会向外部身份提供方校验，并映射到该调用方的 Poznote 配置
+文件。一个实例，多个调用方，各自被正确识别。
+
+| variable | default | meaning |
+|---|---|---|
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
+| `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
+
+`userinfo` 使用调用方的 bearer 令牌执行 `GET <url>`，即 OpenID Connect 的
+UserInfo 端点。令牌从不在本地校验，因此不透明令牌与 JWT 同样可用，也没有需要维护
+的 JWKS 或密钥轮换面。`introspection` 以 `token=<token>` 执行 `POST <url>`
+（RFC 7662）；响应中带有 `active: false` 表示令牌无效。
+
+`POZNOTE_MCP_IDENTITY_MATCH` 中第一个存在**且恰好匹配一个配置文件**的 claim
+胜出。配置文件字段即 `GET /api/v1/admin/users` 返回的字段。匹配到两个配置文件的
+值会因歧义而被拒绝，而不匹配任何配置文件的身份会被直接拒绝：它绝不会回退到默认
+配置文件，因为默认配置文件是配置文件 1，即第一个管理员。已停用的配置文件永远不
+会成为候选。
+
+设置了 `POZNOTE_MCP_AUTH_PROVIDER` 时，其优先级高于
+`POZNOTE_MCP_AUTH_TOKEN`；若该令牌仍然设置，服务器会记录一条警告。
+
 #### 调试模式
 
 在启动命令中设置 `POZNOTE_DEBUG=true`，可将日志级别从 `INFO` 切换为 `DEBUG`。正常使用时请改回 `false`。只识别完全小写的 `true` 和 `false`。其他任何值都会被视为 `false`，并在 MCP 日志中写入警告。Web 服务器的容忍度更高，还接受 `1`、`on` 或 `yes`。发送到 Poznote API 的每个 HTTP 请求、从 AI 助手收到的每个工具调用以及每个响应，都会详细写入容器日志。可用它来诊断连接或身份验证问题：
