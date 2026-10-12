@@ -76,6 +76,22 @@ Los modelos de razonamiento (OpenAI GPT-5 y la serie o, `gpt-oss` en Ollama, ...
 
 Algunos modelos de OpenAI rechazan las llamadas a herramientas en la API de chat completions salvo que el esfuerzo de razonamiento sea `none`. El chat muestra entonces un aviso indicando que el asistente no puede consultar tus notas: pon **Esfuerzo de razonamiento** en **Ninguno** para recuperar las herramientas.
 
+### Encabezados personalizados
+
+Una pasarela situada delante de los modelos (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helicone, ...) suele esperar encabezados propios, para identificar a quien llama o atribuir el consumo. El campo **Encabezados personalizados** de la página de ajustes los recibe, uno por línea, con el formato `Nombre: valor`:
+
+```
+x-litellm-customer-id: poznote
+```
+
+Se envían con cada solicitud al servidor de IA, incluida la comprobación de la conexión. El campo se ofrece para Ollama, LM Studio y las URL personalizadas, tanto en la configuración de la instancia como en una personal. Anthropic y OpenAI se llaman directamente y no admiten ninguno.
+
+Los valores se guardan cifrados y no vuelven a mostrarse: un encabezado guardado aparece como `Nombre: ••••••••`. Deja una línea tal cual para conservar su valor, vuelve a escribir el valor para cambiarlo y borra la línea para quitar el encabezado.
+
+Los encabezados que estructuran la solicitud (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) se rechazan, al igual que `Authorization`, que define el campo **Clave API**. Los nombres y los valores se limitan a caracteres ASCII simples, con 20 encabezados como máximo.
+
+Cada solicitud lleva además `User-Agent: Poznote/<version>`, para que los registros de una pasarela muestren de dónde viene. Una línea `User-Agent` en los encabezados personalizados lo sustituye.
+
 ## Instrucciones personalizadas
 
 Cada usuario puede dar al asistente instrucciones permanentes en **Ajustes → Mi asistente de IA → Instrucciones personalizadas**, por ejemplo «Cuando escribas una nota en inglés, añade debajo su traducción al ruso, y viceversa». El texto (hasta 4000 caracteres) se envía al modelo con cada mensaje, sea cual sea la configuración que responda, la de la instancia o la suya. Úselo para preferencias duraderas como el tono, el idioma o el formato de las notas que escribe el asistente. No cambia lo que el asistente puede hacer: las notas solo se modifican cuando usted lo pide. Deje el campo vacío para no enviar nada.

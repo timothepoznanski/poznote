@@ -55,7 +55,7 @@ class SettingsController {
      * working in a workspace shared with them, and a stored value copied into
      * another account would be decrypted there.
      */
-    private const SECRET_SETTINGS = ['git_token', 'ai_user_api_key', 'stt_user_api_key'];
+    private const SECRET_SETTINGS = ['git_token', 'ai_user_api_key', 'ai_user_headers', 'stt_user_api_key'];
 
     public function __construct($con) {
         $this->con = $con;

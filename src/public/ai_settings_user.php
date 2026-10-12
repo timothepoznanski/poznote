@@ -47,9 +47,12 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
     $model = trim((string)($_POST['ai_model'] ?? ''));
     $apiKey = trim((string)($_POST['ai_api_key'] ?? ''));
     $reasoningEffort = poznoteAiNormalizeReasoningEffort($_POST['ai_reasoning_effort'] ?? 'auto');
+    $headersField = poznoteAiReadHeadersField((string)($_POST['ai_headers'] ?? ''), poznoteAiUserConfig($con)['headers'], $provider);
 
     if ($enabled === '1' && ($url === '' || $model === '')) {
         $error = t('ai_settings_user.messages.incomplete', [], 'Enter a server URL and a model before enabling your own assistant.');
+    } elseif ($headersField['error'] !== '') {
+        $error = $headersField['error'];
     } else {
         $toSave = [
             'enabled' => $enabled,
@@ -57,6 +60,7 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
             'url' => $url,
             'model' => $model,
             'reasoning_effort' => $reasoningEffort,
+            'headers' => $headersField['headers'],
         ];
         // Masked placeholder means "keep the existing key"
         if ($apiKey !== '••••••••') {
@@ -85,6 +89,10 @@ $aiCustomInstructions = poznoteAiCustomInstructions($con);
 $aiProvider = poznoteAiGuessProvider($aiConfig['provider'], $aiConfig['url']);
 $aiEnabled = $aiConfig['enabled'];
 $aiReasoningEffort = $aiConfig['reasoning_effort'];
+// Refused headers come back as they were typed, to be corrected in place
+$aiHeadersText = isset($headersField) && $headersField['error'] !== ''
+    ? (string)($_POST['ai_headers'] ?? '')
+    : aiUpstreamMaskHeaders($aiConfig['headers']);
 $aiLocalHost = aiChatLocalDefaultHost();
 
 // What the AI chat button actually uses right now, so the page can say whether
@@ -192,6 +200,13 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
                                value="<?php echo $aiConfig['api_key'] !== '' ? '••••••••' : ''; ?>"
                                placeholder="sk-..." autocomplete="off">
                         <span class="label-desc" id="ai-key-desc"><?php echo t_h('ai_settings.api_key_description', [], 'Leave empty for a local Ollama server. Required for cloud providers.'); ?></span>
+                    </div>
+
+                    <div class="git-field-group" id="ai-headers-group">
+                        <label class="git-field-label" for="ai_headers"><?php echo t_h('ai_settings.headers_label', [], 'Custom headers (optional)'); ?></label>
+                        <textarea name="ai_headers" id="ai_headers" class="git-field-input" rows="3" spellcheck="false" autocomplete="off"
+                                  placeholder="x-litellm-customer-id: poznote"><?php echo htmlspecialchars($aiHeadersText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
+                        <span class="label-desc"><?php echo t_h('ai_settings.headers_description', [], 'One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter. Saved values are hidden: leave a line as it is to keep its value.'); ?></span>
                     </div>
 
                     <div class="git-field-actions">

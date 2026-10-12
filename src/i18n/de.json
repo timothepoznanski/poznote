@@ -4614,6 +4614,15 @@
     "model_none_found": "Dieser Server hat keine Modelle zurückgegeben.",
     "api_key_label": "API-Schlüssel (optional)",
     "api_key_description": "Für einen lokalen Ollama-Server leer lassen. Für Cloud-Anbieter erforderlich.",
+    "headers_label": "Benutzerdefinierte Header (optional)",
+    "headers_description": "Ein Header pro Zeile in der Form Name: Wert, der mit jeder Anfrage an diesen Server gesendet wird. Nützlich hinter einem Gateway wie LiteLLM oder OpenRouter. Gespeicherte Werte werden verborgen: Lassen Sie eine Zeile unverändert, um ihren Wert zu behalten.",
+    "headers_errors": {
+      "format": "Benutzerdefinierte Header, Zeile {{line}}: Schreiben Sie sie in der Form „Name: Wert“, in einfachen ASCII-Zeichen.",
+      "reserved": "Benutzerdefinierte Header, Zeile {{line}}: Dieser Header wird von Poznote gesetzt und kann nicht geändert werden. Das Feld API-Schlüssel deckt Authorization ab.",
+      "duplicate": "Benutzerdefinierte Header, Zeile {{line}}: Dieser Header steht bereits weiter oben.",
+      "masked": "Benutzerdefinierte Header, Zeile {{line}}: Der verborgene Wert ist nicht verfügbar, geben Sie ihn erneut ein.",
+      "too_many": "Benutzerdefinierte Header: höchstens {{max}} Header."
+    },
     "save": "Konfiguration speichern",
     "test": "Zugang prüfen und Modelle auflisten",
     "testing": "Verbindung wird getestet...",

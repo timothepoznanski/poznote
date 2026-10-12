@@ -76,6 +76,22 @@ Reasoning-Modelle (OpenAI GPT-5 und die o-Serie, `gpt-oss` unter Ollama, ...) ak
 
 Manche OpenAI-Modelle verweigern Tool Calling über die Chat-Completions-API, solange der Denkaufwand nicht `none` ist. Der Chat zeigt dann einen Hinweis an, dass der Assistent Ihre Notizen nicht durchsuchen kann: Setzen Sie **Denkaufwand** auf **Keiner**, um die Tools wieder verfügbar zu machen.
 
+### Benutzerdefinierte Header
+
+Ein Gateway vor den Modellen (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helicone, ...) erwartet oft eigene Header, um den Aufrufer zu erkennen oder die Nutzung zuzuordnen. Das Feld **Benutzerdefinierte Header** der Einstellungsseite nimmt sie auf, einen pro Zeile, in der Form `Name: Wert`:
+
+```
+x-litellm-customer-id: poznote
+```
+
+Sie werden mit jeder Anfrage an den KI-Server gesendet, auch bei der Verbindungsprüfung. Das Feld wird für Ollama, LM Studio und eigene URLs angeboten, in der Konfiguration der Instanz ebenso wie in einer persönlichen. Anthropic und OpenAI werden direkt aufgerufen und erhalten keine.
+
+Die Werte werden verschlüsselt gespeichert und nie wieder angezeigt: Ein gespeicherter Header erscheint als `Name: ••••••••`. Lassen Sie eine Zeile unverändert, um ihren Wert zu behalten, geben Sie den Wert neu ein, um ihn zu ändern, und löschen Sie die Zeile, um den Header zu entfernen.
+
+Header, die die Anfrage selbst bestimmen (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...), werden abgelehnt, ebenso `Authorization`, das vom Feld **API-Schlüssel** gesetzt wird. Namen und Werte sind auf einfache ASCII-Zeichen beschränkt, mit höchstens 20 Headern.
+
+Jede Anfrage trägt außerdem `User-Agent: Poznote/<version>`, damit die Protokolle eines Gateways zeigen, woher sie kommt. Eine Zeile `User-Agent` in den benutzerdefinierten Headern ersetzt ihn.
+
 ## Eigene Anweisungen
 
 Jeder Benutzer kann dem Assistenten unter **Einstellungen → Mein KI-Assistent → Eigene Anweisungen** dauerhafte Anweisungen geben, zum Beispiel „Wenn du eine Notiz auf Englisch schreibst, füge darunter die russische Übersetzung hinzu, und umgekehrt“. Der Text (bis zu 4000 Zeichen) wird mit jeder Nachricht an das Modell gesendet, unabhängig davon, welche Konfiguration antwortet, die der Instanz oder Ihre eigene. Nutzen Sie ihn für dauerhafte Vorgaben wie Ton, Sprache oder das Format der Notizen, die der Assistent schreibt. Er ändert nicht, was der Assistent tun darf: Notizen werden weiterhin nur geändert, wenn Sie darum bitten. Lassen Sie das Feld leer, um nichts zu senden.

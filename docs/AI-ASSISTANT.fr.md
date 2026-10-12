@@ -76,6 +76,22 @@ Les modèles de raisonnement (OpenAI GPT-5 et série o, `gpt-oss` sur Ollama, ..
 
 Certains modèles OpenAI refusent l'appel d'outils sur l'API chat completions tant que l'effort de raisonnement n'est pas `none`. Le chat affiche alors un avertissement indiquant que l'assistant ne peut pas parcourir vos notes : réglez **Effort de raisonnement** sur **Aucun** pour retrouver les outils.
 
+### En-têtes personnalisés
+
+Une passerelle placée devant les modèles (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helicone, ...) attend souvent ses propres en-têtes, pour identifier l'appelant ou attribuer la consommation. Le champ **En-têtes personnalisés** de la page de réglages les reçoit, un par ligne, sous la forme `Nom: valeur` :
+
+```
+x-litellm-customer-id: poznote
+```
+
+Ils sont envoyés avec chaque requête vers le serveur d'IA, vérification de la connexion comprise. Le champ est proposé pour Ollama, LM Studio et les URL personnalisées, dans la configuration de l'instance comme dans une configuration personnelle. Anthropic et OpenAI sont appelés directement et n'en prennent aucun.
+
+Les valeurs sont stockées chiffrées et ne sont plus jamais affichées : un en-tête enregistré revient sous la forme `Nom: ••••••••`. Laissez une ligne telle quelle pour conserver sa valeur, saisissez à nouveau la valeur pour la changer, supprimez la ligne pour retirer l'en-tête.
+
+Les en-têtes qui structurent la requête (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) sont refusés, de même que `Authorization`, que définit le champ **Clé API**. Les noms et les valeurs sont limités aux caractères ASCII simples, avec 20 en-têtes au plus.
+
+Chaque requête porte aussi `User-Agent: Poznote/<version>`, afin que les journaux d'une passerelle montrent d'où elle vient. Une ligne `User-Agent` dans les en-têtes personnalisés le remplace.
+
 ## Instructions personnalisées
 
 Chaque utilisateur peut donner à l'assistant des instructions permanentes dans **Paramètres → Mon assistant IA → Instructions personnalisées**, par exemple « Quand tu écris une note en anglais, ajoute sa traduction en russe en dessous, et inversement ». Le texte (4000 caractères au maximum) est envoyé au modèle avec chaque message, quelle que soit la configuration qui répond, celle de l'instance ou la vôtre. Utilisez-le pour des préférences durables comme le ton, la langue ou le format des notes que l'assistant écrit. Il ne change pas ce que l'assistant a le droit de faire : les notes ne sont toujours modifiées que lorsque vous le demandez. Laissez le champ vide pour ne rien envoyer.

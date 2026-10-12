@@ -4711,6 +4711,15 @@
     "model_none_found": "该服务器未返回任何模型。",
     "api_key_label": "API 密钥（可选）",
     "api_key_description": "本地 Ollama 服务器可留空。云服务商需要填写。",
+    "headers_label": "自定义请求头（可选）",
+    "headers_description": "每行一个请求头，格式为 名称: 值，随每个发往此服务器的请求一起发送。在 LiteLLM 或 OpenRouter 等网关之后很有用。已保存的值会被隐藏：保持某一行不变即可保留其值。",
+    "headers_errors": {
+      "format": "自定义请求头第 {{line}} 行：请按“名称: 值”的格式填写，并只使用普通 ASCII 字符。",
+      "reserved": "自定义请求头第 {{line}} 行：此请求头由 Poznote 设置，无法更改。Authorization 由 API 密钥字段负责。",
+      "duplicate": "自定义请求头第 {{line}} 行：此请求头已在上方列出。",
+      "masked": "自定义请求头第 {{line}} 行：隐藏的值不可用，请重新输入。",
+      "too_many": "自定义请求头：最多 {{max}} 个。"
+    },
     "save": "保存配置",
     "test": "检查访问并列出模型",
     "testing": "正在测试连接...",

@@ -76,6 +76,22 @@ Modelos de raciocínio (OpenAI GPT-5 e série o, `gpt-oss` no Ollama, ...) aceit
 
 Alguns modelos da OpenAI recusam a chamada de ferramentas na API de chat completions, a menos que o esforço de raciocínio seja `none`. O chat então mostra um aviso dizendo que o assistente não pode navegar pelas suas notas: defina **Esforço de raciocínio** como **Nenhum** para recuperar as ferramentas.
 
+### Cabeçalhos personalizados
+
+Um gateway colocado à frente dos modelos (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helicone, ...) espera muitas vezes cabeçalhos próprios, para identificar quem chama ou atribuir o consumo. O campo **Cabeçalhos personalizados** da página de definições recebe-os, um por linha, no formato `Nome: valor`:
+
+```
+x-litellm-customer-id: poznote
+```
+
+São enviados com cada pedido ao servidor de IA, incluindo a verificação da ligação. O campo é proposto para o Ollama, o LM Studio e os URL personalizados, tanto na configuração da instância como numa configuração pessoal. A Anthropic e a OpenAI são chamadas diretamente e não aceitam nenhum.
+
+Os valores são guardados cifrados e nunca mais são mostrados: um cabeçalho guardado aparece como `Nome: ••••••••`. Deixe uma linha como está para manter o seu valor, escreva de novo o valor para o alterar e apague a linha para remover o cabeçalho.
+
+Os cabeçalhos que estruturam o pedido (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) são recusados, tal como `Authorization`, que é definido pelo campo **Chave de API**. Os nomes e os valores estão limitados a caracteres ASCII simples, com 20 cabeçalhos no máximo.
+
+Cada pedido leva também `User-Agent: Poznote/<version>`, para que os registos de um gateway mostrem de onde vem. Uma linha `User-Agent` nos cabeçalhos personalizados substitui-o.
+
 ## Instruções personalizadas
 
 Cada utilizador pode dar ao assistente instruções permanentes em **Definições → O meu assistente de IA → Instruções personalizadas**, por exemplo «Quando escrever uma nota em inglês, adicione abaixo a tradução para russo, e vice-versa». O texto (até 4000 caracteres) é enviado ao modelo com cada mensagem, seja qual for a configuração que responde, a da instância ou a sua. Use-o para preferências duradouras como o tom, o idioma ou o formato das notas que o assistente escreve. Não altera o que o assistente pode fazer: as notas continuam a ser modificadas apenas quando o pede. Deixe o campo vazio para não enviar nada.

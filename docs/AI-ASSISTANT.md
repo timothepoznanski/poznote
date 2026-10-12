@@ -76,6 +76,22 @@ Reasoning models (OpenAI GPT-5 and o-series, `gpt-oss` on Ollama, ...) accept a 
 
 Some OpenAI models refuse tool calling on the chat completions API unless the reasoning effort is `none`. The chat then shows a notice saying the assistant cannot browse your notes: set **Reasoning effort** to **None** to get the tools back.
 
+### Custom headers
+
+A gateway placed in front of the models (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helicone, ...) often expects headers of its own, to identify the caller or to attribute usage. The **Custom headers** field of the settings page takes them, one per line, written as `Name: value`:
+
+```
+x-litellm-customer-id: poznote
+```
+
+They are sent with every request to the AI server, the connection check included. The field is offered for Ollama, LM Studio and custom URLs, in the instance configuration and in a personal one. Anthropic and OpenAI are called directly and take none.
+
+Values are stored encrypted and never shown again: a saved header comes back as `Name: ••••••••`. Leave a line as it is to keep its value, retype the value to change it, delete the line to remove the header.
+
+Headers that frame the request (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) are refused, and so is `Authorization`, which the **API key** field sets. Names and values are limited to plain ASCII characters, with at most 20 headers.
+
+Every request also carries `User-Agent: Poznote/<version>`, so that the logs of a gateway show where it comes from. A `User-Agent` line in the custom headers replaces it.
+
 ## Custom instructions
 
 Each user can give the assistant standing instructions in **Settings → My AI Assistant → Custom instructions**, for example "When you write a note in English, add its Russian translation below, and the other way round". The text (up to 4000 characters) is sent to the model with every message, whichever configuration answers, the instance one or your own. Use it for lasting preferences such as tone, language or the format of the notes the assistant writes. It does not change what the assistant is allowed to do: notes are still only modified when you ask for it. Leave the field empty to send nothing.

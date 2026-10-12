@@ -4271,6 +4271,15 @@
     "model_none_found": "이 서버에서 반환된 모델이 없습니다.",
     "api_key_label": "API 키(선택사항)",
     "api_key_description": "로컬 Ollama 서버의 경우 비워 두세요. 클라우드 공급자에게 필요합니다.",
+    "headers_label": "사용자 지정 헤더 (선택 사항)",
+    "headers_description": "한 줄에 헤더 하나를 이름: 값 형식으로 입력하면 이 서버로 보내는 모든 요청에 함께 전송됩니다. LiteLLM이나 OpenRouter 같은 게이트웨이 뒤에서 유용합니다. 저장된 값은 숨겨집니다. 값을 유지하려면 해당 줄을 그대로 두세요.",
+    "headers_errors": {
+      "format": "사용자 지정 헤더 {{line}}번째 줄: \"이름: 값\" 형식으로, 일반 ASCII 문자로 입력하세요.",
+      "reserved": "사용자 지정 헤더 {{line}}번째 줄: 이 헤더는 Poznote가 설정하며 변경할 수 없습니다. Authorization은 API 키 필드에서 처리합니다.",
+      "duplicate": "사용자 지정 헤더 {{line}}번째 줄: 이 헤더는 이미 위에 있습니다.",
+      "masked": "사용자 지정 헤더 {{line}}번째 줄: 숨겨진 값을 사용할 수 없습니다. 다시 입력하세요.",
+      "too_many": "사용자 지정 헤더: 헤더는 {{max}}개를 넘을 수 없습니다."
+    },
     "save": "설정 저장",
     "test": "접근 확인 및 모델 나열",
     "testing": "연결 테스트 중...",

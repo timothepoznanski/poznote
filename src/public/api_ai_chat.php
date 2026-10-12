@@ -30,6 +30,7 @@ requireApiAuth();
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../ai_config.php';
@@ -102,6 +103,7 @@ $aiConfig = poznoteResolveAiChatConfig($con, $aiUserId);
 $aiUrl = $aiConfig['url'];
 $aiModel = $aiConfig['model'];
 $aiApiKey = $aiConfig['api_key'];
+$aiHeaders = $aiConfig['headers'];
 $aiReasoningEffort = $aiConfig['reasoning_effort'] ?? 'auto';
 
 if ($action === 'test') {
@@ -117,31 +119,47 @@ if ($action === 'test') {
     }
     $ch = curl_init(aiChatModelsUrl($testUrl));
     // The settings pages only post the key when the user typed one; a field
-    // still showing the mask posts nothing. Fall back to the stored key of the
-    // configuration being edited ('scope'), not to the one the chat resolves
+    // still showing the mask posts nothing, and custom headers are posted
+    // with their saved values masked. Both fall back to what is stored in the
+    // configuration being edited ('scope'), not in the one the chat resolves
     // to: that one ignores a personal configuration until it is enabled with a
-    // model, and on the admin page it may be the admin's own personal key.
+    // model, and on the admin page it may be the admin's own personal one.
     //
-    // A stored key follows the caller to the URL they typed only when the
+    // Stored secrets follow the caller to the URL they typed only when the
     // configuration is theirs to edit: their own personal one, or the
     // instance one for an administrator. In every other case (an account
     // opened on someone else's behalf, a workspace shared with the caller, a
-    // request naming no configuration) it goes to the server it is stored
+    // request naming no configuration) they go to the server they are stored
     // with and nowhere else.
-    $testKey = trim((string)($_POST['api_key'] ?? ''));
-    if ($testKey === '') {
-        $testScope = (string)($_POST['scope'] ?? '');
-        if ($testScope === 'user' && poznoteAiUserKeysAllowed()) {
-            $userConfig = poznoteAiUserConfig($con);
-            $ownsConfig = !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
-            $testKey = ($ownsConfig || aiUpstreamSameServer($testUrl, (string)$userConfig['url'])) ? $userConfig['api_key'] : '';
-        } elseif ($testScope === 'instance' && isCurrentUserAdmin()) {
-            $testKey = poznoteAiInstanceConfig()['api_key'];
-        } else {
-            $testKey = aiUpstreamSameServer($testUrl, (string)$aiUrl) ? $aiApiKey : '';
-        }
+    $testScope = (string)($_POST['scope'] ?? '');
+    if ($testScope === 'user' && poznoteAiUserKeysAllowed()) {
+        $storedConfig = poznoteAiUserConfig($con);
+        $ownsConfig = !function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser();
+        $storedFollows = $ownsConfig || aiUpstreamSameServer($testUrl, (string)$storedConfig['url']);
+    } elseif ($testScope === 'instance' && isCurrentUserAdmin()) {
+        $storedConfig = poznoteAiInstanceConfig();
+        $storedFollows = true;
+    } else {
+        $storedConfig = $aiConfig;
+        $storedFollows = aiUpstreamSameServer($testUrl, (string)$aiUrl);
     }
-    $headers = array_merge(['Accept: application/json'], aiChatAuthHeaders($testUrl, $testKey));
+    $testKey = trim((string)($_POST['api_key'] ?? ''));
+    if ($testKey === '' && $storedFollows) {
+        $testKey = $storedConfig['api_key'];
+    }
+    $testHeaders = $storedFollows ? $storedConfig['headers'] : [];
+    if (isset($_POST['headers'])) {
+        $headersField = poznoteAiReadHeadersField((string)$_POST['headers'], $testHeaders);
+        if ($headersField['error'] !== '') {
+            aiChatJsonError(400, $headersField['error']);
+        }
+        $testHeaders = $headersField['headers'];
+    }
+    $headers = array_merge(
+        ['Accept: application/json'],
+        aiChatAuthHeaders($testUrl, $testKey),
+        aiUpstreamIdentityHeaders(getAppVersion(), $testHeaders)
+    );
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_HTTPHEADER => $headers,
@@ -826,7 +844,8 @@ header('X-Accel-Buffering: no');
 
 $upstreamHeaders = array_merge(
     ['Content-Type: application/json', 'Accept: text/event-stream'],
-    aiChatAuthHeaders($aiUrl, $aiApiKey)
+    aiChatAuthHeaders($aiUrl, $aiApiKey),
+    aiUpstreamIdentityHeaders(getAppVersion(), $aiHeaders)
 );
 $completionsUrl = aiChatCompletionsUrl($aiUrl);
 

@@ -28,6 +28,7 @@ requireApiAuth();
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
+require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../stt_config.php';
@@ -105,7 +106,7 @@ function sttTranscribeFile(array $config, string $path, string $filename, string
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => $post,
-        CURLOPT_HTTPHEADER => array_merge(['Accept: application/json'], sttAuthHeaders((string)$config['api_key'])),
+        CURLOPT_HTTPHEADER => array_merge(['Accept: application/json'], sttAuthHeaders((string)$config['api_key']), aiUpstreamIdentityHeaders(getAppVersion())),
         CURLOPT_CONNECTTIMEOUT => 10,
         // Whisper on CPU is slow: a few minutes of audio can take longer than
         // the audio itself, so this waits as long as the stack in front lets
@@ -187,7 +188,7 @@ if ($action === 'test') {
     $ch = curl_init($modelsUrl);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_HTTPHEADER => array_merge(['Accept: application/json'], sttAuthHeaders($testKey)),
+        CURLOPT_HTTPHEADER => array_merge(['Accept: application/json'], sttAuthHeaders($testKey), aiUpstreamIdentityHeaders(getAppVersion())),
         CURLOPT_CONNECTTIMEOUT => 5,
         CURLOPT_TIMEOUT => 15,
     ]);

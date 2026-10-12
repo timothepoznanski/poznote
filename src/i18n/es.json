@@ -4615,6 +4615,15 @@
     "model_none_found": "Este servidor no devolvió ningún modelo.",
     "api_key_label": "Clave API (opcional)",
     "api_key_description": "Déjala vacía para un servidor Ollama local. Necesaria para proveedores en la nube.",
+    "headers_label": "Encabezados personalizados (opcional)",
+    "headers_description": "Un encabezado por línea, con el formato Nombre: valor, enviado con cada solicitud a este servidor. Útil detrás de una pasarela como LiteLLM u OpenRouter. Los valores guardados se ocultan: deja una línea tal cual para conservar su valor.",
+    "headers_errors": {
+      "format": "Encabezados personalizados, línea {{line}}: escríbela como «Nombre: valor», en caracteres ASCII simples.",
+      "reserved": "Encabezados personalizados, línea {{line}}: este encabezado lo define Poznote y no se puede cambiar. El campo Clave API cubre Authorization.",
+      "duplicate": "Encabezados personalizados, línea {{line}}: este encabezado ya aparece más arriba.",
+      "masked": "Encabezados personalizados, línea {{line}}: el valor oculto no está disponible, escríbelo de nuevo.",
+      "too_many": "Encabezados personalizados: no más de {{max}} encabezados."
+    },
     "save": "Guardar configuración",
     "test": "Comprobar el acceso y listar los modelos",
     "testing": "Probando conexión...",
