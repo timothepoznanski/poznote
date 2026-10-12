@@ -835,6 +835,78 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
     display: none;
 }
 
+/* The two sides of an administrator's Settings (settings_shell.php): their
+   own settings and the instance's, picked from a switch under the filter,
+   which searches both.
+   The list under it shows the sections on one side, the groups of Admin
+   Tools on the other. */
+.settings-scope-switch {
+    display: flex;
+    gap: 2px;
+    margin: 0 0 12px 0;
+    padding: 3px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+}
+
+.settings-scope-option {
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    padding: 6px 8px;
+    border-radius: var(--pz-radius);
+    color: var(--pz-text-muted);
+    font-size: calc(13px * var(--settings-font-scale, 1));
+    line-height: 1.3;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.settings-scope-option:hover {
+    color: var(--pz-text);
+    text-decoration: none;
+}
+
+.settings-scope-option.is-active {
+    background: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--pz-accent-text);
+}
+
+.settings-scope-option .lucide {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+}
+
+html[data-theme='dark'] .settings-scope-option.is-active {
+    background: rgba(var(--pz-accent-text-rgb), 0.16);
+}
+
+/* Each side lists its own entries. Admin Tools itself is never listed: the
+   switch leads to it. */
+.settings-sidebar .settings-nav-item[data-section='admin-tools-grid'],
+.settings-sidebar:not(.settings-scope-admin) .settings-nav-group-item,
+.settings-sidebar.settings-scope-admin .settings-nav-item[data-section] {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    /* No list on narrow screens: the switch decides which sections are
+       stacked under it, an active filter term still searching both sides. */
+    .home-container.settings-scope-user:not(.settings-filtering) #admin-tools,
+    .home-container.settings-scope-user:not(.settings-filtering) #admin-tools-grid,
+    .home-container.settings-scope-admin:not(.settings-filtering) .settings-category-title:not(#admin-tools),
+    .home-container.settings-scope-admin:not(.settings-filtering) .home-grid:not(#admin-tools-grid) {
+        display: none;
+    }
+}
+
 @media (min-width: 801px) {
     /* A little wider than the plain page (800px): the list takes its 220px
        and the rows keep about the width of the old list view (600px), so a
@@ -941,6 +1013,13 @@ html[data-theme='dark'] .home-card.is-pinned .settings-card-pin i {
        toggles .settings-filtering on the container, matches only). */
     .home-container.settings-with-nav:not(.settings-filtering) .settings-category-title:not(.settings-section-active),
     .home-container.settings-with-nav:not(.settings-filtering) .home-grid:not(.settings-section-active) {
+        display: none;
+    }
+
+    /* On the administration side the list picks one group of Admin Tools,
+       the way it picks one section on the other side. */
+    .home-container.settings-scope-admin:not(.settings-filtering) #admin-tools-grid > .settings-group-title:not(.settings-admin-group-active),
+    .home-container.settings-scope-admin:not(.settings-filtering) #admin-tools-grid > .settings-group:not(.settings-admin-group-active) {
         display: none;
     }
 

@@ -519,7 +519,8 @@
       "custom_fonts": "Laden Sie Schriftdateien hoch, um sie allen Benutzern in den Listen App-Schriftart und Markdown-Editor-Schriftart anzubieten.",
       "structured_export": "Exportieren Sie Ihre Notizen als Dateien, in Ordnern wie in Poznote organisiert.",
       "local_backup": "Speichern Sie vollständige Sicherungsarchive in einem Ordner des Servers, manuell oder nach Zeitplan, und behalten Sie nur die neuesten.",
-      "whats_new": "Nach einem Update die Versionshinweise der neuen Version einmal beim Öffnen deiner Notizen anzeigen."
+      "whats_new": "Nach einem Update die Versionshinweise der neuen Version einmal beim Öffnen deiner Notizen anzeigen.",
+      "login_disabled": "Überspringt die Anmeldeseite: Jeder Browser, der diese Instanz erreicht, öffnet direkt Ihr Konto, ohne Benutzername, Passwort oder Zwei-Faktor-Code. Nur aktivieren, wenn allein Sie diese Instanz erreichen können oder ein vorgeschalteter Reverse Proxy die Authentifizierung übernimmt. Die API verlangt weiterhin Zugangsdaten."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -636,7 +637,8 @@
       "restore_direct_copy": "Wiederherstellung per Direktkopie",
       "import_notes": "Notizen importieren",
       "local_backup": "Lokale Sicherungen",
-      "whats_new": "Neuigkeiten nach Updates"
+      "whats_new": "Neuigkeiten nach Updates",
+      "login_disabled": "Ohne Anmeldung öffnen"
     },
     "default_credentials": {
       "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
@@ -671,6 +673,13 @@
       "attachments": "Anhänge",
       "s3_attachments": "Anhänge im S3-Speicher",
       "s3_backups": "Sicherungen im S3-Speicher"
+    },
+    "login_disabled": {
+      "confirm": "Jeder, der diese Poznote-Instanz erreichen kann, öffnet direkt Ihr Konto, ohne Benutzername, Passwort oder Zwei-Faktor-Code. Fahren Sie nur fort, wenn allein Sie sie erreichen können oder ein Reverse Proxy die Authentifizierung übernimmt."
+    },
+    "scope": {
+      "user": "Persönlich",
+      "admin": "Admin"
     }
   },
   "workspaces": {
@@ -2099,6 +2108,7 @@
     "numbered_list": "Nummerierte Liste",
     "lettered_list": "Buchstabenliste",
     "roman_list": "Liste mit römischen Ziffern",
+    "dash_list": "Strichliste",
     "checklist": "Checkliste",
     "done": "Erledigt",
     "image": "Bild",
@@ -4009,7 +4019,8 @@
     },
     "methods": {
       "password": "Passwort",
-      "oidc": "SSO"
+      "oidc": "SSO",
+      "auto": "ohne Anmeldung (Anmeldeseite deaktiviert)"
     }
   },
   "backlinks": {

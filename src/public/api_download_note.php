@@ -239,6 +239,9 @@ const EXPORT_STYLES = '
     ol[type="i"] {
         list-style-type: lower-roman;
     }
+    ul.dash-list {
+        list-style-type: "-\00a0\00a0";
+    }
     a {
         color: #007bff;
         text-decoration: none;

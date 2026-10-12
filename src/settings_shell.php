@@ -48,10 +48,34 @@ function poznoteSettingsSections(): array
         ['key' => 'settings-diary-section-grid', 'icon' => 'lucide-book-open', 'label' => t('settings.categories.diary', [], 'Diary')],
     ];
     if ($isAdmin) {
-        $sections[] = ['key' => 'admin-tools-grid', 'icon' => 'lucide-wrench', 'label' => t('settings.categories.admin_tools', [], 'Admin Tools')];
+        $sections[] = ['key' => POZNOTE_SETTINGS_ADMIN_SECTION, 'icon' => 'lucide-wrench', 'label' => t('settings.categories.admin_tools', [], 'Admin Tools')];
     }
     $sections[] = ['key' => 'settings-documentation-section-grid', 'icon' => 'lucide-info', 'label' => t('settings.categories.documentation', [], 'About')];
     return $sections;
+}
+
+/**
+ * Key of the Admin Tools section. It is not an entry of the section list:
+ * an administrator reaches it through the switch above the list (their own
+ * settings on one side, the instance's on the other), and the list then
+ * shows its groups instead of the sections.
+ */
+const POZNOTE_SETTINGS_ADMIN_SECTION = 'admin-tools-grid';
+
+/**
+ * The groups of the Admin Tools section, in page order: what the list shows
+ * on the administration side of the switch. The key is the data-group of the
+ * group's title in settings.php.
+ */
+function poznoteSettingsAdminGroups(): array
+{
+    return [
+        ['key' => 'users-access', 'icon' => 'lucide-users', 'label' => t('settings.groups.users_access', [], 'Users & access')],
+        ['key' => 'integrations', 'icon' => 'lucide-plug', 'label' => t('settings.groups.integrations', [], 'Integrations')],
+        ['key' => 'storage-limits', 'icon' => 'lucide-hard-drive', 'label' => t('settings.groups.storage_limits', [], 'Storage & limits')],
+        ['key' => 'appearance', 'icon' => 'lucide-palette', 'label' => t('settings.groups.appearance', [], 'Appearance')],
+        ['key' => 'maintenance', 'icon' => 'lucide-wrench', 'label' => t('settings.groups.maintenance', [], 'Maintenance')],
+    ];
 }
 
 /** Label of a section, for the title of the pages that belong to it. */
@@ -120,8 +144,11 @@ function poznoteRenderSettingsSidebar(array $opts = []): void
         $pins = json_decode((string)getSetting('settings_pinned_cards', ''), true);
         $hasPins = is_array($pins) && count($pins) > 0;
     }
+    $isAdmin = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
+    $adminScope = $isAdmin && $active === POZNOTE_SETTINGS_ADMIN_SECTION;
+    $adminHref = poznoteSettingsHref($basePath, $workspace, POZNOTE_SETTINGS_ADMIN_SECTION);
     ?>
-        <aside class="settings-sidebar">
+        <aside class="settings-sidebar<?php echo $adminScope ? ' settings-scope-admin' : ''; ?>">
             <div class="settings-filter-row">
                 <div class="home-search-wrapper">
                     <i class="lucide lucide-search home-search-icon"></i>
@@ -141,6 +168,24 @@ function poznoteRenderSettingsSidebar(array $opts = []): void
                 </button>
                 <?php endif; ?>
             </div>
+            <?php if ($isAdmin): ?>
+            <!-- The two sides of Settings for an administrator: their own
+                 settings, and the instance's. The list below follows the side
+                 chosen (js/settings-page.js on settings.php, plain links on
+                 the pages it opens); the filter above searches both. -->
+            <div class="settings-scope-switch" role="group" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>">
+                <a class="settings-scope-option<?php echo $adminScope ? '' : ' is-active'; ?>" data-scope="user" aria-current="<?php echo $adminScope ? 'false' : 'true'; ?>"
+                   href="<?php echo htmlspecialchars(poznoteSettingsHref($basePath, $workspace), ENT_QUOTES, 'UTF-8'); ?>">
+                    <i class="lucide lucide-user"></i>
+                    <span><?php echo t_h('settings.scope.user', [], 'Personal'); ?></span>
+                </a>
+                <a class="settings-scope-option<?php echo $adminScope ? ' is-active' : ''; ?>" data-scope="admin" aria-current="<?php echo $adminScope ? 'true' : 'false'; ?>"
+                   href="<?php echo htmlspecialchars($adminHref, ENT_QUOTES, 'UTF-8'); ?>">
+                    <i class="lucide lucide-shield"></i>
+                    <span><?php echo t_h('settings.scope.admin', [], 'Admin'); ?></span>
+                </a>
+            </div>
+            <?php endif; ?>
             <nav id="settings-nav" class="settings-nav" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>">
                 <?php foreach (poznoteSettingsSections() as $section):
                     $key = $section['key'];
@@ -159,6 +204,13 @@ function poznoteRenderSettingsSidebar(array $opts = []): void
                     <?php endif; ?>
                 </a>
                 <?php endforeach; ?>
+                <?php if ($isAdmin): foreach (poznoteSettingsAdminGroups() as $group): ?>
+                <a class="settings-nav-item settings-nav-group-item" data-admin-group="<?php echo htmlspecialchars($group['key'], ENT_QUOTES, 'UTF-8'); ?>"
+                   href="<?php echo htmlspecialchars($adminHref . '&group=' . rawurlencode($group['key']), ENT_QUOTES, 'UTF-8'); ?>">
+                    <i class="lucide <?php echo htmlspecialchars($group['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
+                    <span class="settings-nav-label"><?php echo htmlspecialchars($group['label'], ENT_QUOTES, 'UTF-8'); ?></span>
+                </a>
+                <?php endforeach; endif; ?>
             </nav>
             <?php if (!$isPage): ?>
             <script>
@@ -167,15 +219,23 @@ function poznoteRenderSettingsSidebar(array $opts = []): void
             // js/settings-page.js records which, so this copy matches. The
             // filter carries its term over to settings.php.
             (function () {
-                var nav = document.currentScript.parentNode.querySelector('.settings-nav');
+                var nav = document.currentScript.parentNode;
                 try {
                     var store = window.__poznoteUserStorage || window.localStorage;
                     var hidden = JSON.parse(store.getItem('settingsNavHiddenSections') || '[]');
                     if (Array.isArray(hidden)) {
                         hidden.forEach(function (key) {
-                            var item = nav.querySelector('[data-section="' + key + '"]');
+                            var item = nav.querySelector('.settings-nav [data-section="' + key + '"]');
                             if (item && !item.classList.contains('is-active')) item.hidden = true;
                         });
+                    }
+                    // On the administration side, the group the page was
+                    // opened from stays lit.
+                    var group = store.getItem('settingsAdminGroup');
+                    var groupItem = group && nav.classList.contains('settings-scope-admin') ? nav.querySelector('[data-admin-group="' + group + '"]') : null;
+                    if (groupItem) {
+                        groupItem.classList.add('is-active');
+                        groupItem.setAttribute('aria-current', 'true');
                     }
                 } catch (e) { /* storage unavailable */ }
                 // Once typing pauses (or on Enter), and only once: a

@@ -317,6 +317,15 @@ if (!(!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAcc
     }));
 }
 
+// With the login screen turned off (Settings > Open without login) there is nothing
+// to log out of: the next page would open the same session again. Accounts
+// are still switched from the workspace menu.
+if (function_exists('isAutoLoginSession') && isAutoLoginSession()) {
+    $iconSidebarBottomItems = array_values(array_filter($iconSidebarBottomItems, static function (array $item): bool {
+        return ($item['id'] ?? '') !== 'iconSidebarLogoutBtn';
+    }));
+}
+
 // Someone who can open several accounts (Admin > User Management) gets them
 // offered in the logout dialog (js/profile.js), in the notes list's workspace
 // menu (js/workspaces-core.js) and in its "Other accounts" block

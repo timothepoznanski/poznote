@@ -555,6 +555,13 @@ function purgeLegacyPublicWorkspaceSession(): void {
 function isAuthenticated() {
     purgeLegacyPublicWorkspaceSession();
 
+    // A session opened without a login lasts as long as the option that
+    // opened it: turned off, or handed to another account, it ends here and
+    // the request is judged again from scratch.
+    if (isAutoLoginSession() && (int)($_SESSION['login_user_id'] ?? 0) !== getAutoLoginAccountId()) {
+        $_SESSION = [];
+    }
+
     // Check session first
     if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true) {
         if (!isset($_SESSION['login_user_id']) && isset($_SESSION['user_id'])) {
@@ -625,7 +632,78 @@ function isAuthenticated() {
         setRememberMeCookie('', time() - 3600);
     }
     
-    return false;
+    return signInWithoutCredentials();
+}
+
+/**
+ * The account opened without a login (Settings > Admin Tools > Open without
+ * login): the administrator who turned the option on, recorded with it in the
+ * master database. 0 while the option is off. Read once per request.
+ */
+function getAutoLoginAccountId(): int {
+    static $accountId = null;
+    if ($accountId === null) {
+        $accountId = 0;
+        require_once __DIR__ . '/users/db_master.php';
+        if (filter_var(getGlobalSetting('login_disabled', '0'), FILTER_VALIDATE_BOOL)) {
+            $accountId = max(0, (int)getGlobalSetting('login_disabled_user_id', '0'));
+        }
+    }
+    return $accountId;
+}
+
+function isLoginDisabled(): bool {
+    return getAutoLoginAccountId() > 0;
+}
+
+/**
+ * True for a session opened by signInWithoutCredentials(): there is nothing
+ * to sign out of, the next request would open the same session again.
+ */
+function isAutoLoginSession(): bool {
+    return ($_SESSION['auth_method'] ?? '') === 'auto';
+}
+
+/**
+ * Opens the recorded account for a browser that shows up with no session
+ * (lib/auto-login.php says which callers). Called last by isAuthenticated(),
+ * so an existing session or a remember-me cookie still wins, and every gate
+ * built on it follows.
+ *
+ * The account is opened as it is, without its second factor and without the
+ * account choice of a login that can open several: the person can still
+ * switch from the workspace menu.
+ */
+function signInWithoutCredentials(): bool {
+    if (PHP_SAPI === 'cli' || session_status() !== PHP_SESSION_ACTIVE || !isLoginDisabled()) {
+        return false;
+    }
+
+    require_once __DIR__ . '/lib/auto-login.php';
+    if (!poznoteRequestQualifiesForAutoLogin($_SERVER, hasApiAuthCredentials())) {
+        return false;
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    $profile = poznoteResolveAutoLoginProfile(getAllUserProfiles(), getAutoLoginAccountId());
+    $user = $profile !== null ? getUserProfileById((int)$profile['id']) : null;
+    if (!$user || empty($user['active'])) {
+        error_log('Poznote: opening without login is on, but its account (id ' . getAutoLoginAccountId() . ') is gone or deactivated, the login page stays in use');
+        return false;
+    }
+
+    session_regenerate_id(true);
+    setAuthenticatedIdentity($user, 'auto');
+    unset($_SESSION['totp_login_challenge']);
+    if (!setActiveUserAccount($user)) {
+        return false;
+    }
+
+    require_once __DIR__ . '/ActivityLog.php';
+    logActivity(ACTIVITY_LOGIN, ['method' => 'auto'], 'web', (int)$user['id'], $user['username'] ?? null);
+    updateUserLastLogin((int)$user['id']);
+
+    return true;
 }
 
 // --- Shared workspace scope -------------------------------------------------

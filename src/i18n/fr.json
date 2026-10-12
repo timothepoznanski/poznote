@@ -518,7 +518,8 @@
       "custom_fonts": "Importez des fichiers de police pour les proposer à tous les utilisateurs dans les listes Police de l'application et Police de l'éditeur Markdown.",
       "structured_export": "Exportez vos notes sous forme de fichiers, rangés dans des dossiers comme dans Poznote.",
       "local_backup": "Enregistrez des archives de sauvegarde complètes dans un dossier du serveur, manuellement ou selon une planification, en ne conservant que les plus récentes.",
-      "whats_new": "Après une mise à jour, afficher une fois les notes de la nouvelle version à l'ouverture de vos notes."
+      "whats_new": "Après une mise à jour, afficher une fois les notes de la nouvelle version à l'ouverture de vos notes.",
+      "login_disabled": "Passe l'écran de connexion : tout navigateur qui atteint cette instance ouvre directement votre compte, sans nom d'utilisateur, mot de passe ni code à deux facteurs. À n'activer que si vous êtes seul à pouvoir joindre cette instance, ou si un reverse proxy placé devant elle gère l'authentification. L'API continue de demander des identifiants."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -635,7 +636,8 @@
       "restore_direct_copy": "Restauration par copie directe",
       "import_notes": "Importer des notes",
       "local_backup": "Sauvegardes locales",
-      "whats_new": "Nouveautés après une mise à jour"
+      "whats_new": "Nouveautés après une mise à jour",
+      "login_disabled": "Ouverture sans connexion"
     },
     "default_credentials": {
       "both": "Ce compte utilise encore le login et le mot de passe livrés par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",
@@ -670,6 +672,13 @@
       "attachments": "Pièces jointes",
       "s3_attachments": "Pièces jointes dans le stockage S3",
       "s3_backups": "Sauvegardes dans le stockage S3"
+    },
+    "login_disabled": {
+      "confirm": "Toute personne qui peut atteindre cette instance Poznote ouvrira directement votre compte, sans nom d'utilisateur, mot de passe ni code à deux facteurs. Ne continuez que si vous êtes seul à pouvoir la joindre, ou si un reverse proxy gère l'authentification."
+    },
+    "scope": {
+      "user": "Personnel",
+      "admin": "Admin"
     }
   },
   "workspaces": {
@@ -2105,6 +2114,7 @@
     "numbered_list": "Liste numérotée",
     "lettered_list": "Liste alphabétique",
     "roman_list": "Liste en chiffres romains",
+    "dash_list": "Liste à tirets",
     "checklist": "Cases à cocher",
     "done": "Fait",
     "image": "Image",
@@ -4114,7 +4124,8 @@
     },
     "methods": {
       "password": "mot de passe",
-      "oidc": "SSO"
+      "oidc": "SSO",
+      "auto": "sans connexion (écran de connexion désactivé)"
     }
   },
   "backlinks": {

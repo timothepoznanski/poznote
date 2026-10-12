@@ -274,6 +274,7 @@ if ($isAdmin) {
         // Resolved rather than read raw, so the badge tells the truth on an
         // instance configured through the environment variable.
         $settingsPageConfig['settings']['allow_executable_attachments'] = poznoteExecutableAttachmentsAllowed() ? '1' : '0';
+        $settingsPageConfig['settings']['login_disabled'] = getGlobalSetting('login_disabled', '0') === '1' ? '1' : '0';
     } catch (Exception $e) {
         // Keep the page usable if the master database is temporarily unavailable.
         error_log('settings: failed: ' . $e->getMessage());
@@ -1460,7 +1461,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
         <h2 class="settings-category-title" id="admin-tools"><?php echo t_h('settings.categories.admin_tools', [], 'Admin Tools'); ?></h2>
         <div class="home-grid settings-grouped" id="admin-tools-grid">
 
-            <div class="settings-group-title"><?php echo t_h('settings.groups.users_access', [], 'Users & access'); ?></div>
+            <div class="settings-group-title" data-group="users-access"><?php echo t_h('settings.groups.users_access', [], 'Users & access'); ?></div>
             <div class="settings-group">
 
                 <!-- User Management (Admin only) -->
@@ -1489,6 +1490,18 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                     </div>
                 </div>
 
+                <!-- Open without login (instance-wide) -->
+                <div class="home-card" id="login-disabled-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.login_disabled', [], 'Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-lock-open"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.login_disabled', [], 'Open without login'); ?></span>
+                        <span id="login-disabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+
                 <!-- Tenant isolation (SaaS mode) -->
                 <div class="home-card" id="tenant-isolation-card">
                     <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.tenant_isolation', [], 'SaaS mode: choose which capabilities are blocked for non-admin users, such as discovering the other accounts of the instance or registering personal webhooks. Leave everything unchecked for a family or team instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -1502,7 +1515,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                 </div>
             </div>
 
-            <div class="settings-group-title"><?php echo t_h('settings.groups.integrations', [], 'Integrations'); ?></div>
+            <div class="settings-group-title" data-group="integrations"><?php echo t_h('settings.groups.integrations', [], 'Integrations'); ?></div>
             <div class="settings-group">
 
                 <!-- SMTP Configuration -->
@@ -1616,7 +1629,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                 </div>
             </div>
 
-            <div class="settings-group-title"><?php echo t_h('settings.groups.storage_limits', [], 'Storage & limits'); ?></div>
+            <div class="settings-group-title" data-group="storage-limits"><?php echo t_h('settings.groups.storage_limits', [], 'Storage & limits'); ?></div>
             <div class="settings-group">
 
                 <!-- S3 Attachment Storage (instance-wide configuration) -->
@@ -1729,7 +1742,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                 </div>
             </div>
 
-            <div class="settings-group-title"><?php echo t_h('settings.groups.appearance', [], 'Appearance'); ?></div>
+            <div class="settings-group-title" data-group="appearance"><?php echo t_h('settings.groups.appearance', [], 'Appearance'); ?></div>
             <div class="settings-group">
 
                 <!-- Custom CSS Path -->
@@ -1769,7 +1782,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                 </div>
             </div>
 
-            <div class="settings-group-title"><?php echo t_h('settings.groups.maintenance', [], 'Maintenance'); ?></div>
+            <div class="settings-group-title" data-group="maintenance"><?php echo t_h('settings.groups.maintenance', [], 'Maintenance'); ?></div>
             <div class="settings-group">
 
                 <!-- Disaster Recovery: one button, so a dialog (#disasterRecoveryModal)
