@@ -4301,12 +4301,18 @@
   "ai_settings_user": {
     "title": "My AI Assistant",
     "card": "My AI Assistant",
-    "card_help": "Use the AI assistant with your own provider and API key.",
+    "card_help": "Give the AI assistant custom instructions, and use it with your own provider and API key.",
     "description": "Connect the AI assistant to your own OpenAI-compatible server (Ollama, LM Studio, OpenAI, Anthropic, ...) with your own API key. Your configuration replaces the one set by the administrator.",
     "disabled_notice": "Your administrator has not allowed personal API keys on this instance.",
     "using_instance": "The assistant currently answers through the configuration set by the administrator. Enable your own configuration below to use your API key instead.",
     "enable_label": "Use my own configuration",
     "enable_description": "The AI chat button uses the server and API key below instead of the instance ones.",
+    "instructions_title": "Custom instructions",
+    "instructions_label": "Instructions",
+    "instructions_placeholder": "Example: when you write a note in English, add its Russian translation below, and the other way round.",
+    "instructions_description": "Sent to the model with every message, whichever configuration answers. Use it for standing preferences: tone, language, format of the notes the assistant writes. Leave empty to send nothing.",
+    "instructions_save": "Save instructions",
+    "instructions_saved": "Custom instructions saved.",
     "messages": {
       "incomplete": "Enter a server URL and a model before enabling your own assistant."
     }

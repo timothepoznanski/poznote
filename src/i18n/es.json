@@ -4645,12 +4645,18 @@
   "ai_settings_user": {
     "title": "Mi asistente de IA",
     "card": "Mi asistente de IA",
-    "card_help": "Usa el asistente de IA con tu propio proveedor y tu propia clave API.",
+    "card_help": "Dé instrucciones personalizadas al asistente de IA y úselo con su propio proveedor y clave API.",
     "description": "Conecta el asistente de IA a tu propio servidor compatible con OpenAI (Ollama, LM Studio, OpenAI, Anthropic, ...) con tu clave API. Tu configuración sustituye a la definida por el administrador.",
     "disabled_notice": "Tu administrador no ha permitido claves API personales en esta instancia.",
     "using_instance": "Actualmente el asistente responde con la configuración definida por el administrador. Activa tu propia configuración a continuación para usar tu clave API.",
     "enable_label": "Usar mi propia configuración",
     "enable_description": "El botón de chat de IA usa el servidor y la clave API de abajo en lugar de los de la instancia.",
+    "instructions_title": "Instrucciones personalizadas",
+    "instructions_label": "Instrucciones",
+    "instructions_placeholder": "Ejemplo: cuando escribas una nota en inglés, añade debajo su traducción al ruso, y viceversa.",
+    "instructions_description": "Se envían al modelo con cada mensaje, sea cual sea la configuración que responda. Úselas para preferencias permanentes: tono, idioma, formato de las notas que escribe el asistente. Déjelo vacío para no enviar nada.",
+    "instructions_save": "Guardar instrucciones",
+    "instructions_saved": "Instrucciones personalizadas guardadas.",
     "messages": {
       "incomplete": "Introduce una URL de servidor y un modelo antes de activar tu propio asistente."
     }

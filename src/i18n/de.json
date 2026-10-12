@@ -4644,12 +4644,18 @@
   "ai_settings_user": {
     "title": "Mein KI-Assistent",
     "card": "Mein KI-Assistent",
-    "card_help": "Nutzen Sie den KI-Assistenten mit Ihrem eigenen Anbieter und Ihrem eigenen API-Schlüssel.",
+    "card_help": "Geben Sie dem KI-Assistenten eigene Anweisungen und nutzen Sie ihn mit Ihrem eigenen Anbieter und API-Schlüssel.",
     "description": "Verbinden Sie den KI-Assistenten mit Ihrem eigenen OpenAI-kompatiblen Server (Ollama, LM Studio, OpenAI, Anthropic, ...) und Ihrem eigenen API-Schlüssel. Ihre Konfiguration ersetzt die des Administrators.",
     "disabled_notice": "Ihr Administrator hat persönliche API-Schlüssel auf dieser Instanz nicht erlaubt.",
     "using_instance": "Der Assistent antwortet derzeit über die vom Administrator festgelegte Konfiguration. Aktivieren Sie unten Ihre eigene Konfiguration, um stattdessen Ihren API-Schlüssel zu verwenden.",
     "enable_label": "Meine eigene Konfiguration verwenden",
     "enable_description": "Die KI-Chat-Schaltfläche verwendet den Server und den API-Schlüssel unten anstelle derer der Instanz.",
+    "instructions_title": "Eigene Anweisungen",
+    "instructions_label": "Anweisungen",
+    "instructions_placeholder": "Beispiel: Wenn du eine Notiz auf Englisch schreibst, füge darunter die russische Übersetzung hinzu, und umgekehrt.",
+    "instructions_description": "Werden mit jeder Nachricht an das Modell gesendet, unabhängig davon, welche Konfiguration antwortet. Für dauerhafte Vorgaben: Ton, Sprache, Format der Notizen, die der Assistent schreibt. Leer lassen, um nichts zu senden.",
+    "instructions_save": "Anweisungen speichern",
+    "instructions_saved": "Eigene Anweisungen gespeichert.",
     "messages": {
       "incomplete": "Geben Sie eine Server-URL und ein Modell an, bevor Sie Ihren eigenen Assistenten aktivieren."
     }

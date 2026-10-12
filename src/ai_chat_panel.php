@@ -34,12 +34,11 @@ if (!isset($aiPanelWorkspace)) {
             <h2 class="ai-chat-title"><i class="lucide lucide-bot"></i> <span data-i18n="ai_chat.title">AI Assistant</span></h2>
             <?php
             // Admins land on the instance configuration, everyone else on their
-            // own one when personal API keys are allowed
-            $aiPanelSettingsHref = '';
+            // own page: custom instructions, plus their own provider when
+            // personal API keys are allowed
+            $aiPanelSettingsHref = 'ai_settings_user.php';
             if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 $aiPanelSettingsHref = 'ai_settings.php';
-            } elseif (function_exists('poznoteAiUserKeysAllowed') && poznoteAiUserKeysAllowed()) {
-                $aiPanelSettingsHref = 'ai_settings_user.php';
             }
             ?>
             <?php if ($aiPanelSettingsHref !== ''): ?>

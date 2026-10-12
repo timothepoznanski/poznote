@@ -76,6 +76,10 @@ Modelos de raciocínio (OpenAI GPT-5 e série o, `gpt-oss` no Ollama, ...) aceit
 
 Alguns modelos da OpenAI recusam a chamada de ferramentas na API de chat completions, a menos que o esforço de raciocínio seja `none`. O chat então mostra um aviso dizendo que o assistente não pode navegar pelas suas notas: defina **Esforço de raciocínio** como **Nenhum** para recuperar as ferramentas.
 
+## Instruções personalizadas
+
+Cada utilizador pode dar ao assistente instruções permanentes em **Definições → O meu assistente de IA → Instruções personalizadas**, por exemplo «Quando escrever uma nota em inglês, adicione abaixo a tradução para russo, e vice-versa». O texto (até 4000 caracteres) é enviado ao modelo com cada mensagem, seja qual for a configuração que responde, a da instância ou a sua. Use-o para preferências duradouras como o tom, o idioma ou o formato das notas que o assistente escreve. Não altera o que o assistente pode fazer: as notas continuam a ser modificadas apenas quando o pede. Deixe o campo vazio para não enviar nada.
+
 ## Servidores locais e rede Docker
 
 O servidor de IA é chamado **a partir do servidor Poznote**, nunca do seu navegador. Como o Poznote é executado em um contêiner Docker, a URL que você configurar precisa estar acessível *de dentro desse contêiner*.

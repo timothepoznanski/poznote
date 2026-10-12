@@ -70,7 +70,18 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
     }
 }
 
+// Custom instructions do not depend on personal API keys: they are sent to
+// whichever configuration answers, the instance one included
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_instructions') {
+    if (poznoteSaveAiCustomInstructions($con, (string)($_POST['ai_custom_instructions'] ?? ''))) {
+        $message = t('ai_settings_user.instructions_saved', [], 'Custom instructions saved.');
+    } else {
+        $error = t('ai_settings.messages.save_error', [], 'Failed to save configuration.');
+    }
+}
+
 $aiConfig = poznoteAiUserConfig($con);
+$aiCustomInstructions = poznoteAiCustomInstructions($con);
 $aiProvider = poznoteAiGuessProvider($aiConfig['provider'], $aiConfig['url']);
 $aiEnabled = $aiConfig['enabled'];
 $aiReasoningEffort = $aiConfig['reasoning_effort'];
@@ -221,6 +232,31 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
             </form>
         </div>
         <?php endif; ?>
+
+        <div class="git-sync-section">
+            <h2><i class="lucide lucide-message-square"></i> <?php echo t_h('ai_settings_user.instructions_title', [], 'Custom instructions'); ?></h2>
+
+            <form method="post">
+                <input type="hidden" name="action" value="save_instructions">
+
+                <div class="git-config-fields">
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="ai_custom_instructions"><?php echo t_h('ai_settings_user.instructions_label', [], 'Instructions'); ?></label>
+                        <textarea name="ai_custom_instructions" id="ai_custom_instructions" class="git-field-input" rows="6"
+                                  maxlength="<?php echo POZNOTE_AI_CUSTOM_INSTRUCTIONS_MAX; ?>"
+                                  placeholder="<?php echo t_h('ai_settings_user.instructions_placeholder', [], 'Example: when you write a note in English, add its Russian translation below, and the other way round.'); ?>"><?php echo htmlspecialchars($aiCustomInstructions, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
+                        <span class="label-desc"><?php echo t_h('ai_settings_user.instructions_description', [], 'Sent to the model with every message, whichever configuration answers. Use it for standing preferences: tone, language, format of the notes the assistant writes. Leave empty to send nothing.'); ?></span>
+                    </div>
+
+                    <div class="git-field-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('ai_settings_user.instructions_save', [], 'Save instructions'); ?>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
 
         <div class="git-sync-footer-note">
             <?php echo t_h('ai_settings.footer_note', [], 'The AI server is called from the Poznote server, not from your browser. Chat conversations are sent to the configured server; with a local Ollama instance nothing leaves your machine.'); ?>

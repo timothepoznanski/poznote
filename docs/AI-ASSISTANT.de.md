@@ -76,6 +76,10 @@ Reasoning-Modelle (OpenAI GPT-5 und die o-Serie, `gpt-oss` unter Ollama, ...) ak
 
 Manche OpenAI-Modelle verweigern Tool Calling über die Chat-Completions-API, solange der Denkaufwand nicht `none` ist. Der Chat zeigt dann einen Hinweis an, dass der Assistent Ihre Notizen nicht durchsuchen kann: Setzen Sie **Denkaufwand** auf **Keiner**, um die Tools wieder verfügbar zu machen.
 
+## Eigene Anweisungen
+
+Jeder Benutzer kann dem Assistenten unter **Einstellungen → Mein KI-Assistent → Eigene Anweisungen** dauerhafte Anweisungen geben, zum Beispiel „Wenn du eine Notiz auf Englisch schreibst, füge darunter die russische Übersetzung hinzu, und umgekehrt“. Der Text (bis zu 4000 Zeichen) wird mit jeder Nachricht an das Modell gesendet, unabhängig davon, welche Konfiguration antwortet, die der Instanz oder Ihre eigene. Nutzen Sie ihn für dauerhafte Vorgaben wie Ton, Sprache oder das Format der Notizen, die der Assistent schreibt. Er ändert nicht, was der Assistent tun darf: Notizen werden weiterhin nur geändert, wenn Sie darum bitten. Lassen Sie das Feld leer, um nichts zu senden.
+
 ## Lokale Server und Docker-Netzwerk
 
 Der KI-Server wird **vom Poznote-Server aus** aufgerufen, niemals von Ihrem Browser. Da Poznote in einem Docker-Container läuft, muss die konfigurierte URL *aus diesem Container heraus* erreichbar sein.

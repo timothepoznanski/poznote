@@ -4741,12 +4741,18 @@
   "ai_settings_user": {
     "title": "我的 AI 助手",
     "card": "我的 AI 助手",
-    "card_help": "使用你自己的提供商和 API 密钥来运行 AI 助手。",
+    "card_help": "为 AI 助手设置自定义指令，并通过您自己的提供商和 API 密钥使用它。",
     "description": "使用你自己的 API 密钥，将 AI 助手连接到你自己的 OpenAI 兼容服务器（Ollama、LM Studio、OpenAI、Anthropic 等）。你的配置将取代管理员设置的配置。",
     "disabled_notice": "管理员未在此实例上允许使用个人 API 密钥。",
     "using_instance": "助手目前使用管理员设置的配置作答。在下方启用你自己的配置即可改用你的 API 密钥。",
     "enable_label": "使用我自己的配置",
     "enable_description": "AI 聊天按钮将使用下面的服务器和 API 密钥，而不是实例的设置。",
+    "instructions_title": "自定义指令",
+    "instructions_label": "指令",
+    "instructions_placeholder": "示例：用英文写笔记时，在下方附上俄文翻译，反之亦然。",
+    "instructions_description": "随每条消息发送给模型，无论由哪个配置应答。可用于长期偏好：语气、语言、助手所写笔记的格式。留空则不发送任何内容。",
+    "instructions_save": "保存指令",
+    "instructions_saved": "自定义指令已保存。",
     "messages": {
       "incomplete": "启用你自己的助手前，请填写服务器 URL 和模型。"
     }

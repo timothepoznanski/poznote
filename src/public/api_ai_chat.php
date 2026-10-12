@@ -787,6 +787,18 @@ if ($openNoteId > 0) {
     }
 }
 
+// Custom instructions the user saved in ai_settings_user.php, sent with every
+// request (discussion #1613). They shape what the assistant writes, in the
+// chat and in the notes, but not when it is allowed to touch a note.
+$aiCustomInstructions = poznoteAiCustomInstructions($con);
+if ($aiCustomInstructions !== '') {
+    $system .= "\n\nThe user saved the custom instructions below in their settings. They apply to every "
+        . 'request of this conversation: follow them in your answers and in the note content you write, '
+        . 'and let them override the defaults above on style, length and language. They never widen what '
+        . 'you may do: the rules above on when notes can be modified, created or deleted still hold.'
+        . "\n\n<custom_instructions>\n" . $aiCustomInstructions . "\n</custom_instructions>";
+}
+
 array_unshift($messages, ['role' => 'system', 'content' => $system]);
 
 // ---------------------------------------------------------------------------

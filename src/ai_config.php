@@ -219,6 +219,45 @@ function poznoteSaveAiUserConfig(?PDO $con, array $config): bool {
     }
 }
 
+/** Longest custom instructions text kept, in characters. */
+const POZNOTE_AI_CUSTOM_INSTRUCTIONS_MAX = 4000;
+
+/**
+ * Custom instructions the user wants sent to the model with every request
+ * (discussion #1613), read from the user's own database. They apply to
+ * whichever configuration answers, the instance one or the personal one.
+ */
+function poznoteAiCustomInstructions(?PDO $con): string {
+    if (!$con) {
+        return '';
+    }
+    try {
+        $stmt = $con->prepare("SELECT value FROM settings WHERE key = 'ai_custom_instructions'");
+        $stmt->execute();
+        $value = trim((string)($stmt->fetchColumn() ?: ''));
+        return mb_substr($value, 0, POZNOTE_AI_CUSTOM_INSTRUCTIONS_MAX);
+    } catch (Exception $e) {
+        error_log('ai_config: poznoteAiCustomInstructions() failed: ' . $e->getMessage());
+        return '';
+    }
+}
+
+function poznoteSaveAiCustomInstructions(?PDO $con, string $instructions): bool {
+    if (!$con) {
+        return false;
+    }
+    try {
+        $value = str_replace(["\r\n", "\r"], "\n", trim($instructions));
+        $value = mb_substr($value, 0, POZNOTE_AI_CUSTOM_INSTRUCTIONS_MAX);
+        $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('ai_custom_instructions', ?)");
+        $stmt->execute([$value]);
+        return true;
+    } catch (Exception $e) {
+        error_log('Failed to save AI custom instructions: ' . $e->getMessage());
+        return false;
+    }
+}
+
 /** A configuration can answer chat requests once it has a URL and a model. */
 function poznoteAiConfigUsable(array $config): bool {
     return !empty($config['enabled']) && trim((string)$config['url']) !== '' && trim((string)$config['model']) !== '';

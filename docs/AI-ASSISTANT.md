@@ -76,6 +76,10 @@ Reasoning models (OpenAI GPT-5 and o-series, `gpt-oss` on Ollama, ...) accept a 
 
 Some OpenAI models refuse tool calling on the chat completions API unless the reasoning effort is `none`. The chat then shows a notice saying the assistant cannot browse your notes: set **Reasoning effort** to **None** to get the tools back.
 
+## Custom instructions
+
+Each user can give the assistant standing instructions in **Settings → My AI Assistant → Custom instructions**, for example "When you write a note in English, add its Russian translation below, and the other way round". The text (up to 4000 characters) is sent to the model with every message, whichever configuration answers, the instance one or your own. Use it for lasting preferences such as tone, language or the format of the notes the assistant writes. It does not change what the assistant is allowed to do: notes are still only modified when you ask for it. Leave the field empty to send nothing.
+
 ## Local servers and Docker networking
 
 The AI server is called **from the Poznote server**, never from your browser. Since Poznote runs in a Docker container, the URL you configure must be reachable *from inside that container*.

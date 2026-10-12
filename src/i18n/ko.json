@@ -4301,12 +4301,18 @@
   "ai_settings_user": {
     "title": "내 AI 어시스턴트",
     "card": "내 AI 어시스턴트",
-    "card_help": "자체 공급자 및 API 키와 함께 AI 어시스턴트를 사용하세요.",
+    "card_help": "AI 어시스턴트에 사용자 지정 지침을 주고, 자신의 제공업체와 API 키로 사용하세요.",
     "description": "개인 API 키로 AI 어시스턴트를 OpenAI 호환 서버(Ollama, LM Studio, OpenAI, Anthropic 등)에 연결합니다. 개인 설정을 사용하면 관리자의 설정 대신 적용됩니다.",
     "disabled_notice": "관리자가 이 인스턴스에 개인 API 키를 허용하지 않았습니다.",
     "using_instance": "어시스턴트는 현재 관리자가 설정한 설정을 통해 응답합니다. API 키를 대신 사용하려면 아래에서 자체 설정을 활성화하세요.",
     "enable_label": "내 설정 사용",
     "enable_description": "AI 채팅 버튼은 인스턴스 키 대신 아래의 서버 및 API 키를 사용합니다.",
+    "instructions_title": "사용자 지정 지침",
+    "instructions_label": "지침",
+    "instructions_placeholder": "예: 영어로 노트를 작성할 때는 아래에 러시아어 번역을 추가하고, 그 반대의 경우도 마찬가지로 해 주세요.",
+    "instructions_description": "어떤 설정이 응답하든 모든 메시지와 함께 모델에 전송됩니다. 어조, 언어, 어시스턴트가 작성하는 노트의 형식 등 항상 적용할 선호 사항에 사용하세요. 비워 두면 아무것도 전송되지 않습니다.",
+    "instructions_save": "지침 저장",
+    "instructions_saved": "사용자 지정 지침이 저장되었습니다.",
     "messages": {
       "incomplete": "자신의 어시스턴트를 활성화하기 전에 서버 URL과 모델을 입력하세요."
     }

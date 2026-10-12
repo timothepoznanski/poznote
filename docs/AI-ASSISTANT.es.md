@@ -76,6 +76,10 @@ Los modelos de razonamiento (OpenAI GPT-5 y la serie o, `gpt-oss` en Ollama, ...
 
 Algunos modelos de OpenAI rechazan las llamadas a herramientas en la API de chat completions salvo que el esfuerzo de razonamiento sea `none`. El chat muestra entonces un aviso indicando que el asistente no puede consultar tus notas: pon **Esfuerzo de razonamiento** en **Ninguno** para recuperar las herramientas.
 
+## Instrucciones personalizadas
+
+Cada usuario puede dar al asistente instrucciones permanentes en **Ajustes → Mi asistente de IA → Instrucciones personalizadas**, por ejemplo «Cuando escribas una nota en inglés, añade debajo su traducción al ruso, y viceversa». El texto (hasta 4000 caracteres) se envía al modelo con cada mensaje, sea cual sea la configuración que responda, la de la instancia o la suya. Úselo para preferencias duraderas como el tono, el idioma o el formato de las notas que escribe el asistente. No cambia lo que el asistente puede hacer: las notas solo se modifican cuando usted lo pide. Deje el campo vacío para no enviar nada.
+
 ## Servidores locales y redes de Docker
 
 El servidor de IA se llama **desde el servidor de Poznote**, nunca desde tu navegador. Como Poznote se ejecuta en un contenedor Docker, la URL que configures debe ser accesible *desde dentro de ese contenedor*.
