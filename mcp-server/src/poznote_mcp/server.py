@@ -47,6 +47,7 @@ from fastmcp.server.auth import AccessToken, TokenVerifier
 from starlette.middleware import Middleware
 
 from .client import PoznoteClient
+from .auth_external import build_external_auth_provider
 
 
 def _is_strict_bool_env_value(value: str) -> bool:
@@ -240,8 +241,11 @@ class LocalOriginGuard:
         await self.app(scope, receive, send)
 
 
-def _build_http_middleware(token: str | None) -> list[Middleware]:
-    return [] if token else [Middleware(LocalOriginGuard)]
+def _build_http_middleware(token: str | None, external: bool = False) -> list[Middleware]:
+    # The origin guard exists to keep a *browser page* off an unauthenticated
+    # endpoint. It is redundant once any bearer check is in force, including
+    # the per-caller one, so it stands down for either.
+    return [] if (token or external) else [Middleware(LocalOriginGuard)]
 
 
 def _load_inbound_auth_token(env_value: str | None = None) -> str | None:
@@ -282,13 +286,25 @@ def _build_auth_provider(token: str | None) -> StaticBearerTokenVerifier | None:
 
 _inbound_auth_token = _load_inbound_auth_token()
 
+# Per-caller authentication (opt-in). When POZNOTE_MCP_AUTH_PROVIDER is
+# set, each caller presents its own token, which is resolved against an
+# external identity provider and mapped to that caller's Poznote profile.
+# None when unset, leaving upstream behaviour untouched.
+_external_auth_provider = build_external_auth_provider()
+
 # Initialize FastMCP server.
 #
 # FastMCP 3.x: host/port/stateless_http are no longer constructor options —
 # they are passed to mcp.run() in main(), which stays the single source of
 # truth for network settings. Inbound auth, on the other hand, is baked into
 # the HTTP app at construction time, so it is decided here from the env.
-mcp = FastMCP("poznote-mcp", auth=_build_auth_provider(_inbound_auth_token))
+mcp = FastMCP(
+    "poznote-mcp",
+    # Per-caller auth takes precedence when configured: an operator who has
+    # just set the provider means it, and leaving the old single token in
+    # force would silently 401 every caller. The conflict is logged.
+    auth=_external_auth_provider or _build_auth_provider(_inbound_auth_token),
+)
 
 # Poznote client (initialized lazily)
 _client: PoznoteClient | None = None
@@ -2991,6 +3007,18 @@ def list_shared_with_me(user_id: Optional[int] = None) -> str:
 
 def _log_inbound_auth_status(host: str, token: str | None) -> None:
     """Tell the operator, once at startup, how the endpoint is protected."""
+    if _external_auth_provider is not None:
+        logger.info(
+            "Per-caller authentication enabled: every client must present its own "
+            "token, resolved against the configured identity provider.",
+        )
+        if token:
+            logger.warning(
+                "%s is also set and is being IGNORED: per-caller authentication "
+                "takes precedence. Unset it so there is exactly one way in.",
+                AUTH_TOKEN_ENV,
+            )
+        return
     if token:
         logger.info(
             "Inbound authentication enabled: clients must send "
@@ -3077,7 +3105,9 @@ def main():
             port=port,
             stateless_http=True,
             show_banner=False,
-            middleware=_build_http_middleware(_inbound_auth_token),
+            middleware=_build_http_middleware(
+                _inbound_auth_token, external=_external_auth_provider is not None
+            ),
         )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")

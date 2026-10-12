@@ -8,6 +8,8 @@ from urllib.parse import quote
 import os
 import logging
 
+from .auth_external import resolve_caller_profile_id
+
 logger = logging.getLogger("poznote-mcp.client")
 
 # Default timeout for most operations (seconds)
@@ -108,7 +110,33 @@ class PoznoteClient:
         headers = dict(self._base_headers)
         if user_id is not None:
             headers["X-User-ID"] = str(user_id)
+            return headers
+
+        # Per-caller authentication. When enabled, the caller's own verified
+        # identity selects the target profile. An identity with no linked
+        # profile raises rather than falling back: the default profile is the
+        # first administrator, so a silent fallback would be a privilege gain.
+        resolved = resolve_caller_profile_id(self._list_profiles)
+        if resolved is not None:
+            headers["X-User-ID"] = str(resolved)
         return headers
+
+    def _list_profiles(self) -> list[dict]:
+        """Profiles, for mapping a verified external identity to a Poznote user.
+
+        Uses the service token and the server's own default profile: this is a
+        lookup, not an action taken as the caller.
+        """
+        response = self.client.get("/admin/users", headers=dict(self._base_headers))
+        response.raise_for_status()
+        payload = response.json()
+        if isinstance(payload, list):
+            profiles = payload
+        elif isinstance(payload, dict):
+            profiles = payload.get("users") or payload.get("data") or []
+        else:
+            profiles = []
+        return [p for p in profiles if isinstance(p, dict)]
 
     @staticmethod
     def _set_workspace(target: dict, workspace: str | None) -> None:

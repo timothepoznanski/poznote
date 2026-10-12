@@ -198,6 +198,44 @@ Then add the same header to your client configuration: see [VS Code Copilot](VSC
 
 This token is separate from `data/.mcp_token`: that one is used by the MCP server to talk *to* the Poznote API, this one is what *your AI assistant* must present to the MCP server.
 
+#### Per-caller authentication (optional)
+
+`POZNOTE_MCP_AUTH_TOKEN` above is one shared secret: every client presents the
+same token, and the server acts as a single profile. When several people or
+agents share one MCP instance, that cannot tell them apart.
+
+Setting `POZNOTE_MCP_AUTH_PROVIDER` switches to per-caller authentication: each
+client presents **its own** token, which is resolved against an external
+identity provider and mapped to that caller's Poznote profile. One instance,
+many callers, each correctly identified.
+
+| variable | default | meaning |
+|---|---|---|
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset — feature off)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | — | provider endpoint (required) |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub,username:preferred_username,email:email` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | header carrying the caller's token |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | — | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
+| `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
+
+`userinfo` performs `GET <url>` with the caller's bearer token — the OpenID
+Connect UserInfo endpoint. The token is never verified locally, so opaque tokens
+work exactly as well as JWTs, and there is no JWKS or key-rotation surface to
+maintain. `introspection` performs `POST <url>` with `token=<token>`
+(RFC 7662); a response carrying `active: false` is an invalid token.
+
+The first claim in `POZNOTE_MCP_IDENTITY_MATCH` that is present **and matches
+exactly one profile** wins. Profile fields are those returned by
+`GET /api/v1/admin/users`. A value matching two profiles is refused as
+ambiguous, and an identity matching no profile is refused outright: it never
+falls back to a default profile, because the default is profile 1, the first
+administrator. A disabled profile is never a match candidate.
+
+With `POZNOTE_MCP_AUTH_PROVIDER` set it takes precedence over
+`POZNOTE_MCP_AUTH_TOKEN`, and the server logs a warning if that token is still
+set.
+
 #### Debug mode
 
 Set `POZNOTE_DEBUG=true` in the startup command to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. The web server is more tolerant and also accepts `1`, `on` or `yes`. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
