@@ -2953,6 +2953,32 @@ def list_shared(workspace: Optional[str] = None, user_id: Optional[int] = None) 
     }, indent=2, ensure_ascii=False)
 
 
+@mcp.tool()
+def list_shared_with_me(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
+    """List notes and folders OTHER USERS have shared with this profile
+
+    Use this to find an incoming share. `list_shared` lists the shares this
+    profile has CREATED, so a grantee sees nothing there — an incoming share is
+    only reachable through this tool.
+
+    Args:
+        workspace: Workspace name to filter by (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        shared = client.list_shared_with_me(workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    return json.dumps({
+        "shared_notes_count": len(shared.get("shared_notes", [])),
+        "shared_folders_count": len(shared.get("shared_folders", [])),
+        **shared,
+    }, indent=2, ensure_ascii=False)
+
+
 # =============================================================================
 # CLI & MAIN
 # =============================================================================
