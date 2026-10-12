@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
         keyDesc.style.display = (p.key === 'optional') ? '' : 'none';
         if (!initial) {
             // The model belongs to the previous server
+            requestSeq++;
             resetModelField();
             resultEl.hidden = true;
             resultEl.textContent = '';
@@ -68,17 +69,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // saved key keeps working on the next visit without being typed again.
     var scope = window.poznoteAiSettingsScope || 'instance';
 
-    testBtn.addEventListener('click', function() {
-        var url = document.getElementById('ai_url').value.trim();
+    // Only the latest request may touch the form: a slow answer must not
+    // fill in the models of a server the user has since moved away from
+    var requestSeq = 0;
+
+    // Fetch the server's models and fill the select. A silent load (issue
+    // #1612, on page open) shows no status line and leaves the form as it is
+    // when the server cannot be reached.
+    function loadModels(silent) {
+        var url = urlInput.value.trim();
         var apiKey = document.getElementById('ai_api_key').value;
         if (apiKey === '••••••••') apiKey = '';
 
         // Read before the list is replaced: a failed test must leave the
         // configured model alone, a successful one re-selects it if still offered
         var previousModel = modelSelect.value;
+        var seq = ++requestSeq;
 
-        resultEl.hidden = false;
-        resultEl.textContent = i18n.testing;
+        if (!silent) {
+            resultEl.hidden = false;
+            resultEl.textContent = i18n.testing;
+        }
 
         var body = new URLSearchParams();
         body.append('url', url);
@@ -93,9 +104,20 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(function(r) { return r.json(); })
         .then(function(data) {
+            if (seq !== requestSeq) return;
             if (data.success) {
                 var models = data.models || [];
-                resultEl.textContent = i18n.success.replace('{{count}}', models.length);
+                if (silent) {
+                    if (!models.length) return;
+                    // The saved model stays in the list even when the server
+                    // no longer offers it: opening the page must not change
+                    // what the next save writes
+                    if (models.indexOf(previousModel) === -1) {
+                        models = [previousModel].concat(models);
+                    }
+                } else {
+                    resultEl.textContent = i18n.success.replace('{{count}}', models.length);
+                }
                 modelSelect.innerHTML = '';
                 models.forEach(function(m) {
                     var opt = document.createElement('option');
@@ -115,14 +137,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     modelMsg.textContent = i18n.modelNoneFound;
                     modelMsg.hidden = false;
                 }
-            } else {
+            } else if (!silent) {
                 resultEl.textContent = i18n.failure.replace('{{error}}', data.error || 'unknown');
             }
         })
         .catch(function(e) {
+            if (seq !== requestSeq || silent) return;
             resultEl.textContent = i18n.failure.replace('{{error}}', e.message);
         });
-    });
+    }
+
+    testBtn.addEventListener('click', function() { loadModels(false); });
+
+    // Issue #1612: the page only stores the chosen model, so the list held
+    // that single entry until the button was clicked again
+    if (modelSelect.value && urlInput.value.trim()) {
+        loadModels(true);
+    }
 });
 
 /**
