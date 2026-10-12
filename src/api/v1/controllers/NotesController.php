@@ -856,19 +856,15 @@ class NotesController {
                 
                 $reference = trim((string)$reference);
                 
-                if (is_numeric($reference)) {
-                    $refId = (int)$reference;
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
-                    $params = [$refId, $workspace];
-                    $stmt = $this->con->prepare($sql);
-                    $stmt->execute($params);
-                } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
-                    $params = ['%' . $reference . '%', $workspace];
-                    $sql .= " ORDER BY updated DESC LIMIT 1";
-                    $stmt = $this->con->prepare($sql);
-                    $stmt->execute($params);
-                }
+                // A title: the note called that way first, then one whose
+                // title contains it
+                $refId = is_numeric($reference)
+                    ? (int)$reference
+                    : findNoteIdByTitle($this->con, $reference, $workspace, true);
+                $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                $params = [$refId, $workspace];
+                $stmt = $this->con->prepare($sql);
+                $stmt->execute($params);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
             }
             
@@ -2531,7 +2527,8 @@ class NotesController {
     
     /**
      * GET /api/v1/notes/resolve
-     * Resolve a note reference by ID or heading
+     * Resolve a note reference by ID or heading (the whole title, whatever
+     * the case and the accents)
      */
     public function resolveReference(): void {
         $reference = $_GET['reference'] ?? null;
@@ -2557,19 +2554,11 @@ class NotesController {
                     $stmt->execute($params);
                 }
             } else {
-                if ($workspace) {
-                    $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?) AND workspace = ?";
-                    $params = ['%' . $reference . '%', $workspace];
-                    $sql .= " ORDER BY updated DESC LIMIT 1";
-                    $stmt = $this->con->prepare($sql);
-                    $stmt->execute($params);
-                } else {
-                    $sql = "SELECT id, heading, workspace FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?)";
-                    $params = ['%' . $reference . '%'];
-                    $sql .= " ORDER BY updated DESC LIMIT 1";
-                    $stmt = $this->con->prepare($sql);
-                    $stmt->execute($params);
-                }
+                // A title resolves to the note called that way, never to one
+                // whose title only contains it (#1614)
+                $noteId = findNoteIdByTitle($this->con, (string)$reference, $workspace ? (string)$workspace : null);
+                $stmt = $this->con->prepare("SELECT id, heading, workspace FROM entries WHERE trash = 0 AND id = ?");
+                $stmt->execute([$noteId]);
             }
             
             $note = $stmt->fetch(PDO::FETCH_ASSOC);

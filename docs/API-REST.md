@@ -293,13 +293,13 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 GET /notes/resolve
 ```
 
-Resolve a note by ID or title (reference). The response includes the note's `id`, `heading` and `workspace`.
+Resolve a note by ID or title (reference), the way a `[[Note Title]]` link does. A title matches the note called exactly that way, whatever the case and the accents: `Paris` resolves to the note `Paris`, never to `Weekend in Paris`. When several notes share the title, the one written the same way wins, then the most recently updated. The response includes the note's `id`, `heading` and `workspace`, or a `404` when no note has that title.
 
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `reference` | string | Note ID, or title to search for |
+| `reference` | string | Note ID, or full note title |
 | `workspace` | string | Workspace to search in (omit to search every workspace) |
 
 ```bash

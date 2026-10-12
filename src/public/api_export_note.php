@@ -704,8 +704,8 @@ function generatePrintHtml($content, $note, $referenceResolver = null) {
 
 /**
  * Returns the lookup used to turn a [[Note Title]] of the exported note into
- * a link. It answers like GET /api/v1/notes/resolve: the most recently
- * updated note of the same workspace whose title contains the reference.
+ * a link. It answers like GET /api/v1/notes/resolve: the note of the same
+ * workspace called that way, whatever the case and the accents.
  */
 function buildExportNoteReferenceResolver($con, $noteId) {
     $workspace = null;
@@ -725,18 +725,15 @@ function buildExportNoteReferenceResolver($con, $noteId) {
         }
         $found = null;
         try {
-            if (is_numeric($reference)) {
-                $sql = 'SELECT id, heading, workspace FROM entries WHERE trash = 0 AND id = ?';
-                $params = [intval($reference)];
-            } else {
-                $sql = 'SELECT id, heading, workspace FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE remove_accents(?)';
-                $params = ['%' . $reference . '%'];
-            }
+            $sql = 'SELECT id, heading, workspace FROM entries WHERE trash = 0 AND id = ?';
+            $params = [is_numeric($reference)
+                ? intval($reference)
+                : findNoteIdByTitle($con, (string)$reference, $workspace)];
             if ($workspace !== '') {
                 $sql .= ' AND workspace = ?';
                 $params[] = $workspace;
             }
-            $stmt = $con->prepare($sql . ' ORDER BY updated DESC LIMIT 1');
+            $stmt = $con->prepare($sql);
             $stmt->execute($params);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($row) {
