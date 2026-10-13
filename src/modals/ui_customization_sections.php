@@ -81,6 +81,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-card-view-card" checked><span><?php echo t_h('display.cards.markdown_split_card_view', [], 'Framed markdown'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-split-preview-left-card" checked><span><?php echo t_h('display.cards.markdown_split_preview_left', [], 'Preview on the left'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-heading-underline-card" checked><span><?php echo t_h('display.cards.markdown_heading_underline', [], 'Heading underline'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-editor-wrap-card" checked><span><?php echo t_h('display.cards.markdown_editor_word_wrap', [], 'Editor word wrap'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:markdown-colored-card" checked><span><?php echo t_h('display.cards.markdown_colored', [], 'Colored markdown'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-wrap-card" checked><span><?php echo t_h('display.cards.code_block_word_wrap', [], 'Code block word wrap'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:code-line-numbers-card" checked><span><?php echo t_h('display.cards.code_block_line_numbers', [], 'Code block line numbers'); ?></span></label>

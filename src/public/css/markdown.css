@@ -197,6 +197,22 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
     display: none;
 }
 
+/* "Editor word wrap" off (discussion 1623): long lines stay on one line and the
+   editor scrolls sideways, so its horizontal bar is the one scrollbar shown
+   here. Chromium follows scrollbar-width and drops the pseudo-element above,
+   which is undone for Safari. The class is set by the editor bundle, never in
+   the live views. */
+.markdown-codemirror-host.markdown-editor-nowrap .cm-scroller {
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--pz-scrollbar) transparent;
+}
+
+.markdown-codemirror-host.markdown-editor-nowrap .cm-scroller::-webkit-scrollbar {
+    display: block;
+    height: 8px;
+}
+
 .markdown-codemirror-host .cm-content {
     min-height: 100px;
     padding: 10px 10px 24px var(--pz-note-text-inset, 10px);
@@ -1659,6 +1675,10 @@ html[data-theme='dark'] .katex {
     max-height: var(--markdown-split-pane-height, calc(100vh - 200px));
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.noteentry.markdown-split-mode .markdown-codemirror-host.markdown-editor-nowrap .cm-scroller {
+    overflow-x: auto;
 }
 
 .noteentry.markdown-split-mode .markdown-codemirror-host .cm-content {

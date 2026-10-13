@@ -1178,6 +1178,17 @@ function setReadOnly(host, readOnly) {
   return true
 }
 
+// Long lines wrap at the editor's width, or stay on one line and the editor
+// scrolls sideways (the account's "Editor word wrap" setting, discussion 1623).
+// The live views always wrap: they are drawn like the preview, which does.
+function isLineWrappingOn(instance) {
+  return instance.lineWrapping || instance.livePreview
+}
+
+function createLineWrappingExtensions(enabled) {
+  return enabled ? EditorView.lineWrapping : []
+}
+
 function setLivePreview(host, enabled) {
   const instance = getInstance(host)
   if (!instance) return false
@@ -1186,8 +1197,26 @@ function setLivePreview(host, enabled) {
 
   instance.livePreview = enabled
   host.classList.toggle('markdown-live-editing', enabled)
+  host.classList.toggle('markdown-editor-nowrap', !isLineWrappingOn(instance))
   instance.view.dispatch({
-    effects: instance.livePreviewCompartment.reconfigure(createLivePreviewExtensions(enabled))
+    effects: [
+      instance.livePreviewCompartment.reconfigure(createLivePreviewExtensions(enabled)),
+      instance.lineWrappingCompartment.reconfigure(createLineWrappingExtensions(isLineWrappingOn(instance)))
+    ]
+  })
+  return true
+}
+
+function setLineWrapping(host, enabled) {
+  const instance = getInstance(host)
+  if (!instance) return false
+  enabled = !!enabled
+  if (instance.lineWrapping === enabled) return true
+
+  instance.lineWrapping = enabled
+  host.classList.toggle('markdown-editor-nowrap', !isLineWrappingOn(instance))
+  instance.view.dispatch({
+    effects: instance.lineWrappingCompartment.reconfigure(createLineWrappingExtensions(isLineWrappingOn(instance)))
   })
   return true
 }
@@ -1567,12 +1596,15 @@ function createEditor(host, options = {}) {
     setValue(host, options.value || '', { preserveSelection: false })
     setReadOnly(host, !!options.readOnly)
     setLivePreview(host, !!options.livePreview)
+    setLineWrapping(host, options.lineWrapping !== false)
     return existing
   }
 
   const readOnlyCompartment = new Compartment()
   const livePreviewCompartment = new Compartment()
+  const lineWrappingCompartment = new Compartment()
   const themeCompartment = new Compartment()
+  const lineWrapping = options.lineWrapping !== false
   const placeholderText = String(options.placeholder || '')
 
   host.textContent = ''
@@ -1672,7 +1704,7 @@ function createEditor(host, options = {}) {
       hiddenRangeField,
       excalidrawPlaceholderField,
       placeholder(placeholderText),
-      EditorView.lineWrapping,
+      lineWrappingCompartment.of(createLineWrappingExtensions(lineWrapping || !!options.livePreview)),
       markdownTableLinePlugin,
       markdownCodeLinePlugin,
       hangingIndentPlugin,
@@ -1718,7 +1750,9 @@ function createEditor(host, options = {}) {
     readOnlyCompartment,
     themeCompartment,
     livePreviewCompartment,
+    lineWrappingCompartment,
     livePreview: !!options.livePreview,
+    lineWrapping,
     themeObserver: null,
     removeNativeFocusListener: null
   }
@@ -1728,6 +1762,7 @@ function createEditor(host, options = {}) {
   }
 
   instances.set(host, instance)
+  host.classList.toggle('markdown-editor-nowrap', !isLineWrappingOn(instance))
   host.setAttribute('data-codemirror-value', state.doc.toString())
   setReadOnly(host, !!options.readOnly)
 
@@ -1752,6 +1787,7 @@ function destroyEditor(host) {
   host.removeAttribute('data-codemirror-value')
   host.classList.remove('markdown-codemirror-host')
   host.classList.remove('markdown-live-editing')
+  host.classList.remove('markdown-editor-nowrap')
   return true
 }
 
@@ -1781,6 +1817,7 @@ window.PoznoteMarkdownCodeMirror = {
   setValue,
   setReadOnly,
   setLivePreview,
+  setLineWrapping,
   isLivePreview,
   refreshLivePreview,
   isInInlineFormat,
