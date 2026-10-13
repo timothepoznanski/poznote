@@ -70,8 +70,16 @@ function webPushValidSubscriptionKeys(string $p256dh, string $auth): bool
 {
     $point = webPushBase64UrlDecode($p256dh);
     $secret = webPushBase64UrlDecode($auth);
-    return $point !== null && strlen($point) === 65 && $point[0] === "\x04"
-        && $secret !== null && strlen($secret) === 16;
+    if ($point === null || strlen($point) !== 65 || $point[0] !== "\x04"
+        || $secret === null || strlen($secret) !== 16) {
+        return false;
+    }
+    // The right length and prefix are not enough: OpenSSL refuses coordinates that are not on the curve.
+    $valid = openssl_pkey_get_public(webPushPublicKeyPem($point)) !== false;
+    while (openssl_error_string() !== false) {
+        // Drop the errors a refused point leaves in the queue.
+    }
+    return $valid;
 }
 
 /** PEM public key from an uncompressed P-256 point. */
