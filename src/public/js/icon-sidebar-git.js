@@ -102,12 +102,12 @@
                     if (progress) progress.close();
                     var detail = data && (data.error || data.message
                         || (data.errors && data.errors[0] && data.errors[0].error));
-                    showError(detail || 'Sync failed.');
+                    showError(detail || window.apiErrorMessage(data, 'Sync failed.'));
                 })
                 .catch(function (error) {
                     stopPolling();
                     if (progress) progress.close();
-                    showError(tr('git_sync.messages.connection_error', { error: error.message }, 'Connection failed: ') + error.message);
+                    showError(tr('git_sync.messages.connection_error', { error: window.apiErrorMessage(error) }, 'Connection failed: ') + window.apiErrorMessage(error));
                 });
         });
     }

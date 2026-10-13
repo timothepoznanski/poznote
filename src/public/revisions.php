@@ -227,6 +227,7 @@ $description = preg_replace('/(?:Ctrl|Strg) \+ Alt \+ S/u', '<span class="revisi
     </div>
 
     <script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/request-errors.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/revisions-diff.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/revisions-page.js'); ?>"></script>

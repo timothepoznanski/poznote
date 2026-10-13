@@ -170,7 +170,7 @@ async function executeMoveTask() {
     try {
         const workspace = getCurrentWorkspace();
         const noteResp = await fetch(`/api/v1/notes/${targetNoteId}?workspace=${encodeURIComponent(workspace)}`);
-        const noteData = await noteResp.json();
+        const noteData = await window.readApiJson(noteResp);
 
         if (!noteData || !noteData.success || !noteData.note || noteData.note.type !== 'tasklist') {
             if (window.modalAlert) {
@@ -218,11 +218,11 @@ async function executeMoveTask() {
             body: JSON.stringify(payload)
         });
 
-        const updateData = await updateResp.json();
+        const updateData = await window.readApiJson(updateResp);
         if (!updateData || !updateData.success) {
             if (window.modalAlert) {
                 window.modalAlert.alert(
-                    window.t ? window.t('tasklist.move_error', null, 'Unable to move task') : 'Unable to move task',
+                    window.apiErrorMessage(updateData, window.t ? window.t('tasklist.move_error', null, 'Unable to move task') : 'Unable to move task'),
                     'error'
                 );
             }
@@ -245,7 +245,7 @@ async function executeMoveTask() {
     } catch (e) {
         if (window.modalAlert) {
             window.modalAlert.alert(
-                window.t ? window.t('tasklist.move_error', null, 'Unable to move task') : 'Unable to move task',
+                window.apiErrorMessage(e, window.t ? window.t('tasklist.move_error', null, 'Unable to move task') : 'Unable to move task'),
                 'error'
             );
         }
@@ -286,7 +286,7 @@ function appendCreateTaskListRow(listEl, notes, query, onCreated) {
             item.disabled = false;
             if (window.modalAlert) {
                 window.modalAlert.alert(
-                    window.t ? window.t('modals.task_move.create_error', null, 'Unable to create task list') : 'Unable to create task list',
+                    window.apiErrorMessage(e, window.t ? window.t('modals.task_move.create_error', null, 'Unable to create task list') : 'Unable to create task list'),
                     'error'
                 );
             }

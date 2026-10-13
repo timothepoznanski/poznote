@@ -2029,6 +2029,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
     <script type="application/json" id="page-config-data"><?php
         echo json_encode($settingsPageConfig, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
     ?></script>
+    <script src="<?php echo poznoteAsset('js/request-errors.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>

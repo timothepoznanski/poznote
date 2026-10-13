@@ -66,9 +66,7 @@ function saveNoteName() {
         credentials: 'same-origin',
         body: JSON.stringify({ heading: newName, editor_session_id: editorSessionId })
     })
-        .then(function (response) {
-            return response.json().catch(function () { return {}; });
-        })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data && data.success) {
                 if (typeof window.adoptNoteRename === 'function') {
@@ -78,13 +76,10 @@ function saveNoteName() {
                 window.location.reload();
                 return;
             }
-            showNotificationPopup(
-                'Error: ' + ((data && (data.error || data.message)) || 'Unknown error'),
-                'error'
-            );
+            showNotificationPopup(window.apiErrorMessage(data, 'The note could not be renamed'), 'error');
         })
         .catch(function (error) {
-            showNotificationPopup('Network error while renaming the note', 'error');
+            showNotificationPopup(window.apiErrorMessage(error, 'The note could not be renamed'), 'error');
             console.error('Note rename error:', error);
         });
 }
@@ -189,20 +184,18 @@ function executeNoteConversion() {
         credentials: 'same-origin',
         body: JSON.stringify({ target: convertNoteTarget })
     })
-        .then(function (response) {
-            return response.json();
-        })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data.success) {
                 // Reload the page to show the converted note
                 window.location.reload();
             } else {
-                showNotificationPopup(data.error || (window.t ? window.t('modals.convert.error', null, 'Failed to convert note') : 'Failed to convert note'), 'error');
+                showNotificationPopup(window.apiErrorMessage(data, window.t ? window.t('modals.convert.error', null, 'Failed to convert note') : 'Failed to convert note'), 'error');
             }
         })
         .catch(function (error) {
             console.error('Convert error:', error);
-            showNotificationPopup(window.t ? window.t('modals.convert.error', null, 'Failed to convert note') : 'Failed to convert note', 'error');
+            showNotificationPopup(window.apiErrorMessage(error, window.t ? window.t('modals.convert.error', null, 'Failed to convert note') : 'Failed to convert note'), 'error');
         });
 
     // Reset

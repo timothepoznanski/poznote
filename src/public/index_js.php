@@ -29,6 +29,7 @@ function poznoteGetIndexJsGroups(): array {
     return [
     'head' => [
         'js/theme-manager.js',
+        'js/request-errors.js',
         'js/modal-alerts.js',
         'js/color-palette.js',
         'js/mermaid-theme.js',

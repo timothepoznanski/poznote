@@ -2255,7 +2255,8 @@
     "alerts": {
       "saved": "Gespeichert",
       "save_error": "Speicherfehler",
-      "network_error": "Netzwerkfehler"
+      "network_error": "Netzwerkfehler",
+      "request_failed": "Die Anfrage ist fehlgeschlagen"
     }
   },
   "theme": {

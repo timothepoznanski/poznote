@@ -617,9 +617,7 @@ function performFavoriteToggle(noteId) {
             workspace: workspace
         })
     })
-        .then(function (response) {
-            return response.json();
-        })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data.success) {
                 // Mark note for auto-push since we toggled favorite (if auto-push enabled)
@@ -631,11 +629,11 @@ function performFavoriteToggle(noteId) {
                 paintFavoriteButtons(noteId, data.is_favorite === 1);
                 refreshTreeAfterFavoriteChange(data.is_favorite === 1);
             } else {
-                showNotificationPopup('Error: ' + (data.message || 'Unknown error'), 'error');
+                showNotificationPopup(window.apiErrorMessage(data, 'Error updating favorites'), 'error');
             }
         })
         .catch(function (error) {
-            showNotificationPopup('Error updating favorites', 'error');
+            showNotificationPopup(window.apiErrorMessage(error, 'Error updating favorites'), 'error');
             console.error('Favorite toggle error:', error);
         });
 }
@@ -661,10 +659,11 @@ function setOfflineKeep(kind, id, keep) {
         credentials: 'same-origin',
         body: JSON.stringify({ offline: keep })
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (!data || !data.success) {
-                throw new Error((data && (data.error || data.message)) || 'Unknown error');
+                showNotificationPopup(window.apiErrorMessage(data, tr('offline.keep.error', {}, 'The offline setting could not be saved.')), 'error');
+                return;
             }
             // No message: the menu entry itself shows the new state
             toggles.forEach(function (toggle) {
@@ -676,7 +675,7 @@ function setOfflineKeep(kind, id, keep) {
         })
         .catch(function (error) {
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(tr('offline.keep.error', {}, 'The offline setting could not be saved.'), 'error');
+                showNotificationPopup(window.apiErrorMessage(error, tr('offline.keep.error', {}, 'The offline setting could not be saved.')), 'error');
             }
             console.error('Offline keep error:', error);
         });
@@ -703,18 +702,16 @@ function toggleFolderFavorite(folderId) {
         credentials: 'same-origin',
         body: JSON.stringify({ favorite: !isFavorite })
     })
-        .then(function (response) {
-            return response.json();
-        })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data.success) {
                 refreshTreeAfterFavoriteChange(!isFavorite);
             } else {
-                showNotificationPopup('Error: ' + (data.message || 'Unknown error'), 'error');
+                showNotificationPopup(window.apiErrorMessage(data, 'Error updating favorites'), 'error');
             }
         })
         .catch(function (error) {
-            showNotificationPopup('Error updating favorites', 'error');
+            showNotificationPopup(window.apiErrorMessage(error, 'Error updating favorites'), 'error');
             console.error('Folder favorite toggle error:', error);
         });
 }

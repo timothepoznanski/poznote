@@ -2255,7 +2255,8 @@
     "alerts": {
       "saved": "Salvo",
       "save_error": "Erro ao salvar",
-      "network_error": "Erro de rede"
+      "network_error": "Erro de rede",
+      "request_failed": "O pedido falhou"
     }
   },
   "theme": {

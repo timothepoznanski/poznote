@@ -336,16 +336,16 @@
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify({ new_name: target, workspace: workspace || undefined })
         })
-        .then(function (r) { return r.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (!data || !data.success) {
-                return fail((data && data.message) || t('tags.rename.error', 'Rename failed'));
+                return fail(window.apiErrorMessage(data, t('tags.rename.error', 'Rename failed')));
             }
             moveColor(oldName, target);
             return target;
         })
-        .catch(function () {
-            return fail(t('ui.alerts.network_error', 'Network error'));
+        .catch(function (error) {
+            return fail(window.apiErrorMessage(error, t('tags.rename.error', 'Rename failed')));
         });
     }
 

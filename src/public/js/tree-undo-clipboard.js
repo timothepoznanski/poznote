@@ -722,8 +722,8 @@
             reloadTree(removedNoteIds);
         }).catch(function (error) {
             var message = direction === 'undo'
-                ? tr('tree_history.undo_failed', 'Undo failed: {{error}}', { error: error.message })
-                : tr('tree_history.redo_failed', 'Redo failed: {{error}}', { error: error.message });
+                ? tr('tree_history.undo_failed', 'Undo failed: {{error}}', { error: window.apiErrorMessage(error) })
+                : tr('tree_history.redo_failed', 'Redo failed: {{error}}', { error: window.apiErrorMessage(error) });
 
             if (!done.length) {
                 // Left on its stack: the user can fix the conflict and try again
@@ -1009,7 +1009,7 @@
             }
             reloadTree([], noteToOpen);
         }).catch(function (error) {
-            var message = tr('tree_clipboard.paste_failed', 'Paste failed: {{error}}', { error: error.message });
+            var message = tr('tree_clipboard.paste_failed', 'Paste failed: {{error}}', { error: window.apiErrorMessage(error) });
             if (!entries.length) {
                 running = false;
                 errorToast(message);
@@ -1139,7 +1139,7 @@
         }).then(function () {
             finish(null);
         }).catch(function (error) {
-            var message = tr('tree_selection.move_failed', 'Move failed: {{error}}', { error: error.message });
+            var message = tr('tree_selection.move_failed', 'Move failed: {{error}}', { error: window.apiErrorMessage(error) });
             if (!done) {
                 running = false;
                 errorToast(message);
@@ -1190,7 +1190,7 @@
             showFavorited(noteIds);
             toast(tr('tree_selection.favorited_items', 'Added {{count}} items to favorites', { count: done }));
         }).catch(function (error) {
-            var message = tr('tree_selection.favorite_failed', 'Could not update favorites: {{error}}', { error: error.message });
+            var message = tr('tree_selection.favorite_failed', 'Could not update favorites: {{error}}', { error: window.apiErrorMessage(error) });
             errorToast(message);
             if (!done) {
                 running = false;
@@ -1380,7 +1380,7 @@
             toastAfterReload(tr('tree_selection.deleted_items', 'Moved {{count}} items to the trash', { count: targets.length }));
             reloadTree(removed);
         }).catch(function (error) {
-            var message = tr('tree_selection.delete_failed', 'Delete failed: {{error}}', { error: error.message });
+            var message = tr('tree_selection.delete_failed', 'Delete failed: {{error}}', { error: window.apiErrorMessage(error) });
             if (!entries.length && !removed.length) {
                 running = false;
                 errorToast(message);

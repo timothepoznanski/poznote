@@ -248,17 +248,16 @@ function apiPostJson(url, body, onSuccess, errorPrefix) {
         credentials: 'same-origin',
         body: JSON.stringify(body)
     })
-        .then(function (r) { return r.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data && data.success) {
                 onSuccess(data);
             } else {
-                var err = (data && (data.error || data.message)) || 'Unknown error';
-                showNotificationPopup(errorPrefix + err, 'error');
+                showNotificationPopup(errorPrefix + window.apiErrorMessage(data), 'error');
             }
         })
         .catch(function (error) {
-            showNotificationPopup(errorPrefix + error.message, 'error');
+            showNotificationPopup(errorPrefix + window.apiErrorMessage(error), 'error');
         });
 }
 

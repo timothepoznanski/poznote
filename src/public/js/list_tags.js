@@ -205,7 +205,7 @@ function deleteTagRequest(tagItem, tagName) {
         credentials: 'same-origin',
         headers: { 'Accept': 'application/json' }
     })
-    .then(function(r) { return r.json(); })
+    .then(window.readApiJson)
     .then(function(data) {
         if (data.success) {
             tagItem.remove();
@@ -222,16 +222,16 @@ function deleteTagRequest(tagItem, tagName) {
         } else {
             if (window.modalAlert) {
                 window.modalAlert.alert(
-                    data.message || (window.t ? window.t('tags.delete.error', {}, 'Delete failed') : 'Delete failed'),
+                    window.apiErrorMessage(data, window.t ? window.t('tags.delete.error', {}, 'Delete failed') : 'Delete failed'),
                     'error'
                 );
             }
         }
     })
-    .catch(function() {
+    .catch(function(error) {
         if (window.modalAlert) {
             window.modalAlert.alert(
-                window.t ? window.t('ui.alerts.network_error', {}, 'Network error') : 'Network error',
+                window.apiErrorMessage(error, window.t ? window.t('tags.delete.error', {}, 'Delete failed') : 'Delete failed'),
                 'error'
             );
         }

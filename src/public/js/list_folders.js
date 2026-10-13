@@ -403,17 +403,17 @@
             credentials: 'same-origin',
             body: JSON.stringify({ favorite: !folder.favorite })
         })
-            .then(function(response) { return response.json(); })
+            .then(window.readApiJson)
             .then(function(data) {
                 if (data.success) {
                     window.location.reload();
                 } else if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup('Error: ' + (data.message || 'Unknown error'), 'error');
+                    showNotificationPopup(window.apiErrorMessage(data, 'Error updating favorites'), 'error');
                 }
             })
             .catch(function(error) {
                 if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup('Error updating favorites', 'error');
+                    showNotificationPopup(window.apiErrorMessage(error, 'Error updating favorites'), 'error');
                 }
                 console.error('Folder favorite toggle error:', error);
             });
@@ -434,10 +434,10 @@
             credentials: 'same-origin',
             body: JSON.stringify({ offline: keep })
         })
-            .then(function(response) { return response.json(); })
+            .then(window.readApiJson)
             .then(function(data) {
                 if (!data.success) {
-                    throw new Error(data.error || data.message || 'Unknown error');
+                    throw new Error(data.error || data.message || ('HTTP ' + data._httpStatus));
                 }
                 document.querySelectorAll('[data-folder-id="' + folder.id + '"][data-offline]').forEach(function(element) {
                     element.setAttribute('data-offline', keep ? '1' : '0');
@@ -452,7 +452,7 @@
             })
             .catch(function(error) {
                 if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup(window.t ? window.t('offline.keep.error', null, 'The offline setting could not be saved.') : 'The offline setting could not be saved.', 'error');
+                    showNotificationPopup(window.apiErrorMessage(error, window.t ? window.t('offline.keep.error', null, 'The offline setting could not be saved.') : 'The offline setting could not be saved.'), 'error');
                 }
                 console.error('Folder offline toggle error:', error);
             });

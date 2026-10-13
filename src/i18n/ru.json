@@ -1760,7 +1760,8 @@
     "alerts": {
       "saved": "Сохранено",
       "save_error": "Ошибка сохранения",
-      "network_error": "Ошибка сети"
+      "network_error": "Ошибка сети",
+      "request_failed": "Не удалось выполнить запрос"
     }
   },
   "theme": {

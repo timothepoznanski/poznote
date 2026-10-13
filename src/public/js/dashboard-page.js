@@ -1134,13 +1134,13 @@
             credentials: 'same-origin',
             body: JSON.stringify(body)
         }).then(function (response) {
-            return response.json().then(function (data) {
+            return window.readApiJson(response).then(function (data) {
                 if (!response.ok || !data || !data.success) {
-                    throw new Error((data && (data.error || data.message)) || '');
+                    throw new Error((data && (data.error || data.message)) || ('HTTP ' + response.status));
                 }
             });
         }).catch(function (error) {
-            restore(error && error.message);
+            restore(error && window.apiErrorMessage(error));
         });
     }
 
@@ -1500,7 +1500,7 @@
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'pin update failed');
+                        throw new Error(data.error || data.message || ('HTTP ' + response.status));
                     });
             }
             return response.json();
@@ -1508,11 +1508,11 @@
             note.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
             rootLevels().forEach(resortLevel);
             renderAll();
-        }).catch(function () {
+        }).catch(function (error) {
             var message = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.error) ||
                 'Could not update the pinned state.';
             if (typeof window.showNotificationPopup === 'function') {
-                window.showNotificationPopup(message, 'error');
+                window.showNotificationPopup(window.apiErrorMessage(error, message), 'error');
             } else {
                 alert(message);
             }
@@ -1535,18 +1535,18 @@
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'pin update failed');
+                        throw new Error(data.error || data.message || ('HTTP ' + response.status));
                     });
             }
             return response.json();
         }).then(function (data) {
             folder.pinned = data && typeof data.pinned === 'boolean' ? data.pinned : nextPinned;
             renderAll();
-        }).catch(function () {
+        }).catch(function (error) {
             var message = (window.DASHBOARD_PIN_TXT && window.DASHBOARD_PIN_TXT.error) ||
                 'Could not update the pinned state.';
             if (typeof window.showNotificationPopup === 'function') {
-                window.showNotificationPopup(message, 'error');
+                window.showNotificationPopup(window.apiErrorMessage(error, message), 'error');
             } else {
                 alert(message);
             }
@@ -1661,7 +1661,7 @@
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'color update failed');
+                        throw new Error(data.error || data.message || ('HTTP ' + response.status));
                     });
             }
             return response.json();
@@ -1676,10 +1676,10 @@
             }
             closeNoteColorModal();
             renderAll();
-        }).catch(function () {
+        }).catch(function (error) {
             var message = (window.NOTE_COLOR_TXT && window.NOTE_COLOR_TXT.applyError) || 'Could not update the note color.';
             if (typeof window.showNotificationPopup === 'function') {
-                window.showNotificationPopup(message, 'error');
+                window.showNotificationPopup(window.apiErrorMessage(error, message), 'error');
             } else {
                 alert(message);
             }

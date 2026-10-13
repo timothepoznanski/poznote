@@ -113,6 +113,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <script src="<?php echo poznoteAsset('js/workspaces-actions.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/workspaces-page.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
+    <script src="js/request-errors.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/ui.js?v=<?php echo $cache_v; ?>"></script>
     <script src="<?php echo poznoteAsset('js/utils-note-create.js'); ?>"></script>

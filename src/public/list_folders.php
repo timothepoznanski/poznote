@@ -883,6 +883,7 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/request-errors.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/ui.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/utils-note-create.js'); ?>"></script>

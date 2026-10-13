@@ -277,10 +277,10 @@ function loadAttachments(noteId) {
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'Failed to load attachments');
+                        throw new Error(data.error || data.message || 'Failed to load attachments (HTTP ' + response.status + ')');
                     });
             }
-            return response.json();
+            return window.readApiJson(response);
         })
         .then(function (data) {
             if (data.success) {
@@ -410,10 +410,10 @@ function deleteAttachment(attachmentId, noteId) {
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'Failed to delete attachment');
+                        throw new Error(data.error || data.message || 'Failed to delete attachment (HTTP ' + response.status + ')');
                     });
             }
-            return response.json();
+            return window.readApiJson(response);
         })
         .then(function (data) {
             if (data.success) {
@@ -451,11 +451,11 @@ function deleteAttachment(attachmentId, noteId) {
                 loadAttachments(noteIdToUse);
                 updateAttachmentCountInMenu(noteIdToUse);
             } else {
-                showNotificationPopup(tr('attachments.errors.deletion_failed', { error: data.message }, 'Deletion failed: {{error}}'), 'error');
+                showNotificationPopup(tr('attachments.errors.deletion_failed', { error: window.apiErrorMessage(data) }, 'Deletion failed: {{error}}'), 'error');
             }
         })
         .catch(function (error) {
-            showNotificationPopup(tr('attachments.errors.deletion_failed_generic', {}, 'Deletion failed'), 'error');
+            showNotificationPopup(window.apiErrorMessage(error, tr('attachments.errors.deletion_failed_generic', {}, 'Deletion failed')), 'error');
         });
 }
 
@@ -554,10 +554,10 @@ function updateAttachmentCountInMenu(noteId) {
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'Failed to update attachment count');
+                        throw new Error(data.error || data.message || 'Failed to update attachment count (HTTP ' + response.status + ')');
                     });
             }
-            return response.json();
+            return window.readApiJson(response);
         })
         .then(function (data) {
             if (data.success) {
@@ -923,10 +923,10 @@ function resolveAttachmentPreviewSetting(callback) {
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'Failed to load setting');
+                        throw new Error(data.error || data.message || 'Failed to load setting (HTTP ' + response.status + ')');
                     });
             }
-            return response.json();
+            return window.readApiJson(response);
         })
         .then(function (data) {
             var enabled = !!(data && data.success && (data.value === '1' || data.value === 'true'));
@@ -1014,10 +1014,10 @@ function refreshAttachmentPreviewsForNote(noteId) {
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'Failed to load attachments');
+                        throw new Error(data.error || data.message || 'Failed to load attachments (HTTP ' + response.status + ')');
                     });
             }
-            return response.json();
+            return window.readApiJson(response);
         })
         .then(function (data) {
             if (!data || !data.success) return;
@@ -1214,10 +1214,10 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
                     return response.json()
                         .catch(function () { return {}; })
                         .then(function (data) {
-                            throw new Error(data.error || data.message || 'Failed to upload attachment');
+                            throw new Error(data.error || data.message || 'Failed to upload attachment (HTTP ' + response.status + ')');
                         });
                 }
-                return response.json();
+                return window.readApiJson(response);
             })
             .then(function (data) {
                 if (data.success) {
@@ -1266,7 +1266,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
                         }
                     }
                     if (typeof showNotificationPopup === 'function') {
-                        showNotificationPopup('Upload failed: ' + data.message, 'error');
+                        showNotificationPopup('Upload failed: ' + window.apiErrorMessage(data), 'error');
                     }
                 }
             })
@@ -1279,7 +1279,7 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
                     }
                 }
                 if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup('Upload failed: ' + error.message, 'error');
+                    showNotificationPopup('Upload failed: ' + window.apiErrorMessage(error), 'error');
                 }
             });
 
@@ -1314,10 +1314,10 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'Failed to upload attachment');
+                        throw new Error(data.error || data.message || 'Failed to upload attachment (HTTP ' + response.status + ')');
                     });
             }
-            return response.json();
+            return window.readApiJson(response);
         })
         .then(function (data) {
             if (data.success) {
@@ -1360,14 +1360,14 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
                 // Remove loading text in case of error
                 replaceLoadingText(loadingText, '', dropTarget, loadingTextNode);
                 if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup('Upload failed: ' + data.message, 'error');
+                    showNotificationPopup('Upload failed: ' + window.apiErrorMessage(data), 'error');
                 }
             }
         })
         .catch(function (error) {
             replaceLoadingText(loadingText, '', dropTarget, loadingTextNode);
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup('Upload failed: ' + error.message, 'error');
+                showNotificationPopup('Upload failed: ' + window.apiErrorMessage(error), 'error');
             }
         });
 }
@@ -1585,10 +1585,10 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
                 return response.json()
                     .catch(function () { return {}; })
                     .then(function (data) {
-                        throw new Error(data.error || data.message || 'Failed to upload attachment');
+                        throw new Error(data.error || data.message || 'Failed to upload attachment (HTTP ' + response.status + ')');
                     });
             }
-            return response.json();
+            return window.readApiJson(response);
         })
         .then(function (data) {
             if (data.success) {
@@ -1635,7 +1635,7 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
                 // Remove placeholder on error
                 discardUploadPlaceholder(placeholderImg);
                 if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup('Upload failed: ' + data.message, 'error');
+                    showNotificationPopup('Upload failed: ' + window.apiErrorMessage(data), 'error');
                 }
             }
         })
@@ -1643,7 +1643,7 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
             // Remove placeholder on error
             discardUploadPlaceholder(placeholderImg);
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup('Upload failed: ' + error.message, 'error');
+                showNotificationPopup('Upload failed: ' + window.apiErrorMessage(error), 'error');
             }
         });
 }

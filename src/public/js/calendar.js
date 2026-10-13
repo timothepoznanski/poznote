@@ -472,7 +472,7 @@ class MiniCalendar {
                     created_date: dateStr
                 })
             });
-            const result = await response.json();
+            const result = await window.readApiJson(response);
             if (result.success && result.note) {
                 this.openNoteInTab(result.note.id, dateStr);
                 // Refresh the folder tree (and thereby the calendar dots) so
@@ -485,10 +485,10 @@ class MiniCalendar {
                 }
                 return true;
             }
-            throw new Error(result.error || result.message || '');
+            throw new Error(result.error || result.message || ('HTTP ' + response.status));
         } catch (error) {
             button.disabled = false;
-            const message = this.translations.modal.diary_error || 'Could not create the diary entry.';
+            const message = window.apiErrorMessage(error, this.translations.modal.diary_error || 'Could not create the diary entry.');
             if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
                 window.modalAlert.alert(message, 'error');
             } else {

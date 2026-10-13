@@ -84,6 +84,7 @@ $scripts = [
     poznoteAsset('js/tasklist-order-drag.js'),
     // The dialogs of the toolbar (link, videos) and the slash / right-click
     // menu, which leaves out what needs the server on this page
+    poznoteAsset('js/request-errors.js'),
     poznoteAsset('js/ui.js'),
     poznoteAsset('js/date-picker-popup.js'),
     poznoteAsset('js/slash-command.js'),

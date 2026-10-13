@@ -83,7 +83,7 @@ function _createNoteOfType(noteType) {
         headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
         body: JSON.stringify(noteData)
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data.success && data.note) {
                 window.scrollTo(0, 0);
@@ -102,14 +102,14 @@ function _createNoteOfType(noteType) {
                 if (typeof window.hideNoteCreationLoading === 'function') {
                     window.hideNoteCreationLoading();
                 }
-                showNotificationPopup(data.error || 'Error creating ' + noteType, 'error');
+                showNotificationPopup(window.apiErrorMessage(data, 'Error creating ' + noteType), 'error');
             }
         })
         .catch(function (error) {
             if (typeof window.hideNoteCreationLoading === 'function') {
                 window.hideNoteCreationLoading();
             }
-            showNotificationPopup('Network error: ' + error.message, 'error');
+            showNotificationPopup(window.apiErrorMessage(error, 'Error creating ' + noteType), 'error');
         });
 }
 
@@ -463,7 +463,7 @@ function saveNoteToServer(options) {
                         }
 
                         if (typeof showNotificationPopup === 'function') {
-                            showNotificationPopup(data.error || data.message || 'Error saving note', 'error');
+                            showNotificationPopup(window.apiErrorMessage(data, 'Error saving note'), 'error');
                         }
                     });
                     return;
@@ -484,7 +484,7 @@ function saveNoteToServer(options) {
 
                 // Show user-visible error notification
                 if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup(data.error || data.message || 'Error saving note', 'error');
+                    showNotificationPopup(window.apiErrorMessage(data, 'Error saving note'), 'error');
                 }
             }
         })
@@ -498,7 +498,7 @@ function saveNoteToServer(options) {
             if (typeof window.noteSaveFailed === 'function') {
                 window.noteSaveFailed(noteid);
             } else if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup('Network error: ' + error.message, 'error');
+                showNotificationPopup(window.apiErrorMessage(error, 'Error saving note'), 'error');
             }
         });
 }
@@ -726,7 +726,7 @@ function requestNoteTrash(noteId) {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data && data.success) {
                 recordNoteDeleteForUndo(noteId, linkedIdsForUndo);
@@ -743,14 +743,10 @@ function requestNoteTrash(noteId) {
                 return;
             }
 
-            if (data && (data.error || data.message)) {
-                showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
-            } else {
-                showNotificationPopup('Deletion error: Unknown error', 'error');
-            }
+            showNotificationPopup(window.apiErrorMessage(data, 'The note could not be deleted'), 'error');
         })
         .catch(function (error) {
-            showNotificationPopup('Network error while deleting: ' + error.message, 'error');
+            showNotificationPopup(window.apiErrorMessage(error, 'The note could not be deleted'), 'error');
         });
 }
 
@@ -933,7 +929,7 @@ function executeArchiveNote(noteId, workspace) {
         body: '{}'
     })
         .then(function (response) {
-            return response.json().then(function (data) {
+            return window.readApiJson(response).then(function (data) {
                 return { status: response.status, data: data || {} };
             });
         })
@@ -979,7 +975,7 @@ function executeArchiveNote(noteId, workspace) {
             }
         })
         .catch(function (error) {
-            showNotificationPopup(archiveErrorMessage(0, { error: error.message }), 'error');
+            showNotificationPopup(archiveErrorMessage(0, error), 'error');
         });
 }
 
@@ -997,7 +993,7 @@ function archiveErrorMessage(status, data) {
             : 'A note with the same title is already archived in this folder.';
     }
 
-    var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+    var err = window.apiErrorMessage(data);
     return window.t
         ? window.t('archive.errors.archive_prefix', { error: err }, 'Error archiving the note: {{error}}')
         : ('Error archiving the note: ' + err);
@@ -1463,7 +1459,7 @@ function deleteLinkedNoteOnly(linkedNoteId) {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data && data.success) {
                 recordNoteDeleteForUndo(linkedNoteId, []);
@@ -1476,14 +1472,10 @@ function deleteLinkedNoteOnly(linkedNoteId) {
                 return;
             }
 
-            if (data && (data.error || data.message)) {
-                showNotificationPopup('Deletion error: ' + (data.error || data.message), 'error');
-            } else {
-                showNotificationPopup('Deletion error: Unknown error', 'error');
-            }
+            showNotificationPopup(window.apiErrorMessage(data, 'The note could not be deleted'), 'error');
         })
         .catch(function (error) {
-            showNotificationPopup('Network error while deleting: ' + error.message, 'error');
+            showNotificationPopup(window.apiErrorMessage(error, 'The note could not be deleted'), 'error');
         });
 }
 
@@ -1508,7 +1500,7 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data && data.success) {
                 recordNoteDeleteForUndo(targetNoteId, linkedIdsForUndo);
@@ -1520,11 +1512,11 @@ function deleteLinkedNoteAndTarget(linkedNoteId, targetNoteId) {
                 closeModal('deleteLinkedNoteModal');
                 leaveTrashedNotes([targetNoteId, linkedNoteId].concat(linkedIdsForUndo));
             } else {
-                throw new Error(data.error || data.message || 'Unknown error');
+                showNotificationPopup(window.apiErrorMessage(data, 'The note could not be deleted'), 'error');
             }
         })
         .catch(function (error) {
-            showNotificationPopup('Deletion error: ' + error.message, 'error');
+            showNotificationPopup(window.apiErrorMessage(error, 'The note could not be deleted'), 'error');
         });
 }
 

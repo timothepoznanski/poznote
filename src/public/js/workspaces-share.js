@@ -332,7 +332,9 @@ function submitWorkspaceShare(button, options) {
         },
         body: params.toString()
     })
-    .then(function (resp) { return resp.json(); })
+    // js/modal-alerts.js, which owns the two request-error helpers, is not on
+    // every page this file is loaded on (trash.php), hence the checks.
+    .then(function (resp) { return typeof window.readApiJson === 'function' ? window.readApiJson(resp) : resp.json(); })
     .then(function (json) {
         button.disabled = false;
         if (json && json.success) {
@@ -341,7 +343,7 @@ function submitWorkspaceShare(button, options) {
         }
         var message = wsTr(
             'workspaces.alerts.error_prefix',
-            { error: (json && json.error) || wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error') },
+            { error: (json && json.error) || (typeof window.apiErrorMessage === 'function' ? window.apiErrorMessage(json) : wsTr('workspaces.alerts.unknown_error', {}, 'Unknown error')) },
             'Error: {{error}}'
         );
         showWorkspaceShareError(message);
@@ -351,7 +353,8 @@ function submitWorkspaceShare(button, options) {
         button.disabled = false;
         console.error('Error updating workspace share:', err);
         if (!err || !err.message || err.message.indexOf('Error:') !== 0) {
-            showWorkspaceShareError(wsTr('workspaces.share.errors.save_failed', {}, 'Failed to update workspace sharing'));
+            var saveFailed = wsTr('workspaces.share.errors.save_failed', {}, 'Failed to update workspace sharing');
+            showWorkspaceShareError(typeof window.apiErrorMessage === 'function' ? window.apiErrorMessage(err, saveFailed) : saveFailed);
         }
         throw err;
     });

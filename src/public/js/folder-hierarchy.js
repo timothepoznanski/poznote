@@ -58,7 +58,7 @@ function createSubfolder(parentFolderKey) {
             body: JSON.stringify(requestData),
             credentials: 'same-origin'
         })
-            .then(function (response) { return response.json(); })
+            .then(window.readApiJson)
             .then(function (data) {
                 if (data.success) {
                     // Extract folder ID from parentFolderKey (e.g., 'folder_123' -> '123')
@@ -78,18 +78,18 @@ function createSubfolder(parentFolderKey) {
                 } else {
                     // Use modal alert instead of notification popup
                     if (typeof window.showError === 'function') {
-                        window.showError(data.error || data.message || 'Unknown error', 'Error Creating Subfolder');
+                        window.showError(window.apiErrorMessage(data), 'Error Creating Subfolder');
                     } else {
-                        showNotificationPopup('Error creating subfolder: ' + (data.error || 'Unknown error'), 'error');
+                        showNotificationPopup('Error creating subfolder: ' + window.apiErrorMessage(data), 'error');
                     }
                 }
             })
             .catch(function (error) {
                 // Use modal alert instead of notification popup
                 if (typeof window.showError === 'function') {
-                    window.showError(error.message, 'Error Creating Subfolder');
+                    window.showError(window.apiErrorMessage(error), 'Error Creating Subfolder');
                 } else {
-                    showNotificationPopup('Error creating subfolder: ' + error.message, 'error');
+                    showNotificationPopup('Error creating subfolder: ' + window.apiErrorMessage(error), 'error');
                 }
             });
     });
@@ -108,7 +108,7 @@ function getFolderPath(folderId, callback) {
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data.success && callback) {
                 callback(data.path, data.depth);

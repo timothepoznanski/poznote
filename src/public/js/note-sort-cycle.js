@@ -125,16 +125,18 @@
             headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
             body: JSON.stringify({ value: mode })
         })
-            .then(function (response) { return response.json(); })
+            .then(window.readApiJson)
             .then(function (result) {
-                if (!result || !result.success) throw new Error('save rejected');
+                if (!result || !result.success) {
+                    throw new Error((result && (result.error || result.message)) || ('HTTP ' + (result && result._httpStatus)));
+                }
                 refreshTree();
             })
             .catch(function (error) {
                 console.error('note-sort-cycle: could not save the sort mode', error);
                 var current = getGroup();
                 if (current) paint(current, previous);
-                showError(tr('sort.save_failed', 'Could not change the sort order'));
+                showError(window.apiErrorMessage(error, tr('sort.save_failed', 'Could not change the sort order')));
             })
             .finally(function () { saving = false; });
     }

@@ -384,7 +384,7 @@
                 body: JSON.stringify(requestData)
             });
             
-            const data = await response.json();
+            const data = await window.readApiJson(response);
             
             if (data.success && data.note && data.note.id) {
                 if (typeof window.rememberFolderStatesForCreatedNote === 'function') {
@@ -408,7 +408,7 @@
                 if (typeof window.hideNoteCreationLoading === 'function') {
                     window.hideNoteCreationLoading();
                 }
-                const errorMsg = data.error || tr('modals.create.linked.error', {}, 'Error creating shortcut');
+                const errorMsg = window.apiErrorMessage(data, tr('modals.create.linked.error', {}, 'Error creating shortcut'));
                 if (typeof showNotificationPopup === 'function') {
                     showNotificationPopup(errorMsg, 'error');
                 }
@@ -419,7 +419,7 @@
                 window.hideNoteCreationLoading();
             }
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(tr('ui.alerts.network_error', {}, 'Network error'), 'error');
+                showNotificationPopup(window.apiErrorMessage(error, tr('modals.create.linked.error', {}, 'Error creating shortcut')), 'error');
             }
         }
     }
@@ -489,7 +489,7 @@
         } catch (error) {
             console.error('Error creating linked note from current:', error);
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(tr('ui.alerts.network_error', {}, 'Network error'), 'error');
+                showNotificationPopup(window.apiErrorMessage(error, tr('modals.create.linked.error', {}, 'Error creating shortcut')), 'error');
             }
         }
     };
