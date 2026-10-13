@@ -16,6 +16,8 @@ tags:
     description: Note reminders and notifications
   - name: Tasks
     description: Tasks inside task list notes
+  - name: Mentions
+    description: Notes of shared workspaces that mention the authenticated user with @username
   - name: Folders
     description: Folders management
   - name: Trash
@@ -1861,6 +1863,157 @@ paths:
   # ==================
   # Reminders Endpoints
   # ==================
+  /mentions:
+    get:
+      tags: [Mentions]
+      summary: List the notes that mention the authenticated user
+      description: >
+        In a workspace shared with other accounts, "@username" in the text of
+        a note mentions that member. Returns the notes that name the
+        authenticated user (the credentials of the request, not the account
+        named by X-User-ID) across every shared workspace they are a member
+        of. A note marked as handled stays handled until it mentions the user
+        more often.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: include_handled
+          in: query
+          required: false
+          description: Set to 1 to also return the notes marked as handled.
+          schema:
+            type: string
+            enum: ['1']
+      responses:
+        '200':
+          description: Notes that mention the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  open:
+                    type: integer
+                    description: Number of notes still waiting for the user
+                  mentions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        owner_user_id:
+                          type: integer
+                          description: Account that holds the note
+                        owner_username:
+                          type: string
+                        workspace:
+                          type: string
+                        note_id:
+                          type: integer
+                        title:
+                          type: string
+                        type:
+                          type: string
+                        excerpt:
+                          type: string
+                          description: The line around the first mention
+                        count:
+                          type: integer
+                          description: Number of times the note names the user
+                        handled:
+                          type: boolean
+                        updated:
+                          type: string
+                        updated_by:
+                          type: string
+  /mentions/members:
+    get:
+      tags: [Mentions]
+      summary: List who can be mentioned in a workspace
+      description: >
+        Usernames of the members of a workspace of the active account, its
+        owner first. Empty when the workspace is shared with nobody.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: workspace
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Members of the workspace
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  workspace:
+                    type: string
+                  members:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: workspace is missing
+  /mentions/{ownerId}/{noteId}/handled:
+    parameters:
+      - $ref: '#/components/parameters/UserIdHeader'
+      - name: ownerId
+        in: path
+        required: true
+        description: Account that holds the note (owner_user_id of the list)
+        schema:
+          type: integer
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: integer
+    post:
+      tags: [Mentions]
+      summary: Mark the mentions of a note as handled
+      responses:
+        '200':
+          description: The note is marked as handled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  handled:
+                    type: boolean
+                  open:
+                    type: integer
+        '404':
+          description: The note does not mention the user
+    delete:
+      tags: [Mentions]
+      summary: Mark the mentions of a note as not handled
+      responses:
+        '200':
+          description: The note waits for the user again
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  handled:
+                    type: boolean
+                  open:
+                    type: integer
+        '404':
+          description: The note does not mention the user
   /tasks:
     get:
       tags: [Tasks]

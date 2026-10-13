@@ -4968,6 +4968,19 @@
     "show_hidden": "Mostrar as listas ocultas",
     "empty_hidden": "Todas as listas estão ocultas."
   },
+  "mentions": {
+    "title": "Menções",
+    "intro": "Notas dos espaços de trabalho partilhados que o mencionam com @{{username}}.",
+    "show_handled": "Mostrar as tratadas",
+    "hide_handled": "Ocultar as tratadas",
+    "mark_handled": "Marcar como tratada",
+    "reopen": "Marcar como não tratada",
+    "shared_by": "partilhado por {{owner}}",
+    "modified_by": "Última modificação por {{user}}",
+    "empty": "Nenhuma nota está à sua espera.",
+    "empty_no_workspace": "As menções funcionam nos espaços de trabalho partilhados: escreva @ seguido de um nome de utilizador numa nota para chamar a atenção dessa pessoa.",
+    "you_are_mentioned": "Foi mencionado nesta nota"
+  },
   "s3_settings": {
     "title": "Armazenamento S3 de anexos",
     "description": "Armazene os anexos das notas em um armazenamento de objetos compatível com S3 em vez do disco local.",

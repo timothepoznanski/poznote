@@ -4,6 +4,19 @@
  * Expected variables: $folders, $is_search_mode, $folder_filter, $workspace_filter, etc.
  */
 
+// Notes of this workspace that mention the person signed in and still wait
+// for them (discussion #1621): their row carries an @ (renderNoteListItem).
+// Only a shared workspace has anyone to mention.
+require_once __DIR__ . '/lib/mentions.php';
+$mention_note_ids = [];
+if (!empty($workspace_filter) && function_exists('getAuthenticatedUserId')) {
+    $mention_note_ids = array_flip(poznoteOpenMentionNoteIds(
+        (int)(getAuthenticatedUserId() ?? 0),
+        (int)(getCurrentUserId() ?? 0),
+        (string)$workspace_filter
+    ));
+}
+
 // Count favorites for the current workspace (needed for display)
 $favorites_count = 0;
 try {
@@ -318,7 +331,7 @@ function getSharedAncestorFolderName($folderId) {
 }
 
 function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName) {
-    global $show_note_icons_setting;
+    global $show_note_icons_setting, $mention_note_ids;
 
     $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
     $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
@@ -342,6 +355,11 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
         }
     }
 
+    $mentionMarker = '';
+    if (isset($mention_note_ids[(int)$noteDbId])) {
+        $mentionMarker = ' <i class="lucide lucide-at-sign note-mention-marker" title="' . t_h('mentions.you_are_mentioned', [], 'You are mentioned in this note') . '"></i>';
+    }
+
     $htmlFolderId = htmlspecialchars((string)$folderId, ENT_QUOTES);
     $htmlFolderName = htmlspecialchars((string)$folderName, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars($noteType, ENT_QUOTES);
@@ -350,7 +368,7 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
 
     echo "<div class='note-list-item'>";
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
-    echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . "</span>";
+    echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . $mentionMarker . "</span>";
     echo "</a>";
     echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), (int)($row1['offline'] ?? 0) > 0, isNoteShared($noteDbId), getSharedAncestorFolderName($folderId));
     echo "</div>";

@@ -4967,6 +4967,19 @@
     "show_hidden": "Ausgeblendete Listen anzeigen",
     "empty_hidden": "Alle Listen sind ausgeblendet."
   },
+  "mentions": {
+    "title": "Erwähnungen",
+    "intro": "Notizen aus geteilten Arbeitsbereichen, die dich mit @{{username}} erwähnen.",
+    "show_handled": "Erledigte anzeigen",
+    "hide_handled": "Erledigte ausblenden",
+    "mark_handled": "Als erledigt markieren",
+    "reopen": "Als nicht erledigt markieren",
+    "shared_by": "geteilt von {{owner}}",
+    "modified_by": "Zuletzt geändert von {{user}}",
+    "empty": "Keine Notiz wartet auf dich.",
+    "empty_no_workspace": "Erwähnungen funktionieren in geteilten Arbeitsbereichen: Schreibe @ gefolgt von einem Benutzernamen in eine Notiz, um diese Person darauf aufmerksam zu machen.",
+    "you_are_mentioned": "Du wirst in dieser Notiz erwähnt"
+  },
   "s3_settings": {
     "title": "S3-Speicher für Anhänge",
     "description": "Speichern Sie Notiz-Anhänge in einem S3-kompatiblen Objektspeicher statt auf der lokalen Festplatte.",

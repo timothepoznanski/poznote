@@ -261,6 +261,16 @@
     font-size: var(--sidebar-font-size, 13px);
 }
 
+/* The note mentions the person signed in and still waits for them
+   (notes_list.php, discussion #1621) */
+/* Two classes: css/icons.css greys every Lucide icon with one attribute selector */
+.lucide.note-mention-marker {
+    font-size: 0.85em;
+    color: var(--pz-danger);
+    margin-left: 4px;
+    vertical-align: -1px;
+}
+
 /* Icon for linked notes */
 .note-type-icon-inline {
     font-size: 0.85em;

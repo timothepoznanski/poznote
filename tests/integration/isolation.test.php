@@ -96,6 +96,14 @@ function routeTable(): array
         'POST /convert-html' => [SCOPED, 'body' => ['content' => '# heading']],
         'POST /convert-markdown' => [SCOPED, 'body' => ['content' => '<p>text</p>']],
 
+        // --- Mentions ----------------------------------------------------
+        'GET /mentions' => [SCOPED],
+        'GET /mentions/members' => [SCOPED, 'query' => ['workspace' => '{workspace}']],
+        'POST /mentions/{ownerId}/{noteId}/handled' => [EXCLUDED,
+            'reason' => 'acts on the caller in a workspace shared with them; the fixtures share none, refusals are covered by curl in #1621'],
+        'DELETE /mentions/{ownerId}/{noteId}/handled' => [EXCLUDED,
+            'reason' => 'acts on the caller in a workspace shared with them; the fixtures share none'],
+
         // --- Tasks -------------------------------------------------------
         'GET /tasks' => [SCOPED],
         'GET /notes/{id}/tasks' => [OWNED, 'target' => ['id' => 'tasklist_note']],

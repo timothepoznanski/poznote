@@ -16,6 +16,7 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [Offline Copies](#offline-copies)
 - [Snapshots](#snapshots)
 - [Tasks](#tasks)
+- [Mentions](#mentions)
 - [Reminders](#reminders)
 - [Note Sharing](#note-sharing)
 - [Folder Sharing](#folder-sharing)
@@ -1439,6 +1440,87 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
 ```
 
 ---
+
+## Mentions
+
+In a workspace shared with other accounts, `@username` in the text of a note mentions that member: the owner of the workspace or one of the accounts it is shared with. A mention is plain text, in rich text notes, Markdown notes and task lists alike, so a note written through this API mentions someone the same way as one typed in the editor. Nothing has to be declared.
+
+These endpoints answer for the authenticated user (the credentials of the request), not for the account named by `X-User-ID`. They cover every shared workspace the user is a member of, their own and the ones shared with them.
+
+A note the user marked as handled stays handled until it mentions them more often than it did at that moment.
+
+### List Mentions
+
+```
+GET /mentions
+```
+
+**Query Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `include_handled` | string | `1` to also return the notes marked as handled |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "open": 1,
+  "mentions": [
+    {
+      "owner_user_id": 4,
+      "owner_username": "anna",
+      "workspace": "Team",
+      "note_id": 123,
+      "title": "Budget review",
+      "type": "note",
+      "excerpt": "Can @tim check the totals?",
+      "count": 1,
+      "handled": false,
+      "updated": "2026-10-13 14:34:10",
+      "updated_by": "anna"
+    }
+  ]
+}
+```
+
+`owner_user_id` is the account that holds the note, `count` the number of times the note names the user, `open` the number of notes still waiting.
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/mentions"
+```
+
+### List Who Can Be Mentioned
+
+```
+GET /mentions/members?workspace={name}
+```
+
+Usernames of the members of a workspace of the account named by `X-User-ID`, its owner first. The list is empty when the workspace is shared with nobody.
+
+```json
+{ "success": true, "workspace": "Team", "members": ["anna", "tim"] }
+```
+
+### Mark A Mention As Handled
+
+```
+POST /mentions/{ownerId}/{noteId}/handled
+DELETE /mentions/{ownerId}/{noteId}/handled
+```
+
+`POST` records that the authenticated user has dealt with the note, `DELETE` takes it back. `ownerId` and `noteId` are the `owner_user_id` and `note_id` of the list above. Answers `404` when the note does not mention the user in a workspace they are a member of.
+
+```json
+{ "success": true, "handled": true, "open": 0 }
+```
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/mentions/4/123/handled"
+```
 
 ## Reminders
 

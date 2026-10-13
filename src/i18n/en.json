@@ -4640,6 +4640,19 @@
     "show_hidden": "Show hidden lists",
     "empty_hidden": "Every list is hidden."
   },
+  "mentions": {
+    "title": "Mentions",
+    "intro": "Notes of shared workspaces that mention you with @{{username}}.",
+    "show_handled": "Show handled",
+    "hide_handled": "Hide handled",
+    "mark_handled": "Mark as handled",
+    "reopen": "Mark as not handled",
+    "shared_by": "shared by {{owner}}",
+    "modified_by": "Last modified by {{user}}",
+    "empty": "No note is waiting for you.",
+    "empty_no_workspace": "Mentions work in shared workspaces: write @ followed by a username in a note to draw that person's attention to it.",
+    "you_are_mentioned": "You are mentioned in this note"
+  },
   "s3_settings": {
     "title": "S3 Attachment Storage",
     "description": "Store note attachments in an S3-compatible object storage instead of the local disk.",

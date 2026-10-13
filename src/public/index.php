@@ -1053,6 +1053,22 @@ $whats_new_preview_since = $whats_new_preview ? trim((string)@file_get_contents(
      index_js.php). Inline scripts below (DEFAULT_NOTE_TITLES, calendar
      translations) execute during parsing, i.e. before the deferred bundle. -->
 <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
+<?php
+// Who can be mentioned with "@" in this workspace (js/mention-autocomplete.js,
+// discussion #1621): its other members, none when it is shared with nobody.
+require_once __DIR__ . '/../lib/mentions.php';
+$mention_members = [];
+if (!empty($workspace_filter)) {
+    $mention_self = getAuthenticatedUser();
+    $mention_self_name = is_array($mention_self) ? strtolower((string)($mention_self['username'] ?? '')) : '';
+    foreach (poznoteMentionMembers((int)(getCurrentUserId() ?? 0), (string)$workspace_filter) as $mention_member) {
+        if (strtolower($mention_member) !== $mention_self_name) {
+            $mention_members[] = $mention_member;
+        }
+    }
+}
+?>
+<script>window.PoznoteMentionMembers = <?php echo json_encode($mention_members, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>;</script>
 <!-- Tag colors, so note tags can show the same dot as the tags list -->
 <script>
 window.TAG_COLORS = <?php echo json_encode(getTagColorsMap(), JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT); ?>;

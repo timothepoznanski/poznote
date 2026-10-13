@@ -282,6 +282,31 @@
     pointer-events: none;
 }
 
+/* Notes that mention the person signed in and still wait for them
+   (icon_sidebar.php, discussion #1621): a count, where the two dots above
+   only say "look here". */
+.icon-sidebar-btn .mention-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 14px;
+    height: 14px;
+    padding: 0 3px;
+    box-sizing: border-box;
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-danger);
+    color: var(--pz-text-inverse);
+    font-size: 10px;
+    font-weight: var(--pz-weight-semibold);
+    line-height: 14px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.icon-sidebar-btn .mention-badge[hidden] {
+    display: none;
+}
+
 /* --icon-rail-scale is the "Icon sidebar icon scaling" preference
    (js/theme-init.js), 0.5 to 2: the largest glyph is 32px, inside the 40px
    (36px at the bottom) button, so the rail keeps its layout. */
