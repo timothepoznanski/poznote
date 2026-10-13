@@ -130,7 +130,7 @@ function deleteFolder(folderId, folderName, options) {
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data.success) {
                 var noteCount = data.count || 0;
@@ -234,7 +234,7 @@ function executeDeleteFolderOperation(folderId, folderName) {
         headers: { 'Accept': 'application/json' },
         credentials: 'same-origin'
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data.success) {
                 // Undo support (js/tree-undo-clipboard.js): the snapshot
@@ -337,7 +337,7 @@ function executeArchiveFolder(folderId, folderName, workspace) {
         body: '{}'
     })
         .then(function (response) {
-            return response.json().then(function (data) {
+            return window.readApiJson(response).then(function (data) {
                 return { status: response.status, data: data || {} };
             });
         })
@@ -391,7 +391,7 @@ function executeArchiveFolder(folderId, folderName, workspace) {
             }
         })
         .catch(function (error) {
-            showNotificationPopup(archiveFolderErrorMessage(0, { error: error.message }), 'error');
+            showNotificationPopup(archiveFolderErrorMessage(0, error), 'error');
         });
 }
 
@@ -410,7 +410,7 @@ function archiveFolderErrorMessage(status, data) {
             : ('Nothing was archived: these notes have the same title as a note already archived in the same folder: ' + titles);
     }
 
-    var err = (data && (data.error || data.message)) ? (data.error || data.message) : 'Unknown error';
+    var err = window.apiErrorMessage(data);
     return window.t
         ? window.t('archive.errors.folder_archive_prefix', { error: err }, 'Error archiving the folder: {{error}}')
         : ('Error archiving the folder: ' + err);
@@ -435,7 +435,7 @@ function duplicateFolder(folderId, folderName) {
                 body: '{}'
             });
         })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data.success) {
                 // New notes were created: mark for auto-push (if enabled)
@@ -513,7 +513,7 @@ function showNewWorkspacePrompt() {
         body: JSON.stringify({ name: name }),
         credentials: 'same-origin'
     })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (res) {
             if (res.success) {
                 var sel = document.getElementById('workspaceSelector');
@@ -548,13 +548,13 @@ function showNewWorkspacePrompt() {
                 }
             } else {
                 showNotificationPopup(
-                    (window.t ? window.t('workspaces.alerts.error_prefix', { error: (res.message || window.t('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}') : ('Error: ' + (res.message || 'Unknown error'))),
+                    (window.t ? window.t('workspaces.alerts.error_prefix', { error: window.apiErrorMessage(res, window.t('workspaces.alerts.unknown_error', {}, 'Unknown error')) }, 'Error: {{error}}') : ('Error: ' + window.apiErrorMessage(res, 'Unknown error'))),
                     'error'
                 );
             }
         })
         .catch(function (err) {
-            showNotificationPopup(window.t ? window.t('ui.alerts.network_error', {}, 'Network error') : 'Network error', 'error');
+            showNotificationPopup(window.apiErrorMessage(err, 'The workspace could not be created'), 'error');
         });
 }
 
@@ -579,7 +579,7 @@ function deleteCurrentWorkspace() {
                     headers: { 'Accept': 'application/json' },
                     credentials: 'same-origin'
                 })
-                    .then(function (response) { return response.json(); })
+                    .then(window.readApiJson)
                     .then(function (res) {
                         if (res.success) {
                             // Get the first remaining workspace from the selector
@@ -665,11 +665,11 @@ function deleteCurrentWorkspace() {
                             url.searchParams.set('workspace', newFirstWorkspace || sel.value);
                             window.location.href = url.toString();
                         } else {
-                            showNotificationPopup('Error deleting workspace: ' + (res.message || 'unknown'), 'error');
+                            showNotificationPopup(window.apiErrorMessage(res, 'The workspace could not be deleted'), 'error');
                         }
                     })
                     .catch(function (err) {
-                        showNotificationPopup('Network error', 'error');
+                        showNotificationPopup(window.apiErrorMessage(err, 'The workspace could not be deleted'), 'error');
                     });
             }
         });

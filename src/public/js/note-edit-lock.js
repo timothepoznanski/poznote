@@ -815,7 +815,9 @@
             }
 
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup((result.data && result.data.error) || 'Unable to acquire the edit lock for this note.', 'error');
+                // No error field means the answer did not come from the API
+                // (a proxy page, an empty 500): the status is the only clue.
+                showNotificationPopup((result.data && result.data.error) || 'Unable to acquire the edit lock for this note (HTTP ' + result.status + ').', 'error');
             }
             setNoteLockUnavailableState(noteId, (result.data && result.data.error) || getLockUnavailableMessage());
             startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
@@ -825,7 +827,7 @@
             }
 
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup('Unable to acquire the edit lock for this note.', 'error');
+                showNotificationPopup('Unable to acquire the edit lock for this note (network error).', 'error');
             }
             setNoteLockUnavailableState(noteId);
             startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);

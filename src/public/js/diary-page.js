@@ -1762,18 +1762,18 @@
                 type: data.noteType === 'markdown' ? 'markdown' : 'note'
             }, fields))
         })
-            .then(function (response) { return response.json(); })
+            .then(window.readApiJson)
             .then(function (result) {
                 if (result.success && result.note) {
                     openNote(result.note.id);
                 } else {
                     if (btn) btn.disabled = false;
-                    showError(result.error || result.message || txt.createError || 'Could not create the diary entry.');
+                    showError(window.apiErrorMessage(result, txt.createError || 'Could not create the diary entry.'));
                 }
             })
             .catch(function (err) {
                 if (btn) btn.disabled = false;
-                showError((txt.createError || 'Could not create the diary entry.') + ' ' + err.message);
+                showError(window.apiErrorMessage(err, txt.createError || 'Could not create the diary entry.'));
             });
     }
 

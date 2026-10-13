@@ -371,6 +371,7 @@ $trashOrderBy = $trashSort === 'created'
     <script src="<?php echo poznoteAsset('js/workspaces-actions.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/workspaces-page.js'); ?>"></script>
     <script>window.DEFAULT_NOTE_TITLES = <?php echo getDefaultNoteTitlesJson(); ?>;</script>
+    <script src="<?php echo poznoteAsset('js/request-errors.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/notes.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/ui.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/date-time-format.js'); ?>"></script>

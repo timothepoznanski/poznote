@@ -1839,7 +1839,7 @@
                             method: 'POST',
                             body: formData
                         })
-                            .then(response => response.json())
+                            .then(window.readApiJson)
                             .then(data => {
                                 if (data.success) {
                                     const borderSuffix = window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding ? '{.img-with-border-no-padding}' : '';
@@ -1850,12 +1850,12 @@
                                     setTimeout(() => { if (typeof window.saveNoteImmediately === 'function') window.saveNoteImmediately(); }, 500);
                                 } else {
                                     replacePlaceholder('');
-                                    if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + data.message, 'error');
+                                    if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + window.apiErrorMessage(data), 'error');
                                 }
                             })
                             .catch(error => {
                                 replacePlaceholder('');
-                                if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + error.message, 'error');
+                                if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + window.apiErrorMessage(error), 'error');
                             });
                     } else {
                         // contenteditable path
@@ -1899,7 +1899,7 @@
                             method: 'POST',
                             body: formData
                         })
-                            .then(response => response.json())
+                            .then(window.readApiJson)
                             .then(data => {
                                 if (data.success) {
                                     const borderSuffix = window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.defaultImageBorderNoPadding ? '{.img-with-border-no-padding}' : '';
@@ -1910,12 +1910,12 @@
                                     setTimeout(() => { if (typeof window.saveNoteImmediately === 'function') window.saveNoteImmediately(); }, 500);
                                 } else {
                                     replaceInDom('');
-                                    if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + data.message, 'error');
+                                    if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + window.apiErrorMessage(data), 'error');
                                 }
                             })
                             .catch(error => {
                                 replaceInDom('');
-                                if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + error.message, 'error');
+                                if (typeof showNotificationPopup === 'function') showNotificationPopup('Upload failed: ' + window.apiErrorMessage(error), 'error');
                             });
                     }
                 } else {
@@ -1964,7 +1964,7 @@
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => response.json())
+                        .then(window.readApiJson)
                         .then(data => {
                             if (data.success) {
                                 // Replace placeholder with actual image
@@ -1999,14 +1999,14 @@
                             } else {
                                 discardUploadPlaceholder(placeholderImg);
                                 if (typeof showNotificationPopup === 'function') {
-                                    showNotificationPopup('Upload failed: ' + data.message, 'error');
+                                    showNotificationPopup('Upload failed: ' + window.apiErrorMessage(data), 'error');
                                 }
                             }
                         })
                         .catch(error => {
                             discardUploadPlaceholder(placeholderImg);
                             if (typeof showNotificationPopup === 'function') {
-                                showNotificationPopup('Upload failed: ' + error.message, 'error');
+                                showNotificationPopup('Upload failed: ' + window.apiErrorMessage(error), 'error');
                             }
                         });
                 }
@@ -2759,7 +2759,7 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(toMarkdown ? { html: content } : { markdown: content })
         })
-            .then(response => response.json())
+            .then(window.readApiJson)
             .then(data => {
                 if (!data || data.success === false) {
                     throw new Error((data && data.error) || 'Conversion failed');
@@ -2841,7 +2841,7 @@
         const t = window.t || ((key, params, fallback) => fallback);
 
         fetch('/api/v1/notes/' + encodeURIComponent(note.id), { credentials: 'same-origin' })
-            .then(response => response.json())
+            .then(window.readApiJson)
             .then(data => {
                 if (!data || !data.success || !data.note) {
                     throw new Error((data && data.error) || 'Template not found');
@@ -2860,7 +2860,7 @@
             .catch(error => {
                 console.error('slash-command: insertTemplate() failed:', error);
                 if (typeof showNotificationPopup === 'function') {
-                    showNotificationPopup(t('slash_menu.template_insert_failed', null, 'Could not insert the template'), 'error');
+                    showNotificationPopup(window.apiErrorMessage(error, t('slash_menu.template_insert_failed', null, 'Could not insert the template')), 'error');
                 }
             });
     }
@@ -6895,18 +6895,19 @@
                     formData.append('workspace', selectedWorkspace);
                 }
 
+                var uploadStatus = 0;
                 fetch('/api/v1/notes/' + noteId + '/attachments', {
                     method: 'POST',
                     body: formData
                 })
-                    .then(function (response) { return response.text(); })
+                    .then(function (response) { uploadStatus = response.status; return response.text(); })
                     .then(function (text) {
                         var data;
                         try {
                             data = JSON.parse(text);
                         } catch (e) {
                             console.error(logPrefix + ' Failed to parse response:', e);
-                            throw new Error('Invalid server response');
+                            throw new Error('Invalid server response (HTTP ' + uploadStatus + ')');
                         }
                         if (!data || !data.success || !data.attachment_id) {
                             console.error(logPrefix + ' Upload failed:', data);

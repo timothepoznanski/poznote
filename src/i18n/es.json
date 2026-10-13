@@ -2255,7 +2255,8 @@
     "alerts": {
       "saved": "Guardado",
       "save_error": "Error al guardar",
-      "network_error": "Error de red"
+      "network_error": "Error de red",
+      "request_failed": "La solicitud ha fallado"
     }
   },
   "theme": {

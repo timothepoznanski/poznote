@@ -1765,7 +1765,8 @@
     "alerts": {
       "saved": "Saved",
       "save_error": "Save error",
-      "network_error": "Network error"
+      "network_error": "Network error",
+      "request_failed": "The request failed"
     }
   },
   "theme": {

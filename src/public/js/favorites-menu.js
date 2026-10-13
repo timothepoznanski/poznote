@@ -79,13 +79,13 @@
             body: JSON.stringify({ value: value })
         }).then(function (response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
-            return response.json();
+            return window.readApiJson(response);
         });
     }
 
-    function showError() {
+    function showError(error) {
         if (typeof window.showNotificationPopup === 'function') {
-            window.showNotificationPopup(tr('notes_list.favorites_menu.error', 'Could not update Favorites'), 'error');
+            window.showNotificationPopup(window.apiErrorMessage(error, tr('notes_list.favorites_menu.error', 'Could not update Favorites')), 'error');
         }
     }
 
@@ -105,7 +105,7 @@
     function setSort(mode) {
         saveSetting('favorites_sort', mode).then(refreshTree).catch(function (error) {
             console.error('favorites-menu: saving the order failed', error);
-            showError();
+            showError(error);
         });
     }
 
@@ -134,7 +134,7 @@
                     paintStar(color || '');
                 }).catch(function (error) {
                     console.error('favorites-menu: saving the star colour failed', error);
-                    showError();
+                    showError(error);
                 });
             }
         });
@@ -157,7 +157,7 @@
                 refreshTree();
             }).catch(function (error) {
                 console.error('favorites-menu: clearing Favorites failed', error);
-                showError();
+                showError(error);
             });
         };
 

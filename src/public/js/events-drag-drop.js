@@ -984,7 +984,7 @@ function reorderNoteBesideTarget(noteId, targetNoteId, position) {
             position: position
         })
     })
-        .then(function (r) { return r.json(); })
+        .then(window.readApiJson)
         .then(function (data) {
             if (data && data.success) {
                 // The row we dropped beside was on screen, so its folder is
@@ -994,13 +994,12 @@ function reorderNoteBesideTarget(noteId, targetNoteId, position) {
                     refreshSidebarAfterMove(data);
                 }
             } else {
-                var err = (data && (data.error || data.message)) || 'Unknown error';
-                showNotificationPopup('Error reordering note: ' + err, 'error');
+                showNotificationPopup('Error reordering note: ' + window.apiErrorMessage(data), 'error');
                 refreshSidebarAfterMove(null);
             }
         })
         .catch(function (error) {
-            showNotificationPopup('Error reordering note: ' + error.message, 'error');
+            showNotificationPopup('Error reordering note: ' + window.apiErrorMessage(error), 'error');
             refreshSidebarAfterMove(null);
         });
 }

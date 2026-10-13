@@ -349,9 +349,9 @@ async function createPublicShare(noteId) {
             const contentType = response.headers.get('content-type') || '';
             if (contentType.indexOf('application/json') !== -1) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || ('Network response not ok: ' + response.status));
+                throw new Error(errorData.error || ('HTTP ' + response.status));
             }
-            throw new Error('Network response not ok: ' + response.status);
+            throw new Error('HTTP ' + response.status);
         }
 
         // Parse response
@@ -360,8 +360,9 @@ async function createPublicShare(noteId) {
         if (contentType.indexOf('application/json') !== -1) {
             data = await response.json();
         } else {
-            const text = await response.text();
-            throw new Error('Unexpected response from server: ' + text);
+            // Not the API's answer (a proxy or login page): its HTML is of
+            // no use in a dialog, the status is.
+            throw new Error('HTTP ' + response.status);
         }
 
         // Handle successful response
@@ -846,9 +847,9 @@ async function createPublicFolderShare(folderId) {
             const contentType = response.headers.get('content-type') || '';
             if (contentType.indexOf('application/json') !== -1) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || ('Network response not ok: ' + response.status));
+                throw new Error(errorData.error || ('HTTP ' + response.status));
             }
-            throw new Error('Network response not ok: ' + response.status);
+            throw new Error('HTTP ' + response.status);
         }
 
         const contentType = response.headers.get('content-type') || '';
@@ -856,8 +857,9 @@ async function createPublicFolderShare(folderId) {
         if (contentType.indexOf('application/json') !== -1) {
             data = await response.json();
         } else {
-            const text = await response.text();
-            throw new Error('Unexpected response from server: ' + text);
+            // Not the API's answer (a proxy or login page): its HTML is of
+            // no use in a dialog, the status is.
+            throw new Error('HTTP ' + response.status);
         }
 
         if (data && data.url) {

@@ -1436,7 +1436,7 @@
             headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
             body: JSON.stringify(noteData)
         })
-            .then(function (response) { return response.json(); })
+            .then(window.readApiJson)
             .then(function (data) {
                 if (data.success && data.note) {
                     window.scrollTo(0, 0);
@@ -1455,14 +1455,14 @@
                     if (typeof window.hideNoteCreationLoading === 'function') {
                         window.hideNoteCreationLoading();
                     }
-                    showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list'), 'error');
+                    showNotificationPopup(window.apiErrorMessage(data, (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list')), 'error');
                 }
             })
             .catch(function (error) {
                 if (typeof window.hideNoteCreationLoading === 'function') {
                     window.hideNoteCreationLoading();
                 }
-                showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
+                showNotificationPopup(window.apiErrorMessage(error, (window.t ? window.t('index.errors.create_task_list', null, 'Error creating task list') : 'Error creating task list')), 'error');
             });
     };
 
@@ -1487,7 +1487,7 @@
             headers: { "Content-Type": "application/json", 'X-Requested-With': 'XMLHttpRequest' },
             body: JSON.stringify(noteData)
         })
-            .then(function (response) { return response.json(); })
+            .then(window.readApiJson)
             .then(function (data) {
                 if (data.success && data.note) {
                     window.scrollTo(0, 0);
@@ -1506,14 +1506,14 @@
                     if (typeof window.hideNoteCreationLoading === 'function') {
                         window.hideNoteCreationLoading();
                     }
-                    showNotificationPopup(data.error || (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note'), 'error');
+                    showNotificationPopup(window.apiErrorMessage(data, (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note')), 'error');
                 }
             })
             .catch(function (error) {
                 if (typeof window.hideNoteCreationLoading === 'function') {
                     window.hideNoteCreationLoading();
                 }
-                showNotificationPopup((window.t ? window.t('ui.alerts.network_error', null, 'Network error') : 'Network error') + ': ' + error.message, 'error');
+                showNotificationPopup(window.apiErrorMessage(error, (window.t ? window.t('index.errors.create_markdown_note', null, 'Error creating markdown note') : 'Error creating markdown note')), 'error');
             });
     };
 

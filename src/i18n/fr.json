@@ -2261,7 +2261,8 @@
     "alerts": {
       "saved": "Enregistré",
       "save_error": "Erreur d’enregistrement",
-      "network_error": "Erreur réseau"
+      "network_error": "Erreur réseau",
+      "request_failed": "La requête a échoué"
     }
   },
   "theme": {

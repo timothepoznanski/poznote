@@ -232,7 +232,7 @@
                 } else if (status === 423) {
                     throw new Error(i18n('editLocked', 'Someone else is currently editing this note. Please try again later.'));
                 } else {
-                    throw new Error(data.error || 'Unknown error');
+                    throw new Error(data.error || ('HTTP ' + status));
                 }
             })
             .catch(err => {

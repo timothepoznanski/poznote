@@ -306,7 +306,7 @@ function createNoteOfType(noteType, globalFnNames) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ folder_id: targetFolderId, workspace: selectedWorkspace, type: noteType })
-            }).then(function (r) { return r.json(); }).then(function (data) {
+            }).then(window.readApiJson).then(function (data) {
                 if (data.success && data.note) {
                     // Mark note for auto-push since we created a note (if auto-push enabled)
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
@@ -326,13 +326,13 @@ function createNoteOfType(noteType, globalFnNames) {
                     if (typeof window.hideNoteCreationLoading === 'function') {
                         window.hideNoteCreationLoading();
                     }
-                    showNotificationPopup(data.error || data.message || 'Error creating note', 'error');
+                    showNotificationPopup(window.apiErrorMessage(data, 'Error creating note'), 'error');
                 }
             }).catch(function (error) {
                 if (typeof window.hideNoteCreationLoading === 'function') {
                     window.hideNoteCreationLoading();
                 }
-                showNotificationPopup('Network error: ' + error.message, 'error');
+                showNotificationPopup(window.apiErrorMessage(error, 'Error creating note'), 'error');
             });
         }
 
@@ -354,7 +354,7 @@ function createNoteOfType(noteType, globalFnNames) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ workspace: selectedWorkspace, type: noteType })
-            }).then(function (r) { return r.json(); }).then(function (data) {
+            }).then(window.readApiJson).then(function (data) {
                 if (data.success && data.note) {
                     // Mark note for auto-push since we created a note (if auto-push enabled)
                     if (window.POZNOTE_CONFIG?.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
@@ -374,13 +374,13 @@ function createNoteOfType(noteType, globalFnNames) {
                     if (typeof window.hideNoteCreationLoading === 'function') {
                         window.hideNoteCreationLoading();
                     }
-                    showNotificationPopup(data.error || data.message || 'Error creating note', 'error');
+                    showNotificationPopup(window.apiErrorMessage(data, 'Error creating note'), 'error');
                 }
             }).catch(function (error) {
                 if (typeof window.hideNoteCreationLoading === 'function') {
                     window.hideNoteCreationLoading();
                 }
-                showNotificationPopup('Network error: ' + error.message, 'error');
+                showNotificationPopup(window.apiErrorMessage(error, 'Error creating note'), 'error');
             });
         }
     }
@@ -438,7 +438,7 @@ function openDiaryEntryForDate(date, workspace, openEntry) {
     }
 
     fetch(lookupUrl, { credentials: 'same-origin' })
-        .then(function (response) { return response.json(); })
+        .then(window.readApiJson)
         .then(function (diary) {
             if (diary && diary.error) throw new Error(diary.error);
 
@@ -461,16 +461,16 @@ function openDiaryEntryForDate(date, workspace, openEntry) {
                     created_date: date
                 })
             })
-                .then(function (response) { return response.json(); })
+                .then(window.readApiJson)
                 .then(function (result) {
                     if (result.success && result.note) {
                         openEntry(result.note.id, result.note.workspace || diary.workspace, true);
                     } else {
-                        fail(result.error || result.message || '');
+                        fail(result.error || result.message || (result._httpStatus ? 'HTTP ' + result._httpStatus : ''));
                     }
                 });
         })
-        .catch(function (error) { fail(error.message); });
+        .catch(function (error) { fail(window.apiErrorMessage(error)); });
 }
 
 window.openDiaryEntryForDate = openDiaryEntryForDate;

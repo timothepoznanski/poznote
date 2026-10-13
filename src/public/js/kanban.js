@@ -195,7 +195,7 @@
                 }
             }
             updateColumnCounts();
-            showError('Error moving note');
+            showError(window.apiErrorMessage(error, 'Error moving note'));
         }
     }
 
@@ -767,11 +767,11 @@
                                     window.location.reload();
                                 }
                             } else {
-                                showError(data.message || 'Failed to create column');
+                                showError(window.apiErrorMessage(data, 'Failed to create column'));
                             }
                         } catch (error) {
                             console.error('Kanban: Error creating column:', error);
-                            showError('Error creating column');
+                            showError(window.apiErrorMessage(error, 'Error creating column'));
                         }
                     },
                     (window.t ? window.t('common.create', null, 'Create') : 'Create')
@@ -1765,7 +1765,7 @@
         } catch (error) {
             console.error('Kanban: Error updating completed state:', error);
             revert();
-            showError(kanbanT('kanban.completed.error', 'Failed to update the card'));
+            showError(window.apiErrorMessage(error, kanbanT('kanban.completed.error', 'Failed to update the card')));
         }
     }
 

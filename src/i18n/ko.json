@@ -1765,7 +1765,8 @@
     "alerts": {
       "saved": "저장됨",
       "save_error": "저장 오류",
-      "network_error": "네트워크 오류"
+      "network_error": "네트워크 오류",
+      "request_failed": "요청에 실패했습니다"
     }
   },
   "theme": {

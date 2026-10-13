@@ -272,13 +272,13 @@
             body: formData,
             credentials: 'same-origin'
         })
-            .then(function (response) { return response.json(); })
+            .then(window.readApiJson)
             .then(function (data) {
                 setBusy(false);
 
                 if (!data || !data.success) {
-                    var errorText = (data && (data.error || data.message)) ||
-                        tr('restore_import.drag_drop.sidebar.import_failed', {}, 'Import failed.');
+                    var errorText = window.apiErrorMessage(data,
+                        tr('restore_import.drag_drop.sidebar.import_failed', {}, 'Import failed.'));
                     showNotificationPopup(errorText, 'error');
                     return;
                 }
@@ -305,7 +305,7 @@
                 setBusy(false);
                 console.error('Drag & drop import failed:', err);
                 showNotificationPopup(
-                    tr('restore_import.drag_drop.sidebar.import_failed', {}, 'Import failed.'),
+                    window.apiErrorMessage(err, tr('restore_import.drag_drop.sidebar.import_failed', {}, 'Import failed.')),
                     'error'
                 );
             });

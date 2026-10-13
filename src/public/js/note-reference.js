@@ -600,9 +600,12 @@
                     type: source.type === 'markdown' ? 'markdown' : 'note'
                 })
             });
-            const data = await response.json();
+            const data = await window.readApiJson(response);
             if (!data.success || !data.note) {
-                throw new Error(data.error || 'Create failed');
+                if (typeof showNotificationPopup === 'function') {
+                    showNotificationPopup(window.apiErrorMessage(data, tr('note_reference.broken.error_creating', {}, 'Error creating note')), 'error');
+                }
+                return;
             }
 
             // Insert the reference (closes the modal and restores the cursor)
@@ -615,7 +618,7 @@
         } catch (e) {
             console.error('Error creating note from reference modal:', e);
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(tr('note_reference.broken.error_creating', {}, 'Error creating note'), 'error');
+                showNotificationPopup(window.apiErrorMessage(e, tr('note_reference.broken.error_creating', {}, 'Error creating note')), 'error');
             }
         } finally {
             if (btn) btn.disabled = false;
@@ -1077,10 +1080,12 @@
                     type: source.type === 'markdown' ? 'markdown' : 'note'
                 })
             });
-            const data = await response.json();
-
+            const data = await window.readApiJson(response);
             if (!data.success || !data.note) {
-                throw new Error(data.error || 'Create failed');
+                if (typeof showNotificationPopup === 'function') {
+                    showNotificationPopup(window.apiErrorMessage(data, tr('note_reference.broken.error_creating', {}, 'Error creating note')), 'error');
+                }
+                return;
             }
 
             activateBrokenLinks(title, data.note.id, data.note.heading, workspace);
@@ -1096,7 +1101,7 @@
         } catch (e) {
             console.error('Error creating note from broken link:', e);
             if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup(tr('note_reference.broken.error_creating', {}, 'Error creating note'), 'error');
+                showNotificationPopup(window.apiErrorMessage(e, tr('note_reference.broken.error_creating', {}, 'Error creating note')), 'error');
             }
         }
     }

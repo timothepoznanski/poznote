@@ -101,12 +101,12 @@
             return requestSnapshotCreate(noteId, true);
         }).then(function (data) {
             if (!data || !data.success) {
-                showSnapshotError((data && data.error) || tr('revisions.errors.create_failed', 'Could not save a revision'));
+                showSnapshotError(window.apiErrorMessage(data, tr('revisions.errors.create_failed', 'Could not save a revision')));
                 return;
             }
             showSnapshotToast(tr('revisions.messages.created', 'Revision saved'));
-        }).catch(function () {
-            showSnapshotError(tr('revisions.errors.create_failed', 'Could not save a revision'));
+        }).catch(function (error) {
+            showSnapshotError(window.apiErrorMessage(error, tr('revisions.errors.create_failed', 'Could not save a revision')));
         });
 
         return true;

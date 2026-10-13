@@ -1104,9 +1104,9 @@
             state.selectedKey = key;
             renderList();
             selectRevision(key);
-        }).catch(function () {
+        }).catch(function (error) {
             showState('empty');
-            showError(tr('errors.load_failed', 'Could not load the revisions'));
+            showError(window.apiErrorMessage(error, tr('errors.load_failed', 'Could not load the revisions')));
         });
     }
 
