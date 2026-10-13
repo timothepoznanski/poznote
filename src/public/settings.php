@@ -121,6 +121,7 @@ $settingsPageUserKeys = [
     'markdown_split_card_view',
     'markdown_split_preview_left',
     'markdown_heading_underline',
+    'markdown_editor_word_wrap',
     'markdown_default_view_mode',
     'markdown_new_note_view_mode',
     'markdown_colored',
@@ -1410,6 +1411,16 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_heading_underline', [], 'Heading underline'); ?></span>
                     <span id="markdown-heading-underline-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Word wrap in the Markdown editor (discussion 1623) -->
+            <div class="home-card" id="markdown-editor-wrap-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_editor_word_wrap', [], 'Wrap long lines in the markdown editor instead of scrolling horizontally. The note itself is not changed. Live preview and Rich text always wrap.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-corner-down-left"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.markdown_editor_word_wrap', [], 'Editor word wrap'); ?></span>
+                    <span id="markdown-editor-wrap-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
 

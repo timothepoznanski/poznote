@@ -55,6 +55,17 @@ function isMarkdownSpellcheckEnabled() {
     }
 }
 
+// Long lines of the Markdown editor wrap unless the account turned "Editor word
+// wrap" off (discussion 1623), which index.php renders as
+// <body class="markdown-editor-no-wrap">.
+function isMarkdownEditorWordWrapEnabled() {
+    try {
+        return !document.body || !document.body.classList.contains('markdown-editor-no-wrap');
+    } catch (e) {
+        return true;
+    }
+}
+
 function syncMarkdownLiveEditing(noteEntry) {
     var api = getMarkdownCodeMirrorApi();
     if (!api || !noteEntry || typeof api.setLivePreview !== 'function') return;
@@ -79,7 +90,8 @@ function initializeCodeMirrorMarkdownEditor(editorDiv, markdownContent, readOnly
             readOnly: !!readOnly,
             spellcheck: isMarkdownSpellcheckEnabled(),
             lang: (document.body && document.body.getAttribute('data-spellcheck-lang')) || '',
-            livePreview: isMarkdownLiveEditingEnabled() && !editorDiv.closest('.markdown-split-mode')
+            livePreview: isMarkdownLiveEditingEnabled() && !editorDiv.closest('.markdown-split-mode'),
+            lineWrapping: isMarkdownEditorWordWrapEnabled()
         });
     } catch (error) {
         console.error('Error initializing CodeMirror Markdown editor:', error);
