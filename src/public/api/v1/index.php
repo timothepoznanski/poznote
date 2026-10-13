@@ -117,6 +117,7 @@ require_once __DIR__ . '/../../../api/v1/controllers/GraphController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/SnapshotsController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/RemindersController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/TasksController.php';
+require_once __DIR__ . '/../../../api/v1/controllers/MentionsController.php';
 require_once __DIR__ . '/../../../api/v1/controllers/OfflineController.php';
 
 /**
@@ -265,6 +266,7 @@ $graphController = new GraphController($con);
 $snapshotsController = new SnapshotsController($con);
 $remindersController = new RemindersController($con);
 $tasksController = new TasksController($con);
+$mentionsController = new MentionsController($con);
 $offlineController = new OfflineController($con, $notesController);
 
 // ======================
@@ -304,6 +306,24 @@ $router->get('/notes/{id}/backlinks', function($params) use ($backlinksControlle
 // Note-link graph (nodes + edges) for the graph view
 $router->get('/graph', function($params) use ($graphController) {
     $graphController->index();
+});
+
+// Notes of the shared workspaces that mention the person signed in (#1621)
+$router->get('/mentions', function($params) use ($mentionsController) {
+    $mentionsController->index();
+});
+
+// Who can be mentioned in a workspace (must come before /mentions/{ownerId}/...)
+$router->get('/mentions/members', function($params) use ($mentionsController) {
+    $mentionsController->members();
+});
+
+$router->post('/mentions/{ownerId}/{noteId}/handled', function($params) use ($mentionsController) {
+    $mentionsController->setHandled($params['ownerId'], $params['noteId'], true);
+});
+
+$router->delete('/mentions/{ownerId}/{noteId}/handled', function($params) use ($mentionsController) {
+    $mentionsController->setHandled($params['ownerId'], $params['noteId'], false);
 });
 
 // Aggregated tasks of all tasklist notes (global tasks page)

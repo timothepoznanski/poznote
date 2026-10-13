@@ -162,6 +162,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTrashBtn" checked><span><?php echo t_h('notes_list.system_folders.trash', [], 'Trash'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDiaryBtn" checked><span><?php echo t_h('diary.title', [], 'Diary'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTasksBtn" checked><span><?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarMentionsBtn" checked><span><?php echo t_h('mentions.title', [], 'Mentions'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPushBtn" checked><span>Push</span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPullBtn" checked><span>Pull</span></label>

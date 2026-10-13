@@ -4640,6 +4640,19 @@
     "show_hidden": "숨겨진 목록 표시",
     "empty_hidden": "모든 목록이 숨겨져 있습니다."
   },
+  "mentions": {
+    "title": "멘션",
+    "intro": "공유 작업 공간에서 @{{username}}(으)로 나를 멘션한 노트입니다.",
+    "show_handled": "처리한 항목 표시",
+    "hide_handled": "처리한 항목 숨기기",
+    "mark_handled": "처리함으로 표시",
+    "reopen": "처리 안 함으로 표시",
+    "shared_by": "{{owner}} 님이 공유",
+    "modified_by": "마지막 수정: {{user}}",
+    "empty": "기다리는 노트가 없습니다.",
+    "empty_no_workspace": "멘션은 공유 작업 공간에서 작동합니다. 노트에 @와 사용자 이름을 쓰면 그 사람의 주의를 끌 수 있습니다.",
+    "you_are_mentioned": "이 노트에서 멘션되었습니다"
+  },
   "s3_settings": {
     "title": "S3 첨부 파일 저장소",
     "description": "로컬 디스크 대신 S3 호환 개체 저장소에 노트 첨부 파일을 저장합니다.",

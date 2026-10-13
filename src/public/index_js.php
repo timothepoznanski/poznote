@@ -122,6 +122,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/slash-command.js',
         'js/mobile-editor-bar.js',
         'js/emoji-autocomplete.js',
+        'js/mention-autocomplete.js',
         'js/pwa-helpers.js',
         'js/share.js',
         'js/reminders.js',

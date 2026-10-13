@@ -5064,6 +5064,19 @@
     "show_hidden": "显示已隐藏的列表",
     "empty_hidden": "所有列表均已隐藏。"
   },
+  "mentions": {
+    "title": "提及",
+    "intro": "共享工作区中用 @{{username}} 提及你的笔记。",
+    "show_handled": "显示已处理",
+    "hide_handled": "隐藏已处理",
+    "mark_handled": "标记为已处理",
+    "reopen": "标记为未处理",
+    "shared_by": "由 {{owner}} 共享",
+    "modified_by": "最后修改者：{{user}}",
+    "empty": "没有等待你处理的笔记。",
+    "empty_no_workspace": "提及功能适用于共享工作区：在笔记中输入 @ 加用户名，即可提醒对方查看。",
+    "you_are_mentioned": "此笔记提及了你"
+  },
   "s3_settings": {
     "title": "S3 附件存储",
     "description": "将笔记附件存储在 S3 兼容的对象存储中,而不是本地磁盘。",

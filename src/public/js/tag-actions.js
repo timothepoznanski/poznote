@@ -87,12 +87,14 @@
     }
 
     /**
-     * Color picker for one tag. Resolves true once the new color is saved,
-     * false when saving failed (the user has been told), null when cancelled.
+     * The color picker itself: the palette, a custom color, Remove, Cancel
+     * and Apply. Resolves the chosen value (a palette id or '#rrggbb'), ''
+     * for Remove, null when cancelled. Saving is left to the caller, which
+     * lets the Kanban cards use it for a note color (js/kanban.js).
      */
-    function openColorDialog(tagName) {
+    function pickColor(title, currentValue) {
         return new Promise(function (resolve) {
-            const currentValue = getColorsMap()[colorKey(tagName)] || '';
+            currentValue = currentValue || '';
 
             const overlay = document.createElement('div');
             overlay.className = 'alert-modal-overlay';
@@ -105,7 +107,7 @@
             header.className = 'alert-modal-header';
             const titleEl = document.createElement('h3');
             titleEl.className = 'alert-modal-title';
-            titleEl.textContent = t('tags.color.modal_title', 'Tag color') + ' — ' + tagName;
+            titleEl.textContent = title;
             header.appendChild(titleEl);
 
             const body = document.createElement('div');
@@ -155,14 +157,14 @@
             const footer = document.createElement('div');
             footer.className = 'alert-modal-footer';
 
-            function closeColorModal(cb) {
+            function closeColorModal(value) {
                 document.removeEventListener('keydown', onKeydown, true);
                 overlay.classList.remove('show');
-                setTimeout(function () { overlay.remove(); if (cb) cb(); }, 300);
+                setTimeout(function () { overlay.remove(); resolve(value); }, 300);
             }
 
             function cancel() {
-                closeColorModal(function () { resolve(null); });
+                closeColorModal(null);
             }
 
             function onKeydown(e) {
@@ -172,24 +174,10 @@
                 }
             }
 
-            function persist(value) {
-                closeColorModal(function () {
-                    setColor(tagName, value, function (success) {
-                        if (!success && window.modalAlert) {
-                            window.modalAlert.alert(
-                                t('tags.color.apply_error', 'Could not update the tag color.'),
-                                'error'
-                            );
-                        }
-                        resolve(success);
-                    });
-                });
-            }
-
             const removeBtn = document.createElement('button');
             removeBtn.className = 'alert-modal-button secondary';
             removeBtn.textContent = t('note_color.remove', 'Remove color');
-            removeBtn.addEventListener('click', function () { persist(''); });
+            removeBtn.addEventListener('click', function () { closeColorModal(''); });
 
             const cancelBtn = document.createElement('button');
             cancelBtn.className = 'alert-modal-button secondary';
@@ -199,7 +187,7 @@
             const applyBtn = document.createElement('button');
             applyBtn.className = 'alert-modal-button primary';
             applyBtn.textContent = t('common.apply', 'Apply');
-            applyBtn.addEventListener('click', function () { persist(selectedValue); });
+            applyBtn.addEventListener('click', function () { closeColorModal(selectedValue); });
 
             footer.appendChild(removeBtn);
             footer.appendChild(cancelBtn);
@@ -214,6 +202,28 @@
 
             refreshSelection();
             requestAnimationFrame(function () { overlay.classList.add('show'); });
+        });
+    }
+
+    /**
+     * Color picker for one tag. Resolves true once the new color is saved,
+     * false when saving failed (the user has been told), null when cancelled.
+     */
+    function openColorDialog(tagName) {
+        const title = t('tags.color.modal_title', 'Tag color') + ' — ' + tagName;
+        return pickColor(title, getColorsMap()[colorKey(tagName)]).then(function (value) {
+            if (value === null) return null;
+            return new Promise(function (resolve) {
+                setColor(tagName, value, function (success) {
+                    if (!success && window.modalAlert) {
+                        window.modalAlert.alert(
+                            t('tags.color.apply_error', 'Could not update the tag color.'),
+                            'error'
+                        );
+                    }
+                    resolve(success);
+                });
+            });
         });
     }
 
@@ -354,6 +364,7 @@
         resolveHex: resolveHex,
         setColor: setColor,
         openColorDialog: openColorDialog,
+        pickColor: pickColor,
         normalizeName: normalizeName,
         openRenameDialog: openRenameDialog,
         rename: rename

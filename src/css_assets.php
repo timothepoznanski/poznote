@@ -518,6 +518,14 @@ function poznoteCssManifest(): array
             '@theme',
             '@icon-sidebar',
         ],
+        'mentions' => [
+            'css/lucide.css',
+            '@components',
+            'css/tasks-page.css',
+            'css/mentions.css',
+            '@theme',
+            '@icon-sidebar',
+        ],
         'tasks' => [
             'css/lucide.css',
             '@components',

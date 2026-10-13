@@ -5072,6 +5072,19 @@
     "show_hidden": "Afficher les listes masquées",
     "empty_hidden": "Toutes les listes sont masquées."
   },
+  "mentions": {
+    "title": "Mentions",
+    "intro": "Notes des espaces de travail partagés qui vous mentionnent avec @{{username}}.",
+    "show_handled": "Afficher les mentions traitées",
+    "hide_handled": "Masquer les mentions traitées",
+    "mark_handled": "Marquer comme traitée",
+    "reopen": "Marquer comme non traitée",
+    "shared_by": "partagé par {{owner}}",
+    "modified_by": "Dernière modification par {{user}}",
+    "empty": "Aucune note ne vous attend.",
+    "empty_no_workspace": "Les mentions fonctionnent dans les espaces de travail partagés : écrivez @ suivi d'un nom d'utilisateur dans une note pour attirer l'attention de cette personne.",
+    "you_are_mentioned": "Vous êtes mentionné dans cette note"
+  },
   "s3_settings": {
     "title": "Stockage S3 des pièces jointes",
     "description": "Stockez les pièces jointes des notes dans un stockage objet compatible S3 au lieu du disque local.",

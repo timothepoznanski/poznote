@@ -100,6 +100,19 @@ $iconSidebarItems = [
     ['id' => 'iconSidebarTrashBtn', 'group' => 'utility', 'url' => $iconSidebarUrl('trash.php'), 'page' => 'trash.php', 'icon' => 'lucide-trash-2', 'label' => t('notes_list.system_folders.trash', [], 'Trash')],
 ];
 
+// Mentions (discussion #1621): the notes of the shared workspaces that name
+// the person signed in with "@username". The entry exists only for someone
+// who shares a workspace or was given one, right after Tasks, and carries
+// the number of notes still waiting for them. It is about the login, not
+// the active account, so it stays inside a workspace shared with them.
+require_once __DIR__ . '/lib/mentions.php';
+$iconSidebarMentionUserId = function_exists('getAuthenticatedUserId') ? (int)(getAuthenticatedUserId() ?? 0) : 0;
+if ($iconSidebarMentionUserId > 0 && poznoteMentionWorkspaces($iconSidebarMentionUserId)) {
+    $iconSidebarMentionsItem = ['id' => 'iconSidebarMentionsBtn', 'group' => 'content', 'url' => $iconSidebarUrl('mentions.php'), 'page' => 'mentions.php', 'icon' => 'lucide-at-sign', 'label' => t('mentions.title', [], 'Mentions'), 'mentionBadge' => poznoteOpenMentionCount($iconSidebarMentionUserId)];
+    $iconSidebarTasksIndex = array_search('iconSidebarTasksBtn', array_column($iconSidebarItems, 'id'), true);
+    array_splice($iconSidebarItems, $iconSidebarTasksIndex === false ? count($iconSidebarItems) : $iconSidebarTasksIndex + 1, 0, [$iconSidebarMentionsItem]);
+}
+
 // A workspace shared with this login (auth.php) opens its owner's account for
 // that one workspace: the views that span the whole account, and the trash and
 // the public links that belong to its owner, are refused there, so they are
@@ -553,6 +566,9 @@ try {
         <?php endif; ?>
         <?php if (!empty($iconSidebarItem['attentionBadge'])): ?>
         <span class="attention-badge"></span>
+        <?php endif; ?>
+        <?php if (isset($iconSidebarItem['mentionBadge'])): // count of notes waiting, kept up to date by js/mentions-page.js ?>
+        <span class="mention-badge"<?php echo (int)$iconSidebarItem['mentionBadge'] > 0 ? '' : ' hidden'; ?>><?php echo (int)$iconSidebarItem['mentionBadge'] > 99 ? '99+' : (int)$iconSidebarItem['mentionBadge']; ?></span>
         <?php endif; ?>
     </a>
     <?php endif; ?>

@@ -1,0 +1,152 @@
+/* Mentions page (mentions.php, discussion #1621). The page frame, the grey
+   ground and the white cards are the Tasks page's (css/tasks-page.css): the
+   body carries both classes. */
+
+.mentions-toolbar {
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+
+.mentions-intro {
+    margin: 0;
+    font-size: 13px;
+    color: var(--pz-text-muted);
+}
+
+.mentions-toggle-handled {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background-color: var(--pz-bg);
+    color: var(--pz-text-muted);
+    font-size: 13px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.mentions-toggle-handled:hover,
+.mentions-toggle-handled.active {
+    color: var(--pz-accent-text);
+    border-color: var(--pz-accent-text);
+}
+
+.mentions-group-header {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--pz-border);
+    font-size: 14px;
+    color: var(--pz-text-strong);
+}
+
+.mentions-group-header .lucide {
+    align-self: center;
+    color: var(--pz-text-muted);
+}
+
+.mentions-group-workspace {
+    font-weight: var(--pz-weight-semibold);
+}
+
+.mentions-group-owner {
+    font-size: 12px;
+    color: var(--pz-text-muted);
+}
+
+.mentions-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mentions-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 4px;
+    border-bottom: 1px solid rgba(var(--pz-shadow-rgb), 0.04);
+}
+
+.mentions-item:last-child {
+    border-bottom: none;
+    padding-bottom: 2px;
+}
+
+.mentions-item-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.mentions-item-title {
+    font-size: 14px;
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-link);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.mentions-item-title:hover {
+    text-decoration: underline;
+}
+
+.mentions-item-excerpt {
+    margin: 4px 0 0 0;
+    font-size: 13px;
+    color: var(--pz-text);
+    overflow-wrap: anywhere;
+}
+
+.mentions-item-meta {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: var(--pz-text-muted);
+}
+
+.mentions-item.handled .mentions-item-body {
+    opacity: 0.55;
+}
+
+.mentions-handled-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-circle);
+    background-color: var(--pz-bg);
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.mentions-handled-btn:hover {
+    color: var(--pz-accent-text);
+    border-color: var(--pz-accent-text);
+}
+
+.mentions-handled-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.mentions-page .empty-message.initially-hidden {
+    display: none;
+}
+
+@media (max-width: 800px) {
+    .mentions-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
