@@ -2488,14 +2488,14 @@ class FoldersController {
         }
         
         // Update note
-        // display_order is reset: positions only mean something among the
-        // siblings they were numbered with (see reorderNote)
+        // display_order and kanban_order are reset: positions only mean
+        // something among the siblings they were numbered with (see reorderNote)
         if ($workspace) {
-            $query = "UPDATE entries SET folder = ?, folder_id = ?, workspace = ?, display_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
+            $query = "UPDATE entries SET folder = ?, folder_id = ?, workspace = ?, display_order = 0, kanban_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $success = $stmt->execute([$targetFolder, $targetFolderId, $workspace, $noteId]);
         } else {
-            $query = "UPDATE entries SET folder = ?, folder_id = ?, display_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
+            $query = "UPDATE entries SET folder = ?, folder_id = ?, display_order = 0, kanban_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $success = $stmt->execute([$targetFolder, $targetFolderId, $noteId]);
         }
@@ -3053,8 +3053,8 @@ class FoldersController {
             return;
         }
         
-        // Move to root (display_order reset, see reorderNote)
-        $query = "UPDATE entries SET folder = NULL, folder_id = NULL, display_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
+        // Move to root (display_order and kanban_order reset, see reorderNote)
+        $query = "UPDATE entries SET folder = NULL, folder_id = NULL, display_order = 0, kanban_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?";
         $stmt = $this->db->prepare($query);
         $success = $stmt->execute([$noteId]);
         
@@ -3092,11 +3092,16 @@ class FoldersController {
      *
      * Body: { "note_id": 12, "target_note_id": 34, "position": "before"|"after",
      *         "workspace": "Poznote" (optional check),
-     *         "scope": "sidebar" (default) | "dashboard" }
+     *         "scope": "sidebar" (default) | "dashboard" | "kanban" }
      *
      * With scope "dashboard" the rank goes to entries.dashboard_order, the
      * column the dashboard sorts its cards on, and nothing else changes (see
-     * reorderNoteOnDashboard); the target must be a sibling.
+     * reorderNoteOnBoard); the target must be a sibling. Scope "kanban" does
+     * the same with entries.kanban_order, the order of the cards inside a
+     * Kanban column under the board's Custom sort. There an optional
+     * "visible_order" (note ids) gives the order the siblings were shown in
+     * when it was not the saved one, a board sorted by date or tag: the drop
+     * is then made in what the user was looking at, as in the sidebar.
      */
     public function reorderNote(): void {
         $data = $this->getInputData();
@@ -3122,8 +3127,8 @@ class FoldersController {
             return;
         }
 
-        if (!in_array($scope, ['sidebar', 'dashboard'], true)) {
-            $this->sendError('scope must be sidebar or dashboard', 400);
+        if (!in_array($scope, ['sidebar', 'dashboard', 'kanban'], true)) {
+            $this->sendError('scope must be sidebar, dashboard or kanban', 400);
             return;
         }
 
@@ -3153,15 +3158,19 @@ class FoldersController {
         $currentFolderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
         $changesFolder = $currentFolderId !== $targetFolderId;
 
-        if ($scope === 'dashboard') {
+        if ($scope !== 'sidebar') {
             // Cards are only rearranged among the siblings shown together on
             // the board; moving a note to another folder stays a sidebar (or
             // move endpoint) operation.
             if ($changesFolder) {
-                $this->sendError('Dashboard reordering keeps the note in its folder: target_note_id must be a sibling', 400);
+                $this->sendError(ucfirst($scope) . ' reordering keeps the note in its folder: target_note_id must be a sibling', 400);
                 return;
             }
-            $this->reorderNoteOnDashboard($note, $targetNoteId, $position, $targetWorkspace, $targetFolderId);
+            $visibleOrder = [];
+            if ($scope === 'kanban' && isset($data['visible_order']) && is_array($data['visible_order'])) {
+                $visibleOrder = array_values(array_unique(array_map('intval', $data['visible_order'])));
+            }
+            $this->reorderNoteOnBoard($scope, $note, $targetNoteId, $position, $targetWorkspace, $targetFolderId, $visibleOrder);
             return;
         }
 
@@ -3215,7 +3224,7 @@ class FoldersController {
                 // Changing folder is an edit, like moveNoteToFolder; a pure
                 // reorder leaves 'updated' alone so date-based views keep
                 // their meaning.
-                $updateDragged = $this->db->prepare("UPDATE entries SET folder = ?, folder_id = ?, display_order = ?, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?");
+                $updateDragged = $this->db->prepare("UPDATE entries SET folder = ?, folder_id = ?, display_order = ?, kanban_order = 0, updated = datetime('now'), updated_by_user_id = " . getWriteActorUserId() . " WHERE id = ?");
             } else {
                 $updateDragged = $this->db->prepare('UPDATE entries SET display_order = ? WHERE id = ?');
             }
@@ -3275,20 +3284,33 @@ class FoldersController {
     }
 
     /**
-     * Dashboard variant of reorderNote(): same before/after contract, but the
-     * rank goes to entries.dashboard_order, the column the board sorts its
-     * cards on, and nothing else changes. The sidebar order (display_order),
-     * the folder's sort setting and the note's 'updated' date are untouched,
-     * so arranging the board never reorders the sidebar, and the sidebar's
-     * sort setting never rearranges the board.
+     * Board variant of reorderNote(), for the dashboard and the Kanban view:
+     * same before/after contract, but the rank goes to the board's own column
+     * (entries.dashboard_order or entries.kanban_order) and nothing else
+     * changes. The sidebar order (display_order), the tree's sort mode and
+     * the note's 'updated' date are untouched, so arranging a board never
+     * reorders the sidebar, and the sidebar's sort never rearranges a board.
      *
-     * Siblings are renumbered from 1 following what the board displays:
-     * pinned cards first, then placed cards in saved order, unplaced ones
-     * ahead of them by newest update (see dashboardSortRows in dashboard.php).
+     * Siblings are renumbered from 1 following what the board displays. On
+     * the dashboard: pinned cards first, then placed cards in saved order,
+     * unplaced ones ahead of them by newest update (see dashboardSortRows in
+     * dashboard.php). In a Kanban column: the same placed order without the
+     * pinned rule (see kanban_content.php); completed cards are numbered
+     * along with the others although their section shows them by completion
+     * date.
+     *
+     * @param int[] $visibleOrder Sibling ids in the order they were shown,
+     *                            when that was not the saved order; siblings
+     *                            it leaves out follow in the saved order.
      */
-    private function reorderNoteOnDashboard(array $note, int $targetNoteId, string $position, string $workspace, ?int $folderId): void {
+    private function reorderNoteOnBoard(string $scope, array $note, int $targetNoteId, string $position, string $workspace, ?int $folderId, array $visibleOrder = []): void {
         $noteId = (int)$note['id'];
-        $orderedIds = $this->getOrderedDashboardSiblingNoteIds($workspace, $folderId, $noteId);
+        $orderColumn = $scope === 'kanban' ? 'kanban_order' : 'dashboard_order';
+        $orderedIds = $this->getOrderedBoardSiblingNoteIds($orderColumn, $workspace, $folderId, $noteId);
+        if ($visibleOrder) {
+            $shown = array_values(array_intersect($visibleOrder, $orderedIds));
+            $orderedIds = array_merge($shown, array_values(array_diff($orderedIds, $shown)));
+        }
         $targetIndex = array_search($targetNoteId, $orderedIds, true);
         if ($targetIndex === false) {
             $this->sendError('Target note is not available in the destination order', 404);
@@ -3300,7 +3322,7 @@ class FoldersController {
 
         try {
             $this->db->beginTransaction();
-            $update = $this->db->prepare('UPDATE entries SET dashboard_order = ? WHERE id = ?');
+            $update = $this->db->prepare('UPDATE entries SET ' . $orderColumn . ' = ? WHERE id = ?');
             foreach ($orderedIds as $index => $id) {
                 $update->execute([$index + 1, $id]);
             }
@@ -3323,19 +3345,20 @@ class FoldersController {
                 'folder' => $note['folder'] ?? null,
                 'position' => $position,
                 'target_note_id' => $targetNoteId,
-                'scope' => 'dashboard',
-                'dashboard_order' => $insertIndex + 1,
+                'scope' => $scope,
+                $orderColumn => $insertIndex + 1,
             ],
             'share_delta' => 0
         ]);
     }
 
     /**
-     * Ids of the notes shown next to a note on the dashboard (same folder, or
-     * the root), in the order the board displays them, excluding one note.
+     * Ids of the notes shown next to a note on a board (same folder, or the
+     * root), in the order that board displays them, excluding one note.
+     * $orderColumn is dashboard_order or kanban_order, never user input.
      */
-    private function getOrderedDashboardSiblingNoteIds(string $workspace, ?int $folderId, int $excludeNoteId): array {
-        $sql = 'SELECT id, pinned, updated, dashboard_order FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND '
+    private function getOrderedBoardSiblingNoteIds(string $orderColumn, string $workspace, ?int $folderId, int $excludeNoteId): array {
+        $sql = 'SELECT id, pinned, updated, ' . $orderColumn . ' FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND '
             . ($folderId === null ? 'folder_id IS NULL' : 'folder_id = ?')
             . ' ORDER BY updated DESC, id DESC';
         $params = [$workspace, $excludeNoteId];
@@ -3346,7 +3369,13 @@ class FoldersController {
         $stmt->execute($params);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        usort($rows, [self::class, 'compareNotesDashboardOrder']);
+        if ($orderColumn === 'dashboard_order') {
+            usort($rows, [self::class, 'compareNotesDashboardOrder']);
+        } else {
+            usort($rows, function ($a, $b) use ($orderColumn) {
+                return self::compareNotesPlacedOrder($a, $b, $orderColumn);
+            });
+        }
 
         return array_map(function ($row) {
             return (int)$row['id'];

@@ -65,6 +65,18 @@ html[data-theme='dark'] .kanban-card:hover {
     box-shadow: 0 4px 6px -1px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
+/* Card tint, dark theme: the hue mixed into the dark surface, like the
+   dashboard cards. */
+html[data-theme='dark'] .kanban-card.has-note-color:not(.kanban-card-completed),
+html[data-theme='dark'] .kanban-card.has-note-color:not(.kanban-card-completed):hover {
+    background: color-mix(in srgb, var(--note-color) 22%, var(--pz-surface));
+    border-color: color-mix(in srgb, var(--note-color) 55%, var(--pz-surface));
+}
+
+html[data-theme='dark'] .kanban-card.has-note-color:not(.kanban-card-completed):hover {
+    border-color: color-mix(in srgb, var(--note-color) 75%, var(--pz-surface));
+}
+
 html[data-theme='dark'] .kanban-card-meta {
     color: var(--pz-text-subtle);
 }

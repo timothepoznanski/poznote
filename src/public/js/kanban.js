@@ -89,16 +89,178 @@
     }
 
     /**
+     * The active cards of a zone, top to bottom (not the completed ones, nor
+     * those of its subfolder groups).
+     */
+    function getKanbanActiveCards(zone) {
+        return Array.from(zone.children).filter((el) => el.classList.contains('kanban-card'));
+    }
+
+    /**
+     * Where a card held at height `clientY` would land among the active cards
+     * of a zone: { target, where } with where 'before' or 'after' that card.
+     * Null when the drop has no position of its own: a move to another column
+     * under the date or tag sort (which decide the place themselves), a
+     * column with no other card, a completed card over its own column, or the
+     * place the card already has.
+     *
+     * Inside its own column a card can always be placed by hand, the board
+     * then switches to the Custom sort (see reorderKanbanCardInZone).
+     */
+    function getKanbanDropPosition(zone, card, clientY) {
+        if (!zone || !card) return null;
+
+        const sameZone = zone.dataset.folderId === card.dataset.folderId;
+        if (sameZone ? card.dataset.completed === '1' : getKanbanCardSort() !== 'manual') return null;
+
+        const cards = getKanbanActiveCards(zone).filter((el) => el !== card);
+        if (!cards.length) return null;
+
+        let position = { target: cards[cards.length - 1], where: 'after' };
+        for (let i = 0; i < cards.length; i++) {
+            const rect = cards[i].getBoundingClientRect();
+            if (clientY < rect.top + rect.height / 2) {
+                position = { target: cards[i], where: 'before' };
+                break;
+            }
+        }
+
+        const neighbour = position.where === 'before'
+            ? position.target.previousElementSibling
+            : position.target.nextElementSibling;
+        return neighbour === card ? null : position;
+    }
+
+    function clearKanbanDropIndicator() {
+        document.querySelectorAll('.kanban-inline-view .kanban-drop-before, .kanban-inline-view .kanban-drop-after').forEach((el) => {
+            el.classList.remove('kanban-drop-before', 'kanban-drop-after');
+        });
+    }
+
+    function showKanbanDropIndicator(position) {
+        const className = position ? 'kanban-drop-' + position.where : '';
+        if (position && position.target.classList.contains(className)) return;
+
+        clearKanbanDropIndicator();
+        if (position) position.target.classList.add(className);
+    }
+
+    function placeKanbanCard(card, position) {
+        position.target.insertAdjacentElement(position.where === 'before' ? 'beforebegin' : 'afterend', card);
+    }
+
+    /**
+     * Number the active cards of a zone in the order they are shown, the rank
+     * the Custom sort reads (data-manual-order, see kanban_content.php).
+     */
+    function stampKanbanManualOrder(zone) {
+        getKanbanActiveCards(zone).forEach((card, index) => {
+            card.dataset.manualOrder = String(index + 1);
+        });
+    }
+
+    /**
+     * Save the place a card has among the active cards of its column
+     * (entries.kanban_order, through the notes reorder endpoint). A card
+     * alone in its column has no place to save.
+     *
+     * `visibleOrder` is the order the other cards of the column were shown
+     * in, sent when it was not the saved one (board sorted by date or tag).
+     */
+    async function saveKanbanCardPosition(card, visibleOrder) {
+        const next = card.nextElementSibling;
+        const previous = card.previousElementSibling;
+        let target = null;
+        let where = '';
+        if (next && next.classList.contains('kanban-card')) {
+            target = next;
+            where = 'before';
+        } else if (previous && previous.classList.contains('kanban-card')) {
+            target = previous;
+            where = 'after';
+        }
+        if (!target) return true;
+
+        const response = await fetch('api/v1/notes/reorder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                note_id: parseInt(card.dataset.noteId, 10),
+                target_note_id: parseInt(target.dataset.noteId, 10),
+                position: where,
+                scope: 'kanban',
+                visible_order: visibleOrder || undefined
+            }),
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json().catch(function () { return {}; });
+        if (!response.ok) throw new Error(data.error || data.message || 'HTTP error: ' + response.status);
+        return data.success === true;
+    }
+
+    /**
+     * Move a card up or down inside its own column (#1620). The hand-set
+     * order only shows under the Custom sort, so a drop made under another
+     * sort switches the board to it. The column the card was dropped in
+     * keeps the order it was showing, which becomes its hand-set order; the
+     * other columns go back to theirs.
+     */
+    async function reorderKanbanCardInZone(card, zone, position) {
+        let visibleOrder = null;
+        if (getKanbanCardSort() !== 'manual') {
+            visibleOrder = getKanbanActiveCards(zone)
+                .filter((el) => el !== card)
+                .map((el) => parseInt(el.dataset.noteId, 10));
+            stampKanbanManualOrder(zone);
+            setKanbanCardSort('manual');
+            applyKanbanCardSort();
+        }
+
+        const originalSibling = card.nextElementSibling;
+        placeKanbanCard(card, position);
+        stampKanbanManualOrder(zone);
+        card.classList.add('kanban-card-dropped');
+        setTimeout(() => {
+            card.classList.remove('kanban-card-dropped');
+        }, 300);
+
+        let error = null;
+        let saved = false;
+        try {
+            saved = await saveKanbanCardPosition(card, visibleOrder);
+        } catch (e) {
+            error = e;
+        }
+        if (saved) return;
+
+        console.error('Kanban: could not save the card position:', error);
+        if (card.parentNode === zone) {
+            zone.insertBefore(card, originalSibling && originalSibling.parentNode === zone ? originalSibling : getKanbanZoneAnchor(zone));
+            stampKanbanManualOrder(zone);
+        }
+        showError(error ? window.apiErrorMessage(error, 'Error moving note') : 'Failed to move note');
+    }
+
+    /**
      * Move a card into a drop zone and persist it. Shared by the native drop
      * and the touch drag, and given its own card reference: dragend clears
      * the drag state while the request is still on its way.
+     *
+     * `position` (see getKanbanDropPosition) is where the card lands among
+     * the cards of the zone; without one it follows the sort of the board.
      */
-    async function moveKanbanCardToZone(card, fromFolderId, columnContent) {
+    async function moveKanbanCardToZone(card, fromFolderId, columnContent, position) {
         const targetFolderId = columnContent.dataset.folderId;
         const noteId = card.dataset.noteId;
 
-        // Don't do anything if dropped in the same column
+        // Dropped in its own column: a new place there, or nothing
         if (targetFolderId === fromFolderId) {
+            if (position) await reorderKanbanCardInZone(card, columnContent, position);
             return;
         }
 
@@ -107,10 +269,18 @@
         const originalSibling = card.nextElementSibling;
         const oldFolderId = fromFolderId;
         const originalOrder = card.dataset.kanbanOrder;
+        const originalManualOrder = card.dataset.manualOrder;
 
         // A dragged card always lands in the active area, above the
         // completed section and the subfolder groups of the target zone.
-        insertActiveCardIntoZone(columnContent, card);
+        if (position) {
+            placeKanbanCard(card, position);
+            stampKanbanManualOrder(columnContent);
+        } else {
+            insertActiveCardIntoZone(columnContent, card);
+            // Not placed by hand in this column: first under the Custom sort
+            card.dataset.manualOrder = '0';
+        }
         card.dataset.folderId = targetFolderId;
 
         // Dropping into a collapsed subfolder group opens it so the card
@@ -148,6 +318,12 @@
         // Update column counts visually
         updateColumnCounts();
 
+        // Undo of the ranks above, once the card is back where it came from
+        const restoreManualOrder = () => {
+            if (position) stampKanbanManualOrder(columnContent);
+            card.dataset.manualOrder = originalManualOrder || '0';
+        };
+
         // Persist the change to the database
         try {
             const success = await moveNoteToFolder(noteId, targetFolderId);
@@ -158,6 +334,7 @@
                 if (originalParent) originalParent.insertBefore(card, originalSibling);
                 card.dataset.folderId = oldFolderId;
                 if (originalOrder) card.dataset.kanbanOrder = originalOrder;
+                restoreManualOrder();
                 if (wasCompleted) {
                     card.classList.add('kanban-card-completed');
                     card.dataset.completed = '1';
@@ -170,6 +347,13 @@
                     // here only leaves a stale completed flag in the DB.
                     setKanbanCompleted(noteId, false).catch((err) => {
                         console.error('Kanban: could not clear completed flag after move:', err);
+                    });
+                }
+                if (position) {
+                    // Best-effort too: the card is in its new column either
+                    // way, a failure only loses its place among the others.
+                    saveKanbanCardPosition(card).catch((err) => {
+                        console.error('Kanban: could not save the card position after move:', err);
                     });
                 }
                 // Mark note for auto-push since we moved a note (if auto-push enabled)
@@ -189,6 +373,7 @@
                 originalParent.insertBefore(card, originalSibling);
                 card.dataset.folderId = oldFolderId;
                 if (originalOrder) card.dataset.kanbanOrder = originalOrder;
+                restoreManualOrder();
                 if (wasCompleted) {
                     card.classList.add('kanban-card-completed');
                     card.dataset.completed = '1';
@@ -230,6 +415,7 @@
             if (drag.ghost) drag.ghost.remove();
             drag.card.classList.remove('kanban-card-touch-hold', 'dragging');
             clearKanbanDragOver();
+            clearKanbanDropIndicator();
         }
 
         function startDragging() {
@@ -287,6 +473,7 @@
             drag.ghost.style.transform = 'translate(' + (drag.x - drag.startX) + 'px, ' + (drag.y - drag.startY) + 'px) rotate(3deg)';
 
             const zone = zoneAtPoint(drag.x, drag.y);
+            showKanbanDropIndicator(getKanbanDropPosition(zone, drag.card, drag.y));
             if (zone === drag.zone) return;
 
             drag.zone = zone;
@@ -401,6 +588,7 @@
             const wasActive = drag.active;
             if (wasActive) updateDragPosition();
             const zone = drag.zone;
+            const position = wasActive ? getKanbanDropPosition(zone, drag.card, drag.y) : null;
             endTouchDrag();
 
             if (!wasActive) return;
@@ -408,7 +596,7 @@
             // The release must not open the note
             if (e.cancelable) e.preventDefault();
             if (zone && zone.isConnected && drag.card.isConnected) {
-                moveKanbanCardToZone(drag.card, drag.card.dataset.folderId, zone);
+                moveKanbanCardToZone(drag.card, drag.card.dataset.folderId, zone, position);
             }
         }, { passive: false });
 
@@ -418,6 +606,51 @@
         document.addEventListener('contextmenu', (e) => {
             if (touchDrag) e.preventDefault();
         }, true);
+    }
+
+    /**
+     * Color of a card (#1620): a right-click on it opens the color picker
+     * shared with the tags (js/tag-actions.js pickColor). The choice is the
+     * note's color, the one the dashboard shows too, saved through
+     * PUT /notes/{id}/color.
+     */
+    async function openKanbanCardColorPicker(card) {
+        const actions = window.PoznoteTagActions;
+        if (!actions || typeof actions.pickColor !== 'function') return;
+
+        const titleEl = card.querySelector('.kanban-card-title');
+        const title = (titleEl && titleEl.textContent.trim()) || kanbanT('note_color.modal_title', 'Note color');
+        const value = await actions.pickColor(title, card.dataset.color || '');
+        if (value === null || value === (card.dataset.color || '')) return;
+
+        try {
+            const response = await fetch('api/v1/notes/' + encodeURIComponent(card.dataset.noteId) + '/color', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ color: value }),
+                credentials: 'same-origin'
+            });
+            const data = await response.json().catch(function () { return {}; });
+            if (!response.ok || data.success !== true) {
+                throw new Error(data.error || data.message || 'HTTP error: ' + response.status);
+            }
+
+            const hex = data.color_hex || '';
+            card.dataset.color = data.color || '';
+            card.classList.toggle('has-note-color', hex !== '');
+            if (hex !== '') {
+                card.style.setProperty('--note-color', hex);
+            } else {
+                card.style.removeProperty('--note-color');
+            }
+        } catch (error) {
+            console.error('Kanban: could not update the card color:', error);
+            showError(window.apiErrorMessage(error, kanbanT('note_color.apply_error', 'Could not update the note color.')));
+        }
     }
 
     /**
@@ -485,6 +718,7 @@
 
             // Clean up visual states
             clearKanbanDragOver();
+            clearKanbanDropIndicator();
 
             draggedCard = null;
             draggedFromFolderId = null;
@@ -493,11 +727,14 @@
 
         // Drag Over - CRITICAL: must prevent default to allow drop
         document.addEventListener('dragover', (e) => {
-            if (!getKanbanDropZone(e.target)) return;
+            const zone = getKanbanDropZone(e.target);
+            if (!zone) return;
 
             // Important: we are over a drop zone, allow drop
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
+
+            showKanbanDropIndicator(getKanbanDropPosition(zone, draggedCard, e.clientY));
         });
 
         // Drag Enter
@@ -536,16 +773,29 @@
             e.stopPropagation();
 
             clearKanbanDragOver();
+            clearKanbanDropIndicator();
 
             if (!draggedCard) {
                 console.warn("Kanban: Drop occurred but no draggedCard state found.");
                 return;
             }
 
-            moveKanbanCardToZone(draggedCard, draggedFromFolderId, columnContent);
+            moveKanbanCardToZone(draggedCard, draggedFromFolderId, columnContent, getKanbanDropPosition(columnContent, draggedCard, e.clientY));
         });
 
         setupTouchDrag();
+
+        // Right-click on a card: its color. The task rows and the buttons of
+        // the card keep the browser's own menu.
+        document.addEventListener('contextmenu', (e) => {
+            if (touchDrag || lastPointerWasTouch) return;
+            const targetEl = e.target instanceof Element ? e.target : e.target && e.target.parentElement;
+            const card = targetEl && targetEl.closest('.kanban-inline-view .kanban-card');
+            if (!card || targetEl.closest('button, input, label, a')) return;
+
+            e.preventDefault();
+            openKanbanCardColorPicker(card);
+        });
 
         // Task checkbox delegation. The task area is interactive but the rest of the card still opens/drags normally.
         document.addEventListener('change', (e) => {
@@ -630,7 +880,7 @@
             cycleKanbanCardSize();
         });
 
-        // Cycle the card sort (date <-> tag)
+        // Cycle the card sort (date, tag, custom)
         document.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-action="cycle-kanban-card-sort"]');
             if (!btn) return;
@@ -1039,9 +1289,9 @@
     // Like the card size, the preference persists per user and is applied
     // client-side after each render.
 
-    const KANBAN_SORTS = ['date', 'tag'];
+    const KANBAN_SORTS = ['date', 'tag', 'manual'];
     const KANBAN_SORT_KEY = 'kanbanCardSort';
-    const KANBAN_SORT_ICONS = { date: 'lucide-calendar', tag: 'lucide-tag' };
+    const KANBAN_SORT_ICONS = { date: 'lucide-calendar', tag: 'lucide-tag', manual: 'lucide-grip-vertical' };
 
     // Rank of each card in the server-rendered (date) order, so switching back
     // from the tag sort restores it without reloading the board.
@@ -1110,16 +1360,32 @@
     }
 
     /**
+     * Custom sort: the rank each card was given by hand (data-manual-order,
+     * stamped by the server and kept up to date by stampKanbanManualOrder).
+     * A card with no rank, moved in from another column since, comes first.
+     */
+    function compareKanbanCardsByManualOrder(a, b) {
+        const diff = (parseInt(a.dataset.manualOrder, 10) || 0) - (parseInt(b.dataset.manualOrder, 10) || 0);
+        return diff !== 0 ? diff : compareKanbanCardsByDate(a, b);
+    }
+
+    const KANBAN_SORT_COMPARATORS = {
+        date: compareKanbanCardsByDate,
+        tag: compareKanbanCardsByTag,
+        manual: compareKanbanCardsByManualOrder
+    };
+
+    /**
      * Reorder the cards that are direct children of a container, keeping them
      * before `anchor` (the completed section, when the column has one).
      */
-    function sortKanbanCardList(container, anchor) {
+    function sortKanbanCardList(container, anchor, sort) {
         if (!container) return;
 
         const cards = Array.from(container.children).filter((el) => el.classList.contains('kanban-card'));
         if (cards.length < 2) return;
 
-        const compare = getKanbanCardSort() === 'tag' ? compareKanbanCardsByTag : compareKanbanCardsByDate;
+        const compare = KANBAN_SORT_COMPARATORS[sort || getKanbanCardSort()];
         const sorted = cards.slice().sort(compare);
         if (sorted.every((card, index) => card === cards[index])) return;
 
@@ -1136,7 +1402,9 @@
         sortKanbanCardList(columnContent, getKanbanZoneAnchor(columnContent));
         const completedSection = columnContent.querySelector(':scope > .kanban-completed-section');
         if (completedSection) {
-            sortKanbanCardList(completedSection.querySelector('.kanban-completed-content'), null);
+            // Completed cards are not arranged by hand: newest finished first
+            const sort = getKanbanCardSort();
+            sortKanbanCardList(completedSection.querySelector('.kanban-completed-content'), null, sort === 'manual' ? 'date' : sort);
         }
     }
 

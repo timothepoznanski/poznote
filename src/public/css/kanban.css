@@ -347,6 +347,31 @@
     box-shadow: 0 10px 20px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
+/* Where a dragged card will land among the cards of a column (js/kanban.js
+   getKanbanDropPosition): a line in the gap above or below the hovered card.
+   A box-shadow, because the card clips its own pseudo-elements. */
+.kanban-inline-view .kanban-column .kanban-card.kanban-drop-before {
+    box-shadow: 0 -4px 0 -1px var(--pz-accent);
+}
+
+.kanban-inline-view .kanban-column .kanban-card.kanban-drop-after {
+    box-shadow: 0 4px 0 -1px var(--pz-accent);
+}
+
+/* Card tint: --note-color is set inline from the note color, which a
+   right-click on the card changes (kanban_content.php renderKanbanCard,
+   js/kanban.js openKanbanCardColorPicker). Same recipe
+   as the dashboard cards (.dash-card.has-note-color in dashboard.css).
+   Completed cards stay dimmed, without the tint. */
+.kanban-card.has-note-color:not(.kanban-card-completed) {
+    background: color-mix(in srgb, var(--note-color) 12%, var(--pz-bg));
+    border-color: color-mix(in srgb, var(--note-color) 45%, var(--pz-bg));
+}
+
+.kanban-card.has-note-color:not(.kanban-card-completed):hover {
+    border-color: color-mix(in srgb, var(--note-color) 70%, var(--pz-bg));
+}
+
 /* Touch drag (js/kanban.js setupTouchDrag): a finger holding a card must not
    select its text nor open the browser's long-press menu. */
 .kanban-card.kanban-card-touch-hold {
@@ -1033,7 +1058,7 @@ html[data-theme='dark'] .kanban-inline-header {
     transform: translateY(-1px);
 }
 
-/* ===== Card sort toggle (date / tag) =====
+/* ===== Card sort toggle (date / tag / custom) =====
    Same shell as the size toggle; kanban.js swaps the icon for the active sort. */
 
 .kanban-sort-toggle {

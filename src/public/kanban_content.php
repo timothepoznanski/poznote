@@ -23,6 +23,7 @@ try {
     require_once __DIR__ . '/../config.php';
     require_once __DIR__ . '/../functions.php';
     require_once __DIR__ . '/../db_connect.php';
+    require_once __DIR__ . '/../lib/note-sort.php';
 
     // 3. Input Validation
     $folder_id = intval($_GET['folder_id'] ?? 0);
@@ -49,7 +50,7 @@ try {
     // Get notes directly in parent folder (using 'entries' table and 'trash' column)
     // Completed cards are ordered by completion date so the newest finished card
     // sits at the top of the "completed" section.
-    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed, n.reminder_at FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
+    $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed, n.reminder_at, n.color, n.kanban_order FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
     $stmt->execute([$folder_id]);
     $parentNotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -63,7 +64,7 @@ try {
 
         // For linked notes, load the target note's content
         if (($note['type'] ?? 'note') === 'linked' && !empty($note['linked_note_id'])) {
-            $targetStmt = $con->prepare("SELECT type, tags, reminder_at FROM entries WHERE id = ? AND trash = 0");
+            $targetStmt = $con->prepare("SELECT type, tags, reminder_at, color FROM entries WHERE id = ? AND trash = 0");
             $targetStmt->execute([$note['linked_note_id']]);
             $targetNote = $targetStmt->fetch(PDO::FETCH_ASSOC);
             $contentType = $targetNote['type'] ?? 'note';
@@ -71,6 +72,10 @@ try {
             $filename = $targetNote ? getEntryFilename($note['linked_note_id'], $contentType) : '';
             if ($targetNote && trim((string) ($note['tags'] ?? '')) === '' && trim((string) ($targetNote['tags'] ?? '')) !== '') {
                 $note['tags'] = $targetNote['tags'];
+            }
+            $note['kanban_own_color'] = (string) ($note['color'] ?? '');
+            if ($targetNote && trim((string) ($note['color'] ?? '')) === '' && trim((string) ($targetNote['color'] ?? '')) !== '') {
+                $note['color'] = $targetNote['color'];
             }
             if ($targetNote && trim((string) ($note['reminder_at'] ?? '')) === '' && trim((string) ($targetNote['reminder_at'] ?? '')) !== '') {
                 $note['reminder_at'] = $targetNote['reminder_at'];
@@ -94,17 +99,40 @@ try {
         }
     };
 
+    /**
+     * Give each note of a folder its rank in the hand-set order (#1620):
+     * placed cards (kanban_order > 0) in saved order, the ones never placed
+     * ahead of them by newest update, like the dashboard. The notes keep the
+     * date order they were loaded in; js/kanban.js sorts on the rank under
+     * the Custom sort.
+     */
+    $rankKanbanNotes = function (array &$notes) {
+        $ordered = $notes;
+        usort($ordered, static function ($a, $b) {
+            return poznoteComparePlacedOrder($a, $b, 'kanban_order');
+        });
+        $ranks = [];
+        foreach ($ordered as $index => $row) {
+            $ranks[(int) $row['id']] = $index + 1;
+        }
+        foreach ($notes as &$note) {
+            $note['kanban_manual_rank'] = $ranks[(int) $note['id']];
+        }
+        unset($note);
+    };
+
     // Load entry snippets for parent notes
     foreach ($parentNotes as &$note) {
         $loadNoteSnippet($note);
     }
     unset($note);
+    $rankKanbanNotes($parentNotes);
 
     /**
      * Notes of one folder with their preview snippets loaded.
      */
-    $loadKanbanFolderNotes = function ($folderId) use ($con, $loadNoteSnippet) {
-        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed, n.reminder_at FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
+    $loadKanbanFolderNotes = function ($folderId) use ($con, $loadNoteSnippet, $rankKanbanNotes) {
+        $stmt = $con->prepare("SELECT n.id, n.heading, n.updated, n.tags, n.type, n.linked_note_id, n.kanban_completed, n.reminder_at, n.color, n.kanban_order FROM entries n WHERE n.folder_id = ? AND n.trash = 0 ORDER BY n.kanban_completed DESC, n.updated DESC");
         $stmt->execute([$folderId]);
         $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -112,6 +140,7 @@ try {
             $loadNoteSnippet($note);
         }
         unset($note);
+        $rankKanbanNotes($notes);
 
         return $notes;
     };
@@ -376,11 +405,21 @@ try {
         $dueValue = $taskDue !== '' ? $taskDue : $reminderDue;
         $dueSource = $taskDue !== '' ? 'task' : 'reminder';
         $dueOverdue = isKanbanDueOverdue($dueValue);
+
+        // Card tint (#1620): the note's own color, the one the dashboard
+        // shows. A right-click on the card changes it (js/kanban.js). On the
+        // shortcut of a note that has no color of its own, the target's color
+        // shows instead; data-color only carries the card's own.
+        $cardColor = (string) ($note['kanban_own_color'] ?? ($note['color'] ?? ''));
+        $cardColorHex = !empty($note['color']) ? resolveNoteColorHex((string) $note['color']) : '';
         ?>
-        <div class="kanban-card<?php echo $isCompleted ? ' kanban-card-completed' : ''; ?>"
+        <div class="kanban-card<?php echo $isCompleted ? ' kanban-card-completed' : ''; ?><?php echo $cardColorHex !== '' ? ' has-note-color' : ''; ?>"
+             <?php echo $cardColorHex !== '' ? 'style="--note-color: ' . htmlspecialchars($cardColorHex, ENT_QUOTES) . ';"' : ''; ?>
              data-note-id="<?php echo $note['id']; ?>"
              data-folder-id="<?php echo $folderId; ?>"
              data-completed="<?php echo $isCompleted ? '1' : '0'; ?>"
+             data-color="<?php echo htmlspecialchars($cardColor, ENT_QUOTES); ?>"
+             data-manual-order="<?php echo (int) ($note['kanban_manual_rank'] ?? 0); ?>"
              data-tags="<?php echo htmlspecialchars(implode(',', $kanbanTags), ENT_QUOTES); ?>"
              data-reminder-due="<?php echo htmlspecialchars($reminderDue, ENT_QUOTES); ?>"
              draggable="true">
@@ -585,6 +624,7 @@ try {
                         data-label="<?php echo t_h('kanban.sort.label', [], 'Sort by'); ?>"
                         data-label-date="<?php echo t_h('kanban.sort.date', [], 'Date'); ?>"
                         data-label-tag="<?php echo t_h('kanban.sort.tag', [], 'Tag'); ?>"
+                        data-label-manual="<?php echo t_h('sort.modes.custom', [], 'Custom'); ?>"
                         title="<?php echo t_h('kanban.sort.label', [], 'Sort by'); ?>">
                     <i class="lucide lucide-calendar kanban-sort-icon"></i>
                 </button>

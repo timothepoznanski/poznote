@@ -771,6 +771,8 @@ Move a note before or after another note (drag-and-drop order). The note lands i
 
 With `"scope": "dashboard"` the request reorders the note's card on the dashboard instead: the rank is written to the note's `dashboard_order` (a column of its own, the sidebar's `display_order` is untouched), the target must be in the same folder, and neither the tree's sort mode nor the note's `updated` date change. The dashboard shows pinned cards first, then placed cards in saved order, with cards that were never placed ahead of them by newest update.
 
+With `"scope": "kanban"` the request reorders the note's card inside its Kanban column, the same way: the rank is written to the note's `kanban_order`, the target must be in the same folder, and nothing else changes. The board follows that order under its Custom sort, with cards that were never placed ahead of the others by newest update. An optional `visible_order` (array of note ids) gives the order the cards of the column were displayed in when the board was sorted another way, by date or by tag: the drop is then made in that order, and the notes it leaves out follow in the saved order. Moving a note to another folder clears its `kanban_order`.
+
 **Request Body (JSON):**
 
 | Field | Type | Required | Description |
@@ -779,7 +781,8 @@ With `"scope": "dashboard"` the request reorders the note's card on the dashboar
 | `target_note_id` | integer | Yes | Note used as anchor (same workspace) |
 | `position` | string | Yes | `before` or `after` the target note |
 | `workspace` | string | No | Workspace check (must match target note) |
-| `scope` | string | No | `sidebar` (default) or `dashboard`, see above |
+| `scope` | string | No | `sidebar` (default), `dashboard` or `kanban`, see above |
+| `visible_order` | array | No | With `kanban` only: note ids of the column in the order displayed, see above |
 
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \

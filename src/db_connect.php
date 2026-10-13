@@ -161,7 +161,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 46; // 46: creation date, character and line counts hidden by default on the line under the note title (poznoteGetDefaultHiddenUiKeys)
+    $CURRENT_SCHEMA_VERSION = 47; // 47: entries.kanban_order, the hand-set position of a card inside a Kanban column (#1620)
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -267,7 +267,8 @@ try {
             trashed_at DATETIME,
             content_width INTEGER,
             display_order INTEGER DEFAULT 0,
-            dashboard_order INTEGER DEFAULT 0
+            dashboard_order INTEGER DEFAULT 0,
+            kanban_order INTEGER DEFAULT 0
         )');
 
         // Create folders table for empty folders (scoped by workspace)
@@ -781,7 +782,7 @@ try {
         // display_order (the sidebar's manual order), so the board can be
         // arranged by hand while the sidebar keeps its own sort. Same
         // convention: 0 = not placed yet, siblings renumbered from 1 on drop
-        // (see FoldersController::reorderNoteOnDashboard).
+        // (see FoldersController::reorderNoteOnBoard).
         try {
             $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
             $existingColumns = array_column($cols, 'name');
@@ -791,6 +792,21 @@ try {
             $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_dashboard_order ON entries(workspace, folder_id, dashboard_order)');
         } catch (Exception $e) {
             error_log('Could not add dashboard_order column to entries: ' . $e->getMessage());
+        }
+
+        // Ensure kanban_order column exists: the position of a card inside a
+        // Kanban column, set by dragging cards there under the board's Custom
+        // sort (#1620). Independent from display_order and dashboard_order,
+        // same convention: 0 = not placed yet, siblings renumbered from 1 on
+        // drop (see FoldersController::reorderNoteOnBoard).
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('kanban_order', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN kanban_order INTEGER DEFAULT 0");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add kanban_order column to entries: ' . $e->getMessage());
         }
 
         // Ensure the client state columns exist: the fingerprint of the editor
