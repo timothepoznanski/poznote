@@ -411,6 +411,7 @@ Poznote MCP 서버는 다음 도구를 제공합니다.
 - `unshare_note` - 공개 공유 비활성화
 - `get_note_share_status` - 공유 상태 조회
 - `list_shared` - 공개 공유된 모든 노트와 폴더 목록 조회
+- `list_shared_with_me` - 다른 사용자가 이 프로필에 공유한 노트와 폴더 목록 조회
 
 ### 첨부 파일
 - `list_attachments` - 노트 첨부 파일 목록 조회

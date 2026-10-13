@@ -103,6 +103,7 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `get_note_share_status` — Get the current sharing status and public URL for a note
 - `get_folder_share_status` — Get the current sharing status and public URL for a folder
 - `list_shared` — List all publicly shared notes and folders
+- `list_shared_with_me` — List notes and folders other users have shared with this profile
 - `get_backlinks` — Get all notes that link to (reference) a specific note
 - `convert_note` — Convert a note between HTML and Markdown formats
 - `rename_folder` — Rename an existing folder

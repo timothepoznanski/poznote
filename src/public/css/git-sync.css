@@ -641,3 +641,11 @@ select.git-field-input {
         grid-template-columns: 1fr;
     }
 }
+
+/* Multi-line field (AI custom instructions) */
+textarea.git-field-input {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+}

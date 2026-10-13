@@ -103,6 +103,7 @@ MCP 서버는 AI 어시스턴트와 Poznote 인스턴스를 연결합니다.
 - `get_note_share_status`: 노트의 현재 공유 상태와 공개 URL 조회
 - `get_folder_share_status`: 폴더의 현재 공유 상태와 공개 URL 조회
 - `list_shared`: 공개 공유된 모든 노트와 폴더 조회
+- `list_shared_with_me`: 다른 사용자가 이 프로필에 공유한 노트와 폴더 조회
 - `get_backlinks`: 특정 노트로 연결되는 모든 노트 조회
 - `convert_note`: HTML과 마크다운 간 노트 변환
 - `rename_folder`: 기존 폴더 이름 변경

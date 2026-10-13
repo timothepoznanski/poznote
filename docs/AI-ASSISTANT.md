@@ -44,7 +44,7 @@ Before the assistant changes the content of a note (rewrite, checkbox, task), Po
 
 The assistant is **scoped to the current workspace**: it only sees, searches and edits the notes of the workspace you opened the chat in, and new notes are created there. To ask about another workspace, switch to it first. On a dashboard showing several workspaces, the first click on the button says which workspace the assistant will act on and asks whether to continue.
 
-The conversation is kept while your browser tab stays open (it survives page reloads) and can be wiped at any time with the trash button in the panel header.
+Conversations are kept on the Poznote server, in your own database next to your notes, and belong to you alone: someone working in a workspace you shared with them has their own. In the panel header, the plus button starts a new conversation and the history button lists the last ten of the workspace, to carry one of them on or delete it; the trash button deletes the conversation on screen. The history follows you from one browser or device to another, and a reload brings back the conversation the tab had open.
 
 ## Enabling the assistant
 
@@ -75,6 +75,38 @@ Pick a model that supports **tool calling** (also called "function calling"), e.
 Reasoning models (OpenAI GPT-5 and o-series, `gpt-oss` on Ollama, ...) accept a **reasoning effort** that sets how long the model thinks before answering. The **Reasoning effort** field of the settings page controls it: **Auto** (the default) sends nothing and leaves the choice to the provider, while **None**, **Minimal**, **Low**, **Medium**, **High** and **Very high** are sent as the `reasoning_effort` parameter of every request. Values a model does not accept are rejected by the provider and reported as an error in the chat.
 
 Some OpenAI models refuse tool calling on the chat completions API unless the reasoning effort is `none`. The chat then shows a notice saying the assistant cannot browse your notes: set **Reasoning effort** to **None** to get the tools back.
+
+### Custom headers
+
+A gateway placed in front of the models (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helicone, ...) often expects headers of its own, to identify the caller or to attribute usage. The **Custom headers** field of the settings page takes them, one per line, written as `Name: value`:
+
+```
+x-litellm-customer-id: poznote
+```
+
+They are sent with every request to the AI server, the connection check included. The field is offered for Ollama, LM Studio and custom URLs, in the instance configuration and in a personal one. Anthropic and OpenAI are called directly and take none.
+
+Values are stored encrypted and never shown again: a saved header comes back as `Name: ••••••••`. Leave a line as it is to keep its value, retype the value to change it, delete the line to remove the header.
+
+Headers that frame the request (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) are refused, and so is `Authorization`, which the **API key** field sets. Names and values are limited to plain ASCII characters, with at most 20 headers.
+
+Every request also carries `User-Agent: Poznote/<version>`, so that the logs of a gateway show where it comes from. A `User-Agent` line in the custom headers replaces it.
+
+## Custom instructions
+
+Each user can give the assistant standing instructions in **Settings → My AI Assistant → Custom instructions**, for example "When you write a note in English, add its Russian translation below, and the other way round". The text (up to 4000 characters) is sent to the model with every message, whichever configuration answers, the instance one or your own. Use it for lasting preferences such as tone, language or the format of the notes the assistant writes. It does not change what the assistant is allowed to do: notes are still only modified when you ask for it. Leave the field empty to send nothing.
+
+## External tools (MCP servers)
+
+The assistant can call tools offered by remote [MCP](https://modelcontextprotocol.io) servers next to its own, for example a web search service, so that it can look up current information before it answers or writes a note. This is the other direction of the [Poznote MCP server](MCP-SERVER.md), which lets other assistants reach your notes.
+
+The feature is off by default. An administrator turns it on in **Settings → Admin Tools → AI Assistant**, section **External tools**, with **Allow external tools**, then adds servers there: a name, the URL of the MCP endpoint (for example `https://mcp.exa.ai/mcp`), an optional API key sent as a Bearer token, and optional custom headers for servers that take their key another way. Poznote connects to the server, reads the tools it offers and lists them with a checkbox each, so that you choose which ones the assistant may call. These servers are offered to the users allowed to use the instance assistant. With **Allow users to connect their own servers**, every user also gets an **External tools** section in **Settings → My AI Assistant**, for servers used in their own conversations only.
+
+Only servers reached over HTTP (the Streamable HTTP transport) with an API key or custom headers are supported: servers started as a local process (stdio, `npx ...`) and servers that require OAuth are not. Like the AI server, an MCP server is called from the Poznote server, so its URL must be reachable from inside the container. The tools are read when you add a server and when you click **Check and refresh tools**: a tool that the server adds or rewords later is not used until you refresh.
+
+Once a server is connected, a globe button appears next to the chat input. It turns the external tools on and off, and the choice is remembered in your browser. Every call is shown in the conversation with the server, the tool and what was sent to it.
+
+What an external tool returns comes from outside Poznote, a web page for instance, and may hold text written to mislead the model. The assistant is told to treat it as data and a revision is saved before any note is changed, but an instruction is not a guarantee. To rule out unwanted changes, open **Settings → My AI Assistant**, section **Assistant tools**, and untick the tools of the **Changing your notes** list: the assistant can still read your notes and search the web, but no longer modify anything. Keep in mind as well that what the assistant sends to an external tool leaves your instance.
 
 ## Local servers and Docker networking
 
@@ -204,4 +236,4 @@ An error that occurs once the answer has started streaming is not retried, since
 
 ## Privacy
 
-The AI server is called from the Poznote server, never from your browser. With a local Ollama or LM Studio instance, your notes and conversations never leave your machine. With a cloud provider, the parts of your notes the assistant reads to answer are sent to that provider.
+The AI server is called from the Poznote server, never from your browser. With a local Ollama or LM Studio instance, your notes and conversations never leave your machine. With a cloud provider, the parts of your notes the assistant reads to answer are sent to that provider. With external tools turned on, what the assistant sends to them, a search query for instance, goes to the servers you connected.

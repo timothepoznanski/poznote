@@ -44,7 +44,7 @@ Antes de que el asistente modifique el contenido de una nota (reescritura, casil
 
 El asistente está **limitado al espacio de trabajo actual**: solo ve, busca y edita las notas del espacio de trabajo en el que abriste el chat, y las notas nuevas se crean ahí. Para preguntar sobre otro espacio de trabajo, cambia a él primero. En un Panel que muestra varios espacios de trabajo, el primer clic en el botón indica sobre qué espacio de trabajo actuará el asistente y pregunta si quieres continuar.
 
-La conversación se conserva mientras la pestaña del navegador siga abierta (sobrevive a las recargas de página) y puede borrarse en cualquier momento con el botón de papelera de la cabecera del panel.
+Las conversaciones se guardan en el servidor de Poznote, en tu propia base de datos junto a tus notas, y solo te pertenecen a ti: quien trabaja en un espacio de trabajo que has compartido con él tiene las suyas. En la cabecera del panel, el botón más inicia una nueva conversación y el botón de historial lista las diez últimas del espacio de trabajo, para retomar una o borrarla; el botón de papelera borra la conversación en pantalla. El historial te sigue de un navegador o dispositivo a otro, y al recargar la página vuelve la conversación que la pestaña tenía abierta.
 
 ## Activar el asistente
 
@@ -75,6 +75,38 @@ Elige un modelo compatible con **llamadas a herramientas** (también llamadas "f
 Los modelos de razonamiento (OpenAI GPT-5 y la serie o, `gpt-oss` en Ollama, ...) aceptan un **esfuerzo de razonamiento** que define cuánto tiempo piensa el modelo antes de responder. Lo controla el campo **Esfuerzo de razonamiento** de la página de configuración: **Auto** (el valor por defecto) no envía nada y deja la elección al proveedor, mientras que **Ninguno**, **Mínimo**, **Bajo**, **Medio**, **Alto** y **Muy alto** se envían como parámetro `reasoning_effort` en cada petición. Los valores que un modelo no acepta los rechaza el proveedor y se muestran como error en el chat.
 
 Algunos modelos de OpenAI rechazan las llamadas a herramientas en la API de chat completions salvo que el esfuerzo de razonamiento sea `none`. El chat muestra entonces un aviso indicando que el asistente no puede consultar tus notas: pon **Esfuerzo de razonamiento** en **Ninguno** para recuperar las herramientas.
+
+### Encabezados personalizados
+
+Una pasarela situada delante de los modelos (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helicone, ...) suele esperar encabezados propios, para identificar a quien llama o atribuir el consumo. El campo **Encabezados personalizados** de la página de ajustes los recibe, uno por línea, con el formato `Nombre: valor`:
+
+```
+x-litellm-customer-id: poznote
+```
+
+Se envían con cada solicitud al servidor de IA, incluida la comprobación de la conexión. El campo se ofrece para Ollama, LM Studio y las URL personalizadas, tanto en la configuración de la instancia como en una personal. Anthropic y OpenAI se llaman directamente y no admiten ninguno.
+
+Los valores se guardan cifrados y no vuelven a mostrarse: un encabezado guardado aparece como `Nombre: ••••••••`. Deja una línea tal cual para conservar su valor, vuelve a escribir el valor para cambiarlo y borra la línea para quitar el encabezado.
+
+Los encabezados que estructuran la solicitud (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) se rechazan, al igual que `Authorization`, que define el campo **Clave API**. Los nombres y los valores se limitan a caracteres ASCII simples, con 20 encabezados como máximo.
+
+Cada solicitud lleva además `User-Agent: Poznote/<version>`, para que los registros de una pasarela muestren de dónde viene. Una línea `User-Agent` en los encabezados personalizados lo sustituye.
+
+## Instrucciones personalizadas
+
+Cada usuario puede dar al asistente instrucciones permanentes en **Ajustes → Mi asistente de IA → Instrucciones personalizadas**, por ejemplo «Cuando escribas una nota en inglés, añade debajo su traducción al ruso, y viceversa». El texto (hasta 4000 caracteres) se envía al modelo con cada mensaje, sea cual sea la configuración que responda, la de la instancia o la suya. Úselo para preferencias duraderas como el tono, el idioma o el formato de las notas que escribe el asistente. No cambia lo que el asistente puede hacer: las notas solo se modifican cuando usted lo pide. Deje el campo vacío para no enviar nada.
+
+## Herramientas externas (servidores MCP)
+
+El asistente puede llamar a herramientas ofrecidas por servidores [MCP](https://modelcontextprotocol.io) remotos además de las propias, por ejemplo un servicio de búsqueda web, para consultar información actual antes de responder o de escribir una nota. Es el sentido contrario al [servidor MCP de Poznote](MCP-SERVER.es.md), que permite a otros asistentes acceder a tus notas.
+
+La función está desactivada por defecto. Un administrador la activa en **Configuración → Herramientas de administración → Asistente IA**, sección **Herramientas externas**, con **Permitir herramientas externas**, y añade allí los servidores: un nombre, la URL del punto de acceso MCP (por ejemplo `https://mcp.exa.ai/mcp`), una clave API opcional enviada como token Bearer y encabezados personalizados opcionales para los servidores que esperan su clave de otra forma. Poznote se conecta al servidor, lee las herramientas que ofrece y las lista con una casilla cada una, para que elijas cuáles puede llamar el asistente. Estos servidores se ofrecen a los usuarios autorizados a usar el asistente de la instancia. Con **Permitir a los usuarios conectar sus propios servidores**, cada usuario obtiene además una sección **Herramientas externas** en **Ajustes → Mi asistente de IA**, para servidores usados solo en sus propias conversaciones.
+
+Solo se admiten servidores accesibles por HTTP (transporte Streamable HTTP) con una clave API o encabezados personalizados: los servidores que se inician como proceso local (stdio, `npx ...`) y los que exigen OAuth no se admiten. Igual que el servidor de IA, un servidor MCP se llama desde el servidor de Poznote, así que su URL debe ser accesible desde dentro del contenedor. Las herramientas se leen al añadir un servidor y al hacer clic en **Comprobar y actualizar herramientas**: una herramienta que el servidor añada o reformule más tarde no se usa hasta que actualices.
+
+Cuando hay un servidor conectado, aparece un botón con forma de globo junto al campo de entrada del chat. Activa y desactiva las herramientas externas, y la elección se recuerda en tu navegador. Cada llamada se muestra en la conversación con el servidor, la herramienta y lo que se le envió.
+
+Lo que devuelve una herramienta externa viene de fuera de Poznote, por ejemplo de una página web, y puede contener texto escrito para engañar al modelo. El asistente tiene la instrucción de tratarlo como datos y se guarda una revisión antes de modificar cualquier nota, pero una instrucción no es una garantía. Para descartar cambios no deseados, abre **Ajustes → Mi asistente de IA**, sección **Herramientas del asistente**, y desmarca las herramientas de la lista **Modificar tus notas**: el asistente podrá seguir leyendo tus notas y buscando en la web, pero ya no modificar nada. Ten en cuenta también que lo que el asistente envía a una herramienta externa sale de tu instancia.
 
 ## Servidores locales y redes de Docker
 
@@ -204,4 +236,4 @@ Un error que ocurre una vez que la respuesta ha empezado a llegar no se reintent
 
 ## Privacidad
 
-El servidor de IA se llama desde el servidor de Poznote, nunca desde tu navegador. Con una instancia local de Ollama o LM Studio, tus notas y conversaciones nunca salen de tu máquina. Con un proveedor en la nube, las partes de tus notas que el asistente lee para responder se envían a ese proveedor.
+El servidor de IA se llama desde el servidor de Poznote, nunca desde tu navegador. Con una instancia local de Ollama o LM Studio, tus notas y conversaciones nunca salen de tu máquina. Con un proveedor en la nube, las partes de tus notas que el asistente lee para responder se envían a ese proveedor. Con las herramientas externas activadas, lo que el asistente les envía, por ejemplo una consulta de búsqueda, va a los servidores que hayas conectado.

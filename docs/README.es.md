@@ -1366,7 +1366,7 @@ Poznote incluye un chat de IA integrado que se conecta a una instancia local de 
 
 Un administrador lo activa desde **Configuración → Herramientas de administración → Asistente IA**, y cada perfil obtiene entonces un botón **Asistente IA** en la barra de iconos de la izquierda. El servidor de IA se llama desde el servidor de Poznote, nunca desde tu navegador, así que con una instancia local de Ollama tus notas nunca salen de tu máquina.
 
-Lo que puede hacer el asistente, la elección de un proveedor y de un modelo, las claves de API personales y la conexión de un servidor local desde el contenedor de Poznote se describen en la [documentación del Asistente IA](AI-ASSISTANT.es.md). Para que sea un asistente de IA externo (VS Code Copilot, Claude CLI...) quien gestione tus notas, consulta el [Servidor MCP](#servidor-mcp) más abajo.
+Lo que puede hacer el asistente, la elección de un proveedor y de un modelo, las claves de API personales, las herramientas externas como una búsqueda web (servidores MCP remotos) y la conexión de un servidor local desde el contenedor de Poznote se describen en la [documentación del Asistente IA](AI-ASSISTANT.es.md). Para que sea un asistente de IA externo (VS Code Copilot, Claude CLI...) quien gestione tus notas, consulta el [Servidor MCP](#servidor-mcp) más abajo.
 
 ## Transcripción (voz a texto)
 
@@ -1448,7 +1448,7 @@ Accede a **Swagger UI** directamente desde Poznote en `Settings > About > API RE
 
 Poznote da prioridad a la sencillez y la portabilidad: sin frameworks complejos ni dependencias pesadas. Solo tecnologías web sencillas y fiables que garantizan que tus notas sigan siendo accesibles y estén bajo tu control.
 
-**Arquitectura centrada en la privacidad:** Poznote funciona completamente en local, sin necesidad de conexiones externas para su funcionamiento. Todas las bibliotecas (Excalidraw, Mermaid, KaTeX) vienen incluidas y se sirven desde tu propia instancia. De serie, la única conexión saliente es una comprobación diaria de actualizaciones; las funciones opcionales que actives tú mismo (Sincronización Git, S3, un proveedor de IA, webhooks, SMTP, OIDC) son las únicas otras.
+**Arquitectura centrada en la privacidad:** Poznote funciona completamente en local, sin necesidad de conexiones externas para su funcionamiento. Todas las bibliotecas (Excalidraw, Mermaid, KaTeX) vienen incluidas y se sirven desde tu propia instancia. De serie, la única conexión saliente es una comprobación diaria de actualizaciones; las funciones opcionales que actives tú mismo (Sincronización Git, S3, un proveedor de IA y las herramientas externas que le conectes, webhooks, SMTP, OIDC) son las únicas otras.
 
 <details>
 <summary>Si te interesa el stack tecnológico sobre el que está construido Poznote, <strong>échale un vistazo aquí.</strong></summary>

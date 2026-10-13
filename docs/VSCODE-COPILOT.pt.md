@@ -384,6 +384,7 @@ O servidor MCP do Poznote oferece as seguintes ferramentas, que o VS Code Copilo
 - `unshare_note`: desativa o compartilhamento público
 - `get_note_share_status`: obtém o status de compartilhamento
 - `list_shared`: lista todas as notas e pastas compartilhadas publicamente
+- `list_shared_with_me`: lista as notas e pastas que outros usuários compartilharam com este perfil
 
 ### Anexos
 - `list_attachments`: lista os anexos de uma nota

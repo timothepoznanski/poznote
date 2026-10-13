@@ -5,6 +5,8 @@
  * Extracted from functions.php. Loaded through it, so no caller changed.
  */
 
+require_once __DIR__ . '/search-text.php';
+
 /**
  * Default note titles as they may already be stored in existing databases,
  * derived from src/i18n/* index.note.new_note values.
@@ -144,4 +146,55 @@ function generateUniqueTitle($originalTitle, $excludeId = null, $workspace = nul
     } while ($count > 0);
     
     return $title;
+}
+
+/**
+ * The note a title leads to, as a [[Note Title]] reference resolves it: the
+ * note whose title is that text, whatever the case and the accents. A title
+ * that merely contains it is not a match (#1614: [[Paris]] opened
+ * "Weekend in Paris"), unless $allowPartial asks for a search.
+ *
+ * Several notes may share a title: the one written the same way wins, then
+ * the most recently updated. Needs the remove_accents() SQL function of
+ * db_connect.php.
+ *
+ * @return int|null Note id, or null when no note matches
+ */
+function findNoteIdByTitle(PDO $con, string $title, ?string $workspace = null, bool $allowPartial = false): ?int {
+    $title = trim($title);
+    if ($title === '') {
+        return null;
+    }
+
+    $scope = '';
+    $scopeParams = [];
+    if ($workspace !== null && $workspace !== '') {
+        $scope = ' AND workspace = ?';
+        $scopeParams[] = $workspace;
+    }
+
+    $stmt = $con->prepare(
+        'SELECT id FROM entries WHERE trash = 0 AND trim(remove_accents(heading)) = ?' . $scope
+        . ' ORDER BY (trim(heading) = ?) DESC, updated DESC, id DESC LIMIT 1'
+    );
+    $stmt->execute(array_merge([poznoteFoldAccents($title)], $scopeParams, [$title]));
+    $id = $stmt->fetchColumn();
+    if ($id !== false) {
+        return (int)$id;
+    }
+
+    if (!$allowPartial) {
+        return null;
+    }
+
+    // % and _ are text here, not wildcards
+    $pattern = '%' . addcslashes(poznoteFoldAccents($title), '\\%_') . '%';
+    $stmt = $con->prepare(
+        "SELECT id FROM entries WHERE trash = 0 AND remove_accents(heading) LIKE ? ESCAPE '\\'" . $scope
+        . ' ORDER BY updated DESC, id DESC LIMIT 1'
+    );
+    $stmt->execute(array_merge([$pattern], $scopeParams));
+    $id = $stmt->fetchColumn();
+
+    return $id !== false ? (int)$id : null;
 }

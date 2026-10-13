@@ -20,6 +20,7 @@ requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../ai_config.php';
+require_once __DIR__ . '/../ai_mcp_settings.php';
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
@@ -47,9 +48,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     $apiKey = trim((string)($_POST['ai_api_key'] ?? ''));
     $reasoningEffort = poznoteAiNormalizeReasoningEffort($_POST['ai_reasoning_effort'] ?? 'auto');
 
+    $headersField = poznoteAiReadHeadersField((string)($_POST['ai_headers'] ?? ''), poznoteAiInstanceConfig()['headers'], $provider);
+
     $userKeysEnabled = isset($_POST['ai_user_keys_enabled']) ? '1' : '0';
 
-    $saved = setGlobalSetting('ai_chat_enabled', $enabled)
+    // Refused headers save nothing, so that the page does not come back with
+    // half of the form applied
+    $saved = $headersField['error'] === ''
+        && setGlobalSetting('ai_chat_headers', poznoteAiStoreHeaders($headersField['headers']))
+        && setGlobalSetting('ai_chat_enabled', $enabled)
         && setGlobalSetting('ai_chat_user_keys_enabled', $userKeysEnabled)
         && setGlobalSetting('ai_chat_provider', $provider)
         && setGlobalSetting('ai_chat_url', $url)
@@ -71,9 +78,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     }
     if ($saved) {
         $message = t('ai_settings.messages.saved', [], 'Configuration saved successfully.');
+    } elseif ($headersField['error'] !== '') {
+        $error = $headersField['error'];
     } else {
         $error = t('ai_settings.messages.save_error', [], 'Failed to save configuration.');
     }
+}
+
+// The External tools section has forms of its own
+$aiMcpState = poznoteAiMcpHandlePost('instance', $con);
+if ($aiMcpState !== null) {
+    $message = $aiMcpState['message'];
+    $error = $aiMcpState['error'];
 }
 
 $aiConfig = [
@@ -84,6 +100,10 @@ $aiConfig = [
     'ai_chat_api_key' => (string)getGlobalSetting('ai_chat_api_key', ''),
 ];
 $aiReasoningEffort = poznoteAiNormalizeReasoningEffort(getGlobalSetting('ai_chat_reasoning_effort', 'auto'));
+// Refused headers come back as they were typed, to be corrected in place
+$aiHeadersText = isset($headersField) && $headersField['error'] !== ''
+    ? (string)($_POST['ai_headers'] ?? '')
+    : aiUpstreamMaskHeaders(poznoteAiInstanceConfig()['headers']);
 
 // Configs saved before the provider selector existed: infer it from the URL
 $aiProvider = poznoteAiGuessProvider($aiConfig['ai_chat_provider'], $aiConfig['ai_chat_url']);
@@ -226,6 +246,13 @@ $aiLocalHost = aiChatLocalDefaultHost();
                         <span class="label-desc" id="ai-key-desc"><?php echo t_h('ai_settings.api_key_description', [], 'Leave empty for a local Ollama server. Required for cloud providers.'); ?></span>
                     </div>
 
+                    <div class="git-field-group" id="ai-headers-group">
+                        <label class="git-field-label" for="ai_headers"><?php echo t_h('ai_settings.headers_label', [], 'Custom headers (optional)'); ?></label>
+                        <textarea name="ai_headers" id="ai_headers" class="git-field-input" rows="3" spellcheck="false" autocomplete="off"
+                                  placeholder="x-litellm-customer-id: poznote"><?php echo htmlspecialchars($aiHeadersText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
+                        <span class="label-desc"><?php echo t_h('ai_settings.headers_description', [], 'One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter. Saved values are hidden: leave a line as it is to keep its value.'); ?></span>
+                    </div>
+
                     <div class="git-field-actions">
                         <button type="button" id="ai-test-btn" class="btn btn-secondary">
                             <i class="lucide lucide-plug"></i>
@@ -274,6 +301,8 @@ $aiLocalHost = aiChatLocalDefaultHost();
                 </div>
             </form>
         </div>
+
+        <?php poznoteAiMcpRenderSection('instance', $con, $aiMcpState); ?>
 
         <div class="git-sync-footer-note">
             <?php echo t_h('ai_settings.footer_note', [], 'The AI server is called from the Poznote server, not from your browser. Chat conversations are sent to the configured server; with a local Ollama instance nothing leaves your machine.'); ?>

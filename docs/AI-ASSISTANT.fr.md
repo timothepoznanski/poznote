@@ -44,7 +44,7 @@ Avant que l'assistant ne modifie le contenu d'une note (réécriture, case à co
 
 L'assistant est **limité à l'espace de travail courant** : il ne voit, ne recherche et ne modifie que les notes de l'espace de travail dans lequel vous avez ouvert le chat, et les nouvelles notes y sont créées. Pour poser une question sur un autre espace de travail, basculez d'abord vers celui-ci. Sur un tableau de bord affichant plusieurs espaces de travail, le premier clic sur le bouton indique sur quel espace de travail l'assistant va agir et demande si vous souhaitez continuer.
 
-La conversation est conservée tant que l'onglet de votre navigateur reste ouvert (elle survit aux rechargements de page) et peut être effacée à tout moment avec le bouton corbeille de l'en-tête du panneau.
+Les conversations sont conservées sur le serveur Poznote, dans votre propre base de données à côté de vos notes, et n'appartiennent qu'à vous : une personne qui travaille dans un espace de travail que vous lui avez partagé a les siennes. Dans l'en-tête du panneau, le bouton plus démarre une nouvelle conversation et le bouton historique liste les dix dernières de l'espace de travail, pour en reprendre une ou la supprimer ; le bouton corbeille supprime la conversation affichée. L'historique vous suit d'un navigateur ou d'un appareil à l'autre, et un rechargement de page retrouve la conversation que l'onglet avait ouverte.
 
 ## Activer l'assistant
 
@@ -75,6 +75,38 @@ Choisissez un modèle qui prend en charge l'**appel d'outils** (aussi appelé «
 Les modèles de raisonnement (OpenAI GPT-5 et série o, `gpt-oss` sur Ollama, ...) acceptent un **effort de raisonnement** qui détermine combien de temps le modèle réfléchit avant de répondre. Le champ **Effort de raisonnement** de la page de paramètres le contrôle : **Auto** (la valeur par défaut) n'envoie rien et laisse le choix au fournisseur, tandis que **Aucun**, **Minimal**, **Faible**, **Moyen**, **Élevé** et **Très élevé** sont envoyés dans le paramètre `reasoning_effort` de chaque requête. Les valeurs qu'un modèle n'accepte pas sont rejetées par le fournisseur et signalées par une erreur dans le chat.
 
 Certains modèles OpenAI refusent l'appel d'outils sur l'API chat completions tant que l'effort de raisonnement n'est pas `none`. Le chat affiche alors un avertissement indiquant que l'assistant ne peut pas parcourir vos notes : réglez **Effort de raisonnement** sur **Aucun** pour retrouver les outils.
+
+### En-têtes personnalisés
+
+Une passerelle placée devant les modèles (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helicone, ...) attend souvent ses propres en-têtes, pour identifier l'appelant ou attribuer la consommation. Le champ **En-têtes personnalisés** de la page de réglages les reçoit, un par ligne, sous la forme `Nom: valeur` :
+
+```
+x-litellm-customer-id: poznote
+```
+
+Ils sont envoyés avec chaque requête vers le serveur d'IA, vérification de la connexion comprise. Le champ est proposé pour Ollama, LM Studio et les URL personnalisées, dans la configuration de l'instance comme dans une configuration personnelle. Anthropic et OpenAI sont appelés directement et n'en prennent aucun.
+
+Les valeurs sont stockées chiffrées et ne sont plus jamais affichées : un en-tête enregistré revient sous la forme `Nom: ••••••••`. Laissez une ligne telle quelle pour conserver sa valeur, saisissez à nouveau la valeur pour la changer, supprimez la ligne pour retirer l'en-tête.
+
+Les en-têtes qui structurent la requête (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) sont refusés, de même que `Authorization`, que définit le champ **Clé API**. Les noms et les valeurs sont limités aux caractères ASCII simples, avec 20 en-têtes au plus.
+
+Chaque requête porte aussi `User-Agent: Poznote/<version>`, afin que les journaux d'une passerelle montrent d'où elle vient. Une ligne `User-Agent` dans les en-têtes personnalisés le remplace.
+
+## Instructions personnalisées
+
+Chaque utilisateur peut donner à l'assistant des instructions permanentes dans **Paramètres → Mon assistant IA → Instructions personnalisées**, par exemple « Quand tu écris une note en anglais, ajoute sa traduction en russe en dessous, et inversement ». Le texte (4000 caractères au maximum) est envoyé au modèle avec chaque message, quelle que soit la configuration qui répond, celle de l'instance ou la vôtre. Utilisez-le pour des préférences durables comme le ton, la langue ou le format des notes que l'assistant écrit. Il ne change pas ce que l'assistant a le droit de faire : les notes ne sont toujours modifiées que lorsque vous le demandez. Laissez le champ vide pour ne rien envoyer.
+
+## Outils externes (serveurs MCP)
+
+L'assistant peut appeler des outils proposés par des serveurs [MCP](https://modelcontextprotocol.io) distants en plus des siens, par exemple un service de recherche web, pour aller chercher des informations à jour avant de répondre ou d'écrire une note. C'est le sens inverse du [serveur MCP de Poznote](MCP-SERVER.fr.md), qui permet à d'autres assistants d'accéder à vos notes.
+
+La fonctionnalité est désactivée par défaut. Un administrateur l'active dans **Paramètres → Outils d'administration → Assistant IA**, section **Outils externes**, avec **Autoriser les outils externes**, puis y ajoute des serveurs : un nom, l'URL du point d'accès MCP (par exemple `https://mcp.exa.ai/mcp`), une clé API optionnelle envoyée comme jeton Bearer, et des en-têtes personnalisés optionnels pour les serveurs qui attendent leur clé autrement. Poznote se connecte au serveur, lit les outils qu'il propose et les liste avec une case à cocher chacun, pour que vous choisissiez ceux que l'assistant peut appeler. Ces serveurs sont proposés aux utilisateurs autorisés à utiliser l'assistant de l'instance. Avec **Autoriser les utilisateurs à connecter leurs propres serveurs**, chaque utilisateur obtient aussi une section **Outils externes** dans **Paramètres → Mon assistant IA**, pour des serveurs utilisés uniquement dans ses propres conversations.
+
+Seuls les serveurs joignables en HTTP (transport Streamable HTTP) avec une clé API ou des en-têtes personnalisés sont pris en charge : les serveurs lancés comme processus local (stdio, `npx ...`) et ceux qui exigent OAuth ne le sont pas. Comme le serveur IA, un serveur MCP est appelé depuis le serveur Poznote, son URL doit donc être joignable depuis l'intérieur du conteneur. Les outils sont lus à l'ajout d'un serveur et quand vous cliquez sur **Vérifier et actualiser les outils** : un outil que le serveur ajoute ou reformule plus tard n'est pas utilisé tant que vous n'avez pas actualisé.
+
+Dès qu'un serveur est connecté, un bouton en forme de globe apparaît à côté du champ de saisie du chat. Il active et désactive les outils externes, et ce choix est mémorisé dans votre navigateur. Chaque appel est affiché dans la conversation avec le serveur, l'outil et ce qui lui a été envoyé.
+
+Ce qu'un outil externe renvoie vient de l'extérieur de Poznote, une page web par exemple, et peut contenir du texte écrit pour tromper le modèle. L'assistant a pour consigne de le traiter comme une donnée et une révision est enregistrée avant toute modification d'une note, mais une consigne n'est pas une garantie. Pour exclure toute modification non voulue, ouvrez **Paramètres → Mon assistant IA**, section **Outils de l'assistant**, et décochez les outils de la liste **Modifier vos notes** : l'assistant peut encore lire vos notes et chercher sur le web, mais plus rien modifier. Gardez aussi à l'esprit que ce que l'assistant envoie à un outil externe quitte votre instance.
 
 ## Serveurs locaux et réseau Docker
 
@@ -204,4 +236,4 @@ Une erreur survenue une fois que la réponse a commencé à s'afficher n'est pas
 
 ## Confidentialité
 
-Le serveur IA est appelé depuis le serveur Poznote, jamais depuis votre navigateur. Avec une instance locale d'Ollama ou de LM Studio, vos notes et vos conversations ne quittent jamais votre machine. Avec un fournisseur cloud, les parties de vos notes que l'assistant lit pour répondre sont envoyées à ce fournisseur.
+Le serveur IA est appelé depuis le serveur Poznote, jamais depuis votre navigateur. Avec une instance locale d'Ollama ou de LM Studio, vos notes et vos conversations ne quittent jamais votre machine. Avec un fournisseur cloud, les parties de vos notes que l'assistant lit pour répondre sont envoyées à ce fournisseur. Avec les outils externes activés, ce que l'assistant leur envoie, une requête de recherche par exemple, part vers les serveurs que vous avez connectés.

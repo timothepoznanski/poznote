@@ -1366,7 +1366,7 @@ Poznote includes an integrated AI chat that connects to a local [Ollama](https:/
 
 An administrator enables it from **Settings → Admin Tools → AI Assistant**, and every profile then gets an **AI assistant** button in the left icon rail. The AI server is called from the Poznote server, never from your browser, so with a local Ollama instance your notes never leave your machine.
 
-What the assistant can do, choosing a provider and a model, personal API keys, and connecting a local server from the Poznote container are covered in the [AI Assistant documentation](docs/AI-ASSISTANT.md). To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
+What the assistant can do, choosing a provider and a model, personal API keys, external tools such as a web search (remote MCP servers), and connecting a local server from the Poznote container are covered in the [AI Assistant documentation](docs/AI-ASSISTANT.md). To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
 
 ## Transcription (speech to text)
 
@@ -1448,7 +1448,7 @@ Access the **Swagger UI** directly from Poznote at `Settings > About > API REST`
 
 Poznote prioritizes simplicity and portability - no complex frameworks, no heavy dependencies. Just straightforward, reliable web technologies that ensure your notes remain accessible and under your control.
 
-**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. Out of the box the only outbound connection is a daily update check; the optional features you turn on yourself (Git Sync, S3, an AI provider, webhooks, SMTP, OIDC) are the only other ones.
+**Privacy-First Architecture:** Poznote operates entirely locally with no external connections required for functionality. All libraries (Excalidraw, Mermaid, KaTeX) are bundled and served from your own instance. Out of the box the only outbound connection is a daily update check; the optional features you turn on yourself (Git Sync, S3, an AI provider and the external tools you connect to it, webhooks, SMTP, OIDC) are the only other ones.
 
 <details>
 <summary>If you are interested in the tech stack on which Poznote is built, <strong>have a look here.</strong></summary>

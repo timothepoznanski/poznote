@@ -14,6 +14,8 @@
  */
 
 require_once __DIR__ . '/users/db_master.php';
+require_once __DIR__ . '/lib/ai-upstream.php';
+require_once __DIR__ . '/lib/ai-mcp.php';
 
 /** Providers offered by both settings pages. */
 function poznoteAiProviders(): array {
@@ -124,6 +126,47 @@ function poznoteAiDecryptSecret(string $stored): string {
 }
 
 /**
+ * Custom request headers of a configuration (discussion #1610), stored
+ * encrypted like a personal API key: their values are often credentials for
+ * a gateway. See lib/ai-upstream.php for the format and the validation.
+ */
+function poznoteAiStoreHeaders(array $headers): string {
+    return poznoteAiEncryptSecret(aiUpstreamEncodeHeaders($headers));
+}
+
+function poznoteAiLoadHeaders(string $stored): array {
+    return aiUpstreamDecodeHeaders(poznoteAiDecryptSecret($stored));
+}
+
+/**
+ * Parse the custom headers field of a settings form or of a connection
+ * test. Anthropic and OpenAI are called directly and take none.
+ * Returns ['headers' => list, 'error' => '' | translated message].
+ */
+function poznoteAiReadHeadersField(string $text, array $stored, string $provider = ''): array {
+    if (isset(poznoteAiFixedUrls()[$provider])) {
+        return ['headers' => [], 'error' => ''];
+    }
+    $parsed = aiUpstreamParseHeaders($text, $stored);
+    if ($parsed['error'] === null) {
+        return ['headers' => $parsed['headers'], 'error' => ''];
+    }
+    $fallbacks = [
+        'format' => 'Custom headers, line {{line}}: write it as "Name: value", in plain ASCII characters.',
+        'reserved' => 'Custom headers, line {{line}}: this header is set by Poznote and cannot be changed. The API key field covers Authorization.',
+        'duplicate' => 'Custom headers, line {{line}}: this header is already listed above.',
+        'masked' => 'Custom headers, line {{line}}: the hidden value is not available, type it again.',
+        'too_many' => 'Custom headers: no more than {{max}} headers.',
+    ];
+    $reason = $parsed['error']['reason'];
+    return ['headers' => [], 'error' => t(
+        'ai_settings.headers_errors.' . $reason,
+        ['line' => $parsed['error']['line'], 'max' => AI_UPSTREAM_HEADERS_MAX],
+        $fallbacks[$reason]
+    )];
+}
+
+/**
  * True when the administrator lets users configure their own AI provider.
  * This applies to every user: the allowed-users list of ai_settings.php only
  * governs access to the instance configuration.
@@ -143,6 +186,7 @@ function poznoteAiInstanceConfig(): array {
         'model' => trim((string)getGlobalSetting('ai_chat_model', '')),
         'api_key' => trim((string)getGlobalSetting('ai_chat_api_key', '')),
         'reasoning_effort' => poznoteAiNormalizeReasoningEffort(getGlobalSetting('ai_chat_reasoning_effort', 'auto')),
+        'headers' => poznoteAiLoadHeaders((string)getGlobalSetting('ai_chat_headers', '')),
     ];
 }
 
@@ -155,15 +199,16 @@ function poznoteAiUserSettingKeys(): array {
         'model' => 'ai_user_model',
         'api_key' => 'ai_user_api_key',
         'reasoning_effort' => 'ai_user_reasoning_effort',
+        'headers' => 'ai_user_headers',
     ];
 }
 
 /**
  * Personal configuration read from the user's own database.
- * The API key comes back decrypted.
+ * The API key and the custom headers come back decrypted.
  */
 function poznoteAiUserConfig(?PDO $con): array {
-    $config = ['enabled' => false, 'provider' => '', 'url' => '', 'model' => '', 'api_key' => '', 'reasoning_effort' => 'auto'];
+    $config = ['enabled' => false, 'provider' => '', 'url' => '', 'model' => '', 'api_key' => '', 'reasoning_effort' => 'auto', 'headers' => []];
     if (!$con) {
         return $config;
     }
@@ -182,6 +227,7 @@ function poznoteAiUserConfig(?PDO $con): array {
         $config['model'] = trim($rows[$keys['model']] ?? '');
         $config['api_key'] = poznoteAiDecryptSecret($rows[$keys['api_key']] ?? '');
         $config['reasoning_effort'] = poznoteAiNormalizeReasoningEffort($rows[$keys['reasoning_effort']] ?? 'auto');
+        $config['headers'] = poznoteAiLoadHeaders($rows[$keys['headers']] ?? '');
     } catch (Exception $e) {
         // A database without the settings table yet: no personal configuration
         error_log('ai_config: poznoteAiUserConfig() failed: ' . $e->getMessage());
@@ -191,7 +237,8 @@ function poznoteAiUserConfig(?PDO $con): array {
 
 /**
  * Save the personal configuration. Only the keys present in $config are
- * written, so an omitted api_key keeps the stored one.
+ * written, so an omitted api_key keeps the stored one. 'headers' is a list
+ * as returned by poznoteAiReadHeadersField().
  */
 function poznoteSaveAiUserConfig(?PDO $con, array $config): bool {
     if (!$con) {
@@ -202,6 +249,10 @@ function poznoteSaveAiUserConfig(?PDO $con, array $config): bool {
         $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)");
         foreach ($keys as $inputKey => $dbKey) {
             if (!array_key_exists($inputKey, $config)) {
+                continue;
+            }
+            if ($inputKey === 'headers') {
+                $stmt->execute([$dbKey, poznoteAiStoreHeaders((array)$config[$inputKey])]);
                 continue;
             }
             $value = trim((string)$config[$inputKey]);
@@ -219,6 +270,138 @@ function poznoteSaveAiUserConfig(?PDO $con, array $config): bool {
     }
 }
 
+/** Longest custom instructions text kept, in characters. */
+const POZNOTE_AI_CUSTOM_INSTRUCTIONS_MAX = 4000;
+
+/**
+ * Custom instructions the user wants sent to the model with every request
+ * (discussion #1613), read from the user's own database. They apply to
+ * whichever configuration answers, the instance one or the personal one.
+ */
+function poznoteAiCustomInstructions(?PDO $con): string {
+    if (!$con) {
+        return '';
+    }
+    try {
+        $stmt = $con->prepare("SELECT value FROM settings WHERE key = 'ai_custom_instructions'");
+        $stmt->execute();
+        $value = trim((string)($stmt->fetchColumn() ?: ''));
+        return mb_substr($value, 0, POZNOTE_AI_CUSTOM_INSTRUCTIONS_MAX);
+    } catch (Exception $e) {
+        error_log('ai_config: poznoteAiCustomInstructions() failed: ' . $e->getMessage());
+        return '';
+    }
+}
+
+function poznoteSaveAiCustomInstructions(?PDO $con, string $instructions): bool {
+    if (!$con) {
+        return false;
+    }
+    try {
+        $value = str_replace(["\r\n", "\r"], "\n", trim($instructions));
+        $value = mb_substr($value, 0, POZNOTE_AI_CUSTOM_INSTRUCTIONS_MAX);
+        $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('ai_custom_instructions', ?)");
+        $stmt->execute([$value]);
+        return true;
+    } catch (Exception $e) {
+        error_log('Failed to save AI custom instructions: ' . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * External tools (discussion #1611): remote MCP servers whose tools the
+ * assistant may call next to its own, see lib/ai-mcp.php. Off until an
+ * administrator turns them on. Servers come from two places, like the
+ * configurations above: the instance ones (master.db), offered to the users
+ * allowed to use the instance assistant, and the user's own (their
+ * database), when the administrator lets users add some. Both lists are
+ * stored encrypted, as they hold API keys.
+ */
+function poznoteAiMcpEnabled(): bool {
+    return (string)getGlobalSetting('ai_chat_mcp_enabled', '0') === '1';
+}
+
+/** True when users may connect servers of their own. */
+function poznoteAiMcpUserServersAllowed(): bool {
+    return poznoteAiMcpEnabled() && (string)getGlobalSetting('ai_chat_mcp_user_servers_enabled', '0') === '1';
+}
+
+function poznoteAiMcpInstanceServers(): array {
+    return aiMcpDecodeServers(poznoteAiDecryptSecret((string)getGlobalSetting('ai_chat_mcp_servers', '')));
+}
+
+function poznoteSaveAiMcpInstanceServers(array $servers): bool {
+    return setGlobalSetting('ai_chat_mcp_servers', poznoteAiEncryptSecret(aiMcpEncodeServers($servers)));
+}
+
+function poznoteAiMcpUserServers(?PDO $con): array {
+    return aiMcpDecodeServers(poznoteAiDecryptSecret(poznoteAiUserSetting($con, 'ai_user_mcp_servers')));
+}
+
+function poznoteSaveAiMcpUserServers(?PDO $con, array $servers): bool {
+    return poznoteSaveAiUserSetting($con, 'ai_user_mcp_servers', poznoteAiEncryptSecret(aiMcpEncodeServers($servers)));
+}
+
+/**
+ * The servers whose tools a chat request of this user may call: the enabled
+ * ones the user has a right to, the instance ones first.
+ */
+function poznoteAiMcpServersForChat(?PDO $con, ?int $userId): array {
+    if (!poznoteAiMcpEnabled()) {
+        return [];
+    }
+    $servers = isAiChatAllowedForUser($userId) ? poznoteAiMcpInstanceServers() : [];
+    if (poznoteAiMcpUserServersAllowed()) {
+        $servers = array_merge($servers, poznoteAiMcpUserServers($con));
+    }
+    return array_values(array_filter($servers, function (array $server): bool {
+        return $server['enabled'] && in_array(true, array_column($server['tools'], 'enabled'), true);
+    }));
+}
+
+/**
+ * Names of the assistant's own tools this user turned off (the names of
+ * aiToolHandlers() in lib/ai-tools.php), for instance every tool that
+ * changes a note while external tools are connected.
+ */
+function poznoteAiDisabledTools(?PDO $con): array {
+    $names = json_decode(poznoteAiUserSetting($con, 'ai_user_disabled_tools'), true);
+    return is_array($names) ? array_values(array_filter($names, 'is_string')) : [];
+}
+
+function poznoteSaveAiDisabledTools(?PDO $con, array $names): bool {
+    return poznoteSaveAiUserSetting($con, 'ai_user_disabled_tools', (string)json_encode(array_values($names)));
+}
+
+/** One value of the user's own settings table, '' when it is not set. */
+function poznoteAiUserSetting(?PDO $con, string $key): string {
+    if (!$con) {
+        return '';
+    }
+    try {
+        $stmt = $con->prepare('SELECT value FROM settings WHERE key = ?');
+        $stmt->execute([$key]);
+        return (string)($stmt->fetchColumn() ?: '');
+    } catch (Exception $e) {
+        error_log('ai_config: poznoteAiUserSetting() failed: ' . $e->getMessage());
+        return '';
+    }
+}
+
+function poznoteSaveAiUserSetting(?PDO $con, string $key, string $value): bool {
+    if (!$con) {
+        return false;
+    }
+    try {
+        $stmt = $con->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)');
+        return $stmt->execute([$key, $value]);
+    } catch (Exception $e) {
+        error_log('ai_config: poznoteSaveAiUserSetting() failed: ' . $e->getMessage());
+        return false;
+    }
+}
+
 /** A configuration can answer chat requests once it has a URL and a model. */
 function poznoteAiConfigUsable(array $config): bool {
     return !empty($config['enabled']) && trim((string)$config['url']) !== '' && trim((string)$config['model']) !== '';
@@ -226,10 +409,10 @@ function poznoteAiConfigUsable(array $config): bool {
 
 /**
  * The configuration the AI chat must actually use for this user.
- * Returns ['available' => bool, 'source' => 'user'|'instance'|'', 'url', 'model', 'api_key', 'reasoning_effort'].
+ * Returns ['available' => bool, 'source' => 'user'|'instance'|'', 'url', 'model', 'api_key', 'reasoning_effort', 'headers'].
  */
 function poznoteResolveAiChatConfig(?PDO $con, ?int $userId): array {
-    $none = ['available' => false, 'source' => '', 'url' => '', 'model' => '', 'api_key' => '', 'reasoning_effort' => 'auto'];
+    $none = ['available' => false, 'source' => '', 'url' => '', 'model' => '', 'api_key' => '', 'reasoning_effort' => 'auto', 'headers' => []];
 
     if (poznoteAiUserKeysAllowed()) {
         $userConfig = poznoteAiUserConfig($con);
@@ -241,6 +424,7 @@ function poznoteResolveAiChatConfig(?PDO $con, ?int $userId): array {
                 'model' => $userConfig['model'],
                 'api_key' => $userConfig['api_key'],
                 'reasoning_effort' => $userConfig['reasoning_effort'],
+                'headers' => $userConfig['headers'],
             ];
         }
     }
@@ -256,6 +440,7 @@ function poznoteResolveAiChatConfig(?PDO $con, ?int $userId): array {
             'model' => $instance['model'],
             'api_key' => $instance['api_key'],
             'reasoning_effort' => $instance['reasoning_effort'],
+            'headers' => $instance['headers'],
         ];
     }
 

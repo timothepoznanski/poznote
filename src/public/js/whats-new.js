@@ -267,9 +267,8 @@
         if (saveBtn) saveBtn.addEventListener('click', saveAsNote);
         var body = document.getElementById('whatsNewBody');
         if (body) body.addEventListener('scroll', markCurrentVersion, { passive: true });
-        modal.addEventListener('mousedown', function (e) {
-            if (e.target === modal) close();
-        });
+        // No close on a click outside the dialog: a misplaced click would
+        // lose the notes, which are shown only once
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && modal.style.display === 'flex') {
                 e.stopPropagation();

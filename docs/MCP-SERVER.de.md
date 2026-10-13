@@ -103,6 +103,7 @@ Ein im Browser geöffneter Poznote-Tab übernimmt die über MCP vorgenommenen Ä
 - `get_note_share_status`: Den aktuellen Freigabestatus und die öffentliche URL einer Notiz abrufen
 - `get_folder_share_status`: Den aktuellen Freigabestatus und die öffentliche URL eines Ordners abrufen
 - `list_shared`: Alle öffentlich freigegebenen Notizen und Ordner auflisten
+- `list_shared_with_me`: Notizen und Ordner auflisten, die andere Benutzer für dieses Profil freigegeben haben
 - `get_backlinks`: Alle Notizen abrufen, die auf eine bestimmte Notiz verlinken (auf sie verweisen)
 - `convert_note`: Eine Notiz zwischen den Formaten HTML und Markdown konvertieren
 - `rename_folder`: Einen bestehenden Ordner umbenennen

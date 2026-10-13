@@ -26,6 +26,13 @@ if (!isset($aiPanelWorkspace)) {
         $aiPanelWorkspace = (string)getFirstWorkspaceName();
     }
 }
+
+// Servers whose external tools the chat may call for this user (discussion
+// #1611). The globe button of the input bar only exists when there are some.
+$aiPanelExternalServers = implode(', ', array_column(
+    poznoteAiMcpServersForChat($con, (int)(getAuthenticatedUserId() ?? 0)),
+    'name'
+));
 ?>
     <!-- AI CHAT PANEL -->
     <div id="ai-chat-panel">
@@ -34,12 +41,11 @@ if (!isset($aiPanelWorkspace)) {
             <h2 class="ai-chat-title"><i class="lucide lucide-bot"></i> <span data-i18n="ai_chat.title">AI Assistant</span></h2>
             <?php
             // Admins land on the instance configuration, everyone else on their
-            // own one when personal API keys are allowed
-            $aiPanelSettingsHref = '';
+            // own page: custom instructions, plus their own provider when
+            // personal API keys are allowed
+            $aiPanelSettingsHref = 'ai_settings_user.php';
             if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
                 $aiPanelSettingsHref = 'ai_settings.php';
-            } elseif (function_exists('poznoteAiUserKeysAllowed') && poznoteAiUserKeysAllowed()) {
-                $aiPanelSettingsHref = 'ai_settings_user.php';
             }
             ?>
             <?php if ($aiPanelSettingsHref !== ''): ?>
@@ -47,7 +53,13 @@ if (!isset($aiPanelWorkspace)) {
                 <i class="lucide lucide-settings"></i>
             </a>
             <?php endif; ?>
-            <button type="button" class="ai-chat-header-btn" data-action="ai-chat-clear" aria-label="<?php echo t_h('ai_chat.clear', [], 'Clear conversation'); ?>" title="<?php echo t_h('ai_chat.clear', [], 'Clear conversation'); ?>">
+            <button type="button" class="ai-chat-header-btn" data-action="ai-chat-new" aria-label="<?php echo t_h('ai_chat.new_chat', [], 'New conversation'); ?>" title="<?php echo t_h('ai_chat.new_chat', [], 'New conversation'); ?>">
+                <i class="lucide lucide-plus"></i>
+            </button>
+            <button type="button" class="ai-chat-header-btn" data-action="ai-chat-history" aria-pressed="false" aria-label="<?php echo t_h('ai_chat.history', [], 'Previous conversations'); ?>" title="<?php echo t_h('ai_chat.history', [], 'Previous conversations'); ?>">
+                <i class="lucide lucide-history"></i>
+            </button>
+            <button type="button" class="ai-chat-header-btn" data-action="ai-chat-clear" aria-label="<?php echo t_h('ai_chat.delete_chat', [], 'Delete this conversation'); ?>" title="<?php echo t_h('ai_chat.delete_chat', [], 'Delete this conversation'); ?>">
                 <i class="lucide lucide-trash"></i>
             </button>
             <button type="button" class="ai-chat-header-btn" data-action="toggle-ai-chat" aria-label="<?php echo t_h('common.close'); ?>" title="<?php echo t_h('common.close'); ?>">
@@ -58,6 +70,8 @@ if (!isset($aiPanelWorkspace)) {
             <div class="ai-chat-empty" data-i18n="ai_chat.empty">Ask a question.
 The assistant can search, read, create, edit, organize and delete your notes.</div>
         </div>
+        <!-- The last conversations of the workspace; js/ai-chat.js fills it and shows it in place of the messages -->
+        <div class="ai-chat-history" id="ai-chat-history" hidden></div>
         <div class="ai-chat-model" title="<?php echo t_h('ai_chat.model_hint', [], 'Open AI Assistant settings.'); ?>">
             <i class="lucide lucide-cpu"></i>
             <span class="ai-chat-model-label" data-i18n="ai_chat.model_label"><?php echo t_h('ai_chat.model_label', [], 'Model:'); ?></span>
@@ -76,6 +90,14 @@ The assistant can search, read, create, edit, organize and delete your notes.</d
             <span class="ai-chat-context-title" id="ai-chat-context-title"></span>
         </div>
         <form id="ai-chat-form" class="ai-chat-inputbar">
+            <?php if ($aiPanelExternalServers !== ''): ?>
+            <!-- External tools on/off; js/ai-chat.js keeps the state and the title -->
+            <button type="button" id="ai-chat-external" class="ai-chat-external-btn" data-action="ai-chat-external" aria-pressed="true"
+                    data-servers="<?php echo htmlspecialchars($aiPanelExternalServers, ENT_QUOTES, 'UTF-8'); ?>"
+                    aria-label="<?php echo t_h('ai_chat.external_tools', [], 'External tools'); ?>">
+                <i class="lucide lucide-globe"></i>
+            </button>
+            <?php endif; ?>
             <textarea id="ai-chat-input" rows="1" placeholder="<?php echo t_h('ai_chat.placeholder', [], 'Ask the assistant...'); ?>" data-i18n-placeholder="ai_chat.placeholder"></textarea>
             <button type="submit" id="ai-chat-send" class="ai-chat-send-btn" title="<?php echo t_h('ai_chat.send', [], 'Send'); ?>">
                 <i class="lucide lucide-arrow-up"></i>

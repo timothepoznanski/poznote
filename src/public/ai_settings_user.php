@@ -21,6 +21,7 @@ requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../ai_config.php';
+require_once __DIR__ . '/../ai_mcp_settings.php';
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
@@ -47,9 +48,12 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
     $model = trim((string)($_POST['ai_model'] ?? ''));
     $apiKey = trim((string)($_POST['ai_api_key'] ?? ''));
     $reasoningEffort = poznoteAiNormalizeReasoningEffort($_POST['ai_reasoning_effort'] ?? 'auto');
+    $headersField = poznoteAiReadHeadersField((string)($_POST['ai_headers'] ?? ''), poznoteAiUserConfig($con)['headers'], $provider);
 
     if ($enabled === '1' && ($url === '' || $model === '')) {
         $error = t('ai_settings_user.messages.incomplete', [], 'Enter a server URL and a model before enabling your own assistant.');
+    } elseif ($headersField['error'] !== '') {
+        $error = $headersField['error'];
     } else {
         $toSave = [
             'enabled' => $enabled,
@@ -57,6 +61,7 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
             'url' => $url,
             'model' => $model,
             'reasoning_effort' => $reasoningEffort,
+            'headers' => $headersField['headers'],
         ];
         // Masked placeholder means "keep the existing key"
         if ($apiKey !== '••••••••') {
@@ -70,10 +75,32 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
     }
 }
 
+// Custom instructions do not depend on personal API keys: they are sent to
+// whichever configuration answers, the instance one included
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_instructions') {
+    if (poznoteSaveAiCustomInstructions($con, (string)($_POST['ai_custom_instructions'] ?? ''))) {
+        $message = t('ai_settings_user.instructions_saved', [], 'Custom instructions saved.');
+    } else {
+        $error = t('ai_settings.messages.save_error', [], 'Failed to save configuration.');
+    }
+}
+
+// The Assistant tools and External tools sections have forms of their own
+$aiMcpState = poznoteAiMcpHandlePost('user', $con);
+if ($aiMcpState !== null) {
+    $message = $aiMcpState['message'];
+    $error = $aiMcpState['error'];
+}
+
 $aiConfig = poznoteAiUserConfig($con);
+$aiCustomInstructions = poznoteAiCustomInstructions($con);
 $aiProvider = poznoteAiGuessProvider($aiConfig['provider'], $aiConfig['url']);
 $aiEnabled = $aiConfig['enabled'];
 $aiReasoningEffort = $aiConfig['reasoning_effort'];
+// Refused headers come back as they were typed, to be corrected in place
+$aiHeadersText = isset($headersField) && $headersField['error'] !== ''
+    ? (string)($_POST['ai_headers'] ?? '')
+    : aiUpstreamMaskHeaders($aiConfig['headers']);
 $aiLocalHost = aiChatLocalDefaultHost();
 
 // What the AI chat button actually uses right now, so the page can say whether
@@ -183,6 +210,13 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
                         <span class="label-desc" id="ai-key-desc"><?php echo t_h('ai_settings.api_key_description', [], 'Leave empty for a local Ollama server. Required for cloud providers.'); ?></span>
                     </div>
 
+                    <div class="git-field-group" id="ai-headers-group">
+                        <label class="git-field-label" for="ai_headers"><?php echo t_h('ai_settings.headers_label', [], 'Custom headers (optional)'); ?></label>
+                        <textarea name="ai_headers" id="ai_headers" class="git-field-input" rows="3" spellcheck="false" autocomplete="off"
+                                  placeholder="x-litellm-customer-id: poznote"><?php echo htmlspecialchars($aiHeadersText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
+                        <span class="label-desc"><?php echo t_h('ai_settings.headers_description', [], 'One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter. Saved values are hidden: leave a line as it is to keep its value.'); ?></span>
+                    </div>
+
                     <div class="git-field-actions">
                         <button type="button" id="ai-test-btn" class="btn btn-secondary">
                             <i class="lucide lucide-plug"></i>
@@ -221,6 +255,35 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
             </form>
         </div>
         <?php endif; ?>
+
+        <div class="git-sync-section">
+            <h2><i class="lucide lucide-message-square"></i> <?php echo t_h('ai_settings_user.instructions_title', [], 'Custom instructions'); ?></h2>
+
+            <form method="post">
+                <input type="hidden" name="action" value="save_instructions">
+
+                <div class="git-config-fields">
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="ai_custom_instructions"><?php echo t_h('ai_settings_user.instructions_label', [], 'Instructions'); ?></label>
+                        <textarea name="ai_custom_instructions" id="ai_custom_instructions" class="git-field-input" rows="6"
+                                  maxlength="<?php echo POZNOTE_AI_CUSTOM_INSTRUCTIONS_MAX; ?>"
+                                  placeholder="<?php echo t_h('ai_settings_user.instructions_placeholder', [], 'Example: when you write a note in English, add its Russian translation below, and the other way round.'); ?>"><?php echo htmlspecialchars($aiCustomInstructions, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
+                        <span class="label-desc"><?php echo t_h('ai_settings_user.instructions_description', [], 'Sent to the model with every message, whichever configuration answers. Use it for standing preferences: tone, language, format of the notes the assistant writes. Leave empty to send nothing.'); ?></span>
+                    </div>
+
+                    <div class="git-field-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('ai_settings_user.instructions_save', [], 'Save instructions'); ?>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <?php poznoteAiMcpRenderBuiltinTools($con); ?>
+
+        <?php poznoteAiMcpRenderSection('user', $con, $aiMcpState); ?>
 
         <div class="git-sync-footer-note">
             <?php echo t_h('ai_settings.footer_note', [], 'The AI server is called from the Poznote server, not from your browser. Chat conversations are sent to the configured server; with a local Ollama instance nothing leaves your machine.'); ?>

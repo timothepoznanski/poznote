@@ -73,6 +73,7 @@ test('malformed subscription keys and oversized payloads are refused', function 
     assertTrue(webPushValidSubscriptionKeys($point, $auth));
     assertFalse(webPushValidSubscriptionKeys($point, webPushBase64UrlEncode(random_bytes(8))), 'short auth');
     assertFalse(webPushValidSubscriptionKeys(webPushBase64UrlEncode(random_bytes(65)), $auth), 'not a point');
+    assertFalse(webPushValidSubscriptionKeys(webPushBase64UrlEncode("\x04" . random_bytes(64)), $auth), 'off the curve');
     assertFalse(webPushValidSubscriptionKeys('not base64 !', $auth));
     assertSame(null, webPushEncrypt('x', 'AAAA', $auth));
     assertSame(null, webPushEncrypt(str_repeat('x', WEB_PUSH_MAX_PAYLOAD + 1), $point, $auth));

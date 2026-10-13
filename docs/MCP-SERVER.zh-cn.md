@@ -103,6 +103,7 @@ MCP 服务器充当 AI 助手与您的 Poznote 实例之间的桥梁。
 - `get_note_share_status`：获取笔记当前的分享状态和公开 URL
 - `get_folder_share_status`：获取文件夹当前的分享状态和公开 URL
 - `list_shared`：列出所有公开分享的笔记和文件夹
+- `list_shared_with_me`：列出其他用户与此用户资料分享的笔记和文件夹
 - `get_backlinks`：获取所有链接到（引用）指定笔记的笔记
 - `convert_note`：在 HTML 和 Markdown 格式之间转换笔记
 - `rename_folder`：重命名现有文件夹

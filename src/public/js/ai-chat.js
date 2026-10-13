@@ -8,25 +8,33 @@
  * backend (api_ai_chat.php) proxies the conversation and streams the answer
  * back as Server-Sent Events.
  *
+ * When external tools are connected in the settings (MCP servers, discussion
+ * #1611), a globe button next to the input turns them on and off; the choice
+ * is remembered and travels with every message.
+ *
  * On desktop the panel is docked as the rightmost column of the page (like
  * the outline panel), resizable by its left edge, and its open state and
  * width survive reloads. On phones it overlays the page.
  *
  * The panel is included by index.php and dashboard.php; the same stored
- * state and conversation follow the user from one page to the other. On the
+ * state and conversation follow the user from one page to the other. The
+ * header starts a new conversation and lists the last ten of the workspace,
+ * kept on the server, to carry one of them on. On the
  * dashboard no note is open, so "this note" has no target there.
  */
 (function () {
     'use strict';
 
     var conversation = [];   // [{role: 'user'|'assistant', content: string}]
+    var conversationId = ''; // names the conversation on the server
     var streaming = false;
     var abortController = null;
     // The multi-workspace notice of the dashboard has been answered with
     // Continue on this page: not asked again until the next load
     var scopeAcknowledged = false;
 
-    var STORAGE_KEY = 'poznote-ai-chat-conversation';
+    var STORAGE_KEY = 'poznote-ai-chat-conversation'; // legacy, see restoreConversation()
+    var CURRENT_KEY = 'poznote-ai-chat-current';      // sessionStorage: id of the tab's conversation
     var MAX_STORED_MESSAGES = 40; // matches the backend's conversation window
 
     // Docked panel state, also read by the first-paint script in index.php
@@ -34,6 +42,9 @@
     var WIDTH_KEY = 'aiChatWidth';
     var MIN_WIDTH = 300;
     var MAX_WIDTH = 700;
+
+    // 'false' once the globe button has been switched off; on otherwise
+    var EXTERNAL_KEY = 'aiChatExternalTools';
 
     /**
      * Workspace the chat is scoped to. The workspace menu switches without a
@@ -117,11 +128,6 @@
         if (box) box.hidden = ws === '';
     }
 
-    /** One stored conversation per workspace, so switching back restores it. */
-    function storageKey(workspace) {
-        return STORAGE_KEY + '::' + (workspace || '');
-    }
-
     function t(key, vars, fallback) {
         if (typeof window.t === 'function') return window.t(key, vars, fallback);
         return fallback || key;
@@ -158,6 +164,57 @@
         messagesEl().appendChild(div);
         scrollToBottom();
         return div;
+    }
+
+    function copyLabel() { return t('ai_chat.copy', {}, 'Copy'); }
+
+    /** Put text on the clipboard; resolves to false when the browser refuses. */
+    function copyText(text) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return false; });
+        }
+        // No Clipboard API on a page served over plain HTTP: copy the
+        // selection of an off-screen field instead
+        var field = document.createElement('textarea');
+        field.value = text;
+        field.setAttribute('readonly', '');
+        field.style.position = 'fixed';
+        field.style.opacity = '0';
+        document.body.appendChild(field);
+        field.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { /* ignore */ }
+        field.remove();
+        return Promise.resolve(ok);
+    }
+
+    /**
+     * The small button under a question or an answer that copies it: the
+     * question as typed, the answer as the Markdown the model wrote, which
+     * is what pastes well into a note. It sits after the bubble rather than
+     * in it, since an answer bubble is redrawn while it streams.
+     */
+    function appendCopyButton(bubble, text) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'ai-chat-copy' + (bubble.classList.contains('ai-chat-msg-user') ? ' ai-chat-copy-user' : '');
+        btn.title = copyLabel();
+        btn.setAttribute('aria-label', copyLabel());
+        var icon = document.createElement('i');
+        icon.className = 'lucide lucide-copy';
+        btn.appendChild(icon);
+        btn.addEventListener('click', function () {
+            copyText(text).then(function (ok) {
+                if (!ok) return;
+                icon.className = 'lucide lucide-check';
+                btn.title = t('ai_chat.copied', {}, 'Copied');
+                setTimeout(function () {
+                    icon.className = 'lucide lucide-copy';
+                    btn.title = copyLabel();
+                }, 1500);
+            });
+        });
+        bubble.insertAdjacentElement('afterend', btn);
     }
 
     // Tags that must never survive in assistant output. Markdown allows raw
@@ -226,14 +283,57 @@
         }
     }
 
-    // Show what the assistant is doing while it uses its note tools
-    // (search_notes / get_note / list_recent_notes). Ephemeral: these lines
-    // are not part of the stored conversation.
+    /** The globe button, absent when no external tools are connected. */
+    function externalButton() { return document.getElementById('ai-chat-external'); }
+
+    function externalToolsOn() {
+        if (!externalButton()) return false;
+        try {
+            return localStorage.getItem(EXTERNAL_KEY) !== 'false';
+        } catch (e) {
+            return true;
+        }
+    }
+
+    function updateExternalButton() {
+        var btn = externalButton();
+        if (!btn) return;
+        var on = externalToolsOn();
+        var servers = btn.getAttribute('data-servers') || '';
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.title = (on
+            ? t('ai_chat.external_tools_on', {}, 'External tools are on: the assistant may call {{servers}}. Click to turn them off.')
+            : t('ai_chat.external_tools_off', {}, 'External tools are off. Click to let the assistant call {{servers}}.'))
+            .replace('{{servers}}', servers);
+    }
+
+    function toggleExternalTools() {
+        try {
+            localStorage.setItem(EXTERNAL_KEY, externalToolsOn() ? 'false' : 'true');
+        } catch (e) { /* ignore */ }
+        updateExternalButton();
+    }
+
+    // What an external tool is called with leaves the instance: the activity
+    // line shows it, the query alone when there is one
+    function externalCallSummary(args) {
+        if (!Object.keys(args).length) return '';
+        var text = typeof args.query === 'string' ? args.query : JSON.stringify(args);
+        return text.length > 160 ? text.slice(0, 160) + '…' : text;
+    }
+
+    // Show what the assistant is doing while it uses its tools, the note
+    // ones (search_notes / get_note / list_recent_notes...) and the external
+    // ones. Ephemeral: these lines are not part of the stored conversation.
     function appendToolActivity(tool, pendingBubble) {
         var name = tool && tool.name;
         var args = (tool && tool.args) || {};
+        var external = tool && tool.external;
         var label;
-        if (name === 'search_notes') {
+        if (external) {
+            var summary = externalCallSummary(args);
+            label = external.server + ': ' + external.tool + (summary ? ' (' + summary + ')' : '');
+        } else if (name === 'search_notes') {
             label = t('ai_chat.tool_search', { query: args.query || '' }, 'Searching notes: {{query}}')
                 .replace('{{query}}', args.query || '');
         } else if (name === 'get_note') {
@@ -341,7 +441,7 @@
         var div = document.createElement('div');
         div.className = 'ai-chat-tool';
         var icon = document.createElement('i');
-        icon.className = 'lucide ' + (ICONS[name] || 'lucide-search');
+        icon.className = 'lucide ' + (external ? 'lucide-globe' : (ICONS[name] || 'lucide-search'));
         div.appendChild(icon);
         div.appendChild(document.createTextNode(' ' + label));
         messagesEl().insertBefore(div, pendingBubble);
@@ -351,19 +451,28 @@
     // Shown once per conversation when the configured model rejects tool
     // calling: the chat still works but cannot browse the notes. Some OpenAI
     // models only refuse tools because of the reasoning effort, which the
-    // settings page can fix: say so.
-    function appendToolsUnsupportedNotice(pendingBubble, reason) {
+    // settings page can fix: say so. The server first tries again without
+    // the external tools: when that is what happened, the notice gives the
+    // refusal of the AI server (detail), which names the tool at fault.
+    function appendToolsUnsupportedNotice(pendingBubble, reason, detail) {
         if (panel() && panel().querySelector('.ai-chat-notice')) return;
         var div = document.createElement('div');
         div.className = 'ai-chat-notice';
         var icon = document.createElement('i');
         icon.className = 'lucide lucide-alert-triangle';
         div.appendChild(icon);
-        var text = (reason === 'tools_need_reasoning_none')
-            ? t('ai_chat.no_tools_reasoning_notice', {},
-                'This model refuses tools at the current reasoning effort, so the assistant cannot browse your notes. Set the reasoning effort to None in the AI Assistant settings.')
-            : t('ai_chat.no_tools_notice', {},
+        var text;
+        if (reason === 'external_tools_refused') {
+            text = t('ai_chat.external_tools_refused', {},
+                'The AI server refused the external tools, so this answer is given without them: {{error}}')
+                .replace('{{error}}', String(detail || ''));
+        } else if (reason === 'tools_need_reasoning_none') {
+            text = t('ai_chat.no_tools_reasoning_notice', {},
+                'This model refuses tools at the current reasoning effort, so the assistant cannot browse your notes. Set the reasoning effort to None in the AI Assistant settings.');
+        } else {
+            text = t('ai_chat.no_tools_notice', {},
                 'This model does not support tools — the assistant cannot browse your notes.');
+        }
         div.appendChild(document.createTextNode(' ' + text));
         messagesEl().insertBefore(div, pendingBubble);
         scrollToBottom();
@@ -405,39 +514,85 @@
         errorBubble.appendChild(btn);
     }
 
-    function saveConversation(workspace) {
-        var key = storageKey(workspace !== undefined ? workspace : currentWorkspace());
-        try {
-            if (conversation.length) {
-                sessionStorage.setItem(key, JSON.stringify(conversation.slice(-MAX_STORED_MESSAGES)));
+    /** A fresh id for a conversation: only ever compared with stored ones. */
+    function newConversationId() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+    }
+
+    /** Messages read back from the server or from storage, reduced to what a conversation holds. */
+    function cleanMessages(stored) {
+        var messages = [];
+        (Array.isArray(stored) ? stored : []).forEach(function (msg) {
+            if (!msg || typeof msg.content !== 'string') return;
+            if (msg.role !== 'user' && msg.role !== 'assistant') return;
+            messages.push({ role: msg.role, content: msg.content });
+        });
+        return messages;
+    }
+
+    /**
+     * Conversations are kept on the server, for the signed-in user and per
+     * workspace (api_ai_chat.php, the conversation* actions). Requests run
+     * one after the other, so that a list asked for right after an answer
+     * holds that answer. Resolves to the JSON reply, or to null when the
+     * request failed: the chat itself never depends on the history.
+     */
+    var historyRequests = Promise.resolve();
+
+    function historyRequest(action, params, post) {
+        var run = function () {
+            var url = 'api_ai_chat.php?action=' + action;
+            var options = { credentials: 'same-origin' };
+            if (post) {
+                options.method = 'POST';
+                options.headers = { 'Content-Type': 'application/json' };
+                options.body = JSON.stringify(params);
             } else {
-                sessionStorage.removeItem(key);
+                url += '&' + new URLSearchParams(params).toString();
+            }
+            return fetch(url, options).then(function (response) {
+                return response.ok ? response.json() : null;
+            }).catch(function (e) {
+                console.debug('ai-chat: ' + action + ' failed:', e);
+                return null;
+            });
+        };
+        historyRequests = historyRequests.then(run);
+        return historyRequests;
+    }
+
+    /**
+     * Which conversation this tab has open in a workspace: only its id
+     * stays in the browser (sessionStorage), for a reload to find it again.
+     */
+    function rememberConversation(workspace, id) {
+        try {
+            if (id) {
+                sessionStorage.setItem(CURRENT_KEY + '::' + (workspace || ''), id);
+            } else {
+                sessionStorage.removeItem(CURRENT_KEY + '::' + (workspace || ''));
             }
         } catch (e) {
-            // Storage full or unavailable — persistence is best-effort
-            console.debug('ai-chat: saveConversation() failed:', e);
+            console.debug('ai-chat: rememberConversation() failed:', e);
         }
     }
 
-    function restoreConversation() {
-        var raw;
-        try {
-            raw = sessionStorage.getItem(storageKey(currentWorkspace()));
-        } catch (e) {
-            return;
-        }
-        if (!raw) return;
-        var stored;
-        try {
-            stored = JSON.parse(raw);
-        } catch (e) {
-            return;
-        }
-        if (!Array.isArray(stored)) return;
-        stored.forEach(function (msg) {
-            if (!msg || typeof msg.content !== 'string') return;
-            if (msg.role !== 'user' && msg.role !== 'assistant') return;
-            conversation.push({ role: msg.role, content: msg.content });
+    /** Send the conversation on screen to the server, after each answer. */
+    function saveConversation() {
+        if (!conversation.length) return;
+        var workspace = currentWorkspace();
+        rememberConversation(workspace, conversationId);
+        historyRequest('conversation_save', {
+            id: conversationId,
+            workspace: workspace,
+            messages: conversation.slice(-MAX_STORED_MESSAGES)
+        }, true);
+    }
+
+    /** Draw the bubbles of the conversation in memory. */
+    function renderConversation() {
+        resetMessages();
+        conversation.forEach(function (msg) {
             var bubble = appendBubble(
                 msg.role === 'user' ? 'ai-chat-msg-user' : 'ai-chat-msg-assistant', '');
             if (msg.role === 'user') {
@@ -445,8 +600,175 @@
             } else {
                 renderAssistantBubble(bubble, msg.content);
             }
+            appendCopyButton(bubble, msg.content);
         });
         scrollToBottom();
+    }
+
+    /**
+     * Start from an empty conversation, then take up the one this tab had
+     * open in the current workspace, if any, once the server has sent it.
+     */
+    function restoreConversation() {
+        var workspace = currentWorkspace();
+        var blank = startConversation();
+        var id = '';
+        try {
+            id = sessionStorage.getItem(CURRENT_KEY + '::' + (workspace || '')) || '';
+            // Before conversations moved to the server, the messages
+            // themselves were kept in the tab: hand them over once
+            var legacyKey = STORAGE_KEY + '::' + (workspace || '');
+            var legacy = cleanMessages(JSON.parse(sessionStorage.getItem(legacyKey) || 'null'));
+            sessionStorage.removeItem(legacyKey);
+            if (legacy.length && !id) {
+                conversation = legacy;
+                renderConversation();
+                saveConversation();
+                return;
+            }
+        } catch (e) {
+            // Nothing usable stored: the conversation stays empty
+        }
+        if (!id) return;
+        historyRequest('conversation', { id: id, workspace: workspace }).then(function (data) {
+            // The user did not wait: what they started is the conversation now
+            if (conversation !== blank || conversation.length) return;
+            if (!data || !data.conversation) {
+                rememberConversation(workspace, '');
+                return;
+            }
+            conversation = cleanMessages(data.conversation.messages);
+            conversationId = id;
+            renderConversation();
+        });
+    }
+
+    /** An empty conversation under a new id; returns its (empty) message list. */
+    function startConversation() {
+        if (streaming && abortController) abortController.abort();
+        conversation = [];
+        conversationId = newConversationId();
+        resetMessages();
+        return conversation;
+    }
+
+    /** Leave the conversation as it is in the history and start an empty one. */
+    function newConversation() {
+        startConversation();
+        rememberConversation(currentWorkspace(), '');
+        closeHistory();
+        var input = document.getElementById('ai-chat-input');
+        if (input && isDesktop()) input.focus();
+    }
+
+    function historyEl() { return document.getElementById('ai-chat-history'); }
+
+    function isHistoryOpen() {
+        var el = historyEl();
+        return !!el && !el.hidden;
+    }
+
+    /** The history takes the place of the messages while it is open. */
+    function setHistoryOpen(open) {
+        var el = historyEl();
+        if (!el) return;
+        if (open) renderHistory();
+        el.hidden = !open;
+        messagesEl().hidden = open;
+        var btn = document.querySelector('[data-action="ai-chat-history"]');
+        if (btn) btn.setAttribute('aria-pressed', open ? 'true' : 'false');
+    }
+
+    function closeHistory() { setHistoryOpen(false); }
+
+    function historyNotice(text) {
+        var el = historyEl();
+        el.innerHTML = '';
+        var notice = document.createElement('div');
+        notice.className = 'ai-chat-empty';
+        notice.textContent = text;
+        el.appendChild(notice);
+    }
+
+    function renderHistory() {
+        var el = historyEl();
+        var workspace = currentWorkspace();
+        historyRequest('conversations', { workspace: workspace }).then(function (data) {
+            if (!isHistoryOpen() || workspace !== currentWorkspace()) return;
+            if (!data || !Array.isArray(data.conversations)) {
+                historyNotice(t('ai_chat.history_error', {}, 'The conversations could not be loaded.'));
+                return;
+            }
+            if (!data.conversations.length) {
+                historyNotice(t('ai_chat.history_empty', {}, 'No conversation yet.'));
+                return;
+            }
+            el.innerHTML = '';
+            data.conversations.forEach(function (entry) {
+                el.appendChild(historyRow(entry));
+            });
+        });
+    }
+
+    /** One line of the history: {id, title, updated: Unix time}. */
+    function historyRow(entry) {
+        var row = document.createElement('div');
+        row.className = 'ai-chat-history-row' + (entry.id === conversationId ? ' ai-chat-history-current' : '');
+
+        var open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'ai-chat-history-open';
+        var title = document.createElement('span');
+        title.className = 'ai-chat-history-title';
+        title.textContent = String(entry.title || '');
+        var date = document.createElement('span');
+        date.className = 'ai-chat-history-date';
+        date.textContent = entry.updated
+            ? new Date(entry.updated * 1000).toLocaleString(document.documentElement.lang || undefined, { dateStyle: 'medium', timeStyle: 'short' })
+            : '';
+        open.appendChild(title);
+        open.appendChild(date);
+        open.addEventListener('click', function () { openConversation(entry.id); });
+
+        var remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'ai-chat-history-delete';
+        remove.title = t('ai_chat.delete_chat', {}, 'Delete this conversation');
+        remove.setAttribute('aria-label', remove.title);
+        var icon = document.createElement('i');
+        icon.className = 'lucide lucide-x';
+        remove.appendChild(icon);
+        remove.addEventListener('click', function () { deleteConversation(entry.id); });
+
+        row.appendChild(open);
+        row.appendChild(remove);
+        return row;
+    }
+
+    /** Carry on with a conversation of the history. */
+    function openConversation(id) {
+        var workspace = currentWorkspace();
+        historyRequest('conversation', { id: id, workspace: workspace }).then(function (data) {
+            if (!data || !data.conversation || workspace !== currentWorkspace()) {
+                if (isHistoryOpen()) renderHistory();
+                return;
+            }
+            startConversation();
+            conversation = cleanMessages(data.conversation.messages);
+            conversationId = id;
+            rememberConversation(workspace, id);
+            closeHistory();
+            renderConversation();
+        });
+    }
+
+    function deleteConversation(id) {
+        if (id === conversationId) {
+            startConversation();
+            rememberConversation(currentWorkspace(), '');
+        }
+        historyRequest('conversation_delete', { id: id }, true);
+        if (isHistoryOpen()) renderHistory();
     }
 
     function setStreaming(on) {
@@ -592,25 +914,21 @@
         el.appendChild(hint);
     }
 
+    /** Delete the conversation on screen, from the history as well. */
     function clear() {
-        if (streaming && abortController) abortController.abort();
-        conversation = [];
-        saveConversation();
-        resetMessages();
+        deleteConversation(conversationId);
     }
 
     /**
-     * Called by workspaces-core.js when the user switches workspace without a page
-     * reload: park the current conversation under the workspace we are
-     * leaving and show the one of the workspace we arrive in (if any). The
-     * backend scopes every tool to the current workspace, so carrying the old
-     * conversation over would only let the model answer from stale context.
+     * Called by workspaces-create.js when the user switches workspace without
+     * a page reload: leave the current conversation, which the server holds,
+     * and show the one this tab had open in the workspace we arrive in (if
+     * any). The backend scopes every tool to the current workspace, so
+     * carrying the old conversation over would only let the model answer
+     * from stale context.
      */
-    function switchWorkspace(oldWorkspace) {
-        if (streaming && abortController) abortController.abort();
-        saveConversation(oldWorkspace);
-        conversation = [];
-        resetMessages();
+    function switchWorkspace() {
+        closeHistory();
         restoreConversation();
         updateWorkspaceIndicator();
     }
@@ -638,9 +956,14 @@
             input.style.overflowY = 'hidden';
         }
 
+        closeHistory();
+        // finish() runs after the answer, or after an abort: by then the
+        // user may have moved to another conversation, which this turn must
+        // not write into
+        var turnConversation = conversation;
         conversation.push({ role: 'user', content: text });
         if (!isRetry) {
-            appendBubble('ai-chat-msg-user', text);
+            appendCopyButton(appendBubble('ai-chat-msg-user', text), text);
         }
 
         var body = { messages: conversation };
@@ -652,6 +975,9 @@
         var openNoteId = currentNoteId();
         if (openNoteId) {
             body.note_id = openNoteId;
+        }
+        if (externalToolsOn()) {
+            body.external_tools = true;
         }
 
         var bubble = appendBubble('ai-chat-msg-assistant ai-chat-pending', '');
@@ -694,8 +1020,9 @@
                     appendRetryNotice(obj.poznote_retry, bubble);
                     return;
                 }
-                if (obj.poznote_notice === 'tools_unsupported' || obj.poznote_notice === 'tools_need_reasoning_none') {
-                    appendToolsUnsupportedNotice(bubble, obj.poznote_notice);
+                if (obj.poznote_notice === 'tools_unsupported' || obj.poznote_notice === 'tools_need_reasoning_none'
+                    || obj.poznote_notice === 'external_tools_refused') {
+                    appendToolsUnsupportedNotice(bubble, obj.poznote_notice, obj.detail);
                     return;
                 }
                 var delta = obj.choices && obj.choices[0] && obj.choices[0].delta;
@@ -750,9 +1077,11 @@
             try {
                 document.dispatchEvent(new CustomEvent('poznoteExternalChangeHint'));
             } catch (e) { /* ignore */ }
+            if (conversation !== turnConversation) return;
             if (!failed) {
                 if (answer) {
                     renderAssistantBubble(bubble, answer);
+                    appendCopyButton(bubble, answer);
                     scrollToBottom();
                     conversation.push({ role: 'assistant', content: answer });
                 } else if (bubble.parentNode && !bubble.textContent) {
@@ -785,6 +1114,21 @@
             if (clearBtn) {
                 e.preventDefault();
                 clear();
+                return;
+            }
+            if (e.target.closest('[data-action="ai-chat-new"]')) {
+                e.preventDefault();
+                newConversation();
+                return;
+            }
+            if (e.target.closest('[data-action="ai-chat-history"]')) {
+                e.preventDefault();
+                setHistoryOpen(!isHistoryOpen());
+                return;
+            }
+            if (e.target.closest('[data-action="ai-chat-external"]')) {
+                e.preventDefault();
+                toggleExternalTools();
                 return;
             }
             var scopeBtn = e.target.closest('[data-action="ai-chat-scope-continue"], [data-action="ai-chat-scope-cancel"]');
@@ -826,7 +1170,16 @@
         // redrawn in the user's language once they are in.
         document.addEventListener('poznote:i18n:loaded', function () {
             if (!conversation.length) resetMessages();
+            if (isHistoryOpen()) renderHistory();
+            updateExternalButton();
+            // Buttons of a restored conversation were labelled before the
+            // translations arrived
+            Array.prototype.forEach.call(document.querySelectorAll('.ai-chat-copy'), function (btn) {
+                btn.title = copyLabel();
+                btn.setAttribute('aria-label', copyLabel());
+            });
         });
+        updateExternalButton();
 
         updateWorkspaceIndicator();
         updateContextIndicator();
