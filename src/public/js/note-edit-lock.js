@@ -2,6 +2,8 @@
     var HEARTBEAT_INTERVAL_MS = 20000;
     var STATUS_CHECK_INTERVAL_MS = 10000;
     var LOCKED_STATUS_CHECK_INTERVAL_MS = 3000;
+    // Waits before each new attempt when the lock request gets no answer
+    var ACQUIRE_RETRY_DELAYS_MS = [500, 2000];
     var SESSION_STORAGE_KEY = 'poznote_editor_session_id';
     var activeNoteId = null;
     var heartbeatTimer = null;
@@ -787,9 +789,11 @@
         stopStatusChecks();
         activeNoteId = noteId;
         acquireRequestId += 1;
-        var requestId = acquireRequestId;
         setNoteCheckingState(noteId);
+        sendAcquireRequest(noteId, acquireRequestId, 0);
+    }
 
+    function sendAcquireRequest(noteId, requestId, attempt) {
         postJson('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
             editor_session_id: getEditorSessionId()
         }).then(parseResponse).then(function (result) {
@@ -823,6 +827,18 @@
             startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
         }).catch(function () {
             if (requestId !== acquireRequestId || String(activeNoteId) !== noteId) {
+                return;
+            }
+
+            // A request the browser dropped on its way back (issue 1618:
+            // Firefox behind a reverse proxy, the server had granted the
+            // lock) is sent again: the same account re-acquires its lock.
+            if (attempt < ACQUIRE_RETRY_DELAYS_MS.length) {
+                window.setTimeout(function () {
+                    if (requestId === acquireRequestId && String(activeNoteId) === noteId) {
+                        sendAcquireRequest(noteId, requestId, attempt + 1);
+                    }
+                }, ACQUIRE_RETRY_DELAYS_MS[attempt]);
                 return;
             }
 
