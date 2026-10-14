@@ -474,15 +474,18 @@ a.ai-chat-header-btn {
     background: var(--pz-chrome-bg);
 }
 
-/* External tools on/off (discussion #1611): two flat looks, accent when on
-   and subtle when off, and no hover look of its own, so that the pointer
-   resting on the button after a click does not show a third colour */
+/* External tools on/off (discussion #1611): two flat looks, accent on a
+   tinted square when on and subtle when off, and no hover look of its own, so
+   that the pointer resting on the button after a click does not show a third
+   colour. The colour alone is not enough: in Sepia the accent and the subtle
+   text are two close browns (#1627), so the "on" look also gets a background */
 .ai-chat-external-btn {
-    width: 28px;
+    width: 34px;
     height: 34px;
     flex-shrink: 0;
     padding: 0;
     border: none;
+    border-radius: var(--pz-radius-lg);
     background: transparent;
     color: var(--pz-text-subtle);
     cursor: pointer;
@@ -494,6 +497,7 @@ a.ai-chat-header-btn {
 
 .ai-chat-external-btn[aria-pressed="true"] {
     color: var(--pz-accent-text);
+    background: rgba(var(--pz-accent-text-rgb), 0.14);
 }
 
 /* icons.css enlarges any lucide icon under the pointer (its hover colour is
