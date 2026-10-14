@@ -250,6 +250,15 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
     background-color: rgba(0, 0, 0, 0.004) !important;
 }
 
+/* Inline code and ==highlight== have a ground of their own, painted over the
+   drawn selection, so a selected run inside them showed nothing (#1626). The
+   browser's own selection paints above an element's background: let it show
+   there, in the same colour. */
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-inline-code, .cm-live-mark)::selection,
+.markdown-codemirror-host .cm-live-preview :is(.cm-live-inline-code, .cm-live-mark) ::selection {
+    background-color: var(--pz-selection) !important;
+}
+
 .markdown-codemirror-host .cm-placeholder {
     color: var(--pz-text-subtle);
     opacity: 1;
@@ -664,11 +673,27 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :
    once the caret is in the block. An indented block has no frame there
    either, and gets none here. */
 .markdown-codemirror-host .cm-live-preview .cm-line.cm-live-code {
-    /* (the ground of the code blocks of an HTML note, css/code-blocks.css) */
-    background-color: var(--pz-code-bg);
+    position: relative;
+    /* (also keeps the active-line tint off the block) */
+    background-color: transparent;
     border: solid var(--pz-border-light);
     border-width: 0 1px;
     padding: 0 30px;
+}
+
+/* The ground is painted under the line, not on it: CodeMirror draws the
+   selection in a layer behind .cm-content (z-index -1), which an opaque line
+   background hid entirely (#1626). This sits below that layer and still above
+   the editor's own background (.cm-scroller is the stacking context). */
+.markdown-codemirror-host .cm-live-preview .cm-line.cm-live-code::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -50;
+    /* (the ground of the code blocks of an HTML note, css/code-blocks.css) */
+    background-color: var(--pz-code-bg);
+    border-radius: inherit;
+    pointer-events: none;
 }
 
 /* Plain code reads in the text colour, as in the preview; highlighted
