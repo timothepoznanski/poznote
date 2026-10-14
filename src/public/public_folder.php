@@ -306,14 +306,10 @@ if (!empty($row['theme']) && in_array($row['theme'], $allowedPublicThemes, true)
 $effectiveTheme = $theme === 'black' ? 'dark' : $theme;
 $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 
-// Build base URL for note links
-$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-// Detect HTTPS including reverse proxy headers
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
-         || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on')
-         ? 'https' : 'http';
-$noteBaseUrl = $protocol . '://' . $host;
+// Note links are root-relative so the browser keeps the scheme, host and port
+// the visitor is on. Rebuilding them from HTTP_HOST dropped the port whenever a
+// proxy in front of Poznote sent a Host header without it (#1628).
+$noteBaseUrl = '';
 ?>
 <!doctype html>
 <html data-theme="<?php echo htmlspecialchars($effectiveTheme); ?>"<?php echo $themeClass; ?>>
