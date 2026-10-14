@@ -427,9 +427,10 @@ class PublicController {
     }
 
     /**
-     * public_note.php rewrites attachment URLs to absolute protocol-relative
-     * form for display. Reverse that before saving so the stored note keeps
-     * the same relative URLs the in-app editor produces.
+     * public_note.php used to rewrite attachment URLs to protocol-relative
+     * //host form for display (root-relative since #1628). Reverse that before
+     * saving so content from a page opened before the change keeps the same
+     * relative URLs the in-app editor produces.
      */
     private function stripPublicUrlBase(string $content): string {
         $host = $_SERVER['HTTP_HOST'] ?? '';

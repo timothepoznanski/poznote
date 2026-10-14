@@ -662,7 +662,9 @@ if ($noteType === 'markdown') {
 // URL REWRITING FOR ATTACHMENTS
 // ============================================================================
 
-$baseUrl = '//' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
+// Root-relative: the browser keeps the visitor's host and port, which HTTP_HOST
+// loses behind a proxy that strips the port from the Host header (#1628).
+$baseUrl = '';
 $scriptDir = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 
 if ($scriptDir && $scriptDir !== '/') {
