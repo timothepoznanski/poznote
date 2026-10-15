@@ -1478,7 +1478,7 @@ Poznote의 `Settings > About > API REST`에서 **Swagger UI**를 열어 엔드�
 - **HTML5**: 문서 구조와 마크업
 - **CSS3**: 스타일과 반응형 디자인
 - **JavaScript (Vanilla)**: 대화형 기능과 동적 콘텐츠
-- **React + Vite**: Excalidraw 빌드 도구(IIFE 번들)
+- **Vite**: Excalidraw(React)와 CodeMirror 빌드 도구(IIFE 번들)
 - **AJAX**: 비동기 데이터 로드
 
 ### 라이브러리
@@ -1487,6 +1487,8 @@ Poznote의 `Settings > About > API REST`에서 **Swagger UI**를 열어 엔드�
 - **Mermaid**: 텍스트로 다이어그램·흐름도를 생성하는 브라우저 라이브러리
 - **KaTeX**: 빠른 수식 조판·렌더링 라이브러리
 - **Sortable.js**: 끌어서 놓기 정렬
+- **Lucide**: 인터페이스 전체의 아이콘
+- **Devicon**: 코드 블록의 프로그래밍 언어 아이콘
 - **highlight.js**: 코드 구문 강조
 - **Swagger UI**: 대화형 API 문서·시험 화면
 
@@ -1499,5 +1501,6 @@ Poznote의 `Settings > About > API REST`에서 **Swagger UI**를 열어 엔드�
 - **Nginx + PHP-FPM**: FastCGI Process Manager 기반 웹 서버
 - **Alpine Linux**: 안전하고 가벼운 기본 이미지
 - **Docker**: 배포와 이동을 쉽게 하는 컨테이너
+- **Supervisor**: Nginx, PHP-FPM, 백그라운드 워커(알림, 예약 백업) 실행
 - **Python 3.12 (Alpine)**: httpx, uvicorn, fastmcp를 사용하는 AI 연결용 MCP 서버 실행 환경
 </details>

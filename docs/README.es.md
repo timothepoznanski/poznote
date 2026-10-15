@@ -1461,7 +1461,7 @@ Poznote da prioridad a la sencillez y la portabilidad: sin frameworks complejos 
 - **HTML5**: marcado y estructura
 - **CSS3**: estilos y diseño adaptable
 - **JavaScript (Vanilla)**: funciones interactivas y contenido dinámico
-- **React + Vite**: cadena de compilación del componente Excalidraw (empaquetado como IIFE)
+- **Vite**: cadena de compilación de los componentes Excalidraw (React) y CodeMirror (empaquetados como IIFE)
 - **AJAX**: carga asíncrona de datos
 
 ### Bibliotecas
@@ -1470,6 +1470,8 @@ Poznote da prioridad a la sencillez y la portabilidad: sin frameworks complejos 
 - **Mermaid**: biblioteca JavaScript del lado del cliente para generar diagramas y diagramas de flujo a partir de texto
 - **KaTeX**: biblioteca JavaScript del lado del cliente para la composición rápida de fórmulas y el renderizado de ecuaciones matemáticas
 - **Sortable.js**: biblioteca JavaScript para ordenar mediante arrastrar y soltar
+- **Lucide**: conjunto de iconos de toda la interfaz
+- **Devicon**: iconos de los lenguajes de programación en los bloques de código
 - **highlight.js**: resaltado de sintaxis para los bloques de código
 - **Swagger UI**: documentación interactiva de la API e interfaz de pruebas
 
@@ -1482,5 +1484,6 @@ Poznote da prioridad a la sencillez y la portabilidad: sin frameworks complejos 
 - **Nginx + PHP-FPM**: servidor web de alto rendimiento con FastCGI Process Manager
 - **Alpine Linux**: imagen base segura y ligera
 - **Docker**: contenedores para un despliegue sencillo y portable
+- **Supervisor**: ejecuta Nginx, PHP-FPM y los procesos en segundo plano (recordatorios, copias de seguridad programadas)
 - **Python 3.12 (Alpine)**: entorno de ejecución del servidor MCP con las bibliotecas httpx, uvicorn y fastmcp para la integración con asistentes de IA
 </details>

@@ -1461,7 +1461,7 @@ Poznote 注重简洁和可移植性：没有复杂的框架，没有沉重的依
 - **HTML5**：标记与结构
 - **CSS3**：样式与响应式设计
 - **JavaScript (Vanilla)**：交互功能与动态内容
-- **React + Vite**：Excalidraw 组件的构建工具链（打包为 IIFE）
+- **Vite**：Excalidraw（React）与 CodeMirror 组件的构建工具链（打包为 IIFE）
 - **AJAX**：异步数据加载
 
 ### 库
@@ -1470,6 +1470,8 @@ Poznote 注重简洁和可移植性：没有复杂的框架，没有沉重的依
 - **Mermaid**：根据文本生成图表和流程图的客户端 JavaScript 库
 - **KaTeX**：用于快速排版和渲染数学公式的客户端 JavaScript 库
 - **Sortable.js**：用于拖放排序的 JavaScript 库
+- **Lucide**：整个界面使用的图标集
+- **Devicon**：代码块中的编程语言图标
 - **highlight.js**：代码块语法高亮
 - **Swagger UI**：交互式 API 文档与测试界面
 
@@ -1482,5 +1484,6 @@ Poznote 注重简洁和可移植性：没有复杂的框架，没有沉重的依
 - **Nginx + PHP-FPM**：高性能 Web 服务器，搭配 FastCGI 进程管理器
 - **Alpine Linux**：安全、轻量的基础镜像
 - **Docker**：容器化，便于部署和移植
+- **Supervisor**：运行 Nginx、PHP-FPM 和后台任务（提醒、定时备份）
 - **Python 3.12 (Alpine)**：MCP 服务器运行时，使用 httpx、uvicorn 和 fastmcp 库实现 AI 助手集成
 </details>
