@@ -1268,14 +1268,10 @@ function updateTitleInElement(linkElement, newTitle) {
             titleSpan.textContent = newTitle;
         }
 
-        var href = linkElement.getAttribute('href');
-        if (href) {
-            var url = new URL(href, window.location.origin);
-            url.searchParams.set('note', newTitle);
-            linkElement.setAttribute('href', url.toString());
-        }
-
-        linkElement.setAttribute('data-note-id', newTitle);
+        // The link's href and data-note-id keep the note's id. They used to
+        // be rewritten to the title, a leftover of title addressing: the
+        // server reads ?note= as an id, so a renamed note's link opened the
+        // last opened note instead (issue #1634).
     }
 }
 
