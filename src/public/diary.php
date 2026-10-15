@@ -225,7 +225,7 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 				</button>
 			</div>
 			<?php if (!empty($diaryRoots)): ?>
-			<?php // One pill per diary, even a lone one, so its name is always shown. Right-click (desktop) renames or deletes it. ?>
+			<?php // One pill per diary, even a lone one, so its name is always shown. Right-click or a long press renames or deletes it. ?>
 			<nav class="diary-switcher">
 				<?php foreach ($diaryRoots as $root): ?>
 				<?php $rootNameAttr = htmlspecialchars($root['name'], ENT_QUOTES, 'UTF-8'); ?>
@@ -235,10 +235,6 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 						<i class="lucide lucide-book-open"></i>
 						<?php echo $rootNameAttr; ?>
 					</a>
-					<button type="button" class="diary-switch-delete" data-diary-id="<?php echo (int)$root['id']; ?>" data-diary-name="<?php echo $rootNameAttr; ?>"
-						title="<?php echo t_h('diary.delete_title', [], 'Delete diary'); ?>" aria-label="<?php echo t_h('diary.delete_title', [], 'Delete diary'); ?>">
-						<i class="lucide lucide-trash-2"></i>
-					</button>
 				</div>
 				<?php endforeach; ?>
 			</nav>

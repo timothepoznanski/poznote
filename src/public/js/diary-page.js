@@ -2016,13 +2016,53 @@
     function initDiaryContextMenu() {
         var switcher = document.querySelector('.diary-switcher');
         if (!switcher) return;
+        // Set while a long press has opened the menu, until its finger lifts
+        var pressOpened = false;
         switcher.addEventListener('contextmenu', function (e) {
             var pill = e.target.closest('.diary-switch-btn');
-            // Phones keep their long-press and the pill's own delete button
-            if (!pill || isMobileLayout()) return;
+            if (!pill) return;
             e.preventDefault();
+            // Android follows a long press with contextmenu: the menu is open
+            if (pressOpened) return;
             openDiaryContextMenu(pill, e.clientX, e.clientY);
         });
+
+        // Touch: iOS fires no contextmenu, so the long press is timed here.
+        // The menu opens under the pill, where the finger does not hide it.
+        var press = null;
+        function cancelPress() {
+            if (press) clearTimeout(press.timer);
+            press = null;
+        }
+        switcher.addEventListener('touchstart', function (e) {
+            cancelPress();
+            pressOpened = false;
+            var pill = e.target.closest('.diary-switch-btn');
+            if (!pill || e.touches.length !== 1) return;
+            var touch = e.touches[0];
+            press = {
+                x: touch.clientX,
+                y: touch.clientY,
+                timer: setTimeout(function () {
+                    press = null;
+                    pressOpened = true;
+                    var rect = pill.getBoundingClientRect();
+                    openDiaryContextMenu(pill, rect.left, rect.bottom + 4);
+                }, COLOR_LONG_PRESS_MS)
+            };
+        }, { passive: true });
+        switcher.addEventListener('touchmove', function (e) {
+            if (!press) return;
+            var touch = e.touches[0];
+            if (Math.abs(touch.clientX - press.x) > COLOR_TOUCH_SLOP || Math.abs(touch.clientY - press.y) > COLOR_TOUCH_SLOP) cancelPress();
+        }, { passive: true });
+        // The lifted finger must neither follow the pill's link nor send the
+        // mousedown that closes the menu it just opened.
+        switcher.addEventListener('touchend', function (e) {
+            cancelPress();
+            if (pressOpened) e.preventDefault();
+        });
+        switcher.addEventListener('touchcancel', cancelPress);
         document.addEventListener('mousedown', function (e) {
             if (diaryContextMenu && !diaryContextMenu.contains(e.target)) closeDiaryContextMenu();
         });
@@ -2110,10 +2150,6 @@
         initNoteColorPicker();
         initColorFilter();
         openRequestedDate();
-
-        document.querySelectorAll('.diary-switch-delete').forEach(function (btn) {
-            btn.addEventListener('click', function () { deleteDiary(btn); });
-        });
 
         var newDiaryBtn = document.getElementById('diaryNewBtn');
         if (newDiaryBtn) {
