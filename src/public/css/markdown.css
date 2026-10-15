@@ -523,6 +523,20 @@ body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-
     overflow-x: auto;
 }
 
+/* Live preview with "Editor word wrap" off (discussion 1623): the content is as
+   wide as its longest line, which would stretch tables and diagrams with it.
+   What is drawn keeps the visible width, measured on the scroller (100cqw),
+   and stays in view while the long lines scroll sideways. */
+.markdown-codemirror-host.markdown-live-editing.markdown-editor-nowrap .cm-scroller {
+    container-type: inline-size;
+}
+
+.markdown-codemirror-host.markdown-editor-nowrap .cm-live-preview :is(.cm-live-block, .cm-live-media, .cm-live-image-wrap, .markdown-excalidraw-render) {
+    position: sticky;
+    left: var(--pz-note-text-inset, 10px);
+    max-width: calc(100cqw - var(--pz-note-text-inset, 10px) - 10px);
+}
+
 .markdown-codemirror-host .cm-live-preview .cm-live-block-folded {
     display: none;
 }
