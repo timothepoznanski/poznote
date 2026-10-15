@@ -74,7 +74,24 @@ function restoreNoteDomFromCache(url, noteId, options) {
     }
 
     finishNoteLoadVisualState(options);
+    rememberOpenedNote(noteId);
     return true;
+}
+
+/**
+ * Tell the server a note shown again from the DOM cache was opened. A note
+ * loaded over AJAX needs no call: index.php records the notes it serves, and
+ * the next page load naming no note lands on the last one (issue #1630).
+ * @param {string|number} noteId
+ */
+function rememberOpenedNote(noteId) {
+    if (!/^\d+$/.test(String(noteId))) return;
+    try {
+        fetch('api/v1/notes/' + noteId + '/opened', { method: 'POST', keepalive: true })
+            .catch(function () { /* best effort: offline or signed out */ });
+    } catch (e) {
+        console.debug('note-loader: rememberOpenedNote() failed:', e);
+    }
 }
 
 /**

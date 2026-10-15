@@ -1416,7 +1416,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
 
             <!-- Word wrap in the Markdown editor (discussion 1623) -->
             <div class="home-card" id="markdown-editor-wrap-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_editor_word_wrap', [], 'Wrap long lines in the markdown editor instead of scrolling horizontally. The note itself is not changed. Live preview and Rich text always wrap.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_editor_word_wrap', [], 'Wrap long lines in the markdown editor and the live preview instead of scrolling horizontally. The note itself is not changed. Rich text always wraps.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-corner-down-left"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.markdown_editor_word_wrap', [], 'Editor word wrap'); ?></span>

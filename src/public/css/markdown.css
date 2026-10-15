@@ -200,8 +200,8 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 /* "Editor word wrap" off (discussion 1623): long lines stay on one line and the
    editor scrolls sideways, so its horizontal bar is the one scrollbar shown
    here. Chromium follows scrollbar-width and drops the pseudo-element above,
-   which is undone for Safari. The class is set by the editor bundle, never in
-   the live views. */
+   which is undone for Safari. The class is set by the editor bundle, in the
+   classic editor and the live preview, never in rich text. */
 .markdown-codemirror-host.markdown-editor-nowrap .cm-scroller {
     overflow-x: auto;
     scrollbar-width: thin;

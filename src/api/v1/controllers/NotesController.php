@@ -2374,7 +2374,31 @@ class NotesController {
             $this->sendError(500, 'Error toggling favorite: ' . $e->getMessage());
         }
     }
-    
+
+    /**
+     * POST /api/v1/notes/{id}/opened
+     * Record the note as the last one opened, which a page load naming no
+     * note lands on (issue #1630). index.php records the notes it serves;
+     * this route is for the ones the browser shows again from its DOM cache.
+     */
+    public function markOpened($id) {
+        $noteId = (int)$id;
+        try {
+            $stmt = $this->con->prepare('SELECT workspace FROM entries WHERE id = ? AND trash = 0');
+            $stmt->execute([$noteId]);
+            $workspace = $stmt->fetchColumn();
+            if ($workspace === false) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            poznoteRememberOpenedNote($this->con, $noteId, (string)$workspace);
+            $this->sendSuccess(['note_id' => $noteId]);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Error recording the opened note: ' . $e->getMessage());
+        }
+    }
+
     /**
      * POST /api/v1/notes/favorites/clear?workspace=X
      * Empty the Favorites section of a workspace: every note and every folder

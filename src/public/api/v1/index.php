@@ -466,6 +466,11 @@ $router->post('/notes/{id}/favorite', function($params) use ($notesController) {
     $notesController->toggleFavorite($params['id']);
 });
 
+// Record a note as the last one opened (landing note of the next page load)
+$router->post('/notes/{id}/opened', function($params) use ($notesController) {
+    $notesController->markOpened($params['id']);
+});
+
 // Keep a note offline whatever its date, or stop (Offline Copies)
 $router->put('/notes/{id}/offline', function($params) use ($notesController) {
     $notesController->updateOffline($params['id']);

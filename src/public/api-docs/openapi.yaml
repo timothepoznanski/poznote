@@ -1038,6 +1038,33 @@ paths:
                     type: integer
                     enum: [0, 1]
 
+  /notes/{id}/opened:
+    post:
+      tags: [Notes]
+      summary: Mark a note as the last one opened
+      description: A page load of the app that names no note opens the last note opened in the workspace, no note when that one has since been deleted or moved, and the last updated note when nothing was opened in the workspace yet.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Note recorded as opened
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  note_id:
+                    type: integer
+        '404':
+          description: Note not found
+
   /notes/{id}/duplicate:
     post:
       tags: [Notes]

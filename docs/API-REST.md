@@ -697,6 +697,28 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/favorite
 ```
 
+### Mark Note as Opened
+
+```
+POST /notes/{id}/opened
+```
+
+Record the note as the last one opened. When a page load of the app names no note (after signing in, for instance), it opens the last note opened in the workspace, no note when that one has since been deleted or moved, and the last updated note when nothing was opened in the workspace yet. Notes opened in the app are recorded automatically, so this route only matters to a client that shows notes on its own.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "note_id": 123
+}
+```
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/opened
+```
+
 ### Keep Note Offline
 
 ```
@@ -3995,6 +4017,7 @@ curl http://YOUR_SERVER/api_health.php
 | `PUT` | `/notes/{id}/pinned` | Pin or unpin a note |
 | `POST` | `/notes/{id}/kanban-completed` | Set Kanban completed state |
 | `POST` | `/notes/{id}/favorite` | Toggle favorite |
+| `POST` | `/notes/{id}/opened` | Mark as last opened |
 | `POST` | `/notes/{id}/folder` | Move to folder |
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
 | `POST` | `/notes/reorder` | Reorder a note before/after another |

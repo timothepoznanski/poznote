@@ -472,7 +472,7 @@
       "markdown_split_card_view": "Exiba notas markdown em uma visão dividida emoldurada com editor e pré-visualização.",
       "markdown_split_preview_left": "No modo dividido, mostra a pré-visualização à esquerda e o editor à direita.",
       "markdown_heading_underline": "Desenha uma linha sob os títulos de nível 1 e 2 das notas markdown.",
-      "markdown_editor_word_wrap": "Quebra as linhas longas no editor markdown em vez de rolar horizontalmente. A nota em si não é alterada. A pré-visualização em tempo real e o texto formatado quebram sempre as linhas.",
+      "markdown_editor_word_wrap": "Quebra as linhas longas no editor markdown e na pré-visualização em tempo real em vez de rolar horizontalmente. A nota em si não é alterada. O texto formatado quebra sempre as linhas.",
       "markdown_colored": "Adicione cor às notas markdown: escolha uma cor para cada nível de título, código embutido, fundo dos blocos de código, citações, cabeçalhos de tabela e separadores.",
       "code_wrap": "Quebre linhas longas nos blocos de código em vez de rolar horizontalmente.",
       "code_line_numbers": "Mostre os números de linha nos blocos de código na pré-visualização de markdown.",

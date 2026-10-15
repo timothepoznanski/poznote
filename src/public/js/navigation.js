@@ -101,7 +101,7 @@ function getStoredActiveTabContext(workspace) {
 /**
  * True when this workspace has a stored tab state holding no tab at all: the
  * user closed every note pane tab, so index.php must be told to leave the
- * pane empty (blank=1) rather than fall back to the last edited note, which
+ * pane empty (blank=1) rather than fall back to the last opened note, which
  * would come back with no tab to close it (issue #1462). A browser that
  * stored nothing yet is a first visit, and keeps the fallback.
  * @param {string} workspace

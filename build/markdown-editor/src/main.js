@@ -1180,13 +1180,25 @@ function setReadOnly(host, readOnly) {
 
 // Long lines wrap at the editor's width, or stay on one line and the editor
 // scrolls sideways (the account's "Editor word wrap" setting, discussion 1623).
-// The live views always wrap: they are drawn like the preview, which does.
+// The live preview follows it too, its lines are edited as source; rich text
+// (<body data-markdown-live-syntax="0">) always wraps, it is drawn like the
+// preview, which does.
 function isLineWrappingOn(instance) {
-  return instance.lineWrapping || instance.livePreview
+  return wrapsLines(instance.lineWrapping, instance.livePreview)
+}
+
+function wrapsLines(lineWrapping, livePreview) {
+  const richText = livePreview && !(document.body && document.body.getAttribute('data-markdown-live-syntax') === '1')
+  return lineWrapping || richText
 }
 
 function createLineWrappingExtensions(enabled) {
   return enabled ? EditorView.lineWrapping : []
+}
+
+function lineWrappingEffect(host, instance) {
+  host.classList.toggle('markdown-editor-nowrap', !isLineWrappingOn(instance))
+  return instance.lineWrappingCompartment.reconfigure(createLineWrappingExtensions(isLineWrappingOn(instance)))
 }
 
 function setLivePreview(host, enabled) {
@@ -1197,11 +1209,10 @@ function setLivePreview(host, enabled) {
 
   instance.livePreview = enabled
   host.classList.toggle('markdown-live-editing', enabled)
-  host.classList.toggle('markdown-editor-nowrap', !isLineWrappingOn(instance))
   instance.view.dispatch({
     effects: [
       instance.livePreviewCompartment.reconfigure(createLivePreviewExtensions(enabled)),
-      instance.lineWrappingCompartment.reconfigure(createLineWrappingExtensions(isLineWrappingOn(instance)))
+      lineWrappingEffect(host, instance)
     ]
   })
   return true
@@ -1214,10 +1225,7 @@ function setLineWrapping(host, enabled) {
   if (instance.lineWrapping === enabled) return true
 
   instance.lineWrapping = enabled
-  host.classList.toggle('markdown-editor-nowrap', !isLineWrappingOn(instance))
-  instance.view.dispatch({
-    effects: instance.lineWrappingCompartment.reconfigure(createLineWrappingExtensions(isLineWrappingOn(instance)))
-  })
+  instance.view.dispatch({ effects: lineWrappingEffect(host, instance) })
   return true
 }
 
@@ -1226,7 +1234,7 @@ function setLineWrapping(host, enabled) {
 function refreshLivePreview(host) {
   const instance = getInstance(host)
   if (!instance || !instance.livePreview) return false
-  instance.view.dispatch({ effects: refreshLivePreviewEffect.of(null) })
+  instance.view.dispatch({ effects: [refreshLivePreviewEffect.of(null), lineWrappingEffect(host, instance)] })
   return true
 }
 
@@ -1704,7 +1712,7 @@ function createEditor(host, options = {}) {
       hiddenRangeField,
       excalidrawPlaceholderField,
       placeholder(placeholderText),
-      lineWrappingCompartment.of(createLineWrappingExtensions(lineWrapping || !!options.livePreview)),
+      lineWrappingCompartment.of(createLineWrappingExtensions(wrapsLines(lineWrapping, !!options.livePreview))),
       markdownTableLinePlugin,
       markdownCodeLinePlugin,
       hangingIndentPlugin,
