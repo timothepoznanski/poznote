@@ -3988,6 +3988,14 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
       }
       if (event.button !== 0) return false
 
+      // The Enlarge button of a diagram opens the viewer on click
+      // (js/mermaid-zoom.js); a caret placed here would bring the source back
+      // and take the button away before the click arrives
+      if (target.closest('.mermaid-zoom-btn')) {
+        event.preventDefault()
+        return true
+      }
+
       // A click on a task box ticks it, like in the preview
       const task = target.closest('.cm-live-task')
       if (task && !view.state.readOnly) {
