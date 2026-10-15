@@ -150,7 +150,7 @@
       "markdown_split_card_view": "Display markdown notes in a framed split view with editor and preview.",
       "markdown_split_preview_left": "In split mode, show the preview on the left and the editor on the right.",
       "markdown_heading_underline": "Draw a line under the level 1 and level 2 headings of markdown notes.",
-      "markdown_editor_word_wrap": "Wrap long lines in the markdown editor instead of scrolling horizontally. The note itself is not changed. Live preview and Rich text always wrap.",
+      "markdown_editor_word_wrap": "Wrap long lines in the markdown editor and the live preview instead of scrolling horizontally. The note itself is not changed. Rich text always wraps.",
       "markdown_colored": "Color markdown notes: pick a color for each heading level, inline code, code block background, quotes, table headers and separators.",
       "code_wrap": "Wrap long lines in code blocks instead of scrolling horizontally.",
       "code_line_numbers": "Show line numbers in code blocks in the markdown preview.",
@@ -170,6 +170,7 @@
       "webhooks": "Send instance events to external services via webhooks.",
       "ai_assistant": "Configure the AI assistant used to chat with your notes.",
       "git_sync_enabled": "Enable or disable Git synchronization on this instance.",
+      "statistics_api": "Let a dashboard such as Homepage read the statistics of this instance (users, notes, storage, backups, updates) with a read-only token.",
       "import_limits": "Set the maximum number of files allowed per import.",
       "user_quotas": "Limit the number of notes and the storage available per user.",
       "custom_css": "Apply your own CSS to customize the appearance of Poznote.",
@@ -283,6 +284,7 @@
       "import_limits": "Import Limits",
       "user_quotas": "User quotas",
       "git_sync_toggle": "Git Sync",
+      "statistics_api": "Statistics API",
       "allow_executable_attachments": "Script and executable attachments",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Email",
@@ -3431,6 +3433,10 @@
       "access_revoked": "Account access revoked",
       "app_password_created": "App password created",
       "app_password_revoked": "App password revoked",
+      "statistics_token_created": "Statistics token created",
+      "statistics_token_revoked": "Statistics token revoked",
+      "statistics_public_enabled": "Statistics made public",
+      "statistics_public_disabled": "Statistics no longer public",
       "workspace_created": "Workspace created",
       "workspace_deleted": "Workspace deleted",
       "workspace_shared": "Workspace shared",
@@ -3744,6 +3750,36 @@
       "label_required": "Give the app password a name.",
       "limit_reached": "Limit reached: revoke an app password before creating another.",
       "load_failed": "Could not load your app passwords.",
+      "generic": "Something went wrong. Try again."
+    }
+  },
+  "statistics_api": {
+    "modal": {
+      "title": "Statistics API",
+      "description": "A dashboard such as Homepage can read a summary of this instance with a token: number of users, notes and workspaces, storage used, last backups and Git sync, available update. Only counts, sizes and dates, never a name or a note. The token unlocks nothing else.",
+      "endpoint": "Address",
+      "copy": "Copy",
+      "copied": "Copied",
+      "secret_notice": "Copy it now: it will not be shown again.",
+      "usage_hint": "Send it in an \"Authorization: Bearer <token>\" header.",
+      "generate": "Generate a token",
+      "regenerate": "New token",
+      "confirm": "Confirm",
+      "revoke": "Revoke",
+      "close": "Close",
+      "token": "Token {{hint}}…",
+      "created": "created {{date}}",
+      "last_used": "last used {{date}}",
+      "never_used": "never used",
+      "none": "No token: the statistics are disabled.",
+      "none_public": "No token.",
+      "public": "Public statistics, without a token",
+      "public_help": "Anyone who can reach this instance can then read these numbers. Leave it off when the instance is reachable from the internet."
+    },
+    "status": {
+      "public": "Public"
+    },
+    "errors": {
       "generic": "Something went wrong. Try again."
     }
   },
@@ -4539,6 +4575,7 @@
     "title": "Diary",
     "today_button_go": "Go to today's entry",
     "today_button_create": "Create today's entry",
+    "pick_date": "Open or create another day's entry",
     "today_badge": "Today",
     "empty": "No diary entries yet. Click \"Create today's entry\" to write your first one. It will be stored in {{folder}}.",
     "create_error": "Could not create the diary entry.",

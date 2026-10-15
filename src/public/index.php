@@ -201,7 +201,7 @@ $currentWorkspaceSynced = ($workspace_filter === '' || $workspace_filter === '__
 // note, skip the latest-note fallback: the board is fetched client-side and
 // the note would otherwise stay visible in the right column after a reload.
 // blank=1 says the note pane is empty on purpose: every tab was closed, so
-// the pane must stay empty instead of bringing the last edited note back
+// the pane must stay empty instead of bringing the last opened note back
 // with no tab to close it (issue #1462). js/tabs.js puts the flag in the URL
 // when it empties the pane, and on the rail's Home link while nothing is open
 // (js/icon-sidebar-toggle.js does it on the other pages, issue #1488).
@@ -211,6 +211,13 @@ if (($kanban_restore_id > 0 || $blank_note_pane) && empty($note)) {
     $note_load_result = [];
 } else {
     $note_load_result = loadNoteData($con, $note, $workspace_filter);
+    // A note the request named and found is an opened note, for page loads
+    // and note-pane fragments alike: the next load that names none lands on
+    // it (issue #1630). Notes restored from the DOM cache report themselves
+    // through POST /notes/{id}/opened (js/note-loader.js).
+    if ($note !== '' && !empty($note_load_result['res_right'])) {
+        poznoteRememberOpenedNote($con, $note, $workspace_filter);
+    }
 }
 $default_note_folder = $note_load_result['default_note_folder'] ?? null;
 $current_note_folder = $note_load_result['current_note_folder'] ?? null;

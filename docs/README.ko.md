@@ -674,6 +674,7 @@ curl -u 'username:pzn_2f7c…' https://YOUR_SERVER/api/v1/notes
 
 *   **용도:** 전용 일기 보드에서 하루 한 노트 작성
 *   **작성 방식:** “오늘 일기 작성”은 현재 날짜 제목의 노트를 `Diary/YYYY/MM` 구조에 자동 저장합니다. 이미 있으면 “오늘 일기로 이동”으로 바뀝니다.
+*   **다른 날:** 보기 설정 옆의 달력 버튼으로 휴대폰에서도 원하는 날을 고를 수 있습니다. 이미 항목이 있는 날에는 점이 표시되며, 그날을 고르면 항목이 열리고 다른 날을 고르면 그 날짜의 항목이 만들어집니다.
 *   **보드 보기:** 월별 카드로 최신순 표시하며 필터로 과거 항목 검색
 *   **일기 보기:** 보기 설정 옆 스크롤 버튼으로 본문 전체를 한 열에 최신순 표시합니다. 스크롤하며 추가 항목을 불러오고 필터도 적용됩니다. 항목이나 연필을 누르면 즉시 편집하며 입력 중 자동 저장됩니다. 연필 옆 태그 버튼을 누르면 노트를 열지 않고도 항목의 태그를 추가하거나 제거할 수 있습니다.
 *   **형식:** **설정 > 일기**의 “일기 항목 형식”에 따라 서식 있는 텍스트 또는 마크다운으로 생성
@@ -1478,7 +1479,7 @@ Poznote의 `Settings > About > API REST`에서 **Swagger UI**를 열어 엔드�
 - **HTML5**: 문서 구조와 마크업
 - **CSS3**: 스타일과 반응형 디자인
 - **JavaScript (Vanilla)**: 대화형 기능과 동적 콘텐츠
-- **React + Vite**: Excalidraw 빌드 도구(IIFE 번들)
+- **Vite**: Excalidraw(React)와 CodeMirror 빌드 도구(IIFE 번들)
 - **AJAX**: 비동기 데이터 로드
 
 ### 라이브러리
@@ -1487,6 +1488,8 @@ Poznote의 `Settings > About > API REST`에서 **Swagger UI**를 열어 엔드�
 - **Mermaid**: 텍스트로 다이어그램·흐름도를 생성하는 브라우저 라이브러리
 - **KaTeX**: 빠른 수식 조판·렌더링 라이브러리
 - **Sortable.js**: 끌어서 놓기 정렬
+- **Lucide**: 인터페이스 전체의 아이콘
+- **Devicon**: 코드 블록의 프로그래밍 언어 아이콘
 - **highlight.js**: 코드 구문 강조
 - **Swagger UI**: 대화형 API 문서·시험 화면
 
@@ -1499,5 +1502,6 @@ Poznote의 `Settings > About > API REST`에서 **Swagger UI**를 열어 엔드�
 - **Nginx + PHP-FPM**: FastCGI Process Manager 기반 웹 서버
 - **Alpine Linux**: 안전하고 가벼운 기본 이미지
 - **Docker**: 배포와 이동을 쉽게 하는 컨테이너
+- **Supervisor**: Nginx, PHP-FPM, 백그라운드 워커(알림, 예약 백업) 실행
 - **Python 3.12 (Alpine)**: httpx, uvicorn, fastmcp를 사용하는 AI 연결용 MCP 서버 실행 환경
 </details>

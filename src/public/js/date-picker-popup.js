@@ -50,6 +50,10 @@
             viewMonth = parseInt(selectedDayStr.substring(5, 7), 10) - 1;
         }
 
+        // Days carrying a mark under their number (options.markedDates,
+        // 'YYYY-MM-DD' strings): the diary page marks the days with an entry
+        const markedDates = new Set(options && Array.isArray(options.markedDates) ? options.markedDates : []);
+
         // Selected time ('HH:MM' or '') and the state of the two-step time
         // menu: pick the hour first, then the minutes
         let selectedTime = (options && typeof options.initialTime === 'string' && /^\d{2}:\d{2}/.test(options.initialTime))
@@ -185,8 +189,9 @@
             }
             for (let day = 1; day <= daysInMonth; day++) {
                 const isToday = day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
-                const isSelected = selectedDayStr === dayString(viewYear, viewMonth, day);
-                html += '<button type="button" class="slash-date-picker-day' + (isToday ? ' today' : '') + (isSelected ? ' selected' : '') + '" data-day="' + day + '">' + day + '</button>';
+                const dayStr = dayString(viewYear, viewMonth, day);
+                const isSelected = selectedDayStr === dayStr;
+                html += '<button type="button" class="slash-date-picker-day' + (isToday ? ' today' : '') + (isSelected ? ' selected' : '') + (markedDates.has(dayStr) ? ' marked' : '') + '" data-day="' + day + '">' + day + '</button>';
             }
             html += '</div>';
 

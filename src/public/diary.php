@@ -225,7 +225,7 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 				</button>
 			</div>
 			<?php if (!empty($diaryRoots)): ?>
-			<?php // One pill per diary, even a lone one, so its name is always shown. Right-click (desktop) renames or deletes it. ?>
+			<?php // One pill per diary, even a lone one, so its name is always shown. Right-click or a long press renames or deletes it. ?>
 			<nav class="diary-switcher">
 				<?php foreach ($diaryRoots as $root): ?>
 				<?php $rootNameAttr = htmlspecialchars($root['name'], ENT_QUOTES, 'UTF-8'); ?>
@@ -235,10 +235,6 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 						<i class="lucide lucide-book-open"></i>
 						<?php echo $rootNameAttr; ?>
 					</a>
-					<button type="button" class="diary-switch-delete" data-diary-id="<?php echo (int)$root['id']; ?>" data-diary-name="<?php echo $rootNameAttr; ?>"
-						title="<?php echo t_h('diary.delete_title', [], 'Delete diary'); ?>" aria-label="<?php echo t_h('diary.delete_title', [], 'Delete diary'); ?>">
-						<i class="lucide lucide-trash-2"></i>
-					</button>
 				</div>
 				<?php endforeach; ?>
 			</nav>
@@ -246,6 +242,10 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 			<div class="board-filter-row">
 			<button type="button" id="diaryJournalToggle" class="board-view-btn diary-journal-toggle" aria-pressed="false" title="<?php echo t_h('diary.journal_view', [], 'Journal view'); ?>">
 				<i class="lucide lucide-scroll"></i>
+			</button>
+			<?php // Opens (or creates) the entry of the day picked in the calendar, the way back to a past day on phones, which have no mini calendar ?>
+			<button type="button" id="diaryDatePickBtn" class="board-view-btn" aria-haspopup="true" title="<?php echo t_h('diary.pick_date', [], "Open or create another day's entry"); ?>" aria-label="<?php echo t_h('diary.pick_date', [], "Open or create another day's entry"); ?>">
+				<i class="lucide lucide-calendar-alt"></i>
 			</button>
 			<?php renderBoardViewMenu('diary'); ?>
 			<?php // Colour filter, the dashboard's filter panel with its colour section alone (initColorFilter in js/diary-page.js) ?>
@@ -327,6 +327,17 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 	</div>
 
 	<script>
+	window.calendarTranslations = {
+		months: <?php echo json_encode(array_map(static function ($m) {
+			return t('calendar.months.' . $m);
+		}, ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'])); ?>,
+		weekdays: <?php echo json_encode(array_map(static function ($d) {
+			return t('calendar.weekdays.' . $d);
+		}, ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'])); ?>,
+		previousMonth: <?php echo json_encode(t('calendar.buttons.previous_month')); ?>,
+		nextMonth: <?php echo json_encode(t('calendar.buttons.next_month')); ?>,
+		today: <?php echo json_encode(t('calendar.buttons.today')); ?>
+	};
 	window.NOTE_COLOR_PALETTE = <?php echo json_encode(getNoteColorPalette(), JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>;
 	window.DIARY_DATA = {
 		notes: <?php echo json_encode($diaryNotes, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP); ?>,
@@ -387,6 +398,7 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 	<script src="js/request-errors.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="<?php echo poznoteAsset('js/shortcut-key.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/date-picker-popup.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/diary-page.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
 </body>

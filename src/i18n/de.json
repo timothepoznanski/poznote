@@ -472,7 +472,7 @@
       "markdown_split_card_view": "Zeigen Sie Markdown-Notizen in einer gerahmten geteilten Ansicht mit Editor und Vorschau an.",
       "markdown_split_preview_left": "Zeigt in der geteilten Ansicht die Vorschau links und den Editor rechts an.",
       "markdown_heading_underline": "Zeichnet eine Linie unter den Überschriften der Ebenen 1 und 2 in Markdown-Notizen.",
-      "markdown_editor_word_wrap": "Lange Zeilen im Markdown-Editor umbrechen statt horizontal zu scrollen. Die Notiz selbst wird nicht verändert. Live-Vorschau und Rich Text brechen immer um.",
+      "markdown_editor_word_wrap": "Lange Zeilen im Markdown-Editor und in der Live-Vorschau umbrechen statt horizontal zu scrollen. Die Notiz selbst wird nicht verändert. Rich Text bricht immer um.",
       "markdown_colored": "Färben Sie Markdown-Notizen: Wählen Sie eine Farbe für jede Überschriftenebene, Inline-Code, Codeblock-Hintergrund, Zitate, Tabellenköpfe und Trennlinien.",
       "code_wrap": "Lange Zeilen in Codeblöcken umbrechen statt horizontal zu scrollen.",
       "code_line_numbers": "Zeilennummern in Codeblöcken in der Markdown-Vorschau anzeigen.",
@@ -492,6 +492,7 @@
       "webhooks": "Senden Sie Instanzereignisse per Webhooks an externe Dienste.",
       "ai_assistant": "Konfigurieren Sie den KI-Assistenten für den Chat mit Ihren Notizen.",
       "git_sync_enabled": "Aktivieren oder deaktivieren Sie die Git-Synchronisation auf dieser Instanz.",
+      "statistics_api": "Ein Dashboard wie Homepage kann mit einem schreibgeschützten Token die Statistiken dieser Instanz lesen (Benutzer, Notizen, Speicher, Sicherungen, Updates).",
       "import_limits": "Legen Sie die maximale Anzahl von Dateien pro Import fest.",
       "user_quotas": "Begrenzen Sie die Anzahl der Notizen und den Speicherplatz pro Benutzer.",
       "custom_css": "Wenden Sie eigenes CSS an, um das Aussehen von Poznote anzupassen.",
@@ -625,6 +626,7 @@
       "import_limits": "Importlimits",
       "user_quotas": "Benutzerkontingente",
       "git_sync_toggle": "Git-Synchronisierung",
+      "statistics_api": "Statistik-API",
       "allow_executable_attachments": "Skript- und Programmanhänge",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / E-Mail",
@@ -3932,6 +3934,10 @@
       "access_revoked": "Kontozugriff entzogen",
       "app_password_created": "App-Passwort erstellt",
       "app_password_revoked": "App-Passwort widerrufen",
+      "statistics_token_created": "Statistik-Token erstellt",
+      "statistics_token_revoked": "Statistik-Token widerrufen",
+      "statistics_public_enabled": "Statistiken öffentlich gemacht",
+      "statistics_public_disabled": "Statistiken nicht mehr öffentlich",
       "workspace_created": "Arbeitsbereich erstellt",
       "workspace_deleted": "Arbeitsbereich gelöscht",
       "workspace_shared": "Arbeitsbereich geteilt",
@@ -4113,6 +4119,36 @@
       "limit_reached": "Limit erreicht: Widerrufen Sie ein App-Passwort, bevor Sie ein neues erstellen.",
       "load_failed": "Ihre App-Passwörter konnten nicht geladen werden.",
       "generic": "Etwas ist schiefgelaufen. Versuchen Sie es erneut."
+    }
+  },
+  "statistics_api": {
+    "modal": {
+      "title": "Statistik-API",
+      "description": "Ein Dashboard wie Homepage kann mit einem Token eine Übersicht dieser Instanz lesen: Anzahl der Benutzer, Notizen und Arbeitsbereiche, belegter Speicher, letzte Sicherungen und Git-Synchronisierung, verfügbares Update. Nur Zahlen, Größen und Daten, niemals ein Name oder eine Notiz. Das Token öffnet nichts anderes.",
+      "endpoint": "Adresse",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "secret_notice": "Kopieren Sie es jetzt: Es wird nicht erneut angezeigt.",
+      "usage_hint": "Senden Sie es in einem Header \"Authorization: Bearer <token>\".",
+      "generate": "Token erzeugen",
+      "regenerate": "Neues Token",
+      "confirm": "Bestätigen",
+      "revoke": "Widerrufen",
+      "close": "Schließen",
+      "token": "Token {{hint}}…",
+      "created": "erstellt am {{date}}",
+      "last_used": "zuletzt verwendet am {{date}}",
+      "never_used": "nie verwendet",
+      "none": "Kein Token: Die Statistiken sind deaktiviert.",
+      "none_public": "Kein Token.",
+      "public": "Öffentliche Statistiken, ohne Token",
+      "public_help": "Jeder, der diese Instanz erreichen kann, kann diese Zahlen dann lesen. Lassen Sie es ausgeschaltet, wenn die Instanz aus dem Internet erreichbar ist."
+    },
+    "status": {
+      "public": "Öffentlich"
+    },
+    "errors": {
+      "generic": "Etwas ist schiefgelaufen. Bitte erneut versuchen."
     }
   },
   "two_factor": {
@@ -4882,6 +4918,7 @@
     "title": "Tagebuch",
     "today_button_go": "Zum heutigen Eintrag",
     "today_button_create": "Heutigen Eintrag erstellen",
+    "pick_date": "Eintrag eines anderen Tages öffnen oder erstellen",
     "today_badge": "Heute",
     "empty": "Noch keine Tagebucheinträge. Klicken Sie auf \"Heutigen Eintrag erstellen\", um den ersten zu schreiben. Er wird in {{folder}} gespeichert.",
     "create_error": "Der Tagebucheintrag konnte nicht erstellt werden.",

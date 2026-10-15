@@ -229,7 +229,7 @@
     /**
      * Make the Home link ask index.php for what its tabs are about to show.
      *
-     * Asked for nothing, index.php renders the last edited note and js/tabs.js
+     * Asked for nothing, index.php renders the last opened note and js/tabs.js
      * then replaces it with what the stored tabs hold, so coming back from
      * Settings flashed a note (issue #1488): one that vanished at once when
      * every tab was closed (see #1462), or that gave way to the active tab's

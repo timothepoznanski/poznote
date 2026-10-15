@@ -150,7 +150,7 @@
       "markdown_split_card_view": "편집기와 미리보기가 포함된 프레임 분할 보기에 마크다운 노트를 표시합니다.",
       "markdown_split_preview_left": "분할 모드에서는 왼쪽에 미리보기가 표시되고 오른쪽에 편집기가 표시됩니다.",
       "markdown_heading_underline": "마크다운 노트의 1단계 및 2단계 제목 아래에 선을 표시합니다.",
-      "markdown_editor_word_wrap": "마크다운 편집기에서 긴 줄을 가로로 스크롤하는 대신 줄 바꿈합니다. 노트 자체는 변경되지 않습니다. 실시간 미리보기와 서식 있는 텍스트에서는 항상 줄 바꿈됩니다.",
+      "markdown_editor_word_wrap": "마크다운 편집기와 실시간 미리보기에서 긴 줄을 가로로 스크롤하는 대신 줄 바꿈합니다. 노트 자체는 변경되지 않습니다. 서식 있는 텍스트에서는 항상 줄 바꿈됩니다.",
       "markdown_colored": "마크다운의 각 제목 수준, 인라인 코드, 코드 블록 배경, 인용문, 표 머리글 및 구분선에 사용할 색상을 선택합니다.",
       "code_wrap": "가로로 스크롤하는 대신 긴 줄을 코드 블록으로 묶습니다.",
       "code_line_numbers": "마크다운 미리보기에서 코드 블록의 줄 번호를 표시합니다.",
@@ -170,6 +170,7 @@
       "webhooks": "웹훅을 통해 인스턴스 이벤트를 외부 서비스로 보냅니다.",
       "ai_assistant": "노트와 채팅하는 데 사용되는 AI 어시스턴트를 설정하세요.",
       "git_sync_enabled": "이 인스턴스에서 Git 동기화를 활성화 또는 비활성화합니다.",
+      "statistics_api": "Homepage 같은 대시보드가 읽기 전용 토큰으로 이 인스턴스의 통계(사용자, 노트, 저장 공간, 백업, 업데이트)를 읽을 수 있게 합니다.",
       "import_limits": "가져오기당 허용되는 최대 파일 수를 설정합니다.",
       "user_quotas": "노트의 수와 사용자당 사용 가능한 저장소를 제한합니다.",
       "custom_css": "나만의 CSS를 적용하여 Poznote의 모양을 사용자 지정 설정하세요.",
@@ -283,6 +284,7 @@
       "import_limits": "가져오기 제한",
       "user_quotas": "사용자 사용 한도",
       "git_sync_toggle": "Git 동기화",
+      "statistics_api": "통계 API",
       "allow_executable_attachments": "스크립트 및 실행 가능한 첨부 파일",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP/이메일",
@@ -3431,6 +3433,10 @@
       "access_revoked": "계정 접근 권한이 철회되었습니다",
       "app_password_created": "앱 비밀번호가 생성되었습니다.",
       "app_password_revoked": "앱 비밀번호가 취소되었습니다.",
+      "statistics_token_created": "통계 토큰이 생성되었습니다.",
+      "statistics_token_revoked": "통계 토큰이 철회되었습니다.",
+      "statistics_public_enabled": "통계가 공개되었습니다.",
+      "statistics_public_disabled": "통계가 더 이상 공개되지 않습니다.",
       "workspace_created": "작업 공간이 생성되었습니다.",
       "workspace_deleted": "작업 공간 삭제됨",
       "workspace_shared": "작업 공간 공유됨",
@@ -3745,6 +3751,36 @@
       "limit_reached": "한도에 도달했습니다. 다른 비밀번호를 만들기 전에 앱 비밀번호를 취소하세요.",
       "load_failed": "앱 비밀번호를 로드할 수 없습니다.",
       "generic": "문제가 발생했습니다. 다시 시도해 보세요."
+    }
+  },
+  "statistics_api": {
+    "modal": {
+      "title": "통계 API",
+      "description": "Homepage 같은 대시보드는 토큰으로 이 인스턴스의 요약을 읽을 수 있습니다: 사용자, 노트, 작업 공간 수, 사용 중인 저장 공간, 최근 백업과 Git 동기화, 사용 가능한 업데이트. 숫자, 크기, 날짜만 포함하며 이름이나 노트는 절대 포함하지 않습니다. 토큰으로는 다른 어떤 것에도 접근할 수 없습니다.",
+      "endpoint": "주소",
+      "copy": "복사",
+      "copied": "복사됨",
+      "secret_notice": "지금 복사하세요. 다시 표시되지 않습니다.",
+      "usage_hint": "\"Authorization: Bearer <token>\" 헤더로 보내세요.",
+      "generate": "토큰 생성",
+      "regenerate": "새 토큰",
+      "confirm": "확인",
+      "revoke": "철회",
+      "close": "닫기",
+      "token": "토큰 {{hint}}…",
+      "created": "{{date}}에 생성",
+      "last_used": "{{date}}에 마지막 사용",
+      "never_used": "사용 안 함",
+      "none": "토큰 없음: 통계가 비활성화되어 있습니다.",
+      "none_public": "토큰 없음.",
+      "public": "토큰 없이 통계 공개",
+      "public_help": "이 인스턴스에 접근할 수 있는 누구나 이 숫자를 읽을 수 있습니다. 인스턴스가 인터넷에서 접근 가능하면 끈 상태로 두세요."
+    },
+    "status": {
+      "public": "공개"
+    },
+    "errors": {
+      "generic": "문제가 발생했습니다. 다시 시도하세요."
     }
   },
   "two_factor": {
@@ -4539,6 +4575,7 @@
     "title": "일기",
     "today_button_go": "오늘의 항목으로 이동",
     "today_button_create": "오늘의 항목 만들기",
+    "pick_date": "다른 날의 항목 열기 또는 만들기",
     "today_badge": "오늘",
     "empty": "아직 일기 항목이 없습니다. 첫 번째 항목을 작성하려면 \"오늘의 항목 만들기\"를 클릭하세요. {{folder}}에 저장됩니다.",
     "create_error": "일기 항목을 생성할 수 없습니다.",

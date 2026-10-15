@@ -618,10 +618,12 @@
         });
     }
 
+    // `note` is the server's answer: a note it created carries its new id,
+    // the `current` of a 409 carries none (it is the entry's own note).
     function serverCopyFromEntry(userId, entry, note, content) {
         return {
             userId: Number(userId),
-            id: Number(note.id),
+            id: Number(note.id !== undefined && note.id !== null ? note.id : entry.id),
             heading: note.heading !== undefined ? String(note.heading) : entry.heading,
             type: entry.type || 'note',
             workspace: note.workspace || entry.workspace || '',

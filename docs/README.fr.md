@@ -674,6 +674,7 @@ Poznote prend en charge deux formats de notes principaux, chacun adapté à une 
 
 *   **Usage :** écrivez une note par jour, façon journal intime, depuis un tableau Journal dédié.
 *   **Fonctionnement :** le bouton « Créer la note du jour » crée la note du jour (il devient « Aller à la note du jour » une fois la note créée), avec la date du jour pour titre, et la range automatiquement dans une arborescence de dossiers `Diary/YYYY/MM`.
+*   **Un autre jour :** le bouton calendrier, à côté des contrôles d'affichage, permet de choisir n'importe quel jour, y compris sur téléphone. Les jours qui ont déjà une note sont marqués d'un point : choisir l'un d'eux ouvre sa note, choisir un autre jour crée la note de cette date.
 *   **Vue tableau :** les entrées s'affichent sous forme de cartes regroupées par mois, les plus récentes en premier, avec un filtre pour retrouver rapidement les entrées passées.
 *   **Vue en fil continu :** le bouton en forme de parchemin, à côté des réglages d'affichage, passe à une seule colonne de lecture : chaque entrée avec son contenu complet, les plus récentes en premier, chargées au fil du défilement. Le filtre s'y applique aussi. Cliquez sur une entrée, ou sur son crayon, pour la modifier sur place : les changements sont enregistrés au fil de la frappe. Le bouton tag, à côté du crayon, rend les tags de l'entrée modifiables : ajoutez-en ou retirez-en sans ouvrir la note.
 *   **Format :** les nouvelles entrées sont créées en notes en texte enrichi ou Markdown, selon le réglage « Format des entrées de journal » dans **Paramètres > Comportement**.
@@ -1461,7 +1462,7 @@ Poznote privilégie la simplicité et la portabilité : pas de framework complex
 - **HTML5** : balisage et structure
 - **CSS3** : mise en forme et design responsive
 - **JavaScript (Vanilla)** : fonctionnalités interactives et contenu dynamique
-- **React + Vite** : chaîne de build du composant Excalidraw (empaqueté en IIFE)
+- **Vite** : chaîne de build des composants Excalidraw (React) et CodeMirror (empaquetés en IIFE)
 - **AJAX** : chargement asynchrone des données
 
 ### Bibliothèques
@@ -1470,6 +1471,8 @@ Poznote privilégie la simplicité et la portabilité : pas de framework complex
 - **Mermaid** : bibliothèque JavaScript côté client qui génère des diagrammes et des organigrammes à partir de texte
 - **KaTeX** : bibliothèque JavaScript côté client pour la composition rapide et le rendu des équations mathématiques
 - **Sortable.js** : bibliothèque JavaScript de tri par glisser-déposer
+- **Lucide** : jeu d'icônes de toute l'interface
+- **Devicon** : icônes des langages de programmation dans les blocs de code
 - **highlight.js** : coloration syntaxique des blocs de code
 - **Swagger UI** : interface interactive de documentation et de test de l'API
 
@@ -1482,5 +1485,6 @@ Poznote privilégie la simplicité et la portabilité : pas de framework complex
 - **Nginx + PHP-FPM** : serveur web performant avec le gestionnaire de processus FastCGI
 - **Alpine Linux** : image de base sécurisée et légère
 - **Docker** : conteneurisation pour un déploiement et une portabilité simplifiés
+- **Supervisor** : lance Nginx, PHP-FPM et les workers d'arrière-plan (rappels, sauvegardes planifiées)
 - **Python 3.12 (Alpine)** : environnement d'exécution du serveur MCP, avec les bibliothèques httpx, uvicorn et fastmcp pour l'intégration des assistants IA
 </details>

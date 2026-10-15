@@ -1777,6 +1777,45 @@
             });
     }
 
+    // Calendar button: open the entry of the picked day, or create it in the
+    // selected diary (title, folder and type come from the server, as for the
+    // mini calendar of index.php, which phones do not show). Days with an
+    // entry carry a dot in the calendar.
+    function openDatePicker(btn) {
+        if (typeof window.showSlashDatePicker !== 'function') return;
+        var markedDates = (data.notes || []).filter(function (note) {
+            return note.dated;
+        }).map(function (note) {
+            return note.entryDate;
+        });
+        window.showSlashDatePicker(btn.getBoundingClientRect(), function (date) {
+            if (!date) return;
+            var iso = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+            openOrCreateEntryForDate(iso, btn);
+        }, null, { markedDates: markedDates });
+    }
+
+    function openOrCreateEntryForDate(iso, btn) {
+        var url = 'api/v1/calendar/diary-entry.php?date=' + encodeURIComponent(iso) +
+            '&workspace=' + encodeURIComponent(data.workspace || '');
+        if (data.diaryId) url += '&diary=' + encodeURIComponent(data.diaryId);
+        btn.disabled = true;
+        fetch(url, { credentials: 'same-origin' })
+            .then(window.readApiJson)
+            .then(function (entry) {
+                if (!entry || entry.error) throw entry;
+                if (entry.exists && entry.id) {
+                    openNote(entry.id);
+                    return;
+                }
+                createEntry({ heading: entry.title || iso, folder_name: entry.folder, created_date: iso }, btn);
+            })
+            .catch(function (err) {
+                btn.disabled = false;
+                showError(window.apiErrorMessage(err, txt.createError || 'Could not create the diary entry.'));
+            });
+    }
+
     // diary.php?date= for a day without an entry (a diary link opened outside
     // the editor): create it, then open it. The param is stripped first so
     // going back to this page does not create it again.
@@ -1977,13 +2016,53 @@
     function initDiaryContextMenu() {
         var switcher = document.querySelector('.diary-switcher');
         if (!switcher) return;
+        // Set while a long press has opened the menu, until its finger lifts
+        var pressOpened = false;
         switcher.addEventListener('contextmenu', function (e) {
             var pill = e.target.closest('.diary-switch-btn');
-            // Phones keep their long-press and the pill's own delete button
-            if (!pill || isMobileLayout()) return;
+            if (!pill) return;
             e.preventDefault();
+            // Android follows a long press with contextmenu: the menu is open
+            if (pressOpened) return;
             openDiaryContextMenu(pill, e.clientX, e.clientY);
         });
+
+        // Touch: iOS fires no contextmenu, so the long press is timed here.
+        // The menu opens under the pill, where the finger does not hide it.
+        var press = null;
+        function cancelPress() {
+            if (press) clearTimeout(press.timer);
+            press = null;
+        }
+        switcher.addEventListener('touchstart', function (e) {
+            cancelPress();
+            pressOpened = false;
+            var pill = e.target.closest('.diary-switch-btn');
+            if (!pill || e.touches.length !== 1) return;
+            var touch = e.touches[0];
+            press = {
+                x: touch.clientX,
+                y: touch.clientY,
+                timer: setTimeout(function () {
+                    press = null;
+                    pressOpened = true;
+                    var rect = pill.getBoundingClientRect();
+                    openDiaryContextMenu(pill, rect.left, rect.bottom + 4);
+                }, COLOR_LONG_PRESS_MS)
+            };
+        }, { passive: true });
+        switcher.addEventListener('touchmove', function (e) {
+            if (!press) return;
+            var touch = e.touches[0];
+            if (Math.abs(touch.clientX - press.x) > COLOR_TOUCH_SLOP || Math.abs(touch.clientY - press.y) > COLOR_TOUCH_SLOP) cancelPress();
+        }, { passive: true });
+        // The lifted finger must neither follow the pill's link nor send the
+        // mousedown that closes the menu it just opened.
+        switcher.addEventListener('touchend', function (e) {
+            cancelPress();
+            if (pressOpened) e.preventDefault();
+        });
+        switcher.addEventListener('touchcancel', cancelPress);
         document.addEventListener('mousedown', function (e) {
             if (diaryContextMenu && !diaryContextMenu.contains(e.target)) closeDiaryContextMenu();
         });
@@ -2072,13 +2151,25 @@
         initColorFilter();
         openRequestedDate();
 
-        document.querySelectorAll('.diary-switch-delete').forEach(function (btn) {
-            btn.addEventListener('click', function () { deleteDiary(btn); });
-        });
-
         var newDiaryBtn = document.getElementById('diaryNewBtn');
         if (newDiaryBtn) {
             newDiaryBtn.addEventListener('click', openNewDiaryModal);
+        }
+
+        var datePickBtn = document.getElementById('diaryDatePickBtn');
+        if (datePickBtn) {
+            // A press on the button while the calendar is open closes it (the
+            // popup's outside-mousedown handler) before the click arrives:
+            // pointerdown comes first and tells that click to stop there.
+            var pickerOpenAtPress = false;
+            datePickBtn.addEventListener('pointerdown', function () {
+                pickerOpenAtPress = !!(window.isSlashDatePickerOpen && window.isSlashDatePickerOpen());
+            });
+            datePickBtn.addEventListener('click', function () {
+                var wasOpen = pickerOpenAtPress;
+                pickerOpenAtPress = false;
+                if (!wasOpen) openDatePicker(datePickBtn);
+            });
         }
 
         var todayBtn = document.getElementById('diaryTodayBtn');

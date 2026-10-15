@@ -73,6 +73,7 @@ function routeTable(): array
         'PUT /notes/{id}/pinned' => [OWNED, 'body' => ['pinned' => 1]],
         'PUT /notes/{id}/content-width' => [OWNED, 'body' => ['content_width' => 60]],
         'POST /notes/{id}/favorite' => [OWNED, 'body' => ['favorite' => 1]],
+        'POST /notes/{id}/opened' => [OWNED],
         'POST /notes/{id}/archive' => [OWNED, 'body' => ['archived' => 1]],
         'POST /notes/{id}/kanban-completed' => [OWNED, 'body' => ['completed' => 1]],
         'POST /notes/{id}/folder' => [OWNED, 'body' => ['folder_id' => '{folder}']],

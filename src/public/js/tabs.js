@@ -299,7 +299,7 @@
 
     /**
      * The rail's Home link asks index.php for nothing in particular, and the
-     * page then falls back to the last edited note. That fallback has to be
+     * page then falls back to the last opened note. That fallback has to be
      * turned off while every tab is closed, or Home would put a note back in
      * the pane the user emptied, with no tab to close it again (issue #1462).
      * The flag is dropped again as soon as something is open, so Home keeps
@@ -1135,7 +1135,7 @@
 
         // Drop the note / kanban id from the URL so a reload does not reopen
         // it, and flag the pane as blank: index.php otherwise falls back to
-        // the last edited note whenever nothing is requested (issue #1462).
+        // the last opened note whenever nothing is requested (issue #1462).
         try {
             var params = new URLSearchParams(window.location.search || '');
             ['note', 'kanban', 'newtab'].forEach(function (key) { params.delete(key); });
@@ -1958,7 +1958,7 @@
 
         // A stored state holding no tab means the user closed everything: the
         // pane is meant to be empty. index.php still falls back to the last
-        // edited note when the URL asks for nothing and carries no blank=1
+        // opened note when the URL asks for nothing and carries no blank=1
         // (a bookmark, a workspace switch, an older link), so drop that note
         // rather than show one no tab could close (issue #1462). A browser
         // with nothing stored at all is a first visit, and keeps the fallback.
@@ -2082,7 +2082,7 @@
 
         // No stored tabs — create first tab from the current note. On a first
         // visit the URL names no note and index.php falls back to the last
-        // edited one, which the page config does not report: take the note the
+        // opened one, which the page config does not report: take the note the
         // page actually rendered, so the landing note gets a tab like any
         // other and can be closed (issue #1462).
         var landingNoteId = currentNoteId || (currentKanbanFolderId ? null : _getRenderedNoteId());

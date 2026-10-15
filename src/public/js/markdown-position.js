@@ -493,10 +493,11 @@ function restoreMarkdownEditorPosition(noteEntry, position, options) {
         var spot = locate();
         if (!spot) {
             // CodeMirror only draws the lines around its viewport: bring the
-            // target into it first, align on the next pass.
+            // target into it first, align on the next pass (the hold keeps
+            // the place itself, the editor is not to scroll to it again).
             if (!revealed && typeof api.revealPos === 'function') {
                 revealed = true;
-                api.revealPos(editorDiv, offset, 'center');
+                api.revealPos(editorDiv, offset, 'center', { keep: false });
             }
             return false;
         }

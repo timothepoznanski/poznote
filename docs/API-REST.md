@@ -34,6 +34,7 @@ Poznote provides a comprehensive RESTful API v1 for programmatic access to notes
 - [User Profile](#user-profile)
 - [Admin (User Management)](#admin-user-management)
 - [Public / Shared Tasks](#public--shared-tasks)
+- [Instance Statistics](#instance-statistics)
 - [Health Check](#health-check)
 
 ---
@@ -93,6 +94,7 @@ By default, the accepted JWT `aud` claim is the configured OIDC Client ID. If yo
 | **User auth** | Valid credentials, no `X-User-ID` needed | `/api/v1/users/me`, `/api/v1/system/*`, `/api/v1/shared/*` |
 | **Data auth** | Valid credentials; `X-User-ID` required for Basic/service token, optional for OIDC JWT and app passwords (own profile) | All user data endpoints (notes, folders, tags, etc.) |
 | **Admin auth** | Admin credentials, no `X-User-ID` needed | `/api/v1/admin/*`, `/api/v1/users/lookup/*` |
+| **Statistics token** | The read-only token generated in `Settings > Admin Tools > Statistics API`, or nothing when an admin made the statistics public | `GET /api/v1/public/statistics` |
 
 ---
 
@@ -695,6 +697,28 @@ Toggle favorite status for a note.
 ```bash
 curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/favorite
+```
+
+### Mark Note as Opened
+
+```
+POST /notes/{id}/opened
+```
+
+Record the note as the last one opened. When a page load of the app names no note (after signing in, for instance), it opens the last note opened in the workspace, no note when that one has since been deleted or moved, and the last updated note when nothing was opened in the workspace yet. Notes opened in the app are recorded automatically, so this route only matters to a client that shows notes on its own.
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "note_id": 123
+}
+```
+
+```bash
+curl -X POST -u 'username:password' -H "X-User-ID: 1" \
+  http://YOUR_SERVER/api/v1/notes/123/opened
 ```
 
 ### Keep Note Offline
@@ -3947,6 +3971,123 @@ Acquire and heartbeat answer `423 Locked` when another editor currently holds th
 
 ---
 
+## Instance Statistics
+
+A read-only summary of the whole instance, made for dashboards such as [Homepage](https://gethomepage.dev), Homarr or Uptime Kuma: users, notes, workspaces, storage, backups, Git sync and available update.
+
+```
+GET /public/statistics
+```
+
+**Authentication:** a statistics token, not an account. An administrator generates it in `Settings > Admin Tools > Statistics API`; it is shown once, can be replaced or revoked there at any time, and unlocks this summary and nothing else. Until a token exists the endpoint answers `403`. The same dialog can also make the statistics public (off by default): the endpoint then answers anyone, token or not, so only turn it on when the instance is not reachable from the internet. Send the token in one of:
+
+- `Authorization: Bearer <token>` (preferred)
+- `X-Poznote-Token: <token>`
+- `?token=<token>` for tools that can only call a URL (the token then shows up in proxy logs)
+
+The summary holds counts, sizes and dates only, never a username, a note title or an error message. It is cached for one minute, and the latest release is looked up on GitHub at most every six hours.
+
+```bash
+curl -H "Authorization: Bearer pzs_..." \
+  http://YOUR_SERVER/api/v1/public/statistics
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "version": "6.117.0",
+  "latest_version": "6.117.1",
+  "update_available": true,
+  "users": { "total": 8, "active": 8, "admins": 2 },
+  "notes": { "total": 68, "trash": 20 },
+  "workspaces": 7,
+  "folders": 17,
+  "attachments": 20,
+  "storage": {
+    "total_bytes": 33326262,
+    "database_bytes": 4874240,
+    "notes_bytes": 3248317,
+    "attachments_bytes": 14010899,
+    "backups_bytes": 11192806,
+    "disk_free_bytes": 91102097408,
+    "disk_total_bytes": 211199320064
+  },
+  "backups": {
+    "last_success_at": "2026-10-09T05:58:32Z",
+    "local": {
+      "enabled": true,
+      "last_run_at": "2026-10-09T04:59:06Z",
+      "last_run_success": false,
+      "last_run_errors": 3,
+      "last_success_at": "2026-10-09T05:58:32Z"
+    },
+    "s3": {
+      "enabled": false,
+      "last_run_at": null,
+      "last_run_success": null,
+      "last_run_errors": 0,
+      "last_success_at": null
+    }
+  },
+  "git_sync": {
+    "enabled": true,
+    "configured_users": 1,
+    "last_sync_at": "2026-10-15T08:12:40Z",
+    "last_sync_errors": 0
+  },
+  "warnings": ["local_backup_failed", "update_available"],
+  "status": "warning",
+  "generated_at": "2026-10-15T21:16:35Z"
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `update_available` | `true` when a newer stable release exists, `null` when GitHub could not be reached or the version is not comparable |
+| `notes.total` | Notes outside the trash, every account together; `notes.trash` counts the trashed ones |
+| `attachments` | Attachments of the notes outside the trash, including those stored in S3 |
+| `storage.*_bytes` | Space used by the accounts' data folders (attachments stored in S3 included); `disk_*` describe the disk holding the data folder |
+| `backups.*.enabled` | Whether automatic backups to that destination are on |
+| `backups.*.last_run_*` | The last backup run of every account (automatic or started from Settings); `last_run_errors` is a count, the messages stay in Settings |
+| `backups.*.last_success_at` | The last backup that went through, including the ones made account by account |
+| `git_sync.last_sync_at` | The most recent push or pull of any account; `last_sync_errors` adds up the files that failed in each account's last sync |
+| `warnings` | Any of `local_backup_failed`, `s3_backup_failed`, `git_sync_errors`, `update_available` |
+| `status` | `ok`, or `warning` when `warnings` is not empty |
+
+Dates are UTC, in ISO 8601.
+
+**Homepage example** (`services.yaml`, [Custom API widget](https://gethomepage.dev/widgets/services/customapi/)):
+
+```yaml
+- Poznote:
+    href: https://notes.example.com
+    icon: https://notes.example.com/favicon.ico
+    widget:
+      type: customapi
+      url: https://notes.example.com/api/v1/public/statistics
+      refreshInterval: 300000
+      headers:
+        Authorization: Bearer pzs_...
+      mappings:
+        - field: notes.total
+          label: Notes
+          format: number
+        - field: users.total
+          label: Users
+          format: number
+        - field: storage.total_bytes
+          label: Storage
+          format: bytes
+        - field: backups.last_success_at
+          label: Last backup
+          format: relativeDate
+```
+
+An administrator signed in to Poznote can read the same summary at `GET /admin/statistics`, and switch the public mode with `PUT /admin/statistics/public` and the body `{"enabled": true}` or `{"enabled": false}`.
+
+---
+
 ## Health Check
 
 ```
@@ -3995,6 +4136,7 @@ curl http://YOUR_SERVER/api_health.php
 | `PUT` | `/notes/{id}/pinned` | Pin or unpin a note |
 | `POST` | `/notes/{id}/kanban-completed` | Set Kanban completed state |
 | `POST` | `/notes/{id}/favorite` | Toggle favorite |
+| `POST` | `/notes/{id}/opened` | Mark as last opened |
 | `POST` | `/notes/{id}/folder` | Move to folder |
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
 | `POST` | `/notes/reorder` | Reorder a note before/after another |
@@ -4194,6 +4336,11 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/admin/users/{id}/two-factor/reset` | Turn a user's two-factor off |
 | `GET` | `/admin/users/{id}/password-status` | Password status |
 | `GET` | `/admin/stats` | System stats |
+| `GET` | `/admin/statistics` | Instance statistics (same summary as the public endpoint) |
+| `GET` | `/admin/statistics/token` | Statistics token status |
+| `POST` | `/admin/statistics/token` | Generate the statistics token (replaces the previous one) |
+| `DELETE` | `/admin/statistics/token` | Revoke the statistics token |
+| `PUT` | `/admin/statistics/public` | Serve the statistics without a token (or stop) |
 | `POST` | `/admin/repair` | Repair database |
 | `GET` | `/admin/orphan-attachments` | List orphan attachment files |
 | `DELETE` | `/admin/orphan-attachments` | Delete orphan attachment files |
@@ -4208,3 +4355,4 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/public/notes/lock` | Acquire the edit lock on a shared note (edit shares) |
 | `POST` | `/public/notes/lock/heartbeat` | Keep the edit lock alive |
 | `POST` | `/public/notes/lock/release` | Release the edit lock |
+| `GET` | `/public/statistics` | Instance statistics (statistics token, or none when public) |

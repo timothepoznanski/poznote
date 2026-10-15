@@ -119,18 +119,23 @@
     margin-top: 16px;
 }
 
-/* The pill holds the switch link and the diary's delete button */
+/* The pill shows the diary's name only: its right-click or long-press menu
+   (js/diary-page.js) renames or deletes the diary. A finger holding it must
+   not select its text, open the browser's link menu nor paint the
+   browser's blue tap highlight. */
 .diary-switch-btn {
     display: inline-flex;
     align-items: center;
-    gap: 2px;
-    padding: 0 5px 0 0;
     border: 1.5px solid var(--pz-border);
     border-radius: var(--pz-radius-pill);
     font-size: 13px;
     font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-strong);
     white-space: nowrap;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .diary-switch-btn:hover {
@@ -141,56 +146,13 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 5px 4px 5px 14px;
+    padding: 5px 14px;
     color: inherit;
     text-decoration: none;
 }
 
 .diary-switch-btn:not(.diary-switch-active) .diary-switch-link:hover {
     color: var(--pz-accent-text);
-}
-
-.diary-switch-delete {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    padding: 0;
-    border: none;
-    border-radius: var(--pz-radius-pill);
-    background: transparent;
-    color: var(--pz-text-muted);
-    cursor: pointer;
-}
-
-.diary-switch-delete .lucide {
-    width: 13px;
-    height: 13px;
-}
-
-.diary-switch-delete:hover,
-.diary-switch-delete:focus-visible {
-    background: var(--pz-surface-hover);
-    color: var(--pz-danger);
-}
-
-/* The icon painters (css/icons.css, dark-mode/icons.css) colour icons
-   themselves, so the delete icon is named to follow its button. */
-.diary-switch-delete [class*="lucide-"],
-.diary-switch-delete:hover [class*="lucide-"] {
-    color: inherit;
-    transform: none;
-}
-
-.diary-switch-active .diary-switch-delete {
-    color: var(--pz-text-inverse);
-}
-
-.diary-switch-active .diary-switch-delete:hover,
-.diary-switch-active .diary-switch-delete:focus-visible {
-    background: rgba(var(--pz-shadow-rgb), 0.18);
-    color: var(--pz-text-inverse);
 }
 
 .diary-switch-btn.diary-switch-active {
@@ -223,22 +185,6 @@
     margin: 8px 0 0;
     font-size: 13px;
     color: var(--pz-danger-text);
-}
-
-/* Desktop renames and deletes a diary from the pill's right-click menu, so
-   the pill shows its name only; phones, without right-click, keep the button. */
-@media (min-width: 801px) {
-    .diary-switch-btn {
-        padding-right: 0;
-    }
-
-    .diary-switch-link {
-        padding-right: 14px;
-    }
-
-    .diary-switch-delete {
-        display: none;
-    }
 }
 
 .diary-context-menu {
@@ -982,34 +928,6 @@ html[data-theme='dark'] .diary-switch-btn:hover {
 
 html[data-theme='dark'] .diary-switch-btn:not(.diary-switch-active) .diary-switch-link:hover {
     color: var(--pz-accent-text);
-}
-
-html[data-theme='dark'] .diary-switch-delete,
-html[data-theme='dark'] .diary-switch-delete [class*="lucide-"] {
-    color: var(--pz-text-muted);
-}
-
-html[data-theme='dark'] .diary-switch-delete:hover,
-html[data-theme='dark'] .diary-switch-delete:focus-visible {
-    background: var(--pz-surface-hover);
-    color: var(--pz-danger-text);
-}
-
-/* Not the background: a lucide icon is a mask painted with it */
-html[data-theme='dark'] .diary-switch-delete:hover [class*="lucide-"],
-html[data-theme='dark'] .diary-switch-delete:focus-visible [class*="lucide-"] {
-    color: var(--pz-danger-text);
-    transform: none;
-}
-
-html[data-theme='dark'] .diary-switch-active .diary-switch-delete,
-html[data-theme='dark'] .diary-switch-active .diary-switch-delete [class*="lucide-"],
-html[data-theme='dark'] .diary-switch-active .diary-switch-delete:hover [class*="lucide-"] {
-    color: var(--pz-text-strong);
-}
-
-html[data-theme='dark'] .diary-switch-active .diary-switch-delete:hover {
-    background: rgba(var(--pz-shadow-rgb), 0.25);
 }
 
 html[data-theme='dark'] .diary-switch-btn.diary-switch-active {

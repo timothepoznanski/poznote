@@ -288,29 +288,13 @@ function scrollMarkdownEditorLineToTop(markdownEditor, lineNumber, scrollContain
     const markdownContent = getMarkdownEditorContent(markdownEditor);
     const sourceOffset = getMarkdownSourceOffsetForLine(markdownContent, lineNumber);
 
-    // For CodeMirror editors: use revealPos first (works even when line is off-screen),
-    // then adjust the scroll container by the remaining offset difference.
+    // For CodeMirror editors: revealPos works even when the line is off-screen
+    // (not drawn yet), and keeps the line in place while images and diagrams
+    // above it finish drawing. The offset keeps it clear of the sticky toolbar.
     const cmApi = window.PoznoteMarkdownCodeMirror;
     if (cmApi && typeof cmApi.isCodeMirrorEditor === 'function' && cmApi.isCodeMirrorEditor(markdownEditor)
         && typeof cmApi.revealPos === 'function') {
-        // Scroll CM's internal scroller to bring the line to the top
-        cmApi.revealPos(markdownEditor, sourceOffset, 'start');
-
-        // After CM scrolls, the line is at the top of the CM viewport. If there is a
-        // safeTopOffset we need to pull back a bit. We do this after a minimal delay so
-        // CM has applied the scroll before we read coordinates.
-        if (safeTopOffset > 0) {
-            requestAnimationFrame(() => {
-                const targetRect = cmApi.getCoordsAtPos(markdownEditor, sourceOffset);
-                const containerRect = scrollContainer.getBoundingClientRect();
-                if (targetRect && containerRect) {
-                    const delta = targetRect.top - containerRect.top - safeTopOffset;
-                    if (Math.abs(delta) > 2) {
-                        scrollContainer.scrollBy({ top: delta, behavior: 'smooth' });
-                    }
-                }
-            });
-        }
+        cmApi.revealPos(markdownEditor, sourceOffset, 'start', { yMargin: safeTopOffset });
         return true;
     }
 

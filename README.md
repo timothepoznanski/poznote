@@ -674,6 +674,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 
 *   **Usage:** Write one note per day, journal-style, from a dedicated Diary board.
 *   **Workflow:** The "Create today's entry" button creates today's note (it reads "Go to today's entry" once the note exists), titled with the current date and stored automatically in a `Diary/YYYY/MM` folder structure.
+*   **Another Day:** The calendar button next to the view controls picks any day, on phones too. Days that already have an entry are marked with a dot; picking one opens its entry, picking another day creates the entry for that date.
 *   **Board View:** Entries are displayed as cards grouped by month, newest first, with a filter to quickly find past entries.
 *   **Journal View:** The scroll button next to the view controls switches to one reading column: every entry with its full content, newest first, loaded as you scroll. The filter works there too. Click an entry, or its pencil, to edit it right there; changes are saved as you type. The tag button next to the pencil turns the entry's tags into an editor: add or remove tags without opening the note.
 *   **Format:** New entries are created as rich text or Markdown notes, depending on the "Diary entry format" setting under **Settings > Behavior**.
@@ -1461,7 +1462,7 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **HTML5** - Markup and structure
 - **CSS3** - Styling and responsive design
 - **JavaScript (Vanilla)** - Interactive features and dynamic content
-- **React + Vite** - Build toolchain for Excalidraw component (bundled as IIFE)
+- **Vite** - Build toolchain for the Excalidraw (React) and CodeMirror components (bundled as IIFE)
 - **AJAX** - Asynchronous data loading
 
 ### Libraries
@@ -1470,6 +1471,8 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Mermaid** - Client-side JavaScript library for diagram and flowchart generation from text
 - **KaTeX** - Client-side JavaScript library for fast math typesetting and rendering mathematical equations
 - **Sortable.js** - JavaScript library for drag-and-drop sorting
+- **Lucide** - Icon set used across the interface
+- **Devicon** - Programming language icons for code blocks
 - **highlight.js** - Syntax highlighting for code blocks
 - **Swagger UI** - Interactive API documentation and testing interface
 
@@ -1482,5 +1485,6 @@ Poznote prioritizes simplicity and portability - no complex frameworks, no heavy
 - **Nginx + PHP-FPM** - High-performance web server with FastCGI Process Manager
 - **Alpine Linux** - Secure, lightweight base image
 - **Docker** - Containerization for easy deployment and portability
+- **Supervisor** - Runs Nginx, PHP-FPM and the background workers (reminders, scheduled backups)
 - **Python 3.12 (Alpine)** - MCP server runtime with the httpx, uvicorn and fastmcp libraries for AI assistant integration
 </details>

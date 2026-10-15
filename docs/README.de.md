@@ -674,6 +674,7 @@ Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschied
 
 *   **Verwendung:** Schreiben Sie wie in einem Tagebuch eine Notiz pro Tag, über ein eigenes Tagebuch-Board.
 *   **Arbeitsablauf:** Die Schaltfläche „Heutigen Eintrag erstellen“ legt die Notiz des heutigen Tages an (sobald sie existiert, heißt sie „Zum heutigen Eintrag“). Sie trägt das aktuelle Datum als Titel und wird automatisch in einer Ordnerstruktur `Diary/YYYY/MM` abgelegt.
+*   **Ein anderer Tag:** Die Kalender-Schaltfläche neben den Ansichtsoptionen wählt einen beliebigen Tag aus, auch auf dem Smartphone. Tage mit einem Eintrag sind mit einem Punkt markiert; die Auswahl eines solchen Tages öffnet seinen Eintrag, jeder andere Tag erhält einen neuen Eintrag mit diesem Datum.
 *   **Board-Ansicht:** Einträge werden als Karten angezeigt, nach Monat gruppiert und die neuesten zuerst, mit einem Filter, um frühere Einträge schnell zu finden.
 *   **Journalansicht:** Die Schriftrollen-Schaltfläche neben den Ansichtseinstellungen wechselt zu einer einzigen Lesespalte: jeder Eintrag mit seinem vollständigen Inhalt, die neuesten zuerst, nachgeladen beim Scrollen. Der Filter wirkt auch hier. Ein Klick auf einen Eintrag oder seinen Stift bearbeitet ihn direkt an Ort und Stelle; Änderungen werden beim Tippen gespeichert. Die Tag-Schaltfläche neben dem Stift macht die Tags des Eintrags bearbeitbar: Tags hinzufügen oder entfernen, ohne die Notiz zu öffnen.
 *   **Format:** Neue Einträge werden als Rich-Text- oder Markdown-Notizen angelegt, je nach der Einstellung „Format der Tagebucheinträge“ unter **Einstellungen > Verhalten**.
@@ -1461,7 +1462,7 @@ Poznote setzt auf Einfachheit und Portabilität: keine komplexen Frameworks, kei
 - **HTML5**: Markup und Struktur
 - **CSS3**: Gestaltung und responsives Design
 - **JavaScript (Vanilla)**: Interaktive Funktionen und dynamische Inhalte
-- **React + Vite**: Build-Toolchain für die Excalidraw-Komponente (als IIFE gebündelt)
+- **Vite**: Build-Toolchain für die Komponenten Excalidraw (React) und CodeMirror (als IIFE gebündelt)
 - **AJAX**: Asynchrones Laden von Daten
 
 ### Bibliotheken
@@ -1470,6 +1471,8 @@ Poznote setzt auf Einfachheit und Portabilität: keine komplexen Frameworks, kei
 - **Mermaid**: Clientseitige JavaScript-Bibliothek zur Erzeugung von Diagrammen und Flussdiagrammen aus Text
 - **KaTeX**: Clientseitige JavaScript-Bibliothek für schnellen mathematischen Formelsatz und die Darstellung mathematischer Gleichungen
 - **Sortable.js**: JavaScript-Bibliothek für Sortieren per Drag-and-drop
+- **Lucide**: Icon-Set der gesamten Oberfläche
+- **Devicon**: Symbole der Programmiersprachen in Codeblöcken
 - **highlight.js**: Syntaxhervorhebung für Codeblöcke
 - **Swagger UI**: Interaktive Oberfläche zur API-Dokumentation und zum Testen
 
@@ -1482,5 +1485,6 @@ Poznote setzt auf Einfachheit und Portabilität: keine komplexen Frameworks, kei
 - **Nginx + PHP-FPM**: Leistungsstarker Webserver mit FastCGI Process Manager
 - **Alpine Linux**: Sicheres, schlankes Basis-Image
 - **Docker**: Containerisierung für einfache Bereitstellung und Portabilität
+- **Supervisor**: Startet Nginx, PHP-FPM und die Hintergrund-Worker (Erinnerungen, geplante Backups)
 - **Python 3.12 (Alpine)**: Laufzeitumgebung des MCP-Servers mit den Bibliotheken httpx, uvicorn und fastmcp für die Integration von KI-Assistenten
 </details>
