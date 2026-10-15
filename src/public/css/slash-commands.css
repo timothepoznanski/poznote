@@ -269,6 +269,27 @@
     font-weight: var(--pz-weight-bold);
 }
 
+/* A dot under the number of a marked day (options.markedDates) */
+.slash-date-picker-day.marked {
+    position: relative;
+}
+
+.slash-date-picker-day.marked::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 1px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: var(--pz-radius-circle);
+    background: var(--pz-accent-text);
+}
+
+.slash-date-picker-day.marked.selected::after {
+    background: var(--pz-text-inverse);
+}
+
 .slash-date-picker-footer {
     display: flex;
     justify-content: space-between;

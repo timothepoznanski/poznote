@@ -4979,6 +4979,7 @@
     "title": "日记",
     "today_button_go": "前往今日日记",
     "today_button_create": "创建今日日记",
+    "pick_date": "打开或创建其他日期的日记",
     "today_badge": "今天",
     "empty": "还没有日记条目。点击\"创建今日日记\"来写第一篇，它将保存在 {{folder}} 中。",
     "create_error": "无法创建日记条目。",

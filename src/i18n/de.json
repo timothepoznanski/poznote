@@ -4882,6 +4882,7 @@
     "title": "Tagebuch",
     "today_button_go": "Zum heutigen Eintrag",
     "today_button_create": "Heutigen Eintrag erstellen",
+    "pick_date": "Eintrag eines anderen Tages öffnen oder erstellen",
     "today_badge": "Heute",
     "empty": "Noch keine Tagebucheinträge. Klicken Sie auf \"Heutigen Eintrag erstellen\", um den ersten zu schreiben. Er wird in {{folder}} gespeichert.",
     "create_error": "Der Tagebucheintrag konnte nicht erstellt werden.",

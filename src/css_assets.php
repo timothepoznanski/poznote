@@ -269,6 +269,8 @@ function poznoteCssManifest(): array
             'css/outline.css',
             // Callouts of the journal entries, as on the public note page
             'css/tasks.css',
+            // The day picker (js/date-picker-popup.js)
+            'css/slash-commands.css',
             'css/diary.css',
             '@theme',
             '@icon-sidebar',

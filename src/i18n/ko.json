@@ -4539,6 +4539,7 @@
     "title": "일기",
     "today_button_go": "오늘의 항목으로 이동",
     "today_button_create": "오늘의 항목 만들기",
+    "pick_date": "다른 날의 항목 열기 또는 만들기",
     "today_badge": "오늘",
     "empty": "아직 일기 항목이 없습니다. 첫 번째 항목을 작성하려면 \"오늘의 항목 만들기\"를 클릭하세요. {{folder}}에 저장됩니다.",
     "create_error": "일기 항목을 생성할 수 없습니다.",

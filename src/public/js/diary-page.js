@@ -1777,6 +1777,45 @@
             });
     }
 
+    // Calendar button: open the entry of the picked day, or create it in the
+    // selected diary (title, folder and type come from the server, as for the
+    // mini calendar of index.php, which phones do not show). Days with an
+    // entry carry a dot in the calendar.
+    function openDatePicker(btn) {
+        if (typeof window.showSlashDatePicker !== 'function') return;
+        var markedDates = (data.notes || []).filter(function (note) {
+            return note.dated;
+        }).map(function (note) {
+            return note.entryDate;
+        });
+        window.showSlashDatePicker(btn.getBoundingClientRect(), function (date) {
+            if (!date) return;
+            var iso = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
+            openOrCreateEntryForDate(iso, btn);
+        }, null, { markedDates: markedDates });
+    }
+
+    function openOrCreateEntryForDate(iso, btn) {
+        var url = 'api/v1/calendar/diary-entry.php?date=' + encodeURIComponent(iso) +
+            '&workspace=' + encodeURIComponent(data.workspace || '');
+        if (data.diaryId) url += '&diary=' + encodeURIComponent(data.diaryId);
+        btn.disabled = true;
+        fetch(url, { credentials: 'same-origin' })
+            .then(window.readApiJson)
+            .then(function (entry) {
+                if (!entry || entry.error) throw entry;
+                if (entry.exists && entry.id) {
+                    openNote(entry.id);
+                    return;
+                }
+                createEntry({ heading: entry.title || iso, folder_name: entry.folder, created_date: iso }, btn);
+            })
+            .catch(function (err) {
+                btn.disabled = false;
+                showError(window.apiErrorMessage(err, txt.createError || 'Could not create the diary entry.'));
+            });
+    }
+
     // diary.php?date= for a day without an entry (a diary link opened outside
     // the editor): create it, then open it. The param is stripped first so
     // going back to this page does not create it again.
@@ -2079,6 +2118,22 @@
         var newDiaryBtn = document.getElementById('diaryNewBtn');
         if (newDiaryBtn) {
             newDiaryBtn.addEventListener('click', openNewDiaryModal);
+        }
+
+        var datePickBtn = document.getElementById('diaryDatePickBtn');
+        if (datePickBtn) {
+            // A press on the button while the calendar is open closes it (the
+            // popup's outside-mousedown handler) before the click arrives:
+            // pointerdown comes first and tells that click to stop there.
+            var pickerOpenAtPress = false;
+            datePickBtn.addEventListener('pointerdown', function () {
+                pickerOpenAtPress = !!(window.isSlashDatePickerOpen && window.isSlashDatePickerOpen());
+            });
+            datePickBtn.addEventListener('click', function () {
+                var wasOpen = pickerOpenAtPress;
+                pickerOpenAtPress = false;
+                if (!wasOpen) openDatePicker(datePickBtn);
+            });
         }
 
         var todayBtn = document.getElementById('diaryTodayBtn');

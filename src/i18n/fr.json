@@ -4987,6 +4987,7 @@
     "title": "Journal",
     "today_button_go": "Aller à la note du jour",
     "today_button_create": "Créer la note du jour",
+    "pick_date": "Ouvrir ou créer la note d'un autre jour",
     "today_badge": "Aujourd'hui",
     "empty": "Aucune note de journal pour le moment. Cliquez sur « Créer la note du jour » pour écrire la première. Elle sera rangée dans {{folder}}.",
     "create_error": "Impossible de créer la note du jour.",

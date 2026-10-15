@@ -4883,6 +4883,7 @@
     "title": "Diario",
     "today_button_go": "Ir a la entrada de hoy",
     "today_button_create": "Crear la entrada de hoy",
+    "pick_date": "Abrir o crear la entrada de otro día",
     "today_badge": "Hoy",
     "empty": "Aún no hay entradas de diario. Haz clic en \"Crear la entrada de hoy\" para escribir la primera. Se guardará en {{folder}}.",
     "create_error": "No se pudo crear la entrada del diario.",
