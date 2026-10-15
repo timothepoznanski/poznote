@@ -3584,6 +3584,28 @@ const richTextKeymap = Prec.highest(keymap.of([
   { key: 'ArrowDown', run: leaveCodeBlockOnArrowDown }
 ]))
 
+// The caret can sit in front of a line's hidden marker ("## " of a heading
+// just inserted on an empty line, "> " of a quote): the browser cannot tell
+// the two sides of text that is not drawn apart. Nobody means to type in
+// front of a marker they cannot see: the text goes after it.
+function pastHiddenLineMarker(state, pos) {
+  const marker = syntaxTree(state).resolveInner(pos, 1)
+  if ((marker.name === 'HeaderMark' || marker.name === 'QuoteMark') && marker.from === pos) {
+    const lineEnd = state.doc.lineAt(pos).to
+    pos = marker.to
+    while (pos < lineEnd && state.doc.sliceString(pos, pos + 1) === ' ') pos++
+  }
+  // Same in front of, or inside, the marker of a list item (bullet, number,
+  // task box): the text belongs to the item
+  const itemLine = state.doc.lineAt(pos)
+  const itemMarker = LIST_ITEM_PREFIX_REGEX.exec(itemLine.text)
+  if (itemMarker && pos < itemLine.from + itemMarker[0].length &&
+      syntaxTree(state).resolveInner(itemLine.from + itemMarker[1].length, 1).name === 'ListMark') {
+    pos = itemLine.from + itemMarker[0].length
+  }
+  return pos
+}
+
 const literalTypingInput = Prec.highest(EditorView.inputHandler.of((view, from, to, text) => {
   if (isSyntaxRevealed() || view.state.readOnly || !text) return false
   // Once the place or the document has been changed here, the insertion is
@@ -3650,25 +3672,10 @@ const literalTypingInput = Prec.highest(EditorView.inputHandler.of((view, from, 
     }
   }
 
-  // The caret can sit in front of a line's hidden marker ("## " of a heading
-  // just inserted on an empty line, "> " of a quote): the browser cannot tell
-  // the two sides of text that is not drawn apart. Nobody means to type in
-  // front of a marker they cannot see: the text goes after it.
   if (from === to) {
-    const marker = syntaxTree(view.state).resolveInner(from, 1)
-    if ((marker.name === 'HeaderMark' || marker.name === 'QuoteMark') && marker.from === from) {
-      let after = marker.to
-      while (after < view.state.doc.lineAt(from).to && view.state.doc.sliceString(after, after + 1) === ' ') after++
-      from = to = after
-      redirected = true
-    }
-    // Same in front of, or inside, the marker of a list item (bullet, number,
-    // task box): the text belongs to the item
-    const itemLine = view.state.doc.lineAt(from)
-    const itemMarker = LIST_ITEM_PREFIX_REGEX.exec(itemLine.text)
-    if (itemMarker && from < itemLine.from + itemMarker[0].length &&
-        syntaxTree(view.state).resolveInner(itemLine.from + itemMarker[1].length, 1).name === 'ListMark') {
-      from = to = itemLine.from + itemMarker[0].length
+    const past = pastHiddenLineMarker(view.state, from)
+    if (past !== from) {
+      from = to = past
       redirected = true
     }
   }
@@ -3709,7 +3716,10 @@ const literalTypingInput = Prec.highest(EditorView.inputHandler.of((view, from, 
       })
     }
     if (covered >= high) {
-      from = to = caret.head
+      // (a caret put at the start of a heading or quote line from outside,
+      // a restored place: Chromium reports the text past the hidden marker,
+      // where it belongs, and the caret is in front of it)
+      from = to = pastHiddenLineMarker(view.state, caret.head)
       redirected = true
     }
   }

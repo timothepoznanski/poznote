@@ -23,7 +23,7 @@ import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
 // searchKeymap includes Mod-f (Ctrl+F) which would intercept the browser's native find.
 // We filter it out so Ctrl+F opens the browser find dialog instead of CodeMirror's panel.
 const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod-f')
-import { CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
+import { Annotation, CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
 import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect } from './live-preview.js'
@@ -1434,12 +1434,163 @@ function replaceRangeKeepSelection(host, start, end, replacement, anchor) {
   return true
 }
 
+// Rich text hides a line's leading syntax ("## ", "> ", "- ") with display:
+// none, where the browser has no box to measure: coordsAtPos() gives null
+// there, and CodeMirror silently drops a scrollIntoView aimed at it (the
+// outline's links aim at the start of a heading line). The first visible
+// character of the same line stands in for it.
+function hasLayoutBoxAt(view, pos) {
+  const start = view.domAtPos(pos, 1)
+  const end = view.domAtPos(pos + 1, -1)
+  const range = document.createRange()
+  try {
+    range.setStart(start.node, start.offset)
+    range.setEnd(end.node, end.offset)
+  } catch (_error) {
+    return true
+  }
+  // No text under the character (a widget draws it): not hidden syntax
+  if (range.collapsed) return true
+  return range.getClientRects().length > 0
+}
+
+// Runs when CodeMirror performs the scroll, the target's line drawn by then.
+// Layout cannot be read through the view at that point (it is mid-update),
+// hence the DOM ranges above, and the corrected scroll is dispatched after.
+const scrollPastHiddenSyntax = EditorView.scrollHandler.of((view, range, options) => {
+  const head = range.head
+  const line = view.state.doc.lineAt(head)
+  if (head >= line.to || head < view.viewport.from || head > view.viewport.to) return false
+  if (hasLayoutBoxAt(view, head)) return false
+  let target = -1
+  for (let next = head + 1; next < line.to; next++) {
+    if (hasLayoutBoxAt(view, next)) {
+      target = next
+      break
+    }
+  }
+  if (target < 0) return false
+  Promise.resolve().then(() => {
+    if (view.destroyed) return
+    view.dispatch({
+      effects: EditorView.scrollIntoView(target, { y: options.y, x: options.x, yMargin: options.yMargin, xMargin: options.xMargin }),
+      annotations: followUpScroll.of(true)
+    })
+  })
+  return true
+})
+
+// A scroll dispatched here to finish one asked for elsewhere
+const followUpScroll = Annotation.define()
+const scrollEffectType = EditorView.scrollIntoView(0).type
+
+// The caret (or a place asked for through revealPos, an outline link) is
+// scrolled into view, then an image, a diagram or a formula above it
+// finishes drawing and pushes it out again (PageDown over a note's pictures):
+// CodeMirror keeps the top line in place, and only while the editor has the
+// focus. For a moment after such a scroll, a change in the content's height
+// scrolls to the same place again, until the reader clicks, the page scrolls
+// for any other reason (the reader, a script) or something else asks for a
+// scroll.
+const SCROLL_SETTLE_MS = 1500
+// (the scroll asked for lands within a frame or two: one later is not ours)
+const SCROLL_LANDING_MS = 250
+const scrollSettlesAfterLateContent = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.view = view
+    this.target = null
+    this.frame = 0
+    this.stop = () => { this.target = null }
+    this.scrolled = () => {
+      if (this.target && Date.now() > this.target.landing) this.target = null
+    }
+    this.observer = typeof ResizeObserver === 'function' ? new ResizeObserver(() => this.contentResized()) : null
+    if (this.observer) this.observer.observe(view.contentDOM)
+    for (const type of ['wheel', 'touchmove', 'pointerdown']) {
+      window.addEventListener(type, this.stop, { passive: true, capture: true })
+    }
+    document.addEventListener('scroll', this.scrolled, { passive: true, capture: true })
+  }
+
+  update(update) {
+    for (const tr of update.transactions) {
+      if (tr.annotation(followUpScroll)) continue
+      if (tr.scrollIntoView) this.aim({ caret: true, y: 'nearest' })
+      else if (tr.effects.some(effect => effect.is(scrollEffectType))) this.target = null
+    }
+    if (this.target && !this.target.caret && update.docChanged) this.target.pos = update.changes.mapPos(this.target.pos)
+  }
+
+  aim(target) {
+    const now = Date.now()
+    this.target = Object.assign(target, { until: now + SCROLL_SETTLE_MS, landing: now + SCROLL_LANDING_MS })
+  }
+
+  // A scroll asked for from the page (revealPos, scrollToPos), just dispatched
+  keep(pos, y, yMargin) {
+    this.aim({ caret: false, pos, y, yMargin })
+  }
+
+  contentResized() {
+    // Out of the observer's own loop: the scroll redraws lines, which would
+    // resize the content again while the browser is still reporting
+    // ("ResizeObserver loop completed with undelivered notifications")
+    if (this.frame) return
+    this.frame = requestAnimationFrame(() => {
+      this.frame = 0
+      const target = this.target
+      if (!target || Date.now() > target.until || this.view.destroyed) return
+      // (the caret only while it is the reader's: the editor has the focus)
+      if (target.caret && !this.view.hasFocus) return
+      const view = this.view
+      const pos = target.caret ? view.state.selection.main.head : Math.min(target.pos, view.state.doc.length)
+      target.landing = Date.now() + SCROLL_LANDING_MS
+      view.dispatch({
+        effects: EditorView.scrollIntoView(pos, { y: target.y, yMargin: target.yMargin }),
+        annotations: followUpScroll.of(true)
+      })
+      // Reading the layout runs the measure (and the scroll) the dispatch
+      // scheduled for the next frame: this frame is painted in place
+      view.coordsAtPos(pos)
+    })
+  }
+
+  destroy() {
+    if (this.frame) cancelAnimationFrame(this.frame)
+    if (this.observer) this.observer.disconnect()
+    for (const type of ['wheel', 'touchmove', 'pointerdown']) {
+      window.removeEventListener(type, this.stop, { capture: true })
+    }
+    document.removeEventListener('scroll', this.scrolled, { capture: true })
+  }
+})
+
+function keepScrollTarget(view, pos, y, yMargin) {
+  const plugin = view.plugin(scrollSettlesAfterLateContent)
+  if (plugin) plugin.keep(pos, y, yMargin)
+}
+
+// The same stand-in for code measuring a position (the outline's alignment,
+// a restored place). A line outside the drawn viewport has nothing to
+// measure either way: pos is kept.
+function measurablePosOnLine(view, pos, side = 1) {
+  if (view.coordsAtPos(pos, side)) return pos
+  if (pos < view.viewport.from || pos > view.viewport.to) return pos
+  const line = view.state.doc.lineAt(pos)
+  for (let next = pos + 1; next <= line.to; next++) {
+    if (view.coordsAtPos(next, 1)) return next
+  }
+  return pos
+}
+
 function getCoordsAtPos(host, position, side = 1) {
   const instance = getInstance(host)
   if (!instance) return null
   const docLength = instance.view.state.doc.length
   const pos = Math.max(0, Math.min(position, docLength))
-  return instance.view.coordsAtPos(pos, side)
+  const view = instance.view
+  const measurable = measurablePosOnLine(view, pos, side)
+  return view.coordsAtPos(measurable, measurable === pos ? side : 1)
 }
 
 // Document position closest to viewport coordinates (e.g. a drop point).
@@ -1460,18 +1611,26 @@ function scrollToPos(host, position, y = 'nearest') {
     selection: { anchor: pos },
     effects: EditorView.scrollIntoView(pos, { y })
   })
+  keepScrollTarget(instance.view, pos, y)
   instance.view.focus()
   return true
 }
 
-function revealPos(host, position, y = 'nearest') {
+// options.yMargin: the room left between the target and the edge it is
+// scrolled to (the outline keeps its headings clear of the sticky toolbar).
+// options.keep: false for a caller that only needs the line drawn and holds
+// the scroll position itself (js/markdown-position.js), where scrolling to
+// the target again once late content has drawn would fight it.
+function revealPos(host, position, y = 'nearest', options = {}) {
   const instance = getInstance(host)
   if (!instance) return false
   const docLength = instance.view.state.doc.length
   const pos = Math.max(0, Math.min(position, docLength))
+  const yMargin = options.yMargin
   instance.view.dispatch({
-    effects: EditorView.scrollIntoView(pos, { y })
+    effects: EditorView.scrollIntoView(pos, { y, yMargin })
   })
+  if (options.keep !== false) keepScrollTarget(instance.view, pos, y, yMargin)
   return true
 }
 
@@ -1699,6 +1858,8 @@ function createEditor(host, options = {}) {
         addKeymap: false
       }),
       pasteUrlOverSelection,
+      scrollPastHiddenSyntax,
+      scrollSettlesAfterLateContent,
       markdownLanguage.data.of({
         autocomplete: markdownCompletionSource
       }),
