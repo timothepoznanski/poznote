@@ -339,6 +339,15 @@ function handleHeadingBoundaryDelete(e, selection, noteentry) {
         return true;
     }
 
+    // Delete in an empty line above a heading: remove the line, the heading keeps its format
+    if (!isBackspace && isBlockVisuallyEmpty(block)) {
+        e.preventDefault();
+        block.remove();
+        placeCaretAtBlockStart(neighbor);
+        triggerNoteSave();
+        return true;
+    }
+
     e.preventDefault();
     if (isBackspace) {
         mergeBlockIntoPrevious(neighbor, block);
