@@ -1638,6 +1638,29 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                         <span id="git-sync-enabled-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
+
+                <!-- Statistics API: read-only token for dashboards (js/statistics-token.js) -->
+                <?php
+                require_once __DIR__ . '/../InstanceStatistics.php';
+                $statisticsTokenStatus = InstanceStatistics::tokenStatus();
+                $statisticsTokenEnabled = $statisticsTokenStatus['enabled'] || $statisticsTokenStatus['public'];
+                ?>
+                <div class="home-card" id="statistics-token-card" role="button" tabindex="0">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.statistics_api', [], 'Let a dashboard such as Homepage read the statistics of this instance (users, notes, storage, backups, updates) with a read-only token.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-bar-chart"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.statistics_api', [], 'Statistics API'); ?></span>
+                        <span id="statistics-token-status" class="setting-status <?php echo $statisticsTokenEnabled ? 'enabled' : 'disabled'; ?>"><?php
+                            if ($statisticsTokenStatus['public']) {
+                                echo t_h('statistics_api.status.public', [], 'Public');
+                            } else {
+                                echo $statisticsTokenEnabled ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled');
+                            }
+                        ?></span>
+                    </div>
+                </div>
             </div>
 
             <div class="settings-group-title" data-group="storage-limits"><?php echo t_h('settings.groups.storage_limits', [], 'Storage & limits'); ?></div>
@@ -2087,6 +2110,9 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
     <script src="js/two-factor.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/two-factor.js') ?: time(); ?>"></script>
     <script src="js/app-passwords.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/app-passwords.js') ?: time(); ?>"></script>
+    <?php if ($isAdmin): ?>
+    <script src="js/statistics-token.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/statistics-token.js') ?: time(); ?>"></script>
+    <?php endif; ?>
     <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,
          which every page carrying the rail includes. -->
     <script src="js/delete-account.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/delete-account.js') ?: time(); ?>"></script>

@@ -105,6 +105,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:s3-backup-card" checked><span><?php echo t_h('settings.cards.s3_backup', [], 'S3 Backups'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:local-backup-card" checked><span><?php echo t_h('settings.cards.local_backup', [], 'Local Backups'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:git-sync-enabled-card" checked><span><?php echo t_h('settings.cards.git_sync_toggle', [], 'Git Sync'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:statistics-token-card" checked><span><?php echo t_h('settings.cards.statistics_api', [], 'Statistics API'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:executable-attachments-card" checked><span><?php echo t_h('settings.cards.allow_executable_attachments', [], 'Script and executable attachments'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:login-disabled-card" checked><span><?php echo t_h('settings.cards.login_disabled', [], 'Open without login'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tenant-isolation-card" checked><span><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span></label>

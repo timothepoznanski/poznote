@@ -492,6 +492,7 @@
       "webhooks": "Envía los eventos de la instancia a servicios externos mediante webhooks.",
       "ai_assistant": "Configura el asistente de IA usado para conversar con tus notas.",
       "git_sync_enabled": "Activa o desactiva la sincronización Git en esta instancia.",
+      "statistics_api": "Permite que un panel como Homepage lea las estadísticas de esta instancia (usuarios, notas, almacenamiento, copias de seguridad, actualizaciones) con un token de solo lectura.",
       "import_limits": "Define el número máximo de archivos permitidos por importación.",
       "user_quotas": "Limita el número de notas y el almacenamiento disponible por usuario.",
       "custom_css": "Aplica tu propio CSS para personalizar la apariencia de Poznote.",
@@ -625,6 +626,7 @@
       "import_limits": "Límites de importación",
       "user_quotas": "Cuotas de usuario",
       "git_sync_toggle": "Sincronización Git",
+      "statistics_api": "API de estadísticas",
       "allow_executable_attachments": "Adjuntos de scripts y ejecutables",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / Correo",
@@ -3933,6 +3935,10 @@
       "access_revoked": "Acceso a la cuenta revocado",
       "app_password_created": "Contraseña de aplicación creada",
       "app_password_revoked": "Contraseña de aplicación revocada",
+      "statistics_token_created": "Token de estadísticas creado",
+      "statistics_token_revoked": "Token de estadísticas revocado",
+      "statistics_public_enabled": "Estadísticas hechas públicas",
+      "statistics_public_disabled": "Estadísticas ya no públicas",
       "workspace_created": "Espacio de trabajo creado",
       "workspace_deleted": "Espacio de trabajo eliminado",
       "workspace_shared": "Espacio de trabajo compartido",
@@ -4114,6 +4120,36 @@
       "limit_reached": "Límite alcanzado: revoca una contraseña de aplicación antes de crear otra.",
       "load_failed": "No se pudieron cargar tus contraseñas de aplicación.",
       "generic": "Algo salió mal. Inténtalo de nuevo."
+    }
+  },
+  "statistics_api": {
+    "modal": {
+      "title": "API de estadísticas",
+      "description": "Un panel como Homepage puede leer un resumen de esta instancia con un token: número de usuarios, notas y espacios de trabajo, almacenamiento usado, últimas copias de seguridad y sincronización Git, actualización disponible. Solo cifras, tamaños y fechas, nunca un nombre ni una nota. El token no da acceso a nada más.",
+      "endpoint": "Dirección",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "secret_notice": "Cópielo ahora: no se volverá a mostrar.",
+      "usage_hint": "Envíelo en una cabecera \"Authorization: Bearer <token>\".",
+      "generate": "Generar un token",
+      "regenerate": "Nuevo token",
+      "confirm": "Confirmar",
+      "revoke": "Revocar",
+      "close": "Cerrar",
+      "token": "Token {{hint}}…",
+      "created": "creado el {{date}}",
+      "last_used": "último uso el {{date}}",
+      "never_used": "nunca usado",
+      "none": "Sin token: las estadísticas están desactivadas.",
+      "none_public": "Sin token.",
+      "public": "Estadísticas públicas, sin token",
+      "public_help": "Cualquier persona que pueda acceder a esta instancia podrá leer estas cifras. Déjelo desactivado si la instancia es accesible desde Internet."
+    },
+    "status": {
+      "public": "Públicas"
+    },
+    "errors": {
+      "generic": "Algo salió mal. Inténtelo de nuevo."
     }
   },
   "two_factor": {

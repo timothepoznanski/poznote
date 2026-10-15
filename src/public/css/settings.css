@@ -305,6 +305,104 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     color: var(--pz-text-muted);
 }
 
+/* Statistics API modal (js/statistics-token.js): the address to call, the
+   token's state, and the new token shown once. Only --pz-* tokens, like the
+   app passwords modal above. */
+#statisticsTokenModal .modal-content {
+    max-width: 600px;
+}
+
+#statisticsTokenModal .statistics-token-description,
+#statisticsTokenModal .statistics-token-status,
+#statisticsTokenModal .statistics-token-hint {
+    color: var(--pz-text-muted);
+    line-height: 1.45;
+    margin: 0 0 14px 0;
+}
+
+#statisticsTokenModal .statistics-token-hint {
+    margin: 8px 0 0 0;
+    font-size: 0.9rem;
+}
+
+#statisticsTokenModal .statistics-token-field {
+    margin: 0 0 14px 0;
+}
+
+#statisticsTokenModal .statistics-token-label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+#statisticsTokenModal .statistics-token-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* One line each, scrolling inside its own box rather than widening the modal */
+#statisticsTokenModal .statistics-token-value {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 6px 8px;
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-surface-sunken);
+    font-family: monospace;
+    font-size: 0.95rem;
+    user-select: all;
+}
+
+#statisticsTokenModal .statistics-token-copy {
+    flex: 0 0 auto;
+    padding: 6px 14px;
+}
+
+#statisticsTokenModal .statistics-token-secret {
+    margin: 0 0 14px 0;
+    padding: 10px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-surface);
+}
+
+/* The public switch: a checkbox and two lines of text. modals/base.css pads
+   and spaces every modal input like a text field, which a checkbox must not
+   inherit. */
+#statisticsTokenModal .statistics-token-public {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin: 0 0 14px 0;
+    cursor: pointer;
+}
+
+#statisticsTokenModal .statistics-token-public input[type="checkbox"] {
+    flex: 0 0 auto;
+    margin: 3px 0 0 0;
+    padding: 0;
+    accent-color: var(--pz-accent);
+}
+
+#statisticsTokenModal .statistics-token-public-title {
+    display: block;
+}
+
+#statisticsTokenModal .statistics-token-public-help {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.9rem;
+    color: var(--pz-text-muted);
+    line-height: 1.45;
+}
+
+#statisticsTokenModal .statistics-token-error {
+    color: var(--pz-danger-text);
+    margin: 0 0 10px 0;
+    font-size: 0.9rem;
+}
+
 /* Two-factor modal (js/two-factor.js): one view at a time, swapped in place
    (off, scanning the secret, recovery codes, on). Only --pz-* tokens, like
    the app passwords modal above. */

@@ -491,6 +491,7 @@
       "webhooks": "通过 Webhook 将实例事件发送到外部服务。",
       "ai_assistant": "配置用于与笔记对话的 AI 助手。",
       "git_sync_enabled": "启用或禁用此实例的 Git 同步。",
+      "statistics_api": "让 Homepage 等仪表板使用只读令牌读取此实例的统计信息（用户、笔记、存储、备份、更新）。",
       "import_limits": "设置每次导入允许的最大文件数量。",
       "user_quotas": "限制每个用户的笔记数量和可用存储空间。",
       "custom_css": "应用您自己的 CSS 来自定义 Poznote 的外观。",
@@ -624,6 +625,7 @@
       "import_limits": "导入限制",
       "user_quotas": "用户配额",
       "git_sync_toggle": "Git 同步",
+      "statistics_api": "统计 API",
       "allow_executable_attachments": "脚本和可执行文件附件",
       "oidc_config": "OIDC / SSO",
       "smtp_config": "SMTP / 邮件",
@@ -4029,6 +4031,10 @@
       "access_revoked": "已撤销账户访问权限",
       "app_password_created": "已创建应用密码",
       "app_password_revoked": "已撤销应用密码",
+      "statistics_token_created": "已创建统计令牌",
+      "statistics_token_revoked": "已撤销统计令牌",
+      "statistics_public_enabled": "已公开统计",
+      "statistics_public_disabled": "已取消公开统计",
       "workspace_created": "工作区已创建",
       "workspace_deleted": "工作区已删除",
       "workspace_shared": "工作区已共享",
@@ -4210,6 +4216,36 @@
       "limit_reached": "已达上限：请先撤销一个应用密码，再创建新的。",
       "load_failed": "无法加载您的应用密码。",
       "generic": "出现错误，请重试。"
+    }
+  },
+  "statistics_api": {
+    "modal": {
+      "title": "统计 API",
+      "description": "Homepage 等仪表板可以使用令牌读取此实例的摘要：用户、笔记和工作区数量，已用存储，最近的备份和 Git 同步，可用更新。仅包含数量、大小和日期，绝不包含名称或笔记。该令牌不能访问其他任何内容。",
+      "endpoint": "地址",
+      "copy": "复制",
+      "copied": "已复制",
+      "secret_notice": "请立即复制：它不会再次显示。",
+      "usage_hint": "请在 \"Authorization: Bearer <token>\" 请求头中发送。",
+      "generate": "生成令牌",
+      "regenerate": "新令牌",
+      "confirm": "确认",
+      "revoke": "撤销",
+      "close": "关闭",
+      "token": "令牌 {{hint}}…",
+      "created": "创建于 {{date}}",
+      "last_used": "上次使用 {{date}}",
+      "never_used": "从未使用",
+      "none": "没有令牌：统计已禁用。",
+      "none_public": "没有令牌。",
+      "public": "公开统计，无需令牌",
+      "public_help": "任何能访问此实例的人都可以读取这些数据。如果实例可从互联网访问，请保持关闭。"
+    },
+    "status": {
+      "public": "公开"
+    },
+    "errors": {
+      "generic": "出错了，请重试。"
     }
   },
   "two_factor": {

@@ -47,6 +47,10 @@ const ACTIVITY_LOGIN              = 'user.login';
 const ACTIVITY_LOGOUT             = 'user.logout';
 const ACTIVITY_APP_PASSWORD_CREATED = 'app_password.created';
 const ACTIVITY_APP_PASSWORD_REVOKED = 'app_password.revoked';
+const ACTIVITY_STATISTICS_TOKEN_CREATED = 'statistics_token.created';
+const ACTIVITY_STATISTICS_TOKEN_REVOKED = 'statistics_token.revoked';
+const ACTIVITY_STATISTICS_PUBLIC_ENABLED = 'statistics_public.enabled';
+const ACTIVITY_STATISTICS_PUBLIC_DISABLED = 'statistics_public.disabled';
 const ACTIVITY_TWO_FACTOR_ENABLED  = 'two_factor.enabled';
 const ACTIVITY_TWO_FACTOR_DISABLED = 'two_factor.disabled';
 const ACTIVITY_TWO_FACTOR_RESET    = 'two_factor.reset';
@@ -73,6 +77,10 @@ function activityLogActions(): array {
         ACTIVITY_ACCESS_REVOKED,
         ACTIVITY_APP_PASSWORD_CREATED,
         ACTIVITY_APP_PASSWORD_REVOKED,
+        ACTIVITY_STATISTICS_TOKEN_CREATED,
+        ACTIVITY_STATISTICS_TOKEN_REVOKED,
+        ACTIVITY_STATISTICS_PUBLIC_ENABLED,
+        ACTIVITY_STATISTICS_PUBLIC_DISABLED,
         ACTIVITY_TWO_FACTOR_ENABLED,
         ACTIVITY_TWO_FACTOR_DISABLED,
         ACTIVITY_TWO_FACTOR_RESET,

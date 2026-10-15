@@ -60,6 +60,14 @@ $isSharedEndpoint = strpos($uri, '/api/v1/shared') !== false;
 $isPublicApiEndpoint = strpos($uri, '/api/v1/public') !== false;
 $isAttachmentDownload = $_SERVER['REQUEST_METHOD'] === 'GET' && preg_match('#/api/v1/notes/\d+/attachments/[^/]+#', $uri);
 
+// Instance statistics for dashboards: checks its own token and answers here,
+// before db_connect.php would open a user database for an anonymous caller
+if (rtrim((string)$uri, '/') === '/api/v1/public/statistics') {
+    require_once __DIR__ . '/../../../InstanceStatistics.php';
+    InstanceStatistics::serveRequest();
+    exit;
+}
+
 // Require authentication (with X-User-ID for data endpoints, without for admin/public endpoints)
 if ($isPublicApiEndpoint) {
     // No additional authentication required (token validation happens in controller)
@@ -1091,6 +1099,49 @@ $router->get('/users/lookup/{username}', function($params) use ($usersController
 // Admin: System stats
 $router->get('/admin/stats', function($params) use ($usersController) {
     echo json_encode($usersController->stats());
+});
+
+// Admin: statistics token for GET /public/statistics (shown once on creation)
+$router->get('/admin/statistics/token', function($params) {
+    require_once __DIR__ . '/../../../InstanceStatistics.php';
+    echo json_encode(['success' => true] + InstanceStatistics::tokenStatus());
+});
+
+$router->post('/admin/statistics/token', function($params) {
+    require_once __DIR__ . '/../../../InstanceStatistics.php';
+    $token = InstanceStatistics::generateToken();
+    logActivity(ACTIVITY_STATISTICS_TOKEN_CREATED, ['hint' => statisticsTokenHint($token)]);
+    http_response_code(201);
+    echo json_encode(['success' => true, 'token' => $token] + InstanceStatistics::tokenStatus());
+});
+
+$router->delete('/admin/statistics/token', function($params) {
+    require_once __DIR__ . '/../../../InstanceStatistics.php';
+    InstanceStatistics::revokeToken();
+    logActivity(ACTIVITY_STATISTICS_TOKEN_REVOKED, []);
+    echo json_encode(['success' => true] + InstanceStatistics::tokenStatus());
+});
+
+// Admin: serve GET /public/statistics to anyone, without a token (off by default)
+$router->put('/admin/statistics/public', function($params) {
+    require_once __DIR__ . '/../../../InstanceStatistics.php';
+    $input = json_decode((string)file_get_contents('php://input'), true);
+    if (!is_array($input) || !is_bool($input['enabled'] ?? null)) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error' => 'Body must be {"enabled": true|false}']);
+        return;
+    }
+    if ($input['enabled'] !== InstanceStatistics::isPublic()) {
+        InstanceStatistics::setPublic($input['enabled']);
+        logActivity($input['enabled'] ? ACTIVITY_STATISTICS_PUBLIC_ENABLED : ACTIVITY_STATISTICS_PUBLIC_DISABLED, []);
+    }
+    echo json_encode(['success' => true] + InstanceStatistics::tokenStatus());
+});
+
+// Admin: the same summary the dashboard gets, for a signed-in admin
+$router->get('/admin/statistics', function($params) {
+    require_once __DIR__ . '/../../../InstanceStatistics.php';
+    echo json_encode(['success' => true] + InstanceStatistics::cached());
 });
 
 // Admin: List all user profiles

@@ -252,6 +252,10 @@ function activityActionIcon(string $action): string {
         case ACTIVITY_ACCESS_REVOKED:     return 'lucide-key';
         case ACTIVITY_APP_PASSWORD_CREATED: return 'lucide-plug';
         case ACTIVITY_APP_PASSWORD_REVOKED: return 'lucide-plug';
+        case ACTIVITY_STATISTICS_TOKEN_CREATED: return 'lucide-bar-chart';
+        case ACTIVITY_STATISTICS_TOKEN_REVOKED: return 'lucide-bar-chart';
+        case ACTIVITY_STATISTICS_PUBLIC_ENABLED: return 'lucide-bar-chart';
+        case ACTIVITY_STATISTICS_PUBLIC_DISABLED: return 'lucide-bar-chart';
         case ACTIVITY_PROFILE_UPDATED:    return 'lucide-pencil';
         case ACTIVITY_QUOTA_UPDATED:      return 'lucide-gauge';
         case ACTIVITY_ACCOUNT_ACTIVATED:  return 'lucide-unlock';
@@ -286,6 +290,8 @@ function activityActionTone(string $action): string {
         case ACTIVITY_ACCOUNT_DEACTIVATED:
         // A new credential is a new way in; its revocation is routine.
         case ACTIVITY_APP_PASSWORD_CREATED:
+        case ACTIVITY_STATISTICS_TOKEN_CREATED:
+        case ACTIVITY_STATISTICS_PUBLIC_ENABLED:
             return 'act-warn';
         case ACTIVITY_LOGIN:
         case ACTIVITY_LOGOUT:
@@ -401,6 +407,9 @@ function activityDetailsText(string $action, ?string $json): string {
                 $parts[] = t('activity_log.details.expires_at', ['date' => $d['expires_at']], 'expires {{date}}');
             }
             return implode(' · ', $parts);
+
+        case ACTIVITY_STATISTICS_TOKEN_CREATED:
+            return empty($d['hint']) ? '' : $d['hint'] . '…';
 
         case ACTIVITY_TWO_FACTOR_RESET:
             return empty($d['performed_by'])
