@@ -25,6 +25,10 @@ A free, self-hosted, open-source alternative to Notion, Obsidian, Evernote, or O
 </h3>
 
 <p align="center">
+  <img src="images/poznote-og.png" alt="Poznote social preview" width="100%">
+</p>
+
+<p align="center">
   <img src="images/pres1.png" alt="Poznote-light" width="100%">
 </p>
 
