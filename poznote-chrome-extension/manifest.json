@@ -6,8 +6,7 @@
   "permissions": [
     "storage",
     "tabs",
-    "activeTab",
-    "scripting"
+    "activeTab"
   ],
   "optional_host_permissions": [
     "*://*/api/v1/*"

@@ -30,7 +30,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === 'searchNotes') {
-    searchNotes(message.config, message.query)
+    searchNotes(message.config, message.query, message.workspace)
       .then(sendResponse)
       .catch(err => sendResponse({ error: err.message }));
     return true;
@@ -131,7 +131,7 @@ async function loadFolders(config) {
 /**
  * Create a new note in Poznote
  * @param {Object} config - Configuration object
- * @param {Object} noteData - Note data including heading, content, tags, workspace and folder_id
+ * @param {Object} noteData - heading, entry (see buildHtmlEntry), tags, workspace and folder_id
  * @returns {Promise<Object>} Created note object
  */
 async function createNote(config, noteData) {
@@ -144,7 +144,7 @@ async function createNote(config, noteData) {
     },
     body: JSON.stringify({
       heading: noteData.heading,
-      content: noteData.content,
+      content: buildHtmlEntry(noteData.entry),
       tags: noteData.tags || '',
       workspace: noteData.workspace,
       ...(noteData.folder_id ? { folder_id: Number(noteData.folder_id) } : {})
@@ -193,16 +193,20 @@ async function apiError(response) {
 }
 
 /**
- * Notes a page can be appended to: HTML and Markdown notes of every workspace,
- * most recently modified first. An empty query lists the latest ones.
+ * Notes a page can be appended to: HTML and Markdown notes, most recently
+ * modified first. An empty query lists the latest ones.
  * @param {Object} config - Configuration object
  * @param {string} query - Words to find in the title or content
+ * @param {string} workspace - Workspace to search, empty for all of them
  * @returns {Promise<Array>} Notes with id, heading, type, workspace and folder
  */
-async function searchNotes(config, query) {
+async function searchNotes(config, query, workspace) {
   const params = new URLSearchParams({ sort: 'updated_desc', limit: '40' });
   if (query) {
     params.set('search', query);
+  }
+  if (workspace) {
+    params.set('workspace', workspace);
   }
   const response = await fetch(`${config.appUrl}/api/v1/notes?${params}`, {
     headers: getHeaders(config)
@@ -263,7 +267,7 @@ async function uploadImageAttachment(config, noteId, dataUrl, fileName) {
  * returned and the write is tried again.
  * @param {Object} config - Configuration object
  * @param {number} noteId - Target note
- * @param {Object} entry - { title, url, preview: {src, alt}|null, screenshot: dataUrl|null }
+ * @param {Object} entry - { url, screenshot: dataUrl|null }
  * @returns {Promise<Object>} The note's id and heading
  */
 async function appendToNote(config, noteId, entry) {
@@ -282,16 +286,12 @@ async function appendToNote(config, noteId, entry) {
 
   let block;
   if (note.type === 'markdown') {
-    // Markdown has no room for a data: image, so pictures become attachments first
-    let previewSrc = entry.preview ? entry.preview.src : '';
-    if (previewSrc.startsWith('data:')) {
-      previewSrc = await uploadImageAttachment(config, noteId, previewSrc, 'preview' + imageExtension(previewSrc));
-    }
+    // Markdown has no room for a data: image, so the screenshot becomes an attachment first
     let screenshotSrc = '';
     if (entry.screenshot) {
       screenshotSrc = await uploadImageAttachment(config, noteId, entry.screenshot, 'screenshot.png');
     }
-    block = buildMarkdownEntry(entry, previewSrc, screenshotSrc);
+    block = buildMarkdownEntry(entry, screenshotSrc);
   } else {
     // The server turns data: images of an HTML note into attachments by itself
     block = buildHtmlEntry(entry);
@@ -342,23 +342,15 @@ function escapeHtml(value) {
     .replace(/"/g, '&quot;');
 }
 
-function imageExtension(dataUrl) {
-  const match = /^data:image\/([a-z0-9.+-]+)/i.exec(dataUrl);
-  const subtype = match ? match[1].toLowerCase() : 'png';
-  if (subtype === 'jpeg') return '.jpg';
-  if (subtype === 'svg+xml') return '.svg';
-  return '.' + subtype.replace(/[^a-z0-9]/g, '');
-}
-
 /**
- * One saved page in an HTML note: the title as a link, then the preview or the screenshot
+ * One saved page in an HTML note: its address as a link and, for a
+ * screenshot, an empty line then the picture
  */
 function buildHtmlEntry(entry) {
-  let html = `<p>🌐 <a href="${escapeHtml(entry.url)}" target="_blank">${escapeHtml(entry.title)}</a></p>`;
+  const url = escapeHtml(entry.url);
+  let html = `<p><a href="${url}" target="_blank">${url}</a></p>`;
   if (entry.screenshot) {
-    html += `<p><img src="${entry.screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto;" /></p>`;
-  } else if (entry.preview) {
-    html += `<p><img src="${escapeHtml(entry.preview.src)}" alt="${escapeHtml(entry.preview.alt)}" style="max-width: 320px; height: auto;" /></p>`;
+    html += `<p><br></p><p><img src="${entry.screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto;" /></p>`;
   }
   return html;
 }
@@ -366,15 +358,13 @@ function buildHtmlEntry(entry) {
 /**
  * The same entry in Markdown
  */
-function buildMarkdownEntry(entry, previewSrc, screenshotSrc) {
-  const title = entry.title.replace(/([\\[\]])/g, '\\$1');
+function buildMarkdownEntry(entry, screenshotSrc) {
   // Poznote's parser ends a link at the first ")" and has no <url> form
-  const target = url => url.replace(/[\s()<>]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
-  let md = `🌐 [${title}](${target(entry.url)})`;
+  const target = entry.url.replace(/[\s()<>]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, '0'));
+  const label = entry.url.replace(/([\\[\]])/g, '\\$1');
+  let md = `[${label}](${target})`;
   if (screenshotSrc) {
-    md += `\n\n![Page Screenshot](${screenshotSrc})`;
-  } else if (previewSrc) {
-    md += `\n\n![${title}](${target(previewSrc)})`;
+    md += `\n\n<br>\n\n![Page Screenshot](${screenshotSrc})`;
   }
   return md;
 }

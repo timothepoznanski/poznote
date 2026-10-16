@@ -78,54 +78,6 @@
       min-width: 160px;
     }
 
-    /* The page being saved */
-    .page-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-    }
-
-    .favicon {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 28px;
-      height: 28px;
-      flex-shrink: 0;
-      border-radius: 6px;
-      background: var(--bg);
-      color: var(--text-muted);
-    }
-
-    .favicon img {
-      width: 16px;
-      height: 16px;
-    }
-
-    .page-text {
-      min-width: 0;
-    }
-
-    .page-title,
-    .page-host {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .page-title {
-      font-weight: 500;
-    }
-
-    .page-host {
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-
     /* New note / existing note */
     .segmented {
       display: grid;
@@ -209,6 +161,59 @@
 
     .search input {
       padding-left: 32px;
+    }
+
+    /* Search the destination workspace only, or every workspace */
+    .switch-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      align-self: flex-start;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .switch-row input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .switch {
+      position: relative;
+      width: 28px;
+      height: 16px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      background: var(--border-strong);
+      transition: background-color 0.15s;
+    }
+
+    .switch::after {
+      content: "";
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      transition: transform 0.15s;
+    }
+
+    .switch-row input:checked + .switch {
+      background: var(--accent-fill);
+    }
+
+    .switch-row input:checked + .switch::after {
+      transform: translateX(12px);
+    }
+
+    .switch-row input:focus-visible + .switch {
+      box-shadow: 0 0 0 3px var(--focus);
     }
 
     .note-results {
@@ -316,7 +321,6 @@
     <symbol id="i-file-plus" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 18v-6"/></symbol>
     <symbol id="i-list-plus" viewBox="0 0 24 24"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/></symbol>
     <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
-    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
   </svg>
 
   <header class="top">
@@ -336,14 +340,6 @@
   </section>
 
   <main class="view" id="mainView" hidden>
-    <div class="page-card">
-      <div class="favicon" id="pageIcon"><svg class="icon"><use href="#i-globe"/></svg></div>
-      <div class="page-text">
-        <div class="page-title" id="pageTitle"></div>
-        <div class="page-host" id="pageHost"></div>
-      </div>
-    </div>
-
     <div class="segmented" role="tablist" aria-label="Destination">
       <button id="modeNew" role="tab" aria-selected="true" title="Save the page as a new note">
         <svg class="icon"><use href="#i-file-plus"/></svg>New note
@@ -364,11 +360,16 @@
         <svg class="icon"><use href="#i-search"/></svg>
         <input type="search" id="noteSearch" placeholder="Search notes" autocomplete="off" aria-label="Search notes">
       </div>
+      <label class="switch-row">
+        <input type="checkbox" id="allWorkspaces" role="switch">
+        <span class="switch" aria-hidden="true"></span>
+        <span>All workspaces</span>
+      </label>
       <ul class="note-results" id="noteResults" role="listbox" aria-label="Notes"></ul>
     </div>
 
     <div class="actions">
-      <button class="btn btn-primary" id="saveNote" title="Save the link and the page's preview picture">
+      <button class="btn btn-primary" id="saveNote" title="Save the page's address">
         <svg class="icon"><use href="#i-link"/></svg>Save link
       </button>
       <button class="btn btn-secondary" id="saveScreenshot" title="Save the link with a screenshot of the visible page">

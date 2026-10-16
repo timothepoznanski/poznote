@@ -60,7 +60,7 @@ PR에는 PHP 문법, PHP 단위 테스트, 스타일시트, JavaScript, 번역 �
 php tests/run.php                                     # 단위 테스트
 php tools/css-check.php                               # 스타일시트
 find . -name "*.php" -print0 | xargs -0 -n1 php -l >/dev/null   # PHP 문법
-npx --yes oxlint@1.55.0 src poznote-url-saver build    # JavaScript
+npx --yes oxlint@1.55.0 src poznote-chrome-extension build    # JavaScript
 python3 tools/docs-i18n.py check                      # 번역 문서
 ```
 

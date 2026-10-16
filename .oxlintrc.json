@@ -7,7 +7,7 @@
   //
   // Run locally the way CI does (keep the paths in sync with ci-js.yml):
   //   npx --yes oxlint@1.55.0 \
-  //     src poznote-url-saver build
+  //     src poznote-chrome-extension build
   //
   // The oxlint version is PINNED in .github/workflows/ci-js.yml (env block).
   // That block also holds the procedure to follow when upgrading it: a new

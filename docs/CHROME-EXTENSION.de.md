@@ -13,7 +13,7 @@
 
 # Poznote Chrome-Erweiterung
 
-**Poznote URL Saver** ist eine Browsererweiterung, die die aktuelle Seite mit einem Klick in Ihrer Poznote-Instanz speichert: ihren Link mit ihrem Vorschaubild oder einen Screenshot, als neue Notiz oder am Ende einer bestehenden Notiz.
+**Poznote URL Saver** ist eine Browsererweiterung, die die aktuelle Seite mit einem Klick in Ihrer Poznote-Instanz speichert: ihre Adresse, allein oder mit einem Screenshot, als neue Notiz oder am Ende einer bestehenden Notiz.
 
 <p align="center">
   <img src="../images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
@@ -39,6 +39,6 @@ Ihr Kontopasswort funktioniert hier ebenfalls, doch für eine Erweiterung ist ei
 Klicken Sie auf der Seite, die Sie behalten möchten, auf das Symbol der Erweiterung und wählen Sie das Ziel:
 
 - **New note** erstellt eine Notiz mit dem Namen der Seite, im Arbeitsbereich und Ordner aus den Einstellungen.
-- **Existing note** fügt die Seite am Ende einer Notiz ein, die Sie in der Liste auswählen. Die Liste zeigt Ihre neuesten Notizen und durchsucht sie während der Eingabe. Die Erweiterung merkt sich diese Notiz für die nächste Seite, sodass das Sammeln von Links in einer Leseliste nur einen Klick pro Seite braucht. HTML- und Markdown-Notizen können Seiten aufnehmen.
+- **Existing note** fügt die Seite am Ende einer Notiz ein, die Sie in der Liste auswählen. Die Liste zeigt Ihre neuesten Notizen und durchsucht sie während der Eingabe. Sie enthält die Notizen des in den Einstellungen gewählten Arbeitsbereichs; aktivieren Sie **All workspaces**, um eine Notiz aus jedem Arbeitsbereich zu wählen. Die Erweiterung merkt sich diese Notiz für die nächste Seite, sodass das Sammeln von Links in einer Leseliste nur einen Klick pro Seite braucht. HTML- und Markdown-Notizen können Seiten aufnehmen.
 
-Klicken Sie dann auf **Save link**, um den Link mit dem Vorschaubild der Seite zu speichern, sofern sie eines hat, oder auf **Screenshot**, um den Link mit einem Bild des sichtbaren Seitenbereichs zu speichern. Die Bestätigung enthält einen Link, der die Notiz in Poznote öffnet.
+Klicken Sie dann auf **Save link**, um die Adresse der Seite zu speichern, oder auf **Screenshot**, um die Adresse gefolgt von einem Bild des sichtbaren Seitenbereichs zu speichern. Die Bestätigung enthält einen Link, der die Notiz in Poznote öffnet.

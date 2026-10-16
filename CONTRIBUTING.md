@@ -62,7 +62,7 @@ You do not need to run anything locally. If you would rather catch a mistake bef
 php tests/run.php                                     # unit tests
 php tools/css-check.php                               # stylesheets
 find . -name "*.php" -print0 | xargs -0 -n1 php -l >/dev/null   # PHP syntax
-npx --yes oxlint@1.55.0 src poznote-url-saver build    # JavaScript
+npx --yes oxlint@1.55.0 src poznote-chrome-extension build    # JavaScript
 python3 tools/docs-i18n.py check                      # translated docs
 ```
 

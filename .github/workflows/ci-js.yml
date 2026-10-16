@@ -44,7 +44,7 @@ on:
 #   1. Set OXLINT_VERSION to the new release.
 #   2. Run the exact same command as the job below, from the repo root:
 #        npx --yes oxlint@<VERSION> \
-#          src poznote-url-saver build
+#          src poznote-chrome-extension build
 #   3. Read the ERROR lines only. Warnings never fail the build and can be
 #      left alone. For each new error, decide:
 #        - a genuine bug        -> fix the code
@@ -86,4 +86,4 @@ jobs:
       - name: Lint JavaScript
         run: |
           npx --yes "oxlint@${OXLINT_VERSION}" \
-            src poznote-url-saver build
+            src poznote-chrome-extension build

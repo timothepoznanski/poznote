@@ -22,7 +22,7 @@ data
 docs
 images
 mcp-server
-poznote-url-saver
+poznote-chrome-extension
 tools
 
 # Tests and static analysis tooling - never part of the runtime image

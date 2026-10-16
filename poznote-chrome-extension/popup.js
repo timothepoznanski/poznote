@@ -1,60 +1,3 @@
-/**
- * Runs inside the saved page: finds the picture the page gives for link
- * previews (og:image, twitter:image) and, when the site lets the page read it,
- * returns it as a data: URL so Poznote keeps its own copy. Otherwise the https
- * address alone is returned and the note shows the remote picture.
- */
-async function collectPagePreview() {
-  const pick = selector => {
-    const el = document.querySelector(selector);
-    return el ? (el.getAttribute('content') || el.getAttribute('href') || '') : '';
-  };
-  const raw = pick('meta[property="og:image:secure_url"]') ||
-    pick('meta[property="og:image"]') ||
-    pick('meta[name="og:image"]') ||
-    pick('meta[name="twitter:image"]') ||
-    pick('meta[name="twitter:image:src"]') ||
-    pick('link[rel="image_src"]');
-
-  let image = '';
-  try {
-    const url = new URL(raw.trim(), document.baseURI);
-    if (raw.trim() && url.protocol === 'https:') {
-      image = url.href;
-    }
-  } catch (e) {
-    // No usable preview
-  }
-  if (!image) {
-    return null;
-  }
-
-  let imageData = '';
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 4000);
-    const response = await fetch(image, { signal: controller.signal, credentials: 'omit' });
-    const type = response.headers.get('content-type') || '';
-    if (response.ok && /^image\/(png|jpe?g|gif|webp)/i.test(type)) {
-      const blob = await response.blob();
-      if (blob.size <= 2 * 1024 * 1024) {
-        imageData = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-      }
-    }
-    clearTimeout(timer);
-  } catch (e) {
-    // Cross-origin picture the page cannot read: keep its address
-  }
-  return { src: imageData || image, alt: document.title || '' };
-}
-
-// ---------------------------------------------------------------------------
-
 document.addEventListener('DOMContentLoaded', async () => {
   const $ = id => document.getElementById(id);
   const connectView = $('connectView');
@@ -66,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const appendPanel = $('appendPanel');
   const noteSearch = $('noteSearch');
   const noteResults = $('noteResults');
+  const allWorkspacesToggle = $('allWorkspaces');
   const saveNoteBtn = $('saveNote');
   const saveScreenshotBtn = $('saveScreenshot');
 
@@ -73,6 +17,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   let tab = null;
   let saveMode = 'new';
   let targetNote = null;
+  let allWorkspaces = false;
+  // Workspace that new notes go to, the only one listed outside "All workspaces"
+  const destinationWorkspace = () => (config && config.workspace) || 'Poznote';
   let searchTimer = null;
   let searchRequest = 0;
 
@@ -140,23 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('destLabel').textContent = [config.workspace || 'Poznote', config.folder].filter(Boolean).join(' / ');
   mainView.hidden = false;
 
-  // --- The page being saved -------------------------------------------------
-
   [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-  if (tab) {
-    $('pageTitle').textContent = tab.title || 'Untitled page';
-    try {
-      $('pageHost').textContent = new URL(tab.url).host || tab.url;
-    } catch (e) {
-      $('pageHost').textContent = tab.url || '';
-    }
-    if (tab.favIconUrl && /^https?:|^data:/.test(tab.favIconUrl)) {
-      const img = document.createElement('img');
-      img.alt = '';
-      img.src = tab.favIconUrl;
-      img.addEventListener('load', () => $('pageIcon').replaceChildren(img));
-    }
-  }
 
   // --- New note or existing note --------------------------------------------
 
@@ -171,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     appendPanel.hidden = saveMode !== 'append';
     status.hidden = true;
     if (remember) {
-      chrome.storage.local.set({ poznoteAppend: { mode: saveMode, note: targetNote } });
+      rememberAppend();
     }
     if (saveMode === 'append') {
       searchNotes(noteSearch.value.trim());
@@ -179,9 +110,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // The mode, the picked note and the workspace scope are kept for the next time the popup opens
+  function rememberAppend() {
+    chrome.storage.local.set({ poznoteAppend: { mode: saveMode, note: targetNote, allWorkspaces } });
+  }
+
   function selectTargetNote(note) {
     targetNote = { id: note.id, heading: note.heading, type: note.type, workspace: note.workspace, folder: note.folder };
-    chrome.storage.local.set({ poznoteAppend: { mode: saveMode, note: targetNote } });
+    rememberAppend();
     noteResults.querySelectorAll('li[data-id]').forEach(li => {
       const selected = Number(li.dataset.id) === targetNote.id;
       li.classList.toggle('selected', selected);
@@ -253,7 +189,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!noteResults.children.length) {
       placeholder('Loading notes...');
     }
-    const response = await chrome.runtime.sendMessage({ type: 'searchNotes', config, query });
+    const response = await chrome.runtime.sendMessage({
+      type: 'searchNotes',
+      config,
+      query,
+      workspace: allWorkspaces ? '' : destinationWorkspace()
+    });
     if (request !== searchRequest) {
       return; // A newer search was started meanwhile
     }
@@ -288,27 +229,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  /**
+   * Outside "All workspaces", a note of another workspace cannot stay the
+   * target: it would receive pages without being shown in the list.
+   */
+  function dropHiddenTarget() {
+    if (!allWorkspaces && targetNote && targetNote.workspace && targetNote.workspace !== destinationWorkspace()) {
+      targetNote = null;
+    }
+  }
+
+  allWorkspacesToggle.addEventListener('change', () => {
+    allWorkspaces = allWorkspacesToggle.checked;
+    dropHiddenTarget();
+    rememberAppend();
+    searchNotes(noteSearch.value.trim());
+  });
+
   const { poznoteAppend } = await chrome.storage.local.get(['poznoteAppend']);
   targetNote = (poznoteAppend && poznoteAppend.note) || null;
+  allWorkspaces = Boolean(poznoteAppend && poznoteAppend.allWorkspaces);
+  allWorkspacesToggle.checked = allWorkspaces;
+  dropHiddenTarget();
   setSaveMode(poznoteAppend ? poznoteAppend.mode : 'new', false);
 
   // --- Saving ---------------------------------------------------------------
-
-  /**
-   * The page's preview picture, or null on pages extensions cannot script
-   * (chrome://, the Web Store) and pages without one
-   */
-  async function readPagePreview(tabId) {
-    try {
-      const [injection] = await chrome.scripting.executeScript({
-        target: { tabId },
-        func: collectPagePreview
-      });
-      return (injection && injection.result) || null;
-    } catch (e) {
-      return null;
-    }
-  }
 
   saveNoteBtn.addEventListener('click', () => saveToNote('url', saveNoteBtn));
   saveScreenshotBtn.addEventListener('click', () => saveToNote('screenshot', saveScreenshotBtn));
@@ -331,19 +276,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     setBusy(button, true);
     try {
-      const pageTitle = tab.title || 'Untitled Page';
-      const pageUrl = tab.url;
-
-      // A screenshot, or the page's own preview picture for a plain link
-      let screenshot = null;
-      let preview = null;
-      if (contentType === 'url') {
-        showStatus('Reading the page...', 'loading');
-        preview = await readPagePreview(tab.id);
-      } else {
+      const entry = { url: tab.url, screenshot: null };
+      if (contentType === 'screenshot') {
         showStatus('Capturing the page...', 'loading');
         try {
-          screenshot = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' });
+          entry.screenshot = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' });
         } catch (error) {
           showStatus('Screenshot failed: ' + error.message, 'error');
           return;
@@ -356,7 +293,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           type: 'appendToNote',
           config,
           noteId: targetNote.id,
-          entry: { title: pageTitle, url: pageUrl, preview, screenshot }
+          entry
         });
         if (response.error) {
           showStatus(response.error, 'error');
@@ -369,21 +306,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const safeUrl = escapeHtml(pageUrl);
-      let content = `<p><a href="${safeUrl}" target="_blank">${safeUrl}</a></p>`;
-      if (screenshot) {
-        content += `<p><img src="${screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto;" /></p>`;
-      } else if (preview) {
-        content += `<p><img src="${escapeHtml(preview.src)}" alt="${escapeHtml(preview.alt)}" style="max-width: 320px; height: auto;" /></p>`;
-      }
-
       showStatus('Creating the note...', 'loading');
       const response = await chrome.runtime.sendMessage({
         type: 'createNote',
         config,
         noteData: {
-          heading: `🌐 ${pageTitle}`,
-          content,
+          heading: `🌐 ${tab.title || 'Untitled Page'}`,
+          entry,
           workspace: config.workspace || 'Poznote',
           folder_id: config.folder_id || ''
         }

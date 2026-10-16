@@ -13,7 +13,7 @@
 
 # Poznote Chrome Extension
 
-The **Poznote URL Saver** is a browser extension that saves the current page to your Poznote instance in one click: its link with its preview picture, or a screenshot, as a new note or at the end of a note you already have.
+The **Poznote URL Saver** is a browser extension that saves the current page to your Poznote instance in one click: its address, or its address with a screenshot, as a new note or at the end of a note you already have.
 
 <p align="center">
   <img src="../images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
@@ -39,6 +39,6 @@ Your account password works here too, but an app password is the better credenti
 Click the extension's icon on the page you want to keep, then choose where it goes:
 
 - **New note** creates a note named after the page, in the workspace and folder picked in the settings.
-- **Existing note** adds the page at the end of a note you pick in the list, which shows your latest notes and searches them as you type. The extension remembers that note for the next page, so collecting links in a single reading list takes one click per page. HTML and Markdown notes can receive pages.
+- **Existing note** adds the page at the end of a note you pick in the list, which shows your latest notes and searches them as you type. It lists the notes of the workspace picked in the settings; turn on **All workspaces** to pick a note anywhere. The extension remembers that note for the next page, so collecting links in a single reading list takes one click per page. HTML and Markdown notes can receive pages.
 
-Then click **Save link** to save the link with the page's preview picture when the page has one, or **Screenshot** to save the link with a picture of the visible part of the page. The confirmation has a link that opens the note in Poznote.
+Then click **Save link** to save the page's address, or **Screenshot** to save the address followed by a picture of the visible part of the page. The confirmation has a link that opens the note in Poznote.

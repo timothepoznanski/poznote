@@ -13,7 +13,7 @@
 
 # Extensão do Chrome do Poznote
 
-O **Poznote URL Saver** é uma extensão de navegador que salva a página atual na sua instância do Poznote com um clique: o link com a imagem de prévia, ou uma captura de tela, em uma nota nova ou no fim de uma nota que você já tem.
+O **Poznote URL Saver** é uma extensão de navegador que salva a página atual na sua instância do Poznote com um clique: o endereço, sozinho ou seguido de uma captura de tela, em uma nota nova ou no fim de uma nota que você já tem.
 
 <p align="center">
   <img src="../images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
@@ -39,6 +39,6 @@ A senha da sua conta também funciona aqui, mas uma senha de aplicativo é a cre
 Clique no ícone da extensão na página que você quer guardar e escolha o destino:
 
 - **New note** cria uma nota com o nome da página, no espaço de trabalho e na pasta escolhidos nas configurações.
-- **Existing note** adiciona a página no fim de uma nota escolhida na lista, que mostra as suas notas mais recentes e as pesquisa enquanto você digita. A extensão lembra dessa nota para a próxima página, então juntar links em uma mesma lista de leitura leva um clique por página. Notas HTML e Markdown podem receber páginas.
+- **Existing note** adiciona a página no fim de uma nota escolhida na lista, que mostra as suas notas mais recentes e as pesquisa enquanto você digita. Ela mostra as notas do espaço de trabalho escolhido nas configurações; ative **All workspaces** para escolher uma nota de qualquer espaço. A extensão lembra dessa nota para a próxima página, então juntar links em uma mesma lista de leitura leva um clique por página. Notas HTML e Markdown podem receber páginas.
 
-Depois clique em **Save link** para salvar o link com a imagem de prévia da página quando ela tiver uma, ou em **Screenshot** para salvar o link com uma imagem da parte visível da página. A confirmação traz um link que abre a nota no Poznote.
+Depois clique em **Save link** para salvar o endereço da página, ou em **Screenshot** para salvar o endereço seguido de uma imagem da parte visível da página. A confirmação traz um link que abre a nota no Poznote.
