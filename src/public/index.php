@@ -423,6 +423,30 @@ if ($center_note_content_enabled && $width_value !== '1' && $width_value !== 'tr
             }
         })();
     </script>
+    <?php if ($res_right && $note === ''): ?>
+    <style>html.landing-note-pending #right_col > * { visibility: hidden; }</style>
+    <script>
+        // The URL named no note, so the pane holds the last opened one (issue
+        // #1630). A stored tab state with no tab means every tab was closed:
+        // js/tabs.js empties the pane again once the deferred bundle runs, and
+        // the note would flash until then (issue #1644). Hide it before the
+        // first paint; tabs.js lifts the class, the load handler is a fallback.
+        (function () {
+            try {
+                var key = window.__poznoteTabsStorageKey(<?php echo json_encode($workspace_filter, JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP); ?>);
+                var stored = JSON.parse(localStorage.getItem(key) || 'null');
+                if (!stored || !Array.isArray(stored.tabs) || stored.tabs.length !== 0) return;
+                var root = document.documentElement;
+                root.classList.add('landing-note-pending', 'outline-no-note');
+                window.addEventListener('load', function () {
+                    root.classList.remove('landing-note-pending');
+                });
+            } catch (_error) {
+                console.debug('index: landing note check failed:', _error);
+            }
+        })();
+    </script>
+    <?php endif; ?>
     <script src="pwa/pwa.js?v=<?php echo $v; ?>" defer></script>
     <script>window.ALLOWED_IFRAME_DOMAINS = <?php echo json_encode(ALLOWED_IFRAME_DOMAINS); ?>;</script>
     <meta name="color-scheme" content="dark light">
