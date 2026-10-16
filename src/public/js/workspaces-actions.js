@@ -415,11 +415,13 @@ function handleSelectButtonClick(e) {
     window.location = 'index.php?workspace=' + encodeURIComponent(name);
 }
 
-// Handle delete button clicks
+// Handle delete button clicks (the label printed in the actions menu is a
+// child of the button, so the click can land on it: #1642)
 function handleDeleteButtonClick(e) {
-    if (e.target && e.target.classList && e.target.classList.contains('btn-delete')) {
-        var workspaceName = e.target.getAttribute('data-ws');
-        if (!workspaceName || e.target.disabled) return;
+    var button = e.target && e.target.closest ? e.target.closest('.workspace-list .btn-delete') : null;
+    if (button) {
+        var workspaceName = button.getAttribute('data-ws');
+        if (!workspaceName || button.disabled) return;
 
         // Populate modal with workspace name
         document.getElementById('deleteWorkspaceName').textContent = workspaceName;
@@ -436,7 +438,7 @@ function handleDeleteButtonClick(e) {
             confirmBtn.disabled = inputEl.value.trim() !== workspaceName;
         }
 
-        inputEl.addEventListener('input', checkInput);
+        inputEl.oninput = checkInput;
         checkInput(); // initial check
 
         // Set up confirm button handler
