@@ -395,18 +395,49 @@ function markupColourCount(string $path, string $body): int
     return $n;
 }
 
-/** PHP is tokenised, so a # comment and a colour in a string never blur. */
+/**
+ * PHP is tokenised, so a # comment and a colour in a string never blur.
+ *
+ * An inline <script> is HTML to the tokeniser, so its JS comments survive and
+ * an issue number cited there (issue #1630) counted as a colour. Inside a
+ * <script>, a // or /* comment that opens its line is dropped too. Only at
+ * the start of a line: the script is cut by every <?php echo ?>, so the JS
+ * scanner cannot tell a string from code across the cut, and a // after code
+ * may sit inside a string ('https://...').
+ */
 function markupStripPhpComments(string $body): string
 {
     $out = '';
+    $inScript = false;
     foreach (token_get_all($body) as $token) {
         if (is_array($token)) {
-            if ($token[0] !== T_COMMENT && $token[0] !== T_DOC_COMMENT) {
+            if ($token[0] === T_INLINE_HTML) {
+                $out .= markupStripInlineScriptComments($token[1], $inScript);
+            } elseif ($token[0] !== T_COMMENT && $token[0] !== T_DOC_COMMENT) {
                 $out .= $token[1];
             }
             continue;
         }
         $out .= $token;
+    }
+    return $out;
+}
+
+/** Drops the line-leading JS comments of the <script> parts of an HTML chunk. */
+function markupStripInlineScriptComments(string $html, bool &$inScript): string
+{
+    $parts = preg_split('/(<script\b[^>]*>|<\/script\s*>)/i', $html, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $out = '';
+    foreach ($parts as $part) {
+        if (preg_match('/^<script\b/i', $part)) {
+            $inScript = true;
+        } elseif (preg_match('/^<\/script/i', $part)) {
+            $inScript = false;
+        } elseif ($inScript) {
+            $part = preg_replace('~^([ \t]*)/\*.*?\*/~ms', '$1', $part);
+            $part = preg_replace('~^([ \t]*)//[^\n]*~m', '$1', $part);
+        }
+        $out .= $part;
     }
     return $out;
 }
