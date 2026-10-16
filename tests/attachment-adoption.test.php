@@ -24,6 +24,16 @@ test('another host, or an address inside another URL, is not ours to resolve', f
     assertSame([], poznoteFindAttachmentRefs($content, 'notes.example.com'));
 });
 
+test('the host with the forwarded port counts as ours too (#1628)', function () {
+    $content = '<img src="http://192.168.1.5:8040/api/v1/notes/4/attachments/aaa">'
+        . '<img src="http://192.168.1.5/api/v1/notes/4/attachments/bbb">'
+        . '<img src="http://192.168.1.5:9999/api/v1/notes/4/attachments/ccc">';
+    $refs = poznoteFindAttachmentRefs($content, ['192.168.1.5', '192.168.1.5:8040']);
+    assertSame(['aaa', 'bbb'], array_column($refs, 'attachment'));
+    // A Host header without the port alone keeps refusing the address with it.
+    assertSame(['bbb'], array_column(poznoteFindAttachmentRefs($content, '192.168.1.5'), 'attachment'));
+});
+
 test('only what the note does not already own at its own address is foreign', function () {
     $refs = poznoteFindAttachmentRefs(
         '<img src="/api/v1/notes/5/attachments/own1"><img src="/api/v1/notes/5/attachments/lost">'
