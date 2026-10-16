@@ -1837,8 +1837,13 @@ def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None)
 
 @mcp.tool()
 def list_workspaces(user_id: Optional[int] = None) -> str:
-    """List all available workspaces
-    
+    """List the workspaces of this profile
+
+    Only the profile's own workspaces. A workspace another user shares with
+    this profile is not listed here and cannot be opened through the API (its
+    notes belong to the owner's profile): `list_shared_with_me` names those
+    under `shared_workspaces`, and the user opens them in the web interface.
+
     Args:
         user_id: User profile ID to access (optional, overrides default)
     """
@@ -2958,15 +2963,17 @@ def list_shared(workspace: Optional[str] = None, user_id: Optional[int] = None) 
 
 @mcp.tool()
 def list_shared_with_me(user_id: Optional[int] = None) -> str:
-    """List notes and folders OTHER USERS have shared with this profile
+    """List notes, folders and workspaces OTHER USERS have shared with this profile
 
     Use this to find an incoming share. `list_shared` lists the shares this
     profile has CREATED, so a grantee sees nothing there — an incoming share is
     only reachable through this tool.
 
     Each entry carries `owner_id`, `owner_name` and the owner's `workspace`.
-    Workspaces shared with this profile are not listed here, only notes and
-    folders shared individually.
+    `shared_workspaces` names the workspaces shared with this profile as a
+    whole. They are listed so you know they exist: their notes belong to the
+    owner's profile and cannot be read or changed through these tools, the
+    user opens them in the web interface.
 
     Args:
         user_id: User profile ID to access (optional, overrides default)
@@ -2981,6 +2988,7 @@ def list_shared_with_me(user_id: Optional[int] = None) -> str:
     return json.dumps({
         "shared_notes_count": len(shared.get("shared_notes", [])),
         "shared_folders_count": len(shared.get("shared_folders", [])),
+        "shared_workspaces_count": len(shared.get("shared_workspaces", [])),
         **shared,
     }, indent=2, ensure_ascii=False)
 

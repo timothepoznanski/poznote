@@ -454,7 +454,7 @@ class PoznoteClient:
         return []
 
     def list_workspaces(self, user_id: str | int | None = None) -> list[dict]:
-        """List all available workspaces"""
+        """List the profile's own workspaces (not the ones shared with it)"""
         response = self.client.get("/workspaces", headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
@@ -1214,7 +1214,7 @@ class PoznoteClient:
         return {"shared_notes": [], "shared_folders": []}
 
     def list_shared_with_me(self, user_id: str | int | None = None) -> dict:
-        """Notes and folders other users have shared with this profile.
+        """Notes, folders and workspaces other users have shared with this profile.
 
         Distinct from list_shared(), which lists the shares THIS profile has
         CREATED. A grantee sees nothing there, which is why an incoming share
@@ -1222,19 +1222,26 @@ class PoznoteClient:
 
         No workspace filter: the endpoint takes none, and the workspace of an
         incoming share belongs to its owner, not to this profile.
+
+        Shared workspaces come in their own list, for discovery: API
+        credentials act on their own profile, so their notes cannot be read
+        through the API.
         """
         response = self.client.get("/shared/with-me", headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
-        items = data.get("items") if isinstance(data, dict) else None
-        if not isinstance(items, list):
-            return {"shared_notes": [], "shared_folders": []}
-        items = [i for i in items if isinstance(i, dict)]
+        if not isinstance(data, dict):
+            data = {}
+        items = data.get("items")
+        items = [i for i in items if isinstance(i, dict)] if isinstance(items, list) else []
+        workspaces = data.get("shared_workspaces")
+        workspaces = [w for w in workspaces if isinstance(w, dict)] if isinstance(workspaces, list) else []
         # One flat list carrying a `_type` discriminator, split to match the
         # shape list_shared() returns.
         return {
             "shared_notes": [i for i in items if i.get("_type") == "shared_with_me_note"],
             "shared_folders": [i for i in items if i.get("_type") == "shared_with_me_folder"],
+            "shared_workspaces": workspaces,
         }
 
     def close(self):

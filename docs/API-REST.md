@@ -102,7 +102,7 @@ By default, the accepted JWT `aud` claim is the configured OIDC Client ID. If yo
 
 Poznote supports multiple user profiles, each with their own isolated data. For API calls that access **user data** (notes, folders, workspaces, tags, attachments, backups, settings, etc.), Basic Auth with an account password and internal service-token requests must include the `X-User-ID` header. OIDC Bearer JWT requests use the token-linked profile by default and only need `X-User-ID` when an admin token targets another profile. App passwords always act on the profile they belong to.
 
-Account-access grants configured in the web admin UI only apply to interactive browser sessions after login account selection. They do not allow non-admin API credentials to use `X-User-ID` for another profile. API access to another user's data requires administrator credentials or the internal service token.
+Account-access grants configured in the web admin UI only apply to interactive browser sessions after login account selection. They do not allow non-admin API credentials to use `X-User-ID` for another profile. The same goes for a workspace another user shares with you: `GET /shared/with-me` lists it, but its notes are only reached from the web interface. API access to another user's data requires administrator credentials or the internal service token.
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
@@ -1826,12 +1826,28 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 GET /shared/with-me
 ```
 
-List notes and folders shared with the current user by other users.
+List notes and folders shared with the current user by other users, in `items`, and the workspaces other users share with them, in `shared_workspaces`.
 
 ```bash
 curl -u 'username:password' \
   http://YOUR_SERVER/api/v1/shared/with-me
 ```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "items": [
+    { "_type": "shared_with_me_note", "note_id": 12, "heading": "Roadmap", "workspace": "Poznote", "owner_id": 1, "owner_name": "alice", "url": "http://YOUR_SERVER/abc123" }
+  ],
+  "shared_workspaces": [
+    { "workspace": "Ankh Labs", "owner_id": 1, "owner_name": "alice" }
+  ]
+}
+```
+
+A shared workspace is listed so that a client knows it exists, it cannot be opened through the API. Its notes live in the owner's profile, and API credentials act on their own profile only, the same rule as for account-access grants (see [Multi-User Mode](#multi-user-mode)). Open it from the workspace menu of the web interface, under *Shared with me*.
 
 ---
 
@@ -2640,6 +2656,8 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   ]
 }
 ```
+
+The list holds the workspaces of the profile the request acts on. A workspace another user shares with you is not part of it: API credentials act on their own profile only, so its notes are reached from the web interface. `GET /shared/with-me` lists those workspaces under `shared_workspaces`.
 
 ### Create Workspace
 
