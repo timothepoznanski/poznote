@@ -735,6 +735,24 @@ class SystemController {
             }
         }
 
-        return ['success' => true, 'items' => $results];
+        // Workspaces shared with this account are listed for discovery only:
+        // API credentials act on their own profile, so their notes are
+        // reached from the web interface, not through X-User-ID. Kept out of
+        // `items`, which shared-page.js renders as note and folder rows. A
+        // share whose workspace is gone is left out, as the web menu cannot
+        // open it either.
+        $sharedWorkspaces = [];
+        foreach (getWorkspacesSharedWithUser($currentUserId) as $row) {
+            if (!sharedWorkspaceExists($row['owner_user_id'], $row['workspace_name'])) {
+                continue;
+            }
+            $sharedWorkspaces[] = [
+                'workspace'  => $row['workspace_name'],
+                'owner_id'   => $row['owner_user_id'],
+                'owner_name' => $row['owner_username'],
+            ];
+        }
+
+        return ['success' => true, 'items' => $results, 'shared_workspaces' => $sharedWorkspaces];
     }
 }

@@ -29,27 +29,37 @@
  * Every attachment address found in a piece of note content, HTML or markdown.
  *
  * @param string      $content
- * @param string|null $currentHost Host of this instance; an absolute URL to
- *                                 another host is not ours to resolve
+ * @param string|string[]|null $currentHost Host(s) of this instance; an
+ *                                 absolute URL to another host is not ours to
+ *                                 resolve
  * @return array list of ['url' => matched text, 'account' => int|null,
  *               'note' => int, 'attachment' => string, 'kind' => 'file'|'audio',
  *               'download' => bool]
  */
-function poznoteFindAttachmentRefs(string $content, ?string $currentHost = null): array
+function poznoteFindAttachmentRefs(string $content, $currentHost = null): array
 {
     $refs = [];
+    $ownHosts = $currentHost === null ? null : array_values(array_filter((array)$currentHost, 'strlen'));
     // What ends a URL in HTML attributes and in markdown. "=" is NOT one: the
     // match must start where the URL starts, so that an address sitting in
     // the query string of another URL (?u=/api/v1/notes/...) is seen with its
     // real prefix and refused.
     $delimiters = '\s"\'()<>';
 
-    $acceptPrefix = static function (string $prefix) use ($currentHost): bool {
+    $acceptPrefix = static function (string $prefix) use ($ownHosts): bool {
         if (!preg_match('#^(?:(https?:)?//([^/]+))?(?:/[\w.~%-]+)*/?$#i', $prefix, $m)) {
             return false;
         }
         $host = $m[2] ?? '';
-        return $host === '' || $currentHost === null || strcasecmp($host, $currentHost) === 0;
+        if ($host === '' || $ownHosts === null) {
+            return true;
+        }
+        foreach ($ownHosts as $ownHost) {
+            if (strcasecmp($host, $ownHost) === 0) {
+                return true;
+            }
+        }
+        return false;
     };
 
     // /api/v1/notes/<note>/attachments/<id>, with or without origin and query
@@ -189,7 +199,13 @@ function poznoteAdoptForeignAttachments(PDO $con, int $noteId, string $content, 
         return $result;
     }
 
+    // Content copied from a page keeps the host the browser was on. Behind a
+    // proxy that drops the port from the Host header, that is the forwarded
+    // host and port rather than HTTP_HOST (#1628), so both count as ours.
     $host = isset($_SERVER['HTTP_HOST']) ? (string)$_SERVER['HTTP_HOST'] : null;
+    if ($host !== null && function_exists('getExternalHostWithPort')) {
+        $host = array_values(array_unique([$host, getExternalHostWithPort()]));
+    }
     $ownIds = array_map(static function ($a) { return (string)($a['id'] ?? ''); }, $existingAttachments);
     $foreign = poznoteForeignAttachmentRefs(poznoteFindAttachmentRefs($content, $host), $noteId, $ownIds);
     if (empty($foreign)) {

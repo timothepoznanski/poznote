@@ -1932,6 +1932,16 @@
     // ── Initialisation ─────────────────────────────────────────────────────
 
     function _init() {
+        try {
+            _restoreTabs();
+        } finally {
+            // index.php hid the fallback note while it could not tell whether
+            // the stored tabs would keep it (issue #1644); that is settled now
+            document.documentElement.classList.remove('landing-note-pending');
+        }
+    }
+
+    function _restoreTabs() {
         hasInitialized = true;
 
         // Read current note from page config

@@ -43,7 +43,7 @@ Poznote는 웹훅을 **발신**하기만 합니다. 이메일 발송, 워크플�
 
 | 범위 | 관리 위치 | 사용자 | 이벤트 |
 |---|---|---|---|
-| **관리자 웹훅** | **설정 > 관리자 도구 > 관리자 웹훅** | 관리자만 | 인스턴스 이벤트: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached` |
+| **관리자 웹훅** | **설정 > 관리자 도구 > 관리자 웹훅** | 관리자만 | 인스턴스 이벤트: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached`, `backup.completed`, `backup.failed` |
 | **사용자 웹훅** | **설정 > 작업 > 사용자 웹훅** | 모든 계정(사용자 기능 제한으로 차단된 경우 제외) | 본인 콘텐츠 이벤트: `note.created`, `note.shared`, `reminder.due`, `reminder.due_title`, `reminder.due_minimal` |
 
 격리 규칙은 엄격합니다. 사용자 이벤트는 해당 계정이 등록한 엔드포인트에만 전달됩니다. 다른 사용자의 노트나 알림은 전달되지 않습니다. 인스턴스 이벤트는 구독한 모든 관리자 웹훅에 전달됩니다.
@@ -364,6 +364,37 @@ https://poznote.example.com/index.php?note=42&workspace=Poznote
 | `data.quota.pool` | 로컬 저장 공간 대신 S3 첨부 한도에 걸렸을 때만 `"s3"`로 포함 |
 
 > **빈도 제한:** 한도 이벤트는 사용자·이벤트 종류별 시간당 최대 한 번 전송합니다. 반복해서 한도에 도달해도 엔드포인트에 요청이 몰리지 않습니다. 한도 이벤트의 `data.user`에는 `source`가 없습니다.
+
+#### backup.completed / backup.failed
+
+자동 백업(S3 버킷 또는 로컬 폴더, 각 설정 페이지에서 정한 일정에 따름) 또는 관리자가 **지금 백업**으로 시작한 백업이 끝났습니다. 이벤트는 사용자마다가 아니라 실행마다 하나씩 전송됩니다. 선택한 모든 사용자가 오류 없이 백업되면 `backup.completed`, 한 명 이상의 사용자가 실패했거나 오래된 아카이브를 정리하지 못했거나 대상에 연결할 수 없었거나 아무도 백업되지 않았으면 `backup.failed`가 전송됩니다. 사용자가 자신의 계정에 대해 시작한 백업은 이 이벤트를 보내지 않습니다.
+
+```json
+{
+  "event": "backup.failed",
+  "delivery_id": "…",
+  "created_at": "2026-10-16T03:00:12+00:00",
+  "data": {
+    "backup": {
+      "target": "s3",
+      "trigger": "auto",
+      "users": 3,
+      "backed_up": 2,
+      "errors": ["nina: Access Denied"]
+    }
+  }
+}
+```
+
+| 필드 | 설명 |
+|---|---|
+| `data.backup.target` | `s3`(S3 백업 버킷) 또는 `local`(로컬 백업 폴더) |
+| `data.backup.trigger` | `auto`(예약 실행) 또는 `manual`(관리자가 시작) |
+| `data.backup.users` | 이번 실행에 선택된 사용자 수 |
+| `data.backup.backed_up` | 기록된 아카이브 수 |
+| `data.backup.errors` | 오류 메시지, 한 사용자에 관한 경우 사용자 이름이 앞에 붙으며 최대 10개. `backup.completed`에서는 비어 있음 |
+
+> **healthchecks.io로 모니터링:** 웹훅을 두 개 등록하세요. 체크의 ping URL(`https://hc-ping.com/<uuid>`)은 `backup.completed`에, 같은 URL 뒤에 `/fail`을 붙인 주소는 `backup.failed`에 구독합니다. 체크 주기를 백업 빈도에 맞추세요. worker가 멈추거나 실행 중 중단되면 이벤트가 전송되지 않고, 누락된 ping이 알림을 발생시킵니다.
 
 ### 사용자 이벤트
 

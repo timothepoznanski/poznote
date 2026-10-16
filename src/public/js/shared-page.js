@@ -453,9 +453,16 @@
             folder.public_url = normalizePublicUrl(folder.public_url || buildFolderPublicUrl(folder.token || ''));
             sharedFolderLookup[String(folder.folder_id)] = folder;
         });
-        sharedNotes.forEach(function(note) { note._type = 'note'; allItems.push(note); });
+        sharedNotes.forEach(function(note) {
+            note.url = normalizePublicUrl(note.url);
+            note._type = 'note';
+            allItems.push(note);
+        });
         sharedFolders.forEach(function(folder) { folder._type = 'folder'; allItems.push(folder); });
-        sharedWithMe.forEach(function(item) { allItems.push(item); });
+        sharedWithMe.forEach(function(item) {
+            item.url = normalizePublicUrl(item.url);
+            allItems.push(item);
+        });
         pruneCollapsedFolderIds();
     }
 
@@ -1016,10 +1023,15 @@
         return new URL('folder/' + encodeURIComponent(token), window.location.origin + '/').href;
     }
 
+    // The API builds absolute URLs from the Host header, which loses the port
+    // behind a proxy that forwards the host without it (#1628). Public pages
+    // live on the same origin as this page, so keep the server's path and take
+    // the scheme, host and port the browser is on, as the share dialog does.
     function normalizePublicUrl(url) {
         if (!url) return '';
         try {
-            return new URL(url, window.location.origin + '/').href;
+            var parsed = new URL(url, window.location.origin + '/');
+            return new URL(parsed.pathname + parsed.search + parsed.hash, window.location.origin + '/').href;
         } catch (error) {
             return url;
         }

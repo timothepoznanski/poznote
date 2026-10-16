@@ -3996,7 +3996,9 @@
       "reminder_due_minimal": "Same trigger as reminder.due but identifiers only (note id, reminder id, trigger time): no note content leaves the instance. Details can be fetched through the REST API.",
       "note_created": "A note was created in your account, from the interface or the REST API. Payload: metadata only (note id, title, type, workspace, folder, direct link), never the note content.",
       "note_shared": "A public share link was published for one of your notes. Payload: the note (id, title, workspace, direct link), the public token and URL, and whether the link is password protected.",
-      "settings_language_changed": "A user changed the interface language in the settings. Payload: the user profile, the new language code, the previous one, and whether the change came from the interface or the REST API."
+      "settings_language_changed": "A user changed the interface language in the settings. Payload: the user profile, the new language code, the previous one, and whether the change came from the interface or the REST API.",
+      "backup_completed": "A scheduled or admin-started backup run (S3 or local folder) finished and every selected user was backed up. Payload: the target, the trigger, the number of users and of archives written.",
+      "backup_failed": "A scheduled or admin-started backup run (S3 or local folder) finished with at least one error, or backed up nobody. Payload: the target, the trigger, the counts and the error messages."
     },
     "title": "Webhooks",
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when a subscribed event occurs. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",

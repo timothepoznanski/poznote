@@ -8,6 +8,8 @@ from urllib.parse import quote
 import os
 import logging
 
+from .auth_external import IdentityMismatch, resolve_caller_profile
+
 logger = logging.getLogger("poznote-mcp.client")
 
 # Default timeout for most operations (seconds)
@@ -29,6 +31,14 @@ def _path_segment(value) -> str:
     if text in ("", ".", ".."):
         raise ValueError(f"Invalid identifier: {text!r}")
     return quote(text, safe="")
+
+
+def _as_int(value) -> int | None:
+    """Best-effort int, or None. A non-numeric user_id must not match a profile."""
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 class PoznoteClient:
@@ -106,9 +116,59 @@ class PoznoteClient:
 
     def _headers_for_user(self, user_id: str | int | None) -> dict:
         headers = dict(self._base_headers)
+
+        # Per-caller authentication. The caller's own verified identity decides
+        # the target profile, and an explicit user_id may only AGREE with it.
+        # Most tools expose that argument, so honouring it on its own would let
+        # any authenticated caller act as any profile, the administrator
+        # included, and the mode would give no isolation at all.
+        profile = resolve_caller_profile(self._list_profiles)
+        if profile is not None:
+            resolved = int(profile["id"])
+            if user_id is not None and _as_int(user_id) != resolved:
+                raise IdentityMismatch(
+                    f"user_id={user_id} is not the profile this token is linked to "
+                    f"(profile {resolved}). Per-caller authentication does not permit "
+                    f"acting as another profile."
+                )
+            headers["X-User-ID"] = str(resolved)
+            return headers
+
         if user_id is not None:
             headers["X-User-ID"] = str(user_id)
         return headers
+
+    def caller_is_admin(self) -> bool | None:
+        """Whether the current caller's profile is an administrator.
+
+        None when per-caller authentication is off, so behaviour is unchanged.
+
+        get_system_info, list_backups, create_backup and delete_backup take no
+        user_id and so do not go through _headers_for_user(): they act as the
+        server's default profile, which has to be an administrator. Under
+        per-caller authentication that must not be every caller.
+        """
+        profile = resolve_caller_profile(self._list_profiles)
+        if profile is None:
+            return None
+        return bool(profile.get("is_admin"))
+
+    def _list_profiles(self) -> list[dict]:
+        """Profiles, for mapping a verified external identity to a Poznote user.
+
+        Uses the service token and the server's own default profile: this is a
+        lookup, not an action taken as the caller.
+        """
+        response = self.client.get("/admin/users", headers=dict(self._base_headers))
+        response.raise_for_status()
+        payload = response.json()
+        if isinstance(payload, list):
+            profiles = payload
+        elif isinstance(payload, dict):
+            profiles = payload.get("users") or payload.get("data") or []
+        else:
+            profiles = []
+        return [p for p in profiles if isinstance(p, dict)]
 
     @staticmethod
     def _set_workspace(target: dict, workspace: str | None) -> None:
@@ -454,7 +514,7 @@ class PoznoteClient:
         return []
 
     def list_workspaces(self, user_id: str | int | None = None) -> list[dict]:
-        """List all available workspaces"""
+        """List the profile's own workspaces (not the ones shared with it)"""
         response = self.client.get("/workspaces", headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
@@ -1214,7 +1274,7 @@ class PoznoteClient:
         return {"shared_notes": [], "shared_folders": []}
 
     def list_shared_with_me(self, user_id: str | int | None = None) -> dict:
-        """Notes and folders other users have shared with this profile.
+        """Notes, folders and workspaces other users have shared with this profile.
 
         Distinct from list_shared(), which lists the shares THIS profile has
         CREATED. A grantee sees nothing there, which is why an incoming share
@@ -1222,19 +1282,26 @@ class PoznoteClient:
 
         No workspace filter: the endpoint takes none, and the workspace of an
         incoming share belongs to its owner, not to this profile.
+
+        Shared workspaces come in their own list, for discovery: API
+        credentials act on their own profile, so their notes cannot be read
+        through the API.
         """
         response = self.client.get("/shared/with-me", headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
-        items = data.get("items") if isinstance(data, dict) else None
-        if not isinstance(items, list):
-            return {"shared_notes": [], "shared_folders": []}
-        items = [i for i in items if isinstance(i, dict)]
+        if not isinstance(data, dict):
+            data = {}
+        items = data.get("items")
+        items = [i for i in items if isinstance(i, dict)] if isinstance(items, list) else []
+        workspaces = data.get("shared_workspaces")
+        workspaces = [w for w in workspaces if isinstance(w, dict)] if isinstance(workspaces, list) else []
         # One flat list carrying a `_type` discriminator, split to match the
         # shape list_shared() returns.
         return {
             "shared_notes": [i for i in items if i.get("_type") == "shared_with_me_note"],
             "shared_folders": [i for i in items if i.get("_type") == "shared_with_me_folder"],
+            "shared_workspaces": workspaces,
         }
 
     def close(self):

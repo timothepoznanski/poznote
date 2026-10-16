@@ -198,6 +198,64 @@ Después añade la misma cabecera a la configuración de tu cliente: consulta [V
 
 Este token es distinto de `data/.mcp_token`: aquel lo usa el servidor MCP para comunicarse *con* la API de Poznote, este es el que *tu asistente de IA* debe presentar al servidor MCP.
 
+#### Autenticación por llamante (opcional)
+
+El `POZNOTE_MCP_AUTH_TOKEN` anterior es un único secreto compartido: todos los
+clientes presentan el mismo token y el servidor actúa como un solo perfil.
+Cuando varias personas o agentes comparten una instancia MCP, eso no permite
+distinguirlos.
+
+Al definir `POZNOTE_MCP_AUTH_PROVIDER` se cambia a autenticación por llamante:
+cada cliente presenta **su propio** token, que se resuelve contra un proveedor
+de identidad externo y se asigna al perfil de Poznote de ese llamante. Una
+instancia, muchos llamantes, cada uno identificado correctamente.
+
+| variable | default | meaning |
+|---|---|---|
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(sin definir, función desactivada)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(obligatorio)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(sin definir, función desactivada)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(sin definir, función desactivada)* | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
+| `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
+
+`userinfo` realiza `GET <url>` con el token portador del llamante, el punto de
+acceso UserInfo de OpenID Connect. El token nunca se verifica localmente, así
+que los tokens opacos funcionan igual de bien que los JWT y no hay ninguna
+superficie de JWKS ni de rotación de claves que mantener. `introspection`
+realiza `POST <url>` con `token=<token>` (RFC 7662); una respuesta con
+`active: false` es un token no válido.
+
+Gana el primer claim de `POZNOTE_MCP_IDENTITY_MATCH` que esté presente **y
+coincida con exactamente un perfil**. Los campos de perfil son los que devuelve
+`GET /api/v1/admin/users`. De forma predeterminada solo se compara el sujeto.
+Comparar por `preferred_username` o `email` es posible pero más débil, porque el
+inicio de sesión de Poznote solo compara un correo cuando está verificado, y un
+proveedor que permita editar esos campos dejaría que un usuario reclamara otro
+perfil. Actívelo a propósito.
+
+Un valor que coincide con dos perfiles se rechaza por ambiguo, y una identidad
+que no coincide con ningún perfil se rechaza sin más: nunca recae en un perfil
+predeterminado, porque el predeterminado es el perfil 1, el primer
+administrador. Un perfil desactivado nunca es candidato.
+
+Dos consecuencias que conviene conocer antes de activarlo:
+
+- **Un argumento `user_id` explícito solo puede coincidir con el perfil
+  resuelto.** La mayoría de las herramientas aceptan ese argumento, así que uno
+  que nombre otro perfil se rechaza en lugar de aceptarse.
+- **Las herramientas que no llevan `user_id`** (`get_system_info`,
+  `list_backups`, `create_backup`, `delete_backup`) actúan como el perfil
+  predeterminado del servidor, por lo que se limitan a llamantes cuyo perfil
+  resuelto sea administrador. Por eso el perfil predeterminado tiene que ser
+  administrador: la búsqueda de perfiles lee `GET /api/v1/admin/users`.
+
+Si `POZNOTE_MCP_AUTH_PROVIDER` está definido, tiene prioridad sobre
+`POZNOTE_MCP_AUTH_TOKEN`, y el servidor registra un aviso si ese token sigue
+definido.
+
 #### Modo de depuración
 
 Define `POZNOTE_DEBUG=true` en el comando de arranque para cambiar el nivel de log de `INFO` a `DEBUG`. Vuelve a ponerlo en `false` para el uso normal. Solo se reconocen los valores exactos en minúsculas `true` y `false`. Cualquier otro valor se trata como `false` y se escribe una advertencia en los logs de MCP. El servidor web es más tolerante y también acepta `1`, `on` o `yes`. Cada petición HTTP enviada a la API de Poznote, cada llamada a herramienta recibida del asistente de IA y cada respuesta se escriben en detalle en los logs del contenedor. Úsalo para diagnosticar problemas de conexión o de autenticación:

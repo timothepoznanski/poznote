@@ -43,7 +43,7 @@ Existem dois níveis independentes de webhooks:
 
 | Nível | Gerenciado em | Quem | Eventos |
 |---|---|---|---|
-| **Webhooks de administrador** | **Configurações > Ferramentas de administração > Webhooks de administrador** | Apenas administradores | Eventos da instância: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached` |
+| **Webhooks de administrador** | **Configurações > Ferramentas de administração > Webhooks de administrador** | Apenas administradores | Eventos da instância: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached`, `backup.completed`, `backup.failed` |
 | **Webhooks de usuário** | **Configurações > Webhooks de usuário** | Todas as contas (a menos que bloqueado pelo isolamento de contas) | Eventos sobre o próprio conteúdo da conta: `note.created`, `note.shared`, `reminder.due`, `reminder.due_title`, `reminder.due_minimal` |
 
 A regra de isolamento é rigorosa: um evento de usuário só é entregue aos endpoints cadastrados pela conta que o gerou. As notas e os lembretes de um usuário nunca chegam aos endpoints de outro usuário. Os eventos da instância vão para todos os webhooks de administrador inscritos.
@@ -364,6 +364,37 @@ Uma ação do usuário (gravação de nota ou envio de anexo) foi bloqueada porq
 | `data.quota.pool` | Presente apenas, com o valor `"s3"`, quando o envio bloqueado visava a cota de anexos no S3 e não o armazenamento local |
 
 > **Limitação de frequência:** os eventos de cota são limitados a no máximo uma entrega por usuário, por tipo de evento, por hora, para que um usuário que esbarra repetidamente no limite não inunde o endpoint. `data.user` não tem o campo `source` nos eventos de cota.
+
+#### backup.completed / backup.failed
+
+Um backup automático (bucket S3 ou pasta local, conforme o agendamento definido em suas páginas de configuração) ou um backup iniciado por um administrador com **Fazer backup agora** terminou. Um único evento é enviado por execução, não por usuário: `backup.completed` quando todos os usuários selecionados foram salvos sem erro, `backup.failed` quando pelo menos um usuário falhou, um arquivo antigo não pôde ser removido, o destino estava inacessível ou ninguém foi salvo. Backups que um usuário inicia para a própria conta não emitem esses eventos.
+
+```json
+{
+  "event": "backup.failed",
+  "delivery_id": "…",
+  "created_at": "2026-10-16T03:00:12+00:00",
+  "data": {
+    "backup": {
+      "target": "s3",
+      "trigger": "auto",
+      "users": 3,
+      "backed_up": 2,
+      "errors": ["nina: Access Denied"]
+    }
+  }
+}
+```
+
+| Campo | Descrição |
+|---|---|
+| `data.backup.target` | `s3` (bucket de backup S3) ou `local` (pasta de backup local) |
+| `data.backup.trigger` | `auto` (execução agendada) ou `manual` (iniciada por um administrador) |
+| `data.backup.users` | Número de usuários selecionados para a execução |
+| `data.backup.backed_up` | Número de arquivos gravados |
+| `data.backup.errors` | Mensagens de erro, prefixadas com o nome de usuário quando dizem respeito a um usuário, no máximo 10. Vazio em `backup.completed` |
+
+> **Monitoramento com healthchecks.io:** registre dois webhooks, a URL de ping do check (`https://hc-ping.com/<uuid>`) inscrita em `backup.completed` e a mesma URL seguida de `/fail` inscrita em `backup.failed`. Ajuste o período do check para a frequência dos backups: se o worker parar ou travar no meio da execução, nenhum evento é enviado e o ping ausente dispara o alerta.
 
 ### Eventos do usuário
 

@@ -340,7 +340,8 @@ class S3BackupService {
     }
 
     /**
-     * Persist when and how the last run went, for the settings page status.
+     * Persist when and how the last run went, for the settings page status,
+     * and tell the admin webhooks (backup.completed / backup.failed).
      */
     public static function recordRun(string $trigger, array $summary): void {
         if ($trigger === 'auto') {
@@ -354,6 +355,13 @@ class S3BackupService {
             'uploaded' => (int)($summary['uploaded'] ?? 0),
             'errors' => array_slice($summary['errors'] ?? [], 0, 10),
         ]));
+
+        try {
+            require_once __DIR__ . '/WebhookDispatcher.php';
+            (new WebhookDispatcher())->dispatchBackupFinished('s3', $trigger, $summary);
+        } catch (Throwable $e) {
+            error_log('Backup webhook dispatch failed: ' . $e->getMessage());
+        }
     }
 
     /**

@@ -3315,10 +3315,49 @@ paths:
     get:
       tags: [Share]
       summary: List items shared with the current user by others
-      description: Does not require the X-User-ID header
+      description: >
+        Does not require the X-User-ID header. Notes and folders come in
+        `items`; workspaces shared with the current user come in
+        `shared_workspaces`, for discovery only, since API credentials act on
+        their own profile and a shared workspace's notes are reached from the
+        web interface.
       responses:
         '200':
-          description: Notes and folders shared with the current user
+          description: Notes, folders and workspaces shared with the current user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _type:
+                          type: string
+                          enum: [shared_with_me_note, shared_with_me_folder]
+                        owner_id:
+                          type: integer
+                        owner_name:
+                          type: string
+                        workspace:
+                          type: string
+                        url:
+                          type: string
+                  shared_workspaces:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        workspace:
+                          type: string
+                        owner_id:
+                          type: integer
+                        owner_name:
+                          type: string
 
   /folders/{id}/share:
     get:
@@ -4190,7 +4229,11 @@ paths:
   /workspaces:
     get:
       tags: [Workspaces]
-      summary: List all workspaces
+      summary: List the profile's workspaces
+      description: >
+        Workspaces of the profile the request acts on. Workspaces other users
+        share with it are not included: they are listed by
+        GET /shared/with-me under `shared_workspaces`.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
       responses:

@@ -43,7 +43,7 @@ There are two independent levels of webhooks:
 
 | Level | Managed from | Who | Events |
 |---|---|---|---|
-| **Admin Webhooks** | **Settings > Admin Tools > Admin Webhooks** | Administrators only | Instance events: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached` |
+| **Admin Webhooks** | **Settings > Admin Tools > Admin Webhooks** | Administrators only | Instance events: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached`, `backup.completed`, `backup.failed` |
 | **User Webhooks** | **Settings > User Webhooks** | Every account (unless blocked by tenant isolation) | Events about the account's own content: `note.created`, `note.shared`, `reminder.due`, `reminder.due_title`, `reminder.due_minimal` |
 
 The isolation rule is strict: a user event is only ever delivered to the endpoints registered by the account that produced it. One user's notes and reminders never reach another user's endpoints. Instance events go to every subscribed admin webhook.
@@ -364,6 +364,37 @@ A user action (note write or attachment upload) was blocked because the account 
 | `data.quota.pool` | Only present with the value `"s3"` when the blocked upload targeted the S3 attachment quota rather than local storage |
 
 > **Throttling:** quota events are throttled to at most one delivery per user, per event type, per hour, so a user repeatedly hitting the limit does not flood the endpoint. `data.user` has no `source` field on quota events.
+
+#### backup.completed / backup.failed
+
+An automatic backup run (S3 bucket or local folder, on the schedule set in their settings pages) or a run started by an administrator with **Back up now** has finished. One event is sent per run, not per user: `backup.completed` when every selected user was backed up without error, `backup.failed` when at least one user failed, an old archive could not be pruned, the destination was unreachable, or nobody was backed up. Backups a user starts for their own account do not emit these events.
+
+```json
+{
+  "event": "backup.failed",
+  "delivery_id": "…",
+  "created_at": "2026-10-16T03:00:12+00:00",
+  "data": {
+    "backup": {
+      "target": "s3",
+      "trigger": "auto",
+      "users": 3,
+      "backed_up": 2,
+      "errors": ["nina: Access Denied"]
+    }
+  }
+}
+```
+
+| Field | Description |
+|---|---|
+| `data.backup.target` | `s3` (S3 backup bucket) or `local` (local backup folder) |
+| `data.backup.trigger` | `auto` (scheduled run) or `manual` (started by an administrator) |
+| `data.backup.users` | Number of users selected for the run |
+| `data.backup.backed_up` | Number of archives written |
+| `data.backup.errors` | Error messages, prefixed with the username when they concern one user, at most 10. Empty on `backup.completed` |
+
+> **Monitoring with healthchecks.io:** register two webhooks, the check's ping URL (`https://hc-ping.com/<uuid>`) subscribed to `backup.completed` and the same URL followed by `/fail` subscribed to `backup.failed`. Set the check's period to the backup frequency: if the worker stops or crashes mid-run, no event is sent and the missing ping raises the alert.
 
 ### User events
 

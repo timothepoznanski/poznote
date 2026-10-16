@@ -4365,7 +4365,9 @@
       "reminder_due_minimal": "Mismo disparador que reminder.due pero solo identificadores (id de nota, id de recordatorio, hora de activación): ningún contenido de la nota sale de la instancia. Los detalles pueden obtenerse a través de la API REST.",
       "note_created": "Se creó una nota en su cuenta, desde la interfaz o la API REST. Payload: solo metadatos (id de nota, título, tipo, workspace, carpeta, enlace directo), nunca el contenido de la nota.",
       "note_shared": "Se publicó un enlace público para una de sus notas. Payload: la nota (id, título, workspace, enlace directo), el token público y su URL, y si el enlace está protegido con contraseña.",
-      "settings_language_changed": "Un usuario cambió el idioma de la interfaz en la configuración. Payload: el perfil del usuario, el nuevo código de idioma, el anterior y si el cambio se hizo desde la interfaz o la API REST."
+      "settings_language_changed": "Un usuario cambió el idioma de la interfaz en la configuración. Payload: el perfil del usuario, el nuevo código de idioma, el anterior y si el cambio se hizo desde la interfaz o la API REST.",
+      "backup_completed": "Una copia de seguridad programada o iniciada por un administrador (S3 o carpeta local) terminó y se respaldaron todos los usuarios seleccionados. Payload: el destino, el disparador, el número de usuarios y de archivos escritos.",
+      "backup_failed": "Una copia de seguridad programada o iniciada por un administrador (S3 o carpeta local) terminó con al menos un error, o no respaldó a nadie. Payload: el destino, el disparador, los contadores y los mensajes de error."
     },
     "title": "Webhooks",
     "description": "Poznote envía una solicitud HTTP POST con una carga JSON a cada endpoint registrado cuando ocurre un evento suscrito. Si se define un secreto, la carga se firma con HMAC-SHA256 en la cabecera X-Poznote-Signature-256.",

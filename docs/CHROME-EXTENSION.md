@@ -13,7 +13,7 @@
 
 # Poznote Chrome Extension
 
-The **Poznote URL Saver** is a browser extension that allows you to quickly save the URL or even a full-page screenshot of the current page to your Poznote instance with a single click.
+The **Poznote URL Saver** is a browser extension that saves the current page to your Poznote instance in one click: its address, or its address with a screenshot, as a new note or at the end of a note you already have.
 
 <p align="center">
   <img src="../images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
@@ -24,13 +24,21 @@ Install the extension directly from the Chrome Web Store: [Install extension](ht
 ## Connecting it to your instance
 
 1. In Poznote, open **Settings > App passwords**, create one named after the extension, and copy the secret it shows. It is displayed once.
-2. Open the extension, then fill in:
-   - **App URL:** the address of your instance, e.g. `https://notes.example.com/`
-   - **Username:** your Poznote username
-   - **Password:** the app password you just copied
-   - **Workspace**, and optionally a **Folder**, where saved pages should land
-3. Save. The extension resolves your profile by itself and is ready to use.
+2. Click the extension's icon, then **Connect**. Its settings page opens in a tab.
+3. Fill in the **Poznote address** (e.g. `https://notes.example.com`), your **Username** and the **App password** you just copied, then click **Connect** and allow the extension to reach your instance when Chrome asks.
+4. Pick the **Workspace**, and optionally the **Folder**, where new notes should land. The choice is saved as you make it.
+
+To change any of this later, click the gear icon at the top of the extension.
 
 Your account password works here too, but an app password is the better credential for an extension: it reaches the API only, never the web interface or your account settings, it is limited to your own profile, and revoking it in Poznote cuts the extension off without changing anything else. See [App Passwords](../README.md#app-passwords) for the full list of limits.
 
 > **If your instance is SSO-only,** an app password is the only way to connect the extension: the sign-in form the extension needs does not exist for your account. Create one from **Settings > App passwords** exactly as above.
+
+## Saving a page
+
+Click the extension's icon on the page you want to keep, then choose where it goes:
+
+- **New note** creates a note named after the page, in the workspace and folder picked in the settings.
+- **Existing note** adds the page at the end of a note you pick in the list, which shows your latest notes and searches them as you type. It lists the notes of the workspace picked in the settings; turn on **All workspaces** to pick a note anywhere. The extension remembers that note for the next page, so collecting links in a single reading list takes one click per page. HTML and Markdown notes can receive pages.
+
+Then click **Save link** to save the page's address, or **Screenshot** to save the address followed by a picture of the visible part of the page. The confirmation has a link that opens the note in Poznote.

@@ -2,7 +2,8 @@
 
 `list_shared` lists the shares a profile has CREATED; a grantee sees nothing
 there. Incoming shares are a different endpoint returning a flat list carrying a
-`_type` discriminator, so the split into notes/folders is the thing to pin.
+`_type` discriminator, so the split into notes/folders is the thing to pin, plus
+a separate `shared_workspaces` list (#1647).
 """
 
 from unittest.mock import MagicMock, patch
@@ -32,6 +33,10 @@ def test_calls_with_me_and_splits_by_type():
                 {"_type": "something_else", "note_id": 99},
                 "not-an-object",
             ],
+            "shared_workspaces": [
+                {"workspace": "Ankh Labs", "owner_id": 1, "owner_name": "alice"},
+                "not-an-object",
+            ],
         }
         with patch.object(client.client, "get", return_value=_response(payload)) as get:
             result = client.list_shared_with_me()
@@ -40,6 +45,9 @@ def test_calls_with_me_and_splits_by_type():
         assert "params" not in get.call_args.kwargs
         assert [n["note_id"] for n in result["shared_notes"]] == [4]
         assert [f["folder_id"] for f in result["shared_folders"]] == [2]
+        assert result["shared_workspaces"] == [
+            {"workspace": "Ankh Labs", "owner_id": 1, "owner_name": "alice"}
+        ]
     finally:
         client.close()
 
@@ -49,7 +57,7 @@ def test_missing_items_key_is_an_empty_result_not_an_error():
     try:
         with patch.object(client.client, "get", return_value=_response({"success": True})):
             result = client.list_shared_with_me()
-        assert result == {"shared_notes": [], "shared_folders": []}
+        assert result == {"shared_notes": [], "shared_folders": [], "shared_workspaces": []}
     finally:
         client.close()
 
@@ -59,6 +67,6 @@ def test_no_items_is_an_empty_result():
     try:
         with patch.object(client.client, "get", return_value=_response({"success": True, "items": []})):
             result = client.list_shared_with_me()
-        assert result == {"shared_notes": [], "shared_folders": []}
+        assert result == {"shared_notes": [], "shared_folders": [], "shared_workspaces": []}
     finally:
         client.close()

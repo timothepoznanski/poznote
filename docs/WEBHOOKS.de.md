@@ -43,7 +43,7 @@ Es gibt zwei voneinander unabhängige Webhook-Ebenen:
 
 | Ebene | Verwaltet unter | Wer | Ereignisse |
 |---|---|---|---|
-| **Admin-Webhooks** | **Einstellungen > Admin-Werkzeuge > Admin-Webhooks** | Nur Administratoren | Instanzereignisse: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached` |
+| **Admin-Webhooks** | **Einstellungen > Admin-Werkzeuge > Admin-Webhooks** | Nur Administratoren | Instanzereignisse: `user.created`, `user.updated`, `user.activated`, `user.deactivated`, `user.deleted`, `settings.language_changed`, `signup.cap_reached`, `quota.notes_reached`, `quota.storage_reached`, `backup.completed`, `backup.failed` |
 | **Benutzer-Webhooks** | **Einstellungen > Benutzer-Webhooks** | Jedes Konto (sofern nicht durch die Mandantentrennung gesperrt) | Ereignisse zu den eigenen Inhalten des Kontos: `note.created`, `note.shared`, `reminder.due`, `reminder.due_title`, `reminder.due_minimal` |
 
 Die Trennungsregel ist strikt: Ein Benutzerereignis wird immer nur an die Endpunkte zugestellt, die das Konto registriert hat, das es ausgelöst hat. Notizen und Erinnerungen eines Benutzers erreichen nie die Endpunkte eines anderen Benutzers. Instanzereignisse gehen an jeden abonnierten Admin-Webhook.
@@ -364,6 +364,37 @@ Eine Benutzeraktion (Schreiben einer Notiz oder Hochladen eines Anhangs) wurde b
 | `data.quota.pool` | Nur vorhanden, mit dem Wert `"s3"`, wenn der blockierte Upload das S3-Anhangskontingent statt des lokalen Speichers betraf |
 
 > **Drosselung:** Kontingentereignisse werden auf höchstens eine Zustellung pro Benutzer, pro Ereignistyp und pro Stunde gedrosselt, sodass ein Benutzer, der wiederholt an das Limit stößt, den Endpunkt nicht überflutet. `data.user` hat bei Kontingentereignissen kein Feld `source`.
+
+#### backup.completed / backup.failed
+
+Eine automatische Sicherung (S3-Bucket oder lokaler Ordner, nach dem auf ihren Einstellungsseiten festgelegten Zeitplan) oder eine von einem Administrator mit **Jetzt sichern** gestartete Sicherung ist abgeschlossen. Pro Lauf wird ein Ereignis gesendet, nicht pro Benutzer: `backup.completed`, wenn alle ausgewählten Benutzer fehlerfrei gesichert wurden, `backup.failed`, wenn mindestens ein Benutzer fehlgeschlagen ist, ein altes Archiv nicht bereinigt werden konnte, das Ziel nicht erreichbar war oder niemand gesichert wurde. Sicherungen, die ein Benutzer für sein eigenes Konto startet, lösen diese Ereignisse nicht aus.
+
+```json
+{
+  "event": "backup.failed",
+  "delivery_id": "…",
+  "created_at": "2026-10-16T03:00:12+00:00",
+  "data": {
+    "backup": {
+      "target": "s3",
+      "trigger": "auto",
+      "users": 3,
+      "backed_up": 2,
+      "errors": ["nina: Access Denied"]
+    }
+  }
+}
+```
+
+| Feld | Beschreibung |
+|---|---|
+| `data.backup.target` | `s3` (S3-Sicherungs-Bucket) oder `local` (lokaler Sicherungsordner) |
+| `data.backup.trigger` | `auto` (geplanter Lauf) oder `manual` (von einem Administrator gestartet) |
+| `data.backup.users` | Anzahl der für den Lauf ausgewählten Benutzer |
+| `data.backup.backed_up` | Anzahl der geschriebenen Archive |
+| `data.backup.errors` | Fehlermeldungen, mit dem Benutzernamen vorangestellt, wenn sie einen Benutzer betreffen, höchstens 10. Leer bei `backup.completed` |
+
+> **Überwachung mit healthchecks.io:** Registrieren Sie zwei Webhooks: die Ping-URL des Checks (`https://hc-ping.com/<uuid>`) für `backup.completed` und dieselbe URL mit angehängtem `/fail` für `backup.failed`. Stellen Sie die Periode des Checks auf die Sicherungshäufigkeit ein: Stoppt der Worker oder stürzt er während eines Laufs ab, wird kein Ereignis gesendet und der fehlende Ping löst den Alarm aus.
 
 ### Benutzerereignisse
 

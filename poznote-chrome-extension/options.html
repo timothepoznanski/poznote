@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poznote URL Saver settings</title>
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="ui.css">
+  <style>
+    body {
+      background: var(--surface);
+      font-size: 14px;
+    }
+
+    .wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 40px 16px 56px;
+    }
+
+    .intro {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .intro img {
+      width: 44px;
+      height: 44px;
+    }
+
+    .intro h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .intro p {
+      margin: 2px 0 0;
+      color: var(--text-muted);
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-bottom: 16px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--bg);
+    }
+
+    .card.locked {
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .card h2 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+    }
+
+    .step.done {
+      background: var(--accent-fill);
+      color: #fff;
+    }
+
+    .step .icon {
+      width: 13px;
+      height: 13px;
+      stroke-width: 3;
+    }
+
+    form,
+    .fields {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    form[hidden],
+    .connected[hidden] {
+      display: none;
+    }
+
+    .hint a {
+      color: var(--accent);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .connected {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .connected .dot {
+      width: 8px;
+      height: 8px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .connected-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .connected-text div {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .connected-text .sub {
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+
+    .saved-note {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 18px;
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+
+    .saved-note .icon {
+      color: var(--success);
+    }
+
+    .footer {
+      color: var(--text-muted);
+      font-size: 13px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-success" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+  </svg>
+
+  <main class="wrap">
+    <div class="intro">
+      <img src="icon.png" alt="">
+      <div>
+        <h1>Poznote URL Saver</h1>
+        <p>Save the pages you visit to your Poznote instance.</p>
+      </div>
+    </div>
+
+    <section class="card" id="connectionCard">
+      <h2><span class="step" id="step1">1</span>Connection</h2>
+
+      <div class="connected" id="connectedBox" hidden>
+        <span class="dot"></span>
+        <div class="connected-text">
+          <div id="connectedUser"></div>
+          <div class="sub" id="connectedHost"></div>
+        </div>
+        <button type="button" class="btn btn-secondary" id="disconnectBtn">Disconnect</button>
+      </div>
+
+      <form id="connectForm" novalidate>
+        <div class="field">
+          <label for="appUrl">Poznote address</label>
+          <input type="url" id="appUrl" placeholder="https://notes.example.com" autocomplete="url" required>
+        </div>
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="password">App password</label>
+          <input type="password" id="password" autocomplete="current-password" required>
+          <span class="hint">Create one in Poznote under Settings &gt; App passwords. It reaches the API only and can be revoked at any time. Your account password works too.</span>
+        </div>
+        <div class="message" id="connectStatus" role="status" hidden></div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="connectBtn">Connect</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card locked" id="destinationCard">
+      <h2><span class="step" id="step2">2</span>Where new notes go</h2>
+      <div class="fields">
+        <div class="field">
+          <label for="workspaceSelect">Workspace</label>
+          <select id="workspaceSelect"></select>
+        </div>
+        <div class="field">
+          <label for="folderSelect">Folder</label>
+          <select id="folderSelect"></select>
+        </div>
+        <div class="saved-note" id="savedNote" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <p class="footer" id="footer">Once connected, click the Poznote icon in the toolbar on any page to save it.</p>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="options.js"></script>
+</body>
+
+</html>

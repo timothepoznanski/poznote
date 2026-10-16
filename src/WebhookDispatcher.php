@@ -29,6 +29,8 @@ class WebhookDispatcher {
         'quota.notes_reached',
         'quota.storage_reached',
         'settings.language_changed',
+        'backup.completed',
+        'backup.failed',
     ];
 
     // Events about an account's own content, managed from that account's
@@ -59,6 +61,8 @@ class WebhookDispatcher {
         'quota.notes_reached',
         'quota.storage_reached',
         'settings.language_changed',
+        'backup.completed',
+        'backup.failed',
         'reminder.due',
         'reminder.due_title',
         'reminder.due_minimal',
@@ -378,6 +382,33 @@ class WebhookDispatcher {
             'language' => $language,
             'previous_language' => $previous !== '' ? $previous : null,
             'source' => $source,
+        ]);
+    }
+
+    /**
+     * Emitted once per backup run, scheduled or started by an admin, when
+     * the run summary is recorded: backup.completed when every selected user
+     * was backed up without error, backup.failed otherwise. Two events
+     * rather than one with a status, so monitoring services that take a
+     * separate failure URL (healthchecks.io's /fail) need no receiver logic.
+     * Self-service backups of a single account do not emit it.
+     *
+     * @param string $target 's3' or 'local'
+     * @param string $trigger 'auto' or 'manual'
+     * @param array $summary run summary as stored by recordRun()
+     * @return array{delivered:int,failed:int}
+     */
+    public function dispatchBackupFinished(string $target, string $trigger, array $summary): array {
+        $success = !empty($summary['success']);
+
+        return $this->dispatch($success ? 'backup.completed' : 'backup.failed', [
+            'backup' => [
+                'target' => $target,
+                'trigger' => $trigger,
+                'users' => (int)($summary['users'] ?? 0),
+                'backed_up' => (int)($summary['uploaded'] ?? $summary['saved'] ?? 0),
+                'errors' => array_values(array_map('strval', array_slice($summary['errors'] ?? [], 0, 10))),
+            ],
         ]);
     }
 
