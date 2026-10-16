@@ -47,7 +47,12 @@ from fastmcp.server.auth import AccessToken, TokenVerifier
 from starlette.middleware import Middleware
 
 from .client import PoznoteClient
-from .auth_external import build_external_auth_provider
+from .auth_external import (
+    IdentityMismatch,
+    IdentityProviderUnavailable,
+    IdentityUnmapped,
+    build_external_auth_provider,
+)
 
 
 def _is_strict_bool_env_value(value: str) -> bool:
@@ -426,7 +431,26 @@ def _resolve_workspace(client, workspace: Optional[str], user_id: Optional[int])
 
 
 def _api_error_json(exc: Exception) -> str:
-    """Convert an HTTP/network exception into a clean JSON error for the AI."""
+    """Convert an exception raised during a tool call into a clean JSON error.
+
+    The caller is told where the failure came from. An error raised by the MCP
+    server itself is labelled as such, rather than reported as a Poznote API
+    error for a request the API never saw.
+    """
+    # Raised by the MCP server before any request reaches the API. Without these
+    # branches they fall through to the generic handler at the bottom and surface
+    # as "Poznote API error: IdentityMismatch", which blames the API for a refusal
+    # the MCP server made.
+    if isinstance(exc, (IdentityMismatch, IdentityUnmapped)):
+        return json.dumps(
+            {"error": f"MCP server refused this request: {exc}"},
+            ensure_ascii=False,
+        )
+    if isinstance(exc, IdentityProviderUnavailable):
+        return json.dumps(
+            {"error": f"MCP server could not verify the caller's identity: {exc}"},
+            ensure_ascii=False,
+        )
     if isinstance(exc, httpx.ConnectError):
         return json.dumps(
             {"error": "Cannot connect to Poznote API. Is the server running?", "detail": str(exc)},
@@ -2649,6 +2673,73 @@ def git_pull(user_id: Optional[int] = None) -> str:
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
+# Settings keys that are INSTANCE-WIDE rather than per-profile, mirrored from
+# SettingsController::$globalSettings on the Poznote side. A non-administrator
+# caller must not read or write these THROUGH A TOOL: they carry SMTP
+# credentials, tenant isolation, user quotas, mcp_user_id and
+# mcp_default_workspace.
+#
+# Scope of the claim, stated precisely because an earlier version of this
+# comment overstated it: the guard covers the tools that expose a setting to a
+# caller. It does not prevent every internal read. `_resolve_workspace()` reads
+# mcp_default_workspace to pick the workspace a workspace-less write lands in,
+# for any caller. That is deliberate: the setting is an instance-wide DEFAULT
+# whose whole purpose is to apply to everyone, the value is a workspace name
+# rather than a credential, and the API still access-checks the workspace it
+# names. It is recorded here so the difference is not mistaken for a hole.
+#
+# This list is duplicated rather than fetched, because GET /settings merges
+# global and per-profile values with no marker distinguishing them, so the MCP
+# cannot tell them apart from a normal call. If the server adds a global key it
+# must be added here too, or the guard silently stops covering it. Filed as a
+# known limitation rather than hidden.
+GLOBAL_SETTING_KEYS = frozenset({
+    'hidden_ui_elements_global', 'login_display_name', 'discussions_url', 'discord_url',
+    'custom_css_path', 'theme_list', 'git_sync_enabled', 'allow_executable_attachments',
+    'login_disabled', 'tenant_isolation', 'tenant_isolation_features',
+    'tenant_isolation_applied_ui_keys', 'import_max_individual_files', 'import_max_zip_files',
+    'user_max_notes', 'user_max_storage_mb', 'user_max_storage_s3_mb', 'user_max_backups_s3_mb',
+    'mcp_user_id', 'mcp_default_workspace', 'mcp_debug',
+    'smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_security', 'smtp_username',
+    'smtp_password', 'smtp_from_email', 'smtp_from_name', 'smtp_app_url',
+    'smtp_reminder_cutoff_at',
+})
+
+
+def _deny_non_admin_caller_for_global_key(key: str | None = None) -> str | None:
+    """Refuse a non-administrator on a tool that reaches instance-wide data.
+
+    Two shapes need this. `restore_backup` takes a user_id but replaces the whole
+    instance. `get_app_setting` / `update_app_setting` take a user_id too, but
+    when the key is a global one the value belongs to the instance, not to the
+    profile named by X-User-ID.
+
+    The Poznote API cannot enforce this for us: its requireGlobalSettingsAdmin()
+    calls isCurrentUserAdmin(), which sees the SERVICE token (an administrator)
+    rather than the caller, so it passes for every caller. The check has to
+    happen here, where caller_is_admin() resolves the caller.
+
+    Returns None when the caller may proceed, which includes the case where
+    per-caller authentication is off.
+    """
+    if key is not None and key not in GLOBAL_SETTING_KEYS:
+        return None
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        is_admin = client.caller_is_admin()
+    except Exception as exc:
+        return _api_error_json(exc)
+    if is_admin is False:
+        what = f"the global setting '{key}'" if key else "instance-wide data"
+        return json.dumps({
+            "error": f"This tool reaches {what}, and is limited to administrator "
+                     "callers when per-caller authentication is enabled.",
+        }, indent=2, ensure_ascii=False)
+    return None
+
+
 def _deny_non_admin_caller() -> str | None:
     """Refuse a non-administrator on a tool that takes no user_id.
 
@@ -2731,6 +2822,9 @@ def restore_backup(filename: str, user_id: Optional[int] = None) -> str:
         filename: Name of the backup file to restore (e.g., poznote_backup_2026-02-02_15-30-00.zip)
         user_id: User profile ID to access (optional, overrides default)
     """
+    denied = _deny_non_admin_caller_for_global_key()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2749,6 +2843,9 @@ def get_app_setting(key: str, user_id: Optional[int] = None) -> str:
         key: The setting key to retrieve
         user_id: User profile ID to access (optional, overrides default)
     """
+    denied = _deny_non_admin_caller_for_global_key(key)
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2768,6 +2865,9 @@ def update_app_setting(key: str, value: str, user_id: Optional[int] = None) -> s
         value: The new value for the setting
         user_id: User profile ID to access (optional, overrides default)
     """
+    denied = _deny_non_admin_caller_for_global_key(key)
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err

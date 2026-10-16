@@ -18,6 +18,7 @@ import unittest
 from unittest import mock
 
 from poznote_mcp import auth_external as mod  # noqa: E402
+from poznote_mcp import server  # noqa: E402
 
 
 def _response(status=200, payload=None, raise_json=False):
@@ -361,8 +362,190 @@ class VerifierTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(key), 64)
 
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
+class HeadersForUserTests(unittest.TestCase):
+    """_headers_for_user must refuse an explicit user_id that disagrees with the
+    caller's verified identity. Without this the mode gives no isolation at all:
+    a caller could pass any profile id, the administrator included.
+
+    Stubs the same hook the existing resolver tests use, `_current_claims`, so the
+    real resolve_caller_profile() path runs rather than being mocked out.
+    """
+
+    def setUp(self):
+        mod.reset_config_cache()
+        self.addCleanup(mod.reset_config_cache)
+        self.env = mock.patch.dict(os.environ, {
+            "POZNOTE_MCP_AUTH_PROVIDER": "userinfo",
+            "POZNOTE_MCP_AUTH_URL": "https://idp.example.com/userinfo",
+        }, clear=True)
+        self.env.start()
+        self.addCleanup(self.env.stop)
+        mod.reset_config_cache()
+
+    def _client(self):
+        from poznote_mcp.client import PoznoteClient
+        client = PoznoteClient.__new__(PoznoteClient)
+        client._list_profiles = lambda: USERS
+        client._base_headers = {"Authorization": "Bearer service-token"}
+        return client
+
+    def test_explicit_user_id_for_another_profile_is_refused(self):
+        client = self._client()
+        with mock.patch.object(mod, "_current_claims", return_value={"sub": "11"}):
+            with self.assertRaises(mod.IdentityMismatch):
+                client._headers_for_user(1)
+
+    def test_matching_user_id_is_allowed_and_stamped(self):
+        client = self._client()
+        with mock.patch.object(mod, "_current_claims", return_value={"sub": "11"}):
+            headers = client._headers_for_user(11)
+        self.assertEqual(headers.get("X-User-ID"), "11")
+
+    def test_no_explicit_user_id_resolves_to_the_callers_own_profile(self):
+        client = self._client()
+        with mock.patch.object(mod, "_current_claims", return_value={"sub": "11"}):
+            headers = client._headers_for_user(None)
+        self.assertEqual(headers.get("X-User-ID"), "11")
+
+
+class AdminGuardTests(unittest.TestCase):
+    """The four system tools take no user_id, and restore_backup plus the global
+    settings keys reach instance-wide data. All of them must refuse a
+    non-administrator, and caller_is_admin() is the only check that resolves the
+    CALLER rather than the service token.
+
+    The client mock returns JSON-serializable values, so that if the guard were
+    absent these tests fail on the missing refusal text rather than on a
+    TypeError from serializing a Mock. Every refusal test also asserts that the
+    guarded call never reached the client.
+    """
+
+    def _client(self, is_admin):
+        client = mock.Mock()
+        client.caller_is_admin.return_value = is_admin
+        client.get_system_version.return_value = {"version": "test"}
+        client.restore_backup.return_value = {"ok": True}
+        client.get_setting.return_value = {"key": "tasklist_insert_order", "value": "top"}
+        client.update_setting.return_value = {"ok": True}
+        return client
+
+    def _patched(self, client):
+        return mock.patch.object(server, "_get_client_or_error", return_value=(client, None))
+
+    def test_system_tool_refuses_a_non_admin(self):
+        client = self._client(False)
+        with self._patched(client):
+            out = server.get_system_info()
+        self.assertIn("limited to administrator callers", out)
+        client.get_system_version.assert_not_called()
+
+    def test_system_tool_allows_an_admin(self):
+        client = self._client(True)
+        with self._patched(client):
+            out = server.get_system_info()
+        self.assertNotIn("limited to administrator callers", out)
+        client.get_system_version.assert_called_once()
+
+    def test_restore_backup_refuses_a_non_admin(self):
+        client = self._client(False)
+        with self._patched(client):
+            out = server.restore_backup("poznote_backup_test.zip", user_id=11)
+        self.assertIn("limited to administrator callers", out)
+        client.restore_backup.assert_not_called()
+
+    def test_global_setting_is_refused_for_a_non_admin(self):
+        client = self._client(False)
+        with self._patched(client):
+            out = server.get_app_setting("smtp_host", user_id=11)
+        self.assertIn("limited to administrator callers", out)
+        client.get_setting.assert_not_called()
+
+    def test_global_setting_write_is_refused_for_a_non_admin(self):
+        client = self._client(False)
+        with self._patched(client):
+            out = server.update_app_setting("mcp_user_id", "1", user_id=11)
+        self.assertIn("limited to administrator callers", out)
+        client.update_setting.assert_not_called()
+
+    def test_per_profile_setting_is_NOT_refused_for_a_non_admin(self):
+        """The guard must not break a caller reading its own display preferences."""
+        client = self._client(False)
+        with self._patched(client):
+            out = server.get_app_setting("tasklist_insert_order", user_id=11)
+        self.assertNotIn("limited to administrator callers", out)
+        client.get_setting.assert_called_once()
+
+    def test_guard_fails_closed_when_admin_lookup_raises(self):
+        """If we cannot tell whether the caller is an admin, refuse. Failing open
+        here would hand a non-admin exactly what the guard protects."""
+        client = self._client(False)
+        client.caller_is_admin.side_effect = RuntimeError("boom")
+        with self._patched(client):
+            out = server.restore_backup("poznote_backup_test.zip", user_id=11)
+        self.assertIn("error", out)
+        client.restore_backup.assert_not_called()
+
+    def test_admin_may_write_a_global_setting(self):
+        """The guard must not block an administrator from the tools it protects."""
+        client = self._client(True)
+        with self._patched(client):
+            out = server.update_app_setting("smtp_host", "mail.example.test", user_id=1)
+        self.assertNotIn("limited to administrator callers", out)
+        client.update_setting.assert_called_once()
+
+    def test_admin_may_restore_a_backup(self):
+        client = self._client(True)
+        with self._patched(client):
+            out = server.restore_backup("poznote_backup_test.zip", user_id=1)
+        self.assertNotIn("limited to administrator callers", out)
+        client.restore_backup.assert_called_once()
+
+    def test_guard_is_inert_when_per_caller_auth_is_off(self):
+        """caller_is_admin() returns None when the mode is off, so nothing changes."""
+        client = self._client(None)
+        with self._patched(client):
+            out = server.restore_backup("poznote_backup_test.zip", user_id=11)
+        self.assertNotIn("limited to administrator callers", out)
+        self.assertIn('"ok": true', out)
+        client.restore_backup.assert_called_once()
+
+
+class ErrorAttributionTests(unittest.TestCase):
+    """A refusal raised by the MCP server must not be reported as a Poznote API
+    error. The maintainer asked for this: the per-caller refusals surfaced as
+    "Poznote API error: IdentityMismatch" although the API never saw the request.
+    """
+
+    def _raising(self, exc):
+        client = mock.Mock()
+        client.get_note.side_effect = exc
+        return mock.patch.object(server, "_get_client_or_error", return_value=(client, None))
+
+    def test_identity_mismatch_is_attributed_to_the_mcp_server(self):
+        from poznote_mcp.auth_external import IdentityMismatch
+        exc = IdentityMismatch(
+            "user_id=1 is not the profile this token is linked to (profile 11)."
+        )
+        with self._raising(exc):
+            out = server.get_note(1, user_id=1)
+        self.assertNotIn("Poznote API error", out)
+        self.assertIn("MCP server refused this request", out)
+        self.assertIn("not the profile this token is linked to", out)
+
+    def test_an_unmapped_identity_is_attributed_to_the_mcp_server(self):
+        from poznote_mcp.auth_external import IdentityUnmapped
+        with self._raising(IdentityUnmapped("No verified identity on this request")):
+            out = server.get_note(1)
+        self.assertNotIn("Poznote API error", out)
+        self.assertIn("MCP server", out)
+
+    def test_a_provider_outage_is_not_reported_as_a_refusal(self):
+        """The provider being unreachable is not the caller being refused."""
+        from poznote_mcp.auth_external import IdentityProviderUnavailable
+        with self._raising(IdentityProviderUnavailable("provider returned 503")):
+            out = server.get_note(1)
+        self.assertNotIn("Poznote API error", out)
+        self.assertIn("could not verify", out)
 
 
 class DefaultMatchTests(unittest.TestCase):
@@ -451,3 +634,7 @@ class ProfileResolutionTests(unittest.TestCase):
         self._enable()
         with mock.patch.object(mod, "_current_claims", return_value={"sub": "12"}):
             self.assertEqual(mod.resolve_caller_profile_id(lambda: USERS), 12)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
