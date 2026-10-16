@@ -4,183 +4,382 @@
 <head>
   <meta charset="UTF-8">
   <title>Poznote URL Saver</title>
+  <link rel="stylesheet" href="ui.css">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 10px;
-      width: 350px;
+      width: 360px;
     }
 
-    h2 {
-      margin: 0 0 12px 0;
-      font-size: 16px;
-    }
-
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 5px;
-      margin-top: 5px;
-      box-sizing: border-box;
-    }
-
-    button {
-      margin-top: 15px;
-      width: 100%;
-      padding: 10px;
-      background: #007cba;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    button:hover {
-      background: #005a87;
-    }
-
-    button:disabled {
-      background: #aaa;
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
-
-    .action-buttons {
+    .top {
       display: flex;
-      gap: 5px;
-      margin-top: 10px;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 10px 10px 14px;
+      border-bottom: 1px solid var(--border);
     }
 
-    .action-buttons button {
-      margin-top: 0;
+    .logo {
+      width: 20px;
+      height: 20px;
+    }
+
+    .brand {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .host {
       flex: 1;
-      font-size: 13px;
-      padding: 10px 5px;
-    }
-
-    #status {
-      margin-top: 10px;
-      color: red;
-      word-wrap: break-word;
+      min-width: 0;
+      color: var(--text-subtle);
       font-size: 12px;
+      text-align: right;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    .row {
+    .view {
       display: flex;
-      gap: 5px;
-      align-items: center;
+      flex-direction: column;
+      gap: 12px;
+      padding: 14px;
     }
 
-    #fetchWorkspaces,
-    #loadFolders {
-      width: auto;
-      margin-top: 5px;
-      padding: 5px 10px;
-      font-size: 12px;
-      flex-shrink: 0;
-    }
-
-    /* Collapsible config panel */
-    .config-toggle {
-      background: none;
-      border: 1px solid #ccc;
-      color: #444;
-      font-size: 12px;
-      padding: 6px 10px;
-      margin-top: 10px;
-      width: 100%;
-      text-align: left;
-      cursor: pointer;
-      border-radius: 4px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .config-toggle:hover {
-      background: #f0f0f0;
-    }
-
-    .config-toggle .arrow {
-      transition: transform 0.2s;
-      font-style: normal;
-    }
-
-    .config-toggle.open .arrow {
-      transform: rotate(180deg);
-    }
-
-    .config-panel {
+    .view[hidden] {
       display: none;
-      border: 1px solid #ddd;
-      border-top: none;
-      padding: 10px;
-      border-radius: 0 0 4px 4px;
-      background: #fafafa;
     }
 
-    .config-panel.open {
-      display: block;
+    /* Not connected yet */
+    .empty {
+      align-items: center;
+      padding: 26px 22px 24px;
+      text-align: center;
     }
 
-    .config-panel label {
+    .empty .logo {
+      width: 44px;
+      height: 44px;
+    }
+
+    .empty h1 {
+      margin: 4px 0 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .empty p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    .empty .btn {
+      margin-top: 6px;
+      min-width: 160px;
+    }
+
+    /* The page being saved */
+    .page-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+
+    .favicon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text-muted);
+    }
+
+    .favicon img {
+      width: 16px;
+      height: 16px;
+    }
+
+    .page-text {
+      min-width: 0;
+    }
+
+    .page-title,
+    .page-host {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .page-title {
+      font-weight: 500;
+    }
+
+    .page-host {
+      color: var(--text-muted);
       font-size: 12px;
     }
 
-    #saveConfig {
-      margin-top: 12px;
-      padding: 8px;
-      font-size: 13px;
+    /* New note / existing note */
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      padding: 3px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .segmented button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 30px;
+      border: none;
+      border-radius: 6px;
+      background: none;
+      color: var(--text-muted);
+      font: inherit;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .segmented button:hover {
+      color: var(--text);
+    }
+
+    .segmented button[aria-selected="true"] {
+      background: var(--bg);
+      color: var(--accent);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    }
+
+    .segmented button:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--focus);
+    }
+
+    .destination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 12.5px;
+    }
+
+    .destination span {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .destination[hidden],
+    .append-panel[hidden] {
+      display: none;
+    }
+
+    /* Note picker */
+    .append-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .search {
+      position: relative;
+    }
+
+    .search .icon {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      color: var(--text-subtle);
+      pointer-events: none;
+    }
+
+    .search input {
+      padding-left: 32px;
+    }
+
+    .note-results {
+      list-style: none;
+      margin: 0;
+      padding: 3px;
+      max-height: 196px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .note-results li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .note-results li:hover,
+    .note-results li:focus-visible {
+      background: var(--surface-hover);
+      outline: none;
+    }
+
+    .note-results li.selected {
+      background: var(--accent-soft);
+    }
+
+    .note-results li.placeholder {
+      justify-content: center;
+      padding: 14px 8px;
+      color: var(--text-muted);
+      cursor: default;
+    }
+
+    .note-results li.placeholder:hover {
+      background: none;
+    }
+
+    .note-results .note-type {
+      display: flex;
+      justify-content: center;
+      width: 24px;
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+
+    .note-results .note-text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .note-results .note-heading,
+    .note-results .note-place {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .note-results .note-place {
+      color: var(--text-muted);
+      font-size: 11.5px;
+    }
+
+    .note-results .note-check {
+      visibility: hidden;
+      color: var(--accent);
+    }
+
+    .note-results li.selected .note-check {
+      visibility: visible;
+    }
+
+    .md-badge {
+      padding: 0 4px;
+      border: 1px solid currentColor;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 600;
+      line-height: 14px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
   </style>
 </head>
 
 <body>
-  <h2>Poznote URL Saver</h2>
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-success" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></symbol>
+    <symbol id="i-file-plus" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 18v-6"/></symbol>
+    <symbol id="i-list-plus" viewBox="0 0 24 24"><path d="M11 12H3"/><path d="M16 6H3"/><path d="M16 18H3"/><path d="M18 9v6"/><path d="M21 12h-6"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+  </svg>
 
-  <div class="action-buttons">
-    <button id="saveNote" title="Save URL only" disabled>🔗 Save URL</button>
-    <button id="saveScreenshot" title="Save with screenshot" disabled>📸 Screenshot</button>
-  </div>
+  <header class="top">
+    <img class="logo" src="icon.png" alt="">
+    <span class="brand">Poznote</span>
+    <span class="host" id="hostLabel"></span>
+    <button class="icon-btn" id="openSettings" title="Settings" aria-label="Settings">
+      <svg class="icon"><use href="#i-settings"/></svg>
+    </button>
+  </header>
 
-  <button class="config-toggle" id="configToggle">
-    ⚙️ Configuration <span class="arrow">▼</span>
-  </button>
+  <section class="view empty" id="connectView" hidden>
+    <img class="logo" src="icon.png" alt="">
+    <h1>Connect to Poznote</h1>
+    <p id="connectText">Link the extension to your Poznote instance once, then save any page in one click.</p>
+    <button class="btn btn-primary" id="connectBtn">Connect</button>
+  </section>
 
-  <div class="config-panel" id="configPanel">
-    <label>App URL (e.g. https://your-server/)</label>
-    <input type="url" id="appUrl" placeholder="https://your-server/">
-
-    <label>Username</label>
-    <input type="text" id="username">
-
-    <label>Password</label>
-    <input type="password" id="password">
-
-    <label>Workspace</label>
-    <div class="row">
-      <select id="workspaceSelect">
-        <option value="Poznote">Poznote (Default)</option>
-      </select>
-      <button id="fetchWorkspaces" title="Fetch Workspaces">↻</button>
+  <main class="view" id="mainView" hidden>
+    <div class="page-card">
+      <div class="favicon" id="pageIcon"><svg class="icon"><use href="#i-globe"/></svg></div>
+      <div class="page-text">
+        <div class="page-title" id="pageTitle"></div>
+        <div class="page-host" id="pageHost"></div>
+      </div>
     </div>
 
-    <label>Folder (optional)</label>
-    <div class="row">
-      <select id="folderSelect"></select>
-      <button id="loadFolders" title="Load Folders">↻</button>
+    <div class="segmented" role="tablist" aria-label="Destination">
+      <button id="modeNew" role="tab" aria-selected="true" title="Save the page as a new note">
+        <svg class="icon"><use href="#i-file-plus"/></svg>New note
+      </button>
+      <button id="modeAppend" role="tab" aria-selected="false" title="Add the page at the end of a note">
+        <svg class="icon"><use href="#i-list-plus"/></svg>Existing note
+      </button>
     </div>
 
-    <button id="saveConfig">💾 Save Configuration</button>
-  </div>
+    <div class="destination" id="newPanel">
+      <svg class="icon"><use href="#i-folder"/></svg>
+      <span id="destLabel"></span>
+      <button class="link-btn" id="changeDest">Change</button>
+    </div>
 
-  <div id="status"></div>
+    <div class="append-panel" id="appendPanel" hidden>
+      <div class="search">
+        <svg class="icon"><use href="#i-search"/></svg>
+        <input type="search" id="noteSearch" placeholder="Search notes" autocomplete="off" aria-label="Search notes">
+      </div>
+      <ul class="note-results" id="noteResults" role="listbox" aria-label="Notes"></ul>
+    </div>
 
+    <div class="actions">
+      <button class="btn btn-primary" id="saveNote" title="Save the link and the page's preview picture">
+        <svg class="icon"><use href="#i-link"/></svg>Save link
+      </button>
+      <button class="btn btn-secondary" id="saveScreenshot" title="Save the link with a screenshot of the visible page">
+        <svg class="icon"><use href="#i-camera"/></svg>Screenshot
+      </button>
+    </div>
+
+    <div class="message" id="status" role="status" hidden></div>
+  </main>
+
+  <script src="common.js"></script>
   <script src="popup.js"></script>
 </body>
 

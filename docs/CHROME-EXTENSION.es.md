@@ -13,7 +13,7 @@
 
 # Extensión de Chrome de Poznote
 
-**Poznote URL Saver** es una extensión del navegador que te permite guardar rápidamente en tu instancia de Poznote, con un solo clic, la URL o incluso una captura de pantalla completa de la página actual.
+**Poznote URL Saver** es una extensión de navegador que guarda la página actual en tu instancia de Poznote con un clic: su enlace con su imagen de vista previa, o una captura de pantalla, en una nota nueva o al final de una nota que ya tienes.
 
 <p align="center">
   <img src="../images/chrome-extension.png" alt="Poznote Chrome Extension" width="50%">
@@ -24,13 +24,21 @@ Instala la extensión directamente desde Chrome Web Store: [Instalar la extensi�
 ## Conectarla a tu instancia
 
 1. En Poznote, abre **Configuración > Contraseñas de aplicación**, crea una con el nombre de la extensión y copia el secreto que muestra. Solo se muestra una vez.
-2. Abre la extensión y rellena:
-   - **App URL:** la dirección de tu instancia, por ejemplo `https://notes.example.com/`
-   - **Username:** tu nombre de usuario de Poznote
-   - **Password:** la contraseña de aplicación que acabas de copiar
-   - **Workspace** y, opcionalmente, **Folder**: dónde deben ir las páginas guardadas
-3. Guarda. La extensión encuentra tu perfil por sí sola y está lista para usarse.
+2. Haz clic en el icono de la extensión y luego en **Connect**. Su página de ajustes se abre en una pestaña.
+3. Rellena la **Poznote address** (por ejemplo `https://notes.example.com`), tu **Username** y el **App password** que acabas de copiar, haz clic en **Connect** y permite que la extensión acceda a tu instancia cuando Chrome lo pida.
+4. Elige el **Workspace** y, opcionalmente, el **Folder** donde deben ir las notas nuevas. La elección se guarda al momento.
+
+Para cambiar estos ajustes más adelante, haz clic en el engranaje de la parte superior de la extensión.
 
 La contraseña de tu cuenta también funciona aquí, pero una contraseña de aplicación es la mejor credencial para una extensión: solo accede a la API, nunca a la interfaz web ni a los ajustes de tu cuenta, está limitada a tu propio perfil, y revocarla en Poznote desconecta la extensión sin cambiar nada más. Consulta [Contraseñas de aplicación](README.es.md#contraseñas-de-aplicación) para ver la lista completa de límites.
 
 > **Si tu instancia es solo SSO,** una contraseña de aplicación es la única forma de conectar la extensión: el formulario de inicio de sesión que necesita la extensión no existe para tu cuenta. Crea una desde **Configuración > Contraseñas de aplicación** exactamente como se indica arriba.
+
+## Guardar una página
+
+Haz clic en el icono de la extensión en la página que quieres conservar y elige su destino:
+
+- **New note** crea una nota con el nombre de la página, en el espacio de trabajo y la carpeta elegidos en los ajustes.
+- **Existing note** añade la página al final de una nota que eliges en la lista, que muestra tus últimas notas y las busca mientras escribes. La extensión recuerda esa nota para la siguiente página, así que reunir enlaces en una misma lista de lectura cuesta un clic por página. Las notas HTML y Markdown pueden recibir páginas.
+
+Después haz clic en **Save link** para guardar el enlace con la imagen de vista previa de la página cuando la tiene, o en **Screenshot** para guardar el enlace con una imagen de la parte visible de la página. La confirmación incluye un enlace que abre la nota en Poznote.

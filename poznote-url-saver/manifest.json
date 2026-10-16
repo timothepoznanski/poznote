@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "Poznote URL Saver",
-  "version": "1.3",
-  "description": "Saves the current page URL or screenshot to Poznote.",
+  "version": "2.0",
+  "description": "Saves the current page URL or screenshot to Poznote, as a new note or at the end of an existing one.",
   "permissions": [
     "storage",
     "tabs",
-    "activeTab"
+    "activeTab",
+    "scripting"
   ],
   "optional_host_permissions": [
     "*://*/api/v1/*"
@@ -22,5 +23,9 @@
   },
   "icons": {
     "128": "icon.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
   }
 }
