@@ -182,6 +182,8 @@ $eventHelpDefaults = [
     'quota.notes_reached' => 'A user action was blocked because their notes quota is reached. Payload: the user, the limit and the current count.',
     'quota.storage_reached' => 'A user action was blocked because their storage quota is reached. Payload: the user, the limit and the current usage.',
     'settings.language_changed' => 'A user changed the interface language in the settings. Payload: the user profile, the new language code, the previous one, and whether the change came from the interface or the REST API.',
+    'backup.completed' => 'A scheduled or admin-started backup run (S3 or local folder) finished and every selected user was backed up. Payload: the target, the trigger, the number of users and of archives written.',
+    'backup.failed' => 'A scheduled or admin-started backup run (S3 or local folder) finished with at least one error, or backed up nobody. Payload: the target, the trigger, the counts and the error messages.',
 ];
 $eventHelp = [];
 foreach ($eventHelpDefaults as $eventName => $default) {

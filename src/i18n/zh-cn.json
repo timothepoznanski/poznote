@@ -4461,7 +4461,9 @@
       "reminder_due_minimal": "与 reminder.due 相同的触发，但仅含标识符（笔记 id、提醒 id、触发时间）：笔记内容不会离开实例。详情可通过 REST API 获取。",
       "note_created": "您的账户中创建了一条笔记，来自界面或 REST API。Payload：仅元数据（笔记 id、标题、类型、工作区、文件夹、直达链接），绝不包含笔记内容。",
       "note_shared": "为您的某条笔记发布了公开分享链接。Payload：笔记（id、标题、工作区、直达链接）、公开令牌及其 URL，以及链接是否受密码保护。",
-      "settings_language_changed": "用户在设置中更改了界面语言。Payload：用户资料、新的语言代码、之前的代码，以及更改来自界面还是 REST API。"
+      "settings_language_changed": "用户在设置中更改了界面语言。Payload：用户资料、新的语言代码、之前的代码，以及更改来自界面还是 REST API。",
+      "backup_completed": "计划的或由管理员启动的备份（S3 或本地文件夹）已完成，所有选定用户均已备份。Payload：目标、触发方式、用户数和已写入的归档数。",
+      "backup_failed": "计划的或由管理员启动的备份（S3 或本地文件夹）结束时至少出现一个错误，或没有备份任何用户。Payload：目标、触发方式、计数和错误信息。"
     },
     "title": "Webhook",
     "description": "当订阅的事件发生时，Poznote 会向每个已注册的端点发送带有 JSON 数据的 HTTP POST 请求。如果设置了密钥，数据将通过 X-Poznote-Signature-256 请求头以 HMAC-SHA256 签名。",

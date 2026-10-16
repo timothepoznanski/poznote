@@ -4469,7 +4469,9 @@
       "reminder_due_minimal": "Même déclenchement que reminder.due mais identifiants seulement (id de note, id de rappel, date d'échéance) : aucun contenu de note ne quitte l'instance. Les détails peuvent être récupérés via l'API REST.",
       "note_created": "Une note a été créée dans votre compte, depuis l'interface ou l'API REST. Payload : métadonnées seulement (id de note, titre, type, workspace, dossier, lien direct), jamais le contenu de la note.",
       "note_shared": "Un lien de partage public a été publié pour une de vos notes. Payload : la note (id, titre, workspace, lien direct), le token public et son URL, et si le lien est protégé par mot de passe.",
-      "settings_language_changed": "Un utilisateur a changé la langue de l'interface dans les paramètres. Payload : le profil utilisateur, le nouveau code langue, l'ancien, et si le changement vient de l'interface ou de l'API REST."
+      "settings_language_changed": "Un utilisateur a changé la langue de l'interface dans les paramètres. Payload : le profil utilisateur, le nouveau code langue, l'ancien, et si le changement vient de l'interface ou de l'API REST.",
+      "backup_completed": "Une sauvegarde planifiée ou lancée par un administrateur (S3 ou dossier local) s'est terminée et tous les utilisateurs sélectionnés ont été sauvegardés. Payload : la cible, le déclencheur, le nombre d'utilisateurs et d'archives écrites.",
+      "backup_failed": "Une sauvegarde planifiée ou lancée par un administrateur (S3 ou dossier local) s'est terminée avec au moins une erreur, ou n'a sauvegardé personne. Payload : la cible, le déclencheur, les compteurs et les messages d'erreur."
     },
     "title": "Webhooks",
     "description": "Poznote envoie une requête HTTP POST avec une charge JSON à chaque endpoint enregistré lorsqu'un événement souscrit se produit. Si un secret est défini, la charge est signée en HMAC-SHA256 dans l'en-tête X-Poznote-Signature-256.",

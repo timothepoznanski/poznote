@@ -4365,7 +4365,9 @@
       "reminder_due_minimal": "Mesmo disparo que reminder.due, mas apenas identificadores (id da nota, id do lembrete, horário de disparo): nenhum conteúdo da nota sai da instância. Os detalhes podem ser obtidos pela API REST.",
       "note_created": "Uma nota foi criada na sua conta, pela interface ou pela API REST. Payload: apenas metadados (id da nota, título, tipo, workspace, pasta, link direto), nunca o conteúdo da nota.",
       "note_shared": "Um link público de compartilhamento foi publicado para uma das suas notas. Payload: a nota (id, título, workspace, link direto), o token público e sua URL, e se o link é protegido por senha.",
-      "settings_language_changed": "Um usuário alterou o idioma da interface nas configurações. Payload: o perfil do usuário, o novo código de idioma, o anterior e se a alteração veio da interface ou da API REST."
+      "settings_language_changed": "Um usuário alterou o idioma da interface nas configurações. Payload: o perfil do usuário, o novo código de idioma, o anterior e se a alteração veio da interface ou da API REST.",
+      "backup_completed": "Um backup agendado ou iniciado por um administrador (S3 ou pasta local) terminou e todos os usuários selecionados foram salvos. Payload: o destino, o gatilho, o número de usuários e de arquivos gravados.",
+      "backup_failed": "Um backup agendado ou iniciado por um administrador (S3 ou pasta local) terminou com pelo menos um erro, ou não salvou ninguém. Payload: o destino, o gatilho, os contadores e as mensagens de erro."
     },
     "title": "Webhooks",
     "description": "O Poznote envia um pedido HTTP POST com um payload JSON a cada endpoint registado quando ocorre um evento subscrito. Se for definido um segredo, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",

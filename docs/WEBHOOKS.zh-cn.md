@@ -43,7 +43,7 @@ Webhook 分为两个相互独立的级别：
 
 | 级别 | 管理位置 | 适用对象 | 事件 |
 |---|---|---|---|
-| **管理员 Webhook** | **设置 > 管理工具 > 管理员 Webhook** | 仅限管理员 | 实例事件：`user.created`、`user.updated`、`user.activated`、`user.deactivated`、`user.deleted`、`settings.language_changed`、`signup.cap_reached`、`quota.notes_reached`、`quota.storage_reached` |
+| **管理员 Webhook** | **设置 > 管理工具 > 管理员 Webhook** | 仅限管理员 | 实例事件：`user.created`、`user.updated`、`user.activated`、`user.deactivated`、`user.deleted`、`settings.language_changed`、`signup.cap_reached`、`quota.notes_reached`、`quota.storage_reached`、`backup.completed`、`backup.failed` |
 | **用户 Webhook** | **设置 > 用户 Webhook** | 所有账户（除非被租户隔离禁用） | 与账户自身内容相关的事件：`note.created`、`note.shared`、`reminder.due`、`reminder.due_title`、`reminder.due_minimal` |
 
 隔离规则非常严格：用户事件只会投递到产生该事件的账户所注册的端点。一个用户的笔记和提醒永远不会到达另一个用户的端点。实例事件会发送到所有订阅了该事件的管理员 Webhook。
@@ -363,6 +363,37 @@ user 对象永远不包含密码、密码哈希或 OIDC 令牌。
 | `data.quota.pool` | 仅当被阻止的上传针对的是 S3 附件配额而不是本地存储时才会出现，值为 `"s3"` |
 
 > **限流：** 配额事件会被限流，每个用户、每种事件类型每小时最多投递一次，因此反复触及上限的用户不会让请求涌向端点。在配额事件中，`data.user` 没有 `source` 字段。
+
+#### backup.completed / backup.failed
+
+一次自动备份（S3 存储桶或本地文件夹，按其设置页面中设定的计划执行）或管理员通过 **立即备份** 启动的备份已结束。每次运行只发送一个事件，而不是每个用户一个：所有选定用户均无错误地完成备份时发送 `backup.completed`；至少一个用户失败、旧归档无法清理、目标不可达或没有备份任何用户时发送 `backup.failed`。用户为自己的账户启动的备份不会触发这些事件。
+
+```json
+{
+  "event": "backup.failed",
+  "delivery_id": "…",
+  "created_at": "2026-10-16T03:00:12+00:00",
+  "data": {
+    "backup": {
+      "target": "s3",
+      "trigger": "auto",
+      "users": 3,
+      "backed_up": 2,
+      "errors": ["nina: Access Denied"]
+    }
+  }
+}
+```
+
+| 字段 | 说明 |
+|---|---|
+| `data.backup.target` | `s3`（S3 备份存储桶）或 `local`（本地备份文件夹） |
+| `data.backup.trigger` | `auto`（计划运行）或 `manual`（由管理员启动） |
+| `data.backup.users` | 本次运行选定的用户数 |
+| `data.backup.backed_up` | 已写入的归档数 |
+| `data.backup.errors` | 错误信息，涉及某个用户时以用户名开头，最多 10 条。`backup.completed` 时为空 |
+
+> **使用 healthchecks.io 监控：** 注册两个 Webhook，将检查的 ping URL（`https://hc-ping.com/<uuid>`）订阅 `backup.completed`，将同一 URL 加上 `/fail` 订阅 `backup.failed`。把检查的周期设为备份频率：如果 worker 停止或在运行中崩溃，就不会发送任何事件，缺失的 ping 会触发告警。
 
 ### 用户事件
 
