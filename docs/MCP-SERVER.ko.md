@@ -198,6 +198,57 @@ docker compose up -d --force-recreate mcp-server
 
 이 토큰은 `data/.mcp_token`과 별개입니다. 파일의 토큰은 MCP 서버가 *Poznote API에* 접속할 때 사용하며, 이 설정값은 *AI 어시스턴트*가 MCP 서버에 제시하는 토큰입니다.
 
+#### 호출자별 인증(선택 사항)
+
+위의 `POZNOTE_MCP_AUTH_TOKEN`은 하나의 공유 비밀입니다. 모든 클라이언트가 같은
+토큰을 제시하고, 서버는 단일 프로필로 동작합니다. 여러 사람이나 에이전트가 하나의
+MCP 인스턴스를 공유하면 이를 구분할 수 없습니다.
+
+`POZNOTE_MCP_AUTH_PROVIDER`를 설정하면 호출자별 인증으로 전환됩니다. 각
+클라이언트가 **자신의** 토큰을 제시하고, 이 토큰은 외부 ID 공급자에서 확인되어 그
+호출자의 Poznote 프로필에 매핑됩니다. 하나의 인스턴스, 여러 호출자, 각자 정확히
+식별됩니다.
+
+| variable | default | meaning |
+|---|---|---|
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(설정하지 않음, 기능 꺼짐)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(필수)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(설정하지 않음, 기능 꺼짐)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(설정하지 않음, 기능 꺼짐)* | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
+| `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
+
+`userinfo`는 호출자의 Bearer 토큰으로 `GET <url>`을 수행합니다. OpenID Connect
+UserInfo 엔드포인트입니다. 토큰은 로컬에서 검증되지 않으므로 불투명 토큰도 JWT와
+똑같이 동작하며, 관리할 JWKS나 키 교체 표면이 없습니다. `introspection`은
+`token=<token>`으로 `POST <url>`을 수행합니다(RFC 7662). `active: false`를 담은
+응답은 유효하지 않은 토큰입니다.
+
+`POZNOTE_MCP_IDENTITY_MATCH`에서 존재하면서 **정확히 하나의 프로필과 일치하는**
+첫 번째 클레임이 선택됩니다. 프로필 필드는 `GET /api/v1/admin/users`가 반환하는
+것입니다. 기본값은 subject만 비교합니다. `preferred_username`이나 `email`로
+비교하는 것도 가능하지만 더 약합니다. Poznote 자체 로그인은 이메일이 확인된
+경우에만 비교하며, 사용자가 그 필드를 수정할 수 있는 공급자에서는 다른 프로필을
+차지할 수 있기 때문입니다. 필요할 때만 명시적으로 켜십시오.
+
+두 프로필과 일치하는 값은 모호하므로 거부되고, 어떤 프로필과도 일치하지 않는
+ID는 그대로 거부됩니다. 기본값은 첫 번째 관리자인 프로필 1이므로 기본 프로필로
+대체되지 않습니다. 비활성화된 프로필은 후보가 되지 않습니다.
+
+활성화하기 전에 알아 두어야 할 두 가지 결과가 있습니다.
+
+- **명시적인 `user_id` 인수는 확인된 프로필과 일치할 때만 허용됩니다.** 대부분의
+  도구가 이 인수를 받으므로, 다른 프로필을 지정한 값은 따르지 않고 거부합니다.
+- **`user_id`를 받지 않는 도구**(`get_system_info`, `list_backups`,
+  `create_backup`, `delete_backup`)는 서버의 기본 프로필로 동작하므로, 확인된
+  프로필이 관리자인 호출자로 제한됩니다. 따라서 기본 프로필은 관리자여야 하며,
+  프로필 조회가 `GET /api/v1/admin/users`를 읽습니다.
+
+`POZNOTE_MCP_AUTH_PROVIDER`가 설정되면 `POZNOTE_MCP_AUTH_TOKEN`보다 우선하며,
+그 토큰이 여전히 설정되어 있으면 서버가 경고를 기록합니다.
+
 #### 디버그 모드
 
 시작 명령에 `POZNOTE_DEBUG=true`를 지정하면 로그 수준이 `INFO`에서 `DEBUG`로 바뀝니다. 평소에는 `false`로 두세요. 소문자 `true`와 `false`만 인식하며 다른 값은 경고와 함께 `false`로 처리합니다. 웹 서버는 `1`, `on`, `yes`도 허용합니다. Poznote API에 보낸 모든 HTTP 요청, AI 어시스턴트의 도구 호출, 응답이 컨테이너 로그에 상세히 기록됩니다. 연결 및 인증 문제 진단에 사용하세요.

@@ -198,6 +198,62 @@ Then add the same header to your client configuration: see [VS Code Copilot](VSC
 
 This token is separate from `data/.mcp_token`: that one is used by the MCP server to talk *to* the Poznote API, this one is what *your AI assistant* must present to the MCP server.
 
+#### Per-caller authentication (optional)
+
+`POZNOTE_MCP_AUTH_TOKEN` above is one shared secret: every client presents the
+same token, and the server acts as a single profile. When several people or
+agents share one MCP instance, that cannot tell them apart.
+
+Setting `POZNOTE_MCP_AUTH_PROVIDER` switches to per-caller authentication: each
+client presents **its own** token, which is resolved against an external
+identity provider and mapped to that caller's Poznote profile. One instance,
+many callers, each correctly identified.
+
+| variable | default | meaning |
+|---|---|---|
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset, feature off)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(required)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(unset, feature off)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(unset, feature off)* | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
+| `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
+
+`userinfo` performs `GET <url>` with the caller's bearer token, the OpenID
+Connect UserInfo endpoint. The token is never verified locally, so opaque tokens
+work exactly as well as JWTs, and there is no JWKS or key-rotation surface to
+maintain. `introspection` performs `POST <url>` with `token=<token>`
+(RFC 7662); a response carrying `active: false` is an invalid token.
+
+The first claim in `POZNOTE_MCP_IDENTITY_MATCH` that is present **and matches
+exactly one profile** wins. Profile fields are those returned by
+`GET /api/v1/admin/users`. The default matches on the subject alone. Matching on
+`preferred_username` or `email` is available but weaker, because Poznote's own
+sign-in matches an email only when it is verified, and a provider that lets users
+edit those fields would let one of them claim another profile. Opt in
+deliberately.
+
+A value matching two profiles is refused as ambiguous, and an identity matching
+no profile is refused outright: it never falls back to a default profile,
+because the default is profile 1, the first administrator. A disabled profile is
+never a match candidate.
+
+Two consequences worth knowing before enabling it:
+
+- **An explicit `user_id` argument may only agree with the resolved profile.**
+  Most tools accept that argument, so one naming a different profile is refused
+  rather than honoured.
+- **The tools that take no `user_id`** (`get_system_info`, `list_backups`,
+  `create_backup`, `delete_backup`) act as the server's default profile, so they
+  are limited to callers whose resolved profile is an administrator. The default
+  profile therefore has to be an administrator, because the profile lookup reads
+  `GET /api/v1/admin/users`.
+
+With `POZNOTE_MCP_AUTH_PROVIDER` set it takes precedence over
+`POZNOTE_MCP_AUTH_TOKEN`, and the server logs a warning if that token is still
+set.
+
 #### Debug mode
 
 Set `POZNOTE_DEBUG=true` in the startup command to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. The web server is more tolerant and also accepts `1`, `on` or `yes`. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:

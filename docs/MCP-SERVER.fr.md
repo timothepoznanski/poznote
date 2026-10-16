@@ -198,6 +198,64 @@ Ajoutez ensuite le même en-tête à la configuration de votre client : voir [VS
 
 Ce jeton est distinct de `data/.mcp_token` : celui-là sert au serveur MCP pour dialoguer *avec* l'API Poznote, celui-ci est ce que *votre assistant IA* doit présenter au serveur MCP.
 
+#### Authentification par appelant (facultatif)
+
+Le `POZNOTE_MCP_AUTH_TOKEN` ci-dessus est un seul secret partagé : chaque client
+présente le même jeton et le serveur agit en tant qu'unique profil. Lorsque
+plusieurs personnes ou agents partagent une instance MCP, cela ne permet pas de
+les distinguer.
+
+Définir `POZNOTE_MCP_AUTH_PROVIDER` bascule vers une authentification par
+appelant : chaque client présente **son propre** jeton, qui est résolu auprès
+d'un fournisseur d'identité externe et associé au profil Poznote de cet
+appelant. Une instance, de nombreux appelants, chacun correctement identifié.
+
+| variable | default | meaning |
+|---|---|---|
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(non défini, fonction désactivée)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_URL` | *(obligatoire)* | provider endpoint |
+| `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
+| `POZNOTE_MCP_AUTH_AUDIENCE` | *(non défini, fonction désactivée)* | expected `aud`, comma separated; refuses a token issued for another application |
+| `POZNOTE_MCP_AUTH_HEADER` | `Authorization` | the header this server sends **to the provider** |
+| `POZNOTE_MCP_AUTH_CLIENT_ID` / `_CLIENT_SECRET` | *(non défini, fonction désactivée)* | `introspection` only, sent as HTTP Basic |
+| `POZNOTE_MCP_AUTH_TIMEOUT` | `5` | seconds |
+| `POZNOTE_MCP_AUTH_CACHE_TTL` | `60` | seconds a resolved token/profile is cached |
+
+`userinfo` effectue `GET <url>` avec le jeton porteur de l'appelant, le point
+d'accès UserInfo d'OpenID Connect. Le jeton n'est jamais vérifié localement,
+donc les jetons opaques fonctionnent aussi bien que les JWT, et il n'y a aucune
+surface JWKS ni de rotation de clés à maintenir. `introspection` effectue
+`POST <url>` avec `token=<token>` (RFC 7662) ; une réponse portant
+`active: false` est un jeton invalide.
+
+La première revendication de `POZNOTE_MCP_IDENTITY_MATCH` qui est présente **et
+correspond à exactement un profil** l'emporte. Les champs de profil sont ceux
+renvoyés par `GET /api/v1/admin/users`. Par défaut, seul le sujet est comparé.
+Comparer sur `preferred_username` ou `email` est possible mais plus faible, car
+la connexion de Poznote ne compare un courriel que lorsqu'il est vérifié, et un
+fournisseur qui laisse modifier ces champs permettrait à un utilisateur de
+revendiquer un autre profil. Activez-le en connaissance de cause.
+
+Une valeur correspondant à deux profils est refusée comme ambiguë, et une
+identité ne correspondant à aucun profil est refusée d'emblée : elle ne retombe
+jamais sur un profil par défaut, car le profil par défaut est le profil 1, le
+premier administrateur. Un profil désactivé n'est jamais candidat.
+
+Deux conséquences à connaître avant de l'activer :
+
+- **Un argument `user_id` explicite ne peut que correspondre au profil résolu.**
+  La plupart des outils acceptent cet argument, donc un argument nommant un
+  autre profil est refusé plutôt qu'honoré.
+- **Les outils qui ne prennent pas de `user_id`** (`get_system_info`,
+  `list_backups`, `create_backup`, `delete_backup`) agissent en tant que profil
+  par défaut du serveur, et sont donc limités aux appelants dont le profil
+  résolu est administrateur. Le profil par défaut doit donc être
+  administrateur, car la recherche de profils lit `GET /api/v1/admin/users`.
+
+Lorsque `POZNOTE_MCP_AUTH_PROVIDER` est défini, il est prioritaire sur
+`POZNOTE_MCP_AUTH_TOKEN`, et le serveur journalise un avertissement si ce jeton
+est encore défini.
+
 #### Mode débogage
 
 Définissez `POZNOTE_DEBUG=true` dans la commande de démarrage pour faire passer le niveau de log de `INFO` à `DEBUG`. Remettez-le à `false` pour un usage normal. Seules les valeurs exactes en minuscules `true` et `false` sont reconnues. Toute autre valeur est traitée comme `false` et un avertissement est écrit dans les logs MCP. Le serveur web est plus tolérant et accepte aussi `1`, `on` ou `yes`. Chaque requête HTTP envoyée à l'API Poznote, chaque appel d'outil reçu de l'assistant IA et chaque réponse sont écrits en détail dans les logs du conteneur. Utilisez-le pour diagnostiquer des problèmes de connexion ou d'authentification :

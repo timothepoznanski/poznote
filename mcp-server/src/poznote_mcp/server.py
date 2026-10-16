@@ -47,6 +47,12 @@ from fastmcp.server.auth import AccessToken, TokenVerifier
 from starlette.middleware import Middleware
 
 from .client import PoznoteClient
+from .auth_external import (
+    IdentityMismatch,
+    IdentityProviderUnavailable,
+    IdentityUnmapped,
+    build_external_auth_provider,
+)
 
 
 def _is_strict_bool_env_value(value: str) -> bool:
@@ -240,8 +246,11 @@ class LocalOriginGuard:
         await self.app(scope, receive, send)
 
 
-def _build_http_middleware(token: str | None) -> list[Middleware]:
-    return [] if token else [Middleware(LocalOriginGuard)]
+def _build_http_middleware(token: str | None, external: bool = False) -> list[Middleware]:
+    # The origin guard exists to keep a *browser page* off an unauthenticated
+    # endpoint. It is redundant once any bearer check is in force, including
+    # the per-caller one, so it stands down for either.
+    return [] if (token or external) else [Middleware(LocalOriginGuard)]
 
 
 def _load_inbound_auth_token(env_value: str | None = None) -> str | None:
@@ -282,13 +291,25 @@ def _build_auth_provider(token: str | None) -> StaticBearerTokenVerifier | None:
 
 _inbound_auth_token = _load_inbound_auth_token()
 
+# Per-caller authentication (opt-in). When POZNOTE_MCP_AUTH_PROVIDER is
+# set, each caller presents its own token, which is resolved against an
+# external identity provider and mapped to that caller's Poznote profile.
+# None when unset, leaving upstream behaviour untouched.
+_external_auth_provider = build_external_auth_provider()
+
 # Initialize FastMCP server.
 #
 # FastMCP 3.x: host/port/stateless_http are no longer constructor options —
 # they are passed to mcp.run() in main(), which stays the single source of
 # truth for network settings. Inbound auth, on the other hand, is baked into
 # the HTTP app at construction time, so it is decided here from the env.
-mcp = FastMCP("poznote-mcp", auth=_build_auth_provider(_inbound_auth_token))
+mcp = FastMCP(
+    "poznote-mcp",
+    # Per-caller auth takes precedence when configured: an operator who has
+    # just set the provider means it, and leaving the old single token in
+    # force would silently 401 every caller. The conflict is logged.
+    auth=_external_auth_provider or _build_auth_provider(_inbound_auth_token),
+)
 
 # Poznote client (initialized lazily)
 _client: PoznoteClient | None = None
@@ -410,7 +431,26 @@ def _resolve_workspace(client, workspace: Optional[str], user_id: Optional[int])
 
 
 def _api_error_json(exc: Exception) -> str:
-    """Convert an HTTP/network exception into a clean JSON error for the AI."""
+    """Convert an exception raised during a tool call into a clean JSON error.
+
+    The caller is told where the failure came from. An error raised by the MCP
+    server itself is labelled as such, rather than reported as a Poznote API
+    error for a request the API never saw.
+    """
+    # Raised by the MCP server before any request reaches the API. Without these
+    # branches they fall through to the generic handler at the bottom and surface
+    # as "Poznote API error: IdentityMismatch", which blames the API for a refusal
+    # the MCP server made.
+    if isinstance(exc, (IdentityMismatch, IdentityUnmapped)):
+        return json.dumps(
+            {"error": f"MCP server refused this request: {exc}"},
+            ensure_ascii=False,
+        )
+    if isinstance(exc, IdentityProviderUnavailable):
+        return json.dumps(
+            {"error": f"MCP server could not verify the caller's identity: {exc}"},
+            ensure_ascii=False,
+        )
     if isinstance(exc, httpx.ConnectError):
         return json.dumps(
             {"error": "Cannot connect to Poznote API. Is the server running?", "detail": str(exc)},
@@ -2638,9 +2678,105 @@ def git_pull(user_id: Optional[int] = None) -> str:
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
+# Settings keys that are INSTANCE-WIDE rather than per-profile, mirrored from
+# SettingsController::$globalSettings on the Poznote side. A non-administrator
+# caller must not read or write these THROUGH A TOOL: they carry SMTP
+# credentials, tenant isolation, user quotas, mcp_user_id and
+# mcp_default_workspace.
+#
+# Scope of the claim, stated precisely because an earlier version of this
+# comment overstated it: the guard covers the tools that expose a setting to a
+# caller. It does not prevent every internal read. `_resolve_workspace()` reads
+# mcp_default_workspace to pick the workspace a workspace-less write lands in,
+# for any caller. That is deliberate: the setting is an instance-wide DEFAULT
+# whose whole purpose is to apply to everyone, the value is a workspace name
+# rather than a credential, and the API still access-checks the workspace it
+# names. It is recorded here so the difference is not mistaken for a hole.
+#
+# This list is duplicated rather than fetched, because GET /settings merges
+# global and per-profile values with no marker distinguishing them, so the MCP
+# cannot tell them apart from a normal call. If the server adds a global key it
+# must be added here too, or the guard silently stops covering it. Filed as a
+# known limitation rather than hidden.
+GLOBAL_SETTING_KEYS = frozenset({
+    'hidden_ui_elements_global', 'login_display_name', 'discussions_url', 'discord_url',
+    'custom_css_path', 'theme_list', 'git_sync_enabled', 'allow_executable_attachments',
+    'login_disabled', 'tenant_isolation', 'tenant_isolation_features',
+    'tenant_isolation_applied_ui_keys', 'import_max_individual_files', 'import_max_zip_files',
+    'user_max_notes', 'user_max_storage_mb', 'user_max_storage_s3_mb', 'user_max_backups_s3_mb',
+    'mcp_user_id', 'mcp_default_workspace', 'mcp_debug',
+    'smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_security', 'smtp_username',
+    'smtp_password', 'smtp_from_email', 'smtp_from_name', 'smtp_app_url',
+    'smtp_reminder_cutoff_at',
+})
+
+
+def _deny_non_admin_caller_for_global_key(key: str | None = None) -> str | None:
+    """Refuse a non-administrator on a tool that reaches instance-wide data.
+
+    Two shapes need this. `restore_backup` takes a user_id but replaces the whole
+    instance. `get_app_setting` / `update_app_setting` take a user_id too, but
+    when the key is a global one the value belongs to the instance, not to the
+    profile named by X-User-ID.
+
+    The Poznote API cannot enforce this for us: its requireGlobalSettingsAdmin()
+    calls isCurrentUserAdmin(), which sees the SERVICE token (an administrator)
+    rather than the caller, so it passes for every caller. The check has to
+    happen here, where caller_is_admin() resolves the caller.
+
+    Returns None when the caller may proceed, which includes the case where
+    per-caller authentication is off.
+    """
+    if key is not None and key not in GLOBAL_SETTING_KEYS:
+        return None
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        is_admin = client.caller_is_admin()
+    except Exception as exc:
+        return _api_error_json(exc)
+    if is_admin is False:
+        what = f"the global setting '{key}'" if key else "instance-wide data"
+        return json.dumps({
+            "error": f"This tool reaches {what}, and is limited to administrator "
+                     "callers when per-caller authentication is enabled.",
+        }, indent=2, ensure_ascii=False)
+    return None
+
+
+def _deny_non_admin_caller() -> str | None:
+    """Refuse a non-administrator on a tool that takes no user_id.
+
+    get_system_info, list_backups, create_backup and delete_backup do not go
+    through _headers_for_user(), so they act as the server's default profile,
+    which has to be an administrator. Under per-caller authentication that would
+    expose them to every caller, so they are limited to administrator callers.
+
+    Returns None when the caller may proceed, which includes the case where
+    per-caller authentication is off and behaviour is unchanged.
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        is_admin = client.caller_is_admin()
+    except Exception as exc:
+        return _api_error_json(exc)
+    if is_admin is False:
+        return json.dumps({
+            "error": "This tool acts as the server's default profile, and is limited "
+                     "to administrator callers when per-caller authentication is enabled.",
+        }, indent=2, ensure_ascii=False)
+    return None
+
+
 @mcp.tool()
 def get_system_info() -> str:
     """Get version information about the Poznote installation"""
+    denied = _deny_non_admin_caller()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2654,6 +2790,9 @@ def get_system_info() -> str:
 @mcp.tool()
 def list_backups() -> str:
     """List all available system backups"""
+    denied = _deny_non_admin_caller()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2667,6 +2806,9 @@ def list_backups() -> str:
 @mcp.tool()
 def create_backup() -> str:
     """Trigger the creation of a new system backup"""
+    denied = _deny_non_admin_caller()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2685,6 +2827,9 @@ def restore_backup(filename: str, user_id: Optional[int] = None) -> str:
         filename: Name of the backup file to restore (e.g., poznote_backup_2026-02-02_15-30-00.zip)
         user_id: User profile ID to access (optional, overrides default)
     """
+    denied = _deny_non_admin_caller_for_global_key()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2703,6 +2848,9 @@ def get_app_setting(key: str, user_id: Optional[int] = None) -> str:
         key: The setting key to retrieve
         user_id: User profile ID to access (optional, overrides default)
     """
+    denied = _deny_non_admin_caller_for_global_key(key)
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2722,6 +2870,9 @@ def update_app_setting(key: str, value: str, user_id: Optional[int] = None) -> s
         value: The new value for the setting
         user_id: User profile ID to access (optional, overrides default)
     """
+    denied = _deny_non_admin_caller_for_global_key(key)
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2923,6 +3074,9 @@ def delete_backup(filename: str) -> str:
     Args:
         filename: Name of the backup file to delete (e.g., poznote_backup_2026-02-02_15-30-00.zip)
     """
+    denied = _deny_non_admin_caller()
+    if denied:
+        return denied
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2999,6 +3153,18 @@ def list_shared_with_me(user_id: Optional[int] = None) -> str:
 
 def _log_inbound_auth_status(host: str, token: str | None) -> None:
     """Tell the operator, once at startup, how the endpoint is protected."""
+    if _external_auth_provider is not None:
+        logger.info(
+            "Per-caller authentication enabled: every client must present its own "
+            "token, resolved against the configured identity provider.",
+        )
+        if token:
+            logger.warning(
+                "%s is also set and is being IGNORED: per-caller authentication "
+                "takes precedence. Unset it so there is exactly one way in.",
+                AUTH_TOKEN_ENV,
+            )
+        return
     if token:
         logger.info(
             "Inbound authentication enabled: clients must send "
@@ -3085,7 +3251,9 @@ def main():
             port=port,
             stateless_http=True,
             show_banner=False,
-            middleware=_build_http_middleware(_inbound_auth_token),
+            middleware=_build_http_middleware(
+                _inbound_auth_token, external=_external_auth_provider is not None
+            ),
         )
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
