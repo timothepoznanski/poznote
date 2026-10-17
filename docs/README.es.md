@@ -25,6 +25,10 @@ Una alternativa gratuita, autoalojada y de código abierto a Notion, Obsidian, E
 </h3>
 
 <p align="center">
+  <a href="https://poznote.com/video/poznote.mp4"><img src="../images/poznote-video.jpg" alt="Ver el vídeo de Poznote" width="100%"></a>
+</p>
+
+<p align="center">
   <img src="../images/pres1.png" alt="Poznote-light" width="100%">
 </p>
 
