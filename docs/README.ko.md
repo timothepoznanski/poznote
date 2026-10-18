@@ -25,6 +25,10 @@ Notion, Obsidian, Evernote, OneNote를 대신할 무료 셀프 호스팅 오픈 
 </h3>
 
 <p align="center">
+  <a href="https://poznote.com/video/poznote.mp4"><img src="../images/poznote-video.jpg" alt="Poznote 영상 보기" width="100%"></a>
+</p>
+
+<p align="center">
   <img src="../images/pres1.png" alt="Poznote-light" width="100%">
 </p>
 
