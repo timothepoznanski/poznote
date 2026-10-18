@@ -321,6 +321,20 @@
         if (card) {
             card.addEventListener('click', showModal);
         }
+
+        // settings.php?open=app-passwords, linked from the browser extension:
+        // settings-page.js has already selected My Account from it (its
+        // DOMContentLoaded handler runs first), so the param can go, or a
+        // reload would open the dialog again.
+        var params = new URLSearchParams(window.location.search || '');
+        if (card && params.get('open') === 'app-passwords') {
+            showModal();
+            if (window.history && typeof window.history.replaceState === 'function') {
+                var cleanUrl = new URL(window.location.href);
+                cleanUrl.searchParams.delete('open');
+                window.history.replaceState(window.history.state, '', cleanUrl.toString());
+            }
+        }
     }
 
     if (document.readyState === 'loading') {

@@ -34,6 +34,9 @@
         // The "View my storage" links (attachment pages, S3 settings) and the
         // former storage-stats-user.php page: the figures close My Account
         account: 'settings-account-section-grid',
+        // The browser extension's settings page; js/app-passwords.js opens
+        // the dialog on top
+        'app-passwords': 'settings-account-section-grid',
         // "All options" button of the contextual panel (ui_customization_panel.php)
         'ui-customization': 'settings-ui-customization-section-grid'
     };
