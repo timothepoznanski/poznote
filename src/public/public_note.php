@@ -398,30 +398,33 @@ try {
     // When allowed_users passes (user is owner or explicitly authorized), the folder's
     // password should not create an additional barrier on a directly-shared note.
     if (!$passedUserRestriction && !empty($protectedFolderContext['password']) && !empty($protectedFolderContext['token'])) {
-        $requiredAuths[] = [
+        $folderAuth = [
             'hash' => $protectedFolderContext['password'],
             'sessionKey' => 'public_folder_auth_' . $protectedFolderContext['token']
         ];
+        // Reached through a folder share that contains the note: unlocking
+        // that folder's page also unlocks the note. This only widens the keys
+        // that satisfy the requirement; the password typed here is still
+        // checked against the protected folder's hash.
+        if ($isFolderShared && !empty($folderToken)) {
+            $folderAuth['acceptedKeys'] = ['public_folder_auth_' . $folderToken];
+        }
+        $requiredAuths[] = $folderAuth;
     }
 
     if (!empty($requiredAuths)) {
         poznoteStartSession();
 
-        // If accessed via a shared folder, also accept that folder's auth session.
-        if (!empty($folderToken)) {
-            $requiredAuths[] = [
-                'hash' => null,
-                'sessionKey' => 'public_folder_auth_' . $folderToken
-            ];
-        }
+        $isAuthSatisfied = function (array $authDef): bool {
+            $keys = array_merge([$authDef['sessionKey']], $authDef['acceptedKeys'] ?? []);
+            foreach ($keys as $key) {
+                if (!empty($_SESSION[$key])) {
+                    return true;
+                }
+            }
+            return false;
+        };
 
-        // Deduplicate by session key
-        $uniqueAuths = [];
-        foreach ($requiredAuths as $authDef) {
-            $uniqueAuths[$authDef['sessionKey']] = $authDef;
-        }
-        $requiredAuths = array_values($uniqueAuths);
-        
         $passwordError = false;
         
         // Handle password submission
@@ -450,11 +453,9 @@ try {
         $allAuthenticated = true;
         $hasAnyAuthenticated = false;
         foreach ($requiredAuths as $authDef) {
-            if (!empty($_SESSION[$authDef['sessionKey']])) {
+            if ($isAuthSatisfied($authDef)) {
                 $hasAnyAuthenticated = true;
-                continue;
-            }
-            if (empty($_SESSION[$authDef['sessionKey']])) {
+            } else {
                 $allAuthenticated = false;
             }
         }
