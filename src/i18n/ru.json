@@ -1867,7 +1867,8 @@
       "shared_via_folder_message": "Эта заметка уже является общей, потому что находится в общей папке \"{{folder}}\".",
       "shared_via_folder_message_generic": "Эта заметка уже является общей, потому что находится в общей папке.",
       "shared_via_folder_create_question": "Хотите также создать отдельную ссылку для этой заметки, в дополнение к доступу через папку?",
-      "shared_via_folder_view_shares": "Открыть общий доступ"
+      "shared_via_folder_view_shares": "Открыть общий доступ",
+      "shared_via_folder_edit_folder_share": "Изменить общий доступ к папке"
     },
     "public_modal": {
       "title": "Общая ссылка",

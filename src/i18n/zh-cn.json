@@ -2360,7 +2360,8 @@
       "shared_via_folder_message": "这条笔记已经被共享，因为它位于共享文件夹“{{folder}}”中。",
       "shared_via_folder_message_generic": "这条笔记已经被共享，因为它位于一个共享文件夹中。",
       "shared_via_folder_create_question": "除了通过共享文件夹共享之外，是否还要为这条笔记单独创建一个共享链接？",
-      "shared_via_folder_view_shares": "查看共享"
+      "shared_via_folder_view_shares": "查看共享",
+      "shared_via_folder_edit_folder_share": "编辑文件夹共享"
     },
     "public_modal": {
       "title": "已共享 URL",

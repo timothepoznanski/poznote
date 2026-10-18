@@ -537,7 +537,10 @@ async function getPublicShare(noteId) {
         return {
             shared: false,
             noteType: data.noteType || 'note',
-            accessMode: data.accessMode || 'full'
+            accessMode: data.accessMode || 'full',
+            workspace: data.workspace || '',
+            // { folderId, folderName } of the nearest shared folder holding the note
+            sharedViaFolder: data.sharedViaFolder || null
         };
     } catch (error) {
         console.error('Error getting public share:', error);
@@ -571,8 +574,17 @@ async function openPublicShareModal(noteId, sourceEl) {
         return;
     }
 
-    // No direct share, but the icon is blue because an ancestor folder is
-    // shared: explain that instead of offering to create another share URL.
+    // No direct share, but an ancestor folder is shared: explain that instead
+    // of offering to create another share URL. The server's answer wins over
+    // the clicked element's attributes, which can be missing (drop on the
+    // Public folder) or stale (folder shared after the page was rendered).
+    if (shareInfo.sharedViaFolder) {
+        showSharedViaFolderModal(noteId, shareInfo.sharedViaFolder.folderName || '', {
+            folderId: shareInfo.sharedViaFolder.folderId,
+            workspace: shareInfo.workspace
+        });
+        return;
+    }
     if (sourceEl && sourceEl.getAttribute && sourceEl.getAttribute('data-shared-via-folder') === '1') {
         showSharedViaFolderModal(noteId, sourceEl.getAttribute('data-shared-folder-name') || '');
         return;
@@ -586,8 +598,10 @@ async function openPublicShareModal(noteId, sourceEl) {
  * Also offers to create a note-specific share link on top of the folder share.
  * @param {string} noteId - The note ID
  * @param {string} folderName - Name of the shared (ancestor) folder
+ * @param {Object} [folderShare] - { folderId, workspace } of that folder share,
+ *                                 enables the "Edit folder share" button
  */
-function showSharedViaFolderModal(noteId, folderName) {
+function showSharedViaFolderModal(noteId, folderName, folderShare) {
     const existing = document.getElementById('sharedViaFolderModal');
     if (existing) existing.parentNode.removeChild(existing);
 
@@ -633,21 +647,43 @@ function showSharedViaFolderModal(noteId, folderName) {
     cancelBtn.onclick = function () { closeModal('sharedViaFolderModal'); };
     buttonsDiv.appendChild(cancelBtn);
 
-    const viewSharesBtn = document.createElement('button');
-    viewSharesBtn.type = 'button';
-    viewSharesBtn.className = 'btn-view-shares';
-    viewSharesBtn.textContent = window.t
-        ? window.t('index.share_modal.shared_via_folder_view_shares', null, 'View shares')
-        : 'View shares';
-    viewSharesBtn.onclick = function () {
-        closeModal('sharedViaFolderModal');
-        // No itemType: land on the "All" tab of shared.php
-        openSharedManagementPage({
-            workspace: (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '',
-            autoEdit: false
-        });
-    };
-    buttonsDiv.appendChild(viewSharesBtn);
+    // With the folder share known, its editor (on the shares page) replaces
+    // the plain "View shares" link, which would only add a fourth button.
+    if (folderShare && folderShare.folderId) {
+        const editFolderShareBtn = document.createElement('button');
+        editFolderShareBtn.type = 'button';
+        editFolderShareBtn.className = 'btn-view-shares';
+        editFolderShareBtn.textContent = window.t
+            ? window.t('index.share_modal.shared_via_folder_edit_folder_share', null, 'Edit folder share')
+            : 'Edit folder share';
+        editFolderShareBtn.onclick = function () {
+            closeModal('sharedViaFolderModal');
+            // Lands on the Folders tab with that folder's share editor open
+            openSharedManagementPage({
+                itemType: 'folder',
+                itemId: folderShare.folderId,
+                workspace: folderShare.workspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '',
+                autoEdit: true
+            });
+        };
+        buttonsDiv.appendChild(editFolderShareBtn);
+    } else {
+        const viewSharesBtn = document.createElement('button');
+        viewSharesBtn.type = 'button';
+        viewSharesBtn.className = 'btn-view-shares';
+        viewSharesBtn.textContent = window.t
+            ? window.t('index.share_modal.shared_via_folder_view_shares', null, 'View shares')
+            : 'View shares';
+        viewSharesBtn.onclick = function () {
+            closeModal('sharedViaFolderModal');
+            // No itemType: land on the "All" tab of shared.php
+            openSharedManagementPage({
+                workspace: (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '',
+                autoEdit: false
+            });
+        };
+        buttonsDiv.appendChild(viewSharesBtn);
+    }
 
     const createBtn = document.createElement('button');
     createBtn.type = 'button';

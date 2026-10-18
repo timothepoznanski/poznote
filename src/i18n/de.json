@@ -2362,7 +2362,8 @@
       "shared_via_folder_message": "Diese Notiz ist bereits geteilt, weil sie sich im geteilten Ordner \"{{folder}}\" befindet.",
       "shared_via_folder_message_generic": "Diese Notiz ist bereits geteilt, weil sie sich in einem geteilten Ordner befindet.",
       "shared_via_folder_create_question": "Möchten Sie zusätzlich zur Ordnerfreigabe auch einen eigenen Freigabelink für diese Notiz erstellen?",
-      "shared_via_folder_view_shares": "Freigaben anzeigen"
+      "shared_via_folder_view_shares": "Freigaben anzeigen",
+      "shared_via_folder_edit_folder_share": "Ordnerfreigabe bearbeiten"
     },
     "public_modal": {
       "title": "Geteilte URL",

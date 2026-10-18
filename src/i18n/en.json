@@ -1872,7 +1872,8 @@
       "shared_via_folder_message": "This note is already shared because it is located in the shared folder \"{{folder}}\".",
       "shared_via_folder_message_generic": "This note is already shared because it is located in a shared folder.",
       "shared_via_folder_create_question": "Do you want to also create a share link specific to this note, in addition to the folder share?",
-      "shared_via_folder_view_shares": "View shares"
+      "shared_via_folder_view_shares": "View shares",
+      "shared_via_folder_edit_folder_share": "Edit folder share"
     },
     "public_modal": {
       "title": "Shared URL",

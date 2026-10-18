@@ -1872,7 +1872,8 @@
       "shared_via_folder_message": "이 노트는 공유 폴더 \"{{folder}}\"에 있으므로 이미 공유되었습니다.",
       "shared_via_folder_message_generic": "이 노트는 공유 폴더에 있으므로 이미 공유되었습니다.",
       "shared_via_folder_create_question": "폴더 공유 외에 이 노트에 특정한 공유 링크도 생성하시겠습니까?",
-      "shared_via_folder_view_shares": "공유 보기"
+      "shared_via_folder_view_shares": "공유 보기",
+      "shared_via_folder_edit_folder_share": "폴더 공유 편집"
     },
     "public_modal": {
       "title": "공유 URL",

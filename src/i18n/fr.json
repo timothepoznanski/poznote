@@ -2368,7 +2368,8 @@
       "shared_via_folder_message": "Cette note est déjà partagée car elle se trouve dans le dossier partagé « {{folder}} ».",
       "shared_via_folder_message_generic": "Cette note est déjà partagée car elle se trouve dans un dossier partagé.",
       "shared_via_folder_create_question": "Souhaitez-vous également créer un lien de partage spécifique à cette note, en plus du partage via le dossier ?",
-      "shared_via_folder_view_shares": "Voir les partages"
+      "shared_via_folder_view_shares": "Voir les partages",
+      "shared_via_folder_edit_folder_share": "Modifier le partage du dossier"
     },
     "public_modal": {
       "title": "URL partagée",

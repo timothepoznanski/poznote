@@ -2362,7 +2362,8 @@
       "shared_via_folder_message": "Esta nota ya está compartida porque se encuentra en la carpeta compartida \"{{folder}}\".",
       "shared_via_folder_message_generic": "Esta nota ya está compartida porque se encuentra en una carpeta compartida.",
       "shared_via_folder_create_question": "¿Desea crear también un enlace para compartir específico de esta nota, además del uso compartido de la carpeta?",
-      "shared_via_folder_view_shares": "Ver compartidos"
+      "shared_via_folder_view_shares": "Ver compartidos",
+      "shared_via_folder_edit_folder_share": "Editar el compartido de la carpeta"
     },
     "public_modal": {
       "title": "URL compartida",

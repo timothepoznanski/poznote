@@ -2362,7 +2362,8 @@
       "shared_via_folder_message": "Esta nota já está compartilhada porque está na pasta compartilhada \"{{folder}}\".",
       "shared_via_folder_message_generic": "Esta nota já está compartilhada porque está em uma pasta compartilhada.",
       "shared_via_folder_create_question": "Deseja também criar um link de compartilhamento específico para esta nota, além do compartilhamento da pasta?",
-      "shared_via_folder_view_shares": "Ver compartilhamentos"
+      "shared_via_folder_view_shares": "Ver compartilhamentos",
+      "shared_via_folder_edit_folder_share": "Editar o compartilhamento da pasta"
     },
     "public_modal": {
       "title": "URL compartilhada",
