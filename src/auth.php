@@ -1762,7 +1762,79 @@ function isApiJwtBearerToken(string $token): bool {
     return substr_count($token, '.') === 2;
 }
 
+/**
+ * Moves a request that authenticated with its own headers off the cookie
+ * session, before setApiAuthenticatedUser() writes the API identity into it.
+ *
+ * Header credentials are the whole identity of such a request, and they come
+ * with every request: the session has nothing to carry over. Persisting the
+ * identity anyway did two things, both wrong. A browser extension calls the
+ * API with an app password while the browser attaches the user's session
+ * cookie, and the write signed the browser itself in as the app password:
+ * admin flag stripped, account settings refused, until the next sign-in
+ * (issue #1650). And a browser that answered a Basic prompt on an attachment
+ * link came out of it signed in to the web UI, with no login flow run.
+ *
+ * The request gets a private session instead: the same lifecycle within the
+ * request (Git sync still closes and reopens it), but its id is never sent
+ * back, it is deleted on the way out, and the browser's session, if any, is
+ * left exactly as it was.
+ */
+function detachApiRequestFromSession(): void {
+    static $detached = false;
+    if ($detached || session_status() !== PHP_SESSION_ACTIVE) {
+        return;
+    }
+    $detached = true;
+
+    $deleteSessionFile = static function (string $id): void {
+        $savePath = (string)session_save_path();
+        $file = rtrim($savePath !== '' ? $savePath : sys_get_temp_dir(), '/') . '/sess_' . $id;
+        if (is_file($file)) {
+            @unlink($file);
+        }
+    };
+
+    $cookieName = session_name();
+    $openedHere = empty($_COOKIE[$cookieName]);
+    $openedId = session_id();
+    session_abort();
+
+    if ($openedHere) {
+        // The session auth.php opened for this very request, which no client
+        // holds the id of: withdraw the cookie that would hand it out, and
+        // drop its empty file, or every call from a cookie-less client (curl,
+        // the MCP server) would leave one behind in data/sessions.
+        $kept = [];
+        foreach (headers_list() as $header) {
+            if (stripos($header, 'Set-Cookie:') === 0
+                && !str_starts_with(ltrim(substr($header, strlen('Set-Cookie:'))), $cookieName . '=')) {
+                $kept[] = $header;
+            }
+        }
+        header_remove('Set-Cookie');
+        foreach ($kept as $header) {
+            header($header, false);
+        }
+        $deleteSessionFile($openedId);
+    }
+
+    ini_set('session.use_cookies', '0');
+    session_id(session_create_id() ?: bin2hex(random_bytes(16)));
+    session_start();
+    $privateId = session_id();
+
+    register_shutdown_function(static function () use ($privateId, $deleteSessionFile): void {
+        if (session_status() === PHP_SESSION_ACTIVE && session_id() === $privateId) {
+            session_destroy();
+            return;
+        }
+        $deleteSessionFile($privateId);
+    });
+}
+
 function setApiAuthenticatedUser(array $user, ?array $authUser = null): void {
+    detachApiRequestFromSession();
     $authUser = $authUser ?? $user;
     $_SESSION['authenticated'] = true;
     $_SESSION['login_user_id'] = (int) $authUser['id'];
