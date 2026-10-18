@@ -69,6 +69,7 @@ https://discord.gg/fuEV6uqf4N
 - [Revisões](#revisões)
 - [Personalização](#personalização)
 - [Multiusuário](#multiusuário)
+- [Compartilhamento e colaboração](#compartilhamento-e-colaboração)
 - [Registro de atividade](#registro-de-atividade)
 - [Webhooks](#webhooks)
 - [Sincronização Git](#sincronização-git)
@@ -894,8 +895,7 @@ Sobrescreva os tokens em `:root` para o modo claro e em `:root[data-theme='dark'
 O Poznote é multiusuário: cada perfil tem as próprias notas, espaços de trabalho, tags, pastas, anexos e configurações, e entra com o próprio nome de usuário ou endereço de e-mail e senha.
 
 - **Gerenciamento de usuários**: os administradores criam, desativam e gerenciam perfis em **Configurações > Ferramentas de administração > Gestão de utilizadores**, e podem dar a um usuário acesso à conta de outro usuário sem transferir a propriedade dela.
-- **Compartilhamento**: notas e pastas podem ser compartilhadas com outros usuários da instância, somente leitura ou editáveis, ou publicamente por links dedicados. Um espaço de trabalho inteiro pode ser compartilhado com outros usuários da instância, que o encontram no menu de espaços de trabalho e o editam junto com o proprietário. Quando a instância envia e-mails (SMTP), cada membro pode ativar **Configurações > Espaços de trabalho > E-mails de espaços compartilhados** para receber a lista das notas que os outros criaram, editaram ou excluíram ali, alguns minutos após as alterações, ou como resumo enviado todos os dias às 8:00 ou toda segunda-feira às 8:00 (no fuso horário do membro). Quando vários usuários têm acesso à mesma nota, apenas um a edita por vez e os demais veem quem detém o bloqueio.
-- **Editar a mesma nota**: só uma pessoa edita de cada vez. Quando uma nota está bloqueada, o banner de somente leitura oferece **assumir a edição**: a tela da outra pessoa passa a somente leitura e as alterações que ela não salvou ficam no navegador dela, oferecidas de novo assim que a nota estiver livre. Uma nota aberta recebe em poucos segundos as alterações feitas em outro lugar. Em uma nota **Markdown** com alterações não salvas dos dois lados, os dois conjuntos de alterações são mesclados automaticamente quando tocam linhas diferentes, e um banner deixa você escolher quando se sobrepõem. Notas de texto formatado nunca são mescladas, você escolhe qual versão manter. Mantenha scripts e outros códigos em blocos de código delimitados (```` ``` ````): HTML bruto fora de um bloco de código é sanitizado ao salvar, o que pode fazer uma mesclagem limpa parecer um conflito.
+- **Compartilhamento e colaboração**: espaços de trabalho, notas e pastas podem ser compartilhados com os outros usuários da instância, veja [Compartilhamento e colaboração](#compartilhamento-e-colaboração).
 - **Isolamento de contas (modo SaaS)**: os administradores podem impedir que usuários que não são administradores descubram as outras contas da instância, compartilhem com elas ou cadastrem webhooks pessoais. Deixe tudo desmarcado para uma instância familiar ou de equipe.
 
 <details>
@@ -923,6 +923,15 @@ data/
 ```
 
 </details>
+
+## Compartilhamento e colaboração
+
+O Poznote oferece várias formas de trabalhar com os outros usuários da sua instância, e cada pessoa mantém a própria conta. Para um espaço comum (família, amigos, uma equipe), compartilhe um espaço de trabalho.
+
+- **Compartilhar um espaço de trabalho**: o proprietário abre **Configurações > Espaços de trabalho**, clica em **Compartilhar** na linha do espaço (o ícone de compartilhamento, ou a primeira entrada do menu **...**) e escolhe os usuários. Eles encontram o espaço no próprio menu de espaços de trabalho, em **Compartilhados comigo**, e editam as notas e pastas com o editor completo, com as mesmas permissões de escrita do proprietário. Os outros espaços de trabalho do proprietário, as configurações, a lixeira e os backups dele continuam privados. Em um espaço compartilhado, escrever `@usuario` em uma nota menciona essa pessoa, que a encontra na página **Menções**. Quando a instância envia e-mails (SMTP), cada membro pode ativar **Configurações > Espaços de trabalho > E-mails de espaços compartilhados** para receber a lista das notas que os outros criaram, editaram ou excluíram ali, alguns minutos após as alterações, ou como resumo enviado todos os dias às 8:00 ou toda segunda-feira às 8:00 (no fuso horário do membro).
+- **Compartilhar uma nota ou uma pasta**: **Compartilhar** no menu da nota, ou no menu da pasta, cria um link só para essa nota ou pasta. O link pode ser público, protegido por senha ou restrito a alguns usuários da instância, que entram para abri-lo, e pode permitir a edição. A página **Compartilhamentos** da barra de ícones lista seus compartilhamentos, e o que os outros compartilharam com você em **Partilhado comigo**.
+- **Dar acesso a uma conta inteira**: um administrador pode permitir que um usuário abra a conta de outro usuário em **Configurações > Ferramentas de administração > Gestão de utilizadores**, sem transferir a propriedade dela. O usuário muda para ela pela seção **Contas** do menu de espaços de trabalho.
+- **Editar a mesma nota**: só uma pessoa edita de cada vez. Quando uma nota está bloqueada, o banner de somente leitura oferece **assumir a edição**: a tela da outra pessoa passa a somente leitura e as alterações que ela não salvou ficam no navegador dela, oferecidas de novo assim que a nota estiver livre. Uma nota aberta recebe em poucos segundos as alterações feitas em outro lugar. Em uma nota **Markdown** com alterações não salvas dos dois lados, os dois conjuntos de alterações são mesclados automaticamente quando tocam linhas diferentes, e um banner deixa você escolher quando se sobrepõem. Notas de texto formatado nunca são mescladas, você escolhe qual versão manter. Mantenha scripts e outros códigos em blocos de código delimitados (```` ``` ````): HTML bruto fora de um bloco de código é sanitizado ao salvar, o que pode fazer uma mesclagem limpa parecer um conflito.
 
 ## Registro de atividade
 

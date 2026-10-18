@@ -69,6 +69,7 @@ https://discord.gg/fuEV6uqf4N
 - [Revisiones](#revisiones)
 - [Personalización](#personalización)
 - [Multiusuario](#multiusuario)
+- [Compartir y colaboración](#compartir-y-colaboración)
 - [Registro de actividad](#registro-de-actividad)
 - [Webhooks](#webhooks)
 - [Sincronización Git](#sincronización-git)
@@ -894,8 +895,7 @@ Sobrescribe los tokens en `:root` para el modo claro y en `:root[data-theme='dar
 Poznote es multiusuario: cada perfil tiene sus propias notas, espacios de trabajo, etiquetas, carpetas, adjuntos y ajustes, e inicia sesión con su propio nombre de usuario o dirección de correo electrónico y su contraseña.
 
 - **Gestión de usuarios**: los administradores crean, desactivan y gestionan perfiles desde **Configuración > Herramientas de administración > Gestión de usuarios**, y pueden dar a un usuario acceso a la cuenta de otro usuario sin transferir su propiedad.
-- **Compartir**: las notas y las carpetas pueden compartirse con otros usuarios de la instancia, en solo lectura o editables, o públicamente mediante enlaces dedicados. Un espacio de trabajo completo puede compartirse con otros usuarios de la instancia, que lo encuentran en su menú de espacios de trabajo y lo editan junto con su propietario. Cuando la instancia envía correos (SMTP), cada miembro puede activar **Configuración > Espacios de trabajo > Correos de espacios compartidos** para recibir la lista de las notas que los demás crearon, editaron o eliminaron allí, unos minutos después de los cambios, o como resumen enviado cada día a las 8:00 o cada lunes a las 8:00 (en la zona horaria del miembro). Cuando varios usuarios pueden acceder a la misma nota, solo uno la edita a la vez y los demás ven quién tiene el bloqueo.
-- **Editar la misma nota**: solo una persona edita a la vez. Cuando una nota está bloqueada, el banner de solo lectura ofrece **tomar el control**: la pantalla de la otra persona pasa a solo lectura y sus cambios sin guardar se quedan en su navegador, y se le ofrecen de nuevo cuando la nota queda libre. Una nota abierta recoge en pocos segundos los cambios hechos en otro sitio. En una nota **Markdown** con cambios sin guardar en ambos lados, los dos conjuntos de cambios se fusionan automáticamente cuando tocan líneas distintas, y un banner te deja elegir cuando se solapan. Las notas de texto enriquecido nunca se fusionan, eliges qué versión conservar. Mantén los scripts y demás código en bloques de código delimitados (```` ``` ````): el HTML sin procesar fuera de un bloque de código se sanea al guardar, lo que puede hacer que una fusión limpia parezca un conflicto.
+- **Compartir y colaboración**: los espacios de trabajo, las notas y las carpetas pueden compartirse con los demás usuarios de la instancia, consulta [Compartir y colaboración](#compartir-y-colaboración).
 - **Aislamiento de cuentas (modo SaaS)**: los administradores pueden impedir que los usuarios que no son administradores descubran las demás cuentas de la instancia, compartan con ellas o registren webhooks personales. Deja todo sin marcar para una instancia familiar o de equipo.
 
 <details>
@@ -923,6 +923,15 @@ data/
 ```
 
 </details>
+
+## Compartir y colaboración
+
+Poznote ofrece varias formas de trabajar con los demás usuarios de tu instancia, y cada persona conserva su propia cuenta. Para un espacio común (familia, amigos, un equipo), comparte un espacio de trabajo.
+
+- **Compartir un espacio de trabajo**: el propietario abre **Configuración > Espacios de trabajo**, hace clic en **Compartir** en la fila del espacio (el icono de compartir, o la primera entrada de su menú **...**) y elige los usuarios. Estos encuentran el espacio en su propio menú de espacios de trabajo, en **Compartidos conmigo**, y editan sus notas y carpetas con el editor completo, con los mismos permisos de escritura que el propietario. Los demás espacios de trabajo del propietario, su configuración, su papelera y sus copias de seguridad siguen siendo privados. En un espacio compartido, escribir `@usuario` en una nota menciona a esa persona, que la encuentra en su página **Menciones**. Cuando la instancia envía correos (SMTP), cada miembro puede activar **Configuración > Espacios de trabajo > Correos de espacios compartidos** para recibir la lista de las notas que los demás crearon, editaron o eliminaron allí, unos minutos después de los cambios, o como resumen enviado cada día a las 8:00 o cada lunes a las 8:00 (en la zona horaria del miembro).
+- **Compartir una nota o una carpeta**: **Compartir** en el menú de la nota, o en el de la carpeta, crea un enlace solo a esa nota o carpeta. El enlace puede ser público, estar protegido por contraseña o reservado a algunos usuarios de la instancia, que inician sesión para abrirlo, y puede permitir la edición. La página **Compartidos** de la barra de iconos lista tus elementos compartidos, y lo que otros han compartido contigo en **Compartido conmigo**.
+- **Dar acceso a una cuenta completa**: un administrador puede permitir que un usuario abra la cuenta de otro usuario desde **Configuración > Herramientas de administración > Gestión de usuarios**, sin transferir su propiedad. El usuario cambia a ella desde la sección **Cuentas** del menú de espacios de trabajo.
+- **Editar la misma nota**: solo una persona edita a la vez. Cuando una nota está bloqueada, el banner de solo lectura ofrece **tomar el control**: la pantalla de la otra persona pasa a solo lectura y sus cambios sin guardar se quedan en su navegador, y se le ofrecen de nuevo cuando la nota queda libre. Una nota abierta recoge en pocos segundos los cambios hechos en otro sitio. En una nota **Markdown** con cambios sin guardar en ambos lados, los dos conjuntos de cambios se fusionan automáticamente cuando tocan líneas distintas, y un banner te deja elegir cuando se solapan. Las notas de texto enriquecido nunca se fusionan, eliges qué versión conservar. Mantén los scripts y demás código en bloques de código delimitados (```` ``` ````): el HTML sin procesar fuera de un bloque de código se sanea al guardar, lo que puede hacer que una fusión limpia parezca un conflicto.
 
 ## Registro de actividad
 

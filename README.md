@@ -69,6 +69,7 @@ https://discord.gg/fuEV6uqf4N
 - [Revisions](#revisions)
 - [Personalization](#personalization)
 - [Multi-users](#multi-users)
+- [Sharing and collaboration](#sharing-and-collaboration)
 - [Activity Log](#activity-log)
 - [Webhooks](#webhooks)
 - [Git Synchronization](#git-synchronization)
@@ -894,8 +895,7 @@ Override the tokens on `:root` for light and on `:root[data-theme='dark']` for d
 Poznote is multi-user: each profile has its own notes, workspaces, tags, folders, attachments and settings, and signs in with its own username or email address and password.
 
 - **User management**: administrators create, disable and manage profiles from **Settings > Admin Tools > User Management**, and can give a user access to another user's account without transferring its ownership.
-- **Sharing**: notes and folders can be shared with other users of the instance, read-only or editable, or publicly through dedicated links. An entire workspace can be shared with other users of the instance, who find it in their workspace menu and edit it alongside its owner. When the instance sends email (SMTP), each member can turn on **Settings > Workspaces > Shared workspace emails** to receive the list of notes the others created, edited or deleted there, a few minutes after the changes happen, or as a summary sent every day at 8:00 or every Monday at 8:00 (in the member's timezone). When several users can access the same note, only one edits it at a time and the others see who holds the lock.
-- **Editing the same note**: one person edits at a time. When a note is locked, the read-only banner offers to **take over**: the previous editor's screen turns read-only and their unsaved changes stay in their browser, offered again once the note is free. An open note picks up changes made elsewhere within a few seconds. For a **Markdown** note with unsaved edits on both sides, the two sets of changes are merged automatically when they touch different lines, and a banner lets you choose when they overlap. Rich-text notes are never merged, you choose which version to keep. Keep scripts and other code in fenced code blocks (```` ``` ````): raw HTML outside a code block is sanitized on save, which can make an otherwise clean merge look like a conflict.
+- **Sharing and collaboration**: workspaces, notes and folders can be shared with the other users of the instance, see [Sharing and collaboration](#sharing-and-collaboration).
 - **Tenant isolation (SaaS mode)**: administrators can stop non-admin users from discovering the other accounts of the instance, sharing with them, or registering personal webhooks. Leave everything unchecked for a family or team instance.
 
 <details>
@@ -923,6 +923,15 @@ data/
 ```
 
 </details>
+
+## Sharing and collaboration
+
+Poznote offers several ways to work with the other users of your instance, each person keeping their own account. For a common space (family, friends, a team), share a workspace.
+
+- **Share a workspace**: the owner opens **Settings > Workspaces** and clicks **Share** on the workspace's row (the share icon, or the first entry of its **...** menu), then picks the users. They find the workspace in their own workspace menu, under **Shared with me**, and edit its notes and folders with the full editor, with the same write access as the owner. The owner's other workspaces, settings, trash and backups stay private. In a shared workspace, writing `@username` in a note mentions that person, who finds it on their **Mentions** page. When the instance sends email (SMTP), each member can turn on **Settings > Workspaces > Shared workspace emails** to receive the list of notes the others created, edited or deleted there, a few minutes after the changes happen, or as a summary sent every day at 8:00 or every Monday at 8:00 (in the member's timezone).
+- **Share a note or a folder**: **Share** in the note's menu, or in the folder's menu, creates a link to that note or folder alone. The link can be public, protected by a password, or restricted to some users of the instance, who sign in to open it, and it can allow editing. The **Shares** page of the icon rail lists your shares, and what the others shared with you under **Shared with me**.
+- **Give access to a whole account**: an administrator can let a user open another user's account from **Settings > Admin Tools > User Management**, without transferring its ownership. The user switches to it from the **Accounts** section of the workspace menu.
+- **Editing the same note**: one person edits at a time. When a note is locked, the read-only banner offers to **take over**: the previous editor's screen turns read-only and their unsaved changes stay in their browser, offered again once the note is free. An open note picks up changes made elsewhere within a few seconds. For a **Markdown** note with unsaved edits on both sides, the two sets of changes are merged automatically when they touch different lines, and a banner lets you choose when they overlap. Rich-text notes are never merged, you choose which version to keep. Keep scripts and other code in fenced code blocks (```` ``` ````): raw HTML outside a code block is sanitized on save, which can make an otherwise clean merge look like a conflict.
 
 ## Activity Log
 

@@ -127,8 +127,8 @@ function poznoteWorkspacesSectionBodyAttributes(array $data): string
 
 /**
  * The list: a filter once there are several rows, then one row per
- * workspace. Share stays on the row; the other actions sit behind its "..."
- * button (js/workspaces-page.js).
+ * workspace. Share stays on the row and opens the "..." menu too; the other
+ * actions sit behind that button only (js/workspaces-page.js).
  */
 function poznoteRenderWorkspacesList(array $data): void
 {
@@ -171,6 +171,16 @@ function poznoteRenderWorkspacesList(array $data): void
                                 ? t_h('workspaces.share.actions.edit', [], 'Edit share')
                                 : t_h('workspaces.share.actions.enable', [], 'Share');
                             $sharedWithAttr = poznoteWorkspacesSectionJsonAttribute($row['shared_with']);
+                            // Printed twice: on the row and as the first entry of its menu
+                            $shareButton = '<button type="button"'
+                                . ' class="ws-icon-btn btn-share-toggle' . ($shared ? ' is-shared' : '') . '"'
+                                . ' data-ws="' . $ws . '"'
+                                . ' data-shared="' . ($shared ? '1' : '0') . '"'
+                                . ' data-allowed-users="' . poznoteWorkspacesSectionJsonAttribute($row['shared_user_ids']) . '"'
+                                . ' data-shared-with="' . $sharedWithAttr . '"'
+                                . ' title="' . $shareLabel . '" aria-label="' . $shareLabel . '">'
+                                . '<i class="lucide lucide-share-2"></i><span class="ws-icon-btn-text">' . $shareLabel . '</span>'
+                                . '</button>';
                         ?>
                         <li class="ws-row" data-ws="<?php echo $ws; ?>">
                             <?php if ($several): ?>
@@ -204,21 +214,18 @@ function poznoteRenderWorkspacesList(array $data): void
                             <div class="ws-col ws-col-actions">
                                 <div class="ws-icon-actions">
                                     <?php if ($data['can_share']): ?>
-                                    <button type="button"
-                                            class="ws-icon-btn btn-share-toggle<?php echo $shared ? ' is-shared' : ''; ?>"
-                                            data-ws="<?php echo $ws; ?>"
-                                            data-shared="<?php echo $shared ? '1' : '0'; ?>"
-                                            data-allowed-users="<?php echo poznoteWorkspacesSectionJsonAttribute($row['shared_user_ids']); ?>"
-                                            data-shared-with="<?php echo $sharedWithAttr; ?>"
-                                            title="<?php echo $shareLabel; ?>" aria-label="<?php echo $shareLabel; ?>">
-                                        <i class="lucide lucide-share-2"></i><span class="ws-icon-btn-text"><?php echo $shareLabel; ?></span>
-                                    </button>
+                                    <?php echo $shareButton; ?>
                                     <?php endif; ?>
                                 </div>
                                 <button type="button" class="ws-actions-toggle" aria-haspopup="true" aria-expanded="false" title="<?php echo $actionsMenuLabel; ?>" aria-label="<?php echo $actionsMenuLabel; ?>">
                                     <i class="lucide lucide-more-horizontal"></i>
                                 </button>
                                 <div class="ws-actions-menu">
+                                    <?php if ($data['can_share']): ?>
+                                    <!-- Share again, first in the menu: on the row it is an icon
+                                         alone, easy to miss -->
+                                    <?php echo $shareButton; ?>
+                                    <?php endif; ?>
                                     <button type="button" class="ws-icon-btn workspace-rename-action" data-ws="<?php echo $ws; ?>" title="<?php echo $renameLabel; ?>" aria-label="<?php echo $renameLabel; ?>">
                                         <i class="lucide lucide-pencil"></i><span class="ws-icon-btn-text"><?php echo $renameLabel; ?></span>
                                     </button>

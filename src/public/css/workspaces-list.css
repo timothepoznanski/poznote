@@ -203,9 +203,14 @@ html[data-theme='dark'] .ws-drag-handle:focus-visible {
     transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
+/* The icon takes the button's colour (accent, amber once shared, muted when
+   disabled): without naming it, the zero-weight default of
+   dark-mode/icons.css paints it the generic grey in dark. The menu's own
+   icon rules below are heavier and still apply there. */
 .ws-icon-btn .lucide {
     width: 16px;
     height: 16px;
+    color: inherit;
     pointer-events: none;
 }
 

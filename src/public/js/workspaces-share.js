@@ -40,29 +40,33 @@ function getCurrentWorkspaceUserId() {
     return isNaN(parsed) ? 0 : parsed;
 }
 
-// Reflect a saved share on the row: the share button (tooltip, tint and the
-// label the mobile actions menu prints next to the icon) and the info
-// button, which reads the same attributes.
+// Reflect a saved share on the row: both share buttons (the one on the row
+// and the first entry of its "..." menu: tooltip, tint and the label the
+// menu prints next to the icon) and the info button, which reads the same
+// attributes.
 function updateWorkspaceShareToggleButton(button, shareState) {
     if (!button) return;
 
     var isShared = !!(shareState && shareState.shared);
     var allowedUsers = (shareState && Array.isArray(shareState.allowed_users)) ? shareState.allowed_users : [];
     var sharedWith = (shareState && Array.isArray(shareState.shared_with)) ? shareState.shared_with : [];
-
-    button.setAttribute('data-shared', isShared ? '1' : '0');
-    button.setAttribute('data-allowed-users', JSON.stringify(allowedUsers));
-    button.setAttribute('data-shared-with', JSON.stringify(sharedWith));
     var shareLabel = isShared
         ? getWorkspaceShareText('workspace-share-edit-btn', 'Edit share')
         : getWorkspaceShareText('workspace-share-enable-btn', 'Share');
-    button.title = shareLabel;
-    button.setAttribute('aria-label', shareLabel);
-    var shareLabelEl = button.querySelector('.ws-icon-btn-text');
-    if (shareLabelEl) shareLabelEl.textContent = shareLabel;
-    button.classList.toggle('is-shared', isShared);
 
     var row = button.closest ? button.closest('.ws-row') : null;
+    var shareButtons = row ? row.querySelectorAll('.btn-share-toggle') : [button];
+    Array.prototype.forEach.call(shareButtons, function (shareButton) {
+        shareButton.setAttribute('data-shared', isShared ? '1' : '0');
+        shareButton.setAttribute('data-allowed-users', JSON.stringify(allowedUsers));
+        shareButton.setAttribute('data-shared-with', JSON.stringify(sharedWith));
+        shareButton.title = shareLabel;
+        shareButton.setAttribute('aria-label', shareLabel);
+        var shareLabelEl = shareButton.querySelector('.ws-icon-btn-text');
+        if (shareLabelEl) shareLabelEl.textContent = shareLabel;
+        shareButton.classList.toggle('is-shared', isShared);
+    });
+
     var infoButton = row ? row.querySelector('.workspace-info-action') : null;
     if (infoButton) {
         infoButton.setAttribute('data-shared', isShared ? '1' : '0');
