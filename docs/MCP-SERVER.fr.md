@@ -210,6 +210,15 @@ appelant : chaque client présente **son propre** jeton, qui est résolu auprès
 d'un fournisseur d'identité externe et associé au profil Poznote de cet
 appelant. Une instance, de nombreux appelants, chacun correctement identifié.
 
+Ces variables se placent dans `.env`, comme les autres. Elles parviennent au
+conteneur MCP par le bloc `environment:` du service `mcp-server`, qu'un
+`docker-compose.yml` plus ancien ne contient pas : elles sont alors ignorées sans
+avertissement. Si vous les définissez, téléchargez d'abord le dernier
+`docker-compose.yml` (voir
+[Mettre à jour l'application](README.fr.md#mettre-à-jour-lapplication)) et
+vérifiez que les logs MCP affichent `Per-caller authentication enabled` au
+démarrage.
+
 | variable | default | meaning |
 |---|---|---|
 | `POZNOTE_MCP_AUTH_PROVIDER` | *(non défini, fonction désactivée)* | `userinfo` or `introspection` |

@@ -207,6 +207,12 @@ docker compose up -d --force-recreate mcp-server
 **自己的**令牌，该令牌会向外部身份提供方校验，并映射到该调用方的 Poznote 配置
 文件。一个实例，多个调用方，各自被正确识别。
 
+这些变量与其他变量一样写在 `.env` 中。它们通过 `mcp-server` 服务的
+`environment:` 块传入 MCP 容器，而较旧的 `docker-compose.yml` 中没有这些条目，
+此时它们会被静默忽略。如果要设置这些变量，请先下载最新的 `docker-compose.yml`
+（参见[更新应用](README.zh-cn.md#更新应用)），并确认 MCP 日志在启动时显示
+`Per-caller authentication enabled`。
+
 | variable | default | meaning |
 |---|---|---|
 | `POZNOTE_MCP_AUTH_PROVIDER` | *(未设置，功能关闭)* | `userinfo` or `introspection` |

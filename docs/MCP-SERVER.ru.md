@@ -211,6 +211,13 @@ docker compose up -d --force-recreate mcp-server
 Poznote этого вызывающего. Один экземпляр, много вызывающих, каждый определён
 правильно.
 
+Эти переменные задаются в `.env`, как и остальные. Они попадают в контейнер
+MCP через блок `environment:` сервиса `mcp-server`, которого нет в более старом
+`docker-compose.yml`: в этом случае они молча игнорируются. Если вы их задаёте,
+сначала скачайте последнюю версию `docker-compose.yml` (см.
+[Обновление приложения](README.ru.md#обновление-приложения)) и убедитесь, что
+при запуске в логах MCP появляется `Per-caller authentication enabled`.
+
 | variable | default | meaning |
 |---|---|---|
 | `POZNOTE_MCP_AUTH_PROVIDER` | *(не задано, функция выключена)* | `userinfo` or `introspection` |

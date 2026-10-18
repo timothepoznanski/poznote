@@ -210,6 +210,14 @@ umgeschaltet: Jeder Client sendet **sein eigenes** Token, das gegen einen
 externen Identitätsanbieter geprüft und dem Poznote-Profil dieses Aufrufers
 zugeordnet wird. Eine Instanz, viele Aufrufer, jeder korrekt identifiziert.
 
+Diese Variablen gehören wie die anderen in die `.env`. Sie erreichen den
+MCP-Container über den `environment:`-Block des Dienstes `mcp-server`, den eine
+ältere `docker-compose.yml` nicht enthält: Dann werden sie stillschweigend
+ignoriert. Wenn Sie sie setzen, laden Sie zuerst die aktuelle
+`docker-compose.yml` herunter (siehe
+[Anwendung aktualisieren](README.de.md#anwendung-aktualisieren)) und prüfen Sie,
+dass die MCP-Logs beim Start `Per-caller authentication enabled` anzeigen.
+
 | variable | default | meaning |
 |---|---|---|
 | `POZNOTE_MCP_AUTH_PROVIDER` | *(nicht gesetzt, Funktion aus)* | `userinfo` or `introspection` |

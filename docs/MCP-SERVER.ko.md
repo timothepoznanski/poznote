@@ -209,6 +209,13 @@ MCP 인스턴스를 공유하면 이를 구분할 수 없습니다.
 호출자의 Poznote 프로필에 매핑됩니다. 하나의 인스턴스, 여러 호출자, 각자 정확히
 식별됩니다.
 
+이 변수들은 다른 변수와 마찬가지로 `.env`에 설정합니다. 이 변수들은
+`mcp-server` 서비스의 `environment:` 블록을 통해 MCP 컨테이너에 전달되는데, 이전
+버전의 `docker-compose.yml`에는 이 항목이 없어 아무 경고 없이 무시됩니다. 이
+변수를 설정한다면 먼저 최신 `docker-compose.yml`을 내려받고
+([앱 업데이트](README.ko.md#앱-업데이트) 참고), 시작 시 MCP 로그에
+`Per-caller authentication enabled`가 표시되는지 확인하세요.
+
 | variable | default | meaning |
 |---|---|---|
 | `POZNOTE_MCP_AUTH_PROVIDER` | *(설정하지 않음, 기능 꺼짐)* | `userinfo` or `introspection` |
