@@ -69,6 +69,7 @@ https://discord.gg/fuEV6uqf4N
 - [Versionen](#versionen)
 - [Personalisierung](#personalisierung)
 - [Mehrbenutzerbetrieb](#mehrbenutzerbetrieb)
+- [Teilen und Zusammenarbeit](#teilen-und-zusammenarbeit)
 - [Aktivitätsprotokoll](#aktivitätsprotokoll)
 - [Webhooks](#webhooks)
 - [Git-Synchronisierung](#git-synchronisierung)
@@ -894,8 +895,7 @@ Für ein einzelnes Symbol braucht es kein CSS: Klicken Sie es in der Notiz-Symbo
 Poznote ist mehrbenutzerfähig: Jedes Profil hat eigene Notizen, Arbeitsbereiche, Tags, Ordner, Anhänge und Einstellungen und meldet sich mit seinem eigenen Benutzernamen oder seiner E-Mail-Adresse und seinem Passwort an.
 
 - **Benutzerverwaltung**: Administratoren legen Profile unter **Einstellungen > Admin-Werkzeuge > Benutzerverwaltung** an, deaktivieren und verwalten sie, und können einem Benutzer Zugriff auf das Konto eines anderen Benutzers gewähren, ohne dessen Eigentümerschaft zu übertragen.
-- **Teilen**: Notizen und Ordner können mit anderen Benutzern der Instanz geteilt werden, schreibgeschützt oder bearbeitbar, oder öffentlich über eigene Links. Ein ganzer Arbeitsbereich kann mit anderen Benutzern der Instanz geteilt werden, die ihn in ihrem Arbeitsbereichsmenü finden und zusammen mit dem Besitzer bearbeiten. Versendet die Instanz E-Mails (SMTP), kann jedes Mitglied unter **Einstellungen > Arbeitsbereiche > E-Mails zu geteilten Arbeitsbereichen** die Liste der Notizen erhalten, die die anderen dort erstellt, bearbeitet oder gelöscht haben, einige Minuten nach den Änderungen oder als Zusammenfassung, die täglich um 8:00 Uhr oder jeden Montag um 8:00 Uhr versendet wird (in der Zeitzone des Mitglieds). Können mehrere Benutzer auf dieselbe Notiz zugreifen, bearbeitet sie jeweils nur einer, und die anderen sehen, wer die Sperre hält.
-- **Dieselbe Notiz bearbeiten**: Es bearbeitet immer nur eine Person. Ist eine Notiz gesperrt, bietet das schreibgeschützte Banner an, die Bearbeitung zu **übernehmen**: Der Bildschirm der anderen Person wird schreibgeschützt, ihre ungespeicherten Änderungen bleiben in ihrem Browser und werden erneut angeboten, sobald die Notiz frei ist. Eine geöffnete Notiz übernimmt anderswo gemachte Änderungen innerhalb weniger Sekunden. Bei einer **Markdown**-Notiz mit ungespeicherten Änderungen auf beiden Seiten werden die beiden Änderungen automatisch zusammengeführt, wenn sie verschiedene Zeilen betreffen; überschneiden sie sich, lässt Sie ein Banner wählen. Rich-Text-Notizen werden nie zusammengeführt, Sie wählen die Version, die bleibt. Halten Sie Skripte und anderen Code in eingezäunten Codeblöcken (```` ``` ````): rohes HTML außerhalb eines Codeblocks wird beim Speichern bereinigt, wodurch eine an sich saubere Zusammenführung wie ein Konflikt aussehen kann.
+- **Teilen und Zusammenarbeit**: Arbeitsbereiche, Notizen und Ordner können mit den anderen Benutzern der Instanz geteilt werden, siehe [Teilen und Zusammenarbeit](#teilen-und-zusammenarbeit).
 - **Mandantentrennung (SaaS-Modus)**: Administratoren können Benutzern ohne Administratorrechte das Auffinden der anderen Konten der Instanz, das Teilen mit ihnen oder das Registrieren persönlicher Webhooks untersagen. Für eine Familien- oder Team-Instanz lassen Sie alles deaktiviert.
 
 <details>
@@ -923,6 +923,15 @@ data/
 ```
 
 </details>
+
+## Teilen und Zusammenarbeit
+
+Poznote bietet mehrere Wege, mit den anderen Benutzern Ihrer Instanz zu arbeiten, wobei jede Person ihr eigenes Konto behält. Für einen gemeinsamen Bereich (Familie, Freunde, ein Team) teilen Sie einen Arbeitsbereich.
+
+- **Einen Arbeitsbereich teilen**: Der Besitzer öffnet **Einstellungen > Arbeitsbereiche**, klickt in der Zeile des Arbeitsbereichs auf **Teilen** (das Teilen-Symbol oder der erste Eintrag seines **...**-Menüs) und wählt die Benutzer aus. Diese finden den Arbeitsbereich in ihrem eigenen Arbeitsbereichsmenü unter **Mit mir geteilt** und bearbeiten seine Notizen und Ordner mit dem vollständigen Editor, mit denselben Schreibrechten wie der Besitzer. Die anderen Arbeitsbereiche des Besitzers, seine Einstellungen, sein Papierkorb und seine Sicherungen bleiben privat. In einem geteilten Arbeitsbereich erwähnt `@benutzername` in einer Notiz diese Person, die die Notiz auf ihrer Seite **Erwähnungen** findet. Versendet die Instanz E-Mails (SMTP), kann jedes Mitglied unter **Einstellungen > Arbeitsbereiche > E-Mails zu geteilten Arbeitsbereichen** die Liste der Notizen erhalten, die die anderen dort erstellt, bearbeitet oder gelöscht haben, einige Minuten nach den Änderungen oder als Zusammenfassung, die täglich um 8:00 Uhr oder jeden Montag um 8:00 Uhr versendet wird (in der Zeitzone des Mitglieds).
+- **Eine Notiz oder einen Ordner teilen**: **Teilen** im Menü der Notiz oder im Menü des Ordners erstellt einen Link nur zu dieser Notiz oder diesem Ordner. Der Link kann öffentlich sein, durch ein Passwort geschützt oder auf bestimmte Benutzer der Instanz beschränkt, die sich zum Öffnen anmelden, und er kann das Bearbeiten erlauben. Die Seite **Freigaben** der Symbolleiste listet Ihre Freigaben auf, und unter **Mit mir geteilt** das, was andere mit Ihnen geteilt haben.
+- **Zugriff auf ein ganzes Konto gewähren**: Ein Administrator kann einem Benutzer unter **Einstellungen > Admin-Werkzeuge > Benutzerverwaltung** erlauben, das Konto eines anderen Benutzers zu öffnen, ohne dessen Eigentümerschaft zu übertragen. Der Benutzer wechselt über den Abschnitt **Konten** des Arbeitsbereichsmenüs dorthin.
+- **Dieselbe Notiz bearbeiten**: Es bearbeitet immer nur eine Person. Ist eine Notiz gesperrt, bietet das schreibgeschützte Banner an, die Bearbeitung zu **übernehmen**: Der Bildschirm der anderen Person wird schreibgeschützt, ihre ungespeicherten Änderungen bleiben in ihrem Browser und werden erneut angeboten, sobald die Notiz frei ist. Eine geöffnete Notiz übernimmt anderswo gemachte Änderungen innerhalb weniger Sekunden. Bei einer **Markdown**-Notiz mit ungespeicherten Änderungen auf beiden Seiten werden die beiden Änderungen automatisch zusammengeführt, wenn sie verschiedene Zeilen betreffen; überschneiden sie sich, lässt Sie ein Banner wählen. Rich-Text-Notizen werden nie zusammengeführt, Sie wählen die Version, die bleibt. Halten Sie Skripte und anderen Code in eingezäunten Codeblöcken (```` ``` ````): rohes HTML außerhalb eines Codeblocks wird beim Speichern bereinigt, wodurch eine an sich saubere Zusammenführung wie ein Konflikt aussehen kann.
 
 ## Aktivitätsprotokoll
 

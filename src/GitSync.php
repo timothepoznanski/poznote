@@ -7,6 +7,9 @@
  * with environment variables as fallback defaults.
  */
 
+require_once __DIR__ . '/users/db_master.php';
+require_once __DIR__ . '/lib/outbound-url.php';
+
 class GitSync {
     // Supported file extensions
     const SUPPORTED_NOTE_EXTENSIONS = ['md', 'html', 'txt', 'markdown', 'json', 'excalidraw'];
@@ -1931,30 +1934,66 @@ class GitSync {
             $headers[] = 'Accept: application/json';
         }
         
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
-        
-        if ($method === 'PUT' || $method === 'POST' || $method === 'DELETE') {
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-            if ($body) {
-                $headers[] = 'Content-Type: application/json';
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
-            }
+        if ($body && ($method === 'PUT' || $method === 'POST' || $method === 'DELETE')) {
+            $headers[] = 'Content-Type: application/json';
         }
-        
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
-        
-        if ($error) {
-            return ['error' => 'cURL error: ' . $error, 'status' => 0];
+
+        // The API base is the account's own setting: unless the account is an
+        // admin's it may only reach public hosts (GHSA-mr2c-9992-59wx), and
+        // redirects are then followed here, each hop checked again, rather
+        // than by curl. The token never follows a redirect to another host.
+        $restricted = poznoteOutboundRestrictedForUser($this->userId !== null ? (int)$this->userId : null);
+        $origin = strtolower((string)parse_url($url, PHP_URL_SCHEME) . '://' . (string)parse_url($url, PHP_URL_HOST) . ':' . (string)parse_url($url, PHP_URL_PORT));
+        $hops = 0;
+        while (true) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            curl_setopt($ch, CURLOPT_MAXREDIRS, 5);
+
+            if ($method === 'PUT' || $method === 'POST' || $method === 'DELETE') {
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+                if ($body) {
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($body));
+                }
+            }
+
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+            $blocked = poznoteOutboundPrepareCurl($ch, $url, $restricted);
+            if ($blocked !== '') {
+                curl_close($ch);
+                return ['error' => $blocked, 'status' => 0];
+            }
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $error = curl_error($ch);
+            $redirectUrl = (string)curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+            curl_close($ch);
+
+            if ($error) {
+                return ['error' => 'cURL error: ' . $error, 'status' => 0];
+            }
+            if (!$restricted || $redirectUrl === '' || !in_array((int)$httpCode, [301, 302, 303, 307, 308], true)) {
+                break;
+            }
+            if (++$hops > 5) {
+                return ['error' => 'Too many redirects', 'status' => $httpCode];
+            }
+            if ((int)$httpCode === 303 || ($method === 'POST' && in_array((int)$httpCode, [301, 302], true))) {
+                $method = 'GET';
+                $body = null;
+            }
+            $url = $redirectUrl;
+            $hopOrigin = strtolower((string)parse_url($url, PHP_URL_SCHEME) . '://' . (string)parse_url($url, PHP_URL_HOST) . ':' . (string)parse_url($url, PHP_URL_PORT));
+            if ($hopOrigin !== $origin) {
+                $headers = array_values(array_filter($headers, function ($header) {
+                    return preg_match('/^(Authorization|PRIVATE-TOKEN|Token):/i', $header) !== 1;
+                }));
+            }
         }
         
         $data = json_decode($response, true);

@@ -748,6 +748,19 @@ function checkAppPasswords(IsolationContext $ctx): void
         assertStatusIn([401], $wrongAccount->get('/notes'), 'owner\'s secret with the stranger\'s username');
     });
 
+    // A browser extension sends its app password with the browser's own
+    // session cookie attached. Written into that session, the restricted
+    // identity replaced the signed-in one, and the settings page lost the
+    // account's app passwords until the next sign-in (issue #1650).
+    test('app password: leaves the browser session it travels with alone', function () use ($ctx, $owner, $secret) {
+        $browser = new BrowserSession($ctx->baseUrl);
+        $browser->signIn($owner->username, $owner->password);
+        assertStatusIn([200], $browser->get('/api/v1/users/me/app-passwords'), 'session GET /users/me/app-passwords before');
+        assertStatusIn([200], $browser->get('/api/v1/notes', ['basic' => [$owner->username, $secret]]), 'GET /notes with the session cookie and the app password');
+        assertStatusIn([200], $browser->get('/api/v1/users/me/app-passwords'), 'session GET /users/me/app-passwords after');
+        assertStatusIn([403], $browser->get('/api/v1/users/me/app-passwords', ['basic' => [$owner->username, $secret]]), 'app password with the session cookie on an account route');
+    });
+
     test('app password: stops working once revoked', function () use ($owner, $client, $id) {
         assertStatusIn([200], $owner->api->request('DELETE', "/users/me/app-passwords/$id"), 'revoke');
         assertStatusIn([401], $client->get('/notes'), 'GET /notes after revocation');

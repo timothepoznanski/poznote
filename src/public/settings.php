@@ -268,6 +268,7 @@ if ($isAdmin) {
             'tenant_isolation',
             'tenant_isolation_features',
             'tenant_isolation_applied_ui_keys',
+            'outbound_allowed_hosts',
         ];
         foreach ($settingsPageGlobalKeys as $settingsPageKey) {
             $settingsPageConfig['settings'][$settingsPageKey] = getGlobalSetting($settingsPageKey, '');
@@ -1522,6 +1523,18 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                     <div class="home-card-content">
                         <span class="home-card-title"><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span>
                         <span id="tenant-isolation-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
+                    </div>
+                </div>
+
+                <!-- Local network access for non-admin users (GHSA-mr2c-9992-59wx) -->
+                <div class="home-card" id="outbound-hosts-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.outbound_hosts', [], 'Webhooks, personal AI, transcription and MCP servers and Git Sync of non-admin users only reach public internet hosts. List here the local hosts and networks they may use, such as an Ollama or n8n server on your network. Administrators are not limited.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-network"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.outbound_hosts', [], 'Local network access'); ?></span>
+                        <span id="outbound-hosts-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>

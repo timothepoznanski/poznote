@@ -114,7 +114,7 @@ function handleMoveButtonClick(e) {
 
 // ========== ROW ACTIONS MENU ==========
 
-// Share stays on the row; the other actions sit in the "..." menu next to it
+// Share stays on the row (and heads the menu too); the other actions sit in the "..." menu next to it
 // (workspaces_section.php). The buttons carry the same classes in either place, so the
 // delegated handlers above fire from the menu too.
 

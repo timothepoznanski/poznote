@@ -25,7 +25,7 @@ class ShareController {
     public function show($noteId) {
         try {
             // Verify note exists
-            $stmt = $this->con->prepare('SELECT id, workspace, type FROM entries WHERE id = ?');
+            $stmt = $this->con->prepare('SELECT id, workspace, type, folder_id FROM entries WHERE id = ?');
             $stmt->execute([$noteId]);
             $noteRow = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -48,7 +48,9 @@ class ShareController {
                     'success' => true,
                     'public' => false,
                     'noteType' => $noteType,
-                    'accessMode' => $this->sanitizeAccessMode('full', $noteType)
+                    'accessMode' => $this->sanitizeAccessMode('full', $noteType),
+                    'workspace' => $noteWorkspace,
+                    'sharedViaFolder' => $this->findSharingFolder($noteRow['folder_id'] ?? null)
                 ]);
                 return;
             }
@@ -434,6 +436,39 @@ class ShareController {
     /**
      * Build public URLs from token
      */
+    /**
+     * The nearest shared folder among the note's folder and its ancestors,
+     * or null when no folder share covers the note.
+     */
+    private function findSharingFolder($folderId): ?array {
+        if (empty($folderId)) {
+            return null;
+        }
+        $stmt = $this->con->prepare(
+            'WITH RECURSIVE folder_path(id, parent_id, depth) AS (
+                SELECT f.id, f.parent_id, 0
+                FROM folders f
+                WHERE f.id = ?
+                UNION ALL
+                SELECT parent.id, parent.parent_id, folder_path.depth + 1
+                FROM folders parent
+                INNER JOIN folder_path ON folder_path.parent_id = parent.id
+            )
+            SELECT fo.id, fo.name
+            FROM folder_path
+            INNER JOIN shared_folders sf ON sf.folder_id = folder_path.id
+            INNER JOIN folders fo ON fo.id = folder_path.id
+            ORDER BY folder_path.depth ASC
+            LIMIT 1'
+        );
+        $stmt->execute([(int)$folderId]);
+        $folder = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$folder) {
+            return null;
+        }
+        return ['folderId' => (int)$folder['id'], 'folderName' => (string)$folder['name']];
+    }
+
     private function buildUrls($token) {
         $host = getExternalHostWithPort();
         $scriptDir = dirname($_SERVER['SCRIPT_NAME']);

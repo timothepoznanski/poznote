@@ -84,11 +84,11 @@
 x-litellm-customer-id: poznote
 ```
 
-它们会随每个发往 AI 服务器的请求一起发送，包括连接检查。该字段适用于 Ollama、LM Studio 和自定义 URL，实例配置和个人配置中都可以使用。Anthropic 和 OpenAI 是直接调用的，不接受任何自定义请求头。
+它们会随每个发往 AI 服务器的请求一起发送，包括连接检查。该字段适用于所有提供商，实例配置和个人配置中都可以使用。使用 Anthropic 时，未绑定工作区的组织 API 密钥需要 `anthropic-workspace-id: wrkspc_...`。使用 OpenAI 时，`OpenAI-Organization` 和 `OpenAI-Project` 用于选择计费的组织或项目。
 
 值会加密保存，之后不再显示：已保存的请求头显示为 `名称: ••••••••`。保持某一行不变即可保留其值，重新输入值即可修改，删除该行即可移除请求头。
 
-决定请求结构的请求头（`Host`、`Content-Type`、`Content-Length`、`Accept` 等）会被拒绝，由 **API 密钥**字段设置的 `Authorization` 也是如此。名称和值只能使用普通 ASCII 字符，最多 20 个请求头。
+决定请求结构的请求头（`Host`、`Content-Type`、`Content-Length`、`Accept` 等）会被拒绝，由 **API 密钥**字段设置的 `Authorization` 也是如此。使用 Anthropic 时，`x-api-key` 和 `anthropic-version` 由 Poznote 设置，同样会被拒绝。名称和值只能使用普通 ASCII 字符，最多 20 个请求头。
 
 每个请求还会带上 `User-Agent: Poznote/<version>`，这样网关的日志就能显示请求的来源。自定义请求头中的 `User-Agent` 行会替换它。
 

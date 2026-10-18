@@ -90,6 +90,28 @@ test('headers that frame or authenticate the request are reserved', function () 
     assertSame(null, aiUpstreamParseHeaders("User-Agent: mine\nx-api-key: k\nCookie: a=b")['error']);
 });
 
+// An Anthropic organization key that is not scoped to a workspace is refused
+// without anthropic-workspace-id. The header goes through for Anthropic,
+// while the key and API version Poznote sends there stay its own; a gateway
+// keeps its x-api-key.
+test('Anthropic takes custom headers but keeps its key and version headers', function () {
+    $anthropic = aiUpstreamServerReservedHeaders('https://api.anthropic.com');
+    assertSame(['x-api-key', 'anthropic-version'], $anthropic);
+    assertSame([], aiUpstreamServerReservedHeaders('https://api.openai.com'));
+    assertSame([], aiUpstreamServerReservedHeaders('http://litellm:4000/v1'));
+    assertSame([], aiUpstreamServerReservedHeaders('https://evil.com/?anthropic.com'));
+
+    $parsed = aiUpstreamParseHeaders("anthropic-workspace-id: wrkspc_01\nanthropic-beta: x", [], $anthropic);
+    assertSame(null, $parsed['error']);
+    assertSame('wrkspc_01', $parsed['headers'][0]['value']);
+    assertSame(['line' => 2, 'reason' => 'reserved'], aiUpstreamParseHeaders("anthropic-workspace-id: w\nX-Api-Key: k", [], $anthropic)['error']);
+    assertSame(['line' => 1, 'reason' => 'reserved'], aiUpstreamParseHeaders('Anthropic-Version: 2099-01-01', [], $anthropic)['error']);
+
+    $stored = [['name' => 'x-api-key', 'value' => 'k'], ['name' => 'anthropic-workspace-id', 'value' => 'w']];
+    assertSame([['name' => 'anthropic-workspace-id', 'value' => 'w']], aiUpstreamWithoutHeaders($stored, $anthropic));
+    assertSame($stored, aiUpstreamWithoutHeaders($stored, []));
+});
+
 test('no more headers than the limit', function () {
     $lines = [];
     for ($i = 1; $i <= AI_UPSTREAM_HEADERS_MAX; $i++) {

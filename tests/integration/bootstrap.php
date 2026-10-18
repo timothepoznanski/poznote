@@ -172,6 +172,81 @@ final class ApiClient
     }
 }
 
+/**
+ * A browser, as far as the session cookie goes: signs in through login.php and
+ * replays the cookie on every request. The exception to ApiClient's rule, for
+ * the one thing that needs it: what an API call does to the browser session
+ * it travels with.
+ */
+final class BrowserSession
+{
+    private string $jar;
+
+    public function __construct(private string $baseUrl)
+    {
+        $this->jar = tempnam(sys_get_temp_dir(), 'poznote-jar-');
+    }
+
+    public function __destruct()
+    {
+        @unlink($this->jar);
+    }
+
+    public function signIn(string $username, string $password): void
+    {
+        $page = $this->request('GET', '/login.php');
+        if (!preg_match('/name="csrf_token" value="([^"]+)"/', $page->body, $m)) {
+            throw new RuntimeException('No CSRF token on login.php: ' . $page->summary());
+        }
+        $this->request('POST', '/login.php', [
+            'form' => ['csrf_token' => $m[1], 'username' => $username, 'password' => $password],
+        ]);
+    }
+
+    /**
+     * @param array{form?:array,basic?:array{0:string,1:string}} $options
+     *        basic: credentials sent alongside the cookie, as an extension does
+     */
+    public function request(string $method, string $path, array $options = []): Response
+    {
+        $ch = curl_init($this->baseUrl . $path);
+        curl_setopt_array($ch, [
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_COOKIEFILE => $this->jar,
+            CURLOPT_COOKIEJAR => $this->jar,
+            CURLOPT_HTTPHEADER => ['Accept: application/json'],
+            CURLOPT_TIMEOUT => 60,
+            CURLOPT_CONNECTTIMEOUT => 5,
+        ]);
+        if (isset($options['form'])) {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($options['form']));
+        }
+        if (isset($options['basic'])) {
+            curl_setopt($ch, CURLOPT_USERPWD, $options['basic'][0] . ':' . $options['basic'][1]);
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        }
+
+        $raw = curl_exec($ch);
+        if ($raw === false) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            throw new RuntimeException("$method $path failed: $error");
+        }
+        $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        // Flushes the jar to disk now, not when the handle is collected.
+        curl_close($ch);
+
+        $decoded = json_decode($raw, true);
+        return new Response($status, $raw, is_array($decoded) ? $decoded : null);
+    }
+
+    public function get(string $path, array $options = []): Response
+    {
+        return $this->request('GET', $path, $options);
+    }
+}
+
 /** Asserts a response status is one of the allowed codes. */
 function assertStatusIn(array $allowed, Response $response, string $what): void
 {

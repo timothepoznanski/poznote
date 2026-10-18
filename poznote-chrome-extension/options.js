@@ -159,6 +159,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // --- Connection -----------------------------------------------------------
 
+  // Opens the App passwords dialog of the instance typed in the address
+  // field. The card sits in Settings > My Account, a section Settings does
+  // not open on by default (discussion #1641).
+  $('appPasswordsLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    let url = null;
+    try {
+      url = new URL('settings.php?open=app-passwords', normalizeUrl($('appUrl').value) + '/');
+    } catch (err) {
+      // No address yet
+    }
+    if (!url) {
+      showConnectStatus('Fill in your Poznote address first.', 'error');
+      $('appUrl').focus();
+      return;
+    }
+    window.open(url.href, '_blank', 'noopener');
+  });
+
   connectForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const form = {

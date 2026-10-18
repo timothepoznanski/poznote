@@ -70,13 +70,26 @@ function getHeaders(config) {
 }
 
 /**
+ * fetch() for the Poznote API. The Authorization header is the whole
+ * identity: the browser must not add the cookie of a Poznote tab signed in
+ * next door, or the server would see two identities on one request
+ * (issue #1650).
+ * @param {string} url
+ * @param {RequestInit} [options]
+ * @returns {Promise<Response>}
+ */
+function apiFetch(url, options = {}) {
+  return fetch(url, { credentials: 'omit', ...options });
+}
+
+/**
  * Fetch list of user profiles from Poznote
  * @param {Object} config - Configuration object with appUrl, username, and password
  * @returns {Promise<Array>} Array of user profile objects
  */
 async function listProfiles(config) {
   const url = `${config.appUrl}/api/v1/users/profiles`;
-  const response = await fetch(url, {
+  const response = await apiFetch(url, {
     headers: {
       'Authorization': 'Basic ' + btoa(`${config.username}:${config.password}`)
     }
@@ -96,7 +109,7 @@ async function listProfiles(config) {
  */
 async function listWorkspaces(config) {
   const url = `${config.appUrl}/api/v1/workspaces`;
-  const response = await fetch(url, {
+  const response = await apiFetch(url, {
     headers: getHeaders(config)
   });
 
@@ -116,7 +129,7 @@ async function listWorkspaces(config) {
 async function loadFolders(config) {
   const workspace = config.workspace || 'Poznote';
   const url = `${config.appUrl}/api/v1/folders?workspace=${encodeURIComponent(workspace)}`;
-  const response = await fetch(url, {
+  const response = await apiFetch(url, {
     headers: getHeaders(config)
   });
 
@@ -136,7 +149,7 @@ async function loadFolders(config) {
  */
 async function createNote(config, noteData) {
   const url = `${config.appUrl}/api/v1/notes`;
-  const response = await fetch(url, {
+  const response = await apiFetch(url, {
     method: 'POST',
     headers: {
       ...getHeaders(config),
@@ -208,7 +221,7 @@ async function searchNotes(config, query, workspace) {
   if (workspace) {
     params.set('workspace', workspace);
   }
-  const response = await fetch(`${config.appUrl}/api/v1/notes?${params}`, {
+  const response = await apiFetch(`${config.appUrl}/api/v1/notes?${params}`, {
     headers: getHeaders(config)
   });
 
@@ -242,7 +255,7 @@ async function uploadImageAttachment(config, noteId, dataUrl, fileName) {
   const blob = await (await fetch(dataUrl)).blob();
   const form = new FormData();
   form.append('file', blob, fileName);
-  const response = await fetch(`${config.appUrl}/api/v1/notes/${noteId}/attachments`, {
+  const response = await apiFetch(`${config.appUrl}/api/v1/notes/${noteId}/attachments`, {
     method: 'POST',
     headers: getHeaders(config),
     body: form
@@ -271,7 +284,7 @@ async function uploadImageAttachment(config, noteId, dataUrl, fileName) {
  * @returns {Promise<Object>} The note's id and heading
  */
 async function appendToNote(config, noteId, entry) {
-  const response = await fetch(`${config.appUrl}/api/v1/notes/${noteId}`, {
+  const response = await apiFetch(`${config.appUrl}/api/v1/notes/${noteId}`, {
     headers: getHeaders(config)
   });
 
@@ -304,7 +317,7 @@ async function appendToNote(config, noteId, entry) {
       ? (content.replace(/\s+$/, '') ? content.replace(/\s+$/, '') + '\n\n' : '') + block + '\n'
       : content + block;
 
-    const patch = await fetch(`${config.appUrl}/api/v1/notes/${noteId}`, {
+    const patch = await apiFetch(`${config.appUrl}/api/v1/notes/${noteId}`, {
       method: 'PATCH',
       headers: {
         ...getHeaders(config),

@@ -18,8 +18,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Provider-driven field visibility: local servers need a URL but no
     // key; Anthropic/OpenAI have a fixed URL and need a key; custom shows
-    // everything. Custom headers go with a URL of one's own: the two fixed
-    // providers are called directly and take none.
+    // everything. Custom headers stay open to every provider: an Anthropic
+    // organization key may need anthropic-workspace-id, an OpenAI one
+    // OpenAI-Organization or OpenAI-Project.
     var PROVIDERS = {
         ollama:    { url: 'http://' + localHost + ':11434', fixedUrl: false, key: 'none' },
         lmstudio:  { url: 'http://' + localHost + ':1234',  fixedUrl: false, key: 'none' },
@@ -32,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function() {
     var keyGroup = document.getElementById('ai-key-group');
     var keyLabel = document.getElementById('ai-key-label');
     var keyDesc = document.getElementById('ai-key-desc');
-    var headersGroup = document.getElementById('ai-headers-group');
     var headersInput = document.getElementById('ai_headers');
     var modelSelect = document.getElementById('ai_model');
     var modelMsg = document.getElementById('ai-model-empty-msg');
@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', function() {
         keyGroup.style.display = (p.key === 'none') ? 'none' : '';
         keyLabel.textContent = (p.key === 'required') ? i18n.apiKeyRequired : i18n.apiKeyOptional;
         keyDesc.style.display = (p.key === 'optional') ? '' : 'none';
-        headersGroup.style.display = p.fixedUrl ? 'none' : '';
         if (!initial) {
             // The headers and the model belong to the previous server
             headersInput.value = '';
@@ -102,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (apiKey) body.append('api_key', apiKey);
         // Always posted, an empty field included: only what the form shows
         // is sent, the server fills in the values still masked
-        body.append('headers', headersGroup.style.display === 'none' ? '' : headersInput.value);
+        body.append('headers', headersInput.value);
 
         fetch('api_ai_chat.php?action=test', {
             method: 'POST',

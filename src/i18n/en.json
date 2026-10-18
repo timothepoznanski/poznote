@@ -200,7 +200,8 @@
       "structured_export": "Export your notes as files, organized in folders like in Poznote.",
       "local_backup": "Save complete backup archives into a folder of the server, manually or on a schedule, and keep only the most recent ones.",
       "whats_new": "After an update, show the release notes of the new version once when you open your notes.",
-      "login_disabled": "Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials."
+      "login_disabled": "Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials.",
+      "outbound_hosts": "Webhooks, personal AI, transcription and MCP servers and Git Sync of non-admin users only reach public internet hosts. List here the local hosts and networks they may use, such as an Ollama or n8n server on your network. Administrators are not limited."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -299,7 +300,8 @@
       "import_notes": "Import notes",
       "local_backup": "Local Backups",
       "whats_new": "What's new after updates",
-      "login_disabled": "Open without login"
+      "login_disabled": "Open without login",
+      "outbound_hosts": "Local network access"
     },
     "default_credentials": {
       "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
@@ -356,6 +358,10 @@
     "scope": {
       "user": "Personal",
       "admin": "Admin"
+    },
+    "outbound_hosts": {
+      "status_allowed": "{{count}} allowed",
+      "status_public_only": "Public only"
     }
   },
   "workspaces": {
@@ -1395,6 +1401,12 @@
       "validation": "Please select WOFF2, WOFF, TTF or OTF font files.",
       "some_rejected": "Some files were not stored: they are not fonts, or they are larger than 10 MB.",
       "delete_confirm": "Delete {{name}}? Its files are removed from your data volume."
+    },
+    "outbound_hosts": {
+      "title": "Local network access",
+      "description": "Non-admin users can only point webhooks, personal AI, transcription and MCP servers and Git Sync at public internet hosts. The hosts and networks listed here are allowed as well. Administrators are never limited.",
+      "label": "One entry per line: a host name, *.domain, an address or a network",
+      "invalid": "Not a host name, address or network: {{entries}}"
     }
   },
   "notes_list": {
@@ -1860,7 +1872,8 @@
       "shared_via_folder_message": "This note is already shared because it is located in the shared folder \"{{folder}}\".",
       "shared_via_folder_message_generic": "This note is already shared because it is located in a shared folder.",
       "shared_via_folder_create_question": "Do you want to also create a share link specific to this note, in addition to the folder share?",
-      "shared_via_folder_view_shares": "View shares"
+      "shared_via_folder_view_shares": "View shares",
+      "shared_via_folder_edit_folder_share": "Edit folder share"
     },
     "public_modal": {
       "title": "Shared URL",
@@ -3979,7 +3992,8 @@
     "description": "Poznote sends an HTTP POST request with a JSON payload to each registered endpoint when one of your notes triggers a subscribed event: a reminder firing, a note being created or publicly shared. Only your own notes are concerned. If a secret is set, the payload is signed with HMAC-SHA256 in the X-Poznote-Signature-256 header.",
     "access_denied": "Access denied. User webhooks are disabled on this instance.",
     "app_url_unset": "No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Ask an administrator to set it on the admin Webhooks page.",
-    "app_url_unset_admin": "No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Set it on the admin Webhooks page."
+    "app_url_unset_admin": "No instance URL is configured, so the payloads carry no direct note link (data.note.url is null). Set it on the admin Webhooks page.",
+    "error_private_url": "This address is not allowed: a webhook must point to a public internet host. An administrator can allow local hosts in Settings, Local network access."
   },
   "webhooks_admin": {
     "event_help": {
@@ -4313,7 +4327,7 @@
     "api_key_label": "API key (optional)",
     "api_key_description": "Leave empty for a local Ollama server. Required for cloud providers.",
     "headers_label": "Custom headers (optional)",
-    "headers_description": "One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter. Saved values are hidden: leave a line as it is to keep its value.",
+    "headers_description": "One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter, or for an Anthropic organization key that needs anthropic-workspace-id. Saved values are hidden: leave a line as it is to keep its value.",
     "headers_errors": {
       "format": "Custom headers, line {{line}}: write it as \"Name: value\", in plain ASCII characters.",
       "reserved": "Custom headers, line {{line}}: this header is set by Poznote and cannot be changed. The API key field covers Authorization.",

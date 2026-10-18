@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Poznote URL Saver",
-  "version": "2.0",
+  "version": "2.0.1",
   "description": "Saves the current page URL or screenshot to Poznote, as a new note or at the end of an existing one.",
   "permissions": [
     "storage",

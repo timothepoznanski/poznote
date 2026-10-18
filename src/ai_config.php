@@ -140,14 +140,13 @@ function poznoteAiLoadHeaders(string $stored): array {
 
 /**
  * Parse the custom headers field of a settings form or of a connection
- * test. Anthropic and OpenAI are called directly and take none.
+ * test, for the server at $serverUrl. Every provider takes them: Anthropic
+ * wants anthropic-workspace-id with an organization key that is not scoped
+ * to a workspace, OpenAI OpenAI-Organization or OpenAI-Project.
  * Returns ['headers' => list, 'error' => '' | translated message].
  */
-function poznoteAiReadHeadersField(string $text, array $stored, string $provider = ''): array {
-    if (isset(poznoteAiFixedUrls()[$provider])) {
-        return ['headers' => [], 'error' => ''];
-    }
-    $parsed = aiUpstreamParseHeaders($text, $stored);
+function poznoteAiReadHeadersField(string $text, array $stored, string $serverUrl = ''): array {
+    $parsed = aiUpstreamParseHeaders($text, $stored, aiUpstreamServerReservedHeaders($serverUrl));
     if ($parsed['error'] === null) {
         return ['headers' => $parsed['headers'], 'error' => ''];
     }
@@ -353,7 +352,12 @@ function poznoteAiMcpServersForChat(?PDO $con, ?int $userId): array {
     }
     $servers = isAiChatAllowedForUser($userId) ? poznoteAiMcpInstanceServers() : [];
     if (poznoteAiMcpUserServersAllowed()) {
-        $servers = array_merge($servers, poznoteAiMcpUserServers($con));
+        // A user's own servers reach public hosts only, unless the account
+        // is an admin's (GHSA-mr2c-9992-59wx)
+        $restricted = poznoteOutboundRestrictedForUser(function_exists('getCurrentUserId') ? (int)(getCurrentUserId() ?? 0) : 0);
+        foreach (poznoteAiMcpUserServers($con) as $server) {
+            $servers[] = array_merge($server, ['restricted' => $restricted]);
+        }
     }
     return array_values(array_filter($servers, function (array $server): bool {
         return $server['enabled'] && in_array(true, array_column($server['tools'], 'enabled'), true);
@@ -457,7 +461,7 @@ function poznoteAiGuessProvider(string $provider, string $url): string {
     }
     $host = strtolower((string)(parse_url($url, PHP_URL_HOST) ?? ''));
     $port = (int)(parse_url($url, PHP_URL_PORT) ?? 0);
-    if ($host === 'anthropic.com' || substr($host, -14) === '.anthropic.com') {
+    if (aiUpstreamIsAnthropicUrl($url)) {
         return 'anthropic';
     }
     if ($host === 'api.openai.com') {

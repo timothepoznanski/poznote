@@ -5,6 +5,7 @@ if (!defined('SQLITE_DATABASE')) {
 }
 
 require_once __DIR__ . '/users/db_master.php';
+require_once __DIR__ . '/lib/outbound-url.php';
 
 /**
  * Delivers events to the registered outgoing webhooks: instance events to the
@@ -481,10 +482,15 @@ class WebhookDispatcher {
             $headers[] = 'X-Poznote-Signature-256: sha256=' . hash_hmac('sha256', $body, $secret);
         }
 
+        // A webhook registered from the User Webhooks page carries its
+        // owner; unless that owner is an admin, it may only reach public
+        // hosts (GHSA-mr2c-9992-59wx). Admin instance webhooks have no owner.
+        $restricted = !empty($webhook['user_id']) && poznoteOutboundRestrictedForUser((int)$webhook['user_id']);
+
         $status = '';
         $success = false;
         try {
-            $response = $this->post((string)$webhook['url'], $body, $headers);
+            $response = $this->post((string)$webhook['url'], $body, $headers, $restricted);
             $success = $response['status'] >= 200 && $response['status'] < 300;
             $status = $response['status'] > 0 ? (string)$response['status'] : 'error: ' . ($response['error'] ?: 'no response');
             if (!$success) {
@@ -504,9 +510,10 @@ class WebhookDispatcher {
 
     /**
      * @param string[] $headers
+     * @param bool $restricted limit the request to public hosts, see lib/outbound-url.php
      * @return array{status:int,error:?string}
      */
-    private function post(string $url, string $body, array $headers): array {
+    private function post(string $url, string $body, array $headers, bool $restricted): array {
         if (function_exists('curl_init')) {
             $ch = curl_init($url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -516,6 +523,11 @@ class WebhookDispatcher {
             curl_setopt($ch, CURLOPT_TIMEOUT, self::TIMEOUT_SECONDS);
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, self::TIMEOUT_SECONDS);
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+            $blocked = poznoteOutboundPrepareCurl($ch, $url, $restricted);
+            if ($blocked !== '') {
+                curl_close($ch);
+                return ['status' => 0, 'error' => $blocked];
+            }
 
             $ok = curl_exec($ch);
             $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
@@ -523,6 +535,13 @@ class WebhookDispatcher {
             curl_close($ch);
 
             return ['status' => $status, 'error' => $error];
+        }
+
+        // Without curl the connection cannot be pinned to the checked
+        // addresses, so this only keeps out the URLs refused outright.
+        $check = poznoteOutboundCheckUrl($url, $restricted);
+        if (!$check['ok']) {
+            return ['status' => 0, 'error' => $check['error']];
         }
 
         $ctx = stream_context_create([

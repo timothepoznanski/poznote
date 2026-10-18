@@ -46,6 +46,15 @@ function user_webhooks_is_valid_url(string $url): bool {
         && preg_match('#^https?://#i', $url) === 1;
 }
 
+/**
+ * Unless the account is an admin's, its webhooks may only reach public hosts
+ * (GHSA-mr2c-9992-59wx). Checked here so the form says so at once; the
+ * dispatcher checks again on every delivery, as DNS answers change.
+ */
+function user_webhooks_target_allowed(string $url, int $userId): bool {
+    return poznoteOutboundCheckUrl($url, poznoteOutboundRestrictedForUser($userId))['ok'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $token = $_POST['csrf_token'] ?? '';
     if (!isset($_SESSION['user_webhooks_csrf_token']) || !hash_equals($_SESSION['user_webhooks_csrf_token'], $token)) {
@@ -73,6 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!user_webhooks_is_valid_url($url)) {
                 $error = t('webhooks_admin.error_invalid_url', [], 'The webhook URL must start with http:// or https://.');
+            } elseif (!user_webhooks_target_allowed($url, $currentWebhookUserId)) {
+                $error = t('webhooks_user.error_private_url', [], 'This address is not allowed: a webhook must point to a public internet host. An administrator can allow local hosts in Settings, Local network access.');
             } elseif (empty($events)) {
                 $error = t('webhooks_admin.error_no_events', [], 'Select at least one event.');
             } elseif (createWebhook($url, $secret, $events, $currentWebhookUserId, $description)) {
@@ -106,6 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!user_webhooks_is_valid_url($url)) {
                     $error = t('webhooks_admin.error_invalid_url', [], 'The webhook URL must start with http:// or https://.');
+                } elseif (!user_webhooks_target_allowed($url, $currentWebhookUserId)) {
+                    $error = t('webhooks_user.error_private_url', [], 'This address is not allowed: a webhook must point to a public internet host. An administrator can allow local hosts in Settings, Local network access.');
                 } elseif (empty($events)) {
                     $error = t('webhooks_admin.error_no_events', [], 'Select at least one event.');
                 } elseif (updateWebhook($id, $url, $secret, $events, $description)) {

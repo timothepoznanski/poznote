@@ -522,7 +522,8 @@
       "structured_export": "Exporta tus notas como archivos, organizados en carpetas como en Poznote.",
       "local_backup": "Guarda archivos de copia de seguridad completos en una carpeta del servidor, manualmente o según una programación, conservando solo los más recientes.",
       "whats_new": "Tras una actualización, mostrar una vez las notas de la nueva versión al abrir tus notas.",
-      "login_disabled": "Omite la pantalla de inicio de sesión: cualquier navegador que llegue a esta instancia abre directamente su cuenta, sin usuario, contraseña ni código de dos factores. Actívelo solo si usted es el único que puede acceder a esta instancia, o si un proxy inverso situado delante se encarga de la autenticación. La API sigue pidiendo credenciales."
+      "login_disabled": "Omite la pantalla de inicio de sesión: cualquier navegador que llegue a esta instancia abre directamente su cuenta, sin usuario, contraseña ni código de dos factores. Actívelo solo si usted es el único que puede acceder a esta instancia, o si un proxy inverso situado delante se encarga de la autenticación. La API sigue pidiendo credenciales.",
+      "outbound_hosts": "Los webhooks, los servidores personales de IA, transcripción y MCP y Git Sync de los usuarios no administradores solo llegan a hosts públicos de Internet. Indica aquí los hosts y redes locales que pueden usar, como un servidor Ollama o n8n en tu red. Los administradores no tienen límites."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -641,7 +642,8 @@
       "import_notes": "Importar notas",
       "local_backup": "Copias de seguridad locales",
       "whats_new": "Novedades tras una actualización",
-      "login_disabled": "Abrir sin iniciar sesión"
+      "login_disabled": "Abrir sin iniciar sesión",
+      "outbound_hosts": "Acceso a la red local"
     },
     "default_credentials": {
       "both": "Esta cuenta sigue usando el nombre de usuario y la contraseña predeterminados. Cualquiera que pueda acceder a esta instancia puede iniciar sesión.",
@@ -683,6 +685,10 @@
     "scope": {
       "user": "Personal",
       "admin": "Admin"
+    },
+    "outbound_hosts": {
+      "status_allowed": "{{count}} permitido(s)",
+      "status_public_only": "Solo públicos"
     }
   },
   "workspaces": {
@@ -1886,6 +1892,12 @@
       "validation": "Selecciona archivos de fuente WOFF2, WOFF, TTF u OTF.",
       "some_rejected": "Algunos archivos no se guardaron: no son fuentes, o superan los 10 MB.",
       "delete_confirm": "¿Eliminar {{name}}? Sus archivos se quitan de tu volumen de datos."
+    },
+    "outbound_hosts": {
+      "title": "Acceso a la red local",
+      "description": "Los usuarios no administradores solo pueden dirigir los webhooks, los servidores personales de IA, transcripción y MCP y Git Sync a hosts públicos de Internet. Los hosts y redes indicados aquí también se permiten. Los administradores nunca tienen límites.",
+      "label": "Una entrada por línea: un nombre de host, *.dominio, una dirección o una red",
+      "invalid": "No es un nombre de host, una dirección ni una red: {{entries}}"
     }
   },
   "notes_list": {
@@ -2350,7 +2362,8 @@
       "shared_via_folder_message": "Esta nota ya está compartida porque se encuentra en la carpeta compartida \"{{folder}}\".",
       "shared_via_folder_message_generic": "Esta nota ya está compartida porque se encuentra en una carpeta compartida.",
       "shared_via_folder_create_question": "¿Desea crear también un enlace para compartir específico de esta nota, además del uso compartido de la carpeta?",
-      "shared_via_folder_view_shares": "Ver compartidos"
+      "shared_via_folder_view_shares": "Ver compartidos",
+      "shared_via_folder_edit_folder_share": "Editar el compartido de la carpeta"
     },
     "public_modal": {
       "title": "URL compartida",
@@ -4348,7 +4361,8 @@
     "description": "Poznote envía una solicitud HTTP POST con un payload JSON a cada endpoint registrado cuando una de tus notas activa un evento suscrito: un recordatorio que se cumple, una nota creada o compartida públicamente. Solo se ven afectadas tus propias notas. Si se define un secreto, el payload se firma con HMAC-SHA256 en la cabecera X-Poznote-Signature-256.",
     "access_denied": "Acceso denegado. Los webhooks de usuario están desactivados en esta instancia.",
     "app_url_unset": "No hay ninguna URL de instancia configurada, por lo que los payloads no incluyen enlace directo a la nota (data.note.url es null). Pide a un administrador que la defina en la pagina Webhooks de administracion.",
-    "app_url_unset_admin": "No hay ninguna URL de instancia configurada, por lo que los payloads no incluyen enlace directo a la nota (data.note.url es null). Definela en la pagina Webhooks de administracion."
+    "app_url_unset_admin": "No hay ninguna URL de instancia configurada, por lo que los payloads no incluyen enlace directo a la nota (data.note.url es null). Definela en la pagina Webhooks de administracion.",
+    "error_private_url": "Esta dirección no está permitida: un webhook debe apuntar a un host público de Internet. Un administrador puede permitir hosts locales en Ajustes, Acceso a la red local."
   },
   "webhooks_admin": {
     "event_help": {
@@ -4657,7 +4671,7 @@
     "api_key_label": "Clave API (opcional)",
     "api_key_description": "Déjala vacía para un servidor Ollama local. Necesaria para proveedores en la nube.",
     "headers_label": "Encabezados personalizados (opcional)",
-    "headers_description": "Un encabezado por línea, con el formato Nombre: valor, enviado con cada solicitud a este servidor. Útil detrás de una pasarela como LiteLLM u OpenRouter. Los valores guardados se ocultan: deja una línea tal cual para conservar su valor.",
+    "headers_description": "Un encabezado por línea, con el formato Nombre: valor, enviado con cada solicitud a este servidor. Útil detrás de una pasarela como LiteLLM u OpenRouter, o para una clave de organización de Anthropic que necesita anthropic-workspace-id. Los valores guardados se ocultan: deja una línea tal cual para conservar su valor.",
     "headers_errors": {
       "format": "Encabezados personalizados, línea {{line}}: escríbela como «Nombre: valor», en caracteres ASCII simples.",
       "reserved": "Encabezados personalizados, línea {{line}}: este encabezado lo define Poznote y no se puede cambiar. El campo Clave API cubre Authorization.",

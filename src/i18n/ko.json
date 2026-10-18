@@ -200,7 +200,8 @@
       "structured_export": "노트를 Poznote와 같은 폴더 구조의 파일로 내보냅니다.",
       "local_backup": "전체 백업 아카이브를 서버의 폴더에 수동으로 또는 일정에 따라 저장하고 최신 백업만 보관합니다.",
       "whats_new": "업데이트 후 노트를 열 때 새 버전의 릴리스 노트를 한 번 표시합니다.",
-      "login_disabled": "로그인 화면을 건너뜁니다. 이 인스턴스에 접근하는 모든 브라우저가 사용자 이름, 비밀번호, 2단계 인증 코드 없이 내 계정을 바로 엽니다. 본인만 이 인스턴스에 접근할 수 있거나 앞단의 리버스 프록시가 인증을 처리하는 경우에만 켜세요. API는 계속 자격 증명을 요구합니다."
+      "login_disabled": "로그인 화면을 건너뜁니다. 이 인스턴스에 접근하는 모든 브라우저가 사용자 이름, 비밀번호, 2단계 인증 코드 없이 내 계정을 바로 엽니다. 본인만 이 인스턴스에 접근할 수 있거나 앞단의 리버스 프록시가 인증을 처리하는 경우에만 켜세요. API는 계속 자격 증명을 요구합니다.",
+      "outbound_hosts": "관리자가 아닌 사용자의 웹훅, 개인 AI·전사·MCP 서버, Git Sync는 공개 인터넷 호스트에만 접근합니다. 네트워크의 Ollama나 n8n 서버처럼 이들이 사용할 수 있는 로컬 호스트와 네트워크를 여기에 입력하세요. 관리자는 제한되지 않습니다."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "모바일에서는 이 설정과 관계없이 키보드 위 도구 모음의 + 버튼으로 같은 메뉴를 열 수 있습니다."
@@ -299,7 +300,8 @@
       "import_notes": "노트 가져오기",
       "local_backup": "로컬 백업",
       "whats_new": "업데이트 후 새로운 기능",
-      "login_disabled": "로그인 없이 열기"
+      "login_disabled": "로그인 없이 열기",
+      "outbound_hosts": "로컬 네트워크 접근"
     },
     "default_credentials": {
       "both": "이 계정은 원래 제공된 사용자 이름과 비밀번호를 계속 사용합니다. 이 인스턴스에 접근할 수 있는 사람은 누구나 로그인할 수 있습니다.",
@@ -356,6 +358,10 @@
     "scope": {
       "user": "개인",
       "admin": "관리"
+    },
+    "outbound_hosts": {
+      "status_allowed": "{{count}}개 허용",
+      "status_public_only": "공개 호스트만"
     }
   },
   "workspaces": {
@@ -1395,6 +1401,12 @@
       "validation": "WOFF2, WOFF, TTF 또는 OTF 글꼴 파일을 선택하세요.",
       "some_rejected": "일부 파일이 저장되지 않았습니다. 글꼴 파일이 아니거나 10MB보다 큽니다.",
       "delete_confirm": "\"{{name}}\" 글꼴을 삭제하시겠습니까? 해당 글꼴 파일이 데이터 볼륨에서 삭제됩니다."
+    },
+    "outbound_hosts": {
+      "title": "로컬 네트워크 접근",
+      "description": "관리자가 아닌 사용자는 웹훅, 개인 AI·전사·MCP 서버, Git Sync를 공개 인터넷 호스트로만 지정할 수 있습니다. 여기에 입력한 호스트와 네트워크도 허용됩니다. 관리자는 제한되지 않습니다.",
+      "label": "한 줄에 하나씩: 호스트 이름, *.도메인, 주소 또는 네트워크",
+      "invalid": "호스트 이름, 주소, 네트워크가 아닙니다: {{entries}}"
     }
   },
   "notes_list": {
@@ -1860,7 +1872,8 @@
       "shared_via_folder_message": "이 노트는 공유 폴더 \"{{folder}}\"에 있으므로 이미 공유되었습니다.",
       "shared_via_folder_message_generic": "이 노트는 공유 폴더에 있으므로 이미 공유되었습니다.",
       "shared_via_folder_create_question": "폴더 공유 외에 이 노트에 특정한 공유 링크도 생성하시겠습니까?",
-      "shared_via_folder_view_shares": "공유 보기"
+      "shared_via_folder_view_shares": "공유 보기",
+      "shared_via_folder_edit_folder_share": "폴더 공유 편집"
     },
     "public_modal": {
       "title": "공유 URL",
@@ -3979,7 +3992,8 @@
     "description": "Poznote는 노트 중 하나가 구독 이벤트(알림 실행, 노트 생성 또는 공개 공유)를 트리거할 때 등록된 각 엔드포인트에 JSON 페이로드가 포함된 HTTP POST 요청을 보냅니다. 노트만이 관련됩니다. 비밀이 설정된 경우 페이로드는 X-Poznote-Signature-256 헤더의 HMAC-SHA256으로 서명됩니다.",
     "access_denied": "접근이 거부되었습니다. 이 인스턴스에서는 사용자 웹훅이 사용 중지되었습니다.",
     "app_url_unset": "인스턴스 URL이 설정되지 않았으므로 페이로드는 직접 노트 링크를 전달하지 않습니다(data.note.url은 null임). 관리자에게 관리자 Webhooks 페이지에서 설정하도록 요청하세요.",
-    "app_url_unset_admin": "인스턴스 URL이 설정되지 않았으므로 페이로드는 직접 노트 링크를 전달하지 않습니다(data.note.url은 null임). 관리자 Webhooks 페이지에서 설정하세요."
+    "app_url_unset_admin": "인스턴스 URL이 설정되지 않았으므로 페이로드는 직접 노트 링크를 전달하지 않습니다(data.note.url은 null임). 관리자 Webhooks 페이지에서 설정하세요.",
+    "error_private_url": "허용되지 않는 주소입니다. 웹훅은 공개 인터넷 호스트를 가리켜야 합니다. 관리자는 설정의 로컬 네트워크 접근에서 로컬 호스트를 허용할 수 있습니다."
   },
   "webhooks_admin": {
     "event_help": {
@@ -4313,7 +4327,7 @@
     "api_key_label": "API 키(선택사항)",
     "api_key_description": "로컬 Ollama 서버의 경우 비워 두세요. 클라우드 공급자에게 필요합니다.",
     "headers_label": "사용자 지정 헤더 (선택 사항)",
-    "headers_description": "한 줄에 헤더 하나를 이름: 값 형식으로 입력하면 이 서버로 보내는 모든 요청에 함께 전송됩니다. LiteLLM이나 OpenRouter 같은 게이트웨이 뒤에서 유용합니다. 저장된 값은 숨겨집니다. 값을 유지하려면 해당 줄을 그대로 두세요.",
+    "headers_description": "한 줄에 헤더 하나를 이름: 값 형식으로 입력하면 이 서버로 보내는 모든 요청에 함께 전송됩니다. LiteLLM이나 OpenRouter 같은 게이트웨이 뒤에서, 또는 anthropic-workspace-id가 필요한 Anthropic 조직 키에 유용합니다. 저장된 값은 숨겨집니다. 값을 유지하려면 해당 줄을 그대로 두세요.",
     "headers_errors": {
       "format": "사용자 지정 헤더 {{line}}번째 줄: \"이름: 값\" 형식으로, 일반 ASCII 문자로 입력하세요.",
       "reserved": "사용자 지정 헤더 {{line}}번째 줄: 이 헤더는 Poznote가 설정하며 변경할 수 없습니다. Authorization은 API 키 필드에서 처리합니다.",

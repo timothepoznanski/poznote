@@ -84,11 +84,11 @@ Une passerelle placée devant les modèles (LiteLLM, OpenRouter, Cloudflare AI G
 x-litellm-customer-id: poznote
 ```
 
-Ils sont envoyés avec chaque requête vers le serveur d'IA, vérification de la connexion comprise. Le champ est proposé pour Ollama, LM Studio et les URL personnalisées, dans la configuration de l'instance comme dans une configuration personnelle. Anthropic et OpenAI sont appelés directement et n'en prennent aucun.
+Ils sont envoyés avec chaque requête vers le serveur d'IA, vérification de la connexion comprise. Le champ est proposé pour tous les fournisseurs, dans la configuration de l'instance comme dans une configuration personnelle. Avec Anthropic, une clé API d'organisation qui n'est rattachée à aucun workspace demande `anthropic-workspace-id: wrkspc_...`. Avec OpenAI, `OpenAI-Organization` et `OpenAI-Project` choisissent l'organisation ou le projet facturé.
 
 Les valeurs sont stockées chiffrées et ne sont plus jamais affichées : un en-tête enregistré revient sous la forme `Nom: ••••••••`. Laissez une ligne telle quelle pour conserver sa valeur, saisissez à nouveau la valeur pour la changer, supprimez la ligne pour retirer l'en-tête.
 
-Les en-têtes qui structurent la requête (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) sont refusés, de même que `Authorization`, que définit le champ **Clé API**. Les noms et les valeurs sont limités aux caractères ASCII simples, avec 20 en-têtes au plus.
+Les en-têtes qui structurent la requête (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) sont refusés, de même que `Authorization`, que définit le champ **Clé API**. Avec Anthropic, `x-api-key` et `anthropic-version` sont refusés aussi, car Poznote les définit. Les noms et les valeurs sont limités aux caractères ASCII simples, avec 20 en-têtes au plus.
 
 Chaque requête porte aussi `User-Agent: Poznote/<version>`, afin que les journaux d'une passerelle montrent d'où elle vient. Une ligne `User-Agent` dans les en-têtes personnalisés le remplace.
 

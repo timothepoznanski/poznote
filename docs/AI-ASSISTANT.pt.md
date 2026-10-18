@@ -84,11 +84,11 @@ Um gateway colocado à frente dos modelos (LiteLLM, OpenRouter, Cloudflare AI Ga
 x-litellm-customer-id: poznote
 ```
 
-São enviados com cada pedido ao servidor de IA, incluindo a verificação da ligação. O campo é proposto para o Ollama, o LM Studio e os URL personalizados, tanto na configuração da instância como numa configuração pessoal. A Anthropic e a OpenAI são chamadas diretamente e não aceitam nenhum.
+São enviados com cada pedido ao servidor de IA, incluindo a verificação da ligação. O campo é proposto para todos os fornecedores, tanto na configuração da instância como numa configuração pessoal. Com a Anthropic, uma chave de API de organização que não está associada a nenhum workspace precisa de `anthropic-workspace-id: wrkspc_...`. Com a OpenAI, `OpenAI-Organization` e `OpenAI-Project` escolhem a organização ou o projeto faturado.
 
 Os valores são guardados cifrados e nunca mais são mostrados: um cabeçalho guardado aparece como `Nome: ••••••••`. Deixe uma linha como está para manter o seu valor, escreva de novo o valor para o alterar e apague a linha para remover o cabeçalho.
 
-Os cabeçalhos que estruturam o pedido (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) são recusados, tal como `Authorization`, que é definido pelo campo **Chave de API**. Os nomes e os valores estão limitados a caracteres ASCII simples, com 20 cabeçalhos no máximo.
+Os cabeçalhos que estruturam o pedido (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) são recusados, tal como `Authorization`, que é definido pelo campo **Chave de API**. Com a Anthropic, `x-api-key` e `anthropic-version` também são recusados, porque o Poznote os define. Os nomes e os valores estão limitados a caracteres ASCII simples, com 20 cabeçalhos no máximo.
 
 Cada pedido leva também `User-Agent: Poznote/<version>`, para que os registos de um gateway mostrem de onde vem. Uma linha `User-Agent` nos cabeçalhos personalizados substitui-o.
 

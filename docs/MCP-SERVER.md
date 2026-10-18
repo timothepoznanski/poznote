@@ -209,6 +209,13 @@ client presents **its own** token, which is resolved against an external
 identity provider and mapped to that caller's Poznote profile. One instance,
 many callers, each correctly identified.
 
+These variables go in `.env`, like the others. They reach the MCP container
+through the `environment:` block of the `mcp-server` service, and an older
+`docker-compose.yml` does not list them, so they are then silently ignored. If
+you set them, download the latest `docker-compose.yml` first (see
+[Update application](../README.md#update-application)) and check that the MCP
+logs show `Per-caller authentication enabled` at startup.
+
 | variable | default | meaning |
 |---|---|---|
 | `POZNOTE_MCP_AUTH_PROVIDER` | *(unset, feature off)* | `userinfo` or `introspection` |

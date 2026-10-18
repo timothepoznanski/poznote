@@ -69,6 +69,7 @@ https://discord.gg/fuEV6uqf4N
 - [Révisions](#révisions)
 - [Personnalisation](#personnalisation)
 - [Multi-utilisateurs](#multi-utilisateurs)
+- [Partage et collaboration](#partage-et-collaboration)
 - [Journal d'activité](#journal-dactivité)
 - [Webhooks](#webhooks)
 - [Synchronisation Git](#synchronisation-git)
@@ -894,8 +895,7 @@ Surchargez les tokens sur `:root` pour le mode clair et sur `:root[data-theme='d
 Poznote est multi-utilisateur : chaque profil a ses propres notes, espaces de travail, tags, dossiers, pièces jointes et paramètres, et se connecte avec son propre nom d'utilisateur ou adresse e-mail et son mot de passe.
 
 - **Gestion des utilisateurs** : les administrateurs créent, désactivent et gèrent les profils depuis **Paramètres > Outils d'administration > Gestion des utilisateurs**, et peuvent donner à un utilisateur l'accès au compte d'un autre utilisateur sans en transférer la propriété.
-- **Partage** : les notes et les dossiers peuvent être partagés avec d'autres utilisateurs de l'instance, en lecture seule ou en modification, ou publiquement via des liens dédiés. Un espace de travail entier peut être partagé avec d'autres utilisateurs de l'instance, qui le retrouvent dans leur menu des espaces de travail et le modifient avec son propriétaire. Quand l'instance envoie des emails (SMTP), chaque membre peut activer **Paramètres > Espaces de travail > Emails des espaces partagés** pour recevoir la liste des notes que les autres y ont créées, modifiées ou supprimées, quelques minutes après les modifications, ou sous forme de résumé envoyé chaque jour à 8 h ou chaque lundi à 8 h (dans le fuseau horaire du membre). Quand plusieurs utilisateurs ont accès à la même note, un seul la modifie à la fois et les autres voient qui détient le verrou.
-- **Modifier la même note** : une seule personne modifie à la fois. Quand une note est verrouillée, le bandeau en lecture seule propose de **prendre la main** : l'écran de l'autre personne passe en lecture seule et ses modifications non enregistrées restent dans son navigateur, proposées à nouveau dès que la note est libre. Une note ouverte récupère en quelques secondes les modifications faites ailleurs. Pour une note **Markdown** avec des modifications non enregistrées des deux côtés, les deux séries de modifications sont fusionnées automatiquement quand elles touchent des lignes différentes, et un bandeau vous laisse choisir quand elles se chevauchent. Les notes en texte riche ne sont jamais fusionnées, vous choisissez la version à garder. Mettez les scripts et autres codes dans des blocs de code délimités (```` ``` ````) : le HTML brut hors bloc de code est assaini à l'enregistrement, ce qui peut faire passer une fusion propre pour un conflit.
+- **Partage et collaboration** : les espaces de travail, les notes et les dossiers peuvent être partagés avec les autres utilisateurs de l'instance, voir [Partage et collaboration](#partage-et-collaboration).
 - **Isolation des comptes (mode SaaS)** : les administrateurs peuvent empêcher les utilisateurs non administrateurs de découvrir les autres comptes de l'instance, de partager avec eux ou d'enregistrer des webhooks personnels. Laissez tout décoché pour une instance familiale ou d'équipe.
 
 <details>
@@ -923,6 +923,15 @@ data/
 ```
 
 </details>
+
+## Partage et collaboration
+
+Poznote propose plusieurs façons de travailler avec les autres utilisateurs de votre instance, chacun gardant son propre compte. Pour un espace commun (famille, amis, équipe), partagez un espace de travail.
+
+- **Partager un espace de travail** : le propriétaire ouvre **Paramètres > Espaces de travail** et clique sur **Partager** sur la ligne de l'espace (l'icône de partage, ou la première entrée de son menu **...**), puis choisit les utilisateurs. Ils retrouvent l'espace dans leur propre menu des espaces de travail, sous **Partagés avec moi**, et modifient ses notes et ses dossiers avec l'éditeur complet, avec les mêmes droits d'écriture que le propriétaire. Les autres espaces de travail du propriétaire, ses paramètres, sa corbeille et ses sauvegardes restent privés. Dans un espace partagé, écrire `@nom_utilisateur` dans une note mentionne cette personne, qui la retrouve sur sa page **Mentions**. Quand l'instance envoie des emails (SMTP), chaque membre peut activer **Paramètres > Espaces de travail > Emails des espaces partagés** pour recevoir la liste des notes que les autres y ont créées, modifiées ou supprimées, quelques minutes après les modifications, ou sous forme de résumé envoyé chaque jour à 8 h ou chaque lundi à 8 h (dans le fuseau horaire du membre).
+- **Partager une note ou un dossier** : **Partager** dans le menu de la note, ou dans celui du dossier, crée un lien vers cette note ou ce dossier seulement. Le lien peut être public, protégé par un mot de passe, ou réservé à certains utilisateurs de l'instance, qui se connectent pour l'ouvrir, et il peut autoriser la modification. La page **Partages** de la barre d'icônes liste vos partages, et ce que les autres ont partagé avec vous sous **Partagé avec moi**.
+- **Donner accès à un compte entier** : un administrateur peut permettre à un utilisateur d'ouvrir le compte d'un autre utilisateur depuis **Paramètres > Outils d'administration > Gestion des utilisateurs**, sans en transférer la propriété. L'utilisateur y passe depuis la section **Comptes** du menu des espaces de travail.
+- **Modifier la même note** : une seule personne modifie à la fois. Quand une note est verrouillée, le bandeau en lecture seule propose de **prendre la main** : l'écran de l'autre personne passe en lecture seule et ses modifications non enregistrées restent dans son navigateur, proposées à nouveau dès que la note est libre. Une note ouverte récupère en quelques secondes les modifications faites ailleurs. Pour une note **Markdown** avec des modifications non enregistrées des deux côtés, les deux séries de modifications sont fusionnées automatiquement quand elles touchent des lignes différentes, et un bandeau vous laisse choisir quand elles se chevauchent. Les notes en texte riche ne sont jamais fusionnées, vous choisissez la version à garder. Mettez les scripts et autres codes dans des blocs de code délimités (```` ``` ````) : le HTML brut hors bloc de code est assaini à l'enregistrement, ce qui peut faire passer une fusion propre pour un conflit.
 
 ## Journal d'activité
 
