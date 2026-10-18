@@ -84,11 +84,11 @@ A gateway placed in front of the models (LiteLLM, OpenRouter, Cloudflare AI Gate
 x-litellm-customer-id: poznote
 ```
 
-They are sent with every request to the AI server, the connection check included. The field is offered for Ollama, LM Studio and custom URLs, in the instance configuration and in a personal one. Anthropic and OpenAI are called directly and take none.
+They are sent with every request to the AI server, the connection check included. The field is offered for every provider, in the instance configuration and in a personal one. With Anthropic, an organization API key that is not scoped to a workspace needs `anthropic-workspace-id: wrkspc_...`. With OpenAI, `OpenAI-Organization` and `OpenAI-Project` choose the organization or the project billed.
 
 Values are stored encrypted and never shown again: a saved header comes back as `Name: ••••••••`. Leave a line as it is to keep its value, retype the value to change it, delete the line to remove the header.
 
-Headers that frame the request (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) are refused, and so is `Authorization`, which the **API key** field sets. Names and values are limited to plain ASCII characters, with at most 20 headers.
+Headers that frame the request (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) are refused, and so is `Authorization`, which the **API key** field sets. With Anthropic, `x-api-key` and `anthropic-version` are refused too, as Poznote sets them. Names and values are limited to plain ASCII characters, with at most 20 headers.
 
 Every request also carries `User-Agent: Poznote/<version>`, so that the logs of a gateway show where it comes from. A `User-Agent` line in the custom headers replaces it.
 

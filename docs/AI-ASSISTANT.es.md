@@ -84,11 +84,11 @@ Una pasarela situada delante de los modelos (LiteLLM, OpenRouter, Cloudflare AI 
 x-litellm-customer-id: poznote
 ```
 
-Se envían con cada solicitud al servidor de IA, incluida la comprobación de la conexión. El campo se ofrece para Ollama, LM Studio y las URL personalizadas, tanto en la configuración de la instancia como en una personal. Anthropic y OpenAI se llaman directamente y no admiten ninguno.
+Se envían con cada solicitud al servidor de IA, incluida la comprobación de la conexión. El campo se ofrece para todos los proveedores, tanto en la configuración de la instancia como en una personal. Con Anthropic, una clave API de organización que no está asociada a ningún workspace necesita `anthropic-workspace-id: wrkspc_...`. Con OpenAI, `OpenAI-Organization` y `OpenAI-Project` eligen la organización o el proyecto facturado.
 
 Los valores se guardan cifrados y no vuelven a mostrarse: un encabezado guardado aparece como `Nombre: ••••••••`. Deja una línea tal cual para conservar su valor, vuelve a escribir el valor para cambiarlo y borra la línea para quitar el encabezado.
 
-Los encabezados que estructuran la solicitud (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) se rechazan, al igual que `Authorization`, que define el campo **Clave API**. Los nombres y los valores se limitan a caracteres ASCII simples, con 20 encabezados como máximo.
+Los encabezados que estructuran la solicitud (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...) se rechazan, al igual que `Authorization`, que define el campo **Clave API**. Con Anthropic también se rechazan `x-api-key` y `anthropic-version`, ya que Poznote los define. Los nombres y los valores se limitan a caracteres ASCII simples, con 20 encabezados como máximo.
 
 Cada solicitud lleva además `User-Agent: Poznote/<version>`, para que los registros de una pasarela muestren de dónde viene. Una línea `User-Agent` en los encabezados personalizados lo sustituye.
 

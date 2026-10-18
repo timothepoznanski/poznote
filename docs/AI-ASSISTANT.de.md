@@ -84,11 +84,11 @@ Ein Gateway vor den Modellen (LiteLLM, OpenRouter, Cloudflare AI Gateway, Helico
 x-litellm-customer-id: poznote
 ```
 
-Sie werden mit jeder Anfrage an den KI-Server gesendet, auch bei der Verbindungsprüfung. Das Feld wird für Ollama, LM Studio und eigene URLs angeboten, in der Konfiguration der Instanz ebenso wie in einer persönlichen. Anthropic und OpenAI werden direkt aufgerufen und erhalten keine.
+Sie werden mit jeder Anfrage an den KI-Server gesendet, auch bei der Verbindungsprüfung. Das Feld wird für alle Anbieter angeboten, in der Konfiguration der Instanz ebenso wie in einer persönlichen. Bei Anthropic braucht ein Organisations-API-Schlüssel, der keinem Workspace zugeordnet ist, `anthropic-workspace-id: wrkspc_...`. Bei OpenAI wählen `OpenAI-Organization` und `OpenAI-Project` die abgerechnete Organisation oder das abgerechnete Projekt.
 
 Die Werte werden verschlüsselt gespeichert und nie wieder angezeigt: Ein gespeicherter Header erscheint als `Name: ••••••••`. Lassen Sie eine Zeile unverändert, um ihren Wert zu behalten, geben Sie den Wert neu ein, um ihn zu ändern, und löschen Sie die Zeile, um den Header zu entfernen.
 
-Header, die die Anfrage selbst bestimmen (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...), werden abgelehnt, ebenso `Authorization`, das vom Feld **API-Schlüssel** gesetzt wird. Namen und Werte sind auf einfache ASCII-Zeichen beschränkt, mit höchstens 20 Headern.
+Header, die die Anfrage selbst bestimmen (`Host`, `Content-Type`, `Content-Length`, `Accept`, ...), werden abgelehnt, ebenso `Authorization`, das vom Feld **API-Schlüssel** gesetzt wird. Bei Anthropic werden auch `x-api-key` und `anthropic-version` abgelehnt, da Poznote sie setzt. Namen und Werte sind auf einfache ASCII-Zeichen beschränkt, mit höchstens 20 Headern.
 
 Jede Anfrage trägt außerdem `User-Agent: Poznote/<version>`, damit die Protokolle eines Gateways zeigen, woher sie kommt. Eine Zeile `User-Agent` in den benutzerdefinierten Headern ersetzt ihn.
 

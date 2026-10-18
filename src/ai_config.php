@@ -140,14 +140,13 @@ function poznoteAiLoadHeaders(string $stored): array {
 
 /**
  * Parse the custom headers field of a settings form or of a connection
- * test. Anthropic and OpenAI are called directly and take none.
+ * test, for the server at $serverUrl. Every provider takes them: Anthropic
+ * wants anthropic-workspace-id with an organization key that is not scoped
+ * to a workspace, OpenAI OpenAI-Organization or OpenAI-Project.
  * Returns ['headers' => list, 'error' => '' | translated message].
  */
-function poznoteAiReadHeadersField(string $text, array $stored, string $provider = ''): array {
-    if (isset(poznoteAiFixedUrls()[$provider])) {
-        return ['headers' => [], 'error' => ''];
-    }
-    $parsed = aiUpstreamParseHeaders($text, $stored);
+function poznoteAiReadHeadersField(string $text, array $stored, string $serverUrl = ''): array {
+    $parsed = aiUpstreamParseHeaders($text, $stored, aiUpstreamServerReservedHeaders($serverUrl));
     if ($parsed['error'] === null) {
         return ['headers' => $parsed['headers'], 'error' => ''];
     }
@@ -457,7 +456,7 @@ function poznoteAiGuessProvider(string $provider, string $url): string {
     }
     $host = strtolower((string)(parse_url($url, PHP_URL_HOST) ?? ''));
     $port = (int)(parse_url($url, PHP_URL_PORT) ?? 0);
-    if ($host === 'anthropic.com' || substr($host, -14) === '.anthropic.com') {
+    if (aiUpstreamIsAnthropicUrl($url)) {
         return 'anthropic';
     }
     if ($host === 'api.openai.com') {

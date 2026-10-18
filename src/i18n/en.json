@@ -4313,7 +4313,7 @@
     "api_key_label": "API key (optional)",
     "api_key_description": "Leave empty for a local Ollama server. Required for cloud providers.",
     "headers_label": "Custom headers (optional)",
-    "headers_description": "One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter. Saved values are hidden: leave a line as it is to keep its value.",
+    "headers_description": "One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter, or for an Anthropic organization key that needs anthropic-workspace-id. Saved values are hidden: leave a line as it is to keep its value.",
     "headers_errors": {
       "format": "Custom headers, line {{line}}: write it as \"Name: value\", in plain ASCII characters.",
       "reserved": "Custom headers, line {{line}}: this header is set by Poznote and cannot be changed. The API key field covers Authorization.",

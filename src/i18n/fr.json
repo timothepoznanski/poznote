@@ -4761,7 +4761,7 @@
     "api_key_label": "Clé API (optionnelle)",
     "api_key_description": "Laissez vide pour un serveur Ollama local. Requise pour les fournisseurs cloud.",
     "headers_label": "En-têtes personnalisés (optionnels)",
-    "headers_description": "Un en-tête par ligne, sous la forme Nom: valeur, envoyé avec chaque requête vers ce serveur. Utile derrière une passerelle comme LiteLLM ou OpenRouter. Les valeurs enregistrées sont masquées : laissez une ligne telle quelle pour conserver sa valeur.",
+    "headers_description": "Un en-tête par ligne, sous la forme Nom: valeur, envoyé avec chaque requête vers ce serveur. Utile derrière une passerelle comme LiteLLM ou OpenRouter, ou pour une clé d'organisation Anthropic qui demande anthropic-workspace-id. Les valeurs enregistrées sont masquées : laissez une ligne telle quelle pour conserver sa valeur.",
     "headers_errors": {
       "format": "En-têtes personnalisés, ligne {{line}} : écrivez-la sous la forme « Nom: valeur », en caractères ASCII simples.",
       "reserved": "En-têtes personnalisés, ligne {{line}} : cet en-tête est défini par Poznote et ne peut pas être modifié. Le champ Clé API couvre Authorization.",

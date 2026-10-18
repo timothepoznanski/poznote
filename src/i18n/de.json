@@ -4656,7 +4656,7 @@
     "api_key_label": "API-Schlüssel (optional)",
     "api_key_description": "Für einen lokalen Ollama-Server leer lassen. Für Cloud-Anbieter erforderlich.",
     "headers_label": "Benutzerdefinierte Header (optional)",
-    "headers_description": "Ein Header pro Zeile in der Form Name: Wert, der mit jeder Anfrage an diesen Server gesendet wird. Nützlich hinter einem Gateway wie LiteLLM oder OpenRouter. Gespeicherte Werte werden verborgen: Lassen Sie eine Zeile unverändert, um ihren Wert zu behalten.",
+    "headers_description": "Ein Header pro Zeile in der Form Name: Wert, der mit jeder Anfrage an diesen Server gesendet wird. Nützlich hinter einem Gateway wie LiteLLM oder OpenRouter oder für einen Anthropic-Organisationsschlüssel, der anthropic-workspace-id braucht. Gespeicherte Werte werden verborgen: Lassen Sie eine Zeile unverändert, um ihren Wert zu behalten.",
     "headers_errors": {
       "format": "Benutzerdefinierte Header, Zeile {{line}}: Schreiben Sie sie in der Form „Name: Wert“, in einfachen ASCII-Zeichen.",
       "reserved": "Benutzerdefinierte Header, Zeile {{line}}: Dieser Header wird von Poznote gesetzt und kann nicht geändert werden. Das Feld API-Schlüssel deckt Authorization ab.",

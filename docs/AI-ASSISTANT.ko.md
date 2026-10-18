@@ -84,11 +84,11 @@
 x-litellm-customer-id: poznote
 ```
 
-이 헤더는 연결 확인을 포함해 AI 서버로 보내는 모든 요청에 함께 전송됩니다. 이 필드는 Ollama, LM Studio, 사용자 지정 URL에서 제공되며, 인스턴스 구성과 개인 구성 모두에서 사용할 수 있습니다. Anthropic과 OpenAI는 직접 호출되므로 헤더를 받지 않습니다.
+이 헤더는 연결 확인을 포함해 AI 서버로 보내는 모든 요청에 함께 전송됩니다. 이 필드는 모든 제공자에서 제공되며, 인스턴스 구성과 개인 구성 모두에서 사용할 수 있습니다. Anthropic에서는 워크스페이스에 연결되지 않은 조직 API 키에 `anthropic-workspace-id: wrkspc_...`가 필요합니다. OpenAI에서는 `OpenAI-Organization`과 `OpenAI-Project`로 비용이 청구될 조직이나 프로젝트를 고릅니다.
 
 값은 암호화되어 저장되며 다시 표시되지 않습니다. 저장된 헤더는 `이름: ••••••••`로 나타납니다. 값을 유지하려면 줄을 그대로 두고, 값을 바꾸려면 다시 입력하고, 헤더를 없애려면 줄을 삭제하세요.
 
-요청의 구조를 정하는 헤더(`Host`, `Content-Type`, `Content-Length`, `Accept` 등)는 거부되며, **API 키** 필드가 설정하는 `Authorization`도 마찬가지입니다. 이름과 값은 일반 ASCII 문자만 사용할 수 있고 헤더는 최대 20개입니다.
+요청의 구조를 정하는 헤더(`Host`, `Content-Type`, `Content-Length`, `Accept` 등)는 거부되며, **API 키** 필드가 설정하는 `Authorization`도 마찬가지입니다. Anthropic에서는 Poznote가 직접 설정하는 `x-api-key`와 `anthropic-version`도 거부됩니다. 이름과 값은 일반 ASCII 문자만 사용할 수 있고 헤더는 최대 20개입니다.
 
 모든 요청에는 `User-Agent: Poznote/<version>`도 포함되어 게이트웨이 로그에서 요청의 출처를 알 수 있습니다. 사용자 지정 헤더에 `User-Agent` 줄을 넣으면 그 값으로 대체됩니다.
 

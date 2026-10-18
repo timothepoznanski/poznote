@@ -96,8 +96,7 @@ function aiChatModelsUrl($baseUrl) {
  */
 function aiChatAuthHeaders($baseUrl, $apiKey) {
     if ($apiKey === '') return [];
-    $host = strtolower((string)(parse_url(trim($baseUrl), PHP_URL_HOST) ?? ''));
-    if ($host === 'anthropic.com' || substr($host, -14) === '.anthropic.com') {
+    if (aiUpstreamIsAnthropicUrl((string)$baseUrl)) {
         return ['x-api-key: ' . $apiKey, 'anthropic-version: 2023-06-01'];
     }
     return ['Authorization: Bearer ' . $apiKey];
@@ -164,7 +163,7 @@ if ($action === 'test') {
     }
     $testHeaders = $storedFollows ? $storedConfig['headers'] : [];
     if (isset($_POST['headers'])) {
-        $headersField = poznoteAiReadHeadersField((string)$_POST['headers'], $testHeaders);
+        $headersField = poznoteAiReadHeadersField((string)$_POST['headers'], $testHeaders, $testUrl);
         if ($headersField['error'] !== '') {
             aiChatJsonError(400, $headersField['error']);
         }
@@ -173,7 +172,7 @@ if ($action === 'test') {
     $headers = array_merge(
         ['Accept: application/json'],
         aiChatAuthHeaders($testUrl, $testKey),
-        aiUpstreamIdentityHeaders(getAppVersion(), $testHeaders)
+        aiUpstreamIdentityHeaders(getAppVersion(), aiUpstreamWithoutHeaders($testHeaders, aiUpstreamServerReservedHeaders($testUrl)))
     );
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
@@ -937,7 +936,7 @@ header('X-Accel-Buffering: no');
 $upstreamHeaders = array_merge(
     ['Content-Type: application/json', 'Accept: text/event-stream'],
     aiChatAuthHeaders($aiUrl, $aiApiKey),
-    aiUpstreamIdentityHeaders(getAppVersion(), $aiHeaders)
+    aiUpstreamIdentityHeaders(getAppVersion(), aiUpstreamWithoutHeaders($aiHeaders, aiUpstreamServerReservedHeaders((string)$aiUrl)))
 );
 $completionsUrl = aiChatCompletionsUrl($aiUrl);
 

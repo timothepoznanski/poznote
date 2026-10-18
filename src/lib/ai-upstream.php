@@ -113,6 +113,43 @@ function aiUpstreamReservedHeaders(): array
 }
 
 /**
+ * True when the URL points at Anthropic's own API, which takes the key as
+ * x-api-key rather than as a Bearer token.
+ */
+function aiUpstreamIsAnthropicUrl(string $url): bool
+{
+    $host = strtolower((string)(parse_url(trim($url), PHP_URL_HOST) ?? ''));
+
+    return $host === 'anthropic.com' || substr($host, -14) === '.anthropic.com';
+}
+
+/**
+ * Header names (lowercase) Poznote sets itself for this server on top of
+ * aiUpstreamReservedHeaders(): Anthropic's key and API version. They stay
+ * free elsewhere, where a gateway may well want an x-api-key of its own.
+ * Anthropic's other headers, anthropic-workspace-id for an organization key
+ * or anthropic-beta, remain open to a configuration.
+ */
+function aiUpstreamServerReservedHeaders(string $url): array
+{
+    return aiUpstreamIsAnthropicUrl($url) ? ['x-api-key', 'anthropic-version'] : [];
+}
+
+/**
+ * Custom headers without the ones named in $names (lowercase): what stored
+ * headers become before they go to a server that reserves some of them.
+ */
+function aiUpstreamWithoutHeaders(array $headers, array $names): array
+{
+    if ($names === []) {
+        return $headers;
+    }
+    return array_values(array_filter($headers, function ($header) use ($names) {
+        return !in_array(strtolower($header['name']), $names, true);
+    }));
+}
+
+/**
  * True when the pair can be handed to curl as it is. The name is an HTTP
  * token; the value is printable ASCII, which leaves no room for the line
  * break a header injection needs.
@@ -130,13 +167,14 @@ function aiUpstreamIsValidHeader(string $name, string $value): bool
  * Read the text of a settings field. A value left as the mask keeps the
  * value $stored holds under that name, so one header can be edited without
  * typing the others again; the callers pass no stored headers when those
- * must not follow the request.
+ * must not follow the request. $alsoReserved adds names the server the
+ * headers go to keeps for itself, see aiUpstreamServerReservedHeaders().
  *
  * Returns ['headers' => list, 'error' => null | ['line' => int, 'reason' => string]]
  * and stops at the first line it refuses. Reasons: 'format', 'reserved',
  * 'duplicate', 'masked' (nothing stored under that name), 'too_many'.
  */
-function aiUpstreamParseHeaders(string $text, array $stored = []): array
+function aiUpstreamParseHeaders(string $text, array $stored = [], array $alsoReserved = []): array
 {
     $storedValues = [];
     foreach ($stored as $header) {
@@ -162,7 +200,7 @@ function aiUpstreamParseHeaders(string $text, array $stored = []): array
         $value = trim($parts[1]);
         $key = strtolower($name);
 
-        if (in_array($key, aiUpstreamReservedHeaders(), true)) {
+        if (in_array($key, aiUpstreamReservedHeaders(), true) || in_array($key, $alsoReserved, true)) {
             return $fail($index + 1, 'reserved');
         }
         if (isset($seen[$key])) {

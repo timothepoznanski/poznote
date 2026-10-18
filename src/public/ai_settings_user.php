@@ -48,7 +48,7 @@ if ($userKeysAllowed && $_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action
     $model = trim((string)($_POST['ai_model'] ?? ''));
     $apiKey = trim((string)($_POST['ai_api_key'] ?? ''));
     $reasoningEffort = poznoteAiNormalizeReasoningEffort($_POST['ai_reasoning_effort'] ?? 'auto');
-    $headersField = poznoteAiReadHeadersField((string)($_POST['ai_headers'] ?? ''), poznoteAiUserConfig($con)['headers'], $provider);
+    $headersField = poznoteAiReadHeadersField((string)($_POST['ai_headers'] ?? ''), poznoteAiUserConfig($con)['headers'], $url);
 
     if ($enabled === '1' && ($url === '' || $model === '')) {
         $error = t('ai_settings_user.messages.incomplete', [], 'Enter a server URL and a model before enabling your own assistant.');
@@ -214,7 +214,7 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
                         <label class="git-field-label" for="ai_headers"><?php echo t_h('ai_settings.headers_label', [], 'Custom headers (optional)'); ?></label>
                         <textarea name="ai_headers" id="ai_headers" class="git-field-input" rows="3" spellcheck="false" autocomplete="off"
                                   placeholder="x-litellm-customer-id: poznote"><?php echo htmlspecialchars($aiHeadersText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
-                        <span class="label-desc"><?php echo t_h('ai_settings.headers_description', [], 'One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter. Saved values are hidden: leave a line as it is to keep its value.'); ?></span>
+                        <span class="label-desc"><?php echo t_h('ai_settings.headers_description', [], 'One header per line, written as Name: value, sent with every request to this server. Useful behind a gateway such as LiteLLM or OpenRouter, or for an Anthropic organization key that needs anthropic-workspace-id. Saved values are hidden: leave a line as it is to keep its value.'); ?></span>
                     </div>
 
                     <div class="git-field-actions">
@@ -308,7 +308,7 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
     };
     window.poznoteAiLocalHost = <?php echo json_encode($aiLocalHost); ?>;
     </script>
-    <script src="js/ai-settings-form.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/ai-settings-form.js'); ?>"></script>
     <?php endif; ?>
 </body>
 </html>
