@@ -25,6 +25,7 @@ class SettingsController {
         'tenant_isolation',
         'tenant_isolation_features',
         'tenant_isolation_applied_ui_keys',
+        'outbound_allowed_hosts',
         'import_max_individual_files',
         'import_max_zip_files',
         'user_max_notes',
@@ -147,6 +148,17 @@ class SettingsController {
 
         if ($key === 'git_sync_enabled' || $key === 'tenant_isolation') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
+        }
+
+        if ($key === 'outbound_allowed_hosts') {
+            // Local hosts that non-admin accounts may point the server at,
+            // see lib/outbound-url.php. Stored one canonical entry per line.
+            require_once __DIR__ . '/../../../lib/outbound-url.php';
+            $parsed = poznoteOutboundParseAllowList((string) $value);
+            if (!empty($parsed['invalid'])) {
+                throw new InvalidArgumentException('invalid entry: ' . mb_substr(implode(', ', $parsed['invalid']), 0, 200), 400);
+            }
+            return implode("\n", $parsed['entries']);
         }
 
         if ($key === 'tenant_isolation_features') {

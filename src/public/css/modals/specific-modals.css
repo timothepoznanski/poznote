@@ -921,6 +921,42 @@
     opacity: 0.7;
 }
 
+/* ============================================
+   Local Network Access Modal (#outboundHostsModal)
+   ============================================ */
+
+#outboundHostsModal .modal-content {
+    max-width: 460px;
+}
+
+.outbound-hosts-label {
+    display: block;
+    margin: 12px 0 6px;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
+.outbound-hosts-input {
+    width: 100%;
+    min-height: 140px;
+    padding: 10px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: transparent;
+    color: inherit;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.outbound-hosts-error {
+    margin: 8px 0 0;
+    font-size: 12px;
+    color: var(--pz-danger-text);
+}
+
 /* Code block language modal (js/code-block-language.js) */
 .code-block-language-list {
     display: flex;

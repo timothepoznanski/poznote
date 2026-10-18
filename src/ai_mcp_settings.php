@@ -28,6 +28,16 @@ function poznoteAiMcpSaveServers(string $scope, ?PDO $con, array $servers): bool
     return $scope === 'instance' ? poznoteSaveAiMcpInstanceServers($servers) : poznoteSaveAiMcpUserServers($con, $servers);
 }
 
+/**
+ * The server as the settings check contacts it: a user's own server may only
+ * be a public host unless the account is an admin's (GHSA-mr2c-9992-59wx).
+ * The flag is never stored, the chat sets it again (poznoteAiMcpServersForChat).
+ */
+function poznoteAiMcpCheckTarget(string $scope, array $server): array {
+    $restricted = $scope !== 'instance' && poznoteOutboundRestrictedForUser(function_exists('getCurrentUserId') ? (int)(getCurrentUserId() ?? 0) : 0);
+    return array_merge($server, ['restricted' => $restricted]);
+}
+
 /** True when the page of this scope may manage servers at all. */
 function poznoteAiMcpScopeAllowed(string $scope): bool {
     return $scope === 'instance' ? poznoteAiMcpEnabled() : poznoteAiMcpUserServersAllowed();
@@ -127,7 +137,7 @@ function poznoteAiMcpHandlePost(string $scope, ?PDO $con): ?array {
         }
         // The "add" form has no switch: a server starts in use
         $server = array_merge($form['server'], ['enabled' => true]);
-        $check = aiMcpFetchTools($server, getAppVersion());
+        $check = aiMcpFetchTools(poznoteAiMcpCheckTarget($scope, $server), getAppVersion());
         $server['tools'] = $check['tools'];
         $servers[] = $server;
         if (!poznoteAiMcpSaveServers($scope, $con, $servers)) {
@@ -169,7 +179,7 @@ function poznoteAiMcpHandlePost(string $scope, ?PDO $con): ?array {
     $server = $form['server'];
     // The check button saves what the form holds first, so that a corrected
     // URL or key is the one being checked
-    $check = $do === 'check' ? aiMcpFetchTools($server, getAppVersion()) : null;
+    $check = $do === 'check' ? aiMcpFetchTools(poznoteAiMcpCheckTarget($scope, $server), getAppVersion()) : null;
     if ($check !== null) {
         $server['tools'] = $check['tools'];
     }

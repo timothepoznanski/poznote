@@ -522,7 +522,8 @@
       "structured_export": "Exporte suas notas como arquivos, organizados em pastas como no Poznote.",
       "local_backup": "Salve arquivos de backup completos em uma pasta do servidor, manualmente ou conforme um agendamento, mantendo apenas os mais recentes.",
       "whats_new": "Após uma atualização, mostrar uma vez as notas da nova versão ao abrir as suas notas.",
-      "login_disabled": "Ignora a tela de login: qualquer navegador que chegue a esta instância abre diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Ative apenas se só você consegue acessar esta instância, ou se um proxy reverso à frente dela cuida da autenticação. A API continua pedindo credenciais."
+      "login_disabled": "Ignora a tela de login: qualquer navegador que chegue a esta instância abre diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Ative apenas se só você consegue acessar esta instância, ou se um proxy reverso à frente dela cuida da autenticação. A API continua pedindo credenciais.",
+      "outbound_hosts": "Os webhooks, os servidores pessoais de IA, transcrição e MCP e o Git Sync dos utilizadores não administradores só alcançam hosts públicos da Internet. Indique aqui os hosts e redes locais que podem usar, como um servidor Ollama ou n8n na sua rede. Os administradores não têm limites."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -641,7 +642,8 @@
       "import_notes": "Importar notas",
       "local_backup": "Backups locais",
       "whats_new": "Novidades após uma atualização",
-      "login_disabled": "Abrir sem login"
+      "login_disabled": "Abrir sem login",
+      "outbound_hosts": "Acesso à rede local"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -683,6 +685,10 @@
     "scope": {
       "user": "Pessoal",
       "admin": "Admin"
+    },
+    "outbound_hosts": {
+      "status_allowed": "{{count}} permitido(s)",
+      "status_public_only": "Apenas públicos"
     }
   },
   "workspaces": {
@@ -1886,6 +1892,12 @@
       "validation": "Selecione arquivos de fonte WOFF2, WOFF, TTF ou OTF.",
       "some_rejected": "Alguns arquivos não foram armazenados: não são fontes, ou têm mais de 10 MB.",
       "delete_confirm": "Excluir {{name}}? Os arquivos são removidos do seu volume de dados."
+    },
+    "outbound_hosts": {
+      "title": "Acesso à rede local",
+      "description": "Os utilizadores não administradores só podem apontar webhooks, servidores pessoais de IA, transcrição e MCP e o Git Sync para hosts públicos da Internet. Os hosts e redes indicados aqui também são permitidos. Os administradores nunca têm limites.",
+      "label": "Uma entrada por linha: um nome de host, *.domínio, um endereço ou uma rede",
+      "invalid": "Não é um nome de host, endereço ou rede: {{entries}}"
     }
   },
   "notes_list": {
@@ -4348,7 +4360,8 @@
     "description": "O Poznote envia uma solicitação HTTP POST com um payload JSON para cada endpoint registrado quando uma das suas notas dispara um evento assinado: um lembrete vencendo, uma nota criada ou compartilhada publicamente. Apenas suas próprias notas são afetadas. Se um segredo for definido, o payload é assinado com HMAC-SHA256 no cabeçalho X-Poznote-Signature-256.",
     "access_denied": "Acesso negado. Os webhooks de usuário estão desativados nesta instância.",
     "app_url_unset": "Nenhuma URL de instancia esta configurada, portanto os payloads nao incluem link direto para a nota (data.note.url e null). Peca a um administrador para defini-la na pagina Webhooks da administracao.",
-    "app_url_unset_admin": "Nenhuma URL de instancia esta configurada, portanto os payloads nao incluem link direto para a nota (data.note.url e null). Defina-a na pagina Webhooks da administracao."
+    "app_url_unset_admin": "Nenhuma URL de instancia esta configurada, portanto os payloads nao incluem link direto para a nota (data.note.url e null). Defina-a na pagina Webhooks da administracao.",
+    "error_private_url": "Este endereço não é permitido: um webhook deve apontar para um host público da Internet. Um administrador pode permitir hosts locais em Definições, Acesso à rede local."
   },
   "webhooks_admin": {
     "event_help": {

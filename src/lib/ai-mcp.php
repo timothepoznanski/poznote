@@ -27,6 +27,7 @@
  */
 
 require_once __DIR__ . '/ai-upstream.php';
+require_once __DIR__ . '/outbound-url.php';
 
 /** The protocol revision asked for; the server answers with the one it speaks. */
 const AI_MCP_PROTOCOL_VERSION = '2025-06-18';
@@ -397,6 +398,11 @@ function aiMcpSend(array &$session, string $method, ?array $params, ?int $id, in
             return $tick !== null && $tick() === false ? 1 : 0;
         },
     ]);
+    $blocked = poznoteOutboundPrepareCurl($ch, $session['url'], !empty($session['restricted']));
+    if ($blocked !== '') {
+        curl_close($ch);
+        throw new RuntimeException($blocked);
+    }
     curl_exec($ch);
     $errno = curl_errno($ch);
     $error = curl_error($ch);
@@ -445,6 +451,8 @@ function aiMcpConnect(array $server, string $version, ?callable $tick = null): a
 {
     $session = [
         'url' => $server['url'],
+        // Set by the callers on a user's own server, see lib/outbound-url.php
+        'restricted' => !empty($server['restricted']),
         'headers' => aiMcpRequestHeaders($server, $version),
         'protocol' => '',
         'id' => '',
@@ -515,7 +523,9 @@ function aiMcpClose(array $session): void
         CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
         CURLOPT_FOLLOWLOCATION => false,
     ]);
-    curl_exec($ch);
+    if (poznoteOutboundPrepareCurl($ch, $session['url'], !empty($session['restricted'])) === '') {
+        curl_exec($ch);
+    }
     curl_close($ch);
 }
 

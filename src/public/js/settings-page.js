@@ -172,6 +172,9 @@
         if (document.getElementById('tenant-isolation-card')) {
             keys.push('tenant_isolation', 'tenant_isolation_features', 'tenant_isolation_applied_ui_keys');
         }
+        if (document.getElementById('outbound-hosts-card')) {
+            keys.push('outbound_allowed_hosts');
+        }
 
         var unique = Object.create(null);
         return keys.filter(function (key) {
@@ -1636,6 +1639,39 @@
                 zipInput.value = (zipValue && zipValue.trim()) ? zipValue.trim() : '300';
                 modal.style.display = 'flex';
             });
+        });
+    }
+
+    // Local hosts non-admin users may reach (outbound_allowed_hosts), one
+    // canonical entry per line as the API stores them.
+    function outboundHostEntries(raw) {
+        return String(raw || '').split('\n').filter(function (line) { return line.trim() !== ''; });
+    }
+
+    function refreshOutboundHostsBadge() {
+        var badge = document.getElementById('outbound-hosts-status');
+        if (!badge) return;
+
+        getSetting('outbound_allowed_hosts', function (raw) {
+            var count = outboundHostEntries(raw).length;
+            badge.textContent = count > 0
+                ? tr('settings.outbound_hosts.status_allowed', { count: count }, '{{count}} allowed')
+                : tr('settings.outbound_hosts.status_public_only', {}, 'Public only');
+            badge.className = 'setting-status ' + (count > 0 ? 'enabled' : 'disabled');
+        });
+    }
+
+    function showOutboundHostsModal() {
+        var modal = document.getElementById('outboundHostsModal');
+        var input = document.getElementById('outboundHostsInput');
+        var error = document.getElementById('outboundHostsError');
+        if (!modal || !input) return;
+
+        getSetting('outbound_allowed_hosts', function (raw) {
+            input.value = outboundHostEntries(raw).join('\n');
+            if (error) error.hidden = true;
+            modal.style.display = 'flex';
+            input.focus();
         });
     }
 
@@ -3193,6 +3229,11 @@
 
         // Tenant isolation (SaaS mode) - opens the modal listing the
         // capabilities that can be blocked for non-admin users.
+        var outboundHostsCard = document.getElementById('outbound-hosts-card');
+        if (outboundHostsCard) {
+            outboundHostsCard.addEventListener('click', showOutboundHostsModal);
+        }
+
         var tenantIsolationCard = document.getElementById('tenant-isolation-card');
         if (tenantIsolationCard) {
             tenantIsolationCard.addEventListener('click', showTenantIsolationModal);
@@ -3807,6 +3848,34 @@
             });
         }
 
+        // Save local network access modal button. The API checks every entry
+        // and answers 400 with the ones it cannot read.
+        var saveOutboundHostsBtn = document.getElementById('saveOutboundHostsBtn');
+        if (saveOutboundHostsBtn) {
+            saveOutboundHostsBtn.addEventListener('click', function () {
+                var input = document.getElementById('outboundHostsInput');
+                var error = document.getElementById('outboundHostsError');
+                if (!input) return;
+
+                setSetting('outbound_allowed_hosts', input.value, function (ok, result) {
+                    if (!ok) {
+                        if (error) {
+                            var detail = result && result.error ? String(result.error).replace(/^invalid entry: /, '') : '';
+                            error.textContent = detail
+                                ? tr('modals.outbound_hosts.invalid', { entries: detail }, 'Not a host name, address or network: {{entries}}')
+                                : tr('display.alerts.error_saving_preference', {}, 'Error saving preference');
+                            error.hidden = false;
+                        }
+                        return;
+                    }
+                    try { closeModal('outboundHostsModal'); } catch (e) {
+                        console.debug('settings-page: closeModal(outboundHostsModal) failed:', e);
+                    }
+                    refreshOutboundHostsBadge();
+                });
+            });
+        }
+
         // Save tenant isolation modal button
         var saveTenantIsolationBtn = document.getElementById('saveTenantIsolationBtn');
         if (saveTenantIsolationBtn) {
@@ -3860,6 +3929,7 @@
             refreshUserQuotasBadges();
             refreshGitSyncEnabledBadge();
             refreshTenantIsolationBadge();
+            refreshOutboundHostsBadge();
             refreshFolderTreeHighlightBadge();
             refreshUiCustomizationBadge();
         });

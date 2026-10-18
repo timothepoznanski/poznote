@@ -352,7 +352,12 @@ function poznoteAiMcpServersForChat(?PDO $con, ?int $userId): array {
     }
     $servers = isAiChatAllowedForUser($userId) ? poznoteAiMcpInstanceServers() : [];
     if (poznoteAiMcpUserServersAllowed()) {
-        $servers = array_merge($servers, poznoteAiMcpUserServers($con));
+        // A user's own servers reach public hosts only, unless the account
+        // is an admin's (GHSA-mr2c-9992-59wx)
+        $restricted = poznoteOutboundRestrictedForUser(function_exists('getCurrentUserId') ? (int)(getCurrentUserId() ?? 0) : 0);
+        foreach (poznoteAiMcpUserServers($con) as $server) {
+            $servers[] = array_merge($server, ['restricted' => $restricted]);
+        }
     }
     return array_values(array_filter($servers, function (array $server): bool {
         return $server['enabled'] && in_array(true, array_column($server['tools'], 'enabled'), true);

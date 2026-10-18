@@ -33,6 +33,7 @@ require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../stt_config.php';
 require_once __DIR__ . '/../lib/ai-upstream.php';
+require_once __DIR__ . '/../lib/outbound-url.php';
 
 ini_set('display_errors', 0);
 ini_set('log_errors', 1);
@@ -115,6 +116,14 @@ function sttTranscribeFile(array $config, string $path, string $filename, string
         // the dialog can show, instead of nginx's bare 504 page.
         CURLOPT_TIMEOUT => POZNOTE_STT_UPSTREAM_TIMEOUT_SECONDS,
     ]);
+    // A personal server may only be a public host unless its account is an
+    // admin's (GHSA-mr2c-9992-59wx); the instance one is an admin's choice.
+    $restricted = ($config['source'] ?? '') === 'user' && poznoteOutboundRestrictedForUser((int)(getCurrentUserId() ?? 0));
+    $blocked = poznoteOutboundPrepareCurl($ch, $url, $restricted);
+    if ($blocked !== '') {
+        curl_close($ch);
+        return ['ok' => false, 'error' => $blocked];
+    }
     $body = curl_exec($ch);
     $curlError = curl_error($ch);
     $curlErrno = curl_errno($ch);
@@ -192,6 +201,12 @@ if ($action === 'test') {
         CURLOPT_CONNECTTIMEOUT => 5,
         CURLOPT_TIMEOUT => 15,
     ]);
+    // The URL is the caller's own words: only an admin may probe local hosts
+    $blocked = poznoteOutboundPrepareCurl($ch, $modelsUrl, !isCurrentUserAdmin());
+    if ($blocked !== '') {
+        curl_close($ch);
+        sttJsonError(400, $blocked);
+    }
     $body = curl_exec($ch);
     $curlError = curl_error($ch);
     $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);

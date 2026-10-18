@@ -52,6 +52,7 @@ require_once __DIR__ . '/../markdown_parser.php';
 require_once __DIR__ . '/../html_to_markdown.php';
 require_once __DIR__ . '/../lib/ai-tools.php';
 require_once __DIR__ . '/../lib/ai-upstream.php';
+require_once __DIR__ . '/../lib/outbound-url.php';
 require_once __DIR__ . '/../lib/ai-conversations.php';
 
 ini_set('display_errors', 0);
@@ -119,6 +120,9 @@ $aiModel = $aiConfig['model'];
 $aiApiKey = $aiConfig['api_key'];
 $aiHeaders = $aiConfig['headers'];
 $aiReasoningEffort = $aiConfig['reasoning_effort'] ?? 'auto';
+// A personal configuration may only reach public hosts unless its account is
+// an admin's (GHSA-mr2c-9992-59wx); the instance one is an admin's choice.
+$aiOutboundRestricted = $aiConfig['source'] === 'user' && poznoteOutboundRestrictedForUser((int)(getCurrentUserId() ?? 0));
 
 if ($action === 'test') {
     // Probing arbitrary URLs from the server is reserved for admins, plus
@@ -132,6 +136,12 @@ if ($action === 'test') {
         aiChatJsonError(400, 'No server URL configured');
     }
     $ch = curl_init(aiChatModelsUrl($testUrl));
+    // The URL is the caller's own words: only an admin may probe local hosts
+    $blocked = poznoteOutboundPrepareCurl($ch, aiChatModelsUrl($testUrl), !isCurrentUserAdmin());
+    if ($blocked !== '') {
+        curl_close($ch);
+        aiChatJsonError(400, $blocked);
+    }
     // The settings pages only post the key when the user typed one; a field
     // still showing the mask posts nothing, and custom headers are posted
     // with their saved values masked. Both fall back to what is stored in the
@@ -962,7 +972,7 @@ function aiStreamHeartbeat(): bool {
  * Run one streamed request. Content deltas are re-emitted to the client
  * as they arrive; tool call deltas are accumulated and returned.
  */
-function aiStreamRound($url, $headers, $payload) {
+function aiStreamRound($url, $headers, $payload, bool $restricted = false) {
     $state = [
         'status' => null,
         'errorBody' => '',
@@ -1043,6 +1053,12 @@ function aiStreamRound($url, $headers, $payload) {
             return 0;
         },
     ]);
+    $blocked = poznoteOutboundPrepareCurl($ch, $url, $restricted);
+    if ($blocked !== '') {
+        curl_close($ch);
+        $state['curlErr'] = $blocked;
+        return $state;
+    }
     $ok = curl_exec($ch);
     $state['curlErr'] = curl_error($ch);
     $state['curlErrno'] = curl_errno($ch);
@@ -1128,7 +1144,7 @@ for ($round = 0; $round < $maxRounds; $round++) {
     $attempt = 0;
     while (true) {
         $attempt++;
-        $state = aiStreamRound($completionsUrl, $upstreamHeaders, $payload);
+        $state = aiStreamRound($completionsUrl, $upstreamHeaders, $payload, $aiOutboundRestricted);
         if ($state['aborted'] || $state['status'] !== null || $attempt >= AI_UPSTREAM_MAX_ATTEMPTS
             || !aiUpstreamIsTransientCurlError($state['curlErrno'], $state['connected'])) {
             break;
