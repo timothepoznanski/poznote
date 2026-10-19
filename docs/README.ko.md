@@ -52,7 +52,7 @@ https://demo.poznote.com
 호스팅 업체에 Poznote 운영을 맡길 수 있습니다. [호스팅 업체 비교](https://poznote.com/hosting.html) 또는 바로 배포하기:
 
 <p>
-  <a href="https://calibernode.com/cloud-apps/poznote"><img src="https://img.shields.io/badge/Deploy%20on-Caliber%20Node-0E7C72?style=for-the-badge" alt="Deploy on Caliber Node" height="32"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>
   <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="32"></a>
 </p>
 
@@ -255,7 +255,7 @@ docker compose up -d
 서버를 직접 관리하고 싶지 않다면 호스팅 업체에 Poznote 운영을 맡길 수 있습니다. 지원 업체와 선택 방법은 [여기](https://poznote.com/hosting.html)를 참고하세요.
 
 <p>
-  <a href="https://calibernode.com/cloud-apps/poznote"><img src="https://img.shields.io/badge/Deploy%20on-Caliber%20Node-0E7C72?style=for-the-badge" alt="Deploy on Caliber Node" height="32"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>
   <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="32"></a>
 </p>
 
