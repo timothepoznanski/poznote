@@ -49,7 +49,8 @@ https://demo.poznote.com
 
 ### Don't want to manage a server?
 
-A hosting company can run Poznote for you. [Compare the hosts](https://poznote.com/hosting.html) or deploy directly:
+A hosting company can run Poznote for you.<br>
+[Compare the hosts](https://poznote.com/hosting.html) or deploy directly:
 
 <p>
   <a href="https://calibernode.com/cloud-apps/poznote"><img src="images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>

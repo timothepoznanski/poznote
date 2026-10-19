@@ -49,7 +49,8 @@ https://demo.poznote.com
 
 ### 서버를 직접 관리하고 싶지 않다면?
 
-호스팅 업체에 Poznote 운영을 맡길 수 있습니다. [호스팅 업체 비교](https://poznote.com/hosting.html) 또는 바로 배포하기:
+호스팅 업체에 Poznote 운영을 맡길 수 있습니다.<br>
+[호스팅 업체 비교](https://poznote.com/hosting.html) 또는 바로 배포하기:
 
 <p>
   <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>

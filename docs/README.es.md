@@ -49,7 +49,8 @@ https://demo.poznote.com
 
 ### ¿No quieres administrar un servidor?
 
-Un proveedor de alojamiento puede ejecutar Poznote por ti. [Compara los proveedores](https://poznote.com/hosting.html) o despliega directamente:
+Un proveedor de alojamiento puede ejecutar Poznote por ti.<br>
+[Compara los proveedores](https://poznote.com/hosting.html) o despliega directamente:
 
 <p>
   <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>

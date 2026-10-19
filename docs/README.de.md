@@ -49,7 +49,8 @@ https://demo.poznote.com
 
 ### Sie möchten keinen Server verwalten?
 
-Ein Hosting-Anbieter kann Poznote für Sie betreiben. [Anbieter vergleichen](https://poznote.com/hosting.html) oder direkt bereitstellen:
+Ein Hosting-Anbieter kann Poznote für Sie betreiben.<br>
+[Anbieter vergleichen](https://poznote.com/hosting.html) oder direkt bereitstellen:
 
 <p>
   <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>

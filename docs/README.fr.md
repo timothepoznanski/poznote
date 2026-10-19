@@ -49,7 +49,8 @@ https://demo.poznote.com
 
 ### Vous ne voulez pas gérer de serveur ?
 
-Un hébergeur peut faire tourner Poznote pour vous. [Comparez les hébergeurs](https://poznote.com/hosting.html) ou déployez directement :
+Un hébergeur peut faire tourner Poznote pour vous.<br>
+[Comparez les hébergeurs](https://poznote.com/hosting.html) ou déployez directement :
 
 <p>
   <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>

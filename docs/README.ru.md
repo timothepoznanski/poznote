@@ -49,7 +49,8 @@ https://demo.poznote.com
 
 ### Не хотите администрировать сервер?
 
-Хостинг-провайдер может запустить Poznote за вас. [Сравните хостинги](https://poznote.com/hosting.html) или разверните сразу:
+Хостинг-провайдер может запустить Poznote за вас.<br>
+[Сравните хостинги](https://poznote.com/hosting.html) или разверните сразу:
 
 <p>
   <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>

@@ -49,7 +49,8 @@ https://demo.poznote.com
 
 ### 不想自己管理服务器？
 
-托管商可以为你运行 Poznote。[比较托管商](https://poznote.com/hosting.html)，或直接部署：
+托管商可以为你运行 Poznote。<br>
+[比较托管商](https://poznote.com/hosting.html)，或直接部署：
 
 <p>
   <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>
