@@ -453,8 +453,7 @@ class AttachmentsController {
                             // Set headers for file download/viewing
                             $inlineContentType = poznoteAttachmentInlineContentType($attachment);
 
-                            // Sanitize filename for Content-Disposition header
-                            $safeFilename = str_replace(['"', "\r", "\n"], '', $attachment['original_filename']);
+                            $originalFilename = (string)($attachment['original_filename'] ?? '');
 
                             $inlineTextContentType = $this->getSafeInlineTextContentType($attachment);
                             $stat = $storage->statForHeaders($attachment);
@@ -462,22 +461,22 @@ class AttachmentsController {
 
                             if ($forceDownload) {
                                 header('Content-Type: application/octet-stream');
-                                header('Content-Disposition: attachment; filename="' . $safeFilename . '"');
+                                header('Content-Disposition: ' . poznoteContentDisposition('attachment', $originalFilename));
                             // Allow a small whitelist of passive text formats to be viewed directly.
                             } elseif ($inlineTextContentType !== null) {
                                 header('Content-Type: ' . $inlineTextContentType);
-                                header('Content-Disposition: inline; filename="' . $safeFilename . '"');
+                                header('Content-Disposition: ' . poznoteContentDisposition('inline', $originalFilename));
                             } elseif ($inlineContentType !== null) {
                                 // PDF, image, video or audio
                                 header('Content-Type: ' . $inlineContentType);
-                                header('Content-Disposition: inline; filename="' . $safeFilename . '"');
+                                header('Content-Disposition: ' . poznoteContentDisposition('inline', $originalFilename));
                                 if (poznoteAttachmentIsSvg($attachment)) {
                                     poznoteSendSvgAttachmentSecurityHeaders();
                                 }
                             } else {
                                 // For other files, force download
                                 header('Content-Type: application/octet-stream');
-                                header('Content-Disposition: attachment; filename="' . $safeFilename . '"');
+                                header('Content-Disposition: ' . poznoteContentDisposition('attachment', $originalFilename));
                             }
 
                             header('Content-Description: File Transfer');
