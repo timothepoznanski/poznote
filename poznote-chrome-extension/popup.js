@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+  localizePage();
   const $ = id => document.getElementById(id);
   const connectView = $('connectView');
   const mainView = $('mainView');
@@ -75,15 +76,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   config = await loadConfig();
   if (!isConnected(config) || !(await hasHostPermission(config.appUrl))) {
     if (config && config.appUrl) {
-      $('connectText').textContent = 'The extension lost access to your Poznote instance. Reconnect it to keep saving pages.';
-      $('connectBtn').textContent = 'Reconnect';
+      $('connectText').textContent = t('lostAccessText');
+      $('connectBtn').textContent = t('reconnect');
     }
     connectView.hidden = false;
     return;
   }
 
-  $('hostLabel').textContent = new URL(config.appUrl).host;
-  $('hostLabel').title = `${config.username} on ${config.appUrl}`;
+  // The stored address keeps the scheme typed at connection time, so the
+  // instance opens over http or https the way it was set up (#1654)
+  const hostLink = $('hostLabel');
+  hostLink.textContent = new URL(config.appUrl).host;
+  hostLink.href = config.appUrl + '/';
+  hostLink.title = t('openPoznoteTitle', [config.username, config.appUrl]);
+  hostLink.hidden = false;
+  hostLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    chrome.tabs.create({ url: hostLink.href });
+    window.close();
+  });
   $('destLabel').textContent = [config.workspace || 'Poznote', config.folder].filter(Boolean).join(' / ');
   mainView.hidden = false;
 
@@ -187,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function searchNotes(query) {
     const request = ++searchRequest;
     if (!noteResults.children.length) {
-      placeholder('Loading notes...');
+      placeholder(t('loadingNotes'));
     }
     const response = await chrome.runtime.sendMessage({
       type: 'searchNotes',
@@ -199,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return; // A newer search was started meanwhile
     }
     if (response.error) {
-      placeholder('Could not load the notes.');
+      placeholder(t('notesLoadFailed'));
       showStatus(response.error, 'error');
       return;
     }
@@ -209,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       notes = [targetNote, ...notes];
     }
     if (!notes.length) {
-      placeholder(query ? 'No note matches.' : 'No note yet.');
+      placeholder(t(query ? 'noNoteMatches' : 'noNoteYet'));
       return;
     }
     noteResults.replaceChildren(...notes.map(noteItem));
@@ -265,11 +276,11 @@ document.addEventListener('DOMContentLoaded', async () => {
    */
   async function saveToNote(contentType, button) {
     if (!tab || !/^https?:|^file:/.test(tab.url || '')) {
-      showStatus('This page cannot be saved.', 'error');
+      showStatus(t('pageCannotBeSaved'), 'error');
       return;
     }
     if (saveMode === 'append' && !targetNote) {
-      showStatus('Pick the note to add the page to.', 'error');
+      showStatus(t('pickNote'), 'error');
       noteSearch.focus();
       return;
     }
@@ -278,17 +289,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const entry = { url: tab.url, screenshot: null };
       if (contentType === 'screenshot') {
-        showStatus('Capturing the page...', 'loading');
+        showStatus(t('capturing'), 'loading');
         try {
           entry.screenshot = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'png' });
         } catch (error) {
-          showStatus('Screenshot failed: ' + error.message, 'error');
+          showStatus(t('screenshotFailed', [error.message]), 'error');
           return;
         }
       }
 
       if (saveMode === 'append') {
-        showStatus(`Adding to ${targetNote.heading}...`, 'loading');
+        showStatus(t('addingTo', [targetNote.heading]), 'loading');
         const response = await chrome.runtime.sendMessage({
           type: 'appendToNote',
           config,
@@ -302,16 +313,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (response.heading && response.heading !== targetNote.heading) {
           selectTargetNote({ ...targetNote, heading: response.heading });
         }
-        showStatus(`Added to ${response.heading}.`, 'success', { href: noteUrl(config, response.id), label: 'Open' });
+        showStatus(t('addedTo', [response.heading]), 'success', { href: noteUrl(config, response.id), label: t('open') });
         return;
       }
 
-      showStatus('Creating the note...', 'loading');
+      showStatus(t('creatingNote'), 'loading');
       const response = await chrome.runtime.sendMessage({
         type: 'createNote',
         config,
         noteData: {
-          heading: `🌐 ${tab.title || 'Untitled Page'}`,
+          heading: `🌐 ${tab.title || t('untitledPage')}`,
           entry,
           workspace: config.workspace || 'Poznote',
           folder_id: config.folder_id || ''
@@ -322,7 +333,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
       const created = response.note || response;
-      showStatus('Note created.', 'success', created.id ? { href: noteUrl(config, created.id), label: 'Open' } : null);
+      showStatus(t('noteCreated'), 'success', created.id ? { href: noteUrl(config, created.id), label: t('open') } : null);
     } catch (error) {
       showStatus(error.message, 'error');
       console.error(error);

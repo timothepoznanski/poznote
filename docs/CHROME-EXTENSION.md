@@ -30,6 +30,10 @@ Install the extension directly from the Chrome Web Store: [Install extension](ht
 
 To change any of this later, click the gear icon at the top of the extension.
 
+The address of your instance, shown next to it, is a link: click it to open Poznote in a new tab, over http or https as you typed it in the settings.
+
+The extension speaks Chrome's language when it is English, French, German, Spanish, Portuguese, Russian, Korean or Simplified Chinese, and English otherwise.
+
 Your account password works here too, but an app password is the better credential for an extension: it reaches the API only, never the web interface or your account settings, it is limited to your own profile, and revoking it in Poznote cuts the extension off without changing anything else. See [App Passwords](../README.md#app-passwords) for the full list of limits.
 
 > **If your instance is SSO-only,** an app password is the only way to connect the extension: the sign-in form the extension needs does not exist for your account. Create one from **Settings > App passwords** exactly as above.

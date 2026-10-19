@@ -1,0 +1,224 @@
+{
+  "extName": {
+    "message": "Poznote URL Saver"
+  },
+  "extDescription": {
+    "message": "Сохраняет адрес или снимок текущей страницы в Poznote: новой заметкой или в конец существующей."
+  },
+  "optionsTitle": {
+    "message": "Настройки Poznote URL Saver"
+  },
+  "settings": {
+    "message": "Настройки"
+  },
+  "connectTitle": {
+    "message": "Подключение к Poznote"
+  },
+  "connectText": {
+    "message": "Один раз свяжите расширение со своим экземпляром Poznote, и сохраняйте любую страницу одним щелчком."
+  },
+  "connect": {
+    "message": "Подключить"
+  },
+  "reconnect": {
+    "message": "Переподключить"
+  },
+  "lostAccessText": {
+    "message": "Расширение потеряло доступ к вашему экземпляру Poznote. Подключите его снова, чтобы продолжить сохранять страницы."
+  },
+  "openPoznote": {
+    "message": "Открыть Poznote"
+  },
+  "openPoznoteTitle": {
+    "message": "Открыть Poznote ($1 на $2)"
+  },
+  "destination": {
+    "message": "Куда сохранить"
+  },
+  "modeNew": {
+    "message": "Новая заметка"
+  },
+  "modeNewTitle": {
+    "message": "Сохранить страницу как новую заметку"
+  },
+  "modeAppend": {
+    "message": "Существующая"
+  },
+  "modeAppendTitle": {
+    "message": "Добавить страницу в конец заметки"
+  },
+  "change": {
+    "message": "Изменить"
+  },
+  "searchNotes": {
+    "message": "Поиск заметок"
+  },
+  "allWorkspaces": {
+    "message": "Все рабочие пространства"
+  },
+  "notes": {
+    "message": "Заметки"
+  },
+  "saveLink": {
+    "message": "Сохранить ссылку"
+  },
+  "saveLinkTitle": {
+    "message": "Сохранить адрес страницы"
+  },
+  "screenshot": {
+    "message": "Снимок"
+  },
+  "screenshotTitle": {
+    "message": "Сохранить ссылку со снимком видимой части страницы"
+  },
+  "loadingNotes": {
+    "message": "Загрузка заметок..."
+  },
+  "notesLoadFailed": {
+    "message": "Не удалось загрузить заметки."
+  },
+  "noNoteMatches": {
+    "message": "Нет подходящих заметок."
+  },
+  "noNoteYet": {
+    "message": "Заметок пока нет."
+  },
+  "pageCannotBeSaved": {
+    "message": "Эту страницу нельзя сохранить."
+  },
+  "pickNote": {
+    "message": "Выберите заметку, в которую добавить страницу."
+  },
+  "capturing": {
+    "message": "Снимок страницы..."
+  },
+  "screenshotFailed": {
+    "message": "Не удалось сделать снимок: $1"
+  },
+  "addingTo": {
+    "message": "Добавление в «$1»..."
+  },
+  "addedTo": {
+    "message": "Добавлено в «$1»."
+  },
+  "open": {
+    "message": "Открыть"
+  },
+  "creatingNote": {
+    "message": "Создание заметки..."
+  },
+  "untitledPage": {
+    "message": "Страница без названия"
+  },
+  "noteCreated": {
+    "message": "Заметка создана."
+  },
+  "optionsIntro": {
+    "message": "Сохраняйте посещаемые страницы в своём экземпляре Poznote."
+  },
+  "connection": {
+    "message": "Подключение"
+  },
+  "disconnect": {
+    "message": "Отключить"
+  },
+  "poznoteAddress": {
+    "message": "Адрес Poznote"
+  },
+  "username": {
+    "message": "Имя пользователя"
+  },
+  "appPassword": {
+    "message": "Пароль приложения"
+  },
+  "appPasswordHint": {
+    "message": "Создайте его в Poznote: $1. Он даёт доступ только к API и может быть отозван в любой момент. Пароль вашей учётной записи тоже подойдёт."
+  },
+  "appPasswordsPath": {
+    "message": "Настройки > Мой аккаунт > Пароли приложений"
+  },
+  "whereNewNotesGo": {
+    "message": "Куда попадают новые заметки"
+  },
+  "workspace": {
+    "message": "Рабочее пространство"
+  },
+  "folder": {
+    "message": "Папка"
+  },
+  "footerConnected": {
+    "message": "Всё готово: на любой странице нажмите значок Poznote на панели инструментов, чтобы сохранить её."
+  },
+  "footerNotConnected": {
+    "message": "После подключения нажмите значок Poznote на панели инструментов на любой странице, чтобы сохранить её."
+  },
+  "saved": {
+    "message": "Сохранено"
+  },
+  "connectedAs": {
+    "message": "Подключено как $1"
+  },
+  "wrongCredentials": {
+    "message": "Неверное имя пользователя или пароль."
+  },
+  "unreachable": {
+    "message": "Не удалось связаться с $1. Проверьте адрес и что экземпляр запущен."
+  },
+  "noInstance": {
+    "message": "По адресу $1 не отвечает ни один экземпляр Poznote. Проверьте адрес."
+  },
+  "loading": {
+    "message": "Загрузка..."
+  },
+  "noFolder": {
+    "message": "Без папки"
+  },
+  "fillAddressFirst": {
+    "message": "Сначала укажите адрес вашего Poznote."
+  },
+  "fillAllFields": {
+    "message": "Укажите адрес, имя пользователя и пароль приложения."
+  },
+  "invalidAddress": {
+    "message": "Этот адрес недействителен."
+  },
+  "waitingAccess": {
+    "message": "Ожидание доступа к вашему экземпляру..."
+  },
+  "accessDenied": {
+    "message": "Расширению нужен доступ к $1, чтобы сохранять страницы. Нажмите «Подключить» ещё раз и выберите «Разрешить»."
+  },
+  "checkingCredentials": {
+    "message": "Проверка учётных данных..."
+  },
+  "noAccount": {
+    "message": "На этом экземпляре нет учётной записи $1."
+  },
+  "loadingWorkspaces": {
+    "message": "Загрузка рабочих пространств..."
+  },
+  "lostAccessOptions": {
+    "message": "Расширение потеряло доступ к вашему экземпляру. Нажмите «Подключить», чтобы снова разрешить его."
+  },
+  "errorStatus": {
+    "message": "Ошибка $1: $2"
+  },
+  "untitled": {
+    "message": "Без названия"
+  },
+  "uploadFailed": {
+    "message": "Не удалось загрузить файл"
+  },
+  "unsupportedNoteType": {
+    "message": "Страницы можно добавлять только в заметки HTML или Markdown."
+  },
+  "noteChanged": {
+    "message": "Заметка за это время изменилась, попробуйте ещё раз."
+  },
+  "noteKeepsChanging": {
+    "message": "Заметка постоянно меняется, попробуйте ещё раз чуть позже."
+  },
+  "pageScreenshot": {
+    "message": "Снимок страницы"
+  }
+}

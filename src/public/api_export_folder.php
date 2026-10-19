@@ -227,7 +227,7 @@ if (filesize($zipFileName) == 0) {
 $safeFilename = sanitizeFilename($folder_name);
 
 header('Content-Type: application/zip');
-header('Content-Disposition: attachment; filename="' . $safeFilename . '_export.zip"');
+header('Content-Disposition: ' . poznoteContentDisposition('attachment', $safeFilename . '_export.zip', 'folder'));
 header('Content-Length: ' . filesize($zipFileName));
 header('Cache-Control: no-cache, must-revalidate');
 header('Expires: 0');

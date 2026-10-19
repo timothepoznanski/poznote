@@ -1,0 +1,224 @@
+{
+  "extName": {
+    "message": "Poznote URL Saver"
+  },
+  "extDescription": {
+    "message": "현재 페이지의 주소나 스크린샷을 Poznote에 새 노트로 또는 기존 노트의 끝에 저장합니다."
+  },
+  "optionsTitle": {
+    "message": "Poznote URL Saver 설정"
+  },
+  "settings": {
+    "message": "설정"
+  },
+  "connectTitle": {
+    "message": "Poznote에 연결"
+  },
+  "connectText": {
+    "message": "확장 프로그램을 Poznote 인스턴스에 한 번만 연결하면 어떤 페이지든 클릭 한 번으로 저장할 수 있습니다."
+  },
+  "connect": {
+    "message": "연결"
+  },
+  "reconnect": {
+    "message": "다시 연결"
+  },
+  "lostAccessText": {
+    "message": "확장 프로그램이 Poznote 인스턴스에 대한 접근 권한을 잃었습니다. 계속 페이지를 저장하려면 다시 연결하세요."
+  },
+  "openPoznote": {
+    "message": "Poznote 열기"
+  },
+  "openPoznoteTitle": {
+    "message": "Poznote 열기 ($2의 $1)"
+  },
+  "destination": {
+    "message": "저장 위치"
+  },
+  "modeNew": {
+    "message": "새 노트"
+  },
+  "modeNewTitle": {
+    "message": "페이지를 새 노트로 저장"
+  },
+  "modeAppend": {
+    "message": "기존 노트"
+  },
+  "modeAppendTitle": {
+    "message": "노트 끝에 페이지 추가"
+  },
+  "change": {
+    "message": "변경"
+  },
+  "searchNotes": {
+    "message": "노트 검색"
+  },
+  "allWorkspaces": {
+    "message": "모든 작업 공간"
+  },
+  "notes": {
+    "message": "노트"
+  },
+  "saveLink": {
+    "message": "링크 저장"
+  },
+  "saveLinkTitle": {
+    "message": "페이지 주소 저장"
+  },
+  "screenshot": {
+    "message": "스크린샷"
+  },
+  "screenshotTitle": {
+    "message": "보이는 페이지의 스크린샷과 함께 링크 저장"
+  },
+  "loadingNotes": {
+    "message": "노트를 불러오는 중..."
+  },
+  "notesLoadFailed": {
+    "message": "노트를 불러올 수 없습니다."
+  },
+  "noNoteMatches": {
+    "message": "일치하는 노트가 없습니다."
+  },
+  "noNoteYet": {
+    "message": "아직 노트가 없습니다."
+  },
+  "pageCannotBeSaved": {
+    "message": "이 페이지는 저장할 수 없습니다."
+  },
+  "pickNote": {
+    "message": "페이지를 추가할 노트를 선택하세요."
+  },
+  "capturing": {
+    "message": "페이지를 캡처하는 중..."
+  },
+  "screenshotFailed": {
+    "message": "스크린샷 실패: $1"
+  },
+  "addingTo": {
+    "message": "$1에 추가하는 중..."
+  },
+  "addedTo": {
+    "message": "$1에 추가했습니다."
+  },
+  "open": {
+    "message": "열기"
+  },
+  "creatingNote": {
+    "message": "노트를 만드는 중..."
+  },
+  "untitledPage": {
+    "message": "제목 없는 페이지"
+  },
+  "noteCreated": {
+    "message": "노트를 만들었습니다."
+  },
+  "optionsIntro": {
+    "message": "방문한 페이지를 Poznote 인스턴스에 저장하세요."
+  },
+  "connection": {
+    "message": "연결"
+  },
+  "disconnect": {
+    "message": "연결 해제"
+  },
+  "poznoteAddress": {
+    "message": "Poznote 주소"
+  },
+  "username": {
+    "message": "사용자 이름"
+  },
+  "appPassword": {
+    "message": "앱 비밀번호"
+  },
+  "appPasswordHint": {
+    "message": "Poznote의 $1에서 만드세요. API에만 접근할 수 있으며 언제든지 취소할 수 있습니다. 계정 비밀번호도 사용할 수 있습니다."
+  },
+  "appPasswordsPath": {
+    "message": "설정 > 내 계정 > 앱 비밀번호"
+  },
+  "whereNewNotesGo": {
+    "message": "새 노트 저장 위치"
+  },
+  "workspace": {
+    "message": "작업 공간"
+  },
+  "folder": {
+    "message": "폴더"
+  },
+  "footerConnected": {
+    "message": "준비 완료: 어떤 페이지에서든 도구 모음의 Poznote 아이콘을 클릭하면 저장됩니다."
+  },
+  "footerNotConnected": {
+    "message": "연결한 후 어떤 페이지에서든 도구 모음의 Poznote 아이콘을 클릭하면 저장됩니다."
+  },
+  "saved": {
+    "message": "저장됨"
+  },
+  "connectedAs": {
+    "message": "$1(으)로 연결됨"
+  },
+  "wrongCredentials": {
+    "message": "사용자 이름 또는 비밀번호가 올바르지 않습니다."
+  },
+  "unreachable": {
+    "message": "$1에 연결할 수 없습니다. 주소와 인스턴스 실행 여부를 확인하세요."
+  },
+  "noInstance": {
+    "message": "$1에서 응답하는 Poznote 인스턴스가 없습니다. 주소를 확인하세요."
+  },
+  "loading": {
+    "message": "불러오는 중..."
+  },
+  "noFolder": {
+    "message": "폴더 없음"
+  },
+  "fillAddressFirst": {
+    "message": "먼저 Poznote 주소를 입력하세요."
+  },
+  "fillAllFields": {
+    "message": "주소, 사용자 이름, 앱 비밀번호를 입력하세요."
+  },
+  "invalidAddress": {
+    "message": "올바른 주소가 아닙니다."
+  },
+  "waitingAccess": {
+    "message": "인스턴스 접근 권한을 기다리는 중..."
+  },
+  "accessDenied": {
+    "message": "페이지를 저장하려면 확장 프로그램이 $1에 접근해야 합니다. 연결을 다시 클릭하고 허용을 선택하세요."
+  },
+  "checkingCredentials": {
+    "message": "자격 증명을 확인하는 중..."
+  },
+  "noAccount": {
+    "message": "이 인스턴스에 $1(이)라는 계정이 없습니다."
+  },
+  "loadingWorkspaces": {
+    "message": "작업 공간을 불러오는 중..."
+  },
+  "lostAccessOptions": {
+    "message": "확장 프로그램이 인스턴스에 대한 접근 권한을 잃었습니다. 다시 허용하려면 연결을 클릭하세요."
+  },
+  "errorStatus": {
+    "message": "오류 $1: $2"
+  },
+  "untitled": {
+    "message": "제목 없음"
+  },
+  "uploadFailed": {
+    "message": "업로드 실패"
+  },
+  "unsupportedNoteType": {
+    "message": "페이지는 HTML 또는 Markdown 노트에만 추가할 수 있습니다."
+  },
+  "noteChanged": {
+    "message": "그 사이에 노트가 변경되었습니다. 다시 시도하세요."
+  },
+  "noteKeepsChanging": {
+    "message": "노트가 계속 변경되고 있습니다. 잠시 후 다시 시도하세요."
+  },
+  "pageScreenshot": {
+    "message": "페이지 스크린샷"
+  }
+}

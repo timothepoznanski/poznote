@@ -1757,11 +1757,16 @@ html[data-theme='dark'] .board-card-date {
     background: var(--pz-surface-hover);
 }
 
+/* Right after the name (and tags), not pushed to the far end of the row,
+   in the same discreet pill as the folder cards' count (.dash-card-count) */
 .dash-group-count {
-    margin-left: auto;
-    font-size: 12px;
-    font-weight: var(--pz-weight-medium);
+    font-size: 11px;
+    font-weight: var(--pz-weight-semibold);
     color: var(--pz-text-muted);
+    background: var(--pz-surface-hover);
+    border-radius: var(--pz-radius-lg);
+    padding: 1px 8px;
+    white-space: nowrap;
 }
 
 .dash-group-empty {

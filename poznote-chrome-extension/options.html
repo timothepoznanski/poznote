@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Poznote URL Saver settings</title>
+  <title data-i18n="optionsTitle">Poznote URL Saver</title>
   <link rel="icon" href="icon.png">
   <link rel="stylesheet" href="ui.css">
   <style>
@@ -144,6 +144,15 @@
       font-size: 12.5px;
     }
 
+    .connected-text .sub a {
+      color: inherit;
+      text-underline-offset: 3px;
+    }
+
+    .connected-text .sub a:hover {
+      color: var(--accent);
+    }
+
     .saved-note {
       display: flex;
       align-items: center;
@@ -176,60 +185,60 @@
     <div class="intro">
       <img src="icon.png" alt="">
       <div>
-        <h1>Poznote URL Saver</h1>
-        <p>Save the pages you visit to your Poznote instance.</p>
+        <h1 data-i18n="extName"></h1>
+        <p data-i18n="optionsIntro"></p>
       </div>
     </div>
 
     <section class="card" id="connectionCard">
-      <h2><span class="step" id="step1">1</span>Connection</h2>
+      <h2><span class="step" id="step1">1</span><span data-i18n="connection"></span></h2>
 
       <div class="connected" id="connectedBox" hidden>
         <span class="dot"></span>
         <div class="connected-text">
           <div id="connectedUser"></div>
-          <div class="sub" id="connectedHost"></div>
+          <div class="sub"><a id="connectedHost" href="#" target="_blank" rel="noopener" data-i18n-title="openPoznote"></a></div>
         </div>
-        <button type="button" class="btn btn-secondary" id="disconnectBtn">Disconnect</button>
+        <button type="button" class="btn btn-secondary" id="disconnectBtn" data-i18n="disconnect"></button>
       </div>
 
       <form id="connectForm" novalidate>
         <div class="field">
-          <label for="appUrl">Poznote address</label>
+          <label for="appUrl" data-i18n="poznoteAddress"></label>
           <input type="url" id="appUrl" placeholder="https://notes.example.com" autocomplete="url" required>
         </div>
         <div class="field">
-          <label for="username">Username</label>
+          <label for="username" data-i18n="username"></label>
           <input type="text" id="username" autocomplete="username" required>
         </div>
         <div class="field">
-          <label for="password">App password</label>
+          <label for="password" data-i18n="appPassword"></label>
           <input type="password" id="password" autocomplete="current-password" required>
-          <span class="hint">Create one in Poznote under <a id="appPasswordsLink" href="#">Settings &gt; My Account &gt; App passwords</a>. It reaches the API only and can be revoked at any time. Your account password works too.</span>
+          <span class="hint" id="appPasswordHint"><a id="appPasswordsLink" href="#" data-i18n="appPasswordsPath"></a></span>
         </div>
         <div class="message" id="connectStatus" role="status" hidden></div>
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary" id="connectBtn">Connect</button>
+          <button type="submit" class="btn btn-primary" id="connectBtn" data-i18n="connect"></button>
         </div>
       </form>
     </section>
 
     <section class="card locked" id="destinationCard">
-      <h2><span class="step" id="step2">2</span>Where new notes go</h2>
+      <h2><span class="step" id="step2">2</span><span data-i18n="whereNewNotesGo"></span></h2>
       <div class="fields">
         <div class="field">
-          <label for="workspaceSelect">Workspace</label>
+          <label for="workspaceSelect" data-i18n="workspace"></label>
           <select id="workspaceSelect"></select>
         </div>
         <div class="field">
-          <label for="folderSelect">Folder</label>
+          <label for="folderSelect" data-i18n="folder"></label>
           <select id="folderSelect"></select>
         </div>
         <div class="saved-note" id="savedNote" aria-live="polite"></div>
       </div>
     </section>
 
-    <p class="footer" id="footer">Once connected, click the Poznote icon in the toolbar on any page to save it.</p>
+    <p class="footer" id="footer"></p>
   </main>
 
   <script src="common.js"></script>

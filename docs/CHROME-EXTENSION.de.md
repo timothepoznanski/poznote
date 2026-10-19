@@ -30,6 +30,10 @@ Installieren Sie die Erweiterung direkt aus dem Chrome Web Store: [Erweiterung i
 
 Um diese Einstellungen später zu ändern, klicken Sie oben in der Erweiterung auf das Zahnradsymbol.
 
+Die Adresse Ihrer Instanz daneben ist ein Link: Ein Klick öffnet Poznote in einem neuen Tab, über http oder https, so wie Sie die Adresse in den Einstellungen eingegeben haben.
+
+Die Erweiterung erscheint in der Sprache von Chrome, wenn diese Englisch, Französisch, Deutsch, Spanisch, Portugiesisch, Russisch, Koreanisch oder vereinfachtes Chinesisch ist, sonst auf Englisch.
+
 Ihr Kontopasswort funktioniert hier ebenfalls, doch für eine Erweiterung ist ein App-Passwort die bessere Wahl: Es erreicht nur die API, nie die Weboberfläche oder Ihre Kontoeinstellungen, es ist auf Ihr eigenes Profil beschränkt, und wenn Sie es in Poznote widerrufen, ist die Erweiterung getrennt, ohne dass sich sonst etwas ändert. Die vollständige Liste der Einschränkungen finden Sie unter [App-Passwörter](README.de.md#app-passwörter).
 
 > **Wenn Ihre Instanz nur SSO erlaubt,** ist ein App-Passwort die einzige Möglichkeit, die Erweiterung zu verbinden: Das Anmeldeformular, das die Erweiterung benötigt, existiert für Ihr Konto nicht. Erstellen Sie eines unter **Einstellungen > App-Passwörter**, genau wie oben beschrieben.

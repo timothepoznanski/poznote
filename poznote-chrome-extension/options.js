@@ -4,7 +4,13 @@
  * connecting does not close it the way it closes the popup.
  */
 document.addEventListener('DOMContentLoaded', async () => {
+  localizePage();
   const $ = id => document.getElementById(id);
+
+  // The link sits inside the sentence, wherever each language puts it
+  const appPasswordsLink = $('appPasswordsLink');
+  const [hintBefore, hintAfter = ''] = t('appPasswordHint', ['\u0001']).split('\u0001');
+  $('appPasswordHint').replaceChildren(hintBefore, appPasswordsLink, hintAfter);
   const connectForm = $('connectForm');
   const connectBtn = $('connectBtn');
   const connectStatus = $('connectStatus');
@@ -38,7 +44,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   function flashSaved() {
-    savedNote.innerHTML = '<svg class="icon"><use href="#i-check"/></svg><span>Saved</span>';
+    savedNote.innerHTML = '<svg class="icon"><use href="#i-check"/></svg>';
+    const label = document.createElement('span');
+    label.textContent = t('saved');
+    savedNote.appendChild(label);
     clearTimeout(savedTimer);
     savedTimer = setTimeout(() => savedNote.replaceChildren(), 2000);
   }
@@ -51,11 +60,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     $('step1').classList.toggle('done', connected);
     $('step1').innerHTML = connected ? '<svg class="icon"><use href="#i-check"/></svg>' : '1';
     if (connected) {
-      $('connectedUser').textContent = `Connected as ${config.username}`;
+      $('connectedUser').textContent = t('connectedAs', [config.username]);
       $('connectedHost').textContent = config.appUrl;
-      $('footer').textContent = 'You are all set: click the Poznote icon in the toolbar on any page to save it.';
+      $('connectedHost').href = config.appUrl + '/';
+      $('footer').textContent = t('footerConnected');
     } else {
-      $('footer').textContent = 'Once connected, click the Poznote icon in the toolbar on any page to save it.';
+      $('footer').textContent = t('footerNotConnected');
     }
   }
 
@@ -71,13 +81,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     })();
     if (/\b401\b/.test(message)) {
-      return 'Wrong username or password.';
+      return t('wrongCredentials');
     }
     if (/Failed to fetch|NetworkError/i.test(message)) {
-      return `Could not reach ${host}. Check the address and that the instance is running.`;
+      return t('unreachable', [host]);
     }
     if (/\b404\b/.test(message)) {
-      return `No Poznote instance answers at ${appUrl}. Check the address.`;
+      return t('noInstance', [appUrl]);
     }
     return message;
   }
@@ -97,12 +107,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function loadFolders() {
-    folderSelect.replaceChildren(new Option('Loading...', ''));
+    folderSelect.replaceChildren(new Option(t('loading'), ''));
     folderSelect.disabled = true;
     const response = await chrome.runtime.sendMessage({ type: 'loadFolders', config });
     folderSelect.disabled = false;
 
-    const options = [new Option('No folder', '')];
+    const options = [new Option(t('noFolder'), '')];
     if (!response.error) {
       const addFolders = (folders) => {
         const list = Array.isArray(folders) ? folders : Object.values(folders || {});
@@ -162,7 +172,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Opens the App passwords dialog of the instance typed in the address
   // field. The card sits in Settings > My Account, a section Settings does
   // not open on by default (discussion #1641).
-  $('appPasswordsLink').addEventListener('click', (e) => {
+  appPasswordsLink.addEventListener('click', (e) => {
     e.preventDefault();
     let url = null;
     try {
@@ -171,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // No address yet
     }
     if (!url) {
-      showConnectStatus('Fill in your Poznote address first.', 'error');
+      showConnectStatus(t('fillAddressFirst'), 'error');
       $('appUrl').focus();
       return;
     }
@@ -186,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       password: $('password').value.trim()
     };
     if (!form.appUrl || !form.username || !form.password) {
-      showConnectStatus('Fill in the address, your username and the app password.', 'error');
+      showConnectStatus(t('fillAllFields'), 'error');
       return;
     }
 
@@ -194,7 +204,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       pattern = apiOriginPattern(form.appUrl);
     } catch (err) {
-      showConnectStatus('This address is not valid.', 'error');
+      showConnectStatus(t('invalidAddress'), 'error');
       return;
     }
     $('appUrl').value = form.appUrl;
@@ -208,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function connect(permission, form) {
     connectBtn.disabled = true;
     try {
-      showConnectStatus('Waiting for access to your instance...', 'loading');
+      showConnectStatus(t('waitingAccess'), 'loading');
       let granted = false;
       try {
         granted = await permission;
@@ -216,11 +226,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         granted = false;
       }
       if (!granted) {
-        showConnectStatus(`The extension needs access to ${new URL(form.appUrl).host} to save pages. Click Connect again and choose Allow.`, 'error');
+        showConnectStatus(t('accessDenied', [new URL(form.appUrl).host]), 'error');
         return;
       }
 
-      showConnectStatus('Checking your credentials...', 'loading');
+      showConnectStatus(t('checkingCredentials'), 'loading');
       const profiles = await chrome.runtime.sendMessage({ type: 'listProfiles', config: form });
       if (profiles.error) {
         showConnectStatus(explainError(profiles.error, form.appUrl), 'error');
@@ -231,7 +241,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         (p.username || '').toLowerCase() === wanted || (p.email || '').toLowerCase() === wanted
       );
       if (!profile) {
-        showConnectStatus(`No account named ${form.username} on this instance.`, 'error');
+        showConnectStatus(t('noAccount', [form.username]), 'error');
         return;
       }
 
@@ -246,7 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         folder_id: sameInstance ? config.folder_id : ''
       };
 
-      showConnectStatus('Loading your workspaces...', 'loading');
+      showConnectStatus(t('loadingWorkspaces'), 'loading');
       const workspaces = await chrome.runtime.sendMessage({ type: 'listWorkspaces', config });
       if (workspaces.error) {
         showConnectStatus(explainError(workspaces.error, form.appUrl), 'error');
@@ -296,7 +306,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Access was removed from Chrome's extension settings: ask again
     $('password').value = config.password;
     config.userId = null;
-    showConnectStatus('The extension lost access to your instance. Click Connect to allow it again.', 'error');
+    showConnectStatus(t('lostAccessOptions'), 'error');
   }
 
   renderConnection();

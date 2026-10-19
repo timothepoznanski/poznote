@@ -1,0 +1,224 @@
+{
+  "extName": {
+    "message": "Poznote URL Saver"
+  },
+  "extDescription": {
+    "message": "Speichert die Adresse oder einen Screenshot der aktuellen Seite in Poznote, als neue Notiz oder am Ende einer bestehenden."
+  },
+  "optionsTitle": {
+    "message": "Poznote URL Saver: Einstellungen"
+  },
+  "settings": {
+    "message": "Einstellungen"
+  },
+  "connectTitle": {
+    "message": "Mit Poznote verbinden"
+  },
+  "connectText": {
+    "message": "Verbinden Sie die Erweiterung einmal mit Ihrer Poznote-Instanz und speichern Sie dann jede Seite mit einem Klick."
+  },
+  "connect": {
+    "message": "Verbinden"
+  },
+  "reconnect": {
+    "message": "Erneut verbinden"
+  },
+  "lostAccessText": {
+    "message": "Die Erweiterung hat keinen Zugriff mehr auf Ihre Poznote-Instanz. Verbinden Sie sie erneut, um weiter Seiten zu speichern."
+  },
+  "openPoznote": {
+    "message": "Poznote öffnen"
+  },
+  "openPoznoteTitle": {
+    "message": "Poznote öffnen ($1 auf $2)"
+  },
+  "destination": {
+    "message": "Ziel"
+  },
+  "modeNew": {
+    "message": "Neue Notiz"
+  },
+  "modeNewTitle": {
+    "message": "Seite als neue Notiz speichern"
+  },
+  "modeAppend": {
+    "message": "Bestehende Notiz"
+  },
+  "modeAppendTitle": {
+    "message": "Seite am Ende einer Notiz hinzufügen"
+  },
+  "change": {
+    "message": "Ändern"
+  },
+  "searchNotes": {
+    "message": "Notizen durchsuchen"
+  },
+  "allWorkspaces": {
+    "message": "Alle Arbeitsbereiche"
+  },
+  "notes": {
+    "message": "Notizen"
+  },
+  "saveLink": {
+    "message": "Link speichern"
+  },
+  "saveLinkTitle": {
+    "message": "Adresse der Seite speichern"
+  },
+  "screenshot": {
+    "message": "Screenshot"
+  },
+  "screenshotTitle": {
+    "message": "Link mit einem Screenshot des sichtbaren Bereichs speichern"
+  },
+  "loadingNotes": {
+    "message": "Notizen werden geladen..."
+  },
+  "notesLoadFailed": {
+    "message": "Die Notizen konnten nicht geladen werden."
+  },
+  "noNoteMatches": {
+    "message": "Keine passende Notiz."
+  },
+  "noNoteYet": {
+    "message": "Noch keine Notiz."
+  },
+  "pageCannotBeSaved": {
+    "message": "Diese Seite kann nicht gespeichert werden."
+  },
+  "pickNote": {
+    "message": "Wählen Sie die Notiz, zu der die Seite hinzugefügt werden soll."
+  },
+  "capturing": {
+    "message": "Seite wird aufgenommen..."
+  },
+  "screenshotFailed": {
+    "message": "Screenshot fehlgeschlagen: $1"
+  },
+  "addingTo": {
+    "message": "Wird zu $1 hinzugefügt..."
+  },
+  "addedTo": {
+    "message": "Zu $1 hinzugefügt."
+  },
+  "open": {
+    "message": "Öffnen"
+  },
+  "creatingNote": {
+    "message": "Notiz wird erstellt..."
+  },
+  "untitledPage": {
+    "message": "Seite ohne Titel"
+  },
+  "noteCreated": {
+    "message": "Notiz erstellt."
+  },
+  "optionsIntro": {
+    "message": "Speichern Sie die besuchten Seiten in Ihrer Poznote-Instanz."
+  },
+  "connection": {
+    "message": "Verbindung"
+  },
+  "disconnect": {
+    "message": "Trennen"
+  },
+  "poznoteAddress": {
+    "message": "Poznote-Adresse"
+  },
+  "username": {
+    "message": "Benutzername"
+  },
+  "appPassword": {
+    "message": "App-Passwort"
+  },
+  "appPasswordHint": {
+    "message": "Erstellen Sie eines in Poznote unter $1. Es gilt nur für die API und kann jederzeit widerrufen werden. Ihr Kontopasswort funktioniert auch."
+  },
+  "appPasswordsPath": {
+    "message": "Einstellungen > Mein Konto > App-Passwörter"
+  },
+  "whereNewNotesGo": {
+    "message": "Wohin neue Notizen kommen"
+  },
+  "workspace": {
+    "message": "Arbeitsbereich"
+  },
+  "folder": {
+    "message": "Ordner"
+  },
+  "footerConnected": {
+    "message": "Alles bereit: Klicken Sie auf einer beliebigen Seite auf das Poznote-Symbol in der Symbolleiste, um sie zu speichern."
+  },
+  "footerNotConnected": {
+    "message": "Klicken Sie nach dem Verbinden auf einer beliebigen Seite auf das Poznote-Symbol in der Symbolleiste, um sie zu speichern."
+  },
+  "saved": {
+    "message": "Gespeichert"
+  },
+  "connectedAs": {
+    "message": "Verbunden als $1"
+  },
+  "wrongCredentials": {
+    "message": "Falscher Benutzername oder falsches Passwort."
+  },
+  "unreachable": {
+    "message": "$1 ist nicht erreichbar. Prüfen Sie die Adresse und ob die Instanz läuft."
+  },
+  "noInstance": {
+    "message": "Unter $1 antwortet keine Poznote-Instanz. Prüfen Sie die Adresse."
+  },
+  "loading": {
+    "message": "Wird geladen..."
+  },
+  "noFolder": {
+    "message": "Kein Ordner"
+  },
+  "fillAddressFirst": {
+    "message": "Geben Sie zuerst Ihre Poznote-Adresse ein."
+  },
+  "fillAllFields": {
+    "message": "Geben Sie die Adresse, Ihren Benutzernamen und das App-Passwort ein."
+  },
+  "invalidAddress": {
+    "message": "Diese Adresse ist ungültig."
+  },
+  "waitingAccess": {
+    "message": "Warten auf Zugriff auf Ihre Instanz..."
+  },
+  "accessDenied": {
+    "message": "Die Erweiterung braucht Zugriff auf $1, um Seiten zu speichern. Klicken Sie erneut auf Verbinden und wählen Sie Zulassen."
+  },
+  "checkingCredentials": {
+    "message": "Ihre Zugangsdaten werden geprüft..."
+  },
+  "noAccount": {
+    "message": "Auf dieser Instanz gibt es kein Konto namens $1."
+  },
+  "loadingWorkspaces": {
+    "message": "Ihre Arbeitsbereiche werden geladen..."
+  },
+  "lostAccessOptions": {
+    "message": "Die Erweiterung hat keinen Zugriff mehr auf Ihre Instanz. Klicken Sie auf Verbinden, um ihn wieder zu erlauben."
+  },
+  "errorStatus": {
+    "message": "Fehler $1: $2"
+  },
+  "untitled": {
+    "message": "Ohne Titel"
+  },
+  "uploadFailed": {
+    "message": "Hochladen fehlgeschlagen"
+  },
+  "unsupportedNoteType": {
+    "message": "Seiten können nur zu HTML- oder Markdown-Notizen hinzugefügt werden."
+  },
+  "noteChanged": {
+    "message": "Die Notiz wurde inzwischen geändert, bitte erneut versuchen."
+  },
+  "noteKeepsChanging": {
+    "message": "Die Notiz ändert sich ständig, bitte gleich erneut versuchen."
+  },
+  "pageScreenshot": {
+    "message": "Screenshot der Seite"
+  }
+}

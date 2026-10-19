@@ -8,6 +8,7 @@ date_default_timezone_set('UTC');
 // ---------------------------------------------------------------------------
 require_once __DIR__ . '/lib/html-sanitize.php';
 require_once __DIR__ . '/lib/attachments.php';
+require_once __DIR__ . '/lib/content-disposition.php';
 require_once __DIR__ . '/lib/backup-restore.php';
 require_once __DIR__ . '/lib/diary.php';
 require_once __DIR__ . '/lib/markdown-colored.php';
