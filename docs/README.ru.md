@@ -47,6 +47,16 @@ https://demo.poznote.com
 **Логин**: poznote<br>
 **Пароль**: poznote
 
+### Не хотите администрировать сервер?
+
+Хостинг-провайдер может запустить Poznote за вас.<br>
+[Сравните хостинги](https://poznote.com/hosting.html) или разверните сразу:
+
+<p>
+  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="44"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Run on Caliber Node" height="44"></a>
+</p>
+
 ### О Poznote пишут
 
 https://poznote.com/press.html
@@ -244,6 +254,11 @@ docker compose up -d
 <summary><strong>☁️ Облако</strong></summary><br>
 
 Не хотите администрировать сервер? Хостинг-провайдер может запустить Poznote за вас и поддерживать его в сети. Доступные хостинги и советы по выбору можно посмотреть [здесь](https://poznote.com/hosting.html).
+
+<p>
+  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="44"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Run on Caliber Node" height="44"></a>
+</p>
 
 </details>
 

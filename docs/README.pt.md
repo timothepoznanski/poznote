@@ -47,6 +47,16 @@ https://demo.poznote.com
 **Login**: poznote<br>
 **Senha**: poznote
 
+### Não quer administrar um servidor?
+
+Um provedor de hospedagem pode rodar o Poznote para você.<br>
+[Compare os provedores](https://poznote.com/hosting.html) ou implante direto:
+
+<p>
+  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="44"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Run on Caliber Node" height="44"></a>
+</p>
+
 ### Falam do Poznote
 
 https://poznote.com/press.html
@@ -244,6 +254,11 @@ docker compose up -d
 <summary><strong>☁️ Nuvem</strong></summary><br>
 
 Não quer administrar um servidor? Um provedor de hospedagem pode rodar o Poznote para você e mantê-lo online. Veja os provedores disponíveis e como escolher entre eles [aqui](https://poznote.com/hosting.html).
+
+<p>
+  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="44"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Run on Caliber Node" height="44"></a>
+</p>
 
 </details>
 
