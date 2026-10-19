@@ -28,15 +28,36 @@
       font-size: 14px;
     }
 
-    .host {
+    .host-slot {
       flex: 1;
       min-width: 0;
+      text-align: right;
+    }
+
+    /* Opens the instance in a new tab */
+    .host {
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
       color: var(--text-subtle);
       font-size: 12px;
-      text-align: right;
-      overflow: hidden;
+      text-decoration: underline;
+      text-decoration-color: var(--border-strong);
+      text-underline-offset: 3px;
       text-overflow: ellipsis;
       white-space: nowrap;
+      vertical-align: middle;
+      border-radius: 4px;
+    }
+
+    .host:hover {
+      color: var(--accent);
+      text-decoration-color: currentColor;
+    }
+
+    .host:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px var(--focus);
     }
 
     .view {
@@ -79,9 +100,10 @@
     }
 
     /* New note / existing note */
+    /* Two equal halves, unless a translation needs more room for one label */
     .segmented {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(max-content, 1fr));
       gap: 2px;
       padding: 3px;
       border-radius: var(--radius);
@@ -302,7 +324,7 @@
 
     .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(max-content, 1fr));
       gap: 8px;
     }
   </style>
@@ -326,54 +348,54 @@
   <header class="top">
     <img class="logo" src="icon.png" alt="">
     <span class="brand">Poznote</span>
-    <span class="host" id="hostLabel"></span>
-    <button class="icon-btn" id="openSettings" title="Settings" aria-label="Settings">
+    <span class="host-slot"><a class="host" id="hostLabel" href="#" target="_blank" rel="noopener" hidden></a></span>
+    <button class="icon-btn" id="openSettings" data-i18n-title="settings" data-i18n-aria-label="settings">
       <svg class="icon"><use href="#i-settings"/></svg>
     </button>
   </header>
 
   <section class="view empty" id="connectView" hidden>
     <img class="logo" src="icon.png" alt="">
-    <h1>Connect to Poznote</h1>
-    <p id="connectText">Link the extension to your Poznote instance once, then save any page in one click.</p>
-    <button class="btn btn-primary" id="connectBtn">Connect</button>
+    <h1 data-i18n="connectTitle"></h1>
+    <p id="connectText" data-i18n="connectText"></p>
+    <button class="btn btn-primary" id="connectBtn" data-i18n="connect"></button>
   </section>
 
   <main class="view" id="mainView" hidden>
-    <div class="segmented" role="tablist" aria-label="Destination">
-      <button id="modeNew" role="tab" aria-selected="true" title="Save the page as a new note">
-        <svg class="icon"><use href="#i-file-plus"/></svg>New note
+    <div class="segmented" role="tablist" data-i18n-aria-label="destination">
+      <button id="modeNew" role="tab" aria-selected="true" data-i18n-title="modeNewTitle">
+        <svg class="icon"><use href="#i-file-plus"/></svg><span data-i18n="modeNew"></span>
       </button>
-      <button id="modeAppend" role="tab" aria-selected="false" title="Add the page at the end of a note">
-        <svg class="icon"><use href="#i-list-plus"/></svg>Existing note
+      <button id="modeAppend" role="tab" aria-selected="false" data-i18n-title="modeAppendTitle">
+        <svg class="icon"><use href="#i-list-plus"/></svg><span data-i18n="modeAppend"></span>
       </button>
     </div>
 
     <div class="destination" id="newPanel">
       <svg class="icon"><use href="#i-folder"/></svg>
       <span id="destLabel"></span>
-      <button class="link-btn" id="changeDest">Change</button>
+      <button class="link-btn" id="changeDest" data-i18n="change"></button>
     </div>
 
     <div class="append-panel" id="appendPanel" hidden>
       <div class="search">
         <svg class="icon"><use href="#i-search"/></svg>
-        <input type="search" id="noteSearch" placeholder="Search notes" autocomplete="off" aria-label="Search notes">
+        <input type="search" id="noteSearch" data-i18n-placeholder="searchNotes" autocomplete="off" data-i18n-aria-label="searchNotes">
       </div>
       <label class="switch-row">
         <input type="checkbox" id="allWorkspaces" role="switch">
         <span class="switch" aria-hidden="true"></span>
-        <span>All workspaces</span>
+        <span data-i18n="allWorkspaces"></span>
       </label>
-      <ul class="note-results" id="noteResults" role="listbox" aria-label="Notes"></ul>
+      <ul class="note-results" id="noteResults" role="listbox" data-i18n-aria-label="notes"></ul>
     </div>
 
     <div class="actions">
-      <button class="btn btn-primary" id="saveNote" title="Save the page's address">
-        <svg class="icon"><use href="#i-link"/></svg>Save link
+      <button class="btn btn-primary" id="saveNote" data-i18n-title="saveLinkTitle">
+        <svg class="icon"><use href="#i-link"/></svg><span data-i18n="saveLink"></span>
       </button>
-      <button class="btn btn-secondary" id="saveScreenshot" title="Save the link with a screenshot of the visible page">
-        <svg class="icon"><use href="#i-camera"/></svg>Screenshot
+      <button class="btn btn-secondary" id="saveScreenshot" data-i18n-title="screenshotTitle">
+        <svg class="icon"><use href="#i-camera"/></svg><span data-i18n="screenshot"></span>
       </button>
     </div>
 

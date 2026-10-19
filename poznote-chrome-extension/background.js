@@ -52,6 +52,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 /**
+ * A sentence in the browser's language, from _locales/<lang>/messages.json
+ */
+function t(key, substitutions) {
+  return chrome.i18n.getMessage(key, substitutions) || key;
+}
+
+/**
  * Build HTTP headers for API requests
  * Includes Basic Authentication and optional User ID
  * @param {Object} config - Configuration object with username, password, and optional userId
@@ -96,7 +103,7 @@ async function listProfiles(config) {
   });
 
   if (!response.ok) {
-    throw new Error(`Error ${response.status}: ${response.statusText}`);
+    throw new Error(t('errorStatus', [String(response.status), response.statusText]));
   }
   
   return await response.json();
@@ -114,7 +121,7 @@ async function listWorkspaces(config) {
   });
 
   if (!response.ok) {
-    throw new Error(`Error ${response.status}: ${response.statusText}`);
+    throw new Error(t('errorStatus', [String(response.status), response.statusText]));
   }
   
   const data = await response.json();
@@ -134,7 +141,7 @@ async function loadFolders(config) {
   });
 
   if (!response.ok) {
-    throw new Error(`Error ${response.status}: ${response.statusText}`);
+    throw new Error(t('errorStatus', [String(response.status), response.statusText]));
   }
   
   const data = await response.json();
@@ -166,7 +173,7 @@ async function createNote(config, noteData) {
 
   if (!response.ok) {
     const text = await response.text();
-    let errorMsg = `Error ${response.status}: ${response.statusText}`;
+    let errorMsg = t('errorStatus', [String(response.status), response.statusText]);
     
     // Try to extract error message from JSON response
     try {
@@ -193,7 +200,7 @@ async function createNote(config, noteData) {
  */
 async function apiError(response) {
   const text = await response.text();
-  let errorMsg = `Error ${response.status}: ${response.statusText}`;
+  let errorMsg = t('errorStatus', [String(response.status), response.statusText]);
   try {
     const errorJson = JSON.parse(text);
     if (errorJson.error || errorJson.message) {
@@ -236,7 +243,7 @@ async function searchNotes(config, query, workspace) {
     .slice(0, 20)
     .map(note => ({
       id: note.id,
-      heading: note.heading || 'Untitled',
+      heading: note.heading || t('untitled'),
       type: note.type,
       workspace: note.workspace,
       folder: note.folder || ''
@@ -267,7 +274,7 @@ async function uploadImageAttachment(config, noteId, dataUrl, fileName) {
 
   const data = await response.json();
   if (!data.attachment_id) {
-    throw new Error(data.message || 'Upload failed');
+    throw new Error(data.message || t('uploadFailed'));
   }
   return `/api/v1/notes/${noteId}/attachments/${data.attachment_id}`;
 }
@@ -294,7 +301,7 @@ async function appendToNote(config, noteId, entry) {
 
   const { note } = await response.json();
   if (note.type !== 'note' && note.type !== 'markdown') {
-    throw new Error('Pages can only be added to HTML or Markdown notes.');
+    throw new Error(t('unsupportedNoteType'));
   }
 
   let block;
@@ -338,13 +345,13 @@ async function appendToNote(config, noteId, entry) {
     const conflict = await patch.json();
     const current = conflict.current;
     if (!current || typeof current.content !== 'string' || !current.version) {
-      throw new Error('The note changed meanwhile, try again.');
+      throw new Error(t('noteChanged'));
     }
     content = current.content;
     version = current.version;
   }
 
-  throw new Error('The note keeps changing, try again in a moment.');
+  throw new Error(t('noteKeepsChanging'));
 }
 
 function escapeHtml(value) {
@@ -363,7 +370,7 @@ function buildHtmlEntry(entry) {
   const url = escapeHtml(entry.url);
   let html = `<p><a href="${url}" target="_blank">${url}</a></p>`;
   if (entry.screenshot) {
-    html += `<p><br></p><p><img src="${entry.screenshot}" alt="Page Screenshot" style="max-width: 100%; height: auto;" /></p>`;
+    html += `<p><br></p><p><img src="${entry.screenshot}" alt="${escapeHtml(t('pageScreenshot'))}" style="max-width: 100%; height: auto;" /></p>`;
   }
   return html;
 }
@@ -377,7 +384,7 @@ function buildMarkdownEntry(entry, screenshotSrc) {
   const label = entry.url.replace(/([\\[\]])/g, '\\$1');
   let md = `[${label}](${target})`;
   if (screenshotSrc) {
-    md += `\n\n<br>\n\n![Page Screenshot](${screenshotSrc})`;
+    md += `\n\n<br>\n\n![${t('pageScreenshot')}](${screenshotSrc})`;
   }
   return md;
 }

@@ -1,0 +1,224 @@
+{
+  "extName": {
+    "message": "Poznote URL Saver"
+  },
+  "extDescription": {
+    "message": "Guarda la dirección o una captura de la página actual en Poznote, como nota nueva o al final de una existente."
+  },
+  "optionsTitle": {
+    "message": "Configuración de Poznote URL Saver"
+  },
+  "settings": {
+    "message": "Configuración"
+  },
+  "connectTitle": {
+    "message": "Conectar con Poznote"
+  },
+  "connectText": {
+    "message": "Vincula la extensión con tu instancia de Poznote una sola vez y guarda cualquier página con un clic."
+  },
+  "connect": {
+    "message": "Conectar"
+  },
+  "reconnect": {
+    "message": "Volver a conectar"
+  },
+  "lostAccessText": {
+    "message": "La extensión ha perdido el acceso a tu instancia de Poznote. Vuelve a conectarla para seguir guardando páginas."
+  },
+  "openPoznote": {
+    "message": "Abrir Poznote"
+  },
+  "openPoznoteTitle": {
+    "message": "Abrir Poznote ($1 en $2)"
+  },
+  "destination": {
+    "message": "Destino"
+  },
+  "modeNew": {
+    "message": "Nueva nota"
+  },
+  "modeNewTitle": {
+    "message": "Guardar la página como nota nueva"
+  },
+  "modeAppend": {
+    "message": "Nota existente"
+  },
+  "modeAppendTitle": {
+    "message": "Añadir la página al final de una nota"
+  },
+  "change": {
+    "message": "Cambiar"
+  },
+  "searchNotes": {
+    "message": "Buscar notas"
+  },
+  "allWorkspaces": {
+    "message": "Todos los espacios de trabajo"
+  },
+  "notes": {
+    "message": "Notas"
+  },
+  "saveLink": {
+    "message": "Guardar enlace"
+  },
+  "saveLinkTitle": {
+    "message": "Guardar la dirección de la página"
+  },
+  "screenshot": {
+    "message": "Captura"
+  },
+  "screenshotTitle": {
+    "message": "Guardar el enlace con una captura de la parte visible de la página"
+  },
+  "loadingNotes": {
+    "message": "Cargando notas..."
+  },
+  "notesLoadFailed": {
+    "message": "No se pudieron cargar las notas."
+  },
+  "noNoteMatches": {
+    "message": "Ninguna nota coincide."
+  },
+  "noNoteYet": {
+    "message": "Todavía no hay notas."
+  },
+  "pageCannotBeSaved": {
+    "message": "Esta página no se puede guardar."
+  },
+  "pickNote": {
+    "message": "Elige la nota a la que añadir la página."
+  },
+  "capturing": {
+    "message": "Capturando la página..."
+  },
+  "screenshotFailed": {
+    "message": "Error en la captura: $1"
+  },
+  "addingTo": {
+    "message": "Añadiendo a $1..."
+  },
+  "addedTo": {
+    "message": "Añadido a $1."
+  },
+  "open": {
+    "message": "Abrir"
+  },
+  "creatingNote": {
+    "message": "Creando la nota..."
+  },
+  "untitledPage": {
+    "message": "Página sin título"
+  },
+  "noteCreated": {
+    "message": "Nota creada."
+  },
+  "optionsIntro": {
+    "message": "Guarda las páginas que visitas en tu instancia de Poznote."
+  },
+  "connection": {
+    "message": "Conexión"
+  },
+  "disconnect": {
+    "message": "Desconectar"
+  },
+  "poznoteAddress": {
+    "message": "Dirección de Poznote"
+  },
+  "username": {
+    "message": "Nombre de usuario"
+  },
+  "appPassword": {
+    "message": "Contraseña de aplicación"
+  },
+  "appPasswordHint": {
+    "message": "Crea una en Poznote en $1. Solo da acceso a la API y se puede revocar en cualquier momento. La contraseña de tu cuenta también sirve."
+  },
+  "appPasswordsPath": {
+    "message": "Configuración > Mi cuenta > Contraseñas de aplicación"
+  },
+  "whereNewNotesGo": {
+    "message": "Dónde van las notas nuevas"
+  },
+  "workspace": {
+    "message": "Espacio de trabajo"
+  },
+  "folder": {
+    "message": "Carpeta"
+  },
+  "footerConnected": {
+    "message": "Todo listo: haz clic en el icono de Poznote de la barra de herramientas en cualquier página para guardarla."
+  },
+  "footerNotConnected": {
+    "message": "Una vez conectado, haz clic en el icono de Poznote de la barra de herramientas en cualquier página para guardarla."
+  },
+  "saved": {
+    "message": "Guardado"
+  },
+  "connectedAs": {
+    "message": "Conectado como $1"
+  },
+  "wrongCredentials": {
+    "message": "Nombre de usuario o contraseña incorrectos."
+  },
+  "unreachable": {
+    "message": "No se pudo contactar con $1. Comprueba la dirección y que la instancia esté en marcha."
+  },
+  "noInstance": {
+    "message": "Ninguna instancia de Poznote responde en $1. Comprueba la dirección."
+  },
+  "loading": {
+    "message": "Cargando..."
+  },
+  "noFolder": {
+    "message": "Sin carpeta"
+  },
+  "fillAddressFirst": {
+    "message": "Indica primero la dirección de tu Poznote."
+  },
+  "fillAllFields": {
+    "message": "Indica la dirección, tu nombre de usuario y la contraseña de aplicación."
+  },
+  "invalidAddress": {
+    "message": "Esta dirección no es válida."
+  },
+  "waitingAccess": {
+    "message": "Esperando el acceso a tu instancia..."
+  },
+  "accessDenied": {
+    "message": "La extensión necesita acceso a $1 para guardar páginas. Vuelve a hacer clic en Conectar y elige Permitir."
+  },
+  "checkingCredentials": {
+    "message": "Comprobando tus credenciales..."
+  },
+  "noAccount": {
+    "message": "No hay ninguna cuenta llamada $1 en esta instancia."
+  },
+  "loadingWorkspaces": {
+    "message": "Cargando tus espacios de trabajo..."
+  },
+  "lostAccessOptions": {
+    "message": "La extensión ha perdido el acceso a tu instancia. Haz clic en Conectar para volver a permitirlo."
+  },
+  "errorStatus": {
+    "message": "Error $1: $2"
+  },
+  "untitled": {
+    "message": "Sin título"
+  },
+  "uploadFailed": {
+    "message": "Error al subir"
+  },
+  "unsupportedNoteType": {
+    "message": "Las páginas solo se pueden añadir a notas HTML o Markdown."
+  },
+  "noteChanged": {
+    "message": "La nota ha cambiado mientras tanto, inténtalo de nuevo."
+  },
+  "noteKeepsChanging": {
+    "message": "La nota no deja de cambiar, inténtalo de nuevo en un momento."
+  },
+  "pageScreenshot": {
+    "message": "Captura de la página"
+  }
+}

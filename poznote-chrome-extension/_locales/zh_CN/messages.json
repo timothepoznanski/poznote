@@ -1,0 +1,224 @@
+{
+  "extName": {
+    "message": "Poznote URL Saver"
+  },
+  "extDescription": {
+    "message": "将当前页面的地址或截图保存到 Poznote，作为新笔记或追加到现有笔记末尾。"
+  },
+  "optionsTitle": {
+    "message": "Poznote URL Saver 设置"
+  },
+  "settings": {
+    "message": "设置"
+  },
+  "connectTitle": {
+    "message": "连接到 Poznote"
+  },
+  "connectText": {
+    "message": "只需将扩展与你的 Poznote 实例连接一次，之后一键即可保存任意页面。"
+  },
+  "connect": {
+    "message": "连接"
+  },
+  "reconnect": {
+    "message": "重新连接"
+  },
+  "lostAccessText": {
+    "message": "扩展已失去对你的 Poznote 实例的访问权限。请重新连接以继续保存页面。"
+  },
+  "openPoznote": {
+    "message": "打开 Poznote"
+  },
+  "openPoznoteTitle": {
+    "message": "打开 Poznote（$2 上的 $1）"
+  },
+  "destination": {
+    "message": "保存位置"
+  },
+  "modeNew": {
+    "message": "新笔记"
+  },
+  "modeNewTitle": {
+    "message": "将页面保存为新笔记"
+  },
+  "modeAppend": {
+    "message": "现有笔记"
+  },
+  "modeAppendTitle": {
+    "message": "将页面添加到笔记末尾"
+  },
+  "change": {
+    "message": "更改"
+  },
+  "searchNotes": {
+    "message": "搜索笔记"
+  },
+  "allWorkspaces": {
+    "message": "所有工作区"
+  },
+  "notes": {
+    "message": "笔记"
+  },
+  "saveLink": {
+    "message": "保存链接"
+  },
+  "saveLinkTitle": {
+    "message": "保存页面地址"
+  },
+  "screenshot": {
+    "message": "截图"
+  },
+  "screenshotTitle": {
+    "message": "保存链接及页面可见部分的截图"
+  },
+  "loadingNotes": {
+    "message": "正在加载笔记..."
+  },
+  "notesLoadFailed": {
+    "message": "无法加载笔记。"
+  },
+  "noNoteMatches": {
+    "message": "没有匹配的笔记。"
+  },
+  "noNoteYet": {
+    "message": "还没有笔记。"
+  },
+  "pageCannotBeSaved": {
+    "message": "此页面无法保存。"
+  },
+  "pickNote": {
+    "message": "请选择要添加页面的笔记。"
+  },
+  "capturing": {
+    "message": "正在截取页面..."
+  },
+  "screenshotFailed": {
+    "message": "截图失败：$1"
+  },
+  "addingTo": {
+    "message": "正在添加到 $1..."
+  },
+  "addedTo": {
+    "message": "已添加到 $1。"
+  },
+  "open": {
+    "message": "打开"
+  },
+  "creatingNote": {
+    "message": "正在创建笔记..."
+  },
+  "untitledPage": {
+    "message": "无标题页面"
+  },
+  "noteCreated": {
+    "message": "笔记已创建。"
+  },
+  "optionsIntro": {
+    "message": "将你访问的页面保存到你的 Poznote 实例。"
+  },
+  "connection": {
+    "message": "连接"
+  },
+  "disconnect": {
+    "message": "断开连接"
+  },
+  "poznoteAddress": {
+    "message": "Poznote 地址"
+  },
+  "username": {
+    "message": "用户名"
+  },
+  "appPassword": {
+    "message": "应用密码"
+  },
+  "appPasswordHint": {
+    "message": "在 Poznote 的 $1 中创建一个。它只能访问 API，并可随时撤销。也可以使用你的账户密码。"
+  },
+  "appPasswordsPath": {
+    "message": "设置 > 我的账户 > 应用密码"
+  },
+  "whereNewNotesGo": {
+    "message": "新笔记的保存位置"
+  },
+  "workspace": {
+    "message": "工作区"
+  },
+  "folder": {
+    "message": "文件夹"
+  },
+  "footerConnected": {
+    "message": "一切就绪：在任意页面点击工具栏中的 Poznote 图标即可保存。"
+  },
+  "footerNotConnected": {
+    "message": "连接后，在任意页面点击工具栏中的 Poznote 图标即可保存。"
+  },
+  "saved": {
+    "message": "已保存"
+  },
+  "connectedAs": {
+    "message": "已作为 $1 连接"
+  },
+  "wrongCredentials": {
+    "message": "用户名或密码错误。"
+  },
+  "unreachable": {
+    "message": "无法访问 $1。请检查地址以及实例是否正在运行。"
+  },
+  "noInstance": {
+    "message": "$1 上没有 Poznote 实例响应。请检查地址。"
+  },
+  "loading": {
+    "message": "加载中..."
+  },
+  "noFolder": {
+    "message": "无文件夹"
+  },
+  "fillAddressFirst": {
+    "message": "请先填写你的 Poznote 地址。"
+  },
+  "fillAllFields": {
+    "message": "请填写地址、用户名和应用密码。"
+  },
+  "invalidAddress": {
+    "message": "此地址无效。"
+  },
+  "waitingAccess": {
+    "message": "正在等待访问你的实例..."
+  },
+  "accessDenied": {
+    "message": "扩展需要访问 $1 才能保存页面。请再次点击“连接”并选择“允许”。"
+  },
+  "checkingCredentials": {
+    "message": "正在验证你的凭据..."
+  },
+  "noAccount": {
+    "message": "此实例上没有名为 $1 的账户。"
+  },
+  "loadingWorkspaces": {
+    "message": "正在加载你的工作区..."
+  },
+  "lostAccessOptions": {
+    "message": "扩展已失去对你的实例的访问权限。点击“连接”重新授权。"
+  },
+  "errorStatus": {
+    "message": "错误 $1：$2"
+  },
+  "untitled": {
+    "message": "无标题"
+  },
+  "uploadFailed": {
+    "message": "上传失败"
+  },
+  "unsupportedNoteType": {
+    "message": "页面只能添加到 HTML 或 Markdown 笔记中。"
+  },
+  "noteChanged": {
+    "message": "笔记在此期间已更改，请重试。"
+  },
+  "noteKeepsChanging": {
+    "message": "笔记一直在变化，请稍后再试。"
+  },
+  "pageScreenshot": {
+    "message": "页面截图"
+  }
+}

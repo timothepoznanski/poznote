@@ -30,6 +30,10 @@ Installez l'extension directement depuis le Chrome Web Store : [Installer l'exte
 
 Pour modifier ces réglages plus tard, cliquez sur la roue dentée en haut de l'extension.
 
+L'adresse de votre instance, affichée juste à côté, est un lien : cliquez dessus pour ouvrir Poznote dans un nouvel onglet, en http ou en https comme vous l'avez saisie dans les réglages.
+
+L'extension s'affiche dans la langue de Chrome si c'est l'anglais, le français, l'allemand, l'espagnol, le portugais, le russe, le coréen ou le chinois simplifié, et en anglais sinon.
+
 Le mot de passe de votre compte fonctionne aussi ici, mais un mot de passe d'application est un meilleur choix pour une extension : il n'atteint que l'API, jamais l'interface web ni les paramètres de votre compte, il est limité à votre propre profil, et le révoquer dans Poznote coupe l'accès de l'extension sans rien changer d'autre. Consultez [Mots de passe d'application](README.fr.md#mots-de-passe-dapplication) pour la liste complète des limites.
 
 > **Si votre instance est en SSO uniquement,** un mot de passe d'application est le seul moyen de connecter l'extension : le formulaire de connexion dont l'extension a besoin n'existe pas pour votre compte. Créez-en un depuis **Paramètres > Mots de passe d'application** exactement comme ci-dessus.

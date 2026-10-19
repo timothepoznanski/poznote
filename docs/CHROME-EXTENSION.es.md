@@ -30,6 +30,10 @@ Instala la extensión directamente desde Chrome Web Store: [Instalar la extensi�
 
 Para cambiar estos ajustes más adelante, haz clic en el engranaje de la parte superior de la extensión.
 
+La dirección de tu instancia, que aparece al lado, es un enlace: haz clic en ella para abrir Poznote en una pestaña nueva, por http o https tal como la escribiste en los ajustes.
+
+La extensión usa el idioma de Chrome si es inglés, francés, alemán, español, portugués, ruso, coreano o chino simplificado, y el inglés en los demás casos.
+
 La contraseña de tu cuenta también funciona aquí, pero una contraseña de aplicación es la mejor credencial para una extensión: solo accede a la API, nunca a la interfaz web ni a los ajustes de tu cuenta, está limitada a tu propio perfil, y revocarla en Poznote desconecta la extensión sin cambiar nada más. Consulta [Contraseñas de aplicación](README.es.md#contraseñas-de-aplicación) para ver la lista completa de límites.
 
 > **Si tu instancia es solo SSO,** una contraseña de aplicación es la única forma de conectar la extensión: el formulario de inicio de sesión que necesita la extensión no existe para tu cuenta. Crea una desde **Configuración > Contraseñas de aplicación** exactamente como se indica arriba.

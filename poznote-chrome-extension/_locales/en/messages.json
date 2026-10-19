@@ -1,0 +1,224 @@
+{
+  "extName": {
+    "message": "Poznote URL Saver"
+  },
+  "extDescription": {
+    "message": "Saves the current page URL or screenshot to Poznote, as a new note or at the end of an existing one."
+  },
+  "optionsTitle": {
+    "message": "Poznote URL Saver settings"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "connectTitle": {
+    "message": "Connect to Poznote"
+  },
+  "connectText": {
+    "message": "Link the extension to your Poznote instance once, then save any page in one click."
+  },
+  "connect": {
+    "message": "Connect"
+  },
+  "reconnect": {
+    "message": "Reconnect"
+  },
+  "lostAccessText": {
+    "message": "The extension lost access to your Poznote instance. Reconnect it to keep saving pages."
+  },
+  "openPoznote": {
+    "message": "Open Poznote"
+  },
+  "openPoznoteTitle": {
+    "message": "Open Poznote ($1 on $2)"
+  },
+  "destination": {
+    "message": "Destination"
+  },
+  "modeNew": {
+    "message": "New note"
+  },
+  "modeNewTitle": {
+    "message": "Save the page as a new note"
+  },
+  "modeAppend": {
+    "message": "Existing note"
+  },
+  "modeAppendTitle": {
+    "message": "Add the page at the end of a note"
+  },
+  "change": {
+    "message": "Change"
+  },
+  "searchNotes": {
+    "message": "Search notes"
+  },
+  "allWorkspaces": {
+    "message": "All workspaces"
+  },
+  "notes": {
+    "message": "Notes"
+  },
+  "saveLink": {
+    "message": "Save link"
+  },
+  "saveLinkTitle": {
+    "message": "Save the page's address"
+  },
+  "screenshot": {
+    "message": "Screenshot"
+  },
+  "screenshotTitle": {
+    "message": "Save the link with a screenshot of the visible page"
+  },
+  "loadingNotes": {
+    "message": "Loading notes..."
+  },
+  "notesLoadFailed": {
+    "message": "Could not load the notes."
+  },
+  "noNoteMatches": {
+    "message": "No note matches."
+  },
+  "noNoteYet": {
+    "message": "No note yet."
+  },
+  "pageCannotBeSaved": {
+    "message": "This page cannot be saved."
+  },
+  "pickNote": {
+    "message": "Pick the note to add the page to."
+  },
+  "capturing": {
+    "message": "Capturing the page..."
+  },
+  "screenshotFailed": {
+    "message": "Screenshot failed: $1"
+  },
+  "addingTo": {
+    "message": "Adding to $1..."
+  },
+  "addedTo": {
+    "message": "Added to $1."
+  },
+  "open": {
+    "message": "Open"
+  },
+  "creatingNote": {
+    "message": "Creating the note..."
+  },
+  "untitledPage": {
+    "message": "Untitled page"
+  },
+  "noteCreated": {
+    "message": "Note created."
+  },
+  "optionsIntro": {
+    "message": "Save the pages you visit to your Poznote instance."
+  },
+  "connection": {
+    "message": "Connection"
+  },
+  "disconnect": {
+    "message": "Disconnect"
+  },
+  "poznoteAddress": {
+    "message": "Poznote address"
+  },
+  "username": {
+    "message": "Username"
+  },
+  "appPassword": {
+    "message": "App password"
+  },
+  "appPasswordHint": {
+    "message": "Create one in Poznote under $1. It reaches the API only and can be revoked at any time. Your account password works too."
+  },
+  "appPasswordsPath": {
+    "message": "Settings > My Account > App passwords"
+  },
+  "whereNewNotesGo": {
+    "message": "Where new notes go"
+  },
+  "workspace": {
+    "message": "Workspace"
+  },
+  "folder": {
+    "message": "Folder"
+  },
+  "footerConnected": {
+    "message": "You are all set: click the Poznote icon in the toolbar on any page to save it."
+  },
+  "footerNotConnected": {
+    "message": "Once connected, click the Poznote icon in the toolbar on any page to save it."
+  },
+  "saved": {
+    "message": "Saved"
+  },
+  "connectedAs": {
+    "message": "Connected as $1"
+  },
+  "wrongCredentials": {
+    "message": "Wrong username or password."
+  },
+  "unreachable": {
+    "message": "Could not reach $1. Check the address and that the instance is running."
+  },
+  "noInstance": {
+    "message": "No Poznote instance answers at $1. Check the address."
+  },
+  "loading": {
+    "message": "Loading..."
+  },
+  "noFolder": {
+    "message": "No folder"
+  },
+  "fillAddressFirst": {
+    "message": "Fill in your Poznote address first."
+  },
+  "fillAllFields": {
+    "message": "Fill in the address, your username and the app password."
+  },
+  "invalidAddress": {
+    "message": "This address is not valid."
+  },
+  "waitingAccess": {
+    "message": "Waiting for access to your instance..."
+  },
+  "accessDenied": {
+    "message": "The extension needs access to $1 to save pages. Click Connect again and choose Allow."
+  },
+  "checkingCredentials": {
+    "message": "Checking your credentials..."
+  },
+  "noAccount": {
+    "message": "No account named $1 on this instance."
+  },
+  "loadingWorkspaces": {
+    "message": "Loading your workspaces..."
+  },
+  "lostAccessOptions": {
+    "message": "The extension lost access to your instance. Click Connect to allow it again."
+  },
+  "errorStatus": {
+    "message": "Error $1: $2"
+  },
+  "untitled": {
+    "message": "Untitled"
+  },
+  "uploadFailed": {
+    "message": "Upload failed"
+  },
+  "unsupportedNoteType": {
+    "message": "Pages can only be added to HTML or Markdown notes."
+  },
+  "noteChanged": {
+    "message": "The note changed meanwhile, try again."
+  },
+  "noteKeepsChanging": {
+    "message": "The note keeps changing, try again in a moment."
+  },
+  "pageScreenshot": {
+    "message": "Page screenshot"
+  }
+}

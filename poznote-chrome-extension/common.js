@@ -111,6 +111,30 @@ function noteUrl(config, noteId) {
   return `${config.appUrl}/index.php?note=${encodeURIComponent(noteId)}`;
 }
 
+/**
+ * A sentence in the browser's language, from _locales/<lang>/messages.json
+ */
+function t(key, substitutions) {
+  return chrome.i18n.getMessage(key, substitutions) || key;
+}
+
+/**
+ * Translate the static texts of a page: data-i18n for the text,
+ * data-i18n-title, data-i18n-placeholder and data-i18n-aria-label for
+ * the attributes.
+ */
+function localizePage() {
+  document.documentElement.lang = chrome.i18n.getUILanguage();
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  ['title', 'placeholder', 'aria-label'].forEach(attribute => {
+    document.querySelectorAll(`[data-i18n-${attribute}]`).forEach(el => {
+      el.setAttribute(attribute, t(el.getAttribute(`data-i18n-${attribute}`)));
+    });
+  });
+}
+
 function escapeHtml(value) {
   return String(value)
     .replace(/&/g, '&amp;')
