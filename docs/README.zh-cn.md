@@ -53,8 +53,8 @@ https://demo.poznote.com
 [比较托管商](https://poznote.com/hosting.html)，或直接部署：
 
 <p>
-  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>
-  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="32"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Run on Caliber Node" height="44"></a>
+  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="44"></a>
 </p>
 
 ### 媒体报道
@@ -256,8 +256,8 @@ docker compose up -d
 不想自己管理服务器？托管商可以为你运行 Poznote 并保持在线。在[这里](https://poznote.com/hosting.html)查看可用的托管商以及如何选择。
 
 <p>
-  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>
-  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="32"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Run on Caliber Node" height="44"></a>
+  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="44"></a>
 </p>
 
 </details>

@@ -53,8 +53,8 @@ Ein Hosting-Anbieter kann Poznote für Sie betreiben.<br>
 [Anbieter vergleichen](https://poznote.com/hosting.html) oder direkt bereitstellen:
 
 <p>
-  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>
-  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="32"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Run on Caliber Node" height="44"></a>
+  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="44"></a>
 </p>
 
 ### Poznote in den Medien
@@ -256,8 +256,8 @@ docker compose up -d
 Sie möchten keinen Server verwalten? Ein Hosting-Anbieter kann Poznote für Sie betreiben und online halten. Die verfügbaren Anbieter und wie Sie zwischen ihnen wählen, finden Sie [hier](https://poznote.com/hosting.html).
 
 <p>
-  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Caliber Node" height="32"></a>
-  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="32"></a>
+  <a href="https://calibernode.com/cloud-apps/poznote"><img src="../images/run-on-calibernode.svg" alt="Run on Caliber Node" height="44"></a>
+  <a href="https://www.pikapods.com/pods?run=poznote"><img src="https://www.pikapods.com/static/run-button.svg" alt="Run on PikaPods" height="44"></a>
 </p>
 
 </details>
