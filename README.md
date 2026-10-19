@@ -49,7 +49,7 @@ https://demo.poznote.com
 
 ### Don't want to manage a server?
 
-A hosting company can run Poznote for you.<br>
+A hosting company can run Poznote for you.<br><br>
 [Compare the hosts](https://poznote.com/hosting.html) or deploy directly:
 
 <p>
