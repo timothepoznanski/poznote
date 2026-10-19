@@ -29,9 +29,6 @@
     var conversationId = ''; // names the conversation on the server
     var streaming = false;
     var abortController = null;
-    // The multi-workspace notice of the dashboard has been answered with
-    // Continue on this page: not asked again until the next load
-    var scopeAcknowledged = false;
 
     var STORAGE_KEY = 'poznote-ai-chat-conversation'; // legacy, see restoreConversation()
     var CURRENT_KEY = 'poznote-ai-chat-current';      // sessionStorage: id of the tab's conversation
@@ -64,6 +61,22 @@
             if (workspaceName) ws = workspaceName.getAttribute('data-fallback') || '';
         }
         return ws;
+    }
+
+    /**
+     * The workspaces of a dashboard showing several (body[data-ai-workspaces],
+     * discussion #1652): the assistant searches and reads all of them and
+     * changes nothing. Empty everywhere else.
+     */
+    function readOnlyWorkspaces() {
+        var raw = document.body ? document.body.getAttribute('data-ai-workspaces') : '';
+        if (!raw) return [];
+        try {
+            var list = JSON.parse(raw);
+            return Array.isArray(list) ? list : [];
+        } catch (e) {
+            return [];
+        }
     }
 
     /**
@@ -121,7 +134,7 @@
      */
     function updateWorkspaceIndicator() {
         var nameEl = document.getElementById('ai-chat-workspace-name');
-        if (!nameEl) return;
+        if (!nameEl || readOnlyWorkspaces().length) return;
         var ws = currentWorkspace() || nameEl.getAttribute('data-fallback') || '';
         nameEl.textContent = ws;
         var box = document.getElementById('ai-chat-workspace');
@@ -812,45 +825,38 @@
         }
     }
 
+    /**
+     * The icons of the workspace line open #aiChatWorkspaceInfoModal
+     * (ai_chat_panel.php), which says how to search several workspaces at
+     * once: from a dashboard showing them. Close, the backdrop and Escape
+     * close it.
+     */
+    function workspaceInfoModal() {
+        return document.getElementById('aiChatWorkspaceInfoModal');
+    }
+
+    function setWorkspaceInfoOpen(open) {
+        var modal = workspaceInfoModal();
+        if (!modal) return;
+        modal.style.display = open ? 'flex' : 'none';
+        if (open) {
+            var btn = modal.querySelector('.modal-buttons .btn-primary') || modal.querySelector('.modal-buttons button');
+            if (btn) btn.focus();
+        }
+    }
+
+    function isWorkspaceInfoOpen() {
+        var modal = workspaceInfoModal();
+        return !!modal && modal.style.display === 'flex';
+    }
+
     function toggle() {
         var open = !isOpen();
-        if (open && askScope()) return;
         setOpen(open);
         if (open) {
             var input = document.getElementById('ai-chat-input');
             if (input && isDesktop()) input.focus();
         }
-    }
-
-    /**
-     * dashboard.php renders #aiChatScopeModal when the board shows several
-     * workspaces: the assistant only ever acts on one, so the first click on
-     * the rail button says which one and asks whether to go on. Continue
-     * opens the panel (and stops asking for the rest of the page), Cancel,
-     * the backdrop and Escape leave it closed. Returns true when the notice
-     * took the click.
-     */
-    function scopeModal() {
-        return document.getElementById('aiChatScopeModal');
-    }
-
-    function askScope() {
-        var modal = scopeModal();
-        if (!modal || scopeAcknowledged) return false;
-        modal.style.display = 'flex';
-        var btn = modal.querySelector('[data-action="ai-chat-scope-continue"]');
-        if (btn) btn.focus();
-        return true;
-    }
-
-    function closeScopeModal() {
-        var modal = scopeModal();
-        if (modal) modal.style.display = 'none';
-    }
-
-    function isScopeModalOpen() {
-        var modal = scopeModal();
-        return !!modal && modal.style.display === 'flex';
     }
 
     /**
@@ -906,8 +912,13 @@
         el.innerHTML = '';
         var hint = document.createElement('div');
         hint.className = 'ai-chat-empty';
-        var text = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, edit, organize and delete your notes.');
-        if (currentNoteId()) {
+        var text;
+        if (readOnlyWorkspaces().length) {
+            text = t('ai_chat.empty_read_only', {}, 'Ask a question.\nThe assistant searches and reads the notes of every workspace shown on this dashboard, but changes nothing here.');
+        } else {
+            text = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, edit, organize and delete your notes.');
+        }
+        if (currentNoteId() && !readOnlyWorkspaces().length) {
             text += '\n' + t('ai_chat.empty_open_note', {}, 'Say "this note" for the one you have open.');
         }
         hint.textContent = text;
@@ -970,6 +981,10 @@
         var workspace = currentWorkspace();
         if (workspace) {
             body.workspace = workspace;
+        }
+        var workspaces = readOnlyWorkspaces();
+        if (workspaces.length) {
+            body.workspaces = workspaces;
         }
         updateContextIndicator();
         var openNoteId = currentNoteId();
@@ -1131,22 +1146,22 @@
                 toggleExternalTools();
                 return;
             }
-            var scopeBtn = e.target.closest('[data-action="ai-chat-scope-continue"], [data-action="ai-chat-scope-cancel"]');
-            if (scopeBtn) {
+            if (e.target.closest('[data-action="ai-chat-workspace-info"]')) {
                 e.preventDefault();
-                closeScopeModal();
-                if (scopeBtn.getAttribute('data-action') === 'ai-chat-scope-continue') {
-                    scopeAcknowledged = true;
-                    toggle();
-                }
+                setWorkspaceInfoOpen(true);
                 return;
             }
-            if (e.target === scopeModal()) {
-                closeScopeModal();
+            if (e.target.closest('[data-action="ai-chat-workspace-info-close"]') || e.target === workspaceInfoModal()) {
+                setWorkspaceInfoOpen(false);
+                return;
+            }
+            if (e.target.closest('[data-action="ai-chat-open-dashboard"]')) {
+                e.preventDefault();
+                window.location.href = 'dashboard.php';
             }
         });
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && isScopeModalOpen()) closeScopeModal();
+            if (e.key === 'Escape' && isWorkspaceInfoOpen()) setWorkspaceInfoOpen(false);
         });
 
         if (window.PoznotePanelBack) {

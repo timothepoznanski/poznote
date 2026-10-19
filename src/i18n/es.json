@@ -4810,9 +4810,6 @@
     "tool_checklist": "Actualizando una casilla de la nota #{{id}}",
     "tool_delete": "Moviendo la nota #{{id}} a la papelera",
     "tool_delete_folder": "Moviendo la carpeta «{{folder}}» y sus notas a la papelera",
-    "scope_modal_title": "Un espacio de trabajo cada vez",
-    "scope_modal_text": "El asistente no puede actuar sobre varios espacios de trabajo a la vez. Aquí solo buscará, leerá y modificará las notas del espacio de trabajo «{{workspace}}».",
-    "scope_modal_continue": "Continuar",
     "external_tools": "Herramientas externas",
     "external_tools_on": "Las herramientas externas están activadas: el asistente puede llamar a {{servers}}. Haz clic para desactivarlas.",
     "external_tools_off": "Las herramientas externas están desactivadas. Haz clic para permitir que el asistente llame a {{servers}}.",
@@ -4823,7 +4820,15 @@
     "history": "Conversaciones anteriores",
     "history_empty": "Aún no hay conversaciones.",
     "delete_chat": "Borrar esta conversación",
-    "history_error": "No se pudieron cargar las conversaciones."
+    "history_error": "No se pudieron cargar las conversaciones.",
+    "workspaces_label": "Espacios de trabajo:",
+    "read_only": "(solo lectura)",
+    "empty_read_only": "Haz una pregunta.\nEl asistente busca y lee las notas de todos los espacios de trabajo de este panel, pero aquí no cambia nada.",
+    "workspace_info": "Buscar en varios espacios de trabajo",
+    "open_dashboard": "Abrir el panel",
+    "workspace_info_text_notes": "Aquí el asistente trabaja solo en el espacio de trabajo actual. Para buscar en varios espacios de trabajo a la vez, abre el panel y selecciónalos en el menú de arriba: el asistente busca y lee entonces en todos, en solo lectura.",
+    "workspace_info_text_dashboard": "Aquí el asistente trabaja solo en este espacio de trabajo. Selecciona varios espacios de trabajo en el menú de arriba del panel: el asistente busca y lee entonces en todos a la vez, en solo lectura.",
+    "workspace_info_text_multi": "El asistente busca y lee las notas de todos los espacios de trabajo de este panel. Aquí no cambia nada: para editar una nota, ábrela o abre su espacio de trabajo y pídelo allí. El menú de arriba del panel elige los espacios de trabajo."
   },
   "stt_settings": {
     "title": "Transcripción",

@@ -4466,9 +4466,6 @@
     "tool_checklist": "노트 #{{id}} 확인란 업데이트",
     "tool_delete": "노트 #{{id}}를 휴지통으로 이동",
     "tool_delete_folder": "폴더 \"{{folder}}\" 및 해당 노트를 휴지통으로 이동",
-    "scope_modal_title": "한 번에 하나의 작업 공간",
-    "scope_modal_text": "어시스턴트는 한 번에 여러 작업 공간에 대해 작업을 수행할 수 없습니다. 여기서는 작업 공간 \"{{workspace}}\"의 노트만 검색하고 읽고 변경합니다.",
-    "scope_modal_continue": "계속",
     "external_tools": "외부 도구",
     "external_tools_on": "외부 도구가 켜져 있습니다. 어시스턴트가 {{servers}}을(를) 호출할 수 있습니다. 끄려면 클릭하세요.",
     "external_tools_off": "외부 도구가 꺼져 있습니다. 어시스턴트가 {{servers}}을(를) 호출하도록 허용하려면 클릭하세요.",
@@ -4479,7 +4476,15 @@
     "history": "이전 대화",
     "history_empty": "아직 대화가 없습니다.",
     "delete_chat": "이 대화 삭제",
-    "history_error": "대화를 불러올 수 없습니다."
+    "history_error": "대화를 불러올 수 없습니다.",
+    "workspaces_label": "작업 공간:",
+    "read_only": "(읽기 전용)",
+    "empty_read_only": "질문을 입력하세요.\n어시스턴트는 이 대시보드에 표시된 모든 작업 공간의 노트를 검색하고 읽지만, 여기서는 아무것도 변경하지 않습니다.",
+    "workspace_info": "여러 작업 공간 검색",
+    "open_dashboard": "대시보드 열기",
+    "workspace_info_text_notes": "여기서 어시스턴트는 현재 작업 공간에서만 작업합니다. 여러 작업 공간을 한 번에 검색하려면 대시보드를 열고 상단 메뉴에서 선택하세요. 그러면 어시스턴트가 모두를 읽기 전용으로 검색하고 읽습니다.",
+    "workspace_info_text_dashboard": "여기서 어시스턴트는 이 작업 공간에서만 작업합니다. 대시보드 상단 메뉴에서 여러 작업 공간을 선택하면 어시스턴트가 모두를 한 번에 읽기 전용으로 검색하고 읽습니다.",
+    "workspace_info_text_multi": "어시스턴트는 이 대시보드에 표시된 모든 작업 공간의 노트를 검색하고 읽습니다. 여기서는 아무것도 변경하지 않습니다. 노트를 수정하려면 노트나 그 작업 공간을 열고 그곳에서 요청하세요. 작업 공간은 대시보드 상단 메뉴에서 선택합니다."
   },
   "stt_settings": {
     "title": "음성 텍스트 변환",

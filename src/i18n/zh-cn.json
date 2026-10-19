@@ -4906,9 +4906,6 @@
     "tool_checklist": "正在更新笔记 #{{id}} 中的复选框",
     "tool_delete": "正在将笔记 #{{id}} 移到回收站",
     "tool_delete_folder": "正在将文件夹“{{folder}}”及其笔记移到回收站",
-    "scope_modal_title": "一次一个工作区",
-    "scope_modal_text": "助手无法同时处理多个工作区。在这里，它只会搜索、读取和修改工作区“{{workspace}}”中的笔记。",
-    "scope_modal_continue": "继续",
     "external_tools": "外部工具",
     "external_tools_on": "外部工具已开启：助手可以调用 {{servers}}。点击以关闭。",
     "external_tools_off": "外部工具已关闭。点击以允许助手调用 {{servers}}。",
@@ -4919,7 +4916,15 @@
     "history": "历史对话",
     "history_empty": "暂无对话。",
     "delete_chat": "删除此对话",
-    "history_error": "无法加载对话。"
+    "history_error": "无法加载对话。",
+    "workspaces_label": "工作区：",
+    "read_only": "（只读）",
+    "empty_read_only": "提出问题。\n助手会搜索和阅读此仪表板上所有工作区的笔记，但在这里不做任何修改。",
+    "workspace_info": "在多个工作区中搜索",
+    "open_dashboard": "打开仪表板",
+    "workspace_info_text_notes": "在这里，助手只在当前工作区中工作。要同时搜索多个工作区，请打开仪表板并在顶部菜单中选择它们：助手随后会以只读方式搜索和阅读所有这些工作区。",
+    "workspace_info_text_dashboard": "在这里，助手只在此工作区中工作。在仪表板顶部菜单中选择多个工作区：助手随后会以只读方式同时搜索和阅读所有这些工作区。",
+    "workspace_info_text_multi": "助手会搜索和阅读此仪表板上所有工作区的笔记。它在这里不做任何修改：要编辑笔记，请打开该笔记或其工作区后再提出请求。仪表板顶部的菜单用于选择工作区。"
   },
   "stt_settings": {
     "title": "转录",

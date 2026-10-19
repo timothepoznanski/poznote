@@ -4809,9 +4809,6 @@
     "tool_checklist": "Kontrollkästchen in Notiz #{{id}} wird aktualisiert",
     "tool_delete": "Notiz #{{id}} wird in den Papierkorb verschoben",
     "tool_delete_folder": "Ordner „{{folder}}“ und seine Notizen werden in den Papierkorb verschoben",
-    "scope_modal_title": "Ein Arbeitsbereich nach dem anderen",
-    "scope_modal_text": "Der Assistent kann nicht in mehreren Arbeitsbereichen gleichzeitig arbeiten. Hier sucht, liest und ändert er nur die Notizen des Arbeitsbereichs „{{workspace}}“.",
-    "scope_modal_continue": "Weiter",
     "external_tools": "Externe Tools",
     "external_tools_on": "Externe Tools sind eingeschaltet: Der Assistent darf {{servers}} aufrufen. Klicken, um sie auszuschalten.",
     "external_tools_off": "Externe Tools sind ausgeschaltet. Klicken, damit der Assistent {{servers}} aufrufen darf.",
@@ -4822,7 +4819,15 @@
     "history": "Frühere Unterhaltungen",
     "history_empty": "Noch keine Unterhaltung.",
     "delete_chat": "Diese Unterhaltung löschen",
-    "history_error": "Die Unterhaltungen konnten nicht geladen werden."
+    "history_error": "Die Unterhaltungen konnten nicht geladen werden.",
+    "workspaces_label": "Arbeitsbereiche:",
+    "read_only": "(nur lesen)",
+    "empty_read_only": "Stellen Sie eine Frage.\nDer Assistent durchsucht und liest die Notizen aller Arbeitsbereiche dieses Dashboards, ändert hier aber nichts.",
+    "workspace_info": "Mehrere Arbeitsbereiche durchsuchen",
+    "open_dashboard": "Dashboard öffnen",
+    "workspace_info_text_notes": "Hier arbeitet der Assistent nur im aktuellen Arbeitsbereich. Um mehrere Arbeitsbereiche auf einmal zu durchsuchen, öffnen Sie das Dashboard und wählen Sie sie im Menü oben aus: Der Assistent durchsucht und liest dann alle, nur lesend.",
+    "workspace_info_text_dashboard": "Hier arbeitet der Assistent nur in diesem Arbeitsbereich. Wählen Sie im Menü oben im Dashboard mehrere Arbeitsbereiche aus: Der Assistent durchsucht und liest dann alle auf einmal, nur lesend.",
+    "workspace_info_text_multi": "Der Assistent durchsucht und liest die Notizen aller Arbeitsbereiche dieses Dashboards. Er ändert hier nichts: Um eine Notiz zu bearbeiten, öffnen Sie sie oder ihren Arbeitsbereich und fragen Sie dort. Das Menü oben im Dashboard legt die Arbeitsbereiche fest."
   },
   "stt_settings": {
     "title": "Transkription",

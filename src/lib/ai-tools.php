@@ -687,6 +687,28 @@ function aiReadOnlyToolNames(): array
 }
 
 /**
+ * The workspaces a read tool looks in. A chat is scoped to one workspace,
+ * passed as its name. A dashboard showing several (discussion #1652) passes
+ * their list instead, which only the read tools accept (aiExecuteTool()).
+ */
+function aiReadScope($chatWorkspace): array
+{
+    return is_array($chatWorkspace) ? array_values(array_map('strval', $chatWorkspace)) : [(string)$chatWorkspace];
+}
+
+/** "workspace IN (?, ?)" for a list from aiReadScope(), bound with that list. */
+function aiWorkspaceInSql(array $workspaces): string
+{
+    return 'workspace IN (' . implode(', ', array_fill(0, count($workspaces), '?')) . ')';
+}
+
+/** Where a read tool did not find something, for its error message. */
+function aiReadScopeLabel(array $workspaces): string
+{
+    return count($workspaces) > 1 ? 'the workspaces shown on this dashboard' : 'the current workspace';
+}
+
+/**
  * Dispatches one tool call from the assistant.
  *
  * This used to be a single 760-line function: 22 `if ($name === ...)` branches
@@ -701,6 +723,18 @@ function aiExecuteTool($con, $name, $args, $chatWorkspace)
     if (!isset($handlers[$name])) {
         return json_encode(['error' => 'Unknown tool: ' . $name]);
     }
+    // Several workspaces make a read-only chat: every write tool takes one
+    // workspace, and api_ai_chat.php does not even offer them to such a chat
+    if (is_array($chatWorkspace)) {
+        if ($chatWorkspace === []) {
+            return json_encode(['error' => 'No workspace to look in']);
+        }
+        if (count($chatWorkspace) === 1) {
+            $chatWorkspace = (string)reset($chatWorkspace);
+        } elseif (!in_array($name, aiReadOnlyToolNames(), true)) {
+            return json_encode(['error' => 'This conversation is read-only: it covers several workspaces, so notes can be searched and read but not changed. Tell the user to open the note or its workspace and ask there.']);
+        }
+    }
 
     return $handlers[$name]($con, $args, $chatWorkspace, $actorUserId);
 }
@@ -713,15 +747,16 @@ function aiToolSearchNotes($con, array $args, $chatWorkspace, $actorUserId): str
         return json_encode(['error' => 'query is required']);
     }
     $limit = max(1, min(20, intval($args['limit'] ?? 8)));
+    $scope = aiReadScope($chatWorkspace);
 
     $sql = "SELECT id, heading, folder, workspace, tags, updated, search_clean_entry(entry, type) AS content
             FROM entries
             WHERE trash = 0
-              AND workspace = ?
+              AND " . aiWorkspaceInSql($scope) . "
               AND (remove_accents(heading) LIKE remove_accents(?)
                    OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))
             ORDER BY updated DESC LIMIT " . $limit;
-    $params = [$chatWorkspace, '%' . $query . '%', '%' . $query . '%'];
+    $params = array_merge($scope, ['%' . $query . '%', '%' . $query . '%']);
     $stmt = $con->prepare($sql);
     $stmt->execute($params);
 
@@ -750,9 +785,13 @@ function aiToolSearchNotes($con, array $args, $chatWorkspace, $actorUserId): str
 /** Tool `get_note`. */
 function aiToolGetNote($con, array $args, $chatWorkspace, $actorUserId): string
 {
-    $note = aiReadNote($con, intval($args['note_id'] ?? 0), AI_NOTE_READ_LIMIT, $chatWorkspace);
+    $scope = aiReadScope($chatWorkspace);
+    $note = aiReadNote($con, intval($args['note_id'] ?? 0), AI_NOTE_READ_LIMIT, count($scope) === 1 ? $scope[0] : '');
+    if ($note !== null && !in_array($note['workspace'], $scope, true)) {
+        $note = null;
+    }
     if ($note === null) {
-        return json_encode(['error' => 'Note not found in the current workspace']);
+        return json_encode(['error' => 'Note not found in ' . aiReadScopeLabel($scope)]);
     }
     return json_encode($note, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 }
@@ -761,19 +800,26 @@ function aiToolGetNote($con, array $args, $chatWorkspace, $actorUserId): string
 function aiToolListRecentNotes($con, array $args, $chatWorkspace, $actorUserId): string
 {
     $limit = max(1, min(50, intval($args['limit'] ?? 20)));
-    $sql = 'SELECT id, heading, type, tags, folder_id, workspace, updated, favorite FROM entries WHERE trash = 0 AND workspace = ?';
-    $params = [$chatWorkspace];
+    $scope = aiReadScope($chatWorkspace);
+    $sql = 'SELECT id, heading, type, tags, folder_id, workspace, updated, favorite FROM entries WHERE trash = 0 AND ' . aiWorkspaceInSql($scope);
+    $params = $scope;
     if (!empty($args['favorites_only'])) {
         $sql .= ' AND favorite = 1';
     }
     $folderFilter = $args['folder'] ?? null;
     if ($folderFilter !== null && trim((string)$folderFilter) !== '') {
-        $folder = aiResolveFolder($con, $chatWorkspace, $folderFilter);
-        if ($folder === null) {
-            return json_encode(['error' => 'Folder not found in the current workspace: ' . $folderFilter . '. Call list_folders to see the existing ones.'], JSON_UNESCAPED_UNICODE);
+        // Across several workspaces, the folder of that path in each of them
+        $folderIds = [];
+        foreach ($scope as $scopeWorkspace) {
+            $folder = aiResolveFolder($con, $scopeWorkspace, $folderFilter);
+            if ($folder !== null) {
+                $folderIds[] = (int)$folder['id'];
+            }
         }
-        $sql .= ' AND folder_id = ?';
-        $params[] = (int)$folder['id'];
+        if ($folderIds === []) {
+            return json_encode(['error' => 'Folder not found in ' . aiReadScopeLabel($scope) . ': ' . $folderFilter . '. Call list_folders to see the existing ones.'], JSON_UNESCAPED_UNICODE);
+        }
+        $sql .= ' AND folder_id IN (' . implode(', ', $folderIds) . ')';
     }
     $tagFilter = mb_strtolower(trim((string)($args['tag'] ?? '')));
     $sql .= ' ORDER BY updated DESC';
@@ -1061,8 +1107,9 @@ function aiToolUpdateNoteTags($con, array $args, $chatWorkspace, $actorUserId): 
 /** Tool `list_tags`. */
 function aiToolListTags($con, array $args, $chatWorkspace, $actorUserId): string
 {
-    $stmt = $con->prepare("SELECT tags FROM entries WHERE trash = 0 AND workspace = ? AND tags IS NOT NULL AND tags != ''");
-    $stmt->execute([$chatWorkspace]);
+    $scope = aiReadScope($chatWorkspace);
+    $stmt = $con->prepare("SELECT tags FROM entries WHERE trash = 0 AND " . aiWorkspaceInSql($scope) . " AND tags IS NOT NULL AND tags != ''");
+    $stmt->execute($scope);
     $counts = [];
     $names = [];
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -1083,7 +1130,18 @@ function aiToolListTags($con, array $args, $chatWorkspace, $actorUserId): string
 /** Tool `list_folders`. */
 function aiToolListFolders($con, array $args, $chatWorkspace, $actorUserId): string
 {
-    $folders = aiListFolders($con, $chatWorkspace);
+    $scope = aiReadScope($chatWorkspace);
+    if (count($scope) === 1) {
+        $folders = aiListFolders($con, $scope[0]);
+    } else {
+        // The same path may exist in several workspaces: each folder says whose it is
+        $folders = [];
+        foreach ($scope as $scopeWorkspace) {
+            foreach (aiListFolders($con, $scopeWorkspace) as $folder) {
+                $folders[] = $folder + ['workspace' => $scopeWorkspace];
+            }
+        }
+    }
     return json_encode(['count' => count($folders), 'folders' => $folders], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 }
 

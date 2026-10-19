@@ -4466,9 +4466,6 @@
     "tool_checklist": "Updating a checkbox of note #{{id}}",
     "tool_delete": "Moving note #{{id}} to the trash",
     "tool_delete_folder": "Moving folder \"{{folder}}\" and its notes to the trash",
-    "scope_modal_title": "One workspace at a time",
-    "scope_modal_text": "The assistant cannot act on several workspaces at once. Here it will only search, read and change the notes of the workspace \"{{workspace}}\".",
-    "scope_modal_continue": "Continue",
     "external_tools": "External tools",
     "external_tools_on": "External tools are on: the assistant may call {{servers}}. Click to turn them off.",
     "external_tools_off": "External tools are off. Click to let the assistant call {{servers}}.",
@@ -4479,7 +4476,15 @@
     "history": "Previous conversations",
     "history_empty": "No conversation yet.",
     "delete_chat": "Delete this conversation",
-    "history_error": "The conversations could not be loaded."
+    "history_error": "The conversations could not be loaded.",
+    "workspaces_label": "Workspaces:",
+    "read_only": "(read only)",
+    "empty_read_only": "Ask a question.\nThe assistant searches and reads the notes of every workspace shown on this dashboard, but changes nothing here.",
+    "workspace_info": "Search several workspaces",
+    "open_dashboard": "Open the dashboard",
+    "workspace_info_text_notes": "Here the assistant works in the current workspace only. To search several workspaces at once, open the dashboard and select them in the menu at the top: the assistant then searches and reads all of them, read only.",
+    "workspace_info_text_dashboard": "Here the assistant works in this workspace only. Select several workspaces in the menu at the top of the dashboard: the assistant then searches and reads all of them at once, read only.",
+    "workspace_info_text_multi": "The assistant searches and reads the notes of every workspace shown on this dashboard. It changes nothing here: to edit a note, open it or its workspace and ask there. The menu at the top of the dashboard chooses the workspaces."
   },
   "stt_settings": {
     "title": "Transcription",

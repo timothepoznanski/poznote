@@ -463,6 +463,24 @@ a.ai-chat-header-btn {
     padding-bottom: 4px;
 }
 
+/* The workspace and info icons of the workspace line: both open the
+   note on searching several workspaces (#aiChatWorkspaceInfoModal) */
+.ai-chat-context-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.ai-chat-context-btn:hover,
+.ai-chat-context-btn:focus-visible {
+    color: var(--pz-text);
+}
+
 /* Input bar */
 .ai-chat-inputbar {
     flex-shrink: 0;

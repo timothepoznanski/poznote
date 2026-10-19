@@ -15,7 +15,9 @@
  * Scope: the current user (their own database is the only one opened) and
  * the workspace the chat was opened in. The workspace restriction is enforced
  * server-side in every tool, it is not left to the model: notes from other
- * workspaces are neither searched, listed, read nor modified.
+ * workspaces are neither searched, listed, read nor modified. A dashboard
+ * showing several workspaces sends their list (discussion #1652): the chat
+ * then searches and reads all of them and is offered no write tool.
  *
  * External tools (discussion #1611): when the administrator allows it, the
  * tools of the MCP servers connected in the settings are offered to the model
@@ -24,7 +26,7 @@
  *
  * Actions:
  *   POST ?action=chat  JSON {messages: [{role, content}...], note_id?, workspace?,
- *                      external_tools?: bool}
+ *                      workspaces?: [name...], external_tools?: bool}
  *                      → SSE stream (OpenAI chat.completion.chunk passthrough,
  *                        plus {"poznote_tool": ...} status events,
  *                        {"poznote_notice": ...} when tools had to be left
@@ -261,6 +263,31 @@ function aiChatWorkspace(PDO $con, $requested): string {
         }
     }
     return $workspace !== '' ? $workspace : (string)getFirstWorkspaceName();
+}
+
+/**
+ * The workspaces of a dashboard showing several (discussion #1652), which
+ * the chat searches and reads all at once, changing nothing. Names that no
+ * longer exist are dropped; fewer than two left, or a session confined to a
+ * workspace shared with the user, and the chat keeps its one workspace.
+ */
+function aiChatReadWorkspaces(PDO $con, $requested): array {
+    if (!is_array($requested) || (function_exists('getSharedWorkspaceScopeName') && getSharedWorkspaceScopeName() !== null)) {
+        return [];
+    }
+    $wanted = [];
+    foreach ($requested as $name) {
+        if (is_string($name) && trim($name) !== '') {
+            $wanted[trim($name)] = true;
+        }
+    }
+    $workspaces = [];
+    foreach ($con->query('SELECT name FROM workspaces')->fetchAll(PDO::FETCH_COLUMN) as $name) {
+        if (isset($wanted[(string)$name])) {
+            $workspaces[] = (string)$name;
+        }
+    }
+    return count($workspaces) > 1 ? $workspaces : [];
 }
 
 $isPost = ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST';
@@ -783,6 +810,23 @@ if ($aiDisabledTools !== []) {
     }));
 }
 
+// A dashboard showing several workspaces makes the chat read-only: the read
+// tools look in all of them, the write tools are not offered at all
+$aiReadWorkspaces = aiChatReadWorkspaces($con, $input['workspaces'] ?? null);
+if ($aiReadWorkspaces !== []) {
+    $aiTools = array_values(array_filter($aiTools, function (array $tool): bool {
+        return in_array($tool['function']['name'], aiReadOnlyToolNames(), true);
+    }));
+    foreach ($aiTools as &$aiReadTool) {
+        $aiReadTool['function']['description'] = str_replace(
+            ['in the current workspace', 'of the current workspace'],
+            ['in the workspaces of this conversation', 'of the workspaces of this conversation'],
+            $aiReadTool['function']['description']
+        );
+    }
+    unset($aiReadTool);
+}
+
 // External tools, when the panel asks for them (its globe button)
 $aiMcpServers = !empty($input['external_tools']) ? poznoteAiMcpServersForChat($con, $aiUserId) : [];
 $aiMcp = aiMcpChatTools($aiMcpServers);
@@ -856,17 +900,30 @@ try {
 // The chat is scoped to the workspace it was opened in, see aiChatWorkspace().
 // It is passed to every tool: the model cannot widen the scope.
 $workspace = aiChatWorkspace($con, $input['workspace'] ?? '');
-$system .= "\n\nThe user is currently in the workspace \"" . $workspace . '". '
-    . 'All tools are restricted to this workspace: notes from other workspaces '
-    . 'are not searchable, readable or editable from this conversation. '
-    . 'If the user asks about another workspace, tell them to switch to it first.';
+if ($aiReadWorkspaces !== []) {
+    $system .= "\n\nThe user is on a dashboard showing several workspaces: "
+        . implode(', ', array_map(fn($name) => json_encode($name, JSON_UNESCAPED_UNICODE), $aiReadWorkspaces)) . '. '
+        . 'Your tools search and read the notes of all of them, and every result says which workspace '
+        . 'a note belongs to: name it when it helps the user find the note. '
+        . 'This conversation is read-only. You have no tool to create, edit, organize or delete '
+        . 'anything here, so the instructions above about changing notes do not apply. When the user '
+        . 'asks for a change, do not write the new version in the chat as if it were applied: say that '
+        . 'the assistant can only search and read on a dashboard showing several workspaces, and that '
+        . 'they can open the note, or a dashboard of its workspace alone, and ask there.';
+} else {
+    $system .= "\n\nThe user is currently in the workspace \"" . $workspace . '". '
+        . 'All tools are restricted to this workspace: notes from other workspaces '
+        . 'are not searchable, readable or editable from this conversation. '
+        . 'If the user asks about another workspace, tell them to switch to it first.';
+}
 
 // The note the user has open in the editor, sent by the chat panel on every
 // message so "improve this note" needs no id. It is only a default target:
 // the tools stay free to use any other note of the workspace, and an id that
 // points to a trashed note or to another workspace is ignored.
+// A read-only chat has no use for it: it is there to be changed.
 $openNoteId = isset($input['note_id']) ? intval($input['note_id']) : 0;
-if ($openNoteId > 0) {
+if ($openNoteId > 0 && $aiReadWorkspaces === []) {
     $openStmt = $con->prepare('SELECT id, heading, folder FROM entries WHERE id = ? AND workspace = ? AND trash = 0');
     $openStmt->execute([$openNoteId, $workspace]);
     $openNote = $openStmt->fetch(PDO::FETCH_ASSOC);
@@ -1246,7 +1303,7 @@ for ($round = 0; $round < $maxRounds; $round++) {
         } elseif (in_array($toolName, $aiDisabledTools, true)) {
             $result = json_encode(['error' => 'The user turned this tool off in the AI Assistant settings.']);
         } else {
-            $result = aiExecuteTool($con, $toolName, $args, $workspace);
+            $result = aiExecuteTool($con, $toolName, $args, $aiReadWorkspaces !== [] ? $aiReadWorkspaces : $workspace);
         }
         $messages[] = [
             'role' => 'tool',
