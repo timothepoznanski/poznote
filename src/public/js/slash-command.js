@@ -4258,6 +4258,7 @@
 
         document.body.appendChild(slashMenuElement);
         positionMenuAtRect(anchorRect || getSelectionSlashAnchorRect(context));
+        trackSlashMenuForBackButton();
 
         requestAnimationFrame(() => {
             if (slashMenuElement) slashMenuElement.classList.add('show');
@@ -4622,6 +4623,37 @@
         }
     }
 
+    // Beside the item it opens from on a computer. On a phone there is no
+    // room beside it: the submenu takes the place of its menu, Back row on
+    // top, and the menu under it is hidden until it closes (issue #1658)
+    function positionSubmenu(element, parentItem) {
+        const parentRect = parentItem.getBoundingClientRect();
+        const submenuRect = element.getBoundingClientRect();
+        const parentMenu = parentItem.closest('.slash-command-menu');
+
+        const padding = 8;
+        let x = parentRect.right + 4;
+        let y = parentRect.top;
+
+        if (window.innerWidth < 768 && parentMenu) {
+            const parentMenuRect = parentMenu.getBoundingClientRect();
+            x = parentMenuRect.left;
+            y = parentMenuRect.top;
+            parentMenu.classList.add('slash-command-covered');
+        } else if (x + submenuRect.width > window.innerWidth - padding) {
+            // If overflows to the right, display to the left
+            x = parentRect.left - submenuRect.width - 4;
+        }
+
+        // If overflows at the bottom
+        if (y + submenuRect.height > window.innerHeight - padding) {
+            y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
+        }
+
+        element.style.left = Math.max(padding, x) + 'px';
+        element.style.top = Math.max(padding, y) + 'px';
+    }
+
     // Hide and cleanup sub-submenu (level 3)
     function hideSubSubmenu() {
         if (!subSubmenuElement) return;
@@ -4645,6 +4677,7 @@
         subSubmenuElement = null;
         currentSubSubmenu = null;
         selectedSubSubmenuIndex = 0;
+        if (submenuElement) submenuElement.classList.remove('slash-command-covered');
     }
 
     // Hide and cleanup submenu (level 2)
@@ -4673,6 +4706,7 @@
         submenuElement = null;
         currentSubmenu = null;
         selectedSubmenuIndex = 0;
+        if (slashMenuElement) slashMenuElement.classList.remove('slash-command-covered');
     }
 
     // Hide slash menu and all its submenus
@@ -4711,6 +4745,30 @@
         slashInsertedByButton = false;
         slashMenuAnchorRect = null;
         resetCodeMirrorSlashState();
+
+        // Deferred: a menu reopened right away (a new '/') keeps the history
+        // entry pushed for this one
+        if (window.PoznotePanelBack) setTimeout(() => window.PoznotePanelBack.closed(), 0);
+    }
+
+    // Phone: the device Back button closes the menu, or the submenu shown over
+    // it, instead of leaving the page (js/panel-back.js, issue #1658)
+    function closeSlashMenuFromBackButton() {
+        if (subSubmenuElement) {
+            hideSubSubmenu();
+            return;
+        }
+        if (submenuElement) {
+            hideSubmenu();
+            return;
+        }
+        removeButtonSlash(false);
+        hideSlashMenu();
+        savedNoteEntry = null;
+    }
+
+    function trackSlashMenuForBackButton() {
+        if (window.PoznotePanelBack) window.PoznotePanelBack.opened();
     }
 
     // The menu opens with the keyboard still up, then closes it: on Android
@@ -4840,6 +4898,7 @@
 
         slashMenuElement.style.left = x + 'px';
         slashMenuElement.style.top = y + 'px';
+        trackSlashMenuForBackButton();
 
         requestAnimationFrame(() => {
             if (slashMenuElement) slashMenuElement.classList.add('show');
@@ -4945,27 +5004,7 @@
         submenuElement.innerHTML = buildSubmenuHTML(cmd.submenu, cmd.id);
 
         document.body.appendChild(submenuElement);
-
-        // Position to the right of parent item
-        const parentRect = parentItem.getBoundingClientRect();
-        const submenuRect = submenuElement.getBoundingClientRect();
-
-        const padding = 8;
-        let x = parentRect.right + 4;
-        let y = parentRect.top;
-
-        // If overflows to the right, display to the left
-        if (x + submenuRect.width > window.innerWidth - padding) {
-            x = parentRect.left - submenuRect.width - 4;
-        }
-
-        // If overflows at the bottom
-        if (y + submenuRect.height > window.innerHeight - padding) {
-            y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
-        }
-
-        submenuElement.style.left = Math.max(padding, x) + 'px';
-        submenuElement.style.top = Math.max(padding, y) + 'px';
+        positionSubmenu(submenuElement, parentItem);
 
         requestAnimationFrame(() => {
             if (submenuElement) submenuElement.classList.add('show');
@@ -4996,27 +5035,7 @@
         subSubmenuElement.innerHTML = buildSubSubmenuHTML(item.submenu);
 
         document.body.appendChild(subSubmenuElement);
-
-        // Position to the right of parent item
-        const parentRect = parentItem.getBoundingClientRect();
-        const submenuRect = subSubmenuElement.getBoundingClientRect();
-
-        const padding = 8;
-        let x = parentRect.right + 4;
-        let y = parentRect.top;
-
-        // If overflows to the right, display to the left
-        if (x + submenuRect.width > window.innerWidth - padding) {
-            x = parentRect.left - submenuRect.width - 4;
-        }
-
-        // If overflows at the bottom
-        if (y + submenuRect.height > window.innerHeight - padding) {
-            y = Math.max(padding, window.innerHeight - submenuRect.height - padding);
-        }
-
-        subSubmenuElement.style.left = Math.max(padding, x) + 'px';
-        subSubmenuElement.style.top = Math.max(padding, y) + 'px';
+        positionSubmenu(subSubmenuElement, parentItem);
 
         requestAnimationFrame(() => {
             if (subSubmenuElement) subSubmenuElement.classList.add('show');
@@ -5957,6 +5976,7 @@
             : null;
         const fallbackRect = editor.getBoundingClientRect();
         positionMenuAtRect(coords || fallbackRect);
+        trackSlashMenuForBackButton();
 
         requestAnimationFrame(() => {
             if (slashMenuElement) slashMenuElement.classList.add('show');
@@ -6051,6 +6071,7 @@
 
         document.body.appendChild(slashMenuElement);
         positionMenu(range);
+        trackSlashMenuForBackButton();
 
         requestAnimationFrame(() => {
             if (slashMenuElement) slashMenuElement.classList.add('show');
@@ -6364,6 +6385,13 @@
         document.addEventListener('keydown', handleKeydown, true);
         document.addEventListener('mousedown', handleClickOutside, true);
         window.addEventListener('resize', handleSlashMenuViewportResize);
+
+        if (window.PoznotePanelBack) {
+            window.PoznotePanelBack.register({
+                isOpen: () => !!slashMenuElement,
+                close: closeSlashMenuFromBackButton
+            });
+        }
 
         // Position caret at the end of the toggle title when clicked
         document.addEventListener('click', function (e) {

@@ -35,6 +35,14 @@
     transition: opacity 0.12s ease, transform 0.12s ease;
 }
 
+/* A styled scrollbar (the dark theme's, css/dark-mode/components.css) stays
+   inside the rounded frame: no track of its own colour, kept off the corners
+   (issue #1658) */
+.slash-command-menu::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 6px 0;
+}
+
 /* The '/' a right-click or the mobile Insert button puts in a rich text note
    to open the menu was not typed: no room taken, with the filter typed after
    it (js/slash-command.js releaseHiddenButtonSlash) */

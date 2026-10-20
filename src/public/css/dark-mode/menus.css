@@ -11,6 +11,11 @@ html[data-theme='dark'] .slash-command-menu {
     border-color: var(--pz-border);
 }
 
+/* Thinner than the page scrollbars */
+html[data-theme='dark'] .slash-command-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
 html[data-theme='dark'] .slash-command-item:hover,
 html[data-theme='dark'] .slash-command-item.selected {
     background: rgba(var(--pz-highlight-rgb), 0.08);
