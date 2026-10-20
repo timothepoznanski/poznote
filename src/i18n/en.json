@@ -2040,6 +2040,7 @@
   },
   "image_menu": {
     "view_large": "Open",
+    "copy_image": "Copy image",
     "download": "Download",
     "resize": "Resize",
     "edit": "Edit",
@@ -2053,6 +2054,9 @@
     "add_link": "Add link",
     "edit_link": "Edit link",
     "remove_link": "Remove link",
+    "image_copied": "Image copied",
+    "copy_failed": "The image could not be copied.",
+    "copy_blocked": "The browser only lets Poznote copy images over HTTPS.",
     "link_modal": {
       "title_add": "Add link to image",
       "title_edit": "Edit image link",

@@ -382,6 +382,27 @@ if (isset($_GET['oidc_error'])) {
 
                 <a class="login-button oidc-button" href="#" id="oidc-login-btn"<?php if (!$passwordLoginVisible && !$justLoggedOut): ?> autofocus<?php endif; ?>><?php echo t_h('login.oidc_button', ['provider' => (defined('OIDC_PROVIDER_NAME') ? OIDC_PROVIDER_NAME : 'SSO')], 'Continue with SSO', $currentLang ?? 'en'); ?></a>
                 <a class="login-button oidc-button oidc-other-account-button" href="#" id="oidc-other-account-btn" hidden style="display:none"><?php echo t_h('login.oidc_other_account', [], 'Sign in with another account', $currentLang ?? 'en'); ?></a>
+                <script>
+                // Put the remembered SSO account in the button label before the first
+                // paint: done in js/login-page.js at DOMContentLoaded, the generic
+                // "Continue with <provider>" label showed until the scripts loaded
+                (function () {
+                    var hint = null;
+                    try {
+                        hint = localStorage.getItem('poznote_oidc_login_hint');
+                    } catch (e) {
+                        // localStorage unavailable - hint is best-effort only
+                    }
+                    if (!hint) return;
+                    var template = <?php echo json_encode(t('login.oidc_button_account', [], 'Continue with {{account}}', $currentLang ?? 'en'), JSON_HEX_TAG | JSON_HEX_AMP); ?>;
+                    document.getElementById('oidc-login-btn').textContent = template.replace('{{account}}', hint);
+                    // The inline display:none (not just [hidden]) keeps the button
+                    // dead-proof under a stale cached login.css
+                    var other = document.getElementById('oidc-other-account-btn');
+                    other.hidden = false;
+                    other.style.display = '';
+                })();
+                </script>
             <?php endif; ?>
             
             <?php if ($oidcError): ?>
@@ -399,9 +420,6 @@ if (isset($_GET['oidc_error'])) {
         'showPasswordTitle' => t('login.show_password', [], 'Show password', $currentLang ?? 'en'),
         'hidePasswordTitle' => t('login.hide_password', [], 'Hide password', $currentLang ?? 'en'),
         'oidcEnabled' => !$renderAccountSelection && !$renderTotpChallenge && function_exists('oidc_is_enabled') && oidc_is_enabled(),
-        // Template for the OIDC button when the last SSO account is remembered on
-        // this device; {{account}} is replaced client-side with the stored email
-        'oidcAccountButtonTemplate' => t('login.oidc_button_account', [], 'Continue with {{account}}', $currentLang ?? 'en'),
         'redirectAfter' => $redirectAfter,
         // js/offline-login.js forgets this device's offline copies after a sign-out
         'justLoggedOut' => $justLoggedOut

@@ -14,7 +14,8 @@
  * events-navigation.js from reloading the page on the entry we own.
  *
  * Panels register with { isOpen, close } and call opened()/closed() from
- * their own open/close path.
+ * their own open/close path. The slash menu (js/slash-command.js) is one too,
+ * its close() only leaves the submenu when one is shown.
  */
 (function () {
     'use strict';
@@ -59,6 +60,14 @@
         pushed = false;
         closeAll();
         e.stopImmediatePropagation();
+        // A panel that only stepped back a level (the slash menu leaving a
+        // submenu) is still open: the next Back needs an entry of its own
+        if (anyOpen()) {
+            try {
+                history.pushState({ poznotePanel: true }, '', window.location.href);
+                pushed = true;
+            } catch (err) { /* ignore */ }
+        }
     });
 
     window.PoznotePanelBack = {

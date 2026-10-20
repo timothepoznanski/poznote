@@ -2040,6 +2040,7 @@
   },
   "image_menu": {
     "view_large": "열기",
+    "copy_image": "이미지 복사",
     "download": "다운로드",
     "resize": "크기 조정",
     "edit": "편집",
@@ -2053,6 +2054,9 @@
     "add_link": "링크 추가",
     "edit_link": "링크 수정",
     "remove_link": "링크 삭제",
+    "image_copied": "이미지가 복사되었습니다",
+    "copy_failed": "이미지를 복사할 수 없습니다.",
+    "copy_blocked": "브라우저는 HTTPS에서만 Poznote가 이미지를 복사하도록 허용합니다.",
     "link_modal": {
       "title_add": "이미지에 링크 추가",
       "title_edit": "이미지 링크 수정",

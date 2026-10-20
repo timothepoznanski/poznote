@@ -92,8 +92,15 @@ CACHE_TTL_ENV = "POZNOTE_MCP_AUTH_CACHE_TTL"
 MATCH_ENV = "POZNOTE_MCP_IDENTITY_MATCH"
 AUDIENCE_ENV = "POZNOTE_MCP_AUTH_AUDIENCE"
 HEADER_ENV = "POZNOTE_MCP_AUTH_HEADER"
+SCOPE_CLAIM_ENV = "POZNOTE_MCP_SCOPE_CLAIM"
+SCOPE_MAP_ENV = "POZNOTE_MCP_SCOPE_MAP"
+
+# Tool levels, lowest first (discussion #1657). Defined here rather than in
+# server.py, which imports this module.
+SCOPE_LEVELS = ("read", "write", "admin")
 
 DEFAULT_MATCH = "oidc_subject:sub"
+DEFAULT_SCOPE_CLAIM = "scope"
 DEFAULT_TIMEOUT = 5.0
 DEFAULT_CACHE_TTL = 60.0
 DEFAULT_HEADER = "Authorization"
@@ -122,6 +129,49 @@ class ExternalAuthConfig:
     audience: list[str] = field(default_factory=list)
     timeout: float = DEFAULT_TIMEOUT
     cache_ttl: float = DEFAULT_CACHE_TTL
+    # Claim value -> tool level. Empty: every caller gets the server's level.
+    scope_claim: str = DEFAULT_SCOPE_CLAIM
+    scope_map: dict[str, str] = field(default_factory=dict)
+
+    @staticmethod
+    def parse_scope_map(raw: str | None) -> dict[str, str]:
+        """``<claim value>=<level>`` pairs, comma separated.
+
+        A malformed entry stops the server rather than being skipped, since a
+        skipped entry silently refuses the callers it was written for.
+        """
+        mapping: dict[str, str] = {}
+        for item in (raw or "").split(","):
+            item = item.strip()
+            if not item:
+                continue
+            if "=" not in item:
+                raise ValueError(f"{SCOPE_MAP_ENV} entry {item!r} is not <claim value>=<level>")
+            value, level = item.rsplit("=", 1)
+            value, level = value.strip(), level.strip().lower()
+            if not value or level not in SCOPE_LEVELS:
+                raise ValueError(
+                    f"{SCOPE_MAP_ENV} entry {item!r}: level must be one of {', '.join(SCOPE_LEVELS)}"
+                )
+            mapping[value] = level
+        return mapping
+
+    def caller_level(self, claims: dict[str, Any]) -> str | None:
+        """The highest level the caller's claim maps to, None when none does.
+
+        A string claim is split on spaces, as the OAuth ``scope`` claim is; a
+        list claim such as ``groups`` or ``roles`` is taken item by item, so a
+        group name with a space in it still matches.
+        """
+        raw = claims.get(self.scope_claim)
+        if isinstance(raw, str):
+            presented = set(raw.split())
+        else:
+            presented = set(claim_values(claims, self.scope_claim))
+        levels = [self.scope_map[v] for v in presented if v in self.scope_map]
+        if not levels:
+            return None
+        return max(levels, key=SCOPE_LEVELS.index)
 
     @staticmethod
     def _float(name: str, default: float) -> float:
@@ -206,6 +256,8 @@ class ExternalAuthConfig:
             client_secret=client_secret,
             timeout=cls._float(TIMEOUT_ENV, DEFAULT_TIMEOUT),
             cache_ttl=cls._float(CACHE_TTL_ENV, DEFAULT_CACHE_TTL),
+            scope_claim=(os.getenv(SCOPE_CLAIM_ENV) or "").strip() or DEFAULT_SCOPE_CLAIM,
+            scope_map=cls.parse_scope_map(os.getenv(SCOPE_MAP_ENV)),
         )
 
 
@@ -227,6 +279,12 @@ def get_config() -> "ExternalAuthConfig | None":
                 _active_config.url,
                 ",".join(f"{r.field}:{r.claim}" for r in _active_config.match),
             )
+            if _active_config.scope_map:
+                logger.info(
+                    "Per-caller tool scope from claim %r: %s",
+                    _active_config.scope_claim,
+                    ",".join(f"{v}={lvl}" for v, lvl in _active_config.scope_map.items()),
+                )
     return _active_config
 
 
@@ -467,10 +525,29 @@ if AccessToken is not None:
                     return None
 
             subject = str(claims.get("sub") or claims.get("username") or "")
+
+            # With a scope map, the caller's level travels as the token's only
+            # scope, and a caller whose claim maps to no level is refused, the
+            # way an identity matching no profile is: falling back to the
+            # server's level would hand admin to anyone the provider knows.
+            scopes: list[str] = []
+            if self.config.scope_map:
+                level = self.config.caller_level(claims)
+                if level is None:
+                    logger.warning(
+                        "Rejecting caller %s: claim %r %s maps to no tool level in %s",
+                        subject or "(no subject)",
+                        self.config.scope_claim,
+                        claim_values(claims, self.config.scope_claim) or "(absent)",
+                        SCOPE_MAP_ENV,
+                    )
+                    return None
+                scopes = [level]
+
             access = AccessToken(
                 token=token,
                 client_id=subject or "external",
-                scopes=[],
+                scopes=scopes,
                 claims=dict(claims),
             )
             self._cache.set(key, access)

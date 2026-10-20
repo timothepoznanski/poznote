@@ -2427,6 +2427,7 @@
   },
   "image_menu": {
     "view_large": "Abrir",
+    "copy_image": "Copiar imagem",
     "download": "Baixar",
     "resize": "Redimensionar",
     "edit": "Editar",
@@ -2440,6 +2441,9 @@
     "add_link": "Adicionar Link",
     "edit_link": "Editar Link",
     "remove_link": "Remover Link",
+    "image_copied": "Imagem copiada",
+    "copy_failed": "Não foi possível copiar a imagem.",
+    "copy_blocked": "O navegador só permite que o Poznote copie imagens via HTTPS.",
     "link_modal": {
       "title_add": "Adicionar Link à Imagem",
       "title_edit": "Editar Link da Imagem",

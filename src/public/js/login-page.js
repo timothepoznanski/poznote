@@ -125,18 +125,9 @@
                 };
 
                 if (oidcLoginBtn) {
-                    // When an account is remembered, show it in the button label and
-                    // reveal the "sign in with another account" alternative
-                    if (loginHint && config.oidcAccountButtonTemplate) {
-                        oidcLoginBtn.textContent = config.oidcAccountButtonTemplate.replace('{{account}}', loginHint);
-                        if (oidcOtherAccountBtn) {
-                            // The inline display:none (not just [hidden]) keeps the
-                            // button dead-proof under a stale cached login.css
-                            oidcOtherAccountBtn.hidden = false;
-                            oidcOtherAccountBtn.style.display = '';
-                        }
-                    }
-
+                    // The remembered account's label and the "sign in with another
+                    // account" button are set by the inline script in login.php,
+                    // before the first paint
                     oidcLoginBtn.addEventListener('click', function (e) {
                         e.preventDefault();
                         startOidcLogin({ loginHint: loginHint });

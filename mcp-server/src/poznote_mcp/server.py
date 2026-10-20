@@ -44,10 +44,16 @@ from urllib.parse import urlsplit
 import httpx
 from fastmcp import FastMCP
 from fastmcp.server.auth import AccessToken, TokenVerifier
+from mcp.types import ToolAnnotations
 from starlette.middleware import Middleware
 
 from .client import PoznoteClient
+from fastmcp.server.auth import AuthContext
+from fastmcp.server.middleware import AuthMiddleware
+
 from .auth_external import (
+    SCOPE_LEVELS,
+    SCOPE_MAP_ENV,
     IdentityMismatch,
     IdentityProviderUnavailable,
     IdentityUnmapped,
@@ -476,10 +482,179 @@ def _api_error_json(exc: Exception) -> str:
 
 
 # =============================================================================
+# TOOL SCOPES - Which tools this server exposes (discussion #1657)
+# =============================================================================
+#
+# Every tool belongs to one of three levels, and POZNOTE_MCP_SCOPE decides the
+# highest one this server registers:
+#
+#   read   tools that change nothing
+#   write  read, plus note-level changes that can be undone: notes go to the
+#          trash, content changes leave a revision, trash and revisions restore
+#   admin  everything, including what cannot be undone (emptying the trash,
+#          backups, workspaces, Git sync), app settings and public sharing
+#
+# A tool above the level is never registered: it is missing from tools/list and
+# a call to it is refused as an unknown tool, whatever the client is told. A
+# tool missing from this table stops the server at import, so a new tool has to
+# be classified before it ships.
+
+SCOPE_ENV = "POZNOTE_MCP_SCOPE"
+DEFAULT_SCOPE = "admin"
+
+TOOL_SCOPES: dict[str, str] = {
+    # read
+    "get_note": "read",
+    "list_notes": "read",
+    "search_notes": "read",
+    "list_templates": "read",
+    "list_reminders": "read",
+    "get_reminder": "read",
+    "list_tasks": "read",
+    "list_all_tasks": "read",
+    "list_folders": "read",
+    "list_workspaces": "read",
+    "list_tags": "read",
+    "get_trash": "read",
+    "list_attachments": "read",
+    "get_note_share_status": "read",
+    "get_folder_share_status": "read",
+    "list_snapshots": "read",
+    "get_snapshot": "read",
+    "get_git_sync_status": "read",
+    "get_system_info": "read",
+    "list_backups": "read",
+    "get_app_setting": "read",
+    "get_backlinks": "read",
+    "list_shared": "read",
+    "list_shared_with_me": "read",
+    # write
+    "create_note": "write",
+    "update_note": "write",
+    "delete_note": "write",
+    "set_reminder": "write",
+    "remove_reminder": "write",
+    "add_task": "write",
+    "update_task": "write",
+    "complete_task": "write",
+    "delete_task": "write",
+    "add_subtask": "write",
+    "update_subtask": "write",
+    "delete_subtask": "write",
+    "create_folder": "write",
+    "rename_folder": "write",
+    "move_folder": "write",
+    "delete_folder": "write",
+    "restore_note": "write",
+    "duplicate_note": "write",
+    "toggle_favorite": "write",
+    "move_note_to_folder": "write",
+    "remove_note_from_folder": "write",
+    "move_note": "write",
+    "add_attachment": "write",
+    "restore_snapshot": "write",
+    "convert_note": "write",
+    # admin
+    "empty_trash": "admin",
+    "delete_trash_note": "admin",
+    "share_note": "admin",
+    "unshare_note": "admin",
+    "git_push": "admin",
+    "git_pull": "admin",
+    "create_backup": "admin",
+    "restore_backup": "admin",
+    "delete_backup": "admin",
+    "update_app_setting": "admin",
+    "create_workspace": "admin",
+    "rename_workspace": "admin",
+    "delete_workspace": "admin",
+}
+
+# Tools that remove or overwrite data, for the MCP destructiveHint annotation.
+# The others above read only add, move or rename.
+DESTRUCTIVE_TOOLS = frozenset({
+    "update_note", "delete_note", "remove_reminder", "delete_task", "delete_subtask",
+    "delete_folder", "restore_snapshot", "convert_note", "empty_trash",
+    "delete_trash_note", "unshare_note", "git_pull", "restore_backup",
+    "delete_backup", "update_app_setting", "delete_workspace",
+})
+
+# Tools that reach a system outside Poznote, for openWorldHint.
+OPEN_WORLD_TOOLS = frozenset({"git_push", "git_pull"})
+
+
+def _load_scope(env_value: str | None = None) -> str:
+    """The configured level. An unknown value stops the server: falling back to
+    admin would hand every tool to an operator who meant to restrict them."""
+    raw = os.getenv(SCOPE_ENV) if env_value is None else env_value
+    value = (raw or "").strip().lower()
+    if not value:
+        return DEFAULT_SCOPE
+    if value not in SCOPE_LEVELS:
+        raise ValueError(
+            f"Invalid {SCOPE_ENV} value {raw!r}; expected one of: {', '.join(SCOPE_LEVELS)}."
+        )
+    return value
+
+
+def _scope_allows(configured: str, required: str) -> bool:
+    return SCOPE_LEVELS.index(required) <= SCOPE_LEVELS.index(configured)
+
+
+def _tool_annotations(name: str) -> ToolAnnotations:
+    read_only = TOOL_SCOPES[name] == "read"
+    return ToolAnnotations(
+        readOnlyHint=read_only,
+        destructiveHint=None if read_only else name in DESTRUCTIVE_TOOLS,
+        openWorldHint=name in OPEN_WORLD_TOOLS,
+    )
+
+
+_scope = _load_scope()
+
+
+def _tool():
+    """@mcp.tool() with the tool's scope applied.
+
+    Out-of-scope tools stay plain functions, so the module and its tests can
+    still call them directly; they are just never exposed over MCP.
+    """
+    def decorator(fn):
+        name = fn.__name__
+        if name not in TOOL_SCOPES:
+            raise RuntimeError(f"MCP tool {name!r} has no entry in TOOL_SCOPES")
+        required = TOOL_SCOPES[name]
+        if not _scope_allows(_scope, required):
+            return fn
+        return mcp.tool(annotations=_tool_annotations(name), tags={f"scope:{required}"})(fn)
+    return decorator
+
+
+def _caller_scope_check(ctx: AuthContext) -> bool:
+    """Per-caller level, on top of POZNOTE_MCP_SCOPE.
+
+    Under per-caller authentication with POZNOTE_MCP_SCOPE_MAP, the verifier
+    puts the caller's level in the token's scopes. A token without one (the
+    shared token, or per-caller auth without a map) is held to the server's
+    level alone, which registration already applied.
+    """
+    token = ctx.token
+    levels = [s for s in (token.scopes if token else []) if s in SCOPE_LEVELS]
+    if not levels:
+        return True
+    required = TOOL_SCOPES.get(getattr(ctx.component, "name", ""))
+    return required is not None and _scope_allows(levels[0], required)
+
+
+# Filters tools/list and refuses tools/call for tools above the caller's level.
+mcp.add_middleware(AuthMiddleware(auth=_caller_scope_check))
+
+
+# =============================================================================
 # TOOLS - Actions for searching and modifying notes
 # =============================================================================
 
-@mcp.tool()
+@_tool()
 def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """Get a specific note by its ID with full content
 
@@ -518,7 +693,7 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_notes(
     workspace: Optional[str] = None,
     limit: int = 50,
@@ -599,7 +774,7 @@ def list_notes(
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, created_from: Optional[str] = None, created_to: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """Search notes by text query. Returns matching notes with excerpts.
     
@@ -642,7 +817,7 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, c
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_templates(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """List the template notes available to create_note's from_template_id
 
@@ -744,7 +919,7 @@ def _reminder_result(client, note_id: int, reminder_at, recurrence, message, ema
     }
 
 
-@mcp.tool()
+@_tool()
 def create_note(
     title: str,
     content: Optional[Union[str, list]] = None,
@@ -918,7 +1093,7 @@ def create_note(
     return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def update_note(
     id: int,
     workspace: Optional[str] = None,
@@ -1053,7 +1228,7 @@ def update_note(
     return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def delete_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """Delete a note by its ID
     
@@ -1083,7 +1258,7 @@ def delete_note(id: int, workspace: Optional[str] = None, user_id: Optional[int]
 # REMINDERS
 # =============================================================================
 
-@mcp.tool()
+@_tool()
 def list_reminders(
     workspace: Optional[str] = None,
     unread_only: bool = False,
@@ -1140,7 +1315,7 @@ def list_reminders(
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def get_reminder(note_id: int, user_id: Optional[int] = None) -> str:
     """Get the reminder currently set on a note
 
@@ -1167,7 +1342,7 @@ def get_reminder(note_id: int, user_id: Optional[int] = None) -> str:
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def set_reminder(
     note_id: int,
     reminder_at: str,
@@ -1219,7 +1394,7 @@ def set_reminder(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def remove_reminder(note_id: int, user_id: Optional[int] = None) -> str:
     """Remove the reminder from a note
 
@@ -1245,7 +1420,7 @@ def remove_reminder(note_id: int, user_id: Optional[int] = None) -> str:
 # TASKS - Individual items inside a tasklist note
 # =============================================================================
 
-@mcp.tool()
+@_tool()
 def list_tasks(note_id: int, user_id: Optional[int] = None) -> str:
     """List the tasks of a tasklist note, with their IDs, due dates and flags
 
@@ -1330,7 +1505,7 @@ def _task_sort_key(task: dict):
     return (due == "", due, not task.get("important"), str(task.get("text") or ""))
 
 
-@mcp.tool()
+@_tool()
 def list_all_tasks(
     workspace: Optional[str] = None,
     include_completed: bool = False,
@@ -1419,7 +1594,7 @@ def list_all_tasks(
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def add_task(
     note_id: int,
     text: str,
@@ -1481,7 +1656,7 @@ def add_task(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def update_task(
     note_id: int,
     task_id: str,
@@ -1551,7 +1726,7 @@ def update_task(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def complete_task(note_id: int, task_id: str, completed: bool = True, user_id: Optional[int] = None) -> str:
     """Mark a task of a tasklist note as done (or undone)
 
@@ -1580,7 +1755,7 @@ def complete_task(note_id: int, task_id: str, completed: bool = True, user_id: O
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def delete_task(note_id: int, task_id: str, user_id: Optional[int] = None) -> str:
     """Delete one task from a tasklist note
 
@@ -1603,7 +1778,7 @@ def delete_task(note_id: int, task_id: str, user_id: Optional[int] = None) -> st
     }, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def add_subtask(
     note_id: int,
     task_id: str,
@@ -1655,7 +1830,7 @@ def add_subtask(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def update_subtask(
     note_id: int,
     task_id: str,
@@ -1710,7 +1885,7 @@ def update_subtask(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def delete_subtask(note_id: int, task_id: str, subtask_id: str, user_id: Optional[int] = None) -> str:
     """Delete one subtask of a task
 
@@ -1743,7 +1918,7 @@ def delete_subtask(note_id: int, task_id: str, subtask_id: str, user_id: Optiona
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def create_folder(
     folder_name: Optional[str] = None,
     workspace: Optional[str] = None,
@@ -1837,7 +2012,7 @@ def create_folder(
         return json.dumps({"error": "Failed to create folder"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """List all folders from a specific workspace
 
@@ -1875,7 +2050,7 @@ def list_folders(workspace: Optional[str] = None, user_id: Optional[int] = None)
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_workspaces(user_id: Optional[int] = None) -> str:
     """List the workspaces of this profile
 
@@ -1900,7 +2075,7 @@ def list_workspaces(user_id: Optional[int] = None) -> str:
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_tags(user_id: Optional[int] = None) -> str:
     """List all unique tags used in notes
     
@@ -1920,7 +2095,7 @@ def list_tags(user_id: Optional[int] = None) -> str:
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def get_trash(user_id: Optional[int] = None) -> str:
     """List all notes currently in the trash
     
@@ -1940,7 +2115,7 @@ def get_trash(user_id: Optional[int] = None) -> str:
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def empty_trash(user_id: Optional[int] = None) -> str:
     """Permanently delete all notes in the trash
     
@@ -1957,7 +2132,7 @@ def empty_trash(user_id: Optional[int] = None) -> str:
     return json.dumps({"success": success, "message": "Trash emptied" if success else "Failed to empty trash"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def delete_trash_note(
     id: int,
     workspace: Optional[str] = None,
@@ -2010,7 +2185,7 @@ def delete_trash_note(
     )
 
 
-@mcp.tool()
+@_tool()
 def restore_note(id: int, user_id: Optional[int] = None) -> str:
     """Restore a note from the trash
     
@@ -2028,7 +2203,7 @@ def restore_note(id: int, user_id: Optional[int] = None) -> str:
     return json.dumps({"success": success, "message": f"Note {id} restored" if success else f"Failed to restore note {id}"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def duplicate_note(id: int, user_id: Optional[int] = None) -> str:
     """Create a duplicate of an existing note
     
@@ -2049,7 +2224,7 @@ def duplicate_note(id: int, user_id: Optional[int] = None) -> str:
         return json.dumps({"success": False, "error": f"Failed to duplicate note {id}"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def toggle_favorite(id: int, user_id: Optional[int] = None) -> str:
     """Toggle the favorite status of a note
     
@@ -2067,7 +2242,7 @@ def toggle_favorite(id: int, user_id: Optional[int] = None) -> str:
     return json.dumps({"success": success, "message": f"Note {id} favorite status toggled"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_attachments(note_id: int, user_id: Optional[int] = None) -> str:
     """List all attachments for a specific note
     
@@ -2089,7 +2264,7 @@ def list_attachments(note_id: int, user_id: Optional[int] = None) -> str:
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = None) -> str:
     """Move a note to a specific folder
     
@@ -2108,7 +2283,7 @@ def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = N
     return json.dumps({"success": success, "message": f"Note {note_id} moved to folder {folder_id}" if success else "Failed to move note"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def add_attachment(
     note_id: int,
     filename: str,
@@ -2210,7 +2385,7 @@ def add_attachment(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def move_note(
     note_id: int,
     target_workspace: Optional[str] = None,
@@ -2271,7 +2446,7 @@ def move_note(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def move_folder(
     folder_id: int,
     target_workspace: Optional[str] = None,
@@ -2329,7 +2504,7 @@ def move_folder(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def remove_note_from_folder(note_id: int, user_id: Optional[int] = None) -> str:
     """Remove a note from its current folder (moves it to root)
     
@@ -2347,7 +2522,7 @@ def remove_note_from_folder(note_id: int, user_id: Optional[int] = None) -> str:
     return json.dumps({"success": success, "message": f"Note {note_id} removed from folder" if success else "Failed to remove note from folder"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def share_note(note_id: int, user_id: Optional[int] = None) -> str:
     """Enable public sharing for a note and get the public URL
     
@@ -2368,7 +2543,7 @@ def share_note(note_id: int, user_id: Optional[int] = None) -> str:
         return json.dumps({"success": False, "error": "Failed to enable sharing"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def unshare_note(note_id: int, user_id: Optional[int] = None) -> str:
     """Disable public sharing for a note
     
@@ -2386,7 +2561,7 @@ def unshare_note(note_id: int, user_id: Optional[int] = None) -> str:
     return json.dumps({"success": success, "message": "Sharing disabled" if success else "Failed to disable sharing"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
     """Get the current sharing status and public URL for a note
     
@@ -2407,7 +2582,7 @@ def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
         return json.dumps({"success": False, "message": "Note is not shared publicly"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def get_folder_share_status(folder_id: int, user_id: Optional[int] = None) -> str:
     """Get the current sharing status and public URL for a folder
 
@@ -2446,7 +2621,7 @@ _SNAPSHOT_KEY_RE = r"\d{4}-\d{2}-\d{2}(?:--[A-Za-z0-9_-]+)?"
 _SNAPSHOT_KEY_HINT = "snapshot_key must be a key returned by list_snapshots (YYYY-MM-DD or YYYY-MM-DD--<suffix>)"
 
 
-@mcp.tool()
+@_tool()
 def list_snapshots(note_id: int, user_id: Optional[int] = None) -> str:
     """List the saved earlier versions (snapshots) of a note
 
@@ -2489,7 +2664,7 @@ def list_snapshots(note_id: int, user_id: Optional[int] = None) -> str:
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def get_snapshot(
     note_id: int,
     snapshot_key: Optional[str] = None,
@@ -2552,7 +2727,7 @@ def get_snapshot(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def restore_snapshot(
     note_id: int,
     snapshot_key: Optional[str] = None,
@@ -2627,7 +2802,7 @@ def restore_snapshot(
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def get_git_sync_status(user_id: Optional[int] = None) -> str:
     """Get the current status of Git synchronization (GitHub, GitLab or Forgejo)
     
@@ -2644,7 +2819,7 @@ def get_git_sync_status(user_id: Optional[int] = None) -> str:
     return json.dumps(status, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def git_push(user_id: Optional[int] = None) -> str:
     """Force push local notes to the configured Git repository
     
@@ -2661,7 +2836,7 @@ def git_push(user_id: Optional[int] = None) -> str:
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def git_pull(user_id: Optional[int] = None) -> str:
     """Force pull notes from the configured Git repository
     
@@ -2771,7 +2946,7 @@ def _deny_non_admin_caller() -> str | None:
     return None
 
 
-@mcp.tool()
+@_tool()
 def get_system_info() -> str:
     """Get version information about the Poznote installation"""
     denied = _deny_non_admin_caller()
@@ -2787,7 +2962,7 @@ def get_system_info() -> str:
     return json.dumps(info, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_backups() -> str:
     """List all available system backups"""
     denied = _deny_non_admin_caller()
@@ -2803,7 +2978,7 @@ def list_backups() -> str:
     return json.dumps({"count": len(backups), "backups": backups}, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def create_backup() -> str:
     """Trigger the creation of a new system backup"""
     denied = _deny_non_admin_caller()
@@ -2819,7 +2994,7 @@ def create_backup() -> str:
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def restore_backup(filename: str, user_id: Optional[int] = None) -> str:
     """Restore a backup file. This will replace all current user data.
     
@@ -2840,7 +3015,7 @@ def restore_backup(filename: str, user_id: Optional[int] = None) -> str:
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def get_app_setting(key: str, user_id: Optional[int] = None) -> str:
     """Get the value of a specific application setting
     
@@ -2861,7 +3036,7 @@ def get_app_setting(key: str, user_id: Optional[int] = None) -> str:
     return json.dumps(setting, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def update_app_setting(key: str, value: str, user_id: Optional[int] = None) -> str:
     """Update the value of a specific application setting
     
@@ -2886,7 +3061,7 @@ def update_app_setting(key: str, value: str, user_id: Optional[int] = None) -> s
     return json.dumps(result, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def get_backlinks(note_id: int, user_id: Optional[int] = None) -> str:
     """Get all notes that link to (reference) a specific note
     
@@ -2908,7 +3083,7 @@ def get_backlinks(note_id: int, user_id: Optional[int] = None) -> str:
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def convert_note(id: int, target: str, user_id: Optional[int] = None) -> str:
     """Convert a note between HTML and Markdown formats
     
@@ -2934,7 +3109,7 @@ def convert_note(id: int, target: str, user_id: Optional[int] = None) -> str:
         return json.dumps({"error": f"Failed to convert note {id}"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def rename_folder(
     folder_id: int,
     new_name: str,
@@ -2965,7 +3140,7 @@ def rename_folder(
         return json.dumps({"error": f"Folder {folder_id} not found or rename failed"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def delete_folder(
     folder_id: int,
     workspace: Optional[str] = None,
@@ -2991,7 +3166,7 @@ def delete_folder(
         return json.dumps({"error": f"Folder {folder_id} not found or deletion failed"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def create_workspace(name: str, user_id: Optional[int] = None) -> str:
     """Create a new workspace
     
@@ -3017,7 +3192,7 @@ def create_workspace(name: str, user_id: Optional[int] = None) -> str:
         return json.dumps({"error": "Failed to create workspace"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def rename_workspace(current_name: str, new_name: str, user_id: Optional[int] = None) -> str:
     """Rename an existing workspace
     
@@ -3044,7 +3219,7 @@ def rename_workspace(current_name: str, new_name: str, user_id: Optional[int] = 
         return json.dumps({"error": f"Failed to rename workspace '{current_name}'"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def delete_workspace(name: str, user_id: Optional[int] = None) -> str:
     """Delete a workspace (cannot delete the last remaining workspace)
     
@@ -3067,7 +3242,7 @@ def delete_workspace(name: str, user_id: Optional[int] = None) -> str:
         return json.dumps({"error": f"Failed to delete workspace '{name}'"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def delete_backup(filename: str) -> str:
     """Delete a specific backup file
     
@@ -3090,7 +3265,7 @@ def delete_backup(filename: str) -> str:
         return json.dumps({"error": f"Failed to delete backup '{filename}'"}, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_shared(workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
     """List the notes and folders this profile has shared
 
@@ -3115,7 +3290,7 @@ def list_shared(workspace: Optional[str] = None, user_id: Optional[int] = None) 
     }, indent=2, ensure_ascii=False)
 
 
-@mcp.tool()
+@_tool()
 def list_shared_with_me(user_id: Optional[int] = None) -> str:
     """List notes, folders and workspaces OTHER USERS have shared with this profile
 
@@ -3238,6 +3413,17 @@ def main():
     try:
         logger.info("Starting Poznote MCP Server (HTTP mode on %s:%s)...", host, port)
         _log_inbound_auth_status(host, _inbound_auth_token)
+        exposed = sum(1 for level in TOOL_SCOPES.values() if _scope_allows(_scope, level))
+        logger.info(
+            "Tool scope %s=%s: %d of %d tools exposed.",
+            SCOPE_ENV, _scope, exposed, len(TOOL_SCOPES),
+        )
+        if _external_auth_provider is None and (os.getenv(SCOPE_MAP_ENV) or "").strip():
+            logger.warning(
+                "%s is set but IGNORED: it needs per-caller authentication "
+                "(POZNOTE_MCP_AUTH_PROVIDER). Every client gets %s=%s.",
+                SCOPE_MAP_ENV, SCOPE_ENV, _scope,
+            )
         try:
             _assert_port_available(host, port)
         except OSError:
