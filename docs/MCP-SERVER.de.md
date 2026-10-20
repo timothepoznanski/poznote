@@ -265,6 +265,43 @@ Ist `POZNOTE_MCP_AUTH_PROVIDER` gesetzt, hat es Vorrang vor
 `POZNOTE_MCP_AUTH_TOKEN`, und der Server protokolliert eine Warnung, wenn
 dieses Token noch gesetzt ist.
 
+#### Tool-Umfang
+
+Standardmäßig stellt der Server alle Tools bereit. `POZNOTE_MCP_SCOPE` beschränkt ihn auf eine von drei Stufen. Das ist nützlich für einen Agenten, der unbeaufsichtigt läuft, denn Notizinhalte könnten ihn zu einem Tool lenken, das er nie aufrufen sollte:
+
+| Stufe | Tools |
+|---|---|
+| `read` | nur Tools, die nichts ändern: Abrufen, Auflisten, Suchen, Backlinks, Versionen, Freigabestatus, Systeminformationen, Einstellungen |
+| `write` | `read` sowie Änderungen, die sich rückgängig machen lassen: Notizen, Aufgaben, Erinnerungen, Ordner, Verschieben, Anhänge, eine Notiz in den Papierkorb verschieben, Wiederherstellen aus dem Papierkorb oder aus einer Version |
+| `admin` *(Standard)* | alles, auch was sich nicht rückgängig machen lässt (Papierkorb leeren, endgültig daraus löschen), Arbeitsbereiche, Backups, Git-Synchronisierung, Anwendungseinstellungen und öffentliche Freigabe |
+
+```bash
+# In .env
+POZNOTE_MCP_SCOPE=read
+
+# Den MCP-Container neu erstellen, damit er die neue Umgebung übernimmt
+docker compose up -d --force-recreate mcp-server
+```
+
+Ein Tool oberhalb der Stufe wird gar nicht registriert: Clients sehen es nicht, und ein Aufruf wird als unbekanntes Tool abgelehnt, unabhängig davon, was dem Client mitgeteilt wurde. Die Logzeile beim Start zeigt die Stufe und wie viele Tools bereitgestellt werden. Ein unbekannter Wert beendet den Server, statt auf `admin` zurückzufallen.
+
+Mit dem gemeinsamen Token gilt die Stufe für den gesamten Server: Um zwei Clients unterschiedliche Stufen zu geben, betreiben Sie einen zweiten MCP-Container mit eigenem `POZNOTE_MCP_SCOPE`, eigenem Port und eigenem `POZNOTE_MCP_AUTH_TOKEN`.
+
+Mit der [Authentifizierung pro Aufrufer](#authentifizierung-pro-aufrufer-optional) kann jeder Aufrufer seine eigene Stufe aus einem Claim seines Tokens erhalten. `POZNOTE_MCP_SCOPE_MAP` listet Paare `<claim value>=<level>` auf, die aus dem in `POZNOTE_MCP_SCOPE_CLAIM` benannten Claim gelesen werden (Standard `scope`, die durch Leerzeichen getrennten OAuth-Scopes; ein Listen-Claim wie `groups` oder `roles` funktioniert ebenfalls):
+
+```bash
+# OAuth-Scopes, die der Identitätsanbieter jedem Client gewährt
+POZNOTE_MCP_SCOPE_MAP=poznote.read=read,poznote.write=write,poznote.admin=admin
+
+# Oder Gruppen, für Anbieter, die sie in das Token schreiben
+POZNOTE_MCP_SCOPE_CLAIM=groups
+POZNOTE_MCP_SCOPE_MAP=/poznote-agents=read,/poznote-users=write,/poznote-admins=admin
+```
+
+Ein Aufrufer erhält die höchste Stufe, auf die sein Claim abgebildet wird, nie mehr als `POZNOTE_MCP_SCOPE`, und Tools oberhalb dieser Stufe werden in seiner Tool-Liste ausgeblendet und beim Aufruf abgelehnt. Ein Aufrufer, dessen Claim auf keine Stufe abgebildet wird, wird rundheraus abgelehnt (`401`), statt die Stufe des Servers zu erhalten, und der Grund wird protokolliert. Ohne `POZNOTE_MCP_SCOPE_MAP` erhält jeder Aufrufer die Stufe des Servers.
+
+Jedes Tool trägt außerdem die Standard-MCP-Annotationen `readOnlyHint` und `destructiveHint`, sodass sich Clients, die Tools auf ihrer Seite filtern oder bestätigen lassen, darauf verlassen können.
+
 #### Debug-Modus
 
 Setzen Sie `POZNOTE_DEBUG=true` im Startbefehl, um die Log-Stufe von `INFO` auf `DEBUG` umzustellen. Für den normalen Betrieb setzen Sie den Wert wieder auf `false`. Nur die exakten Kleinschreibungswerte `true` und `false` werden erkannt. Jeder andere Wert wird als `false` behandelt, und in die MCP-Logs wird eine Warnung geschrieben. Der Webserver ist toleranter und akzeptiert auch `1`, `on` oder `yes`. Jede an die Poznote-API gesendete HTTP-Anfrage, jeder vom KI-Assistenten empfangene Tool-Aufruf und jede Antwort werden ausführlich in die Container-Logs geschrieben. Nutzen Sie den Modus, um Verbindungs- oder Authentifizierungsprobleme zu diagnostizieren:
@@ -314,7 +351,7 @@ Wer den MCP-Endpunkt erreichen kann, kann jede Notiz jedes Profils lesen, erstel
 1. **Netzwerk-Erreichbarkeit.** Standardmäßig ist der Endpunkt nur vom lokalen Rechner aus erreichbar.
 2. **Bearer-Token für eingehende Anfragen** (optional). Setzen Sie `POZNOTE_MCP_AUTH_TOKEN`, dann muss jede Anfrage `Authorization: Bearer <token>` mitsenden.
 
-Mit der Standard-`docker-compose.yml` genügt Ebene 1. Ergänzen Sie Ebene 2, sobald der Port von einem Ort aus erreichbar ist, den Sie nicht vollständig kontrollieren.
+Mit der Standard-`docker-compose.yml` genügt Ebene 1. Ergänzen Sie Ebene 2, sobald der Port von einem Ort aus erreichbar ist, den Sie nicht vollständig kontrollieren. Um einzuschränken, was ein Client tun kann, der den Endpunkt erreicht, legen Sie einen [Tool-Umfang](#tool-umfang) fest.
 
 ### Warum nur 127.0.0.1 normal und sicher ist
 

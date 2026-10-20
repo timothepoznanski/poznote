@@ -261,6 +261,43 @@ With `POZNOTE_MCP_AUTH_PROVIDER` set it takes precedence over
 `POZNOTE_MCP_AUTH_TOKEN`, and the server logs a warning if that token is still
 set.
 
+#### Tool scope
+
+By default the server exposes every tool. `POZNOTE_MCP_SCOPE` limits it to one of three levels, which is useful for an agent that runs unattended, since note content could steer it towards a tool it should never call:
+
+| level | tools |
+|---|---|
+| `read` | only tools that change nothing: get, list, search, backlinks, revisions, share status, system info, settings |
+| `write` | `read`, plus changes that can be undone: notes, tasks, reminders, folders, moves, attachments, moving a note to the trash, restoring from the trash or a revision |
+| `admin` *(default)* | everything, including what cannot be undone (emptying the trash, deleting from it), workspaces, backups, Git sync, app settings and public sharing |
+
+```bash
+# In .env
+POZNOTE_MCP_SCOPE=read
+
+# Recreate the MCP container so it picks up the new environment
+docker compose up -d --force-recreate mcp-server
+```
+
+A tool above the level is not registered at all: clients do not see it, and a call to it is refused as an unknown tool, whatever the client is told. The startup log shows the level and how many tools are exposed. An unknown value stops the server rather than falling back to `admin`.
+
+With the shared token, the level applies to the whole server: to give two clients different levels, run a second MCP container with its own `POZNOTE_MCP_SCOPE`, its own port and its own `POZNOTE_MCP_AUTH_TOKEN`.
+
+With [per-caller authentication](#per-caller-authentication-optional), each caller can get its own level from a claim of its token. `POZNOTE_MCP_SCOPE_MAP` lists `<claim value>=<level>` pairs, read from the claim named by `POZNOTE_MCP_SCOPE_CLAIM` (default `scope`, the space-separated OAuth scopes; a list claim such as `groups` or `roles` works too):
+
+```bash
+# OAuth scopes granted to each client by the identity provider
+POZNOTE_MCP_SCOPE_MAP=poznote.read=read,poznote.write=write,poznote.admin=admin
+
+# Or groups, for providers that put them in the token
+POZNOTE_MCP_SCOPE_CLAIM=groups
+POZNOTE_MCP_SCOPE_MAP=/poznote-agents=read,/poznote-users=write,/poznote-admins=admin
+```
+
+A caller gets the highest level its claim maps to, never above `POZNOTE_MCP_SCOPE`, and tools above it are hidden from its tool list and refused when called. A caller whose claim maps to no level is refused outright (`401`), rather than given the server's level, and the reason is logged. Without `POZNOTE_MCP_SCOPE_MAP`, every caller gets the server's level.
+
+Every tool also carries the standard MCP `readOnlyHint` and `destructiveHint` annotations, so clients that filter or confirm tools on their side can rely on them.
+
 #### Debug mode
 
 Set `POZNOTE_DEBUG=true` in the startup command to switch the log level from `INFO` to `DEBUG`. Set it back to `false` for normal use. Only the exact lowercase values `true` and `false` are recognized. Any other value is treated as `false` and a warning is written to the MCP logs. The web server is more tolerant and also accepts `1`, `on` or `yes`. Every HTTP request sent to the Poznote API, every tool call received from the AI assistant, and every response are written in detail to the container logs. Use it to diagnose connection or authentication issues:
@@ -310,7 +347,7 @@ Anyone who can reach the MCP endpoint can read, create, modify and delete every 
 1. **Network reachability.** The endpoint is only reachable from the local machine by default.
 2. **Inbound bearer token** (optional). Set `POZNOTE_MCP_AUTH_TOKEN` and every request must carry `Authorization: Bearer <token>`.
 
-With the default `docker-compose.yml`, layer 1 alone is enough. Add layer 2 whenever the port becomes reachable from somewhere you do not fully control.
+With the default `docker-compose.yml`, layer 1 alone is enough. Add layer 2 whenever the port becomes reachable from somewhere you do not fully control. To narrow what a reachable client can do, set a [tool scope](#tool-scope).
 
 ### Why 127.0.0.1-only is both normal and secure
 

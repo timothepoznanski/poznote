@@ -265,6 +265,43 @@ Lorsque `POZNOTE_MCP_AUTH_PROVIDER` est défini, il est prioritaire sur
 `POZNOTE_MCP_AUTH_TOKEN`, et le serveur journalise un avertissement si ce jeton
 est encore défini.
 
+#### Portée des outils
+
+Par défaut, le serveur expose tous les outils. `POZNOTE_MCP_SCOPE` le limite à l'un des trois niveaux, ce qui est utile pour un agent qui fonctionne sans surveillance, puisque le contenu d'une note pourrait l'orienter vers un outil qu'il ne devrait jamais appeler :
+
+| niveau | outils |
+|---|---|
+| `read` | uniquement les outils qui ne modifient rien : lecture, listes, recherche, rétroliens, révisions, état de partage, informations système, paramètres |
+| `write` | `read`, plus les modifications réversibles : notes, tâches, rappels, dossiers, déplacements, pièces jointes, mise à la corbeille d'une note, restauration depuis la corbeille ou une révision |
+| `admin` *(par défaut)* | tout, y compris ce qui est irréversible (vider la corbeille, en supprimer des notes), espaces de travail, sauvegardes, synchronisation Git, paramètres de l'application et partage public |
+
+```bash
+# Dans .env
+POZNOTE_MCP_SCOPE=read
+
+# Recréez le conteneur MCP pour qu'il prenne en compte le nouvel environnement
+docker compose up -d --force-recreate mcp-server
+```
+
+Un outil au-dessus du niveau n'est pas enregistré du tout : les clients ne le voient pas, et un appel à cet outil est refusé comme outil inconnu, quoi qu'on ait annoncé au client. Le log de démarrage indique le niveau et le nombre d'outils exposés. Une valeur inconnue arrête le serveur au lieu de retomber sur `admin`.
+
+Avec le jeton partagé, le niveau s'applique à tout le serveur : pour donner des niveaux différents à deux clients, lancez un second conteneur MCP avec son propre `POZNOTE_MCP_SCOPE`, son propre port et son propre `POZNOTE_MCP_AUTH_TOKEN`.
+
+Avec l'[authentification par appelant](#authentification-par-appelant-facultatif), chaque appelant peut recevoir son propre niveau à partir d'une revendication de son jeton. `POZNOTE_MCP_SCOPE_MAP` liste des paires `<claim value>=<level>`, lues dans la revendication désignée par `POZNOTE_MCP_SCOPE_CLAIM` (`scope` par défaut, les scopes OAuth séparés par des espaces ; une revendication de type liste comme `groups` ou `roles` fonctionne aussi) :
+
+```bash
+# Scopes OAuth accordés à chaque client par le fournisseur d'identité
+POZNOTE_MCP_SCOPE_MAP=poznote.read=read,poznote.write=write,poznote.admin=admin
+
+# Ou des groupes, pour les fournisseurs qui les placent dans le jeton
+POZNOTE_MCP_SCOPE_CLAIM=groups
+POZNOTE_MCP_SCOPE_MAP=/poznote-agents=read,/poznote-users=write,/poznote-admins=admin
+```
+
+Un appelant reçoit le niveau le plus élevé auquel correspond sa revendication, jamais au-delà de `POZNOTE_MCP_SCOPE`, et les outils au-dessus de ce niveau sont masqués de sa liste d'outils et refusés s'il les appelle. Un appelant dont la revendication ne correspond à aucun niveau est refusé d'emblée (`401`), au lieu de recevoir le niveau du serveur, et la raison est écrite dans les logs. Sans `POZNOTE_MCP_SCOPE_MAP`, chaque appelant reçoit le niveau du serveur.
+
+Chaque outil porte aussi les annotations MCP standard `readOnlyHint` et `destructiveHint`, si bien que les clients qui filtrent les outils ou les font confirmer de leur côté peuvent s'appuyer dessus.
+
 #### Mode débogage
 
 Définissez `POZNOTE_DEBUG=true` dans la commande de démarrage pour faire passer le niveau de log de `INFO` à `DEBUG`. Remettez-le à `false` pour un usage normal. Seules les valeurs exactes en minuscules `true` et `false` sont reconnues. Toute autre valeur est traitée comme `false` et un avertissement est écrit dans les logs MCP. Le serveur web est plus tolérant et accepte aussi `1`, `on` ou `yes`. Chaque requête HTTP envoyée à l'API Poznote, chaque appel d'outil reçu de l'assistant IA et chaque réponse sont écrits en détail dans les logs du conteneur. Utilisez-le pour diagnostiquer des problèmes de connexion ou d'authentification :
@@ -314,7 +351,7 @@ Quiconque peut joindre le point de terminaison MCP peut lire, créer, modifier e
 1. **Accessibilité réseau.** Par défaut, le point de terminaison n'est joignable que depuis la machine locale.
 2. **Jeton bearer entrant** (facultatif). Définissez `POZNOTE_MCP_AUTH_TOKEN` et chaque requête devra comporter `Authorization: Bearer <token>`.
 
-Avec le `docker-compose.yml` par défaut, le niveau 1 suffit à lui seul. Ajoutez le niveau 2 dès que le port devient joignable depuis un endroit que vous ne maîtrisez pas entièrement.
+Avec le `docker-compose.yml` par défaut, le niveau 1 suffit à lui seul. Ajoutez le niveau 2 dès que le port devient joignable depuis un endroit que vous ne maîtrisez pas entièrement. Pour restreindre ce que peut faire un client qui joint le point de terminaison, limitez la [portée des outils](#portée-des-outils).
 
 ### Pourquoi l'écoute limitée à 127.0.0.1 est à la fois normale et sûre
 

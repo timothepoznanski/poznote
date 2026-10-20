@@ -251,6 +251,43 @@ UserInfo 端点。令牌从不在本地校验，因此不透明令牌与 JWT 同
 设置了 `POZNOTE_MCP_AUTH_PROVIDER` 时，其优先级高于
 `POZNOTE_MCP_AUTH_TOKEN`；若该令牌仍然设置，服务器会记录一条警告。
 
+#### 工具范围
+
+默认情况下，服务器公开所有工具。`POZNOTE_MCP_SCOPE` 将其限制为三个级别之一，这对无人值守运行的 agent 很有用，因为笔记内容可能会引导它调用一个本不该调用的工具：
+
+| 级别 | 工具 |
+|---|---|
+| `read` | 仅限不做任何更改的工具：获取、列出、搜索、反向链接、修订版本、分享状态、系统信息、设置 |
+| `write` | `read` 的全部工具，外加可以撤销的更改：笔记、任务、提醒、文件夹、移动、附件、将笔记移入回收站、从回收站或修订版本恢复 |
+| `admin` *（默认）* | 全部工具，包括无法撤销的操作（清空回收站、从回收站中永久删除）、工作区、备份、Git 同步、应用设置和公开分享 |
+
+```bash
+# 在 .env 中
+POZNOTE_MCP_SCOPE=read
+
+# 重建 MCP 容器，使其读取新的环境变量
+docker compose up -d --force-recreate mcp-server
+```
+
+高于该级别的工具根本不会注册：客户端看不到它，而且无论客户端被告知了什么，对它的调用都会作为未知工具被拒绝。启动日志会显示级别以及公开的工具数量。未知的值会让服务器停止运行，而不是退回到 `admin`。
+
+使用共享令牌时，级别作用于整个服务器：要为两个客户端设置不同级别，请再运行一个 MCP 容器，并为其配置独立的 `POZNOTE_MCP_SCOPE`、端口和 `POZNOTE_MCP_AUTH_TOKEN`。
+
+使用[按调用方身份认证](#按调用方身份认证可选)时，每个调用方都可以根据其令牌中的某个 claim 获得自己的级别。`POZNOTE_MCP_SCOPE_MAP` 列出 `<claim value>=<level>` 键值对，从 `POZNOTE_MCP_SCOPE_CLAIM` 指定的 claim 中读取（默认 `scope`，即以空格分隔的 OAuth 作用域；`groups` 或 `roles` 这类列表型 claim 也可以）：
+
+```bash
+# 身份提供方授予每个客户端的 OAuth 作用域
+POZNOTE_MCP_SCOPE_MAP=poznote.read=read,poznote.write=write,poznote.admin=admin
+
+# 或者使用组，适用于将组写入令牌的提供方
+POZNOTE_MCP_SCOPE_CLAIM=groups
+POZNOTE_MCP_SCOPE_MAP=/poznote-agents=read,/poznote-users=write,/poznote-admins=admin
+```
+
+调用方获得其 claim 所映射到的最高级别，但绝不会高于 `POZNOTE_MCP_SCOPE`，高于该级别的工具不会出现在它的工具列表中，调用时也会被拒绝。claim 未映射到任何级别的调用方会被直接拒绝（`401`），而不是获得服务器的级别，原因会写入日志。未设置 `POZNOTE_MCP_SCOPE_MAP` 时，所有调用方都获得服务器的级别。
+
+每个工具还带有标准的 MCP 注解 `readOnlyHint` 和 `destructiveHint`，因此自行筛选工具或要求确认工具调用的客户端可以依赖它们。
+
 #### 调试模式
 
 在启动命令中设置 `POZNOTE_DEBUG=true`，可将日志级别从 `INFO` 切换为 `DEBUG`。正常使用时请改回 `false`。只识别完全小写的 `true` 和 `false`。其他任何值都会被视为 `false`，并在 MCP 日志中写入警告。Web 服务器的容忍度更高，还接受 `1`、`on` 或 `yes`。发送到 Poznote API 的每个 HTTP 请求、从 AI 助手收到的每个工具调用以及每个响应，都会详细写入容器日志。可用它来诊断连接或身份验证问题：
@@ -300,7 +337,7 @@ curl http://127.0.0.1:8045/mcp
 1. **网络可达性。** 默认情况下，只能从本机访问该端点。
 2. **入站 Bearer 令牌**（可选）。设置 `POZNOTE_MCP_AUTH_TOKEN` 后，每个请求都必须携带 `Authorization: Bearer <token>`。
 
-使用默认的 `docker-compose.yml` 时，仅第 1 层就已足够。一旦端口可以从您无法完全掌控的地方访问，请加上第 2 层。
+使用默认的 `docker-compose.yml` 时，仅第 1 层就已足够。一旦端口可以从您无法完全掌控的地方访问，请加上第 2 层。要限制能够访问端点的客户端可执行的操作，请设置[工具范围](#工具范围)。
 
 ### 为什么仅限 127.0.0.1 既正常又安全
 

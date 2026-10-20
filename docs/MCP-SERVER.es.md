@@ -263,6 +263,43 @@ Si `POZNOTE_MCP_AUTH_PROVIDER` está definido, tiene prioridad sobre
 `POZNOTE_MCP_AUTH_TOKEN`, y el servidor registra un aviso si ese token sigue
 definido.
 
+#### Alcance de las herramientas
+
+Por defecto, el servidor expone todas las herramientas. `POZNOTE_MCP_SCOPE` lo limita a uno de tres niveles, lo cual es útil para un agente que funciona sin supervisión, ya que el contenido de una nota podría llevarlo hacia una herramienta que nunca debería llamar:
+
+| nivel | herramientas |
+|---|---|
+| `read` | solo herramientas que no cambian nada: obtener, listar, buscar, retroenlaces, revisiones, estado de uso compartido, información del sistema, ajustes |
+| `write` | `read`, más los cambios que se pueden deshacer: notas, tareas, recordatorios, carpetas, movimientos, adjuntos, enviar una nota a la papelera, restaurar desde la papelera o desde una revisión |
+| `admin` *(por defecto)* | todo, incluido lo que no se puede deshacer (vaciar la papelera, eliminar de ella), espacios de trabajo, copias de seguridad, sincronización Git, ajustes de la aplicación y uso compartido público |
+
+```bash
+# En .env
+POZNOTE_MCP_SCOPE=read
+
+# Vuelve a crear el contenedor MCP para que tome el nuevo entorno
+docker compose up -d --force-recreate mcp-server
+```
+
+Una herramienta por encima del nivel no se registra en absoluto: los clientes no la ven, y una llamada a ella se rechaza como herramienta desconocida, independientemente de lo que se le haya indicado al cliente. La línea de log del arranque muestra el nivel y cuántas herramientas se exponen. Un valor desconocido detiene el servidor en lugar de recurrir a `admin`.
+
+Con el token compartido, el nivel se aplica a todo el servidor: para dar niveles distintos a dos clientes, ejecuta un segundo contenedor MCP con su propio `POZNOTE_MCP_SCOPE`, su propio puerto y su propio `POZNOTE_MCP_AUTH_TOKEN`.
+
+Con la [autenticación por llamante](#autenticación-por-llamante-opcional), cada llamante puede recibir su propio nivel a partir de un claim de su token. `POZNOTE_MCP_SCOPE_MAP` enumera pares `<claim value>=<level>`, leídos del claim indicado por `POZNOTE_MCP_SCOPE_CLAIM` (por defecto `scope`, los scopes OAuth separados por espacios; también sirve un claim de tipo lista como `groups` o `roles`):
+
+```bash
+# Scopes OAuth concedidos a cada cliente por el proveedor de identidad
+POZNOTE_MCP_SCOPE_MAP=poznote.read=read,poznote.write=write,poznote.admin=admin
+
+# O grupos, para los proveedores que los incluyen en el token
+POZNOTE_MCP_SCOPE_CLAIM=groups
+POZNOTE_MCP_SCOPE_MAP=/poznote-agents=read,/poznote-users=write,/poznote-admins=admin
+```
+
+Un llamante recibe el nivel más alto al que corresponde su claim, nunca por encima de `POZNOTE_MCP_SCOPE`, y las herramientas por encima de ese nivel se ocultan de su lista de herramientas y se rechazan si las llama. Un llamante cuyo claim no corresponde a ningún nivel se rechaza sin más (`401`), en lugar de recibir el nivel del servidor, y el motivo queda registrado. Sin `POZNOTE_MCP_SCOPE_MAP`, todos los llamantes reciben el nivel del servidor.
+
+Cada herramienta lleva además las anotaciones MCP estándar `readOnlyHint` y `destructiveHint`, de modo que los clientes que filtran las herramientas o piden confirmarlas por su cuenta pueden apoyarse en ellas.
+
 #### Modo de depuración
 
 Define `POZNOTE_DEBUG=true` en el comando de arranque para cambiar el nivel de log de `INFO` a `DEBUG`. Vuelve a ponerlo en `false` para el uso normal. Solo se reconocen los valores exactos en minúsculas `true` y `false`. Cualquier otro valor se trata como `false` y se escribe una advertencia en los logs de MCP. El servidor web es más tolerante y también acepta `1`, `on` o `yes`. Cada petición HTTP enviada a la API de Poznote, cada llamada a herramienta recibida del asistente de IA y cada respuesta se escriben en detalle en los logs del contenedor. Úsalo para diagnosticar problemas de conexión o de autenticación:
@@ -312,7 +349,7 @@ Cualquiera que pueda llegar al endpoint MCP puede leer, crear, modificar y elimi
 1. **Accesibilidad de red.** Por defecto, el endpoint solo es accesible desde la máquina local.
 2. **Token bearer entrante** (opcional). Define `POZNOTE_MCP_AUTH_TOKEN` y cada petición deberá llevar `Authorization: Bearer <token>`.
 
-Con el `docker-compose.yml` por defecto, la capa 1 basta por sí sola. Añade la capa 2 en cuanto el puerto sea accesible desde algún lugar que no controlas por completo.
+Con el `docker-compose.yml` por defecto, la capa 1 basta por sí sola. Añade la capa 2 en cuanto el puerto sea accesible desde algún lugar que no controlas por completo. Para limitar lo que puede hacer un cliente que llegue al endpoint, define un [alcance de las herramientas](#alcance-de-las-herramientas).
 
 ### Por qué limitarse a 127.0.0.1 es normal y seguro
 
