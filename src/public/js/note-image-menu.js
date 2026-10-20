@@ -136,6 +136,10 @@ function buildImageMenuHTML(img) {
             <i class="lucide-maximize-2"></i>
             ${t('image_menu.view_large', null, 'Open')}
         </div>
+        <div class="image-menu-item" data-action="copy-image">
+            <i class="lucide lucide-copy"></i>
+            ${t('image_menu.copy_image', null, 'Copy image')}
+        </div>
         <div class="image-menu-item" data-action="download">
             <i class="lucide lucide-download"></i>
             ${t('image_menu.download', null, 'Download')}
@@ -385,6 +389,8 @@ function handleImageMenuAction(action, img, e) {
 
     if (action === 'view-large') {
         viewImageLarge(img.src);
+    } else if (action === 'copy-image') {
+        copyImageToClipboard(img);
     } else if (action === 'download') {
         downloadImage(img.src);
     } else if (action === 'edit-excalidraw') {
@@ -595,6 +601,126 @@ function viewImageLarge(imageSrc) {
         // For regular URLs, open directly
         window.open(imageSrc, '_blank');
     }
+}
+
+/**
+ * Copy an image to the clipboard, as the browser's own "Copy image" does,
+ * which the image menu replaces. Clipboards take PNG everywhere, so the
+ * image is redrawn as one.
+ * @param {HTMLImageElement} img
+ */
+function copyImageToClipboard(img) {
+    const t = window.t || ((key, params, fallback) => fallback);
+
+    // The Clipboard API only exists over HTTPS (or localhost)
+    if (!window.isSecureContext || !navigator.clipboard || typeof navigator.clipboard.write !== 'function' || typeof window.ClipboardItem !== 'function') {
+        showImageCopyToast(t('image_menu.copy_blocked', null, 'The browser only lets Poznote copy images over HTTPS.'));
+        return;
+    }
+
+    // The item gets a promise rather than the blob: Safari only accepts a
+    // write started inside the click, and the redraw is asynchronous
+    let item;
+    try {
+        item = new window.ClipboardItem({ 'image/png': getImagePngBlob(img) });
+    } catch (e) {
+        showImageCopyToast(t('image_menu.copy_failed', null, 'The image could not be copied.'));
+        return;
+    }
+
+    navigator.clipboard.write([item]).then(function () {
+        showImageCopyToast(t('image_menu.image_copied', null, 'Image copied'));
+    }).catch(function (e) {
+        console.debug('note-image-menu: copy failed:', e);
+        showImageCopyToast(t('image_menu.copy_failed', null, 'The image could not be copied.'));
+    });
+}
+
+/**
+ * The image as a PNG blob. The image on the page is drawn first; one from
+ * another site taints the canvas, and is fetched instead, which works when
+ * that site allows it.
+ * @param {HTMLImageElement} img
+ * @returns {Promise<Blob>}
+ */
+async function getImagePngBlob(img) {
+    if (!img.complete || !img.naturalWidth) {
+        await img.decode();
+    }
+    try {
+        return await drawImageAsPng(img, img.naturalWidth, img.naturalHeight, img);
+    } catch (e) {
+        if (!e || e.name !== 'SecurityError') throw e;
+    }
+
+    const response = await fetch(img.currentSrc || img.src, { mode: 'cors', credentials: 'omit' });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const blob = await response.blob();
+    if (blob.type === 'image/png') return blob;
+    const bitmap = await createImageBitmap(blob);
+    try {
+        return await drawImageAsPng(bitmap, bitmap.width, bitmap.height, img);
+    } finally {
+        bitmap.close();
+    }
+}
+
+/**
+ * Draw an image source on a canvas and read it back as PNG.
+ * @param {CanvasImageSource} source
+ * @param {number} width - Intrinsic width, 0 for an SVG without one
+ * @param {number} height
+ * @param {HTMLImageElement} img - The image on the page, for its shown size
+ * @returns {Promise<Blob>}
+ */
+function drawImageAsPng(source, width, height, img) {
+    // An SVG without a size of its own is copied at the size it is shown
+    if (!width || !height) {
+        const rect = img.getBoundingClientRect();
+        const ratio = window.devicePixelRatio || 1;
+        width = Math.round(rect.width * ratio);
+        height = Math.round(rect.height * ratio);
+    }
+    if (!width || !height) {
+        return Promise.reject(new Error('Image has no size'));
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext('2d').drawImage(source, 0, 0, width, height);
+
+    return new Promise(function (resolve, reject) {
+        // toBlob throws a SecurityError on a tainted canvas
+        canvas.toBlob(function (blob) {
+            if (blob) resolve(blob);
+            else reject(new Error('Canvas export failed'));
+        }, 'image/png');
+    });
+}
+
+/**
+ * Short message after a copy, in the toast the editor uses for its notices.
+ * @param {string} message
+ */
+function showImageCopyToast(message) {
+    let toast = document.getElementById('image-copy-toast');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'image-copy-toast';
+        toast.className = 'pz-toast pz-toast--message';
+        toast.setAttribute('role', 'status');
+        document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.classList.remove('pz-toast--hidden');
+    toast.classList.add('pz-toast--visible');
+
+    clearTimeout(showImageCopyToast.timer);
+    showImageCopyToast.timer = setTimeout(function () {
+        toast.classList.remove('pz-toast--visible');
+        toast.classList.add('pz-toast--hidden');
+    }, 2500);
 }
 
 /**

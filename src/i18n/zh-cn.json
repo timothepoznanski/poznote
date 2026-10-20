@@ -2422,6 +2422,7 @@
   },
   "image_menu": {
     "view_large": "打开",
+    "copy_image": "复制图片",
     "download": "下载",
     "resize": "调整大小",
     "edit": "编辑",
@@ -2435,6 +2436,9 @@
     "add_link": "添加链接",
     "edit_link": "编辑链接",
     "remove_link": "移除链接",
+    "image_copied": "图片已复制",
+    "copy_failed": "无法复制图片。",
+    "copy_blocked": "浏览器仅允许 Poznote 通过 HTTPS 复制图片。",
     "link_modal": {
       "title_add": "向图片添加链接",
       "title_edit": "编辑图片链接",
