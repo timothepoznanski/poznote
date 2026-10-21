@@ -24,6 +24,7 @@
             txtReasonRecentOne: txt('reason-recent-one', 'Modified in the last day'),
             txtFolderDirect: txt('folder-direct', 'Kept offline'),
             txtFolderParent: txt('folder-parent', 'Via a parent folder'),
+            txtFolderNotes: txt('folder-notes', 'All its notes kept offline'),
             txtKeep: txt('keep', 'Keep offline'),
             txtStop: txt('stop', 'Stop keeping offline'),
             txtKeepError: txt('keep-error', 'The offline setting could not be saved.'),
@@ -619,7 +620,9 @@
 
         var actions = document.createElement('div');
         actions.className = 'note-actions';
-        actions.appendChild(renderToggleButton('note', note.note_id, note.reason === 'note'));
+        // Kept by a mark (its own or its folder's): stop, as in the tree's
+        // menu; favorites and recent notes can be marked to stay
+        actions.appendChild(renderToggleButton('note', note.note_id, note.reason === 'note' || note.reason === 'folder'));
         item.appendChild(actions);
         return item;
     }
@@ -670,18 +673,23 @@
         link.href = 'index.php?kanban=' + encodeURIComponent(folder.folder_id) + (folder.workspace ? '&workspace=' + encodeURIComponent(folder.workspace) : '');
         link.className = 'folder-name-path note-name';
         link.title = folder.folder_path;
-        link.textContent = folder.folder_name + ' (' + folder.note_count + ')';
+        link.textContent = folder.folder_name;
         nameContainer.appendChild(link);
+
+        var count = document.createElement('span');
+        count.className = 'shared-folder-count';
+        count.textContent = String(folder.note_count);
+        nameContainer.appendChild(count);
         item.appendChild(nameContainer);
 
-        item.appendChild(renderReasonCell(folder.is_direct ? config.txtFolderDirect : config.txtFolderParent));
+        var folderReason = folder.reason || (folder.is_direct ? 'direct' : 'parent');
+        item.appendChild(renderReasonCell(folderReason === 'direct' ? config.txtFolderDirect
+            : (folderReason === 'notes' ? config.txtFolderNotes : config.txtFolderParent)));
 
         var actions = document.createElement('div');
         actions.className = 'note-actions';
-        // Kept through a parent: only that parent can be stopped
-        if (folder.is_direct) {
-            actions.appendChild(renderToggleButton('folder', folder.folder_id, true));
-        }
+        // Stopping takes the notes and subfolders with it (FoldersController)
+        actions.appendChild(renderToggleButton('folder', folder.folder_id, true));
         item.appendChild(actions);
         return item;
     }

@@ -36,6 +36,14 @@ while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 	$folders[(int)$row['id']] = $row;
 }
 
+// Kept offline as the menus show it: every note in the folder kept
+// (lib/offline.php). list_folders.js takes the new list from the API reply.
+$offlineShownFolderIds = poznoteOfflineFolderStates($con)['shown'];
+foreach ($folders as $keptId => &$keptRow) {
+	$keptRow['offline_kept'] = isset($offlineShownFolderIds[$keptId]);
+}
+unset($keptRow);
+
 // Same order as the sidebar tree: the one global sort mode (#1442)
 $folders = sortFolders($folders, poznoteNormalizeNoteSort(getSetting('note_list_sort', POZNOTE_NOTE_SORT_DEFAULT)));
 
@@ -211,7 +219,7 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	$note_count = (int)$folder['note_count'];
 	$is_shared = isset($sharedFolderIds[(int)$folder['id']]) ? '1' : '0';
 	$is_favorite = !empty($folder['favorite']) ? '1' : '0';
-	$is_offline = !empty($folder['offline']) ? '1' : '0';
+	$is_offline = !empty($folder['offline_kept']) ? '1' : '0';
 
 	$kanban_url = 'index.php?kanban=' . $folder_id . '&workspace=' . urlencode($workspace);
 

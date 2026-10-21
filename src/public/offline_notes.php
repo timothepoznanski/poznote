@@ -48,6 +48,7 @@ $currentLang = getUserLanguage();
 	data-txt-reason-recent-one="<?php echo t_h('offline.page.reason_recent_one', [], 'Modified in the last day'); ?>"
 	data-txt-folder-direct="<?php echo t_h('offline.page.folder_direct', [], 'Kept offline'); ?>"
 	data-txt-folder-parent="<?php echo t_h('offline.page.folder_parent', [], 'Via a parent folder'); ?>"
+	data-txt-folder-notes="<?php echo t_h('offline.page.folder_notes', [], 'All its notes kept offline'); ?>"
 	data-txt-keep="<?php echo t_h('notes_list.note_actions.keep_offline', [], 'Keep offline'); ?>"
 	data-txt-stop="<?php echo t_h('notes_list.note_actions.stop_offline', [], 'Stop keeping offline'); ?>"
 	data-txt-keep-error="<?php echo t_h('offline.keep.error', [], 'The offline setting could not be saved.'); ?>"

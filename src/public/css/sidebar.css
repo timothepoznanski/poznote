@@ -238,12 +238,6 @@
     font-size: var(--sidebar-font-size, 13px);
 }
 
-.folder-note-count {
-    color: var(--pz-text-muted);
-    margin-left: 6px;
-    font-weight: var(--pz-weight-normal);
-}
-
 /* Folder content / notes styling */
 .note-in-folder {
     padding-left: 26px;

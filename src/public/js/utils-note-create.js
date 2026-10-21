@@ -669,6 +669,17 @@ function setOfflineKeep(kind, id, keep) {
             toggles.forEach(function (toggle) {
                 toggle.setAttribute('data-offline', keep ? '1' : '0');
             });
+            // The notes and subfolders of a folder follow it: the server
+            // says which (notes_list.php)
+            if (kind === 'folder' && document.getElementById('left_col') && typeof window.refreshNotesListAfterFolderAction === 'function') {
+                window.refreshNotesListAfterFolderAction();
+            } else if (Array.isArray(data.kept_folders)) {
+                // A folder shows as kept once every note in it is
+                var keptFolders = data.kept_folders.map(String);
+                document.querySelectorAll('.folder-actions-toggle[data-folder-id]').forEach(function (toggle) {
+                    toggle.setAttribute('data-offline', keptFolders.indexOf(toggle.getAttribute('data-folder-id')) !== -1 ? '1' : '0');
+                });
+            }
             if (typeof window.poznoteOfflineSyncNow === 'function') {
                 window.poznoteOfflineSyncNow();
             }

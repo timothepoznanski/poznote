@@ -1912,7 +1912,11 @@ class FoldersController {
     /**
      * PUT /api/v1/folders/{id}/offline - keep the folder's notes, subfolders
      * included, in the browser whatever their date (lib/offline.php), or stop
-     * doing so. Body: {"offline": bool}.
+     * doing so. Body: {"offline": bool}. The notes and subfolders follow:
+     * keeping brings back those left out, stopping clears their own marks.
+     * Stopping a subfolder that a parent keeps leaves it out. The reply's
+     * "mark" is the value stored (1, 0, -1), "kept_folders" the folders to
+     * show as kept (every note in them kept, lib/offline.php).
      */
     public function updateOffline(string $id): void {
         $folderId = (int)$id;
@@ -1932,8 +1936,36 @@ class FoldersController {
             return;
         }
 
-        $stmt = $this->db->prepare("UPDATE folders SET offline = ? WHERE id = ?");
-        if (!$stmt->execute([$offline ? 1 : 0, $folderId])) {
+        // The folder decides for everything in it: "Keep" brings back the
+        // notes and subfolders left out (-1), "Stop" clears the marks of
+        // those kept on their own (1). "Stop" on a subfolder that a parent
+        // keeps leaves it out (-1); elsewhere it only clears its mark.
+        require_once __DIR__ . '/../../../lib/offline.php';
+        $folders = $this->db->query('SELECT id, parent_id, offline FROM folders')->fetchAll(PDO::FETCH_ASSOC);
+        $mark = 1;
+        if (!$offline) {
+            foreach ($folders as &$folder) {
+                if ((int)$folder['id'] === $folderId) {
+                    $folder['offline'] = 0;
+                }
+            }
+            unset($folder);
+            $mark = isset(poznoteOfflineFolderIds($folders)[$folderId]) ? -1 : 0;
+        }
+        $subtree = poznoteOfflineFolderSubtree($folders, $folderId);
+        $inSubtree = implode(',', array_map('intval', $subtree));
+        $innerMark = $offline ? -1 : 1;
+
+        try {
+            $this->db->beginTransaction();
+            $this->db->prepare('UPDATE folders SET offline = ? WHERE id = ?')->execute([$mark, $folderId]);
+            $this->db->prepare("UPDATE folders SET offline = 0 WHERE offline = ? AND id <> ? AND id IN ($inSubtree)")->execute([$innerMark, $folderId]);
+            $this->db->prepare("UPDATE entries SET offline = 0 WHERE offline = ? AND folder_id IN ($inSubtree)")->execute([$innerMark]);
+            $this->db->commit();
+        } catch (Exception $e) {
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
             $this->sendError('Database error while updating offline state', 500);
             return;
         }
@@ -1941,7 +1973,10 @@ class FoldersController {
         $this->sendJson([
             'success' => true,
             'message' => 'Folder offline state updated successfully',
-            'offline' => $offline
+            'offline' => $offline,
+            'mark' => $mark,
+            // Folders to show as kept now (every note in them kept)
+            'kept_folders' => array_map('intval', array_keys(poznoteOfflineFolderStates($this->db)['shown']))
         ]);
     }
 

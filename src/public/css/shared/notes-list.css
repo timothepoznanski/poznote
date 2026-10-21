@@ -313,7 +313,6 @@
 }
 
 .shared-via-parent {
-    padding-left: 0;
     border-left: none;
     background-color: transparent;
 }
@@ -321,6 +320,22 @@
 html[data-theme='dark'] .shared-via-parent {
     border-left-color: transparent;
     background-color: transparent;
+}
+
+/* Number of notes of a folder: a discreet pill after its name */
+.shared-folder-count {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    height: 14px;
+    padding: 0 5px;
+    border-radius: var(--pz-radius-pill);
+    background-color: var(--pz-surface-sunken);
+    color: var(--pz-text-muted);
+    font-size: 10px;
+    font-weight: var(--pz-weight-medium);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
 }
 
 .folder-name-path {

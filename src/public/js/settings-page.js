@@ -105,6 +105,7 @@
             'folder_tree_dim_level',
             'notes_without_folders_after_folders',
             'folder_icon_opens_kanban',
+            'folder_count_parentheses',
             'sidebar_offline_marks',
             'whats_new_popup',
             'markdown_split_card_view',
@@ -3042,6 +3043,7 @@
         setupToggleCard('folder-actions-card', 'folder-actions-status', 'hide_folder_actions', true);
         setupToggleCard('notes-without-folders-card', 'notes-without-folders-status', 'notes_without_folders_after_folders', false);
         setupToggleCard('folder-icon-kanban-card', 'folder-icon-kanban-status', 'folder_icon_opens_kanban', false, false);
+        setupToggleCard('folder-count-parentheses-card', 'folder-count-parentheses-status', 'folder_count_parentheses', false, false);
         setupToggleCard('sidebar-offline-marks-card', 'sidebar-offline-marks-status', 'sidebar_offline_marks', false, true);
         setupToggleCard('whats-new-card', 'whats-new-status', 'whats_new_popup', false, true);
         setupToggleCard('markdown-split-card-view-card', 'markdown-split-card-view-status', 'markdown_split_card_view', false, true);

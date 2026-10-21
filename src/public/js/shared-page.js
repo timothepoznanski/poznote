@@ -2315,8 +2315,13 @@
         folderLink.href = 'index.php?kanban=' + folder.folder_id + (config.workspace ? '&workspace=' + encodeURIComponent(config.workspace) : '');
         folderLink.className = 'folder-name-path note-name';
         folderLink.title = folder.folder_path;
-        folderLink.textContent = folder.folder_name + ' (' + folder.note_count + ')';
+        folderLink.textContent = folder.folder_name;
         nameContainer.appendChild(folderLink);
+
+        var folderCount = document.createElement('span');
+        folderCount.className = 'shared-folder-count';
+        folderCount.textContent = String(folder.note_count);
+        nameContainer.appendChild(folderCount);
 
         if (folder.password) {
             var lockIcon = document.createElement('i');

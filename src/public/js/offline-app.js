@@ -669,7 +669,7 @@
             toggle.setAttribute('data-offline-folder', String(folderId));
             toggle.appendChild(icon((open ? 'lucide-folder-open' : 'lucide-folder') + ' folder-icon'));
             toggle.appendChild(el('span', 'folder-name', folder.name));
-            toggle.appendChild(el('span', 'folder-note-count', '(' + countNotes(folderId) + ')'));
+            toggle.appendChild(el('span', 'folder-note-count', String(countNotes(folderId))));
             header.appendChild(toggle);
             container.appendChild(header);
 

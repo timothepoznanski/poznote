@@ -20,12 +20,41 @@
     font-size: var(--sidebar-font-size, 13px);
 }
 
+/* Number of notes of a folder: a discreet pill after its name, as on the
+   Shares and Offline pages (css/shared/notes-list.css), sized from the
+   sidebar font */
 .folder-note-count {
-    font-size: 12px;
-    color: var(--pz-text-muted);
-    font-weight: var(--pz-weight-normal);
-    margin-left: 8px;
     flex: 0 0 auto;
+    display: inline-block;
+    height: 1.4em;
+    padding: 0 0.5em;
+    border-radius: var(--pz-radius-pill);
+    background-color: var(--pz-surface-sunken);
+    color: var(--pz-text-muted);
+    font-size: calc(var(--sidebar-font-size, 13px) - 3px);
+    font-weight: var(--pz-weight-medium);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.4em;
+    margin-left: 8px;
+}
+
+/* "Folder counts in parentheses" setting: "(12)" in plain muted text */
+body.folder-count-parentheses .folder-note-count {
+    height: auto;
+    padding: 0;
+    border-radius: 0;
+    background-color: transparent;
+    font-size: 12px;
+    font-weight: var(--pz-weight-normal);
+    line-height: inherit;
+}
+
+body.folder-count-parentheses .folder-note-count::before {
+    content: "(";
+}
+
+body.folder-count-parentheses .folder-note-count::after {
+    content: ")";
 }
 
 .folder-icon[data-action='open-kanban-view']:hover {
