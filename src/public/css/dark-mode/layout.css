@@ -279,7 +279,7 @@ html[data-theme='dark'] #iconSidebarToggle {
     color: var(--pz-text);
 }
 
-@media (hover: hover) {
+@media (hover: hover) and (min-width: 801px) {
     html[data-theme='dark'] #iconSidebarToggle:hover {
         background: var(--pz-surface-hover);
         color: var(--pz-accent-text);
