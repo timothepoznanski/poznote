@@ -1722,6 +1722,7 @@ class NotesController {
      * its date (lib/offline.php), or stop doing so. Body: {"offline": bool}.
      * Stopping a note the browser would still keep on its own (recent,
      * favorite, in a folder kept offline) marks it -1, which keeps it out.
+     * The reply's "kept_folders" are the folders to show as kept now.
      */
     public function updateOffline(string $id): void {
         if (!is_numeric($id)) {
@@ -1764,7 +1765,9 @@ class NotesController {
 
             $this->sendSuccess([
                 'message' => 'Note offline state updated successfully',
-                'offline' => $offline
+                'offline' => $offline,
+                // Folders to show as kept now (every note in them kept)
+                'kept_folders' => array_map('intval', array_keys(poznoteOfflineFolderStates($this->con)['shown']))
             ]);
         } catch (Exception $e) {
             $this->sendError(500, 'Database error occurred');

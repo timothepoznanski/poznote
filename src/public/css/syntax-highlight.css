@@ -30,86 +30,104 @@ code.hljs {
     padding: 3px 5px;
 }
 
-/* Light theme (default) */
+/* Token colours. They read the --pz-syntax-* tokens (css/tokens.css), which
+   switch with the theme, so one set of rules serves every theme. Strings,
+   numbers and variables each have their own colour: the dark rules used to
+   paint all three the same blue, and comments a grey next to grey text
+   (issue #1660). */
 .hljs {
-    color: var(--pz-text);
+    color: var(--pz-syntax-text);
     background: var(--pz-surface);
 }
 
-.hljs-doctag,
 .hljs-keyword,
 .hljs-meta .hljs-keyword,
+.hljs-literal,
+.hljs-doctag,
 .hljs-template-tag,
-.hljs-template-variable,
-.hljs-type,
 .hljs-variable.language_ {
-    color: var(--pz-danger-text);
+    color: var(--pz-syntax-keyword);
 }
 
 .hljs-title,
-.hljs-title.class_,
-.hljs-title.class_.inherited__,
-.hljs-title.function_ {
-    color: #6f42c1;
+.hljs-title.function_,
+.hljs-built_in {
+    color: var(--pz-syntax-function);
 }
 
+.hljs-type,
+.hljs-title.class_,
+.hljs-title.class_.inherited__ {
+    color: var(--pz-syntax-type);
+}
+
+.hljs-variable,
+.hljs-template-variable,
+.hljs-params,
+.hljs-property,
 .hljs-attr,
 .hljs-attribute,
-.hljs-literal,
-.hljs-meta,
-.hljs-number,
-.hljs-operator,
-.hljs-selector-attr,
-.hljs-selector-class,
-.hljs-selector-id,
-.hljs-variable {
-    color: var(--pz-accent-text-hover);
+.hljs-selector-attr {
+    color: var(--pz-syntax-variable);
 }
 
 .hljs-meta .hljs-string,
-.hljs-regexp,
-.hljs-string {
-    color: var(--pz-accent-strong);
+.hljs-string,
+.hljs-char.escape_ {
+    color: var(--pz-syntax-string);
 }
 
-.hljs-built_in,
-.hljs-symbol {
-    color: var(--pz-warning-strong);
+.hljs-number {
+    color: var(--pz-syntax-number);
+}
+
+.hljs-regexp,
+.hljs-symbol,
+.hljs-link {
+    color: var(--pz-syntax-regexp);
+}
+
+.hljs-meta {
+    color: var(--pz-syntax-meta);
 }
 
 .hljs-code,
 .hljs-comment,
-.hljs-formula {
-    color: var(--pz-text-muted);
+.hljs-formula,
+.hljs-quote {
+    color: var(--pz-syntax-comment);
 }
 
 .hljs-name,
-.hljs-quote,
-.hljs-selector-pseudo,
-.hljs-selector-tag {
-    color: var(--pz-success-hover);
+.hljs-selector-tag,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-selector-pseudo {
+    color: var(--pz-syntax-tag);
 }
 
+.hljs-operator,
+.hljs-punctuation,
 .hljs-subst {
-    color: var(--pz-text);
+    color: var(--pz-syntax-text);
 }
 
 .hljs-section {
-    color: var(--pz-accent-hover);
+    color: var(--pz-syntax-keyword);
     font-weight: var(--pz-weight-bold);
 }
 
 .hljs-bullet {
-    color: var(--pz-warning-strong);
+    color: var(--pz-syntax-function);
 }
 
 .hljs-emphasis {
-    color: var(--pz-text);
+    color: var(--pz-syntax-text);
     font-style: italic;
 }
 
 .hljs-strong {
-    color: var(--pz-text);
+    color: var(--pz-syntax-text);
     font-weight: var(--pz-weight-bold);
 }
 
@@ -125,7 +143,6 @@ code.hljs {
 
 /* Dark theme - Applied when data-theme="dark" is set on html element */
 html[data-theme='dark'] .hljs {
-    color: var(--pz-text-muted);
     background: var(--pz-bg);
 }
 
@@ -135,83 +152,6 @@ html[data-theme='dark'] .hljs {
    theme, a faint one in dark and terminal. */
 html[data-theme='dark'] pre code.hljs {
     background: transparent;
-}
-
-html[data-theme='dark'] .hljs-doctag,
-html[data-theme='dark'] .hljs-keyword,
-html[data-theme='dark'] .hljs-meta .hljs-keyword,
-html[data-theme='dark'] .hljs-template-tag,
-html[data-theme='dark'] .hljs-template-variable,
-html[data-theme='dark'] .hljs-type,
-html[data-theme='dark'] .hljs-variable.language_ {
-    color: var(--pz-danger-text);
-}
-
-html[data-theme='dark'] .hljs-title,
-html[data-theme='dark'] .hljs-title.class_,
-html[data-theme='dark'] .hljs-title.class_.inherited__,
-html[data-theme='dark'] .hljs-title.function_ {
-    color: #d2a8ff;
-}
-
-html[data-theme='dark'] .hljs-attr,
-html[data-theme='dark'] .hljs-attribute,
-html[data-theme='dark'] .hljs-literal,
-html[data-theme='dark'] .hljs-meta,
-html[data-theme='dark'] .hljs-number,
-html[data-theme='dark'] .hljs-operator,
-html[data-theme='dark'] .hljs-selector-attr,
-html[data-theme='dark'] .hljs-selector-class,
-html[data-theme='dark'] .hljs-selector-id,
-html[data-theme='dark'] .hljs-variable {
-    color: var(--pz-accent-text-hover);
-}
-
-html[data-theme='dark'] .hljs-meta .hljs-string,
-html[data-theme='dark'] .hljs-regexp,
-html[data-theme='dark'] .hljs-string {
-    color: var(--pz-accent-text-hover);
-}
-
-html[data-theme='dark'] .hljs-built_in,
-html[data-theme='dark'] .hljs-symbol {
-    color: var(--pz-warning-text-hover);
-}
-
-html[data-theme='dark'] .hljs-code,
-html[data-theme='dark'] .hljs-comment,
-html[data-theme='dark'] .hljs-formula {
-    color: var(--pz-text-subtle);
-}
-
-html[data-theme='dark'] .hljs-name,
-html[data-theme='dark'] .hljs-quote,
-html[data-theme='dark'] .hljs-selector-pseudo,
-html[data-theme='dark'] .hljs-selector-tag {
-    color: var(--pz-success-text);
-}
-
-html[data-theme='dark'] .hljs-subst {
-    color: var(--pz-text-muted);
-}
-
-html[data-theme='dark'] .hljs-section {
-    color: var(--pz-accent-text);
-    font-weight: var(--pz-weight-bold);
-}
-
-html[data-theme='dark'] .hljs-bullet {
-    color: var(--pz-warning-text);
-}
-
-html[data-theme='dark'] .hljs-emphasis {
-    color: var(--pz-text-muted);
-    font-style: italic;
-}
-
-html[data-theme='dark'] .hljs-strong {
-    color: var(--pz-text-muted);
-    font-weight: var(--pz-weight-bold);
 }
 
 html[data-theme='dark'] .hljs-addition {

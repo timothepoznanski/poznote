@@ -17,6 +17,22 @@ if (!empty($workspace_filter) && function_exists('getAuthenticatedUserId')) {
     ));
 }
 
+// Offline folders (lib/offline.php): a note in a kept folder shows "Stop
+// keeping offline" unless that was chosen for the note itself
+// (entries.offline = -1); a folder shows it when every note in it is kept.
+$offline_kept_folder_ids = [];
+$offline_shown_folder_ids = [];
+if (isset($con) && function_exists('poznoteOfflineModeEnabled') && poznoteOfflineModeEnabled()) {
+    try {
+        $offlineFolderStates = poznoteOfflineFolderStates($con);
+        $offline_kept_folder_ids = $offlineFolderStates['kept'];
+        $offline_shown_folder_ids = $offlineFolderStates['shown'];
+    } catch (Exception $e) {
+        $offline_kept_folder_ids = [];
+        $offline_shown_folder_ids = [];
+    }
+}
+
 // Count favorites for the current workspace (needed for display)
 $favorites_count = 0;
 try {
@@ -331,7 +347,7 @@ function getSharedAncestorFolderName($folderId) {
 }
 
 function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $folderName) {
-    global $show_note_icons_setting, $mention_note_ids;
+    global $show_note_icons_setting, $mention_note_ids, $offline_kept_folder_ids;
 
     $noteDbId = isset($row1["id"]) ? $row1["id"] : '';
     $noteTitle = $row1["heading"] ?: t('index.note.new_note', [], 'New note');
@@ -370,7 +386,11 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
     echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . $mentionMarker . "</span>";
     echo "</a>";
-    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), (int)($row1['offline'] ?? 0) > 0, isNoteShared($noteDbId), getSharedAncestorFolderName($folderId));
+    // Kept offline: marked itself, or in a kept folder and not left out
+    $offlineMark = (int)($row1['offline'] ?? 0);
+    $isOffline = $offlineMark > 0
+        || ($offlineMark === 0 && isset($offline_kept_folder_ids[(int)($row1['folder_id'] ?? 0)]));
+    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), $isOffline, isNoteShared($noteDbId), getSharedAncestorFolderName($folderId));
     echo "</div>";
     echo "<div class='pxbetweennotes'></div>";
 }
@@ -427,7 +447,7 @@ function findFolderPathByName($nodes, $name, $path = []) {
 }
 
 function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search_mode, $folders_with_results, $note, $current_note_folder, $default_note_folder, $workspace_filter, $total_notes, $folder_filter, $search, $tags_search, $preserve_notes, $preserve_tags, $search_combined = false, $displayUncategorizedFirst = true, $created_from = '', $created_to = '') {
-    global $selected_linked_note_id, $favorite_folders, $folder_tree_active_id, $folder_tree_ancestors, $favorites_icon_color;
+    global $selected_linked_note_id, $favorite_folders, $folder_tree_active_id, $folder_tree_ancestors, $favorites_icon_color, $offline_shown_folder_ids;
     $folderName = $folderData['name'];
     $notes = $folderData['notes'];
 
@@ -527,7 +547,7 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         // Favorites shows no count: its rows repeat notes and folders counted
         // further down the tree
         if (!$isFavoritesSection) {
-            echo "<span class='folder-note-count' id='count-" . $folderId . "'>(" . $noteCount . ")</span>";
+            echo "<span class='folder-note-count' id='count-" . $folderId . "'>" . $noteCount . "</span>";
         }
         echo "<span class='folder-actions'>";
         // Favorites has a menu of its own (#favorites-actions-menu below)
@@ -536,7 +556,8 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
         }
         
         // Generate folder actions
-        echo generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount, !empty($folderData['favorite']), !empty($folderData['offline']));
+        // Kept offline: every note in it kept (or, empty, the folder's rule)
+        echo generateFolderActions($folderId, $folderName, $con, $workspace_filter, $noteCount, !empty($folderData['favorite']), isset($offline_shown_folder_ids[(int)$folderId]));
         
         echo "</span>";
         echo "</div>";

@@ -80,16 +80,6 @@ html[data-theme='dark'] .noteentry.markdown-split-mode .markdown-editor {
 }
 
 html[data-theme='dark'] .markdown-codemirror-host {
-    --poznote-cm-keyword: #ff7b72;
-    --poznote-cm-atom: #79c0ff;
-    --poznote-cm-string: #a5d6ff;
-    --poznote-cm-number: #79c0ff;
-    --poznote-cm-comment: #8b949e;
-    --poznote-cm-function: #d2a8ff;
-    --poznote-cm-variable: #c9d1d9;
-    --poznote-cm-type: #7ee787;
-    --poznote-cm-punctuation: #c9d1d9;
-    --poznote-cm-meta: #79c0ff;
     --poznote-cm-heading: #79c0ff;
     --poznote-cm-link: #58a6ff;
     --poznote-cm-monospace: #d2a8ff;

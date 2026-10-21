@@ -31,9 +31,8 @@ class OfflineController {
     // own budget, applied by the browser (js/offline-sync.js).
     private const MAX_NOTES_PER_REQUEST = 50;
 
-    // Types the offline page can show and edit. Excalidraw drawings and the
-    // other special types stay online only.
-    private const OFFLINE_TYPES = ['note', 'markdown', 'tasklist'];
+    // Types the offline page can show and edit (lib/offline.php)
+    private const OFFLINE_TYPES = POZNOTE_OFFLINE_NOTE_TYPES;
 
     private PDO $con;
     private NotesController $notes;
@@ -166,6 +165,21 @@ class OfflineController {
     }
 
     /**
+     * The ids of the notes collectKeptNotes() sends, as
+     * poznoteOfflineFolderStates() takes them.
+     *
+     * @param array<int, array<string, mixed>> $keptNotes
+     * @return array<int, true>
+     */
+    private function copiedNoteIds(array $keptNotes): array {
+        $ids = [];
+        foreach ($keptNotes as $note) {
+            $ids[(int)$note['id']] = true;
+        }
+        return $ids;
+    }
+
+    /**
      * GET /api/v1/offline/manifest
      */
     public function manifest(): void {
@@ -183,7 +197,7 @@ class OfflineController {
             $workspaces = $this->con->query('SELECT name FROM workspaces ORDER BY display_order, name COLLATE NOCASE')
                 ->fetchAll(PDO::FETCH_COLUMN);
 
-            ['folders' => $allFolders, 'kept_folders' => $keptFolders, 'notes' => $keptNotes] = $this->collectKeptNotes($days);
+            ['folders' => $allFolders, 'notes' => $keptNotes] = $this->collectKeptNotes($days);
             $notes = [];
             foreach ($keptNotes as $row) {
                 $notes[] = [
@@ -234,9 +248,10 @@ class OfflineController {
                 ],
                 'workspaces' => array_values(array_map('strval', $workspaces)),
                 'folders' => array_values($folders),
-                // Folders kept whole ("Keep offline", or under one), for the
-                // marks of the note and folder lists (js/offline-marks.js)
-                'kept_folders' => array_map('intval', array_keys($keptFolders)),
+                // Folders whose notes are all kept, as the menus show them
+                // (lib/offline.php), for the marks of the note and folder
+                // lists (js/offline-marks.js)
+                'kept_folders' => $days > 0 ? array_map('intval', array_keys(poznoteOfflineFolderStates($this->con, $this->copiedNoteIds($keptNotes))['shown'])) : [],
                 'notes' => $notes,
             ];
 
@@ -264,8 +279,8 @@ class OfflineController {
      *
      * The notes and folders kept offline, for the page that lists them
      * (offline_notes.php): the manifest's notes with why each one is kept,
-     * and the folders kept whole ("Keep offline", or under one). Without a
-     * workspace, every workspace.
+     * and the folders whose notes, subfolders included, are all kept. Without
+     * a workspace, every workspace.
      */
     public function listing(): void {
         if ($this->refuseBorrowedAccount()) {
@@ -294,8 +309,14 @@ class OfflineController {
                 if ($workspace !== '' && $note['workspace'] !== $workspace) {
                     continue;
                 }
-                if ($note['folder_id'] !== null) {
-                    $noteCounts[$note['folder_id']] = ($noteCounts[$note['folder_id']] ?? 0) + 1;
+                // Counted for its folder and every folder above it, as the
+                // tree counts them
+                $countId = $note['folder_id'];
+                $counted = [];
+                while ($countId !== null && isset($allFolders[$countId]) && !isset($counted[$countId])) {
+                    $counted[$countId] = true;
+                    $noteCounts[$countId] = ($noteCounts[$countId] ?? 0) + 1;
+                    $countId = $allFolders[$countId]['parent_id'];
                 }
                 $notes[] = [
                     'note_id' => $note['id'],
@@ -312,8 +333,11 @@ class OfflineController {
                 ];
             }
 
+            // Only the folders really offline: every note in them, subfolders
+            // included, kept by a mark and within the budgets
+            $shownFolders = $days > 0 ? poznoteOfflineFolderStates($this->con, $this->copiedNoteIds($keptNotes))['shown'] : [];
             $folders = [];
-            foreach (array_keys($keptFolders) as $folderId) {
+            foreach (array_keys($shownFolders) as $folderId) {
                 $folder = $allFolders[$folderId] ?? null;
                 if ($folder === null || ($workspace !== '' && $folder['workspace'] !== $workspace)) {
                     continue;
@@ -324,7 +348,10 @@ class OfflineController {
                     'parent_id' => $folder['parent_id'],
                     'workspace' => $folder['workspace'],
                     'folder_path' => $folderPath($folder['id']),
-                    'is_direct' => !empty($folder['offline']),
+                    'is_direct' => $folder['offline'] > 0,
+                    // direct: marked "Keep offline"; parent: under a folder
+                    // marked; notes: every note in it marked one by one
+                    'reason' => $folder['offline'] > 0 ? 'direct' : (isset($keptFolders[$folderId]) ? 'parent' : 'notes'),
                     'note_count' => $noteCounts[$folder['id']] ?? 0,
                     'icon' => $folder['icon'],
                     'icon_color' => $folder['icon_color'],

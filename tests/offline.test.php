@@ -34,6 +34,58 @@ test('a folder marked Keep offline covers every folder under it', function () {
     assertSame([], poznoteOfflineFolderIds([['id' => 1, 'parent_id' => null, 'offline' => 0]]), 'nothing marked');
 });
 
+test('a subfolder left out of a kept folder takes its own subfolders with it', function () {
+    $folders = [
+        ['id' => 1, 'parent_id' => null, 'offline' => 1],
+        ['id' => 2, 'parent_id' => 1, 'offline' => -1],
+        ['id' => 3, 'parent_id' => 2, 'offline' => 0],
+        ['id' => 4, 'parent_id' => 2, 'offline' => 1],
+        ['id' => 5, 'parent_id' => 4, 'offline' => 0],
+        ['id' => 6, 'parent_id' => 1, 'offline' => 0],
+    ];
+    assertSame([1, 4, 5, 6], array_keys(poznoteOfflineFolderIds($folders)), 'the nearest mark decides');
+    assertSame([], poznoteOfflineFolderIds([['id' => 1, 'parent_id' => null, 'offline' => -1]]), 'left out, nothing above');
+});
+
+test('a folder shows as kept only when every note in it is', function () {
+    $folders = [
+        ['id' => 1, 'parent_id' => null, 'offline' => 1],
+        ['id' => 2, 'parent_id' => 1, 'offline' => 0],
+        ['id' => 3, 'parent_id' => 1, 'offline' => -1],
+        ['id' => 4, 'parent_id' => null, 'offline' => 0],
+        ['id' => 5, 'parent_id' => null, 'offline' => 1],
+        ['id' => 6, 'parent_id' => null, 'offline' => 0],
+    ];
+    $notes = [
+        ['folder_id' => 2, 'offline' => 0],
+        ['folder_id' => 3, 'offline' => 0],
+        ['folder_id' => 4, 'offline' => 1],
+        ['folder_id' => 4, 'offline' => 1],
+        ['folder_id' => 6, 'offline' => 1],
+        ['folder_id' => 6, 'offline' => 0],
+    ];
+    // 1: a note of subfolder 3 is left out; 4: both notes marked; 5: empty,
+    // its own mark; 6: one note not marked
+    assertSame([2, 4, 5], array_keys(poznoteOfflineShownFolderIds($folders, $notes)));
+    $notes[1]['offline'] = 1;
+    assertSame([1, 2, 3, 4, 5], array_keys(poznoteOfflineShownFolderIds($folders, $notes)), 'the left-out folder\'s note marked on its own');
+    $notes[0]['offline'] = -1;
+    assertSame([3, 4, 5], array_keys(poznoteOfflineShownFolderIds($folders, $notes)), 'a note left out unmarks its folders');
+});
+
+test('a folder subtree holds the folder and everything under it', function () {
+    $folders = [
+        ['id' => 1, 'parent_id' => null],
+        ['id' => 2, 'parent_id' => 1],
+        ['id' => 3, 'parent_id' => 2],
+        ['id' => 4, 'parent_id' => null],
+        ['id' => 5, 'parent_id' => 5],
+    ];
+    assertSame([1, 2, 3], poznoteOfflineFolderSubtree($folders, 1));
+    assertSame([4], poznoteOfflineFolderSubtree($folders, 4));
+    assertSame([5], poznoteOfflineFolderSubtree($folders, 5), 'a folder that is its own parent');
+});
+
 test('a parent loop does not hang the folder walk', function () {
     $kept = poznoteOfflineFolderIds([
         ['id' => 1, 'parent_id' => 2, 'offline' => 0],

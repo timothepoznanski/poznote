@@ -552,7 +552,8 @@ function renderFolderActionsMenu($currentWorkspace = '') {
  * @param string $folderName Containing folder name
  * @param bool $isFavorite Whether the note is marked as favorite, which picks
  *                         the favorite variant shown by the menu
- * @param bool $isOffline Whether the note is marked "Keep offline"
+ * @param bool $isOffline Whether the note is marked "Keep offline", or sits
+ *                        in a folder kept offline without being left out
  * @param bool $isShared Whether the note has its own public link, which picks
  *                       the share variant shown by the menu
  * @param string|null $sharedViaFolderName Nearest shared ancestor folder when

@@ -154,16 +154,16 @@ html[data-theme='dark'] .markdown-editor .markdown-excalidraw-placeholder::befor
 .markdown-codemirror-host {
     padding: 0;
     white-space: normal;
-    --poznote-cm-keyword: #d73a49;
-    --poznote-cm-atom: #005cc5;
-    --poznote-cm-string: #032f62;
-    --poznote-cm-number: #005cc5;
-    --poznote-cm-comment: #6a737d;
-    --poznote-cm-function: #6f42c1;
-    --poznote-cm-variable: #24292e;
-    --poznote-cm-type: #22863a;
-    --poznote-cm-punctuation: #24292e;
-    --poznote-cm-meta: #005cc5;
+    --poznote-cm-keyword: var(--pz-syntax-keyword);
+    --poznote-cm-atom: var(--pz-syntax-keyword);
+    --poznote-cm-string: var(--pz-syntax-string);
+    --poznote-cm-number: var(--pz-syntax-number);
+    --poznote-cm-comment: var(--pz-syntax-comment);
+    --poznote-cm-function: var(--pz-syntax-function);
+    --poznote-cm-variable: var(--pz-syntax-text);
+    --poznote-cm-type: var(--pz-syntax-type);
+    --poznote-cm-punctuation: var(--pz-syntax-text);
+    --poznote-cm-meta: var(--pz-syntax-meta);
     --poznote-cm-heading: #005cc5;
     --poznote-cm-link: #0366d6;
     --poznote-cm-monospace: #6f42c1;

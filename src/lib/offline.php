@@ -9,7 +9,8 @@
  *
  * A note is kept offline for one of four reasons, in this order of priority:
  *   note      it is marked "Keep offline" (entries.offline = 1)
- *   folder    it sits in a folder marked "Keep offline", or under one
+ *   folder    it sits in a folder marked "Keep offline", or under one, unless
+ *             a subfolder between them was left out (folders.offline = -1)
  *   favorite  it is a favorite (entries.favorite)
  *   recent    it was modified in the last offline_notes_days days
  * A note whose "Stop keeping offline" was chosen while one of the last three
@@ -21,6 +22,12 @@
 
 /** The four reasons, most important first. */
 const POZNOTE_OFFLINE_REASONS = ['note', 'folder', 'favorite', 'recent'];
+
+/**
+ * Types the offline page can show and edit. Excalidraw drawings and the
+ * other special types stay online only.
+ */
+const POZNOTE_OFFLINE_NOTE_TYPES = ['note', 'markdown', 'tasklist'];
 
 /**
  * The offline_notes_days user setting, or the default when never set,
@@ -35,31 +42,37 @@ function poznoteOfflineDays($raw, int $default, int $max): int {
 
 /**
  * Ids of the folders whose notes are kept offline: those marked "Keep
- * offline" and every folder under them. $folders holds rows with id,
- * parent_id and offline (as `SELECT id, parent_id, offline FROM folders`).
+ * offline" and every folder under them, except a subfolder whose "Stop
+ * keeping offline" was chosen (folders.offline = -1) and the folders under
+ * that one. The nearest mark decides, the folder's own first: 1 keeps, -1
+ * leaves out, 0 follows the parent. $folders holds rows with id, parent_id
+ * and offline (as `SELECT id, parent_id, offline FROM folders`).
  *
  * @param array<int, array<string, mixed>> $folders
  * @return array<int, true> keyed by folder id
  */
 function poznoteOfflineFolderIds(array $folders): array {
     $parent = [];
-    $marked = [];
+    $marks = [];
+    $anyKept = false;
     foreach ($folders as $folder) {
         $id = (int)($folder['id'] ?? 0);
         if ($id <= 0) {
             continue;
         }
         $parent[$id] = isset($folder['parent_id']) && $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null;
-        if (!empty($folder['offline'])) {
-            $marked[$id] = true;
+        $mark = (int)($folder['offline'] ?? 0);
+        if ($mark !== 0) {
+            $marks[$id] = $mark;
+            $anyKept = $anyKept || $mark > 0;
         }
     }
-    if (empty($marked)) {
+    if (!$anyKept) {
         return [];
     }
     $kept = [];
     foreach (array_keys($parent) as $id) {
-        // Walk up: a folder is kept when it or an ancestor is marked
+        // Walk up to the nearest marked folder, this one included
         $current = $id;
         $seen = [];
         while ($current !== null && array_key_exists($current, $parent)) {
@@ -67,14 +80,97 @@ function poznoteOfflineFolderIds(array $folders): array {
                 break;
             }
             $seen[$current] = true;
-            if (isset($marked[$current])) {
-                $kept[$id] = true;
+            if (isset($marks[$current])) {
+                if ($marks[$current] > 0) {
+                    $kept[$id] = true;
+                }
                 break;
             }
             $current = $parent[$current];
         }
     }
     return $kept;
+}
+
+/**
+ * Folders shown as kept offline in the menus and marks: those whose notes,
+ * subfolders included, are all kept by a "Keep offline" (marked themselves,
+ * or in a folder of poznoteOfflineFolderIds() and not left out). A folder
+ * with no such note to judge by shows its own rule. Favorites and recent
+ * notes do not count: they are not marked. $folders as for
+ * poznoteOfflineFolderIds(); $notes holds folder_id and offline for the
+ * notes in the trash excluded, of the types of POZNOTE_OFFLINE_NOTE_TYPES.
+ *
+ * @param array<int, array<string, mixed>> $folders
+ * @param array<int, array<string, mixed>> $notes
+ * @return array<int, true> keyed by folder id
+ */
+function poznoteOfflineShownFolderIds(array $folders, array $notes): array {
+    $kept = poznoteOfflineFolderIds($folders);
+    $parent = [];
+    foreach ($folders as $folder) {
+        $id = (int)($folder['id'] ?? 0);
+        if ($id > 0) {
+            $parent[$id] = isset($folder['parent_id']) && $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null;
+        }
+    }
+    $judged = [];
+    $missing = [];
+    foreach ($notes as $note) {
+        $folderId = isset($note['folder_id']) && $note['folder_id'] !== null ? (int)$note['folder_id'] : 0;
+        if ($folderId <= 0) {
+            continue;
+        }
+        $mark = (int)($note['offline'] ?? 0);
+        $isKept = $mark > 0 || ($mark === 0 && isset($kept[$folderId]));
+        // The note counts for its folder and every folder above it
+        $current = $folderId;
+        $seen = [];
+        while ($current !== null && array_key_exists($current, $parent) && !isset($seen[$current])) {
+            $seen[$current] = true;
+            $judged[$current] = true;
+            if (!$isKept) {
+                $missing[$current] = true;
+            }
+            $current = $parent[$current];
+        }
+    }
+    $shown = [];
+    foreach (array_keys($parent) as $id) {
+        if (isset($judged[$id]) ? !isset($missing[$id]) : isset($kept[$id])) {
+            $shown[$id] = true;
+        }
+    }
+    return $shown;
+}
+
+/**
+ * Ids of the folder $folderId and every folder under it. $folders as for
+ * poznoteOfflineFolderIds().
+ *
+ * @param array<int, array<string, mixed>> $folders
+ * @return list<int>
+ */
+function poznoteOfflineFolderSubtree(array $folders, int $folderId): array {
+    $children = [];
+    foreach ($folders as $folder) {
+        if (isset($folder['parent_id']) && $folder['parent_id'] !== null) {
+            $children[(int)$folder['parent_id']][] = (int)$folder['id'];
+        }
+    }
+    $subtree = [];
+    $queue = [$folderId];
+    while ($queue) {
+        $id = array_shift($queue);
+        if (isset($subtree[$id])) {
+            continue;
+        }
+        $subtree[$id] = true;
+        foreach ($children[$id] ?? [] as $child) {
+            $queue[] = $child;
+        }
+    }
+    return array_keys($subtree);
 }
 
 /**

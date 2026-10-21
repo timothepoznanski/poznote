@@ -465,6 +465,37 @@ function poznoteOfflineModeEnabled(): bool {
     return $raw !== '0' && $raw !== 'false';
 }
 
+/**
+ * The folders of the account kept offline, read from the database
+ * (lib/offline.php): `kept`, whose notes the rules keep, and `shown`, the
+ * ones the menus and marks show as kept (every note in them kept). With
+ * $copiedNoteIds (the notes the manifest sends, keyed by id), a note left out
+ * of the copies by the budgets does not count as kept either.
+ *
+ * @param array<int, true>|null $copiedNoteIds
+ * @return array{kept: array<int, true>, shown: array<int, true>}
+ */
+function poznoteOfflineFolderStates(PDO $con, ?array $copiedNoteIds = null): array {
+    require_once __DIR__ . '/lib/offline.php';
+    $folders = $con->query('SELECT id, parent_id, offline FROM folders')->fetchAll(PDO::FETCH_ASSOC);
+    $typeList = implode(',', array_fill(0, count(POZNOTE_OFFLINE_NOTE_TYPES), '?'));
+    $stmt = $con->prepare("SELECT id, folder_id, offline FROM entries WHERE trash = 0 AND folder_id IS NOT NULL AND COALESCE(type, 'note') IN ($typeList)");
+    $stmt->execute(POZNOTE_OFFLINE_NOTE_TYPES);
+    $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($copiedNoteIds !== null) {
+        foreach ($notes as &$note) {
+            if (!isset($copiedNoteIds[(int)$note['id']])) {
+                $note['offline'] = -1;
+            }
+        }
+        unset($note);
+    }
+    return [
+        'kept' => poznoteOfflineFolderIds($folders),
+        'shown' => poznoteOfflineShownFolderIds($folders, $notes),
+    ];
+}
+
 
 
 

@@ -116,6 +116,7 @@ $settingsPageUserKeys = [
     'folder_tree_dim_level',
     'notes_without_folders_after_folders',
     'folder_icon_opens_kanban',
+    'folder_count_parentheses',
     'sidebar_offline_marks',
     'whats_new_popup',
     'markdown_split_card_view',
@@ -1117,6 +1118,16 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('display.cards.folder_icon_opens_kanban', [], 'Folder icon opens Kanban'); ?></span>
                     <span id="folder-icon-kanban-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
+                </div>
+            </div>
+
+            <!-- Folder counts of the tree: a pill by default, "(12)" when on -->
+            <div class="home-card" id="folder-count-parentheses-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.folder_count_parentheses', [], 'Show the number of notes of a folder in parentheses, like (12), instead of a small pill.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-hash"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('display.cards.folder_count_parentheses', [], 'Folder counts in parentheses'); ?></span>
+                    <span id="folder-count-parentheses-status" class="setting-status disabled"><?php echo t_h('common.disabled'); ?></span>
                 </div>
             </div>
 

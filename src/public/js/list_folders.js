@@ -419,6 +419,18 @@
             });
     }
 
+    // Folders shown as kept: every note in them kept (lib/offline.php),
+    // the list the API sends back after a change
+    function applyKeptFolders(keptIds) {
+        const kept = new Set((keptIds || []).map(String));
+        folderItems.forEach(function(item) {
+            const id = item.getAttribute('data-folder-id');
+            document.querySelectorAll('[data-folder-id="' + id + '"][data-offline]').forEach(function(element) {
+                element.setAttribute('data-offline', kept.has(id) ? '1' : '0');
+            });
+        });
+    }
+
     /**
      * Keep a folder offline (its notes, subfolders included, stay in the
      * browser whatever their date), or stop. No reload: the state goes onto
@@ -439,9 +451,7 @@
                 if (!data.success) {
                     throw new Error(data.error || data.message || ('HTTP ' + data._httpStatus));
                 }
-                document.querySelectorAll('[data-folder-id="' + folder.id + '"][data-offline]').forEach(function(element) {
-                    element.setAttribute('data-offline', keep ? '1' : '0');
-                });
+                applyKeptFolders(data.kept_folders);
                 if (typeof window.poznoteOfflineSyncNow === 'function') {
                     Promise.resolve(window.poznoteOfflineSyncNow()).then(function() {
                         if (typeof window.poznoteOfflineMarksRefresh === 'function') {
