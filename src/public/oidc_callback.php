@@ -72,6 +72,15 @@ try {
         header('Location: login.php?oidc_error=unauthorized');
     } elseif (strpos($e->getMessage(), 'signup limit reached') !== false) {
         header('Location: login.php?oidc_error=signup_limit');
+    } elseif (strpos($e->getMessage(), 'not linked to the existing profile') !== false) {
+        // Kept in the session rather than the URL: a crafted link must not be
+        // able to tell an admin which email to put on which account.
+        preg_match('/"([^"]+)"/', $e->getMessage(), $matches);
+        $_SESSION['oidc_not_linked'] = [
+            'username' => $matches[1] ?? '',
+            'email' => (isset($claims) && is_string($claims['email'] ?? null)) ? $claims['email'] : '',
+        ];
+        header('Location: login.php?oidc_error=not_linked');
     } elseif (strpos($e->getMessage(), 'No user profile found') !== false) {
         preg_match('/"([^"]+)"/', $e->getMessage(), $matches);
         $identifier = $matches[1] ?? 'unknown';

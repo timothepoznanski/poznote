@@ -1430,7 +1430,8 @@
       "note_stats_words": "Mostrar número de palabras",
       "note_stats_lines": "Mostrar número de líneas",
       "note_info_icon": "Mostrar icono de información bajo el título de la nota",
-      "note_scrollbar": "Barra de desplazamiento de las notas"
+      "note_scrollbar": "Barra de desplazamiento de las notas",
+      "note_scroll_arrows": "Flechas para ir al principio y al final de la nota"
     },
     "icon_sidebar_order": {
       "title": "Diseño de la barra de iconos",
@@ -2565,6 +2566,8 @@
       "invalid_credentials": "Nombre de usuario o contraseña incorrectos.",
       "oidc_disabled": "Tu cuenta ha sido desactivada por un administrador. Por favor, contacta con él para más información.",
       "oidc_no_profile": "No se encontró ningún perfil de usuario para \"{{identifier}}\". Por favor, contacta con un administrador para crear tu perfil.",
+      "oidc_not_linked": "Tu identidad SSO no se ha vinculado a la cuenta existente \"{{username}}\": por seguridad, una cuenta existente se vincula por su email, nunca por su nombre. Si esta cuenta es tuya, pide a un administrador que le añada el email que usas con tu proveedor de identidad ({{email}}) en Settings > Admin Tools > User Management y vuelve a iniciar sesión. Si eres el administrador, inicia sesión con tu contraseña para hacerlo (en una instancia solo SSO, establece POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false mientras tanto).",
+      "oidc_not_linked_no_email": "Tu identidad SSO no se ha vinculado a la cuenta existente \"{{username}}\": por seguridad, una cuenta existente se vincula por su email o su sujeto OIDC, nunca por su nombre, y tu proveedor de identidad no envía email. Si esta cuenta es tuya, pide a un administrador que le pegue el sujeto OIDC que aparece en el log del servidor en Settings > Admin Tools > User Management y vuelve a iniciar sesión. Si eres el administrador, inicia sesión con tu contraseña para hacerlo (en una instancia solo SSO, establece POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false mientras tanto).",
       "oidc_failed": "Falló el inicio de sesión SSO. Por favor, inténtalo de nuevo.",
       "oidc_unauthorized": "No estás autorizado para acceder a esta aplicación. Por favor, contacta con tu administrador.",
       "oidc_signup_limit": "Esta instancia no acepta nuevas cuentas. Póngase en contacto con el administrador."

@@ -279,8 +279,10 @@ html[data-theme='dark'] #iconSidebarToggle {
     color: var(--pz-text);
 }
 
-html[data-theme='dark'] #iconSidebarToggle:hover {
-    background: var(--pz-surface-hover);
-    color: var(--pz-accent-text);
-    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.3);
+@media (hover: hover) and (min-width: 801px) {
+    html[data-theme='dark'] #iconSidebarToggle:hover {
+        background: var(--pz-surface-hover);
+        color: var(--pz-accent-text);
+        box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.3);
+    }
 }

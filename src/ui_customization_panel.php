@@ -14,6 +14,11 @@
  * css/ui-customization-panel.css plus css/modals/ui-customization.css for the
  * checklist itself.
  *
+ * Element visibility can hide its own toggle (card:edgeCustomizeBtn, which
+ * takes the menu entry along): the way back is then the Element visibility
+ * section of the settings page. The "..." button goes once none of its entries
+ * is left (syncMoreMenuButton() in js/ui-customization-panel.js).
+ *
  * The panel only edits the user's own preference. The instance-wide "Users"
  * column administrators get stays in the "Element visibility" section of the
  * settings page, which the header link opens

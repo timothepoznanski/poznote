@@ -6,7 +6,9 @@
  * both with !important, hence the !important here.
  *
  * It is pinned to the left edge and the page content is inset by its width,
- * the same arrangement css/icon-sidebar-page.css uses on desktop.
+ * the same arrangement css/icon-sidebar-page.css uses on desktop. The collapse
+ * chevron works here too (issue #1663): collapsed, the rail is gone and the
+ * content takes the full width back.
  */
 
 @media (max-width: 800px) {
@@ -15,11 +17,16 @@
        #icon_sidebar` (0,2,1) and css/index-mobile.css a bare `#icon_sidebar`
        (0,1,0) from a sheet that loads after the bundle. `:is(#icon_sidebar)`
        adds an ID's worth of weight (0,2,1 -> beats the first outright at
-       0,2,2), and the html prefix keeps it ahead on element count.
-       It also overrides a stale .icon-sidebar-collapsed left from desktop,
-       which matters because the collapse chevron is hidden at this width. */
-    html body :is(#icon_sidebar)#icon_sidebar {
+       0,3,2 with the :not()), and the html prefix keeps it ahead on element
+       count. Collapsed, the rule no longer matches and the hiding rules win. */
+    html body:not(.icon-sidebar-collapsed) :is(#icon_sidebar)#icon_sidebar,
+    html body :is(#iconSidebarToggle)#iconSidebarToggle {
         display: flex !important;
+    }
+
+    /* No grey flash of the tap either */
+    #iconSidebarToggle {
+        -webkit-tap-highlight-color: transparent;
     }
 
     /* The secondary pages scroll the body, so the rail is pinned and the
@@ -32,9 +39,12 @@
         height: 100%;
     }
 
-    body.has-icon-sidebar,
-    body.has-icon-sidebar.icon-sidebar-collapsed {
+    body.has-icon-sidebar {
         margin-left: var(--icon-sidebar-width);
+    }
+
+    body.has-icon-sidebar.icon-sidebar-collapsed {
+        margin-left: 0;
     }
 
     /* index.php (and offline.php) slide between their two columns by
@@ -44,8 +54,10 @@
        <body>, which is the scroller (position: fixed, css/index-mobile.css),
        it sits in the margin left of the list and slides in and out with it.
        Out of sight on the note, it never covers it, and nothing has to hide it
-       or resize the columns halfway through a swipe. */
-    body:not(.has-icon-sidebar) #icon_sidebar {
+       or resize the columns halfway through a swipe. The chevron goes with
+       it, at the bottom of the list. */
+    body:not(.has-icon-sidebar) #icon_sidebar,
+    body:not(.has-icon-sidebar) #iconSidebarToggle {
         position: absolute;
         left: 0;
         top: 0;
@@ -53,17 +65,23 @@
         height: 100%;
     }
 
+    body:not(.has-icon-sidebar) #iconSidebarToggle {
+        top: auto;
+        left: var(--icon-sidebar-width);
+        z-index: 11;
+        height: 25px;
+    }
+
+    body.icon-sidebar-collapsed:not(.has-icon-sidebar) #iconSidebarToggle {
+        left: 0;
+    }
+
     /* The list gives up the rail's width rather than be pushed right: a margin
        alone would shift its full-viewport width off-screen and crop the search
        bar and create button. Only beside a rail. */
-    body:not(.has-icon-sidebar) #icon_sidebar ~ #left_col {
+    body:not(.has-icon-sidebar):not(.icon-sidebar-collapsed) #icon_sidebar ~ #left_col {
         margin-left: var(--icon-sidebar-width);
         width: calc(100% - var(--icon-sidebar-width)) !important;
         min-width: 0 !important;
-    }
-
-    /* The collapse chevron sits over the content at this width. */
-    #iconSidebarToggle {
-        display: none !important;
     }
 }

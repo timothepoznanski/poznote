@@ -565,7 +565,7 @@ Poznote supports OpenID Connect (authorization code + PKCE) for single sign-on i
 1. The login page displays a `Continue with [Provider Name]` button when OIDC is enabled.
 2. Users authenticate with the OIDC authorization code flow secured by PKCE.
 3. Access can be restricted with allowed groups and, if needed, a legacy allowed users list.
-4. After authentication, Poznote links the identity in this order: `sub` (`oidc_subject`), then `preferred_username`, then `email`.
+4. After authentication, Poznote links the identity by `sub` (`oidc_subject`), then by a verified email (one set by an admin or synced from the provider, case does not matter). An existing profile is never linked by its username: to link one on its first SSO login, give it the email the provider sends, or paste its OIDC subject, in **Settings > Admin Tools > User Management**. A refused first login logs the subject to paste.
 5. If auto-create users is enabled and no profile matches, Poznote creates one automatically. Such a profile has **no password at all**: it never went through the initial-credential handover an admin does when creating an account, so it does not answer to the default password. Sign-in goes through the provider, or an admin sets an explicit password from **Settings > Admin Tools > User Management**.
 6. If `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, the username/password form is hidden and the login page becomes SSO-only.
 7. REST API clients can authenticate with `Authorization: Bearer <OIDC JWT>` when OIDC is enabled; Poznote validates the provider JWKS, issuer, expiration, audience, and configured access controls.
@@ -614,7 +614,7 @@ From the OIDC admin page, configure:
 - **Allowed groups:** `poznote`
 - **Auto-create users:** enabled
 
-If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile.
+If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile. If an existing profile that has never signed in with SSO already carries that `preferred_username`, the login is refused instead of creating a second profile next to it: give that profile the email the provider sends, or its OIDC subject, so it is linked.
 
 </details>
 

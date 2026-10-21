@@ -565,7 +565,7 @@ Poznote 支持 OpenID Connect（授权码 + PKCE），用于集成单点登录�
 1. 启用 OIDC 后，登录页面会显示一个 `Continue with [Provider Name]` 按钮。
 2. 用户通过受 PKCE 保护的 OIDC 授权码流程进行身份验证。
 3. 可以通过允许的组来限制访问，如有需要，还可以使用旧版的允许用户列表。
-4. 身份验证完成后，Poznote 按以下顺序关联身份：`sub`（`oidc_subject`），然后是 `preferred_username`，最后是 `email`。
+4. 身份验证完成后，Poznote 先按 `sub`（`oidc_subject`），再按已验证的电子邮件（由管理员设置或从提供方同步，不区分大小写）关联身份。现有资料永远不会按用户名关联：要在首次 SSO 登录时关联它，请在 **Settings > Admin Tools > User Management** 中填写提供方发送的电子邮件，或粘贴其 OIDC subject。首次登录被拒绝时，日志会记录需要粘贴的 subject。
 5. 如果启用了自动创建用户且没有匹配的资料，Poznote 会自动创建一个。这样创建的资料**完全没有密码**：它没有经过管理员创建账户时的初始凭据交接流程，因此不接受默认密码。登录需通过身份提供商进行，或者由管理员在 **设置 > 管理工具 > 用户管理** 中为其设置明确的密码。
 6. 如果 `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`，用户名/密码表单将被隐藏，登录页面变为仅支持 SSO。
 7. 启用 OIDC 后，REST API 客户端可以使用 `Authorization: Bearer <OIDC JWT>` 进行身份验证；Poznote 会校验提供商的 JWKS、issuer、过期时间、audience 以及已配置的访问控制。
@@ -614,7 +614,7 @@ Poznote 根据请求到达的主机名生成这两个地址，并且始终使用
 - **允许的组：** `poznote`
 - **首次通过 OIDC 登录时自动创建用户资料：** 启用
 
-如果启用了自动创建，Poznote 会根据 OIDC claims（`preferred_username`、`nickname`、电子邮件的本地部分、`name`，最后是 `sub`）生成用户名，并将 OIDC subject 存储在所创建的资料中。
+如果启用了自动创建，Poznote 会根据 OIDC claims（`preferred_username`、`nickname`、电子邮件的本地部分、`name`，最后是 `sub`）生成用户名，并将 OIDC subject 存储在所创建的资料中。如果某个从未通过 SSO 登录的现有资料已经使用了这个 `preferred_username`，登录会被拒绝，而不会在旁边再创建一个资料：在该资料中填写提供方发送的电子邮件或其 OIDC subject，即可完成关联。
 
 </details>
 

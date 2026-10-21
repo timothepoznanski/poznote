@@ -1428,7 +1428,8 @@
       "note_stats_words": "显示字数",
       "note_stats_lines": "显示行数",
       "note_info_icon": "在笔记标题下显示信息图标",
-      "note_scrollbar": "笔记滚动条"
+      "note_scrollbar": "笔记滚动条",
+      "note_scroll_arrows": "跳到笔记顶部和底部的箭头"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏布局",
@@ -2563,6 +2564,8 @@
       "invalid_credentials": "用户名或密码错误。",
       "oidc_disabled": "您的账户已被管理员禁用。请联系管理员了解更多信息。",
       "oidc_no_profile": "未找到 \"{{identifier}}\" 的用户个人资料。请联系管理员创建您的个人资料。",
+      "oidc_not_linked": "您的 SSO 身份未关联到现有账户“{{username}}”：出于安全考虑，现有账户只按电子邮件关联，绝不按名称关联。如果这是您的账户，请让管理员在 Settings > Admin Tools > User Management 中为它添加您在身份提供方使用的电子邮件（{{email}}），然后重新登录。如果您是管理员，请用密码登录后自行设置（仅 SSO 的实例请暂时设置 POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false）。",
+      "oidc_not_linked_no_email": "您的 SSO 身份未关联到现有账户“{{username}}”：出于安全考虑，现有账户只按电子邮件或 OIDC subject 关联，绝不按名称关联，而您的身份提供方没有发送电子邮件。如果这是您的账户，请让管理员在 Settings > Admin Tools > User Management 中将服务器日志里记录的 OIDC subject 粘贴到该账户，然后重新登录。如果您是管理员，请用密码登录后自行设置（仅 SSO 的实例请暂时设置 POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false）。",
       "oidc_failed": "SSO 登录失败。请稍后再试。",
       "oidc_unauthorized": "您无权访问此应用程序。请联系您的管理员。",
       "oidc_signup_limit": "此实例不再接受新账户。请联系管理员。"

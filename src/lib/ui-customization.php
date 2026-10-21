@@ -466,6 +466,12 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
             if (isset($createMenuOptionSelectors[$key])) {
                 $rules[] = '#create-menu ' . $createMenuOptionSelectors[$key] . ' { display: none !important; }';
             }
+            // Element visibility is a button of the floating stack on a
+            // computer and an entry of its "..." menu on a phone
+            // (ui_customization_panel.php): one key hides both (issue #1663).
+            if ($id === 'edgeCustomizeBtn') {
+                $rules[] = '#edgeMenuCustomize { display: none !important; }';
+            }
         } elseif ($type === 'toolbar') {
             $rules[] = '.note-edit-toolbar .' . $id . ', .note-edit-toolbar .' . $id . ':not(.hide-on-selection) { display: none !important; }';
             $rules[] = '.mobile-toolbar-menu [data-selector=".' . $id . '"] { display: none !important; }';
@@ -536,6 +542,12 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // The fixed controls follow on their own (js/index-events.js).
                 $rules[] = '#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview) { scrollbar-width: none !important; scrollbar-gutter: auto !important; }';
                 $rules[] = ':is(#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview))::-webkit-scrollbar { display: none !important; }';
+            } elseif ($id === 'note-scroll-arrows') {
+                // The arrows at the bottom-right of the note (issue #1663).
+                // The floating stack is raised over them by :has() rules
+                // (css/ui-customization-panel.css): it drops back to the edge.
+                $rules[] = '.note-scroll-edge-controls { display: none !important; }';
+                $rules[] = '.pz-edge-stack { bottom: 10px !important; }';
             } elseif ($id === 'tasklist-progress') {
                 $rules[] = '.tasklist-progress { display: none !important; }';
             } elseif ($id === 'preview-code-block-delete') {

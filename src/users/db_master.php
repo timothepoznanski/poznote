@@ -1239,6 +1239,10 @@ function getUserProfileByEmail(string $email): ?array {
  * Get user profile by email, restricted to VERIFIED emails (set by an admin
  * or synced from the OIDC provider). Used for OIDC account matching so a
  * self-set, unverified email can never capture someone else's SSO login.
+ *
+ * Mail providers ignore case, so Tim@x.com from the provider finds tim@x.com.
+ * An exact match wins; a case-only match counts only when it is the single
+ * one, since profiles differing only by email case can coexist.
  */
 function getUserProfileByVerifiedEmail(string $email): ?array {
     try {
@@ -1247,6 +1251,12 @@ function getUserProfileByVerifiedEmail(string $email): ?array {
         $stmt = $con->prepare("SELECT * FROM users WHERE email = ? AND email_verified = 1");
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$user) {
+            $stmt = $con->prepare("SELECT * FROM users WHERE LOWER(email) = LOWER(?) AND email_verified = 1 LIMIT 2");
+            $stmt->execute([$email]);
+            $matches = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $user = count($matches) === 1 ? $matches[0] : false;
+        }
         return $user ? withComputedDisplayName($user) : null;
     } catch (Exception $e) {
         return null;

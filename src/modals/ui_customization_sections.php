@@ -306,6 +306,7 @@
 <div class="ui-custom-items">
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-scrollbar" checked><span><?php echo t_h('modals.ui_customization.note_scrollbar', [], 'Note scrollbar'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-scroll-arrows" checked><span><?php echo t_h('modals.ui_customization.note_scroll_arrows', [], 'Scroll to top and bottom arrows'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:preview-code-block-delete" checked><span><?php echo t_h('modals.ui_customization.preview_code_block_delete', [], 'Delete button on code blocks, in markdown preview'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-created-date" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
@@ -315,6 +316,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-stats-lines" checked><span><?php echo t_h('modals.ui_customization.note_stats_lines', [], 'Show line count'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-info-icon" checked><span><?php echo t_h('modals.ui_customization.note_info_icon', [], 'Show information icon under the note title'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-icons" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeCustomizeBtn" checked><span><?php echo t_h('modals.ui_customization.panel_title', [], 'Element visibility'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard"><input type="checkbox" data-ui-key="card:edgeAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeFocusModeBtn" checked><span><?php echo t_h('focus_mode.button', [], 'Focus mode'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeSplitViewBtn" checked><span><?php echo t_h('page_menu.markdown_view', [], 'Markdown view (classic, live preview, rich text, split)'); ?></span></label>

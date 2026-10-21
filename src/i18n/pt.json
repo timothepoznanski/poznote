@@ -1430,7 +1430,8 @@
       "note_stats_words": "Mostrar número de palavras",
       "note_stats_lines": "Mostrar número de linhas",
       "note_info_icon": "Mostrar ícone de informação sob o título da nota",
-      "note_scrollbar": "Barra de rolagem das notas"
+      "note_scrollbar": "Barra de rolagem das notas",
+      "note_scroll_arrows": "Setas para ir ao início e ao fim da nota"
     },
     "icon_sidebar_order": {
       "title": "Layout da barra de ícones",
@@ -2565,6 +2566,8 @@
       "invalid_credentials": "Nome de usuário ou senha incorretos.",
       "oidc_disabled": "A sua conta foi desativada por un administrador. Por favor, contacte-o para mais informações.",
       "oidc_no_profile": "Nenhum perfil de utilizador encontrado para \"{{identifier}}\". Por favor, contacte um administrador para criar o seu perfil.",
+      "oidc_not_linked": "A sua identidade SSO não foi vinculada à conta existente \"{{username}}\": por segurança, uma conta existente é vinculada pelo email, nunca pelo nome. Se esta conta é sua, peça a um administrador que adicione a ela o email que você usa no seu provedor de identidade ({{email}}), em Settings > Admin Tools > User Management, e entre novamente. Se você é o administrador, entre com a sua senha para fazer isso (numa instância apenas SSO, defina POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false temporariamente).",
+      "oidc_not_linked_no_email": "A sua identidade SSO não foi vinculada à conta existente \"{{username}}\": por segurança, uma conta existente é vinculada pelo email ou pelo sujeito OIDC, nunca pelo nome, e o seu provedor de identidade não envia email. Se esta conta é sua, peça a um administrador que cole nela o sujeito OIDC registrado no log do servidor, em Settings > Admin Tools > User Management, e entre novamente. Se você é o administrador, entre com a sua senha para fazer isso (numa instância apenas SSO, defina POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false temporariamente).",
       "oidc_failed": "Falha no login SSO. Por favor, tente novamente.",
       "oidc_unauthorized": "Você não está autorizado a acessar esta aplicação. Por favor, entre em contato com o administrador.",
       "oidc_signup_limit": "Esta instância não está aceitando novas contas. Entre em contato com o administrador."

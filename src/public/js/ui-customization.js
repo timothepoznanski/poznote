@@ -424,6 +424,10 @@
                 if (CREATE_MENU_OPTION_SELECTORS[key]) {
                     rules.push('#create-menu ' + CREATE_MENU_OPTION_SELECTORS[key] + ' { display: none !important; }');
                 }
+                // Same button, in the "..." menu on a phone (issue #1663)
+                if (id === 'edgeCustomizeBtn') {
+                    rules.push('#edgeMenuCustomize { display: none !important; }');
+                }
             } else if (type === 'toolbar') {
                 rules.push('.note-edit-toolbar .' + id + ', .note-edit-toolbar .' + id + ':not(.hide-on-selection) { display: none !important; }');
                 rules.push('.mobile-toolbar-menu [data-selector=".' + id + '"] { display: none !important; }');
@@ -486,6 +490,10 @@
                     // lib/ui-customization.php.
                     rules.push('#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview) { scrollbar-width: none !important; scrollbar-gutter: auto !important; }');
                     rules.push(':is(#right_col, .noteentry.markdown-split-mode :is(.markdown-editor-container, .markdown-editor, .cm-scroller, .markdown-preview))::-webkit-scrollbar { display: none !important; }');
+                } else if (id === 'note-scroll-arrows') {
+                    // Issue #1663; see lib/ui-customization.php.
+                    rules.push('.note-scroll-edge-controls { display: none !important; }');
+                    rules.push('.pz-edge-stack { bottom: 10px !important; }');
                 } else if (id === 'tasklist-progress') {
                     rules.push('.tasklist-progress { display: none !important; }');
                 } else if (id === 'preview-code-block-delete') {

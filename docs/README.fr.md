@@ -565,7 +565,7 @@ Poznote prend en charge OpenID Connect (authorization code + PKCE) pour l'authen
 1. Quand OIDC est activé, la page de connexion affiche un bouton `Continue with [Provider Name]`.
 2. Les utilisateurs s'authentifient via le flux authorization code d'OIDC, sécurisé par PKCE.
 3. L'accès peut être restreint à des groupes autorisés et, si nécessaire, à une ancienne liste d'utilisateurs autorisés.
-4. Après l'authentification, Poznote rattache l'identité dans cet ordre : `sub` (`oidc_subject`), puis `preferred_username`, puis `email`.
+4. Après l'authentification, Poznote rattache l'identité par `sub` (`oidc_subject`), puis par un email vérifié (saisi par un administrateur ou synchronisé depuis le fournisseur, sans tenir compte des majuscules). Un profil existant n'est jamais rattaché par son nom d'utilisateur : pour le rattacher à sa première connexion SSO, renseignez dans **Settings > Admin Tools > User Management** l'email que le fournisseur envoie, ou collez son sujet OIDC. Une première connexion refusée écrit dans le log le sujet à coller.
 5. Si la création automatique des utilisateurs est activée et qu'aucun profil ne correspond, Poznote en crée un automatiquement. Un tel profil n'a **aucun mot de passe** : il n'est jamais passé par la remise des identifiants initiaux qu'effectue un administrateur lorsqu'il crée un compte, il ne répond donc pas au mot de passe par défaut. La connexion passe par le fournisseur, ou bien un administrateur définit un mot de passe explicite depuis **Paramètres > Outils d'administration > Gestion des utilisateurs**.
 6. Si `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`, le formulaire nom d'utilisateur/mot de passe est masqué et la page de connexion passe en SSO uniquement.
 7. Quand OIDC est activé, les clients de l'API REST peuvent s'authentifier avec `Authorization: Bearer <OIDC JWT>` ; Poznote vérifie le JWKS du fournisseur, l'émetteur, l'expiration, l'audience et les contrôles d'accès configurés.
@@ -614,7 +614,7 @@ Depuis la page d'administration OIDC, configurez :
 - **Groupes autorisés :** `poznote`
 - **Créer automatiquement les profils à la première connexion OIDC :** activé
 
-Si la création automatique est activée, Poznote génère un nom d'utilisateur à partir des claims OIDC (`preferred_username`, `nickname`, partie locale de l'adresse e-mail, `name`, puis `sub`) et enregistre le subject OIDC sur le profil créé.
+Si la création automatique est activée, Poznote génère un nom d'utilisateur à partir des claims OIDC (`preferred_username`, `nickname`, partie locale de l'adresse e-mail, `name`, puis `sub`) et enregistre le subject OIDC sur le profil créé. Si un profil existant qui ne s'est jamais connecté en SSO porte déjà ce `preferred_username`, la connexion est refusée au lieu de créer un second profil à côté : renseignez sur ce profil l'adresse e-mail que le fournisseur envoie, ou son subject OIDC, pour qu'il soit rattaché.
 
 </details>
 

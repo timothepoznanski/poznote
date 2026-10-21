@@ -191,6 +191,18 @@ if (isset($_GET['oidc_error'])) {
     } elseif ($_GET['oidc_error'] === 'no_profile') {
         $identifier = $_GET['identifier'] ?? 'unknown';
         $oidcError = t('login.errors.oidc_no_profile', ['identifier' => $identifier], 'No user profile found for "' . $identifier . '". Please contact an administrator to create your profile.', $currentLang ?? 'en');
+    } elseif ($_GET['oidc_error'] === 'not_linked') {
+        $notLinked = $_SESSION['oidc_not_linked'] ?? null;
+        unset($_SESSION['oidc_not_linked']);
+        if (is_array($notLinked) && ($notLinked['username'] ?? '') !== '') {
+            if (($notLinked['email'] ?? '') !== '') {
+                $oidcError = t('login.errors.oidc_not_linked', ['username' => $notLinked['username'], 'email' => $notLinked['email']], 'Your SSO identity was not linked to the existing account "' . $notLinked['username'] . '": for security, an existing account is linked by its email, never by its name. If this account is yours, ask an administrator to add the email you use with your identity provider (' . $notLinked['email'] . ') to it in Settings > Admin Tools > User Management, then sign in again. If you are the administrator, sign in with your password to do it (on an SSO-only instance, set POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false for the time being).', $currentLang);
+            } else {
+                $oidcError = t('login.errors.oidc_not_linked_no_email', ['username' => $notLinked['username']], 'Your SSO identity was not linked to the existing account "' . $notLinked['username'] . '": for security, an existing account is linked by its email or its OIDC subject, never by its name, and your identity provider sends no email. If this account is yours, ask an administrator to paste the OIDC subject written in the server log into it in Settings > Admin Tools > User Management, then sign in again. If you are the administrator, sign in with your password to do it (on an SSO-only instance, set POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false for the time being).', $currentLang);
+            }
+        } else {
+            $oidcError = t('login.errors.oidc_failed', [], 'SSO login failed. Please try again.', $currentLang);
+        }
     } elseif ($_GET['oidc_error'] === 'signup_limit') {
         $oidcError = t('login.errors.oidc_signup_limit', [], 'This instance is not accepting new accounts. Please contact the administrator.', $currentLang ?? 'en');
     } elseif ($_GET['oidc_error'] === 'disabled') {
