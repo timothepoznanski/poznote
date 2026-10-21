@@ -459,6 +459,25 @@ class SettingsController {
             return $normalized;
         }
 
+        // Note each workspace's diary entries start from, {"<workspace id>": <note id>}
+        // (parseDiaryTemplates() in lib/diary.php), '' for none
+        if ($key === 'diary_templates') {
+            require_once __DIR__ . '/../../../functions.php';
+            $raw = is_array($value) ? $value : trim((string) $value);
+            if ($raw === '' || $raw === []) {
+                return '';
+            }
+            $decoded = is_array($raw) ? $raw : json_decode($raw, true);
+            $templates = parseDiaryTemplates($decoded);
+            if (!is_array($decoded) || count($templates) !== count($decoded)) {
+                throw new InvalidArgumentException('value must be a JSON object mapping workspace ids to note ids', 400);
+            }
+            if (count($templates) > 1000) {
+                throw new InvalidArgumentException('too many diary templates', 400);
+            }
+            return $templates ? json_encode((object) $templates) : '';
+        }
+
         if ($key === 'timezone') {
             $normalized = trim((string) $value);
             if ($normalized === '') {

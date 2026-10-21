@@ -1068,6 +1068,20 @@ class NotesController {
                 }
             }
             
+            // A diary entry created without content starts from its
+            // workspace's diary template (Settings > Diary), whichever client
+            // creates it: the diary page, the calendar, a diary link or the API.
+            if (is_scalar($entry) && trim((string)$entry) === '' && $folder_id !== null
+                && parseDiaryEntryTitle($originalHeading) !== null
+                && findDiaryRootForFolder($this->con, $workspace, $folder_id) !== null) {
+                $templateContent = getDiaryTemplateContent($this->con, $type, $workspace);
+                if ($templateContent !== '') {
+                    $entry = $templateContent;
+                    $entrycontent = $this->sanitizeContentForType($type, $templateContent);
+                    $entrycontentIsEntry = true;
+                }
+            }
+
             // Create the note
             $now_utc = gmdate('Y-m-d H:i:s', time());
             $created_utc = $now_utc;

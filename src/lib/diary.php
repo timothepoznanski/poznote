@@ -18,6 +18,83 @@ function getDiaryDefaultNoteType(): string {
 }
 
 /**
+ * Diary entry template of each workspace (discussion #1668), from the
+ * diary_templates setting: a JSON object mapping a workspace id to a note id.
+ * Keyed by id rather than name so a renamed workspace keeps its template.
+ * @return array<int, int>
+ */
+function parseDiaryTemplates($value): array {
+    $decoded = is_array($value) ? $value : json_decode((string)$value, true);
+    if (!is_array($decoded)) {
+        return [];
+    }
+    $templates = [];
+    foreach ($decoded as $workspaceId => $noteId) {
+        if (!is_scalar($noteId) || !ctype_digit((string)$workspaceId) || !ctype_digit((string)$noteId)) {
+            continue;
+        }
+        if ((int)$workspaceId > 0 && (int)$noteId > 0) {
+            $templates[(int)$workspaceId] = (int)$noteId;
+        }
+    }
+    return $templates;
+}
+
+/**
+ * Content a new diary entry of a workspace starts with: the note picked for
+ * that workspace in the diary_templates setting, converted to the entry's type
+ * when the two differ. Empty when the workspace has no template, or when that
+ * note is gone, trashed, not an HTML or Markdown note, or no longer in that
+ * workspace: a template never crosses workspaces.
+ */
+function getDiaryTemplateContent(PDO $con, string $type, string $workspace): string {
+    if (!in_array($type, ['note', 'markdown'], true)) {
+        return '';
+    }
+    $stmt = $con->prepare("SELECT id FROM workspaces WHERE name = ?");
+    $stmt->execute([$workspace]);
+    $workspaceId = (int)$stmt->fetchColumn();
+    $templateId = parseDiaryTemplates(getSetting('diary_templates', ''))[$workspaceId] ?? 0;
+    if ($templateId <= 0) {
+        return '';
+    }
+
+    $stmt = $con->prepare("SELECT id, type, entry FROM entries WHERE id = ? AND workspace = ? AND trash = 0");
+    $stmt->execute([$templateId, $workspace]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    if (!$row) {
+        return '';
+    }
+    $templateType = (string)($row['type'] ?? '');
+    if ($templateType === '') {
+        $templateType = 'note';
+    }
+    if (!in_array($templateType, ['note', 'markdown'], true)) {
+        return '';
+    }
+
+    // The file is the note; the entry column is only a copy
+    $filename = getEntryFilename((int)$row['id'], $templateType);
+    $content = is_readable($filename) ? file_get_contents($filename) : false;
+    if ($content === false) {
+        $content = (string)($row['entry'] ?? '');
+    }
+    if (trim($content) === '') {
+        return '';
+    }
+
+    if ($templateType === $type) {
+        return $content;
+    }
+    if ($type === 'markdown') {
+        require_once __DIR__ . '/../html_to_markdown.php';
+        return poznoteHtmlToMarkdown($content);
+    }
+    require_once __DIR__ . '/../markdown_parser.php';
+    return parseMarkdownForRichText($content);
+}
+
+/**
  * Title formats a diary entry can use, keyed by the diary_date_format setting.
  * Each entry holds the PHP date() pattern used to build a title and the regex
  * used to recognize one, with the (year, month, day) capture groups named so

@@ -524,7 +524,8 @@
       "local_backup": "Speichern Sie vollständige Sicherungsarchive in einem Ordner des Servers, manuell oder nach Zeitplan, und behalten Sie nur die neuesten.",
       "whats_new": "Nach einem Update die Versionshinweise der neuen Version einmal beim Öffnen deiner Notizen anzeigen.",
       "login_disabled": "Überspringt die Anmeldeseite: Jeder Browser, der diese Instanz erreicht, öffnet direkt Ihr Konto, ohne Benutzername, Passwort oder Zwei-Faktor-Code. Nur aktivieren, wenn allein Sie diese Instanz erreichen können oder ein vorgeschalteter Reverse Proxy die Authentifizierung übernimmt. Die API verlangt weiterhin Zugangsdaten.",
-      "outbound_hosts": "Webhooks, persönliche KI-, Transkriptions- und MCP-Server sowie Git Sync von Benutzern ohne Administratorrechte erreichen nur öffentliche Internet-Hosts. Listen Sie hier die lokalen Hosts und Netzwerke auf, die sie verwenden dürfen, etwa einen Ollama- oder n8n-Server in Ihrem Netzwerk. Administratoren sind nicht eingeschränkt."
+      "outbound_hosts": "Webhooks, persönliche KI-, Transkriptions- und MCP-Server sowie Git Sync von Benutzern ohne Administratorrechte erreichen nur öffentliche Internet-Hosts. Listen Sie hier die lokalen Hosts und Netzwerke auf, die sie verwenden dürfen, etwa einen Ollama- oder n8n-Server in Ihrem Netzwerk. Administratoren sind nicht eingeschränkt.",
+      "diary_template": "Wählen Sie eine Notiz, mit deren Inhalt jeder neue Tagebucheintrag des Arbeitsbereichs {{workspace}} beginnt. Die Liste zeigt die Notizen in einem Ordner namens Vorlagen (oder Templates) dieses Arbeitsbereichs. Jeder Arbeitsbereich hat seine eigene Vorlage."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -690,6 +691,10 @@
     "outbound_hosts": {
       "status_allowed": "{{count}} erlaubt",
       "status_public_only": "Nur öffentlich"
+    },
+    "diary_template": {
+      "none": "Keine",
+      "missing": "Notiz nicht gefunden"
     }
   },
   "workspaces": {
@@ -885,7 +890,8 @@
       "show_note_icons": "Notizsymbole anzeigen",
       "sidebar_offline_marks": "Offline-Punkt anzeigen",
       "format_toolbar_mode": "Formatierungsleiste",
-      "workspace_activity_emails": "E-Mails zu geteilten Arbeitsbereichen"
+      "workspace_activity_emails": "E-Mails zu geteilten Arbeitsbereichen",
+      "diary_template": "Vorlage für Tagebucheinträge"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",

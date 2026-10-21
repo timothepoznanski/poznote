@@ -202,7 +202,8 @@
       "local_backup": "Save complete backup archives into a folder of the server, manually or on a schedule, and keep only the most recent ones.",
       "whats_new": "After an update, show the release notes of the new version once when you open your notes.",
       "login_disabled": "Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials.",
-      "outbound_hosts": "Webhooks, personal AI, transcription and MCP servers and Git Sync of non-admin users only reach public internet hosts. List here the local hosts and networks they may use, such as an Ollama or n8n server on your network. Administrators are not limited."
+      "outbound_hosts": "Webhooks, personal AI, transcription and MCP servers and Git Sync of non-admin users only reach public internet hosts. List here the local hosts and networks they may use, such as an Ollama or n8n server on your network. Administrators are not limited.",
+      "diary_template": "Choose a note whose content every new diary entry of the {{workspace}} workspace starts with. The list shows the notes kept in a folder named Templates in that workspace. Each workspace has its own template."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -363,6 +364,10 @@
     "outbound_hosts": {
       "status_allowed": "{{count}} allowed",
       "status_public_only": "Public only"
+    },
+    "diary_template": {
+      "none": "None",
+      "missing": "Note not found"
     }
   },
   "workspaces": {
@@ -528,7 +533,8 @@
       "snapshots": "Revisions",
       "sidebar_offline_marks": "Show offline dot",
       "format_toolbar_mode": "Formatting toolbar",
-      "workspace_activity_emails": "Shared workspace emails"
+      "workspace_activity_emails": "Shared workspace emails",
+      "diary_template": "Diary entry template"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",

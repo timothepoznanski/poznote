@@ -524,7 +524,8 @@
       "local_backup": "Salve arquivos de backup completos em uma pasta do servidor, manualmente ou conforme um agendamento, mantendo apenas os mais recentes.",
       "whats_new": "Após uma atualização, mostrar uma vez as notas da nova versão ao abrir as suas notas.",
       "login_disabled": "Ignora a tela de login: qualquer navegador que chegue a esta instância abre diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Ative apenas se só você consegue acessar esta instância, ou se um proxy reverso à frente dela cuida da autenticação. A API continua pedindo credenciais.",
-      "outbound_hosts": "Os webhooks, os servidores pessoais de IA, transcrição e MCP e o Git Sync dos utilizadores não administradores só alcançam hosts públicos da Internet. Indique aqui os hosts e redes locais que podem usar, como um servidor Ollama ou n8n na sua rede. Os administradores não têm limites."
+      "outbound_hosts": "Os webhooks, os servidores pessoais de IA, transcrição e MCP e o Git Sync dos utilizadores não administradores só alcançam hosts públicos da Internet. Indique aqui os hosts e redes locais que podem usar, como um servidor Ollama ou n8n na sua rede. Os administradores não têm limites.",
+      "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -690,6 +691,10 @@
     "outbound_hosts": {
       "status_allowed": "{{count}} permitido(s)",
       "status_public_only": "Apenas públicos"
+    },
+    "diary_template": {
+      "none": "Nenhum",
+      "missing": "Nota não encontrada"
     }
   },
   "workspaces": {
@@ -885,7 +890,8 @@
       "show_note_icons": "Mostrar ícones das notas",
       "sidebar_offline_marks": "Mostrar o ponto offline",
       "format_toolbar_mode": "Barra de formatação",
-      "workspace_activity_emails": "E-mails de espaços compartilhados"
+      "workspace_activity_emails": "E-mails de espaços compartilhados",
+      "diary_template": "Modelo de entrada do diário"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",

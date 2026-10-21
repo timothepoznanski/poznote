@@ -523,7 +523,8 @@
       "local_backup": "Enregistrez des archives de sauvegarde complètes dans un dossier du serveur, manuellement ou selon une planification, en ne conservant que les plus récentes.",
       "whats_new": "Après une mise à jour, afficher une fois les notes de la nouvelle version à l'ouverture de vos notes.",
       "login_disabled": "Passe l'écran de connexion : tout navigateur qui atteint cette instance ouvre directement votre compte, sans nom d'utilisateur, mot de passe ni code à deux facteurs. À n'activer que si vous êtes seul à pouvoir joindre cette instance, ou si un reverse proxy placé devant elle gère l'authentification. L'API continue de demander des identifiants.",
-      "outbound_hosts": "Les webhooks, les serveurs IA, de transcription et MCP personnels et Git Sync des utilisateurs non administrateurs n'atteignent que des hôtes publics d'Internet. Listez ici les hôtes et réseaux locaux qu'ils peuvent utiliser, par exemple un serveur Ollama ou n8n sur votre réseau. Les administrateurs ne sont pas limités."
+      "outbound_hosts": "Les webhooks, les serveurs IA, de transcription et MCP personnels et Git Sync des utilisateurs non administrateurs n'atteignent que des hôtes publics d'Internet. Listez ici les hôtes et réseaux locaux qu'ils peuvent utiliser, par exemple un serveur Ollama ou n8n sur votre réseau. Les administrateurs ne sont pas limités.",
+      "diary_template": "Choisissez une note dont le contenu sert de point de départ à chaque nouvelle entrée de journal de l'espace de travail {{workspace}}. La liste montre les notes rangées dans un dossier nommé Modèles (ou Templates) de cet espace. Chaque espace de travail a son propre modèle."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -689,6 +690,10 @@
     "outbound_hosts": {
       "status_allowed": "{{count}} autorisé(s)",
       "status_public_only": "Public uniquement"
+    },
+    "diary_template": {
+      "none": "Aucun",
+      "missing": "Note introuvable"
     }
   },
   "workspaces": {
@@ -885,7 +890,8 @@
       "snapshots": "Révisions",
       "sidebar_offline_marks": "Afficher le point hors ligne",
       "format_toolbar_mode": "Barre de mise en forme",
-      "workspace_activity_emails": "Emails des espaces partagés"
+      "workspace_activity_emails": "Emails des espaces partagés",
+      "diary_template": "Modèle d'entrée de journal"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",

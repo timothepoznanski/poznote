@@ -523,7 +523,8 @@
       "local_backup": "将完整备份归档保存到服务器上的文件夹，可手动或按计划执行，并且只保留最新的几份。",
       "whats_new": "更新后，在打开笔记时显示一次新版本的发行说明。",
       "login_disabled": "跳过登录页面：任何能访问此实例的浏览器都会直接打开您的账户，无需用户名、密码或双重验证码。仅当只有您本人能访问此实例，或其前面的反向代理负责认证时才开启。API 仍然要求凭据。",
-      "outbound_hosts": "非管理员用户的 Webhook、个人 AI、转录和 MCP 服务器以及 Git Sync 只能访问公共互联网主机。在此列出允许他们使用的本地主机和网络，例如你网络中的 Ollama 或 n8n 服务器。管理员不受限制。"
+      "outbound_hosts": "非管理员用户的 Webhook、个人 AI、转录和 MCP 服务器以及 Git Sync 只能访问公共互联网主机。在此列出允许他们使用的本地主机和网络，例如你网络中的 Ollama 或 n8n 服务器。管理员不受限制。",
+      "diary_template": "选择一篇笔记，工作区 {{workspace}} 中的每个新日记条目都以其内容开头。列表显示该工作区中名为“模板”（或 Templates）的文件夹里的笔记。每个工作区都有自己的模板。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -689,6 +690,10 @@
     "outbound_hosts": {
       "status_allowed": "已允许 {{count}} 项",
       "status_public_only": "仅公共主机"
+    },
+    "diary_template": {
+      "none": "无",
+      "missing": "未找到笔记"
     }
   },
   "workspaces": {
@@ -884,7 +889,8 @@
       "show_note_icons": "显示笔记图标",
       "sidebar_offline_marks": "显示离线圆点",
       "format_toolbar_mode": "格式工具栏",
-      "workspace_activity_emails": "共享工作区邮件"
+      "workspace_activity_emails": "共享工作区邮件",
+      "diary_template": "日记条目模板"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
