@@ -1430,7 +1430,8 @@
       "note_stats_words": "Mostrar número de palavras",
       "note_stats_lines": "Mostrar número de linhas",
       "note_info_icon": "Mostrar ícone de informação sob o título da nota",
-      "note_scrollbar": "Barra de rolagem das notas"
+      "note_scrollbar": "Barra de rolagem das notas",
+      "note_scroll_arrows": "Setas para ir ao início e ao fim da nota"
     },
     "icon_sidebar_order": {
       "title": "Layout da barra de ícones",

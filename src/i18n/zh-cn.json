@@ -1428,7 +1428,8 @@
       "note_stats_words": "显示字数",
       "note_stats_lines": "显示行数",
       "note_info_icon": "在笔记标题下显示信息图标",
-      "note_scrollbar": "笔记滚动条"
+      "note_scrollbar": "笔记滚动条",
+      "note_scroll_arrows": "跳到笔记顶部和底部的箭头"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏布局",

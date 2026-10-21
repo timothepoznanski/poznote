@@ -939,7 +939,8 @@
       "note_stats_words": "단어 수 표시",
       "note_stats_lines": "줄 수 표시",
       "note_info_icon": "노트 제목 아래에 정보 아이콘 표시",
-      "note_scrollbar": "노트 스크롤바"
+      "note_scrollbar": "노트 스크롤바",
+      "note_scroll_arrows": "노트 맨 위·맨 아래로 이동 화살표"
     },
     "icon_sidebar_order": {
       "title": "아이콘 사이드바 레이아웃",

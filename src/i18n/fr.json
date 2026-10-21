@@ -1430,7 +1430,8 @@
       "note_stats_words": "Afficher le nombre de mots",
       "note_stats_lines": "Afficher le nombre de lignes",
       "note_info_icon": "Afficher l'icône d'information sous le titre de la note",
-      "note_scrollbar": "Barre de défilement des notes"
+      "note_scrollbar": "Barre de défilement des notes",
+      "note_scroll_arrows": "Flèches pour remonter et descendre dans la note"
     },
     "icon_sidebar_order": {
       "title": "Disposition de la barre d'icônes",

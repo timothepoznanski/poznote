@@ -1430,7 +1430,8 @@
       "note_stats_words": "Wortanzahl anzeigen",
       "note_stats_lines": "Zeilenanzahl anzeigen",
       "note_info_icon": "Informationssymbol unter dem Notiztitel anzeigen",
-      "note_scrollbar": "Bildlaufleiste der Notizen"
+      "note_scrollbar": "Bildlaufleiste der Notizen",
+      "note_scroll_arrows": "Pfeile zum Anfang und Ende der Notiz"
     },
     "icon_sidebar_order": {
       "title": "Layout der Icon-Seitenleiste",

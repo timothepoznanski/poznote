@@ -939,7 +939,8 @@
       "note_stats_words": "Show word count",
       "note_stats_lines": "Show line count",
       "note_info_icon": "Show information icon under the note title",
-      "note_scrollbar": "Note scrollbar"
+      "note_scrollbar": "Note scrollbar",
+      "note_scroll_arrows": "Scroll to top and bottom arrows"
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar layout",

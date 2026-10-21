@@ -351,10 +351,14 @@
     transition: left 0.3s ease, background 0.2s ease, color 0.2s ease;
 }
 
-#iconSidebarToggle:hover {
-    background: var(--pz-surface);
-    color: var(--pz-accent-text);
-    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
+/* Only where there is a pointer to hover with: a tap on a phone leaves the
+   :hover state stuck on the chevron, lit and shadowed after the click */
+@media (hover: hover) {
+    #iconSidebarToggle:hover {
+        background: var(--pz-surface);
+        color: var(--pz-accent-text);
+        box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
+    }
 }
 
 #iconSidebarToggle .lucide {
