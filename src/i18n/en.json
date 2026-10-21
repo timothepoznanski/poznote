@@ -2179,6 +2179,8 @@
       "invalid_credentials": "Incorrect username or password.",
       "oidc_disabled": "Your account has been disabled by an administrator. Please contact them for more information.",
       "oidc_no_profile": "No user profile found for \"{{identifier}}\". Please contact an administrator to create your profile.",
+      "oidc_not_linked": "Your SSO identity was not linked to the existing account \"{{username}}\": for security, an existing account is linked by its email, never by its name. If this account is yours, ask an administrator to add the email you use with your identity provider ({{email}}) to it in Settings > Admin Tools > User Management, then sign in again. If you are the administrator, sign in with your password to do it (on an SSO-only instance, set POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false for the time being).",
+      "oidc_not_linked_no_email": "Your SSO identity was not linked to the existing account \"{{username}}\": for security, an existing account is linked by its email or its OIDC subject, never by its name, and your identity provider sends no email. If this account is yours, ask an administrator to paste the OIDC subject written in the server log into it in Settings > Admin Tools > User Management, then sign in again. If you are the administrator, sign in with your password to do it (on an SSO-only instance, set POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=false for the time being).",
       "oidc_failed": "SSO login failed. Please try again.",
       "oidc_unauthorized": "You are not authorized to access this application. Please contact your administrator.",
       "oidc_signup_limit": "This instance is not accepting new accounts. Please contact the administrator."

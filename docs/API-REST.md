@@ -75,7 +75,7 @@ curl -u 'username:password' -H 'X-User-ID: 1' -H 'X-Poznote-OTP: 123456' \
 
 Without the header the API answers `401` with an `X-Poznote-OTP: required` response header and a message saying so. A code sent this way stays valid for its whole window (up to 90 seconds), so a script can make several requests with it. Recovery codes are not accepted here.
 
-OIDC Bearer JWT authentication is available when OIDC is enabled. Poznote validates the token signature with the provider JWKS, checks issuer, expiration, and audience, then maps the token claims to a Poznote profile using the same OIDC linking rules as interactive login (`sub`, then `preferred_username`, then `email`). Group and user allowlists, disabled profiles, and auto-create settings are also enforced.
+OIDC Bearer JWT authentication is available when OIDC is enabled. Poznote validates the token signature with the provider JWKS, checks issuer, expiration, and audience, then maps the token claims to a Poznote profile using the same OIDC linking rules as interactive login (`sub`, then a verified email; never the username). Group and user allowlists, disabled profiles, and auto-create settings are also enforced.
 
 ```bash
 curl -H "Authorization: Bearer $OIDC_ACCESS_TOKEN" -H "X-User-ID: 1" \

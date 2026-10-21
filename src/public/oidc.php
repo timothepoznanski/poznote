@@ -911,7 +911,7 @@ function oidc_find_or_provision_user($claims) {
 
     // Fallback matching for profiles not linked by sub yet. A profile already
     // linked to a DIFFERENT sub belongs to someone else's SSO identity and
-    // must never be re-captured through a username or email collision.
+    // must never be re-captured through an email collision.
     $oidcRejectForeignLink = function (?array $candidate) use ($sub): ?array {
         if ($candidate && !empty($candidate['oidc_subject']) && $candidate['oidc_subject'] !== $sub) {
             return null;
@@ -919,17 +919,34 @@ function oidc_find_or_provision_user($claims) {
         return $candidate;
     };
 
-    if (!$user && is_string($preferredUsername) && $preferredUsername !== '') {
-        $user = $oidcRejectForeignLink(getUserProfileByUsername($preferredUsername));
-    }
-
     // Only VERIFIED emails (admin-set or provider-synced) take part in
     // matching: a self-set email must not capture someone's first SSO login.
+    // The username is never matched: preferred_username is whatever the
+    // provider lets its users pick, so it would hand any never-linked
+    // profile, the admin included, to whoever claims its name.
     if (!$user && is_string($email) && $email !== '') {
         $user = $oidcRejectForeignLink(getUserProfileByVerifiedEmail($email));
     }
 
     if (!$user) {
+        // A never-linked profile carrying this preferred_username used to be
+        // linked by it. Refuse rather than auto-create a look-alike profile
+        // next to it, and log the subject so an admin can link the right one.
+        $sameNameProfile = (is_string($preferredUsername) && $preferredUsername !== '')
+            ? getUserProfileByUsername($preferredUsername)
+            : null;
+        $sameNameUnlinked = $sameNameProfile && empty($sameNameProfile['oidc_subject']);
+        if ($sameNameUnlinked) {
+            error_log(sprintf(
+                'OIDC login with preferred_username "%s" was not linked to the existing profile "%s" (id %d): profiles are linked by verified email or OIDC subject only. Set the profile\'s email to the one the provider sends, or paste the OIDC subject "%s" into the profile in User Management.',
+                $preferredUsername,
+                $sameNameProfile['username'],
+                (int)$sameNameProfile['id'],
+                is_string($sub) ? $sub : ''
+            ));
+            throw new Exception('SSO identity not linked to the existing profile "' . $sameNameProfile['username'] . '".');
+        }
+
         if (!oidc_is_auto_create_users_enabled()) {
             $identifier = $preferredUsername ?: $email ?: ($sub ?: 'unknown');
             throw new Exception('No user profile found for "' . $identifier . '". Please contact an administrator to create your profile.');

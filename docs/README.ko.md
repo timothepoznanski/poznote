@@ -565,7 +565,7 @@ OpenID Connect(인증 코드 + PKCE)로 통합 로그인을 지원합니다. Aut
 1. OIDC를 활성화하면 `Continue with [Provider Name]` 버튼 표시
 2. PKCE로 보호된 OIDC 인증 코드 흐름으로 사용자 인증
 3. 허용 그룹 및 필요 시 기존 허용 사용자 목록으로 접근 제한
-4. 인증 후 `sub`(`oidc_subject`), `preferred_username`, `email` 순서로 계정 연결
+4. 인증 후 `sub`(`oidc_subject`), 그다음 검증된 이메일(관리자가 설정했거나 공급자에서 동기화된 이메일, 대소문자 구분 없음) 순서로 계정 연결. 기존 프로필은 사용자 이름으로 연결되지 않습니다. 첫 SSO 로그인에서 연결하려면 **Settings > Admin Tools > User Management**에서 공급자가 보내는 이메일을 입력하거나 OIDC subject를 붙여 넣으세요. 첫 로그인이 거부되면 붙여 넣을 subject가 로그에 기록됩니다.
 5. 자동 사용자 생성이 켜져 있고 일치하는 프로필이 없으면 새 프로필 생성. 이 프로필은 **비밀번호가 전혀 없습니다**. 관리자가 계정을 만들 때의 초기 인증 정보 전달 절차가 없으므로 기본 비밀번호도 작동하지 않습니다. 제공업체로 로그인하거나 관리자가 **설정 > 관리자 도구 > 사용자 관리**에서 명시적으로 비밀번호를 설정해야 합니다.
 6. `POZNOTE_OIDC_DISABLE_NORMAL_LOGIN=true`이면 비밀번호 양식을 숨기고 SSO 전용으로 전환
 7. OIDC 활성화 시 REST API에서 `Authorization: Bearer <OIDC JWT>` 인증 가능. JWKS, 발급자, 만료, 대상, 접근 제어 검증
