@@ -614,7 +614,7 @@ Depuis la page d'administration OIDC, configurez :
 - **Groupes autorisés :** `poznote`
 - **Créer automatiquement les profils à la première connexion OIDC :** activé
 
-Si la création automatique est activée, Poznote génère un nom d'utilisateur à partir des claims OIDC (`preferred_username`, `nickname`, partie locale de l'adresse e-mail, `name`, puis `sub`) et enregistre le subject OIDC sur le profil créé.
+Si la création automatique est activée, Poznote génère un nom d'utilisateur à partir des claims OIDC (`preferred_username`, `nickname`, partie locale de l'adresse e-mail, `name`, puis `sub`) et enregistre le subject OIDC sur le profil créé. Si un profil existant qui ne s'est jamais connecté en SSO porte déjà ce `preferred_username`, la connexion est refusée au lieu de créer un second profil à côté : renseignez sur ce profil l'adresse e-mail que le fournisseur envoie, ou son subject OIDC, pour qu'il soit rattaché.
 
 </details>
 

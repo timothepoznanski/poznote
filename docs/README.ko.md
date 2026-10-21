@@ -614,7 +614,7 @@ OIDC 관리자 페이지에서 다음을 설정하세요.
 - **허용 그룹:** `poznote`
 - **사용자 자동 생성:** 활성화
 
-자동 생성 시 OIDC 클레임(`preferred_username`, `nickname`, 이메일의 @ 앞부분, `name`, `sub` 순)으로 이름을 만들고 프로필에 OIDC subject를 저장합니다.
+자동 생성 시 OIDC 클레임(`preferred_username`, `nickname`, 이메일의 @ 앞부분, `name`, `sub` 순)으로 이름을 만들고 프로필에 OIDC subject를 저장합니다. SSO로 로그인한 적이 없는 기존 프로필이 이미 같은 `preferred_username`을 쓰고 있으면, 옆에 두 번째 프로필을 만드는 대신 로그인이 거부됩니다. 해당 프로필에 공급자가 보내는 이메일이나 OIDC subject를 입력하면 연결됩니다.
 
 </details>
 

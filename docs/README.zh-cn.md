@@ -614,7 +614,7 @@ Poznote 根据请求到达的主机名生成这两个地址，并且始终使用
 - **允许的组：** `poznote`
 - **首次通过 OIDC 登录时自动创建用户资料：** 启用
 
-如果启用了自动创建，Poznote 会根据 OIDC claims（`preferred_username`、`nickname`、电子邮件的本地部分、`name`，最后是 `sub`）生成用户名，并将 OIDC subject 存储在所创建的资料中。
+如果启用了自动创建，Poznote 会根据 OIDC claims（`preferred_username`、`nickname`、电子邮件的本地部分、`name`，最后是 `sub`）生成用户名，并将 OIDC subject 存储在所创建的资料中。如果某个从未通过 SSO 登录的现有资料已经使用了这个 `preferred_username`，登录会被拒绝，而不会在旁边再创建一个资料：在该资料中填写提供方发送的电子邮件或其 OIDC subject，即可完成关联。
 
 </details>
 

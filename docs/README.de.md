@@ -614,7 +614,7 @@ Konfigurieren Sie auf der OIDC-Administrationsseite:
 - **Erlaubte Gruppen:** `poznote`
 - **Benutzerprofile bei der ersten OIDC-Anmeldung automatisch erstellen:** aktiviert
 
-Ist das automatische Anlegen aktiviert, erzeugt Poznote einen Benutzernamen aus den OIDC-Claims (`preferred_username`, `nickname`, lokaler Teil der E-Mail-Adresse, `name`, dann `sub`) und speichert das OIDC-Subject im angelegten Profil.
+Ist das automatische Anlegen aktiviert, erzeugt Poznote einen Benutzernamen aus den OIDC-Claims (`preferred_username`, `nickname`, lokaler Teil der E-Mail-Adresse, `name`, dann `sub`) und speichert das OIDC-Subject im angelegten Profil. Trägt ein bestehendes Profil, das sich noch nie per SSO angemeldet hat, bereits diesen `preferred_username`, wird die Anmeldung abgelehnt, statt daneben ein zweites Profil anzulegen: Trage bei diesem Profil die E-Mail ein, die der Anbieter sendet, oder seinen OIDC-Subject, damit es verknüpft wird.
 
 </details>
 

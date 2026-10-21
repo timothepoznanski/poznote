@@ -614,7 +614,7 @@ Desde la página de administración de OIDC, configura:
 - **Grupos permitidos:** `poznote`
 - **Crear perfiles de usuario automáticamente:** activado
 
-Si el aprovisionamiento automático está activado, Poznote genera un nombre de usuario a partir de los claims de OIDC (`preferred_username`, `nickname`, la parte local del correo electrónico, `name` y después `sub`) y guarda el subject de OIDC en el perfil creado.
+Si el aprovisionamiento automático está activado, Poznote genera un nombre de usuario a partir de los claims de OIDC (`preferred_username`, `nickname`, la parte local del correo electrónico, `name` y después `sub`) y guarda el subject de OIDC en el perfil creado. Si un perfil existente que nunca ha iniciado sesión por SSO ya tiene ese `preferred_username`, el inicio de sesión se rechaza en lugar de crear un segundo perfil a su lado: asígnale a ese perfil el correo que envía el proveedor, o su subject de OIDC, para que quede vinculado.
 
 </details>
 

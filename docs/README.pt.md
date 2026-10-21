@@ -614,7 +614,7 @@ Na página de administração do OIDC, configure:
 - **Grupos permitidos:** `poznote`
 - **Criar automaticamente perfis de utilizador no primeiro login OIDC:** ativado
 
-Se o provisionamento automático estiver ativado, o Poznote gera um nome de usuário a partir das claims OIDC (`preferred_username`, `nickname`, parte local do e-mail, `name`, depois `sub`) e armazena o subject OIDC no perfil criado.
+Se o provisionamento automático estiver ativado, o Poznote gera um nome de usuário a partir das claims OIDC (`preferred_username`, `nickname`, parte local do e-mail, `name`, depois `sub`) e armazena o subject OIDC no perfil criado. Se um perfil existente que nunca entrou por SSO já tiver esse `preferred_username`, o login é recusado em vez de criar um segundo perfil ao lado: defina nesse perfil o e-mail que o provedor envia, ou o seu subject OIDC, para que ele seja vinculado.
 
 </details>
 

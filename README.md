@@ -614,7 +614,7 @@ From the OIDC admin page, configure:
 - **Allowed groups:** `poznote`
 - **Auto-create users:** enabled
 
-If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile.
+If auto-provisioning is enabled, Poznote generates a username from the OIDC claims (`preferred_username`, `nickname`, email local part, `name`, then `sub`) and stores the OIDC subject on the created profile. If an existing profile that has never signed in with SSO already carries that `preferred_username`, the login is refused instead of creating a second profile next to it: give that profile the email the provider sends, or its OIDC subject, so it is linked.
 
 </details>
 
