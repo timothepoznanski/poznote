@@ -29,6 +29,32 @@
         }, 0);
     }
 
+    /**
+     * highlight.js's Bash grammar leaves numbers and the name of an assignment
+     * (name=value, an fstab option) in the text colour, so a shell snippet came
+     * out nearly monochrome (issue #1660). Re-register it with both added on
+     * top of the stock definition. A name after a comma (uid=1000) is left
+     * alone, like the other editors do; its number is still coloured.
+     */
+    function extendBashGrammar() {
+        if (typeof hljs === 'undefined' || !hljs || typeof hljs.getLanguage !== 'function') return;
+        var bash = hljs.getLanguage('bash');
+        if (!bash || bash.poznoteExtended || typeof bash.rawDefinition !== 'function') return;
+
+        var stockDefinition = bash.rawDefinition;
+        hljs.registerLanguage('bash', function() {
+            var definition = stockDefinition();
+            definition.poznoteExtended = true;
+            definition.contains = (definition.contains || []).concat([
+                { scope: 'variable', match: /(?<=^|[\s;|&(])[A-Za-z_]\w*(?=\+?=)/, relevance: 0 },
+                { scope: 'number', match: /(?<=^|[\s=,:])\d+(?:\.\d+)?(?=$|[\s,;:)|&])/, relevance: 0 }
+            ]);
+            return definition;
+        });
+    }
+
+    extendBashGrammar();
+
     function isKnownSyntaxHighlightLanguage(language) {
         var normalizedLanguage = String(language || '').trim().toLowerCase();
         return !!(normalizedLanguage && typeof hljs !== 'undefined' && hljs && typeof hljs.getLanguage === 'function' && hljs.getLanguage(normalizedLanguage));

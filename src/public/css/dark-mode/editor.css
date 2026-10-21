@@ -124,7 +124,7 @@ html[data-theme='dark'] .noteentry pre code:not([class*="hljs"]):not([class*="la
 /* Code blocks with language class - readable text before highlight.js processes */
 html[data-theme='dark'] .noteentry pre code[class*="language-"],
 html[data-theme='dark'] .noteentry code[class*="language-"] {
-    color: var(--pz-text-muted) !important;
+    color: var(--pz-syntax-text) !important;
 }
 
 /* Code block placeholders */

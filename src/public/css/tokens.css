@@ -266,6 +266,24 @@
        (issue #1578), so a theme that changes the filter states both. */
     --pz-excalidraw-filter: none;
     --pz-excalidraw-scheme: light;
+
+    /* Code syntax colours, one per kind of token: the highlighted blocks of
+       a note (highlight.js) and the code fences of the Markdown editor
+       (CodeMirror) both read them. The values follow VS Code's Light+ and
+       Dark+, darkened where needed to keep 4.5:1 on the code background. A
+       comment has a colour of its own: in grey it read like the code around
+       it (issue #1660). */
+    --pz-syntax-text: var(--pz-text);
+    --pz-syntax-comment: #236b23;
+    --pz-syntax-keyword: #0000ff;
+    --pz-syntax-string: #a31515;
+    --pz-syntax-number: #06704a;
+    --pz-syntax-function: #6b5221;
+    --pz-syntax-variable: #001080;
+    --pz-syntax-type: #1b6a80;
+    --pz-syntax-tag: #800000;
+    --pz-syntax-regexp: #811f3f;
+    --pz-syntax-meta: #8e00b3;
 }
 
 /* ============================================
@@ -347,6 +365,18 @@ html[data-theme='dark'] {
     --pz-color-gray: #9ca3af;
     --pz-color-soft-mix: 25%;
     --pz-color-yellow-soft-mix: var(--pz-color-soft-mix);
+
+    /* Code syntax colours (see :root), Dark+ on the dark code background. */
+    --pz-syntax-comment: #7ca668;
+    --pz-syntax-keyword: #569cd6;
+    --pz-syntax-string: #ce9178;
+    --pz-syntax-number: #b5cea8;
+    --pz-syntax-function: #dcdcaa;
+    --pz-syntax-variable: #9cdcfe;
+    --pz-syntax-type: #4ec9b0;
+    --pz-syntax-tag: #569cd6;
+    --pz-syntax-regexp: #e07a7a;
+    --pz-syntax-meta: #c586c0;
 
     /* The light tokens, switched for this theme.
 
@@ -606,6 +636,19 @@ html.theme-terminal[data-theme='dark'] {
     --pz-neutral-hover: #1f7a3a;
     --pz-shadow-rgb: 0, 0, 0;
     --pz-highlight-rgb: 78, 232, 122;
+
+    /* Code stays on the tube: greens by brightness, amber and red for what
+       the other themes colour warm. */
+    --pz-syntax-comment: #279449;
+    --pz-syntax-keyword: #b6ffc8;
+    --pz-syntax-string: #ffd473;
+    --pz-syntax-number: #ffbd2e;
+    --pz-syntax-function: #e8fff0;
+    --pz-syntax-variable: #8cf2a8;
+    --pz-syntax-type: #8cf2a8;
+    --pz-syntax-tag: #b6ffc8;
+    --pz-syntax-regexp: #ff8a84;
+    --pz-syntax-meta: #ff8a84;
 }
 
 html.theme-black[data-theme='dark'] {

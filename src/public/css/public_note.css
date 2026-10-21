@@ -904,7 +904,7 @@ html[data-theme='dark'] .public-note .content pre code:not([class*="hljs"]):not(
 
 html[data-theme='dark'] .public-note .content pre code[class*="language-"],
 html[data-theme='dark'] .public-note .content code[class*="language-"] {
-    color: var(--pz-text-muted);
+    color: var(--pz-syntax-text);
 }
 
 /* Dark mode styles for important tasks */
