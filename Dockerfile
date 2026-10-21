@@ -18,7 +18,10 @@
 # has to be updated once. Only what genuinely differs between running as
 # root and running as "poznote" (user creation, a couple of config lines,
 # ownership, the exposed port) is repeated in the two final stages below.
-FROM php:8.4-fpm-alpine3.23 AS base
+# PHP is pinned to a patch release, not the floating 8.4 tag, so a cached
+# build can never fall back below a security fix: 8.4.27 is the floor for
+# CVE-2026-109618 and CVE-2026-109619 (unauthenticated RCE in PHP core).
+FROM php:8.4.27-fpm-alpine3.23 AS base
 
 # Install system dependencies and PHP extensions
 RUN apk add --no-cache \
