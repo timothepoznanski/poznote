@@ -52,13 +52,27 @@ $uiCustomizationPanelAiLabel = t_h('ai_chat.toolbar_button', [], 'AI assistant')
  * only answers while its own pane has the focus (js/pane-focus.js).
  */
 $pzShortcutFilterPlaceholder = t_h('keyboard_shortcuts.filter_placeholder', [], 'Filter shortcuts...');
+// Type of the note Alt+Shift+N creates, picked from its row (the account's
+// new_note_shortcut_type setting, saved by js/ui-customization-panel.js)
+$pzNewNoteShortcutType = function_exists('getSetting') ? trim((string)getSetting('new_note_shortcut_type', 'markdown')) : 'markdown';
+$pzNewNoteShortcutTypes = [
+    'note' => t_h('modals.create.note.title', [], 'Rich text note'),
+    'markdown' => t_h('modals.create.markdown.title', [], 'Markdown note'),
+    'tasklist' => t_h('modals.create.task_list.title', [], 'Task List'),
+];
+if (!isset($pzNewNoteShortcutTypes[$pzNewNoteShortcutType])) {
+    $pzNewNoteShortcutType = 'markdown';
+}
 $pzShortcutGroups = [
     [
         'title' => t_h('keyboard_shortcuts.sections.general', [], 'General'),
         'items' => [
+            ['keys' => [['mod', 'K']], 'label' => t_h('keyboard_shortcuts.search_notes', [], 'Search the notes')],
+            ['keys' => [['alt', 'Shift', 'N']], 'label' => t_h('keyboard_shortcuts.new_note', [], 'Create a note:'), 'select' => 'new_note_type'],
             ['keys' => [['mod', 'S']], 'label' => t_h('keyboard_shortcuts.save_note', [], 'Save the note')],
             ['keys' => [['mod', 'alt', 'S']], 'label' => t_h('keyboard_shortcuts.snapshot', [], 'Save a revision of the note')],
             ['keys' => [['mod', 'Shift', 'F']], 'label' => t_h('keyboard_shortcuts.search_replace', [], 'Search and replace in the note')],
+            ['keys' => [['mod', 'E']], 'label' => t_h('keyboard_shortcuts.markdown_view_toggle', [], 'Switch a Markdown note between edit and preview')],
             ['keys' => [['alt', '↑'], ['alt', '↓']], 'label' => t_h('keyboard_shortcuts.note_nav', [], 'Previous or next note in the folder')],
             ['keys' => [['Ctrl', '↑'], ['Ctrl', '↓']], 'label' => t_h('keyboard_shortcuts.note_scroll', [], 'Scroll the note up or down')],
             ['keys' => [['Esc']], 'label' => t_h('keyboard_shortcuts.close', [], 'Close a menu, panel or window')],
@@ -73,7 +87,7 @@ $pzShortcutGroups = [
             ['keys' => [['mod', 'I']], 'label' => t_h('keyboard_shortcuts.italic', [], 'Italic')],
             ['keys' => [['mod', 'U']], 'label' => t_h('keyboard_shortcuts.underline', [], 'Underline')],
             ['keys' => [['mod', 'Shift', 'S']], 'label' => t_h('keyboard_shortcuts.strikethrough', [], 'Strikethrough')],
-            ['keys' => [['mod', 'K']], 'label' => t_h('keyboard_shortcuts.link', [], 'Insert a link')],
+            ['keys' => [['mod', 'K']], 'label' => t_h('keyboard_shortcuts.link', [], 'Insert a link on the selected text')],
             ['keys' => [['mod', 'Shift', 'B']], 'label' => t_h('keyboard_shortcuts.code_block', [], 'Code block')],
             ['keys' => [['/']], 'label' => t_h('keyboard_shortcuts.slash_menu', [], 'Open the command menu'), 'hint' => t_h('keyboard_shortcuts.slash_menu_hint', [], 'Alt + / or no shortcut at all, depending on the option in Settings. A right-click in a note always opens it')],
             ['keys' => [[':']], 'label' => t_h('keyboard_shortcuts.emoji', [], 'Insert an emoji by its name')],
@@ -246,7 +260,18 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     <ul class="keyboard-shortcuts-list">
                         <?php foreach ($group['items'] as $item): ?>
                         <li class="keyboard-shortcuts-item" data-help-entry>
+                            <?php if (($item['select'] ?? '') === 'new_note_type'): ?>
+                            <span class="keyboard-shortcuts-label keyboard-shortcuts-label-select">
+                                <label for="newNoteShortcutType"><?php echo $item['label']; ?></label>
+                                <select id="newNoteShortcutType" class="keyboard-shortcuts-select">
+                                    <?php foreach ($pzNewNoteShortcutTypes as $typeValue => $typeLabel): ?>
+                                    <option value="<?php echo $typeValue; ?>"<?php echo $typeValue === $pzNewNoteShortcutType ? ' selected' : ''; ?>><?php echo $typeLabel; ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </span>
+                            <?php else: ?>
                             <span class="keyboard-shortcuts-label"><?php echo $item['label']; ?><?php if (!empty($item['hint'])): ?><span class="keyboard-shortcuts-hint"><?php echo $item['hint']; ?></span><?php endif; ?></span>
+                            <?php endif; ?>
                             <span class="keyboard-shortcuts-keys">
                                 <?php foreach ($item['keys'] as $comboIndex => $combo): ?>
                                 <?php if ($comboIndex > 0): ?><span class="keyboard-shortcuts-or">/</span><?php endif; ?>

@@ -71,6 +71,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:offline-notes-card" checked><span><?php echo t_h('offline.settings.card', [], 'Offline notes'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tasklist-insert-order-card" checked><span><?php echo t_h('display.cards.tasklist_insert_order', [], 'Task list insert order'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-note-type-card" checked><span><?php echo t_h('display.cards.diary_default_note_type', [], 'Diary entry format'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-template-card" checked><span><?php echo t_h('display.cards.diary_template', [], 'Diary entry template'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:diary-date-format-card" checked><span><?php echo t_h('display.cards.diary_date_format', [], 'Diary entry date format'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:folder-tree-highlight-card" checked><span><?php echo t_h('display.cards.highlight_current_folder_tree', [], 'Highlight current folder tree'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:note-color-palette-card" checked><span><?php echo t_h('display.cards.note_color_palette', [], 'Note colors'); ?></span></label>

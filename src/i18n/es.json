@@ -524,7 +524,8 @@
       "local_backup": "Guarda archivos de copia de seguridad completos en una carpeta del servidor, manualmente o según una programación, conservando solo los más recientes.",
       "whats_new": "Tras una actualización, mostrar una vez las notas de la nueva versión al abrir tus notas.",
       "login_disabled": "Omite la pantalla de inicio de sesión: cualquier navegador que llegue a esta instancia abre directamente su cuenta, sin usuario, contraseña ni código de dos factores. Actívelo solo si usted es el único que puede acceder a esta instancia, o si un proxy inverso situado delante se encarga de la autenticación. La API sigue pidiendo credenciales.",
-      "outbound_hosts": "Los webhooks, los servidores personales de IA, transcripción y MCP y Git Sync de los usuarios no administradores solo llegan a hosts públicos de Internet. Indica aquí los hosts y redes locales que pueden usar, como un servidor Ollama o n8n en tu red. Los administradores no tienen límites."
+      "outbound_hosts": "Los webhooks, los servidores personales de IA, transcripción y MCP y Git Sync de los usuarios no administradores solo llegan a hosts públicos de Internet. Indica aquí los hosts y redes locales que pueden usar, como un servidor Ollama o n8n en tu red. Los administradores no tienen límites.",
+      "diary_template": "Elija una nota cuyo contenido sirva de punto de partida para cada nueva entrada del diario del espacio de trabajo {{workspace}}. La lista muestra las notas guardadas en una carpeta llamada Plantillas (o Templates) de ese espacio. Cada espacio de trabajo tiene su propia plantilla."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -690,6 +691,10 @@
     "outbound_hosts": {
       "status_allowed": "{{count}} permitido(s)",
       "status_public_only": "Solo públicos"
+    },
+    "diary_template": {
+      "none": "Ninguna",
+      "missing": "Nota no encontrada"
     }
   },
   "workspaces": {
@@ -885,7 +890,8 @@
       "show_note_icons": "Mostrar iconos de las notas",
       "sidebar_offline_marks": "Mostrar el punto sin conexión",
       "format_toolbar_mode": "Barra de formato",
-      "workspace_activity_emails": "Correos de espacios compartidos"
+      "workspace_activity_emails": "Correos de espacios compartidos",
+      "diary_template": "Plantilla de entrada del diario"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",
@@ -5296,7 +5302,7 @@
     "italic": "Cursiva",
     "underline": "Subrayado",
     "strikethrough": "Tachado",
-    "link": "Insertar un enlace",
+    "link": "Insertar un enlace en el texto seleccionado",
     "code_block": "Bloque de código",
     "slash_menu": "Abrir el menú de comandos",
     "slash_menu_hint": "Alt + / o ningún atajo, según la opción en Ajustes. Un clic derecho en una nota siempre lo abre",
@@ -5325,7 +5331,10 @@
     "tree_select_toggle": "Añadir una nota o carpeta a la selección, o quitarla",
     "tree_select_range": "Seleccionar todas las filas hasta esta",
     "tree_delete": "Mover las notas y carpetas seleccionadas a la papelera",
-    "focus_mode": "Activar o desactivar el modo enfoque"
+    "focus_mode": "Activar o desactivar el modo enfoque",
+    "search_notes": "Buscar en las notas",
+    "markdown_view_toggle": "Cambiar una nota Markdown entre edición y vista previa",
+    "new_note": "Crear una nota:"
   },
   "icon_context_menu": {
     "hide": "Ocultar el botón"

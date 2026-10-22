@@ -294,6 +294,16 @@ class SettingsController {
             return $normalized;
         }
 
+        // Type of the note Alt+Shift+N creates, chosen in the keyboard
+        // shortcuts window (ui_customization_panel.php)
+        if ($key === 'new_note_shortcut_type') {
+            $normalized = trim((string) $value);
+            if (!in_array($normalized, ['markdown', 'note', 'tasklist'], true)) {
+                throw new InvalidArgumentException('invalid new note shortcut type', 400);
+            }
+            return $normalized;
+        }
+
         if ($key === 'slash_menu_trigger' || $key === 'slash_menu_trigger_mobile') {
             $normalized = trim((string) $value);
             if (!in_array($normalized, ['slash', 'alt-slash', 'disabled'], true)) {
@@ -457,6 +467,25 @@ class SettingsController {
                 throw new InvalidArgumentException('invalid diary date format', 400);
             }
             return $normalized;
+        }
+
+        // Note each workspace's diary entries start from, {"<workspace id>": <note id>}
+        // (parseDiaryTemplates() in lib/diary.php), '' for none
+        if ($key === 'diary_templates') {
+            require_once __DIR__ . '/../../../functions.php';
+            $raw = is_array($value) ? $value : trim((string) $value);
+            if ($raw === '' || $raw === []) {
+                return '';
+            }
+            $decoded = is_array($raw) ? $raw : json_decode($raw, true);
+            $templates = parseDiaryTemplates($decoded);
+            if (!is_array($decoded) || count($templates) !== count($decoded)) {
+                throw new InvalidArgumentException('value must be a JSON object mapping workspace ids to note ids', 400);
+            }
+            if (count($templates) > 1000) {
+                throw new InvalidArgumentException('too many diary templates', 400);
+            }
+            return $templates ? json_encode((object) $templates) : '';
         }
 
         if ($key === 'timezone') {

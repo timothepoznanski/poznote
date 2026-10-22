@@ -6,6 +6,10 @@
  *   (plain Ctrl+F / Cmd+F does the same from the Markdown editor)
  * - Alt+ArrowUp / Alt+ArrowDown: switch between notes in the current folder
  * - Ctrl+ArrowUp / Ctrl+ArrowDown: scroll the note without moving the caret
+ * - Ctrl+K / Cmd+K: go to the notes search (in the note, with some text
+ *   selected or the caret on a link, it stays the link shortcut)
+ * - Ctrl+E / Cmd+E: switch a Markdown note between edit and preview
+ * - Alt+Shift+N: create a note of the type chosen in the shortcuts window
  * All are always on; the former opt-in settings were removed.
  */
 
@@ -91,6 +95,98 @@
         return true;
     }
 
+    // Ctrl+K inside the note: a selection or a link under the caret is the
+    // link shortcut's (js/events-rte-notes.js and the Markdown editor's keymap)
+    function isLinkShortcutTarget(target) {
+        if (!target || !target.closest) return false;
+
+        var markdownEditor = target.closest('.markdown-editor');
+        if (markdownEditor) {
+            var cmApi = window.PoznoteMarkdownCodeMirror;
+            if (!cmApi || typeof cmApi.isCodeMirrorEditor !== 'function' || !cmApi.isCodeMirrorEditor(markdownEditor)) return true;
+            var offsets = cmApi.getSelectionOffsets(markdownEditor);
+            if (offsets && offsets.start !== offsets.end) return true;
+            return typeof window.findMarkdownLinkAround === 'function' && !!window.findMarkdownLinkAround(markdownEditor);
+        }
+
+        var noteEditor = target.closest('.noteentry[contenteditable="true"]');
+        if (!noteEditor) return false;
+        var selection = window.getSelection();
+        if (!selection || !selection.rangeCount) return false;
+        if (!selection.isCollapsed) return true;
+        var node = selection.anchorNode;
+        var element = node && node.nodeType === 3 ? node.parentElement : node;
+        var link = element && element.closest ? element.closest('a[href]') : null;
+        return !!(link && noteEditor.contains(link));
+    }
+
+    // Ctrl+K: the search box at the top of the notes column, shown first
+    // when the column or the box itself is hidden
+    function focusNotesSearch() {
+        var input = document.getElementById('unified-search');
+        if (!input) return false;
+
+        if (window.resizeColumn && window.resizeColumn.isCollapsed()) {
+            window.resizeColumn.toggleSidebar();
+        }
+        if (window.PoznoteFocusMode && window.PoznoteFocusMode.isEnabled() && window.PoznoteFocusMode.peek) {
+            window.PoznoteFocusMode.peek(true);
+        }
+        var container = document.getElementById('search-bar-container');
+        if (container && window.getComputedStyle(container).display === 'none' && typeof window.toggleSearchBar === 'function') {
+            window.toggleSearchBar();
+        }
+
+        // (the phone layout, where the column is not on screen with a note)
+        if (input.offsetWidth === 0 && input.offsetHeight === 0) return false;
+        input.focus();
+        input.select();
+        return true;
+    }
+
+    // Runs before the editors' own Ctrl+K, which would open the link window
+    function handleSearchShortcutKeydown(e) {
+        if (e.defaultPrevented || e.altKey || e.shiftKey || !(e.ctrlKey || e.metaKey)) return;
+        var key = window.poznoteShortcutKey ? window.poznoteShortcutKey(e) : (e.key || '').toLowerCase();
+        if (key !== 'k') return;
+        // A window or a menu keeps its own keys
+        if (e.target && e.target.closest && e.target.closest('.modal, [role="dialog"], [role="menu"]')) return;
+        if (isLinkShortcutTarget(e.target)) return;
+        if (focusNotesSearch()) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+
+    // Ctrl+E: the note's edit / preview button. Only in the classic view:
+    // the live views and the split view have no preview to switch to.
+    function toggleMarkdownViewShortcut() {
+        var noteId = typeof window.getDisplayedNoteId === 'function' ? window.getDisplayedNoteId() : null;
+        if (!noteId || typeof window.toggleMarkdownMode !== 'function') return false;
+        var noteEntry = document.getElementById('entry' + noteId);
+        if (!noteEntry || noteEntry.getAttribute('data-note-type') !== 'markdown'
+            || noteEntry.classList.contains('markdown-split-mode')) return false;
+        var button = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
+        if (!button || button.style.display === 'none' || button.classList.contains('is-live-hidden')) return false;
+        window.toggleMarkdownMode(noteId);
+        return true;
+    }
+
+    // Alt+Shift+N: the creator of the type chosen in the shortcuts window
+    // (#newNoteShortcutType, the account's new_note_shortcut_type setting)
+    var NEW_NOTE_CREATORS = {
+        markdown: 'createMarkdownNote',
+        note: 'createNewNote',
+        tasklist: 'createTaskListNote'
+    };
+
+    function getNewNoteShortcutCreator() {
+        var select = document.getElementById('newNoteShortcutType');
+        var type = select && NEW_NOTE_CREATORS[select.value] ? select.value : 'markdown';
+        var create = window[NEW_NOTE_CREATORS[type]];
+        return typeof create === 'function' ? create : null;
+    }
+
     var savedToastTimeoutId = null;
 
     function showSavedToast() {
@@ -165,6 +261,31 @@
             return;
         }
 
+        // Ctrl+E / Cmd+E switches a Markdown note between edit and preview.
+        // Cmd only on a Mac, where Ctrl+E goes to the end of the line.
+        if ((isMacPlatform ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey)
+            && !e.altKey && !e.shiftKey && key === 'e') {
+            if (toggleMarkdownViewShortcut()) {
+                e.preventDefault();
+            }
+            return;
+        }
+
+        // Alt+Shift+N creates a note, in the selected folder, of the type
+        // picked in the keyboard shortcuts window. On a Mac, Option+Shift+N
+        // reports "˜", hence the physical key check.
+        if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey
+            && (key === 'n' || (isMacPlatform && e.code === 'KeyN'))) {
+            var create = getNewNoteShortcutCreator();
+            if (!create) return;
+            e.preventDefault();
+            // (one note per press, not one per auto-repeat)
+            if (!e.repeat) {
+                create();
+            }
+            return;
+        }
+
         // Alt+ArrowUp/ArrowDown navigates to the previous/next note in the current folder
         if (e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey &&
             (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
@@ -193,5 +314,6 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         document.addEventListener('keydown', handleShortcutKeydown);
+        document.addEventListener('keydown', handleSearchShortcutKeydown, true);
     });
 })();

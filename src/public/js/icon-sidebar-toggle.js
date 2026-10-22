@@ -798,7 +798,9 @@
     window.PoznoteFocusMode = {
         isEnabled: isFocusMode,
         set: setFocusMode,
-        toggle: toggleFocusMode
+        toggle: toggleFocusMode,
+        // Shows the flyout, as a hover on the left edge does (Ctrl+K)
+        peek: setFocusPeek
     };
 
     function init() {

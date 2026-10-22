@@ -141,6 +141,7 @@ $settingsPageUserKeys = [
     'tasklist_insert_order',
     'diary_default_note_type',
     'diary_date_format',
+    'diary_templates',
     'toolbar_mode',
     'timezone',
     'workspace_activity_emails',
@@ -1461,6 +1462,30 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                     <select id="diary-note-type-select" class="settings-inline-control settings-inline-select" data-control="diary-note-type-select">
                         <option value="html"><?php echo t_h('modals.create.note.title', [], 'Note'); ?></option>
                         <option value="markdown"><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Diary Entry Template: one per workspace, this card sets the
+                 current workspace's; options filled from GET /notes/templates
+                 (js/settings-page.js) -->
+            <?php
+            $diaryTemplateWorkspaceId = 0;
+            try {
+                $stmt = $con->prepare('SELECT id FROM workspaces WHERE name = ?');
+                $stmt->execute([$pageWorkspace]);
+                $diaryTemplateWorkspaceId = (int)$stmt->fetchColumn();
+            } catch (Throwable $e) {
+                // The card then only offers "None"
+            }
+            ?>
+            <div class="home-card settings-inline-card" id="diary-template-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.diary_template', ['workspace' => $pageWorkspace], 'Choose a note whose content every new diary entry of the {{workspace}} workspace starts with. The list shows the notes kept in a folder named Templates in that workspace. Each workspace has its own template.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-file-text"></i></div>
+                <div class="home-card-content">
+                    <label class="home-card-title" for="diary-template-select"><?php echo t_h('display.cards.diary_template', [], 'Diary entry template'); ?></label>
+                    <select id="diary-template-select" class="settings-inline-control settings-inline-select" data-control="diary-template-select" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-workspace-id="<?php echo $diaryTemplateWorkspaceId; ?>">
+                        <option value=""><?php echo t_h('settings.diary_template.none', [], 'None'); ?></option>
                     </select>
                 </div>
             </div>

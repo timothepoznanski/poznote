@@ -470,6 +470,43 @@ html[data-theme='dark'] .pz-help-empty {
     gap: 2px;
 }
 
+/* Alt+Shift+N: the type of note it creates is picked in its row */
+.keyboard-shortcuts-label-select {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Without the stacked-form margins of .modal-content select (modals/base.css)
+   and smaller: !important beats the blanket padding and 16px font size of
+   modals/responsive.css. The 16px comes back on a touch screen, where it
+   keeps iOS from zooming in. The dark ground is dark-mode/modals.css's. */
+.keyboard-shortcuts-label-select .keyboard-shortcuts-select {
+    box-sizing: border-box;
+    max-width: 100%;
+    margin: 0;
+    padding: 2px 6px !important;
+    font-size: 0.8125rem !important;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-bg);
+    color: var(--pz-text);
+    cursor: pointer;
+}
+
+@media (pointer: coarse) {
+    .keyboard-shortcuts-label-select .keyboard-shortcuts-select {
+        font-size: 16px !important;
+    }
+}
+
+.keyboard-shortcuts-label-select .keyboard-shortcuts-select:focus {
+    outline: none;
+    border-color: var(--pz-accent-text);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.1);
+}
+
 .keyboard-shortcuts-hint {
     font-size: 0.78rem;
     color: var(--pz-text-subtle);

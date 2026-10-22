@@ -368,7 +368,7 @@ Create a new note with title, content, tags, folder and workspace.
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `heading` | string | Yes | Note title |
-| `content` | string | No | Note content (HTML or Markdown) |
+| `content` | string | No | Note content (HTML or Markdown). Left empty for a note titled with a date inside a diary, it is filled from the diary entry template of the workspace (`diary_templates` setting, a JSON object mapping workspace ids to note ids) when that workspace has one |
 | `entry` | string | No | Alternative field for content |
 | `tags` | string | No | Comma-separated tags |
 | `folder_id` | integer | No | Target folder ID |

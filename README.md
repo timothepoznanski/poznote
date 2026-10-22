@@ -697,7 +697,8 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Another Day:** The calendar button next to the view controls picks any day, on phones too. Days that already have an entry are marked with a dot; picking one opens its entry, picking another day creates the entry for that date.
 *   **Board View:** Entries are displayed as cards grouped by month, newest first, with a filter to quickly find past entries.
 *   **Journal View:** The scroll button next to the view controls switches to one reading column: every entry with its full content, newest first, loaded as you scroll. The filter works there too. Click an entry, or its pencil, to edit it right there; changes are saved as you type. The tag button next to the pencil turns the entry's tags into an editor: add or remove tags without opening the note.
-*   **Format:** New entries are created as rich text or Markdown notes, depending on the "Diary entry format" setting under **Settings > Behavior**.
+*   **Format:** New entries are created as rich text or Markdown notes, depending on the "Diary entry format" setting under **Settings > Diary**.
+*   **Template:** To start every new entry with the same content (headings, checkboxes...), keep that note in a folder named `Templates` of the workspace and pick it in the "Diary entry template" setting under **Settings > Diary**. Each workspace has its own template, chosen among its own notes: open Settings from the workspace to set it. The template is converted when its format differs from the entry's.
 </details>
 
 ## Revisions
@@ -765,6 +766,7 @@ Under **Settings > Behavior**, you can configure:
 - **Show notes after folders:** list notes without folders below the folder list
 - **Code block word wrap:** enable or disable word wrap in code blocks
 - **Diary entry format:** create diary entries as rich text or Markdown notes
+- **Diary entry template:** a note from the workspace's `Templates` folder that every new diary entry of that workspace starts with
 - Interface language, timezone and date format, attachments and backlinks at the bottom of a note, spell check, and the keyboard shortcuts
 
 Under **Settings > Markdown**, you can configure the default view mode, the editor font, framed and coloured Markdown, and code block line numbers.
