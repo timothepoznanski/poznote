@@ -1466,6 +1466,24 @@ function locateTableCell(view, block, cell) {
   }
 }
 
+// The table a cell is being typed in, { from, to } in the note, or null. What
+// is typed is only written back when the cell is left: until then the table
+// must not be drawn again, which a rewrite of its source would do (the
+// alignment of the pipes at save time, js/markdown-lists-tables.js)
+export function getEditingTableRange(view) {
+  const cell = view.dom.querySelector('.cm-live-cell-editing')
+  const block = cell ? cell.closest('.cm-live-block-table') : null
+  if (!block) return null
+  let blockPos
+  try {
+    blockPos = view.posAtDOM(block)
+  } catch (error) {
+    return null
+  }
+  const tableBlock = getRenderedBlocks(view.state.doc).find(candidate => candidate.kind === 'table' && blockPos >= candidate.from && blockPos <= candidate.to)
+  return tableBlock ? { from: tableBlock.from, to: tableBlock.to } : null
+}
+
 function findTableBlockElement(view, blockFrom) {
   return Array.from(view.dom.querySelectorAll('.cm-live-block-table')).find(element => {
     try {
@@ -1485,7 +1503,21 @@ function editTableCellAt(view, blockFrom, rowIndex, cellIndex) {
 
 function startTableCellEdit(view, block, cell) {
   if (block._liveEditingCell === cell || view.state.readOnly) return
-  if (block._liveEditingCell && block._liveFinishEdit) block._liveFinishEdit(true)
+  const editing = view.dom.querySelector('.cm-live-cell-editing')
+  const editingBlock = editing ? editing.closest('.cm-live-block-table') : null
+  if (editingBlock && editingBlock._liveFinishEdit) {
+    // Writing the open cell back draws its table again, and the cell clicked
+    // goes with it if it is in that table: its place is kept to open the new one
+    const target = locateTableCell(view, block, cell)
+    const tableIndex = target ? getRenderedBlocks(view.state.doc).filter(candidate => candidate.kind === 'table').indexOf(target.tableBlock) : -1
+    editingBlock._liveFinishEdit(true)
+    if (!cell.isConnected) {
+      if (tableIndex < 0) return
+      const tableBlock = getRenderedBlocks(view.state.doc).filter(candidate => candidate.kind === 'table')[tableIndex]
+      if (tableBlock) requestAnimationFrame(() => editTableCellAt(view, tableBlock.from, target.rowIndex, target.cellIndex))
+      return
+    }
+  }
   const located = locateTableCell(view, block, cell)
   if (!located) return
 
@@ -1505,15 +1537,16 @@ function startTableCellEdit(view, block, cell) {
     cell.removeEventListener('blur', onBlur)
     block._liveEditingCell = null
     block._liveFinishEdit = null
-    const blockFrom = located.tableBlock.from
+    // (the cell's place is looked up again: the note may have moved on, a
+    // table above it aligned at save time for one)
+    const now = locateTableCell(view, block, cell)
+    const blockFrom = now ? now.tableBlock.from : located.tableBlock.from
     const text = cell.textContent.replace(/\s*[\r\n]+\s*/g, ' ').trim().replace(/\\?\|/g, '\\|')
     cell.removeAttribute('contenteditable')
     cell.classList.remove('cm-live-cell-editing')
 
     let changed = false
     if (commit && text !== raw) {
-      // (the cell's place is looked up again: the note may have moved on)
-      const now = locateTableCell(view, block, cell)
       if (now) {
         changed = true
         view.dispatch({

@@ -26,7 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { Annotation, CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
-import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect } from './live-preview.js'
+import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, getEditingTableRange } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -1355,6 +1355,12 @@ function indent(host, less) {
   return runMarkdownOrderedListTab(host, !!less)(instance.view)
 }
 
+// Rich text: the table a cell is being typed in ({ from, to }), or null
+function getEditingTableCellRange(host) {
+  const instance = getInstance(host)
+  return instance ? getEditingTableRange(instance.view) : null
+}
+
 function getLastActiveEditor() {
   return lastActiveHost && getInstance(lastActiveHost) ? lastActiveHost : null
 }
@@ -1998,6 +2004,7 @@ window.PoznoteMarkdownCodeMirror = {
   focus,
   hasFocus,
   getSelectionOffsets,
+  getEditingTableCellRange,
   setSelection,
   replaceRange,
   replaceRangeKeepSelection,
