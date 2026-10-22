@@ -1739,6 +1739,17 @@
         var idx = _indexById(tabId);
         if (idx === -1) return false;
 
+        // A click on the tab started loading its note (the first click of the
+        // double-click that closes it): drop that load, or it lands once the
+        // tab is gone, shows its note and leaves the bar with no active tab
+        if (tabId === _pendingTabSwitch) {
+            _pendingTabSwitch = null;
+            if (_loadingNoteId === tabToClose.noteId && typeof window.abortActiveNoteLoad === 'function') {
+                window.abortActiveNoteLoad();
+            }
+            _loadingNoteId = null;
+        }
+
         var wasActive = (tabId === activeTabId);
         tabs.splice(idx, 1);
         delete _scrollPositions[tabId];

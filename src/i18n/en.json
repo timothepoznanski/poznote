@@ -1475,7 +1475,8 @@
     },
     "note_actions": {
       "menu": "Note actions",
-      "open_in_new_tab": "Open in new tab",
+      "open_in_new_tab": "Open in a tab",
+      "close_tab": "Close this tab",
       "move_note": "Move note",
       "is_shared": "Is shared",
       "share_note": "Share note",
@@ -2015,7 +2016,7 @@
       "remove_checklist": "Remove checkboxes",
       "add_separator": "Add separator",
       "insert_note_reference": "Insert note reference",
-      "open_in_new_tab": "Open in new tab",
+      "open_in_new_tab": "Open in a tab",
       "create_linked_note": "Create shortcut",
       "search_replace": "Search and replace",
       "split_view": "Toggle split view",

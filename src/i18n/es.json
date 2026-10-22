@@ -1213,7 +1213,7 @@
       "add_separator": "Agregar separador",
       "insert_note_reference": "Insertar referencia de nota",
       "create_linked_note": "Crear atajo",
-      "open_in_new_tab": "Abrir en nueva pestaña",
+      "open_in_new_tab": "Abrir en una pestaña",
       "split_view": "Alternar vista dividida",
       "view_cycle_live": "Cambiar a vista previa en vivo",
       "view_cycle_rich": "Cambiar a texto enriquecido",
@@ -1966,7 +1966,8 @@
     },
     "note_actions": {
       "menu": "Acciones de la nota",
-      "open_in_new_tab": "Abrir en nueva pestaña",
+      "open_in_new_tab": "Abrir en una pestaña",
+      "close_tab": "Cerrar esta pestaña",
       "move_note": "Mover nota",
       "is_shared": "Es compartida",
       "share_note": "Compartir nota",

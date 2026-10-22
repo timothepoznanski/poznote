@@ -272,7 +272,7 @@
                     echo '<button type="button" class="toolbar-btn btn-reminder note-action-btn'.$reminder_class.'" title="'.t_h('reminder.toolbar_button', [], 'Set reminder').'" data-action="open-reminder-modal" data-note-id="'.$row['id'].'" data-reminder-at="'.htmlspecialchars($row['reminder_at'] ?? '', ENT_QUOTES).'"><i class="lucide lucide-bell"></i></button>';
                     
                     // Open in new tab button
-                    echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in new tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="lucide lucide-external-link"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-open-new-tab note-action-btn" title="'.t_h('editor.toolbar.open_in_new_tab', [], 'Open in a tab').'" data-action="open-note-new-tab" data-note-id="'.$row['id'].'"><i class="lucide lucide-external-link"></i></button>';
 
                     // Check if this note already has a linked note (for toolbar + mobile menu)
                     $hasLinkedNote = false;

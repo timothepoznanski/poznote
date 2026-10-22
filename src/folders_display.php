@@ -621,7 +621,13 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     // --- Open, name and appearance in the tree ---
     $menu .= "<div class='note-actions-menu-item' data-action='open-note-new-tab'>";
     $menu .= "<i class='lucide lucide-external-link'></i>";
-    $menu .= "<span>" . t_h('notes_list.note_actions.open_in_new_tab', [], 'Open in new tab') . "</span>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.open_in_new_tab', [], 'Open in a tab') . "</span>";
+    $menu .= "</div>";
+
+    // Takes its place for a note already in a tab (js/utils-menus.js)
+    $menu .= "<div class='note-actions-menu-item' data-action='close-note-tab'>";
+    $menu .= "<i class='lucide lucide-x'></i>";
+    $menu .= "<span>" . t_h('notes_list.note_actions.close_tab', [], 'Close this tab') . "</span>";
     $menu .= "</div>";
 
     $menu .= "<div class='note-actions-menu-item' data-action='rename-note'>";
