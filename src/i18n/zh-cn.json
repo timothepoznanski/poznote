@@ -1211,7 +1211,7 @@
       "add_separator": "添加分隔符",
       "insert_note_reference": "插入笔记引用",
       "create_linked_note": "创建快捷方式",
-      "open_in_new_tab": "在新标签页中打开",
+      "open_in_new_tab": "在标签页中打开",
       "search_replace": "查找替换",
       "split_view": "切换分屏视图",
       "view_cycle_live": "切换到实时预览",
@@ -1964,7 +1964,8 @@
     },
     "note_actions": {
       "menu": "笔记操作",
-      "open_in_new_tab": "在新标签页中打开",
+      "open_in_new_tab": "在标签页中打开",
+      "close_tab": "关闭此标签页",
       "move_note": "移动笔记",
       "is_shared": "已共享",
       "share_note": "共享笔记",
@@ -2329,7 +2330,14 @@
       },
       "confirm": {
         "delete_table": "您确定要删除此表格吗？"
-      }
+      },
+      "copy": "复制"
+    },
+    "toolbar": {
+      "label": "表格",
+      "delete": "删除",
+      "add_row": "添加一行",
+      "add_column": "添加一列"
     }
   },
   "index": {

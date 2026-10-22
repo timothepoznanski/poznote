@@ -285,6 +285,130 @@
     color: var(--pz-accent);
 }
 
+/* ── Table bar and "+" buttons, Markdown and HTML notes (js/table-toolbar.js) */
+
+/* Above the table in use: rows, columns, column alignment, delete, more */
+.md-table-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1001;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    box-sizing: border-box;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
+}
+
+.md-table-bar[hidden] {
+    display: none;
+}
+
+.md-table-bar-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-icon);
+    cursor: pointer;
+}
+
+.md-table-bar-btn:hover:not(:disabled) {
+    background: var(--pz-surface-hover);
+}
+
+.md-table-bar-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+}
+
+.md-table-bar-btn.active {
+    color: var(--pz-accent);
+}
+
+.md-table-bar-btn [class*="lucide-"],
+.md-table-bar-btn [class*="lucide-"]:hover {
+    font-size: 17px;
+    transform: none;
+}
+
+.md-table-bar-svg {
+    width: 18px;
+    height: 18px;
+}
+
+.md-table-bar-separator {
+    width: 1px;
+    height: 18px;
+    margin: 0 3px;
+    background: var(--pz-border);
+}
+
+/* Its Delete list: entries a table cannot lose (its header, its last row or column) */
+.md-table-bar-menu .table-context-menu-item.disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.md-table-bar-menu .table-context-menu-item.disabled:hover {
+    background: transparent;
+}
+
+.md-table-bar-menu [class*="lucide-"] {
+    font-size: 15px;
+}
+
+/* The preview has no caret: the cell the bar works on is outlined */
+.markdown-preview td.md-table-active-cell,
+.markdown-preview th.md-table-active-cell {
+    outline: 2px solid var(--pz-accent);
+    outline-offset: -2px;
+}
+
+/* Along a table under the mouse: a row below, a column on the right */
+.md-table-handle {
+    position: fixed;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-surface-hover);
+    color: var(--pz-text-muted);
+    opacity: 0.7;
+    cursor: pointer;
+    transition: opacity 0.15s, background 0.15s, color 0.15s;
+}
+
+.md-table-handle[hidden] {
+    display: none;
+}
+
+.md-table-handle:hover {
+    opacity: 1;
+    background: rgba(var(--pz-accent-rgb), 0.15);
+    color: var(--pz-accent);
+}
+
+.md-table-handle [class*="lucide-"],
+.md-table-handle [class*="lucide-"]:hover {
+    font-size: 12px;
+    transform: none;
+}
+
 /* ── Formula cells (js/table-formulas.js) ───────────────────────────────── */
 
 /* A small mark in the corner names the formula: what it computes (Σ sum,

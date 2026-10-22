@@ -358,7 +358,8 @@ function formatMarkdownTableAtLine(lines, lineIndex) {
 // editor. The caret's own table is formatted with caret tracking (its cell keeps
 // the whitespace typed so far and the caret is remapped to the aligned position);
 // tables overlapping a non-empty selection are left untouched so the selection
-// isn't invalidated, and a separator line being hand-edited is left alone too.
+// isn't invalidated, and a separator line being hand-edited is left alone too, as
+// is a table with a cell being typed in (rich text).
 function formatMarkdownTablesBeforeSave(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) {
@@ -393,6 +394,16 @@ function formatMarkdownTablesBeforeSave(noteId) {
         }
     }
 
+    // Rich text: a cell being typed in keeps its text to itself until it is
+    // left; rewriting its table would draw the table again and drop that text
+    var editingStartLine = -1;
+    var editingEndLine = -1;
+    var editingRange = typeof api.getEditingTableCellRange === 'function' ? api.getEditingTableCellRange(editorDiv) : null;
+    if (editingRange) {
+        editingStartLine = getMarkdownLineIndexForOffset(lineStarts, editingRange.from);
+        editingEndLine = getMarkdownLineIndexForOffset(lineStarts, editingRange.to);
+    }
+
     var blocks = [];
     for (var i = 0; i < lines.length; i++) {
         if (isMarkdownTableRowLine(lines[i] || '')) {
@@ -408,6 +419,9 @@ function formatMarkdownTablesBeforeSave(noteId) {
     var changed = false;
     for (var b = blocks.length - 1; b >= 0; b--) {
         var block = blocks[b];
+        if (editingStartLine <= block.end && editingEndLine >= block.start) {
+            continue;
+        }
         var caret = null;
         if (selectionStartLine <= block.end && selectionEndLine >= block.start) {
             // A non-empty selection must not be rewritten under the user

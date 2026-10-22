@@ -1475,7 +1475,8 @@
     },
     "note_actions": {
       "menu": "Note actions",
-      "open_in_new_tab": "Open in new tab",
+      "open_in_new_tab": "Open in a tab",
+      "close_tab": "Close this tab",
       "move_note": "Move note",
       "is_shared": "Is shared",
       "share_note": "Share note",
@@ -1841,7 +1842,14 @@
       },
       "confirm": {
         "delete_table": "Do you really want to delete this table?"
-      }
+      },
+      "copy": "Copy"
+    },
+    "toolbar": {
+      "label": "Table",
+      "delete": "Delete",
+      "add_row": "Add a row",
+      "add_column": "Add a column"
     }
   },
   "index": {
@@ -2015,7 +2023,7 @@
       "remove_checklist": "Remove checkboxes",
       "add_separator": "Add separator",
       "insert_note_reference": "Insert note reference",
-      "open_in_new_tab": "Open in new tab",
+      "open_in_new_tab": "Open in a tab",
       "create_linked_note": "Create shortcut",
       "search_replace": "Search and replace",
       "split_view": "Toggle split view",

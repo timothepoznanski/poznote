@@ -527,21 +527,15 @@ function setupPreviewInteractivity(noteId, roots) {
             table._mdTableClickHandler = null;
         }
         table.removeEventListener('contextmenu', table._mdTableContextMenuHandler);
+        // Text selected in the table is offered as Copy in the menu; Shift +
+        // right click leaves the browser's own menu
         table._mdTableContextMenuHandler = function(e) {
             const cell = e.target.closest('td, th');
-            if (!cell) return;
+            if (!cell || e.shiftKey || typeof window.showMdTableContextMenuForCell !== 'function') return;
 
-            // Keep the browser's default menu when text is selected in the
-            // table (so the user can copy the selection)
-            var sel = window.getSelection();
-            if (sel && !sel.isCollapsed && sel.rangeCount > 0 && sel.getRangeAt(0).intersectsNode(table)) {
-                return;
-            }
-
-            e.preventDefault();
-            e.stopPropagation();
-            if (typeof window.showMdTableContextMenu === 'function') {
-                window.showMdTableContextMenu(e.clientX, e.clientY, table, cell, noteEntry);
+            if (window.showMdTableContextMenuForCell(e.clientX, e.clientY, cell)) {
+                e.preventDefault();
+                e.stopPropagation();
             }
         };
         table.addEventListener('contextmenu', table._mdTableContextMenuHandler);

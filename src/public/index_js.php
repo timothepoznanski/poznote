@@ -160,6 +160,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/code-block-language.js',
         'js/table-columns.js',
         'js/table-context-menu.js',
+        'js/table-toolbar.js',
         'js/table-cell-selection.js',
         'js/system-menu.js',
         'js/notes-list-events.js',

@@ -542,6 +542,12 @@ html[data-theme='dark'] .table-context-menu-item[style*="color: #dc2626"] {
     color: var(--pz-danger-text) !important;
 }
 
+/* Table bar (js/table-toolbar.js): the same ground as the menu */
+html[data-theme='dark'] .md-table-bar {
+    background: var(--pz-surface);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.4);
+}
+
 /* ============================================
    Scrollbar (WebKit)
    ============================================ */

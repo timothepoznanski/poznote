@@ -856,6 +856,11 @@
                     openNoteInNewTab(noteId);
                 }
                 break;
+            case 'close-note-tab':
+                if (noteId && window.tabManager && typeof window.tabManager.closeTabByNoteId === 'function') {
+                    window.tabManager.closeTabByNoteId(noteId, true);
+                }
+                break;
             case 'toggle-mobile-toolbar-menu':
                 if (typeof toggleMobileToolbarMenu === 'function') {
                     toggleMobileToolbarMenu(target);

@@ -3542,7 +3542,12 @@
                         icon: 'lucide-table',
                         label: t('slash_menu.table', null, 'Table'),
                         action: function () {
-                            insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+                            // The size picker, as in HTML notes (js/toolbar-tables.js)
+                            if (typeof window.toggleTablePicker === 'function') {
+                                window.toggleTablePicker();
+                            } else {
+                                insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+                            }
                         }
                     },
                     {
@@ -6253,6 +6258,10 @@
     // it opens; the table menu is left the cells it owns.
     function handleSelectionContextMenu(e) {
         if (e.defaultPrevented || slashMenuElement) return;
+        // Shift + right click keeps the browser's menu, the only place its
+        // spelling suggestions are offered (discussion #1675); Firefox shows
+        // it on its own, Chromium needs the event left alone
+        if (e.shiftKey) return;
         if (window.matchMedia && window.matchMedia('(max-width: 800px)').matches) return;
 
         const pointer = { left: e.clientX, right: e.clientX, top: e.clientY, bottom: e.clientY, width: 0, height: 0 };

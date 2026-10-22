@@ -88,11 +88,15 @@ try {
         $note['kanban_preview_note_id'] = $previewNoteId;
 
         if ($filename && file_exists($filename)) {
-            $content = file_get_contents($filename);
             if ($contentType === 'tasklist') {
-                $note['entry'] = resolveTasklistStoredContent($content, '');
+                $note['entry'] = resolveTasklistStoredContent(file_get_contents($filename), '');
             } else {
-                $note['entry'] = mb_substr(strip_tags($content), 0, 150);
+                // Plain text as the dashboard cards show it: a markdown note
+                // loses its syntax ([text](url) keeps the text, #1672). Its
+                // links stay clickable, see renderKanbanSnippet().
+                $preview = buildNoteCardPreview($previewNoteId, $contentType, false, true);
+                $note['entry'] = $preview['text'];
+                $note['kanban_links'] = $preview['links'] ?? [];
             }
         } else {
             $note['entry'] = '';
@@ -387,6 +391,64 @@ try {
     }
 
     /**
+     * Echo a card's excerpt, its links as anchors (#1672). $text comes from
+     * buildNoteCardPreview() with $withLinks: each link's text is marked by
+     * \x02 and \x03, $links holds the targets in order. An internal link
+     * (index.php?note=ID) is a note-internal-link, opened by
+     * navigateToNote() in js/note-reference.js; http(s) and mailto links
+     * open in a new tab; any other target is left as plain text.
+     * The excerpt is already cut at 220 characters: $maxLength only bounds
+     * the raw content of a task list that could not be read as tasks.
+     */
+    function renderKanbanSnippet($text, array $links, $maxLength = 300) {
+        $visible = 0;
+        $linkIndex = 0;
+        $openLink = false;
+        $truncated = false;
+        foreach (preg_split('/([\x02\x03])/', (string) $text, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY) as $part) {
+            if ($part === "\x02") {
+                if ($openLink) {
+                    echo '</a>';
+                    $openLink = false;
+                }
+                $href = (string) ($links[$linkIndex++] ?? '');
+                if (preg_match('/(?:^|\/)index\.php\?[^#\s]*\bnote=(\d+)\b|^\?[^#\s]*\bnote=(\d+)\b/', $href, $m)) {
+                    $targetId = (int) ($m[1] !== '' ? $m[1] : $m[2]);
+                    echo '<a href="index.php?note=' . $targetId . '" class="kanban-card-link note-internal-link" data-note-id="' . $targetId . '" draggable="false">';
+                    $openLink = true;
+                } elseif (preg_match('/^(https?:\/\/|mailto:)/i', $href)) {
+                    echo '<a href="' . htmlspecialchars($href, ENT_QUOTES) . '" class="kanban-card-link" target="_blank" rel="noopener noreferrer" draggable="false">';
+                    $openLink = true;
+                }
+                continue;
+            }
+            if ($part === "\x03") {
+                if ($openLink) {
+                    echo '</a>';
+                    $openLink = false;
+                }
+                continue;
+            }
+            $room = $maxLength - $visible;
+            if (mb_strlen($part) > $room) {
+                $part = mb_substr($part, 0, $room);
+                $truncated = true;
+            }
+            echo htmlspecialchars($part, ENT_QUOTES);
+            $visible += mb_strlen($part);
+            if ($truncated) {
+                break;
+            }
+        }
+        if ($openLink) {
+            echo '</a>';
+        }
+        if ($truncated) {
+            echo '...';
+        }
+    }
+
+    /**
      * Render a single kanban card HTML for a note.
      */
     function renderKanbanCard($note, $folderId) {
@@ -467,15 +529,17 @@ try {
                 ?>
             </div>
 
-            <div class="kanban-card-snippet<?php echo $isTasklistPreview ? ' kanban-card-tasklist' : ''; ?>">
-                <?php 
+            <div class="kanban-card-snippet<?php echo $isTasklistPreview ? ' kanban-card-tasklist' : ''; ?>"><?php
+                // No whitespace around the excerpt: the box keeps line breaks
                 if (!$isTasklistPreview || !renderKanbanTasklistPreview($note['entry'] ?? '', 3, $note['kanban_preview_note_id'] ?? $note['id'])) {
-                    $snippet = strip_tags($note['entry'] ?? '');
-                    $snippet = html_entity_decode($snippet);
-                    echo htmlspecialchars(mb_substr($snippet, 0, 80) . (mb_strlen($snippet) > 80 ? '...' : ''), ENT_QUOTES);
+                    // Other notes already carry plain text (see $loadNoteSnippet)
+                    $snippet = (string) ($note['entry'] ?? '');
+                    if ($isTasklistPreview) {
+                        $snippet = html_entity_decode(strip_tags(str_replace(["\x02", "\x03"], '', $snippet)));
+                    }
+                    renderKanbanSnippet($snippet, $isTasklistPreview ? [] : ($note['kanban_links'] ?? []));
                 }
-                ?>
-            </div>
+            ?></div>
         </div>
         <?php
     }

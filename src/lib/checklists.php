@@ -31,9 +31,14 @@ function collapseNoteCardWhitespace($text) {
  * 'headings' gives, for a markdown note, the heading level (1-6, 0 for plain
  * text) of each line of 'text', so a card can tint its heading lines like the
  * note does ("Colored markdown"); null when the excerpt holds no heading.
- * @return array{text: string, tasks: ?array, search: string, image: ?string, headings?: ?array<int, int>}
+ *
+ * $withLinks = true keeps the note's links for a card that renders them
+ * (Kanban, #1672): the text of each link sits between \x02 and \x03 in
+ * 'text', and 'links' gives their targets in the same order. A link cut by
+ * the excerpt may lose its \x03.
+ * @return array{text: string, tasks: ?array, search: string, image: ?string, headings?: ?array<int, int>, links?: array<int, string>}
  */
-function buildNoteCardPreview($noteId, $type, $withSearch = true) {
+function buildNoteCardPreview($noteId, $type, $withSearch = true, $withLinks = false) {
     $excerptLength = 220;
     $file = getEntryFilename($noteId, $type);
     if (!is_readable($file)) {
@@ -43,6 +48,12 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true) {
     $raw = @file_get_contents($file);
     if ($raw === false || $raw === '') {
         return ['text' => '', 'tasks' => null, 'search' => '', 'image' => null];
+    }
+
+    // Targets of the links kept by $withLinks, in the order of their marks
+    $links = [];
+    if ($withLinks) {
+        $raw = str_replace(["\x02", "\x03"], '', $raw);
     }
 
     if ($type === 'tasklist') {
@@ -97,12 +108,37 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true) {
         }, $text);
         $text = preg_replace('/^ {0,3}#{1,6}\s+/m', '', $text);
         $text = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $text);
-        $text = preg_replace('/\[([^\]]*)\]\([^)]*\)/', '$1', $text);
+        $text = preg_replace_callback('/\[([^\]]*)\]\(([^)]*)\)/', function ($m) use ($withLinks, &$links) {
+            if (!$withLinks) return $m[1];
+            // [text](<url> "title"): the target is the first word
+            $parts = preg_split('/\s+/', trim($m[2]));
+            $links[] = trim((string)($parts[0] ?? ''), '<>');
+            return "\x02" . $m[1] . "\x03";
+        }, $text);
         $text = str_replace(['**', '__', '*', '`', '> '], ' ', $text);
     } else {
         // HTML notes: turn line-breaking tags into newlines before stripping
         // so the excerpt keeps the note's line structure.
-        $text = preg_replace('/<br\s*\/?>/i', "\n", $raw);
+        $text = $raw;
+        if ($withLinks) {
+            $marked = preg_replace_callback('/<a\b([^>]*)>(.*?)<\/a>/is', function ($m) use (&$links) {
+                $href = '';
+                if (preg_match('/\bdata-note-id\s*=\s*["\']?(\d+)/i', $m[1], $hm)) {
+                    $href = 'index.php?note=' . $hm[1];
+                } elseif (preg_match('/\bhref\s*=\s*(?:"([^"]*)"|\'([^\']*)\')/i', $m[1], $hm)) {
+                    $href = html_entity_decode($hm[1] !== '' ? $hm[1] : ($hm[2] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                }
+                $links[] = $href;
+                return "\x02" . $m[2] . "\x03";
+            }, $text);
+            // A PCRE failure (huge note) leaves the links out, not the text
+            if ($marked === null) {
+                $links = [];
+            } else {
+                $text = $marked;
+            }
+        }
+        $text = preg_replace('/<br\s*\/?>/i', "\n", $text);
         $text = preg_replace('/<\/?(p|div|li|h[1-6]|tr|blockquote|pre|ul|ol|table)(\s[^>]*)?>/i', "\n", $text);
     }
 
@@ -157,7 +193,11 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true) {
     }
 
     $search = $withSearch ? preg_replace('/\s+/u', ' ', $text) : '';
-    return ['text' => $previewText, 'tasks' => null, 'search' => $search, 'image' => $image, 'headings' => $headings];
+    $preview = ['text' => $previewText, 'tasks' => null, 'search' => $search, 'image' => $image, 'headings' => $headings];
+    if ($withLinks) {
+        $preview['links'] = $links;
+    }
+    return $preview;
 }
 
 /**

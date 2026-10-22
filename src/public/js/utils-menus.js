@@ -542,6 +542,19 @@ function populateNoteActionsMenu(menu, toggle) {
         item.setAttribute('data-folder', folderName);
     });
 
+    // "Open in a tab" for a note no tab holds yet, "Close this tab" for one
+    // already in a tab. tabs.js re-checks the first on each tab bar render,
+    // but against the note the shared menu showed last, so both are set here
+    // for the note the menu now opens on.
+    var isOpenInTab = !!(window.tabManager && typeof window.tabManager.isNoteOpen === 'function'
+        && window.tabManager.isNoteOpen(noteId));
+    menu.querySelectorAll('[data-action="open-note-new-tab"]').forEach(function (item) {
+        item.style.display = isOpenInTab ? 'none' : '';
+    });
+    menu.querySelectorAll('[data-action="close-note-tab"]').forEach(function (item) {
+        item.style.display = isOpenInTab ? '' : 'none';
+    });
+
     syncActionsMenuSeparators(menu);
 
     // Copy / cut / paste items (js/tree-undo-clipboard.js): paste only

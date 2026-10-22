@@ -578,22 +578,36 @@
     font-size: 0.75rem;
 }
 
+/* The excerpt keeps the note's line breaks (#1672) */
 .kanban-card-snippet {
     font-size: 0.8rem;
     color: var(--pz-text-muted);
     line-height: 1.5;
     margin-bottom: 10px;
     display: -webkit-box;
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    white-space: pre-line;
     word-break: break-word;
+}
+
+/* Links of the excerpt (#1672), in the colour of the note's own links */
+.kanban-card-snippet a.kanban-card-link {
+    color: var(--pz-accent-text);
+    text-decoration: none;
+    padding: 0;
+}
+
+.kanban-card-snippet a.kanban-card-link:hover {
+    text-decoration: underline;
 }
 
 .kanban-card-tasklist {
     display: block;
     overflow: visible;
+    white-space: normal;
     -webkit-line-clamp: unset;
     line-clamp: unset;
     -webkit-box-orient: initial;
@@ -996,6 +1010,10 @@ html[data-theme='dark'] .kanban-scroll-btn {
     border-color: var(--pz-border);
 }
 
+html[data-theme='dark'] .kanban-card-snippet a.kanban-card-link {
+    color: var(--pz-accent-text-hover);
+}
+
 /* Dark mode support for inline view */
 html[data-theme='dark'] .kanban-inline-view {
     background: transparent;
@@ -1110,6 +1128,8 @@ html[data-theme='dark'] .kanban-inline-header {
 .kanban-size-small .kanban-card-snippet {
     font-size: 0.75rem;
     margin-bottom: 6px;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
 }
 
 .kanban-size-large .kanban-card {
@@ -1123,8 +1143,8 @@ html[data-theme='dark'] .kanban-inline-header {
 
 .kanban-size-large .kanban-card-snippet {
     font-size: 0.9rem;
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
+    -webkit-line-clamp: 5;
+    line-clamp: 5;
 }
 
 /* Large cards show more of a tasklist before scrolling (5 rows vs 3) */

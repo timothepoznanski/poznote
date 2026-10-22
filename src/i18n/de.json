@@ -1213,7 +1213,7 @@
       "add_separator": "Trennlinie hinzufügen",
       "insert_note_reference": "Notiz-Referenz einfügen",
       "create_linked_note": "Verknüpfung erstellen",
-      "open_in_new_tab": "In neuem Tab öffnen",
+      "open_in_new_tab": "In einem Tab öffnen",
       "split_view": "Geteilte Ansicht umschalten",
       "view_cycle_live": "Zur Live-Vorschau wechseln",
       "view_cycle_rich": "Zu Rich Text wechseln",
@@ -1966,7 +1966,8 @@
     },
     "note_actions": {
       "menu": "Notizaktionen",
-      "open_in_new_tab": "In neuem Tab öffnen",
+      "open_in_new_tab": "In einem Tab öffnen",
+      "close_tab": "Diesen Tab schließen",
       "move_note": "Notiz verschieben",
       "is_shared": "Ist geteilt",
       "share_note": "Notiz teilen",
@@ -2331,7 +2332,14 @@
       },
       "confirm": {
         "delete_table": "Möchten Sie diese Tabelle wirklich löschen?"
-      }
+      },
+      "copy": "Kopieren"
+    },
+    "toolbar": {
+      "label": "Tabelle",
+      "delete": "Löschen",
+      "add_row": "Zeile hinzufügen",
+      "add_column": "Spalte hinzufügen"
     }
   },
   "index": {

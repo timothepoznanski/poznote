@@ -1475,7 +1475,8 @@
     },
     "note_actions": {
       "menu": "노트 작업",
-      "open_in_new_tab": "새 탭에서 열기",
+      "open_in_new_tab": "탭에서 열기",
+      "close_tab": "이 탭 닫기",
       "move_note": "노트 이동",
       "is_shared": "공유됨",
       "share_note": "노트 공유",
@@ -1841,7 +1842,14 @@
       },
       "confirm": {
         "delete_table": "이 표을 정말로 삭제하시겠습니까?"
-      }
+      },
+      "copy": "복사"
+    },
+    "toolbar": {
+      "label": "표",
+      "delete": "삭제",
+      "add_row": "행 추가",
+      "add_column": "열 추가"
     }
   },
   "index": {
@@ -2015,7 +2023,7 @@
       "remove_checklist": "체크박스 제거",
       "add_separator": "구분 기호 추가",
       "insert_note_reference": "노트 참조 삽입",
-      "open_in_new_tab": "새 탭에서 열기",
+      "open_in_new_tab": "탭에서 열기",
       "create_linked_note": "바로가기 만들기",
       "search_replace": "검색 및 바꾸기",
       "split_view": "분할 보기 전환",
