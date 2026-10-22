@@ -5406,7 +5406,7 @@
     "italic": "Italique",
     "underline": "Souligné",
     "strikethrough": "Barré",
-    "link": "Insérer un lien",
+    "link": "Insérer un lien sur le texte sélectionné",
     "code_block": "Bloc de code",
     "slash_menu": "Ouvrir le menu de commandes",
     "slash_menu_hint": "Alt + / ou aucun raccourci, selon l'option dans les paramètres. Un clic droit dans une note l'ouvre toujours",
@@ -5435,7 +5435,10 @@
     "tree_select_toggle": "Ajouter une note ou un dossier à la sélection, ou l'en retirer",
     "tree_select_range": "Sélectionner toutes les lignes jusqu'à celle-ci",
     "tree_delete": "Placer les notes et dossiers sélectionnés dans la corbeille",
-    "focus_mode": "Activer ou désactiver le mode focus"
+    "focus_mode": "Activer ou désactiver le mode focus",
+    "search_notes": "Rechercher dans les notes",
+    "markdown_view_toggle": "Basculer une note Markdown entre édition et aperçu",
+    "new_note": "Créer une note :"
   },
   "icon_context_menu": {
     "hide": "Masquer le bouton"

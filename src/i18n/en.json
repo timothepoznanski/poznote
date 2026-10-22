@@ -5137,7 +5137,7 @@
     "italic": "Italic",
     "underline": "Underline",
     "strikethrough": "Strikethrough",
-    "link": "Insert a link",
+    "link": "Insert a link on the selected text",
     "code_block": "Code block",
     "slash_menu": "Open the command menu",
     "slash_menu_hint": "Alt + / or no shortcut at all, depending on the option in Settings. A right-click in a note always opens it",
@@ -5166,7 +5166,10 @@
     "tree_select_toggle": "Add a note or folder to the selection, or remove it",
     "tree_select_range": "Select every row up to this one",
     "tree_delete": "Move the selected notes and folders to the trash",
-    "focus_mode": "Turn focus mode on or off"
+    "focus_mode": "Turn focus mode on or off",
+    "search_notes": "Search the notes",
+    "markdown_view_toggle": "Switch a Markdown note between edit and preview",
+    "new_note": "Create a note:"
   },
   "icon_context_menu": {
     "hide": "Hide button"

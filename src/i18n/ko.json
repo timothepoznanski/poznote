@@ -5137,7 +5137,7 @@
     "italic": "이탤릭체",
     "underline": "밑줄",
     "strikethrough": "취소선",
-    "link": "링크 삽입",
+    "link": "선택한 텍스트에 링크 삽입",
     "code_block": "코드 블록",
     "slash_menu": "명령 메뉴 열기",
     "slash_menu_hint": "설정 옵션에 따라 Alt + / 또는 단축키가 전혀 없습니다. 노트를 마우스 오른쪽 버튼으로 클릭하면 항상 열립니다.",
@@ -5166,7 +5166,10 @@
     "tree_select_toggle": "노트 또는 폴더를 선택 항목에 추가하거나 제거하세요.",
     "tree_select_range": "이 행까지의 모든 행을 선택하세요.",
     "tree_delete": "선택한 노트 및 폴더를 휴지통으로 이동합니다.",
-    "focus_mode": "집중 모드 켜기 또는 끄기"
+    "focus_mode": "집중 모드 켜기 또는 끄기",
+    "search_notes": "노트 검색",
+    "markdown_view_toggle": "Markdown 노트의 편집과 미리보기 전환",
+    "new_note": "노트 만들기:"
   },
   "icon_context_menu": {
     "hide": "숨기기 버튼"

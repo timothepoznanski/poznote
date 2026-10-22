@@ -5398,7 +5398,7 @@
     "italic": "斜体",
     "underline": "下划线",
     "strikethrough": "删除线",
-    "link": "插入链接",
+    "link": "为所选文本插入链接",
     "code_block": "代码块",
     "slash_menu": "打开命令菜单",
     "slash_menu_hint": "Alt + / 或完全不用快捷键，取决于设置中的选项。在笔记中点击右键始终可以打开它",
@@ -5427,7 +5427,10 @@
     "tree_select_toggle": "将笔记或文件夹加入选择，或从选择中移除",
     "tree_select_range": "选择到此行为止的所有行",
     "tree_delete": "将所选笔记和文件夹移到回收站",
-    "focus_mode": "开启或关闭专注模式"
+    "focus_mode": "开启或关闭专注模式",
+    "search_notes": "搜索笔记",
+    "markdown_view_toggle": "在编辑和预览之间切换 Markdown 笔记",
+    "new_note": "新建笔记："
   },
   "icon_context_menu": {
     "hide": "隐藏按钮"

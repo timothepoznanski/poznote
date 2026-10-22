@@ -5301,7 +5301,7 @@
     "italic": "Kursiv",
     "underline": "Unterstrichen",
     "strikethrough": "Durchgestrichen",
-    "link": "Link einfügen",
+    "link": "Link auf den markierten Text setzen",
     "code_block": "Codeblock",
     "slash_menu": "Befehlsmenü öffnen",
     "slash_menu_hint": "Alt + / oder gar kein Tastenkürzel, je nach Option in den Einstellungen. Ein Rechtsklick in einer Notiz öffnet es immer",
@@ -5330,7 +5330,10 @@
     "tree_select_toggle": "Notiz oder Ordner zur Auswahl hinzufügen oder daraus entfernen",
     "tree_select_range": "Alle Zeilen bis zu dieser auswählen",
     "tree_delete": "Ausgewählte Notizen und Ordner in den Papierkorb verschieben",
-    "focus_mode": "Fokusmodus ein- oder ausschalten"
+    "focus_mode": "Fokusmodus ein- oder ausschalten",
+    "search_notes": "Notizen durchsuchen",
+    "markdown_view_toggle": "Markdown-Notiz zwischen Bearbeitung und Vorschau umschalten",
+    "new_note": "Notiz erstellen:"
   },
   "icon_context_menu": {
     "hide": "Schaltfläche ausblenden"

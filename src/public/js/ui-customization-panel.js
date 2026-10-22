@@ -553,6 +553,37 @@
         return normalizeFilterText(parts.join(' ')).replace(/ ?\+ ?/g, '+');
     }
 
+    // Type of the note Alt+Shift+N creates (js/keyboard-shortcuts.js reads
+    // the select), saved to the account at once. A failed save puts the
+    // previous type back, so the select never shows what the next page
+    // would not.
+    function initNewNoteShortcutType() {
+        var select = document.getElementById('newNoteShortcutType');
+        if (!select) return;
+        var saved = select.value;
+        select.addEventListener('change', function () {
+            var value = select.value;
+            fetch('/api/v1/settings/new_note_shortcut_type', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ value: value })
+            })
+                .then(function (r) { return r.json(); })
+                .then(function (result) {
+                    if (!result || !result.success) throw new Error('not saved');
+                    saved = value;
+                })
+                .catch(function () {
+                    select.value = saved;
+                    if (typeof window.showNotificationPopup === 'function') {
+                        window.showNotificationPopup(
+                            (typeof window.t === 'function') ? window.t('common.error', null, 'Error') : 'Error', 'error');
+                    }
+                });
+        });
+    }
+
     // Filter of a help modal. The Markdown syntax reference matches whole
     // cards; a shortcut section matches its rows ([data-help-entry]) and
     // hides when none is left, unless its title matches, which keeps them all.
@@ -653,6 +684,7 @@
             document.querySelectorAll('.pz-help-modal kbd[data-key="alt"]').forEach(function (kbd) { kbd.textContent = '⌥'; });
         }
         document.querySelectorAll('.pz-help-modal').forEach(initHelpFilter);
+        initNewNoteShortcutType();
 
         document.addEventListener('click', function (e) {
             var action = e.target.closest ? e.target.closest('[data-action]') : null;

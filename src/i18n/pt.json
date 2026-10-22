@@ -5302,7 +5302,7 @@
     "italic": "Itálico",
     "underline": "Sublinhado",
     "strikethrough": "Riscado",
-    "link": "Inserir uma ligação",
+    "link": "Inserir uma ligação no texto selecionado",
     "code_block": "Bloco de código",
     "slash_menu": "Abrir o menu de comandos",
     "slash_menu_hint": "Alt + / ou nenhum atalho, conforme a opção nas Configurações. Um clique com o botão direito numa nota abre-o sempre",
@@ -5331,7 +5331,10 @@
     "tree_select_toggle": "Adicionar uma nota ou pasta à seleção, ou removê-la",
     "tree_select_range": "Selecionar todas as linhas até esta",
     "tree_delete": "Mover as notas e pastas selecionadas para a lixeira",
-    "focus_mode": "Ativar ou desativar o modo foco"
+    "focus_mode": "Ativar ou desativar o modo foco",
+    "search_notes": "Pesquisar nas notas",
+    "markdown_view_toggle": "Alternar uma nota Markdown entre edição e pré-visualização",
+    "new_note": "Criar uma nota:"
   },
   "icon_context_menu": {
     "hide": "Ocultar o botão"

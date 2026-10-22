@@ -294,6 +294,16 @@ class SettingsController {
             return $normalized;
         }
 
+        // Type of the note Alt+Shift+N creates, chosen in the keyboard
+        // shortcuts window (ui_customization_panel.php)
+        if ($key === 'new_note_shortcut_type') {
+            $normalized = trim((string) $value);
+            if (!in_array($normalized, ['markdown', 'note', 'tasklist'], true)) {
+                throw new InvalidArgumentException('invalid new note shortcut type', 400);
+            }
+            return $normalized;
+        }
+
         if ($key === 'slash_menu_trigger' || $key === 'slash_menu_trigger_mobile') {
             $normalized = trim((string) $value);
             if (!in_array($normalized, ['slash', 'alt-slash', 'disabled'], true)) {
