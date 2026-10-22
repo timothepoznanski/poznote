@@ -1361,7 +1361,7 @@ function getEditingTableCellRange(host) {
   return instance ? getEditingTableRange(instance.view) : null
 }
 
-// Tables, for the table bar and menu (js/markdown-table-toolbar.js,
+// Tables, for the table bar and menu (js/table-toolbar.js,
 // js/table-context-menu.js): where a table and a cell are, by line
 function getTableAtSelection(host) {
   const instance = getInstance(host)

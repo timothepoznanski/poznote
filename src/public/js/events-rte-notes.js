@@ -996,6 +996,15 @@ function handleNoteEntryKeydown(e) {
             var inCodeBlock = checkNode && checkNode.closest && (checkNode.closest('pre') || checkNode.closest('code'));
             var inRichTextNote = checkNode && checkNode.closest && checkNode.closest('.noteentry[contenteditable="true"]');
 
+            // A table cell: Tab / Shift+Tab go to the next or previous cell,
+            // Tab in the last one adds a row (js/table-context-menu.js)
+            var tableCell = inRichTextNote && !inMarkdownEditor && !inCodeBlock && checkNode.closest('td, th');
+            if (tableCell && inRichTextNote.contains(tableCell) && window.pzHtmlTable &&
+                window.pzHtmlTable.moveToCell(tableCell, e.shiftKey)) {
+                e.preventDefault();
+                return;
+            }
+
             if (inMarkdownEditor || inCodeBlock || inRichTextNote) {
                 e.preventDefault();
 

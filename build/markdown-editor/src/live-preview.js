@@ -1680,7 +1680,7 @@ function setupTableEditing(view, block) {
   })
 }
 
-// --- Tables reached from the page (js/markdown-table-toolbar.js) ------------
+// --- Tables reached from the page (js/table-toolbar.js) ------------
 // The table bar and the row/column buttons change a table through its source,
 // by line (js/table-context-menu.js). They ask here where a table and a cell
 // are, and where to put the caret once the table changed. A table is named by

@@ -1,18 +1,21 @@
-// Markdown tables: a bar above the table being worked on, and "+" buttons
-// along a table under the mouse (discussion #1673).
+// Tables of the notes: a bar above the table being worked on, and "+"
+// buttons along a table under the mouse (discussion #1673). Markdown notes
+// and HTML (rich text) notes alike.
 //
 // The bar shows while a cell is in use: a cell typed in (rich text), the caret
 // in the source of a table (live preview, the editor of the classic and split
-// views), a cell clicked in the preview. It inserts rows and columns, aligns
+// views), a cell clicked in the preview, the caret in a cell of an HTML note.
+// It inserts rows and columns, aligns
 // the column, deletes, and its Σ sets a formula in the cell (the right click
-// still opens the whole table menu).
+// still opens the whole table menu). It steps aside while text is selected
+// in the table: the formatting bar of the selection takes that place.
 // The "+" buttons below and to the right of a drawn table add a row or a
 // column at the end, mouse only (touch screens have the bar).
 //
-// Everything goes through the Markdown table menu (js/table-context-menu.js,
-// window.pzMdTable): a target names the table and the cell, the change is made
-// in the note's source by line. Markdown notes only: HTML notes keep their own
-// menu.
+// Everything goes through the table menus (js/table-context-menu.js). For
+// Markdown (window.pzMdTable) a target names the table and the cell, the
+// change is made in the note's source by line; an HTML note's table is
+// changed in place (window.pzHtmlTable).
 (function () {
     'use strict';
 
@@ -22,8 +25,10 @@
 
     // The table in use:
     //   kind       'drawn' (the editor's drawn table: rich text, live preview),
-    //              'source' (the editor shows its source), 'preview'
+    //              'source' (the editor shows its source), 'preview',
+    //              'html' (a table of an HTML note)
     //   noteEntry, editor (the CodeMirror host, editor kinds)
+    //   table      the table element (html)
     //   startLine  the table's first line (editor kinds)
     //   tableIndex the table's place among the preview's tables (preview)
     //   rowIndex, cellIndex  the cell, as drawn (row 0: the header)
@@ -42,6 +47,19 @@
 
     function getMdTable() {
         return window.pzMdTable || null;
+    }
+
+    function getHtmlTable() {
+        return window.pzHtmlTable || null;
+    }
+
+    function isHtml() {
+        return !!active && active.kind === 'html';
+    }
+
+    // The menu of the kind in use (Markdown or HTML)
+    function isAnyMenuOpen() {
+        return !!((getMdTable() && getMdTable().isMenuOpen()) || (getHtmlTable() && getHtmlTable().isMenuOpen()));
     }
 
     function icon(name) {
@@ -72,6 +90,7 @@
     // The drawn table in use, null when the editor shows it as source
     function getActiveTableElement() {
         if (!active) return null;
+        if (active.kind === 'html') return active.table.isConnected ? active.table : null;
         if (active.kind === 'preview') {
             const table = getPreviewTables(active.noteEntry)[active.tableIndex];
             return table && table.offsetParent !== null ? table : null;
@@ -86,8 +105,32 @@
         return row ? row.children[Math.max(0, Math.min(cellIndex, row.children.length - 1))] || null : null;
     }
 
+    // An HTML note's table: what the bar needs to know of the cell
+    function getHtmlTarget(table, cell) {
+        const htmlTable = getHtmlTable();
+        if (!htmlTable || !cell) return null;
+        const rows = htmlTable.getRows(table);
+        const row = cell.parentElement;
+        return {
+            html: true,
+            table: table,
+            cell: cell,
+            rowIndex: rows.indexOf(row),
+            cellIndex: Array.from(row.children).indexOf(cell),
+            rowCount: rows.length,
+            columnCount: rows[0] ? rows[0].children.length : 0,
+            align: window.pzTableColumns ? window.pzTableColumns.readLineAlignment(table, cell, 'column') : null
+        };
+    }
+
     // A target for js/table-context-menu.js, as the table is now
     function getActiveTarget() {
+        if (isHtml()) {
+            const table = getActiveTableElement();
+            const rows = table && getHtmlTable() ? getHtmlTable().getRows(table) : [];
+            const row = rows[Math.min(active.rowIndex, rows.length - 1)];
+            return row ? getHtmlTarget(table, row.children[Math.min(active.cellIndex, row.children.length - 1)]) : null;
+        }
         const mdTable = getMdTable();
         if (!active || !mdTable) return null;
         if (active.kind === 'source') {
@@ -100,7 +143,7 @@
     }
 
     function activate(state) {
-        const changed = !active || active.kind !== state.kind || active.editor !== state.editor ||
+        const changed = !active || active.kind !== state.kind || active.editor !== state.editor || active.table !== state.table ||
             active.noteEntry !== state.noteEntry || active.startLine !== state.startLine || active.tableIndex !== state.tableIndex;
         active = state;
         if (changed) closeDeleteMenu();
@@ -191,18 +234,38 @@
         return bar;
     }
 
+    // Text selected in the table in use (or in the source of it): the
+    // formatting bar shows over the selection, the table bar would cover it
+    function hasTextSelected() {
+        if (!active) return false;
+        if (active.kind === 'source') {
+            const api = getApi();
+            const offsets = api && typeof api.getSelectionOffsets === 'function' ? api.getSelectionOffsets(active.editor) : null;
+            return !!offsets && offsets.end > offsets.start;
+        }
+        const sel = window.getSelection();
+        const table = getActiveTableElement();
+        // (an HTML table's range of cells, highlighted by a drag, too)
+        const cells = window.pzTableCellSelection;
+        if (isHtml() && cells && cells.isActive() && cells.getTable() === table) return true;
+        return !!(sel && !sel.isCollapsed && sel.rangeCount && table && sel.getRangeAt(0).intersectsNode(table));
+    }
+
     function refreshBar() {
         if (!active) return;
-        const target = getActiveTarget();
+        const target = hasTextSelected() ? null : getActiveTarget();
         if (!target) {
             if (bar) bar.hidden = true;
+            closeDeleteMenu();
             return;
         }
         createBar();
-        const isHeader = target.rowIndex === 0;
+        // (an HTML table has no header row of its own: rows go anywhere)
+        const isHeader = !target.html && target.rowIndex === 0;
         bar.querySelector('[data-action="insertRowAbove"]').disabled = isHeader;
         // Formulas: body cells, whose shown value is known (not the source)
-        bar.querySelector('[data-action="formulas"]').disabled = isHeader || target.cellText === undefined || !window.pzTableFormulas;
+        bar.querySelector('[data-action="formulas"]').disabled = !window.pzTableFormulas ||
+            (target.html ? target.cell.tagName !== 'TD' : (isHeader || target.cellText === undefined));
         bar.querySelectorAll('[data-action="align"]').forEach(button => {
             button.classList.toggle('active', button.dataset.align === target.align);
         });
@@ -273,6 +336,17 @@
         if (deleteMenu && deleteMenu.style.display !== 'none') placeMenuUnder(deleteMenu, bar.querySelector('[data-action="delete"]'));
     }
 
+    let refreshFrame = 0;
+
+    function scheduleRefresh() {
+        if (refreshFrame) return;
+        refreshFrame = requestAnimationFrame(() => {
+            refreshFrame = 0;
+            followHtmlCaret();
+            refreshBar();
+        });
+    }
+
     function schedulePosition() {
         if (repositionFrame) return;
         repositionFrame = requestAnimationFrame(() => {
@@ -285,10 +359,24 @@
     // ─── Actions ─────────────────────────────────────────────────────────────
 
     function runAction(action, value) {
-        const mdTable = getMdTable();
         const target = getActiveTarget();
-        if (!mdTable || !target) return;
+        if (!target) return;
+        if (target.html) {
+            runOnHtmlTable(target, action, value);
+            return;
+        }
+        if (!getMdTable()) return;
         runOnTarget(target, action, value, getActiveTableElement());
+    }
+
+    // The table changes in place and the caret goes to the cell the action
+    // leaves the user in, which the bar follows (selectionchange)
+    function runOnHtmlTable(target, action, value) {
+        const htmlTable = getHtmlTable();
+        if (!htmlTable) return;
+        if (action === 'align') value = { scope: 'column', align: value };
+        htmlTable.run(target.table, target.cell, action, value);
+        scheduleRefresh();
     }
 
     // table: the drawn table of the target (preview: the bar goes back to it)
@@ -331,6 +419,19 @@
     }
 
     function openFormulaMenu(button) {
+        const htmlTable = getHtmlTable();
+        if (isHtml() && htmlTable) {
+            if (htmlTable.isMenuOpen()) {
+                htmlTable.hideMenu();
+                return;
+            }
+            closeDeleteMenu();
+            const target = getActiveTarget();
+            if (!target) return;
+            const rect = button.getBoundingClientRect();
+            htmlTable.showFormulaMenu(rect.left, rect.bottom + 4, target.table, target.cell);
+            return;
+        }
         const mdTable = getMdTable();
         if (!mdTable) return;
         if (mdTable.isMenuOpen()) {
@@ -402,8 +503,9 @@
             });
             document.body.appendChild(deleteMenu);
         }
-        // A table keeps its header, one row and one column
-        deleteMenu.querySelector('[data-action="deleteRow"]').classList.toggle('disabled', target.rowIndex === 0 || target.rowCount <= 2);
+        // A table keeps one row and one column, a Markdown table its header too
+        deleteMenu.querySelector('[data-action="deleteRow"]').classList.toggle('disabled',
+            target.html ? target.rowCount <= 1 : (target.rowIndex === 0 || target.rowCount <= 2));
         deleteMenu.querySelector('[data-action="deleteCol"]').classList.toggle('disabled', target.columnCount <= 1);
         deleteMenu.style.display = 'block';
         placeMenuUnder(deleteMenu, button);
@@ -413,10 +515,19 @@
 
     const canHover = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine)') : null;
 
-    // A drawn Markdown table of a note that can be edited, or null
+    // A table of an HTML note being edited, or null
+    function getHtmlNoteTable(element) {
+        const table = element && element.closest ? element.closest('table') : null;
+        const noteEntry = table ? table.closest('.noteentry[contenteditable="true"]') : null;
+        if (!noteEntry || noteEntry.getAttribute('data-note-type') === 'markdown') return null;
+        return table.closest('.markdown-preview, .markdown-editor') ? null : table;
+    }
+
+    // A drawn table of a note that can be edited (Markdown or HTML), or null
     function getEditableTable(element) {
         const table = element && element.closest ? element.closest('table') : null;
         if (!table) return null;
+        if (getHtmlNoteTable(table)) return table;
         const noteEntry = table.closest('.noteentry');
         if (!noteEntry || (typeof isMarkdownEntryReadOnly === 'function' && isMarkdownEntryReadOnly(noteEntry))) return null;
         if (table.matches('.markdown-preview table[data-start-line]')) return table;
@@ -455,12 +566,19 @@
         const mdTable = getMdTable();
         const table = hoverTable;
         hideHandles();
-        if (!mdTable || !table || !table.isConnected) return;
-        const rows = table.querySelectorAll('tr');
+        if (!table || !table.isConnected) return;
+        const html = !!getHtmlNoteTable(table);
+        const rows = html && getHtmlTable() ? getHtmlTable().getRows(table) : Array.from(table.querySelectorAll('tr'));
         if (!rows.length) return;
         const cell = what === 'row'
             ? rows[rows.length - 1].children[0]
             : rows[0].children[rows[0].children.length - 1];
+        if (html) {
+            const target = getHtmlTarget(table, cell);
+            if (target) runOnHtmlTable(target, what === 'row' ? 'insertRowBelow' : 'insertColRight');
+            return;
+        }
+        if (!mdTable) return;
         const target = cell ? mdTable.getTarget(cell) : null;
         if (!target) return;
         runOnTarget(target, what === 'row' ? 'insertRowBelow' : 'insertColRight', undefined, table);
@@ -490,7 +608,8 @@
         const rect = hoverTable.getBoundingClientRect();
         const clip = getClipRect(hoverTable);
         const size = 16;
-        const gap = 3;
+        // (clear of the column resize grip along an HTML table's edge)
+        const gap = 6;
 
         const rowTop = rect.bottom + gap;
         const rowLeft = Math.max(rect.left, clip.left);
@@ -565,6 +684,29 @@
         }
     }
 
+    // The caret in a cell of an HTML note's table brings the bar there
+    function followHtmlCaret() {
+        const sel = window.getSelection();
+        let node = sel && sel.rangeCount ? sel.anchorNode : null;
+        if (node && node.nodeType === 3) node = node.parentElement;
+        const cell = node && node.closest ? node.closest('td, th') : null;
+        const table = cell ? getHtmlNoteTable(cell) : null;
+        const target = table && table === cell.closest('table') ? getHtmlTarget(table, cell) : null;
+        if (target) {
+            if (!isHtml() || active.table !== table || active.rowIndex !== target.rowIndex || active.cellIndex !== target.cellIndex) {
+                activate({
+                    kind: 'html',
+                    noteEntry: table.closest('.noteentry'),
+                    table: table,
+                    rowIndex: target.rowIndex,
+                    cellIndex: target.cellIndex
+                });
+            }
+        } else if (isHtml()) {
+            deactivate();
+        }
+    }
+
     function onPreviewClick(e) {
         const cell = e.target.closest ? e.target.closest('td, th') : null;
         const table = cell ? getEditableTable(cell) : null;
@@ -582,7 +724,7 @@
 
     function isInsideTools(node) {
         if (!node || !node.closest) return false;
-        if (node.closest('.md-table-bar, .md-table-bar-menu, .md-table-handle, .md-table-context-menu')) return true;
+        if (node.closest('.md-table-bar, .md-table-bar-menu, .md-table-handle, .table-context-menu')) return true;
         // The confirmation of "Delete table"
         return !!node.closest('.modal, .modal-alert, [role="dialog"]');
     }
@@ -595,6 +737,8 @@
         const table = getActiveTableElement();
         if (table && table.contains(e.target)) return;
         if (active.kind === 'source' && active.editor.contains(e.target)) return;
+        // (HTML: the caret says, once the click has moved it)
+        if (isHtml() && active.noteEntry.contains(e.target)) return;
         deactivate();
     }
 
@@ -621,7 +765,7 @@
     }
 
     function onKeyDown(e) {
-        if (e.key === 'Escape' && active && !(getMdTable() && getMdTable().isMenuOpen())) {
+        if (e.key === 'Escape' && active && !isAnyMenuOpen()) {
             if (deleteMenu && deleteMenu.style.display !== 'none') {
                 closeDeleteMenu();
                 return;
@@ -643,6 +787,8 @@
         document.addEventListener('mouseover', onMouseOver);
         document.addEventListener('scroll', schedulePosition, true);
         window.addEventListener('resize', schedulePosition);
+        // Selecting text hides the bar, letting go of it brings it back
+        document.addEventListener('selectionchange', scheduleRefresh);
         // Typing in the source moves the table's edges
         document.addEventListener('input', e => {
             if (active && active.editor && e.target === active.editor) schedulePosition();

@@ -285,7 +285,7 @@
     color: var(--pz-accent);
 }
 
-/* ── Markdown table bar and "+" buttons (js/markdown-table-toolbar.js) ───── */
+/* ── Table bar and "+" buttons, Markdown and HTML notes (js/table-toolbar.js) */
 
 /* Above the table in use: rows, columns, column alignment, delete, more */
 .md-table-bar {

@@ -5,6 +5,7 @@
     let activeTable = null;
     let activeCell = null;
     let contextMenu = null;
+    let htmlCopyText = '';
 
     // Use global translation function from globals.js
     const tr = window.t || function(key, vars, fallback) {
@@ -45,7 +46,12 @@
         contextMenu = document.createElement('div');
         contextMenu.className = 'table-context-menu';
 
+        // (a click in the menu must not take away the selection Copy is for)
+        contextMenu.addEventListener('mousedown', (e) => e.preventDefault());
+
         const menuItems = [
+            { label: tr('table.context_menu.copy', 'Copy'), action: 'copy', icon: '<i class="lucide lucide-copy"></i>', id: 'copy' },
+            { separator: true, id: 'copy' },
             { label: tr('table.context_menu.insert_row_above', 'Insert row above'), action: 'insertRowAbove', icon: '↑' },
             { label: tr('table.context_menu.insert_row_below', 'Insert row below'), action: 'insertRowBelow', icon: '↓' },
             { separator: true },
@@ -71,12 +77,13 @@
                 contextMenu.appendChild(createAlignRow('cell', pickAlignment));
             } else if (item.formulas) {
                 contextMenu.appendChild(createFormulaItem(formula => {
-                    executeTableAction('formula', formula);
+                    runTableAction(activeTable, activeCell, 'formula', formula);
                     hideTableContextMenu();
                 }));
             } else if (item.separator) {
                 const separator = document.createElement('div');
                 separator.className = 'table-context-menu-separator';
+                if (item.id) separator.dataset.item = item.id;
                 contextMenu.appendChild(separator);
             } else {
                 const menuItem = document.createElement('div');
@@ -87,7 +94,11 @@
                 menuItem.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    executeTableAction(item.action);
+                    if (item.action === 'copy') {
+                        if (htmlCopyText) copyMdText(htmlCopyText);
+                    } else {
+                        runTableAction(activeTable, activeCell, item.action);
+                    }
                     hideTableContextMenu();
                 });
 
@@ -100,7 +111,7 @@
     }
 
     function pickAlignment(scope, align) {
-        executeTableAction('align', { scope: scope, align: align });
+        runTableAction(activeTable, activeCell, 'align', { scope: scope, align: align });
         hideTableContextMenu();
     }
 
@@ -293,14 +304,19 @@
     }
 
     /**
-     * Shows the context menu at the mouse position
+     * Shows the context menu at the mouse position; copyText, when given, is
+     * offered as Copy
      */
-    function showTableContextMenu(x, y, table, cell) {
+    function showTableContextMenu(x, y, table, cell, copyText) {
         activeTable = table;
         activeCell = cell;
+        htmlCopyText = copyText || '';
         
         const menu = createTableContextMenu();
         refreshTableContextMenu(menu, table, cell);
+        menu.querySelectorAll('[data-item="copy"]').forEach(el => {
+            el.style.display = htmlCopyText ? '' : 'none';
+        });
         menu.style.display = 'block';
         
         // Menu position
@@ -327,82 +343,168 @@
         if (contextMenu) {
             contextMenu.style.display = 'none';
         }
+        if (htmlFormulaMenu) {
+            htmlFormulaMenu.style.display = 'none';
+        }
         activeTable = null;
         activeCell = null;
+        htmlCopyText = '';
+    }
+
+    // The rows of a table, header (thead) included, not those of a table
+    // nested in one of its cells
+    function getTableRows(table) {
+        return Array.from(table.querySelectorAll('tr')).filter(row => row.closest('table') === table);
     }
 
     /**
-     * Gets the row or column index
+     * Runs an action on a cell of an HTML note's table (the menu, the table
+     * bar and the row/column buttons of js/table-toolbar.js).
+     * Returns the cell the action leaves the user in (the caret goes there
+     * after inserting or deleting), null when nothing changed.
      */
-    function getCellIndex(cell) {
+    function runTableAction(table, cell, action, value) {
+        if (!table || !cell || !table.contains(cell)) return null;
+
         const row = cell.parentElement;
+        const rows = getTableRows(table);
+        const rowIndex = rows.indexOf(row);
         const cellIndex = Array.from(row.children).indexOf(cell);
-        const rowIndex = Array.from(row.parentElement.children).indexOf(row);
-        return { rowIndex, cellIndex };
-    }
-
-    /**
-     * Executes the context menu action
-     */
-    function executeTableAction(action, value) {
-        if (!activeTable || !activeCell) return;
-
-        const { rowIndex, cellIndex } = getCellIndex(activeCell);
-        const tbody = activeTable.querySelector('tbody') || activeTable;
-        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const cellOf = (target, index) => target ? target.children[Math.max(0, Math.min(index, target.children.length - 1))] || null : null;
+        let focus = null;
 
         switch (action) {
             case 'insertRowAbove':
-                insertRow(tbody, rowIndex, false);
+                focus = cellOf(insertRow(row, false), cellIndex);
                 break;
             case 'insertRowBelow':
-                insertRow(tbody, rowIndex, true);
+                focus = cellOf(insertRow(row, true), cellIndex);
                 break;
             case 'insertColLeft':
                 insertColumn(rows, cellIndex, false);
+                focus = cellOf(row, cellIndex);
                 break;
             case 'insertColRight':
                 insertColumn(rows, cellIndex, true);
+                focus = cellOf(row, cellIndex + 1);
                 break;
-            case 'deleteRow':
-                deleteRow(tbody, rowIndex);
+            case 'deleteRow': {
+                const neighbour = rows[rowIndex + 1] || rows[rowIndex - 1];
+                if (!deleteRow(rows, row)) return null;
+                focus = cellOf(neighbour, cellIndex);
                 break;
+            }
             case 'deleteCol':
-                deleteColumn(rows, cellIndex);
+                if (!deleteColumn(rows, cellIndex)) return null;
+                focus = cellOf(row, cellIndex);
                 break;
             case 'align':
-                if (!window.pzTableColumns) return;
-                window.pzTableColumns.alignCells(activeTable, activeCell, value.scope, value.align);
+                if (!window.pzTableColumns) return null;
+                window.pzTableColumns.alignCells(table, cell, value.scope, value.align);
                 break;
             case 'resetColumnWidths':
-                if (!window.pzTableColumns || !window.pzTableColumns.resetColumnWidths(activeTable)) return;
+                if (!window.pzTableColumns || !window.pzTableColumns.resetColumnWidths(table)) return null;
                 break;
             case 'fitTable':
             case 'fullWidthTable':
-                if (!window.pzTableColumns || !window.pzTableColumns.setTableWidthMode(activeTable, action === 'fitTable' ? 'fit' : 'full')) return;
+                if (!window.pzTableColumns || !window.pzTableColumns.setTableWidthMode(table, action === 'fitTable' ? 'fit' : 'full')) return null;
                 break;
             case 'formula':
-                if (!window.pzTableFormulas || !window.pzTableFormulas.setFormula(activeTable, activeCell, value)) return;
+                if (!window.pzTableFormulas || !window.pzTableFormulas.setFormula(table, cell, value)) return null;
                 break;
             case 'deleteTable':
                 // Asynchronous (styled confirmation): it saves the note itself
-                deleteTable();
-                return;
+                deleteTable(table);
+                return null;
+            default:
+                return null;
         }
 
         // Trigger input event to save
-        const noteentry = activeTable.closest('.noteentry');
+        const noteentry = table.closest('.noteentry');
         if (noteentry) {
             noteentry.dispatchEvent(new Event('input', { bubbles: true }));
         }
+
+        if (focus) placeCaretInCell(focus);
+        return focus || cell;
+    }
+
+    // The caret at the start of a cell, the note keeping the focus
+    function placeCaretInCell(cell) {
+        const noteentry = cell.closest('.noteentry');
+        if (noteentry && document.activeElement !== noteentry) noteentry.focus({ preventScroll: true });
+        const range = document.createRange();
+        range.selectNodeContents(cell);
+        range.collapse(true);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
     }
 
     /**
-     * Inserts a new row
+     * Tab / Shift+Tab in a cell of an HTML note (js/events-rte-notes.js): the
+     * next or previous cell, its text selected; Tab in the last cell adds a row
      */
-    function insertRow(tbody, index, after) {
-        const rows = tbody.querySelectorAll('tr');
-        const referenceRow = rows[index];
+    function moveToTableCell(cell, backward) {
+        const table = cell.closest('table');
+        if (!table) return false;
+        const cells = getTableRows(table).reduce((all, row) => all.concat(Array.from(row.children)), []);
+        const index = cells.indexOf(cell);
+        if (index < 0) return false;
+        let next = cells[index + (backward ? -1 : 1)];
+        if (!next && !backward) {
+            const row = cell.parentElement;
+            next = runTableAction(table, row.children[0] || cell, 'insertRowBelow');
+            return !!next;
+        }
+        if (!next) return true;
+        const range = document.createRange();
+        range.selectNodeContents(next);
+        // (an empty cell holds a <br>: the caret goes before it)
+        if (!next.textContent.trim()) range.collapse(true);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        return true;
+    }
+
+    // The formulas alone, for the Σ button of the table bar
+    let htmlFormulaMenu = null;
+
+    function showTableFormulaMenu(x, y, table, cell) {
+        if (!htmlFormulaMenu) {
+            htmlFormulaMenu = document.createElement('div');
+            htmlFormulaMenu.className = 'table-context-menu md-table-formula-menu';
+            htmlFormulaMenu.addEventListener('mousedown', (e) => e.preventDefault());
+            const item = createFormulaItem(formula => {
+                runTableAction(activeTable, activeCell, 'formula', formula);
+                hideTableContextMenu();
+            });
+            Array.from(item.querySelector('.table-context-menu-submenu').children).forEach(child => htmlFormulaMenu.appendChild(child));
+            document.body.appendChild(htmlFormulaMenu);
+        }
+        if (contextMenu) contextMenu.style.display = 'none';
+        activeTable = table;
+        activeCell = cell;
+        const formula = window.pzTableFormulas ? window.pzTableFormulas.readFormula(cell) : null;
+        htmlFormulaMenu.querySelectorAll('.open').forEach(opened => opened.classList.remove('open'));
+        htmlFormulaMenu.querySelectorAll('[data-formula]').forEach(el => {
+            el.classList.toggle('active', el.dataset.formula === formula);
+        });
+        htmlFormulaMenu.querySelectorAll('[data-item="removeFormula"]').forEach(el => {
+            el.style.display = formula ? '' : 'none';
+        });
+        htmlFormulaMenu.style.display = 'block';
+        const rect = htmlFormulaMenu.getBoundingClientRect();
+        htmlFormulaMenu.style.left = Math.max(10, Math.min(x, window.innerWidth - rect.width - 10)) + 'px';
+        htmlFormulaMenu.style.top = Math.max(10, Math.min(y, window.innerHeight - rect.height - 10)) + 'px';
+    }
+
+    /**
+     * Inserts a new row beside the row given; returns it
+     */
+    function insertRow(referenceRow, after) {
         const numCols = referenceRow.querySelectorAll('td, th').length;
         
         const referenceCells = referenceRow.querySelectorAll('td, th');
@@ -416,11 +518,19 @@
             newRow.appendChild(cell);
         }
 
-        if (after) {
-            referenceRow.parentNode.insertBefore(newRow, referenceRow.nextSibling);
+        // Below a header row (thead): the new row opens the body
+        const section = referenceRow.parentNode;
+        const body = after && section.tagName === 'THEAD' && referenceRow === section.lastElementChild
+            ? section.parentNode.querySelector(':scope > tbody')
+            : null;
+        if (body) {
+            body.insertBefore(newRow, body.firstChild);
+        } else if (after) {
+            section.insertBefore(newRow, referenceRow.nextSibling);
         } else {
-            referenceRow.parentNode.insertBefore(newRow, referenceRow);
+            section.insertBefore(newRow, referenceRow);
         }
+        return newRow;
     }
 
     /**
@@ -454,15 +564,15 @@
     }
 
     /**
-     * Deletes a row
+     * Deletes a row; false when it is the table's last one
      */
-    function deleteRow(tbody, index) {
-        const rows = tbody.querySelectorAll('tr');
+    function deleteRow(rows, row) {
         if (rows.length <= 1) {
             alert(tr('table.context_menu.errors.cannot_delete_last_row', 'Cannot delete the last row of the table.'));
-            return;
+            return false;
         }
-        rows[index].remove();
+        row.remove();
+        return true;
     }
 
     /**
@@ -473,7 +583,7 @@
         const firstRowCells = rows[0].querySelectorAll('td, th');
         if (firstRowCells.length <= 1) {
             alert(tr('table.context_menu.errors.cannot_delete_last_column', 'Cannot delete the last column of the table.'));
-            return;
+            return false;
         }
 
         rows.forEach(row => {
@@ -488,14 +598,13 @@
                 cells[index].remove();
             }
         });
+        return true;
     }
 
     /**
      * Deletes the entire table
      */
-    function deleteTable() {
-        // Cached now: hideTableContextMenu() clears activeTable before the user answers
-        const table = activeTable;
+    function deleteTable(table) {
         if (!table) return;
 
         confirmDeleteTable().then((confirmed) => {
@@ -532,12 +641,10 @@
             const noteentry = table.closest('.noteentry[contenteditable="true"]');
             if (!noteentry) return;
 
-            // Keep the browser's default menu when text is selected in the
-            // table (so the user can copy the selection)
-            const sel = window.getSelection();
-            if (sel && !sel.isCollapsed && sel.rangeCount > 0 && sel.getRangeAt(0).intersectsNode(table)) {
-                return;
-            }
+            // Text selected: the formatting menu of the selection may have
+            // taken the click already (js/slash-command.js, wide screens);
+            // otherwise the table menu opens and offers Copy for it
+            if (e.defaultPrevented) return;
 
             // Keep the browser's default menu when a range of cells is
             // highlighted (blue selection) so the user can copy the cells
@@ -550,12 +657,13 @@
             e.preventDefault();
             e.stopPropagation();
 
-            showTableContextMenu(e.clientX, e.clientY, table, cell);
+            showTableContextMenu(e.clientX, e.clientY, table, cell, getMdSelectedText(table));
         });
 
         // Close the context menu by clicking elsewhere
         document.addEventListener('click', (e) => {
-            if (contextMenu && !contextMenu.contains(e.target)) {
+            if ((contextMenu && contextMenu.style.display !== 'none' && !contextMenu.contains(e.target)) ||
+                (htmlFormulaMenu && htmlFormulaMenu.style.display !== 'none' && !htmlFormulaMenu.contains(e.target))) {
                 hideTableContextMenu();
             }
             if ((mdContextMenu && mdContextMenu.style.display !== 'none' && !mdContextMenu.contains(e.target)) ||
@@ -567,7 +675,8 @@
         // Close the context menu with Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                if (contextMenu && contextMenu.style.display !== 'none') {
+                if ((contextMenu && contextMenu.style.display !== 'none') ||
+                    (htmlFormulaMenu && htmlFormulaMenu.style.display !== 'none')) {
                     hideTableContextMenu();
                 }
                 if ((mdContextMenu && mdContextMenu.style.display !== 'none') ||
@@ -580,7 +689,7 @@
 
     // ─── Markdown table context menu ─────────────────────────────────────────
     // A Markdown table is changed through its source, by line. The menu, the
-    // table bar and the row/column buttons (js/markdown-table-toolbar.js) all
+    // table bar and the row/column buttons (js/table-toolbar.js) all
     // hand over a target:
     //   noteEntry
     //   startLine    first line of the table in the note, counted from 0
@@ -1241,7 +1350,7 @@
 
     // Exposed for the preview (markdown-actions.js), the editor's drawn
     // tables (CodeMirror live-preview.js) and the table bar
-    // (markdown-table-toolbar.js)
+    // (table-toolbar.js)
     window.showMdTableContextMenu = showMdTableContextMenu;
     window.showMdTableContextMenuForCell = showMdTableContextMenuForCell;
     window.hideMdTableContextMenu = hideMdTableContextMenu;
@@ -1269,6 +1378,19 @@
         init: initTableContextMenu,
         show: showTableContextMenu,
         hide: hideTableContextMenu
+    };
+
+    // HTML notes' tables for the table bar and the row/column buttons
+    // (js/table-toolbar.js) and Tab (js/events-rte-notes.js)
+    window.pzHtmlTable = {
+        run: runTableAction,
+        showMenu: showTableContextMenu,
+        showFormulaMenu: showTableFormulaMenu,
+        hideMenu: hideTableContextMenu,
+        isMenuOpen: () => !!((contextMenu && contextMenu.style.display !== 'none') ||
+            (htmlFormulaMenu && htmlFormulaMenu.style.display !== 'none')),
+        moveToCell: moveToTableCell,
+        getRows: getTableRows
     };
 
 })();
