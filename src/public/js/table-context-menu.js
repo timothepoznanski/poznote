@@ -517,6 +517,8 @@
     function initTableContextMenu() {
         // Listener for right-click on table cells
         document.addEventListener('contextmenu', (e) => {
+            // Shift + right click = the browser's menu, as everywhere in a note
+            if (e.shiftKey) return;
             const cell = e.target.closest('td, th');
             if (!cell) return;
 
