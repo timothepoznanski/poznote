@@ -815,6 +815,12 @@
                 return;
             }
 
+            // A link in the excerpt opens its own target (#1672): note links
+            // through navigateToNote() (js/note-reference.js), others natively
+            if (e.target.closest('.kanban-card-link')) {
+                return;
+            }
+
             // Don't trigger if dragging
             if (card.classList.contains('dragging')) return;
 
