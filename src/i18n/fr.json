@@ -2338,7 +2338,14 @@
       },
       "confirm": {
         "delete_table": "Voulez-vous vraiment supprimer ce tableau ?"
-      }
+      },
+      "copy": "Copier"
+    },
+    "toolbar": {
+      "label": "Tableau",
+      "delete": "Supprimer",
+      "add_row": "Ajouter une ligne",
+      "add_column": "Ajouter une colonne"
     }
   },
   "index": {

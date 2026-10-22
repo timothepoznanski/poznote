@@ -2332,7 +2332,14 @@
       },
       "confirm": {
         "delete_table": "Você realmente deseja excluir esta tabela?"
-      }
+      },
+      "copy": "Copiar"
+    },
+    "toolbar": {
+      "label": "Tabela",
+      "delete": "Excluir",
+      "add_row": "Adicionar uma linha",
+      "add_column": "Adicionar uma coluna"
     }
   },
   "index": {

@@ -2332,7 +2332,14 @@
       },
       "confirm": {
         "delete_table": "Möchten Sie diese Tabelle wirklich löschen?"
-      }
+      },
+      "copy": "Kopieren"
+    },
+    "toolbar": {
+      "label": "Tabelle",
+      "delete": "Löschen",
+      "add_row": "Zeile hinzufügen",
+      "add_column": "Spalte hinzufügen"
     }
   },
   "index": {

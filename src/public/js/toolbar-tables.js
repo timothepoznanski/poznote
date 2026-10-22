@@ -91,9 +91,48 @@ function buildMarkdownTable(rows, cols) {
   );
   if (typeof window.formatMarkdownTableBlockLines === 'function') {
     const formatted = window.formatMarkdownTableBlockLines(lines);
-    if (formatted) return `\n${formatted.join('\n')}\n`;
+    if (formatted) return formatted.join('\n');
   }
-  return `\n${lines.join('\n')}\n`;
+  return lines.join('\n');
+}
+
+// Where a Markdown table goes for a caret or a selection: on a line of text,
+// under it; a blank line between the table and the text around it, which
+// would otherwise run into the table (a line right under it is read as one
+// more row). Returns { from, to, text, startLine }.
+function placeMarkdownTable(value, start, end, table) {
+  let from = start;
+  let to = end;
+  let before = '';
+  let after = '';
+  const lineStart = value.lastIndexOf('\n', from - 1) + 1;
+  let lineEnd = value.indexOf('\n', to);
+  if (lineEnd === -1) lineEnd = value.length;
+
+  if (from === to && value.slice(lineStart, lineEnd).trim() !== '') {
+    from = to = lineEnd;
+    before = '\n\n';
+  } else {
+    if (value.slice(lineStart, from).trim() !== '') {
+      before = '\n\n';
+    } else if (lineStart > 0) {
+      const previousStart = value.lastIndexOf('\n', lineStart - 2) + 1;
+      if (value.slice(previousStart, lineStart - 1).trim() !== '') before = '\n';
+    }
+  }
+
+  const rest = value.slice(to);
+  if (rest === '') {
+    after = '\n';
+  } else if (rest.charAt(0) !== '\n') {
+    after = '\n\n';
+  } else {
+    const nextLine = rest.slice(1).split('\n')[0];
+    if (nextLine.trim() !== '') after = '\n';
+  }
+
+  const startLine = value.slice(0, from).split('\n').length - 1 + before.length;
+  return { from, to, text: before + table + after, startLine };
 }
 
 function toggleTablePicker(triggerElement) {
@@ -419,10 +458,12 @@ function insertTable(rows, cols) {
   const cmApi = window.PoznoteMarkdownCodeMirror;
   const cmContext = window.savedCodeMirrorTable || getCurrentTableCodeMirrorContext();
   if (cmContext && cmApi && typeof cmApi.isCodeMirrorEditor === 'function' && cmApi.isCodeMirrorEditor(cmContext.editor) && typeof cmApi.replaceRange === 'function') {
-    const tableMarkdown = buildMarkdownTable(rows, cols);
-    cmApi.replaceRange(cmContext.editor, cmContext.start, cmContext.end, tableMarkdown);
-    if (typeof cmApi.setSelection === 'function') {
-      const caretPos = cmContext.start + tableMarkdown.length;
+    const placed = placeMarkdownTable(cmApi.getValue(cmContext.editor) || '', cmContext.start, cmContext.end, buildMarkdownTable(rows, cols));
+    cmApi.replaceRange(cmContext.editor, placed.from, placed.to, placed.text);
+    // The first header is selected, to be typed over (rich text opens it)
+    if (!(typeof cmApi.focusTableCell === 'function' && cmApi.focusTableCell(cmContext.editor, placed.startLine, 0, 0, true)) &&
+        typeof cmApi.setSelection === 'function') {
+      const caretPos = placed.from + placed.text.length;
       cmApi.setSelection(cmContext.editor, caretPos, caretPos);
     }
     window.savedCodeMirrorTable = null;

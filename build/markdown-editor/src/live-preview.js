@@ -1421,9 +1421,10 @@ class RenderedBlockWidget extends WidgetType {
 
 // --- Tables edited where they are drawn (rich text) --------------------------
 // The source of a table never comes back in the rich text view. A click in a
-// cell turns that cell into a one-line text field holding the cell's own
-// Markdown; Enter, Tab, or a click elsewhere writes it back into the note and
-// the table is drawn again. A right click opens the menu the preview has for
+// cell turns that cell into a text field holding the cell's own Markdown;
+// Enter, Tab, or a click elsewhere writes it back into the note and the table
+// is drawn again. A table row is one line of source: a line break in a cell
+// (Shift+Enter) is written as <br>, and shown as a line break while typing. A right click opens the menu the preview has for
 // its tables (js/table-context-menu.js: rows, columns, alignment, delete).
 
 // The line and the stretch of it (between two pipes) a drawn cell stands for
@@ -1494,14 +1495,26 @@ function findTableBlockElement(view, blockFrom) {
   }) || null
 }
 
-function editTableCellAt(view, blockFrom, rowIndex, cellIndex) {
+function editTableCellAt(view, blockFrom, rowIndex, cellIndex, select) {
   const block = findTableBlockElement(view, blockFrom)
   const rows = block ? block.querySelectorAll('tr') : []
   const cell = rows[rowIndex] ? rows[rowIndex].children[cellIndex] : null
-  if (cell) startTableCellEdit(view, block, cell)
+  if (cell) startTableCellEdit(view, block, cell, select)
 }
 
-function startTableCellEdit(view, block, cell) {
+// What a cell being typed in holds, as the source of a cell: its line breaks
+// as <br> (innerText: a break the browser made a <br> or a <div> counts too),
+// its pipes escaped
+function readTableCellText(cell) {
+  return (cell.innerText || cell.textContent || '')
+    .replace(/\r\n?/g, '\n')
+    .trim()
+    .replace(/[ \t]*\n[ \t]*/g, '<br>')
+    .replace(/\\?\|/g, '\\|')
+}
+
+// select: the cell's text selected, the caret at its end otherwise
+function startTableCellEdit(view, block, cell, select) {
   if (block._liveEditingCell === cell || view.state.readOnly) return
   const editing = view.dom.querySelector('.cm-live-cell-editing')
   const editingBlock = editing ? editing.closest('.cm-live-block-table') : null
@@ -1523,7 +1536,7 @@ function startTableCellEdit(view, block, cell) {
 
   const raw = located.line.text.slice(located.start, located.stop).trim()
   const originalHtml = cell.innerHTML
-  cell.textContent = raw.replace(/\\\|/g, '|')
+  cell.textContent = raw.replace(/\\\|/g, '|').replace(/<br\s*\/?>/gi, '\n')
   cell.setAttribute('contenteditable', 'plaintext-only')
   if (cell.contentEditable !== 'plaintext-only') cell.setAttribute('contenteditable', 'true')
   cell.classList.add('cm-live-cell-editing')
@@ -1541,7 +1554,7 @@ function startTableCellEdit(view, block, cell) {
     // table above it aligned at save time for one)
     const now = locateTableCell(view, block, cell)
     const blockFrom = now ? now.tableBlock.from : located.tableBlock.from
-    const text = cell.textContent.replace(/\s*[\r\n]+\s*/g, ' ').trim().replace(/\\?\|/g, '\\|')
+    const text = readTableCellText(cell)
     cell.removeAttribute('contenteditable')
     cell.classList.remove('cm-live-cell-editing')
 
@@ -1589,7 +1602,11 @@ function startTableCellEdit(view, block, cell) {
   const onKeyDown = event => {
     // Nothing typed in a cell is for the editor or for the page's shortcuts
     event.stopPropagation()
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey) {
+      // A line break in the cell (<br> in the source)
+      event.preventDefault()
+      if (!document.execCommand('insertLineBreak')) document.execCommand('insertText', false, '\n')
+    } else if (event.key === 'Enter') {
       event.preventDefault()
       finish(true, 'down')
     } else if (event.key === 'Tab') {
@@ -1618,7 +1635,7 @@ function startTableCellEdit(view, block, cell) {
   cell.focus()
   const range = document.createRange()
   range.selectNodeContents(cell)
-  range.collapse(false)
+  if (!select) range.collapse(false)
   const selection = window.getSelection()
   selection.removeAllRanges()
   selection.addRange(range)
@@ -1634,9 +1651,9 @@ function setupTableEditing(view, block) {
   })
   block.addEventListener('paste', event => {
     if (!block._liveEditingCell || !event.clipboardData) return
-    // One line of plain text, whatever was copied
+    // Plain text, whatever was copied, its lines kept as line breaks
     event.preventDefault()
-    const text = event.clipboardData.getData('text/plain').replace(/\s*[\r\n]+\s*/g, ' ')
+    const text = event.clipboardData.getData('text/plain').replace(/\r\n?/g, '\n').replace(/^\n+|\n+$/g, '')
     document.execCommand('insertText', false, text)
   })
 
@@ -1650,27 +1667,181 @@ function setupTableEditing(view, block) {
     startTableCellEdit(view, block, cell)
   })
 
+  // The menu opens on the cell being typed in too; Shift + right click leaves
+  // the browser's own menu (paste, spelling)
   block.addEventListener('contextmenu', event => {
-    if (isSyntaxRevealed() || view.state.readOnly) return
+    if (view.state.readOnly || event.shiftKey) return
     const cell = event.target.closest ? event.target.closest('td, th') : null
-    const table = cell ? cell.closest('table') : null
-    const noteEntry = view.dom.closest('.noteentry')
-    if (!cell || !table || !noteEntry || typeof window.showMdTableContextMenu !== 'function') return
-    // (while a cell is being typed in, the browser's own menu: copy, paste)
-    if (block._liveEditingCell === cell) return
-    if (block._liveFinishEdit) block._liveFinishEdit(true)
-    const located = locateTableCell(view, block, cell)
-    if (!located) return
-    event.preventDefault()
-    event.stopPropagation()
-    // The menu works on the note's source, by line: both are handed to it
-    // as they are now
-    noteEntry.setAttribute('data-markdown-content', view.state.doc.toString())
-    table.setAttribute('data-start-line', String(view.state.doc.lineAt(located.tableBlock.from).number - 1))
-    // (the editor keeps the focus, so that Ctrl+Z takes back what the menu does)
-    view.focus()
-    window.showMdTableContextMenu(event.clientX, event.clientY, table, cell, noteEntry)
+    if (!cell || typeof window.showMdTableContextMenuForCell !== 'function') return
+    if (window.showMdTableContextMenuForCell(event.clientX, event.clientY, cell)) {
+      event.preventDefault()
+      event.stopPropagation()
+    }
   })
+}
+
+// --- Tables reached from the page (js/markdown-table-toolbar.js) ------------
+// The table bar and the row/column buttons change a table through its source,
+// by line (js/table-context-menu.js). They ask here where a table and a cell
+// are, and where to put the caret once the table changed. A table is named by
+// its first line (counted from 0), rows as they are drawn: 0 is the header.
+
+// The cells of a table line: start/stop between two pipes, from/to around the
+// text (the spaces taken off)
+function getTableLineCells(text) {
+  const pipes = []
+  for (let index = 0; index < text.length; index++) {
+    if (text.charAt(index) === '|' && text.charAt(index - 1) !== '\\') pipes.push(index)
+  }
+  const edges = /^\s*\|/.test(text) ? pipes.slice() : [-1].concat(pipes)
+  if (!/\|\s*$/.test(text)) edges.push(text.length)
+  const cells = []
+  for (let index = 0; index + 1 < edges.length; index++) {
+    const start = edges[index] + 1
+    const stop = edges[index + 1]
+    const raw = text.slice(start, stop)
+    const from = start + raw.length - raw.trimStart().length
+    cells.push({ start, stop, from, to: from + raw.trim().length })
+  }
+  return cells
+}
+
+function describeTable(doc, tableBlock, rowIndex, cellIndex) {
+  const first = doc.lineAt(tableBlock.from).number
+  const columns = getTableLineCells(doc.line(first).text).length
+  const column = Math.max(0, Math.min(cellIndex, columns - 1))
+  const separatorText = doc.line(first + 1).text
+  const separator = getTableLineCells(separatorText)[column]
+  const mark = separator ? separatorText.slice(separator.from, separator.to) : ''
+  return {
+    startLine: first - 1,
+    rowIndex,
+    cellIndex: column,
+    rowCount: doc.lineAt(tableBlock.to).number - first,
+    columnCount: columns,
+    align: /^:-+:$/.test(mark) ? 'center' : (mark.endsWith('-:') ? 'right' : (mark.startsWith(':-') ? 'left' : null)),
+    from: tableBlock.from,
+    to: tableBlock.to
+  }
+}
+
+function findTableBlockAtLine(doc, startLine) {
+  if (startLine < 0 || startLine + 1 > doc.lines) return null
+  const from = doc.line(startLine + 1).from
+  return getRenderedBlocks(doc).find(candidate => candidate.kind === 'table' && candidate.from === from) || null
+}
+
+// The table and the cell the caret is in, while the table shows as source
+// (the live preview, the editor of the classic and split views), or null
+export function getTableCellAtSelection(view) {
+  return getTableCellAt(view, view.state.selection.main)
+}
+
+// range: { from, to, head }, a position in the note for all three
+export function getTableCellAt(view, range) {
+  const doc = view.state.doc
+  const tableBlock = getRenderedBlocks(doc).find(candidate => candidate.kind === 'table' && range.head >= candidate.from && range.head <= candidate.to)
+  if (!tableBlock || range.from < tableBlock.from || range.to > tableBlock.to) return null
+  // (a drawn table: the caret can only be at its edge)
+  if (findTableBlockElement(view, tableBlock.from)) return null
+  const line = doc.lineAt(range.head)
+  const offset = line.number - doc.lineAt(tableBlock.from).number
+  const cells = getTableLineCells(line.text)
+  const column = range.head - line.from
+  const cellIndex = cells.findIndex(cell => column <= cell.stop)
+  // (the |---|---| line stands for the header: what it holds is the columns)
+  return describeTable(doc, tableBlock, offset <= 1 ? 0 : offset - 1, cellIndex < 0 ? cells.length - 1 : cellIndex)
+}
+
+// The same for a cell of a drawn table
+export function getTableCellTarget(view, cell) {
+  const block = cell && cell.closest ? cell.closest('.cm-live-block-table') : null
+  if (!block) return null
+  const located = locateTableCell(view, block, cell)
+  return located ? describeTable(view.state.doc, located.tableBlock, located.rowIndex, located.cellIndex) : null
+}
+
+// The drawn table that stands for the table starting on that line, or null
+// (shown as source)
+export function getTableBlockElement(view, startLine) {
+  const tableBlock = findTableBlockAtLine(view.state.doc, startLine)
+  return tableBlock ? findTableBlockElement(view, tableBlock.from) : null
+}
+
+// Writes back the cell being typed in, if any
+export function finishTableCellEdit(view) {
+  const cell = view.dom.querySelector('.cm-live-cell-editing')
+  const block = cell ? cell.closest('.cm-live-block-table') : null
+  if (block && block._liveFinishEdit) block._liveFinishEdit(true)
+}
+
+// Goes to a cell: rich text opens it for typing, the source puts the caret at
+// the end of its text (select: the whole text, what Tab does)
+export function focusTableCell(view, startLine, rowIndex, cellIndex, select) {
+  const doc = view.state.doc
+  const tableBlock = findTableBlockAtLine(doc, startLine)
+  if (!tableBlock) return false
+  if (!isSyntaxRevealed() && findTableBlockElement(view, tableBlock.from)) {
+    requestAnimationFrame(() => editTableCellAt(view, tableBlock.from, rowIndex, cellIndex, select))
+    return true
+  }
+  const first = doc.lineAt(tableBlock.from).number
+  const line = doc.line(Math.min(doc.lineAt(tableBlock.to).number, first + (rowIndex === 0 ? 0 : rowIndex + 1)))
+  const cells = getTableLineCells(line.text)
+  const cell = cells[Math.max(0, Math.min(cellIndex, cells.length - 1))]
+  if (!cell) return false
+  // (an empty cell: past the space that follows the pipe)
+  const head = line.from + (cell.from === cell.to ? Math.min(cell.start + 1, cell.stop) : cell.to)
+  const anchor = select && cell.from !== cell.to ? line.from + cell.from : head
+  view.dispatch({ selection: { anchor, head }, scrollIntoView: true })
+  view.focus()
+  return true
+}
+
+// Shift+Enter in the source of a table: a line break in the cell, <br>, the
+// row staying on its line (a newline would cut the table in two)
+export function insertTableLineBreak(view) {
+  if (view.state.readOnly) return false
+  const range = view.state.selection.main
+  const at = getTableCellAt(view, range)
+  if (!at || view.state.doc.lineAt(range.from).number !== view.state.doc.lineAt(range.to).number) return false
+  // (the |---|---| line has no text to break)
+  if (view.state.doc.lineAt(range.head).number === view.state.doc.lineAt(at.from).number + 1) return true
+  view.dispatch({
+    changes: { from: range.from, to: range.to, insert: '<br>' },
+    selection: { anchor: range.from + 4 },
+    scrollIntoView: true,
+    userEvent: 'input'
+  })
+  return true
+}
+
+// Tab / Shift+Tab in the source of a table: the next or previous cell, and
+// out of the last cell a new row (rich text does the same in its drawn cells)
+export function moveTableCell(view, backward) {
+  if (view.state.readOnly) return false
+  const { doc } = view.state
+  const range = view.state.selection.main
+  if (doc.lineAt(range.from).number !== doc.lineAt(range.to).number) return false
+  const at = getTableCellAtSelection(view)
+  if (!at) return false
+  let rowIndex = at.rowIndex
+  let cellIndex = at.cellIndex + (backward ? -1 : 1)
+  if (cellIndex >= at.columnCount) {
+    cellIndex = 0
+    rowIndex++
+  } else if (cellIndex < 0) {
+    cellIndex = at.columnCount - 1
+    rowIndex--
+  }
+  if (rowIndex < 0) return true
+  if (rowIndex >= at.rowCount) {
+    const lines = doc.sliceString(at.from, at.to).split('\n')
+    lines.push('|' + '   |'.repeat(at.columnCount))
+    const formatted = typeof window.formatMarkdownTableBlockLines === 'function' ? window.formatMarkdownTableBlockLines(lines) : null
+    view.dispatch({ changes: { from: at.from, to: at.to, insert: (formatted || lines).join('\n') }, userEvent: 'input' })
+  }
+  return focusTableCell(view, at.startLine, rowIndex, cellIndex, true)
 }
 
 function buildRenderedBlockDecorations(state) {

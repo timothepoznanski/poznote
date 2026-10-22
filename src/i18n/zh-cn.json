@@ -2330,7 +2330,14 @@
       },
       "confirm": {
         "delete_table": "您确定要删除此表格吗？"
-      }
+      },
+      "copy": "复制"
+    },
+    "toolbar": {
+      "label": "表格",
+      "delete": "删除",
+      "add_row": "添加一行",
+      "add_column": "添加一列"
     }
   },
   "index": {

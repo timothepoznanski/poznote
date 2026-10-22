@@ -1842,7 +1842,14 @@
       },
       "confirm": {
         "delete_table": "Do you really want to delete this table?"
-      }
+      },
+      "copy": "Copy"
+    },
+    "toolbar": {
+      "label": "Table",
+      "delete": "Delete",
+      "add_row": "Add a row",
+      "add_column": "Add a column"
     }
   },
   "index": {

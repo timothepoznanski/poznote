@@ -1842,7 +1842,14 @@
       },
       "confirm": {
         "delete_table": "이 표을 정말로 삭제하시겠습니까?"
-      }
+      },
+      "copy": "복사"
+    },
+    "toolbar": {
+      "label": "표",
+      "delete": "삭제",
+      "add_row": "행 추가",
+      "add_column": "열 추가"
     }
   },
   "index": {

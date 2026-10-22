@@ -556,7 +556,8 @@
             if (contextMenu && !contextMenu.contains(e.target)) {
                 hideTableContextMenu();
             }
-            if (mdContextMenu && !mdContextMenu.contains(e.target)) {
+            if ((mdContextMenu && mdContextMenu.style.display !== 'none' && !mdContextMenu.contains(e.target)) ||
+                (mdFormulaMenu && mdFormulaMenu.style.display !== 'none' && !mdFormulaMenu.contains(e.target))) {
                 hideMdTableContextMenu();
             }
         });
@@ -567,20 +568,142 @@
                 if (contextMenu && contextMenu.style.display !== 'none') {
                     hideTableContextMenu();
                 }
-                if (mdContextMenu && mdContextMenu.style.display !== 'none') {
+                if ((mdContextMenu && mdContextMenu.style.display !== 'none') ||
+                    (mdFormulaMenu && mdFormulaMenu.style.display !== 'none')) {
                     hideMdTableContextMenu();
                 }
             }
         });
     }
 
-    // ─── Markdown preview table context menu ─────────────────────────────────
+    // ─── Markdown table context menu ─────────────────────────────────────────
+    // A Markdown table is changed through its source, by line. The menu, the
+    // table bar and the row/column buttons (js/markdown-table-toolbar.js) all
+    // hand over a target:
+    //   noteEntry
+    //   startLine    first line of the table in the note, counted from 0
+    //   exact        startLine is the editor's own count; the preview's
+    //                data-start-line may come before the real line (below)
+    //   rowIndex, cellIndex, rowCount, columnCount
+    //                as the table is drawn: row 0 is the header
+    //   align        the column's current alignment
+    //   formula, cellText
+    //                the cell's formula and the value it shows (cellText is
+    //                undefined when unknown: the source of a table)
+    //   editor       the CodeMirror host when the table lives in the editor
+    //                (drawn in rich text or the live preview, or shown as
+    //                source), null for the preview's tables
 
     let mdContextMenu = null;
-    let mdActiveTable = null;
-    let mdActiveCell = null;
-    let mdActiveNoteEntry = null;
+    let mdActiveTarget = null;
+    let mdCopyText = '';
     let mdContextMenuIsHeader = null; // track whether the cached menu was built for a header row
+
+    function getMdCodeMirrorApi() {
+        return window.PoznoteMarkdownCodeMirror || null;
+    }
+
+    function isMdNoteReadOnly(noteEntry) {
+        return typeof isMarkdownEntryReadOnly === 'function' && isMarkdownEntryReadOnly(noteEntry);
+    }
+
+    /**
+     * The target for a cell of a drawn Markdown table: the preview's (classic
+     * and split views) or the editor's (rich text, live preview). Null when
+     * the table cannot be changed from here (read-only note, not a table of
+     * the note).
+     */
+    function getMdTableTarget(cell) {
+        const table = cell && cell.closest ? cell.closest('table') : null;
+        const noteEntry = table ? table.closest('.noteentry') : null;
+        if (!noteEntry || isMdNoteReadOnly(noteEntry)) return null;
+
+        const row = cell.parentElement;
+        const rows = Array.from(table.querySelectorAll('tr'));
+        const target = {
+            noteEntry: noteEntry,
+            rowIndex: rows.indexOf(row),
+            cellIndex: Array.from(row.children).indexOf(cell),
+            rowCount: rows.length,
+            columnCount: rows[0] ? rows[0].children.length : 0,
+            align: window.pzTableColumns ? window.pzTableColumns.readLineAlignment(table, cell, 'column') : null,
+            formula: cell.getAttribute('data-md-formula'),
+            cellText: cell.textContent.trim(),
+            editor: null
+        };
+
+        const editor = table.closest('.markdown-editor');
+        if (editor) {
+            const api = getMdCodeMirrorApi();
+            const located = api && typeof api.getTableCellTarget === 'function' ? api.getTableCellTarget(editor, cell) : null;
+            return located ? Object.assign(target, getMdLocatedFields(located), { editor: editor }) : null;
+        }
+
+        if (!table.matches('.markdown-preview table[data-start-line]')) return null;
+        const startLine = parseInt(table.getAttribute('data-start-line'), 10);
+        if (isNaN(startLine)) return null;
+        target.startLine = startLine;
+        target.exact = false;
+        return target;
+    }
+
+    /**
+     * The target for a table shown as source in the editor, located there
+     * (PoznoteMarkdownCodeMirror.getTableAtSelection / getTableAtPoint)
+     */
+    function getMdSourceTableTarget(editor, located) {
+        const noteEntry = editor && editor.closest ? editor.closest('.noteentry') : null;
+        if (!located || !noteEntry || isMdNoteReadOnly(noteEntry)) return null;
+        return Object.assign({
+            noteEntry: noteEntry,
+            formula: null,
+            cellText: undefined,
+            editor: editor
+        }, getMdLocatedFields(located));
+    }
+
+    function getMdLocatedFields(located) {
+        return {
+            startLine: located.startLine,
+            exact: true,
+            rowIndex: located.rowIndex,
+            cellIndex: located.cellIndex,
+            rowCount: located.rowCount,
+            columnCount: located.columnCount,
+            align: located.align
+        };
+    }
+
+    // What is selected in the table, offered as Copy at the top of the menu
+    // (the browser's own menu, which had it, is now Shift + right click)
+    function getMdSelectedText(table) {
+        const sel = window.getSelection();
+        if (!sel || sel.isCollapsed || !sel.rangeCount || !table || !sel.getRangeAt(0).intersectsNode(table)) return '';
+        return sel.toString();
+    }
+
+    function copyMdText(text) {
+        const fallback = () => {
+            const area = document.createElement('textarea');
+            area.value = text;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed';
+            area.style.opacity = '0';
+            document.body.appendChild(area);
+            area.select();
+            try {
+                document.execCommand('copy');
+            } catch (e) {
+                // Nothing more to try
+            }
+            area.remove();
+        };
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).catch(fallback);
+        } else {
+            fallback();
+        }
+    }
 
     function createMdTableContextMenu(isHeader) {
         // Rebuild if the header status changed (menu items differ)
@@ -593,8 +716,12 @@
         mdContextMenuIsHeader = isHeader;
         mdContextMenu = document.createElement('div');
         mdContextMenu.className = 'table-context-menu md-table-context-menu';
+        // (a click in the menu must not take away the selection Copy is for)
+        mdContextMenu.addEventListener('mousedown', (e) => e.preventDefault());
 
         var menuItems = [];
+        menuItems.push({ label: tr('table.context_menu.copy', 'Copy'), action: 'copy', icon: '<i class="lucide lucide-copy"></i>', item: 'copy' });
+        menuItems.push({ separator: true, item: 'copy' });
         if (!isHeader) {
             menuItems.push({ label: tr('table.context_menu.insert_row_above', 'Insert row above'), action: 'insertRowAbove', icon: '↑' });
         }
@@ -624,10 +751,12 @@
             } else if (item.separator) {
                 const sep = document.createElement('div');
                 sep.className = 'table-context-menu-separator';
+                if (item.item) sep.dataset.item = item.item;
                 mdContextMenu.appendChild(sep);
             } else {
                 const el = document.createElement('div');
                 el.className = 'table-context-menu-item' + (item.danger ? ' danger' : '');
+                if (item.item) el.dataset.item = item.item;
                 el.innerHTML = `<span style="width:20px;text-align:center">${item.icon}</span><span>${item.label}</span>`;
                 el.addEventListener('click', (e) => {
                     e.preventDefault();
@@ -642,40 +771,96 @@
         return mdContextMenu;
     }
 
-    function showMdTableContextMenu(x, y, table, cell, noteEntry) {
-        mdActiveTable = table;
-        mdActiveCell = cell;
-        mdActiveNoteEntry = noteEntry;
+    /**
+     * Opens the menu for a target (see above) at x, y; copyText, when given,
+     * is offered as Copy
+     */
+    function showMdTableContextMenu(x, y, target, copyText) {
+        mdActiveTarget = target;
+        mdCopyText = copyText || '';
 
-        const { rowIndex } = getMdCellIndex(cell);
-        const isHeader = rowIndex === 0;
-
+        const isHeader = target.rowIndex === 0;
         const menu = createMdTableContextMenu(isHeader);
-        refreshAlignButtons(menu, table, cell);
-        refreshFormulaItem(menu, cell.getAttribute('data-md-formula'), !isHeader);
+        menu.querySelectorAll('.table-context-menu-align-btn').forEach(button => {
+            button.classList.toggle('active', button.dataset.align === target.align);
+        });
+        refreshFormulaItem(menu, target.formula || null, !isHeader && target.cellText !== undefined);
+        menu.querySelectorAll('[data-item="copy"]').forEach(el => {
+            el.style.display = mdCopyText ? '' : 'none';
+        });
         menu.style.display = 'block';
 
         let left = x, top = y;
         const rect = menu.getBoundingClientRect();
         if (left + rect.width > window.innerWidth) left = window.innerWidth - rect.width - 10;
         if (top + rect.height > window.innerHeight) top = window.innerHeight - rect.height - 10;
-        menu.style.left = left + 'px';
-        menu.style.top = top + 'px';
+        menu.style.left = Math.max(10, left) + 'px';
+        menu.style.top = Math.max(10, top) + 'px';
+    }
+
+    /**
+     * Right click on a cell of a drawn Markdown table (preview, rich text,
+     * live preview): opens the menu, true when it did
+     */
+    function showMdTableContextMenuForCell(x, y, cell) {
+        const target = getMdTableTarget(cell);
+        if (!target) return false;
+        const copyText = getMdSelectedText(cell.closest('table'));
+
+        if (target.editor) {
+            // The cell being typed in is written back first; it then shows
+            // its value again, or is drawn anew if its text changed
+            const api = getMdCodeMirrorApi();
+            if (api && typeof api.finishTableEdit === 'function') api.finishTableEdit(target.editor);
+            if (cell.isConnected) {
+                target.cellText = cell.textContent.trim();
+                target.formula = cell.getAttribute('data-md-formula');
+            } else {
+                target.cellText = undefined;
+                target.formula = null;
+            }
+            // (the editor keeps the focus, so that Ctrl+Z takes back what the menu does)
+            if (api && typeof api.focus === 'function') api.focus(target.editor);
+        }
+
+        showMdTableContextMenu(x, y, target, copyText);
+        return true;
     }
 
     function hideMdTableContextMenu() {
         if (mdContextMenu) mdContextMenu.style.display = 'none';
-        mdActiveTable = null;
-        mdActiveCell = null;
-        mdActiveNoteEntry = null;
+        if (mdFormulaMenu) mdFormulaMenu.style.display = 'none';
+        mdActiveTarget = null;
+        mdCopyText = '';
     }
 
-    function getMdCellIndex(cell) {
-        const row = cell.parentElement;
-        const cellIndex = Array.from(row.children).indexOf(cell);
-        const allRows = Array.from(mdActiveTable.querySelectorAll('tr'));
-        const rowIndex = allRows.indexOf(row);
-        return { rowIndex, cellIndex };
+    // The formulas alone (Column, Row, Remove), for the Σ button of the table
+    // bar: the rest of the menu is on the bar already
+    let mdFormulaMenu = null;
+
+    function showMdFormulaMenu(x, y, target) {
+        if (!mdFormulaMenu) {
+            mdFormulaMenu = document.createElement('div');
+            mdFormulaMenu.className = 'table-context-menu md-table-context-menu md-table-formula-menu';
+            mdFormulaMenu.addEventListener('mousedown', (e) => e.preventDefault());
+            const item = createFormulaItem(formula => runMdTableAction('formula', formula));
+            Array.from(item.querySelector('.table-context-menu-submenu').children).forEach(child => mdFormulaMenu.appendChild(child));
+            document.body.appendChild(mdFormulaMenu);
+        }
+        mdActiveTarget = target;
+        mdCopyText = '';
+        if (mdContextMenu) mdContextMenu.style.display = 'none';
+        mdFormulaMenu.querySelectorAll('.open').forEach(opened => opened.classList.remove('open'));
+        mdFormulaMenu.querySelectorAll('[data-formula]').forEach(el => {
+            el.classList.toggle('active', el.dataset.formula === target.formula);
+        });
+        mdFormulaMenu.querySelectorAll('[data-item="removeFormula"]').forEach(el => {
+            el.style.display = target.formula ? '' : 'none';
+        });
+        mdFormulaMenu.style.display = 'block';
+        const rect = mdFormulaMenu.getBoundingClientRect();
+        mdFormulaMenu.style.left = Math.max(10, Math.min(x, window.innerWidth - rect.width - 10)) + 'px';
+        mdFormulaMenu.style.top = Math.max(10, Math.min(y, window.innerHeight - rect.height - 10)) + 'px';
     }
 
     function addMdScrollSnapshot(snapshots, target) {
@@ -770,37 +955,50 @@
      * Runs a menu action, asking for confirmation first when the whole table goes
      */
     function runMdTableAction(action, value) {
-        if (action !== 'deleteTable') {
-            executeMdTableAction(action, value);
-            hideMdTableContextMenu();
+        const target = mdActiveTarget;
+        const copyText = mdCopyText;
+        hideMdTableContextMenu();
+        if (!target) return;
+        if (action === 'copy') {
+            if (copyText) copyMdText(copyText);
             return;
         }
-
-        // The modal is asynchronous, so keep the targets hideMdTableContextMenu() clears
-        const table = mdActiveTable;
-        const cell = mdActiveCell;
-        const noteEntry = mdActiveNoteEntry;
-        hideMdTableContextMenu();
-
-        confirmDeleteTable().then((confirmed) => {
-            if (!confirmed) return;
-            mdActiveTable = table;
-            mdActiveCell = cell;
-            mdActiveNoteEntry = noteEntry;
-            executeMdTableAction('deleteTable');
-            hideMdTableContextMenu();
-        });
+        runMdTableActionOn(target, action, value);
     }
 
-    function executeMdTableAction(action, value) {
-        if (!mdActiveTable || !mdActiveCell || !mdActiveNoteEntry) return;
+    /**
+     * Runs an action on a target (menu, table bar, row/column buttons).
+     * Returns a promise of what executeMdTableAction returned, null when
+     * nothing changed.
+     */
+    function runMdTableActionOn(target, action, value) {
+        if (action !== 'deleteTable') {
+            return Promise.resolve(executeMdTableAction(target, action, value));
+        }
+        return confirmDeleteTable().then((confirmed) => confirmed ? executeMdTableAction(target, 'deleteTable') : null);
+    }
 
-        const startLine = parseInt(mdActiveTable.getAttribute('data-start-line'), 10);
-        if (isNaN(startLine)) return;
+    /**
+     * Changes the table of a target in the note's source, draws the note
+     * again and goes back to the cell the action leaves the user in.
+     * Returns { startLine, focus: { rowIndex, cellIndex } | null }, or null
+     * when nothing changed.
+     */
+    function executeMdTableAction(target, action, value) {
+        if (!target || !target.noteEntry) return null;
+        const noteEntry = target.noteEntry;
 
-        const noteId = mdActiveNoteEntry.getAttribute('data-note-id') ||
-            (mdActiveNoteEntry.id || '').replace('entry', '');
-        const rawContent = mdActiveNoteEntry.getAttribute('data-markdown-content') || '';
+        const startLine = target.startLine;
+        if (typeof startLine !== 'number' || isNaN(startLine)) return null;
+
+        const api = getMdCodeMirrorApi();
+        const noteId = noteEntry.getAttribute('data-note-id') ||
+            (noteEntry.id || '').replace('entry', '');
+        // A table of the editor: its text as it is now, a cell just typed in included
+        if (target.editor && api && typeof api.getValue === 'function') {
+            noteEntry.setAttribute('data-markdown-content', api.getValue(target.editor));
+        }
+        const rawContent = noteEntry.getAttribute('data-markdown-content') || '';
         const lines = rawContent.split('\n');
 
         // data-start-line is computed from the pre-processed text (where Excalidraw blocks
@@ -808,9 +1006,7 @@
         // line index in rawContent when Excalidraw blocks appear before the table.
         // Find the actual table start by searching forward from startLine for the first
         // line that belongs to a markdown table with the same column count as the rendered table.
-        const expectedCols = mdActiveTable.querySelectorAll('tr')[0]
-            ? mdActiveTable.querySelectorAll('tr')[0].children.length
-            : 0;
+        const expectedCols = target.exact ? 0 : (target.columnCount || 0);
 
         let tableStart = -1;
         for (let li = startLine; li < lines.length; li++) {
@@ -826,8 +1022,9 @@
                     break;
                 }
             }
+            if (target.exact) break;
         }
-        if (tableStart < 0) return;
+        if (tableStart < 0) return null;
 
         let tableEnd = tableStart;
         while (tableEnd + 1 < lines.length && isMarkdownTableLine(lines[tableEnd + 1])) {
@@ -838,10 +1035,14 @@
 
         // Separate header, separator, and data rows (by line index within tableLines)
         const separatorIdx = tableLines.findIndex(l => isMarkdownTableSeparatorLine(l));
-        if (separatorIdx < 0) return;
+        if (separatorIdx < 0) return null;
 
-        const { rowIndex, cellIndex } = getMdCellIndex(mdActiveCell);
+        const rowIndex = target.rowIndex;
+        const cellIndex = target.cellIndex;
         const numCols = getMarkdownTableCells(tableLines[0]).length;
+        const allDataRows = tableLines.length - separatorIdx - 1;
+        // The cell the user is left in, as drawn after the change
+        let focus = { rowIndex: rowIndex, cellIndex: cellIndex };
 
         function makeEmptyRow(cols) {
             return '| ' + Array(cols).fill('   ').join(' | ') + ' |';
@@ -872,7 +1073,7 @@
 
         switch (action) {
             case 'insertRowAbove': {
-                if (rowIndex === 0) break; // can't insert above the header row
+                if (rowIndex === 0) return null; // can't insert above the header row
                 const newRow = makeEmptyRow(numCols);
                 lines.splice(tableStart + tableLineIndex, 0, newRow);
                 break;
@@ -882,6 +1083,7 @@
                 // Clicking header → insert first data row after separator
                 const insertAt = rowIndex === 0 ? tableStart + separatorIdx + 1 : tableStart + tableLineIndex + 1;
                 lines.splice(insertAt, 0, newRow);
+                focus.rowIndex = rowIndex + 1;
                 break;
             }
             case 'insertColLeft':
@@ -895,35 +1097,37 @@
                     cells.splice(insertColIdx, 0, newCell);
                     lines[li] = '| ' + cells.join(' | ') + ' |';
                 }
+                focus.cellIndex = insertColIdx;
                 break;
             }
             case 'deleteRow': {
-                const allDataRows = tableLines.length - separatorIdx - 1;
                 if (allDataRows <= 1 && rowIndex !== 0) {
                     alert(tr('table.context_menu.errors.cannot_delete_last_row', 'Cannot delete the last row of the table.'));
-                    return;
+                    return null;
                 }
-                if (rowIndex === 0) return; // don't delete header
+                if (rowIndex === 0) return null; // don't delete header
                 lines.splice(tableStart + tableLineIndex, 1);
+                focus.rowIndex = Math.min(rowIndex, allDataRows - 1);
                 break;
             }
             case 'deleteCol': {
                 if (numCols <= 1) {
                     alert(tr('table.context_menu.errors.cannot_delete_last_column', 'Cannot delete the last column of the table.'));
-                    return;
+                    return null;
                 }
                 for (let li = tableStart; li <= tableEnd; li++) {
                     const cells = getMarkdownTableCells(lines[li]);
                     cells.splice(cellIndex, 1);
                     lines[li] = '| ' + cells.join(' | ') + ' |';
                 }
+                focus.cellIndex = Math.min(cellIndex, numCols - 2);
                 break;
             }
             case 'align': {
                 // The separator row carries the alignment: :--- / :---: / ---:
                 const sepLine = tableStart + separatorIdx;
                 const cells = getMarkdownTableCells(lines[sepLine]);
-                if (cellIndex >= cells.length) return;
+                if (cellIndex >= cells.length) return null;
                 cells[cellIndex] = value === 'center' ? ':---:' : (value === 'right' ? '---:' : ':---');
                 lines[sepLine] = '| ' + cells.join(' | ') + ' |';
                 break;
@@ -931,18 +1135,19 @@
             case 'formula': {
                 // The source cell holds the formula (=SUM(col)); removing it
                 // leaves the value that was displayed
-                if (rowIndex === 0 || !window.pzTableFormulas) return;
+                if (rowIndex === 0 || !window.pzTableFormulas) return null;
+                if (!value && target.cellText === undefined) return null;
                 const line = tableStart + tableLineIndex;
                 const cells = getMarkdownTableCells(lines[line]);
-                if (cellIndex >= cells.length) return;
+                if (cellIndex >= cells.length) return null;
                 cells[cellIndex] = value
                     ? window.pzTableFormulas.markdownToken(value)
-                    : mdActiveCell.textContent.trim();
+                    : target.cellText;
                 lines[line] = '| ' + cells.join(' | ') + ' |';
                 break;
             }
             case 'deleteTable': {
-                // Confirmation already handled by runMdTableAction()
+                // Confirmation already handled by runMdTableActionOn()
                 lines.splice(tableStart, tableEnd - tableStart + 1);
                 // Removing the block would otherwise leave the blank line before
                 // and the blank line after stacked into an empty paragraph
@@ -951,8 +1156,11 @@
                     isBlank(lines[tableStart - 1]) && isBlank(lines[tableStart])) {
                     lines.splice(tableStart, 1);
                 }
+                focus = null;
                 break;
             }
+            default:
+                return null;
         }
 
         // Re-align every column of the (possibly resized) table so pipes line up in the source
@@ -961,10 +1169,10 @@
         }
 
         const newContent = lines.join('\n');
-        mdActiveNoteEntry.setAttribute('data-markdown-content', newContent);
+        noteEntry.setAttribute('data-markdown-content', newContent);
 
-        const previewDiv = mdActiveNoteEntry.querySelector('.markdown-preview');
-        const editorDiv = mdActiveNoteEntry.querySelector('.markdown-editor');
+        const previewDiv = noteEntry.querySelector('.markdown-preview');
+        const editorDiv = noteEntry.querySelector('.markdown-editor');
         const cmScroller = editorDiv && editorDiv.querySelector('.cm-scroller');
         const editorScrollTarget = cmScroller || editorDiv;
 
@@ -990,17 +1198,22 @@
             }
         }
 
-        // The menu was opened from the editor (a table drawn in the rich text
-        // view): the editor takes the focus back, so that Ctrl+Z undoes the
-        // change just made
-        var codeMirrorApi = window.PoznoteMarkdownCodeMirror;
-        if (editorDiv && editorDiv.offsetParent !== null && codeMirrorApi && typeof codeMirrorApi.focus === 'function' &&
-            typeof codeMirrorApi.isLivePreview === 'function' && codeMirrorApi.isLivePreview(editorDiv)) {
-            codeMirrorApi.focus(editorDiv);
+        // A table of the editor: the editor takes the focus back, so that
+        // Ctrl+Z undoes the change just made, in the cell the action leaves
+        // the user in (rich text opens it for typing)
+        if (target.editor && target.editor.offsetParent !== null && api) {
+            // (a formula: the cell is not opened, it would show the formula's
+            // source instead of its value)
+            if (focus && action !== 'formula' && typeof api.focusTableCell === 'function') {
+                api.focusTableCell(target.editor, tableStart, focus.rowIndex, focus.cellIndex);
+            } else if (typeof api.focus === 'function') {
+                api.focus(target.editor);
+            }
         }
 
         markMdTableActionAsModified(noteId);
         restoreMdTableScrollStateAfterLayout(scrollState);
+        return { startLine: tableStart, focus: focus };
     }
 
     function isMarkdownTableLine(line) {
@@ -1024,9 +1237,23 @@
         return trimmed.split('|').map(c => c.trim());
     }
 
-    // Exposed so setupPreviewInteractivity (markdown-actions.js) can call it
+    // Exposed for the preview (markdown-actions.js), the editor's drawn
+    // tables (CodeMirror live-preview.js) and the table bar
+    // (markdown-table-toolbar.js)
     window.showMdTableContextMenu = showMdTableContextMenu;
+    window.showMdTableContextMenuForCell = showMdTableContextMenuForCell;
     window.hideMdTableContextMenu = hideMdTableContextMenu;
+    window.pzMdTable = {
+        getTarget: getMdTableTarget,
+        getSourceTarget: getMdSourceTableTarget,
+        run: runMdTableActionOn,
+        showMenu: showMdTableContextMenu,
+        showFormulaMenu: showMdFormulaMenu,
+        hideMenu: hideMdTableContextMenu,
+        isMenuOpen: () => !!((mdContextMenu && mdContextMenu.style.display !== 'none') ||
+            (mdFormulaMenu && mdFormulaMenu.style.display !== 'none')),
+        getMenuElement: () => mdContextMenu
+    };
 
     // Initialize on page load
     if (document.readyState === 'loading') {

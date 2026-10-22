@@ -3542,7 +3542,12 @@
                         icon: 'lucide-table',
                         label: t('slash_menu.table', null, 'Table'),
                         action: function () {
-                            insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+                            // The size picker, as in HTML notes (js/toolbar-tables.js)
+                            if (typeof window.toggleTablePicker === 'function') {
+                                window.toggleTablePicker();
+                            } else {
+                                insertMarkdownAtCursor('| Column | Column |\n| --- | --- |\n|  |  |\n', 0);
+                            }
                         }
                     },
                     {

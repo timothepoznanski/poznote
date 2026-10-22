@@ -26,7 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { Annotation, CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
-import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, getEditingTableRange } from './live-preview.js'
+import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, getEditingTableRange, getTableCellAt, getTableCellAtSelection, getTableCellTarget, getTableBlockElement, finishTableCellEdit, focusTableCell, moveTableCell, insertTableLineBreak } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -1361,6 +1361,65 @@ function getEditingTableCellRange(host) {
   return instance ? getEditingTableRange(instance.view) : null
 }
 
+// Tables, for the table bar and menu (js/markdown-table-toolbar.js,
+// js/table-context-menu.js): where a table and a cell are, by line
+function getTableAtSelection(host) {
+  const instance = getInstance(host)
+  return instance && !instance.view.state.readOnly ? getTableCellAtSelection(instance.view) : null
+}
+
+function getTableAtPoint(host, x, y) {
+  const instance = getInstance(host)
+  if (!instance || instance.view.state.readOnly) return null
+  const pos = instance.view.posAtCoords({ x, y })
+  return typeof pos === 'number' ? getTableCellAt(instance.view, { from: pos, to: pos, head: pos }) : null
+}
+
+function getTableCellTargetOf(host, cell) {
+  const instance = getInstance(host)
+  return instance && !instance.view.state.readOnly ? getTableCellTarget(instance.view, cell) : null
+}
+
+// The box of a table on screen: the drawn table, or its lines of source
+// The drawn table (rich text, live preview) starting on that line, or null
+function getTableElement(host, startLine) {
+  const instance = getInstance(host)
+  const element = instance ? getTableBlockElement(instance.view, startLine) : null
+  return element ? element.querySelector('table') : null
+}
+
+function getTableRect(host, startLine) {
+  const instance = getInstance(host)
+  if (!instance) return null
+  const { view } = instance
+  const table = getTableElement(host, startLine)
+  if (table) return table.getBoundingClientRect()
+  const doc = view.state.doc
+  if (startLine < 0 || startLine + 1 > doc.lines) return null
+  let last = startLine + 1
+  while (last < doc.lines && typeof window.isMarkdownTableRowLine === 'function' && window.isMarkdownTableRowLine(doc.line(last + 1).text)) last++
+  const top = view.coordsAtPos(doc.line(startLine + 1).from)
+  const bottom = view.coordsAtPos(doc.line(last).to)
+  if (!top || !bottom) return null
+  const content = view.contentDOM.getBoundingClientRect()
+  let right = top.left
+  for (let number = startLine + 1; number <= last; number++) {
+    const end = view.coordsAtPos(doc.line(number).to)
+    if (end) right = Math.max(right, end.right)
+  }
+  return { top: top.top, bottom: bottom.bottom, left: Math.max(content.left, top.left), right: Math.min(content.right, right) }
+}
+
+function finishTableEdit(host) {
+  const instance = getInstance(host)
+  if (instance) finishTableCellEdit(instance.view)
+}
+
+function focusTableCellAt(host, startLine, rowIndex, cellIndex, select) {
+  const instance = getInstance(host)
+  return !!instance && focusTableCell(instance.view, startLine, rowIndex, cellIndex, !!select)
+}
+
 function getLastActiveEditor() {
   return lastActiveHost && getInstance(lastActiveHost) ? lastActiveHost : null
 }
@@ -1889,6 +1948,7 @@ function createEditor(host, options = {}) {
       updateListener,
       domHandlers,
       keymap.of([
+        { key: 'Shift-Enter', run: insertTableLineBreak },
         { key: 'Enter', run: runMarkdownTableEnter(host) },
         { key: 'Enter', run: insertNewlineContinueMarkup },
         { key: 'Enter', run: insertNewlineAtColumnZero },
@@ -1905,8 +1965,8 @@ function createEditor(host, options = {}) {
         { key: 'Mod-k', run: openLinkModal },
         {
           key: 'Tab',
-          run: runMarkdownOrderedListTab(host),
-          shift: runMarkdownOrderedListTab(host, true)
+          run: view => moveTableCell(view, false) || runMarkdownOrderedListTab(host)(view),
+          shift: view => moveTableCell(view, true) || runMarkdownOrderedListTab(host, true)(view)
         },
         ...filteredSearchKeymap,
         ...historyKeymap,
@@ -2005,6 +2065,13 @@ window.PoznoteMarkdownCodeMirror = {
   hasFocus,
   getSelectionOffsets,
   getEditingTableCellRange,
+  getTableAtSelection,
+  getTableAtPoint,
+  getTableCellTarget: getTableCellTargetOf,
+  getTableElement,
+  getTableRect,
+  finishTableEdit,
+  focusTableCell: focusTableCellAt,
   setSelection,
   replaceRange,
   replaceRangeKeepSelection,
