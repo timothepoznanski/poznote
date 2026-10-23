@@ -291,6 +291,8 @@ function poznoteRenderSettingsSidebar(array $opts = []): void
 function poznoteSettingsShellOpen(array $opts): void
 {
     $basePath = (string)($opts['basePath'] ?? '');
+    // For the script poznoteSettingsShellClose() loads
+    $GLOBALS['poznoteSettingsShellBasePath'] = $basePath;
     $section = (string)($opts['section'] ?? '');
     $workspace = isset($opts['workspace'])
         ? (string)$opts['workspace']
@@ -346,13 +348,18 @@ function poznoteSettingsShellOpen(array $opts): void
     <?php
 }
 
-/** Closes what poznoteSettingsShellOpen() opened. */
+/**
+ * Closes what poznoteSettingsShellOpen() opened, and folds the page's boxes
+ * under their titles (js/settings-boxes.js).
+ */
 function poznoteSettingsShellClose(): void
 {
+    $basePath = (string)($GLOBALS['poznoteSettingsShellBasePath'] ?? '');
     ?>
                 </div>
             </div>
         </div>
     </div>
+    <script src="<?php echo htmlspecialchars($basePath . poznoteAsset('js/settings-boxes.js'), ENT_QUOTES, 'UTF-8'); ?>"></script>
     <?php
 }

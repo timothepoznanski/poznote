@@ -203,7 +203,8 @@
       "whats_new": "업데이트 후 노트를 열 때 새 버전의 릴리스 노트를 한 번 표시합니다.",
       "login_disabled": "로그인 화면을 건너뜁니다. 이 인스턴스에 접근하는 모든 브라우저가 사용자 이름, 비밀번호, 2단계 인증 코드 없이 내 계정을 바로 엽니다. 본인만 이 인스턴스에 접근할 수 있거나 앞단의 리버스 프록시가 인증을 처리하는 경우에만 켜세요. API는 계속 자격 증명을 요구합니다.",
       "outbound_hosts": "관리자가 아닌 사용자의 웹훅, 개인 AI·전사·MCP 서버, Git Sync는 공개 인터넷 호스트에만 접근합니다. 네트워크의 Ollama나 n8n 서버처럼 이들이 사용할 수 있는 로컬 호스트와 네트워크를 여기에 입력하세요. 관리자는 제한되지 않습니다.",
-      "diary_template": "{{workspace}} 작업 공간의 새 일기 항목이 시작될 때 사용할 내용을 담은 노트를 선택하세요. 목록에는 이 작업 공간에서 템플릿(또는 Templates)이라는 이름의 폴더에 있는 노트가 표시됩니다. 작업 공간마다 자체 템플릿이 있습니다."
+      "diary_template": "{{workspace}} 작업 공간의 새 일기 항목이 시작될 때 사용할 내용을 담은 노트를 선택하세요. 목록에는 이 작업 공간에서 템플릿(또는 Templates)이라는 이름의 폴더에 있는 노트가 표시됩니다. 작업 공간마다 자체 템플릿이 있습니다.",
+      "markdown_view_cycle": "마크다운 노트의 보기 버튼이 기본 보기(미리보기, 연필로 편집) 다음에 거치는 보기를 선택하세요. 선택하지 않은 보기는 건너뜁니다. 아무것도 선택하지 않으면 버튼이 숨겨집니다. 휴대폰에서는 버튼이 분할 모드로 전환되지 않습니다."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "모바일에서는 이 설정과 관계없이 키보드 위 도구 모음의 + 버튼으로 같은 메뉴를 열 수 있습니다."
@@ -534,7 +535,8 @@
       "sidebar_offline_marks": "오프라인 점 표시",
       "format_toolbar_mode": "서식 도구 모음",
       "workspace_activity_emails": "공유 작업 공간 알림 이메일",
-      "diary_template": "일기 항목 템플릿"
+      "diary_template": "일기 항목 템플릿",
+      "markdown_view_cycle": "보기 버튼"
     },
     "badges": {
       "font_size_default": "기본값({{size}}px)",
@@ -2353,16 +2355,20 @@
         "loading": "불러오는 중...",
         "folder": "대상 폴더",
         "optional": "선택사항",
-        "frontmatter_warning": "MD 노트의 머리말에 폴더 키가 포함되어 있는 경우 이 값은 아래에서 선택한 값보다 우선 적용됩니다. 따라서 먼저 폴더가 이미 존재하는지 확인해야 합니다. 그렇지 않으면 노트가 작업 공간의 루트에 생성됩니다.",
-        "zip_folders_info": "폴더 구조의 ZIP:",
+        "frontmatter_warning": "Markdown 파일 머리말의 folder 키가 대상 폴더보다 우선합니다. 해당 폴더가 이미 있어야 하며, 없으면 노트가 작업 공간의 루트에 생성됩니다.",
         "zip_folders_description": "ZIP에 폴더가 포함되어 있으면 Poznote에 폴더가 자동으로 생성되어 계층 구조(하위 폴더 포함)가 유지됩니다.",
         "no_folder": "폴더 없음(루트 수준)",
         "select_files": "파일 선택",
-        "files_info": "여러 파일(최대 {{maxIndividualFiles}}) 또는 단일 ZIP 파일(최대 {{maxZipFiles}} 파일). 이러한 한도는 변경될 수 있습니다.",
-        "files_info_link": "문서를 참조하세요",
         "supported_formats": "지원됨: .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "개별 HTML, 마크다운, 텍스트, JSON 파일 또는 여러 파일을 담은 ZIP 파일을 가져옵니다.<br><br>마크다운 파일의 front matter에 title 키가 지정되어 있지 않으면 파일 이름에서 확장자를 제외한 부분으로 노트 제목을 자동 생성합니다.<br><br><strong>할 일 목록:</strong> tasks 배열이 담긴 .json 파일과 체크박스 문법(- [ ] 또는 - [x])을 사용하는 .md 파일은 자동으로 할 일 목록으로 가져옵니다.",
-        "helper": "한 번에 여러 파일을 선택할 수 있습니다(최대 50개 파일). 지원되는 형식: .html, .md, .markdown, .txt, .json"
+        "helper": "한 번에 여러 파일을 선택할 수 있습니다(최대 50개 파일). 지원되는 형식: .html, .md, .markdown, .txt, .json",
+        "dropzone_title": "파일을 여기에 놓거나 클릭하여 찾아보기",
+        "clear_selection": "선택 항목 제거",
+        "selected_count": "{{count}}개 파일 선택됨",
+        "limits_info": "한 번에 최대 {{maxIndividualFiles}}개 파일, 또는 최대 {{maxZipFiles}}개 파일이 든 ZIP 아카이브 하나.",
+        "limits_change": "제한 변경",
+        "tips_title": "알아두기",
+        "tip_front_matter": "Markdown 파일의 머리말을 읽습니다: 제목, 태그, 즐겨찾기, 생성일과 수정일."
       },
       "s3_restore": {
         "title": "S3에서 복원",
@@ -2377,7 +2383,6 @@
       "start_import": "가져오기 시작"
     },
     "drag_drop": {
-      "individual_notes": "여기에 파일을 드롭하세요.",
       "complete_backup": "여기에 백업 ZIP을 드롭하세요.",
       "database": "여기에 SQL 파일을 드롭하세요.",
       "notes": "노트 ZIP 파일을 여기에 끌어 놓으세요",
@@ -4402,7 +4407,18 @@
     "instructions_saved": "사용자 지정 지침이 저장되었습니다.",
     "messages": {
       "incomplete": "자신의 어시스턴트를 활성화하기 전에 서버 URL과 모델을 입력하세요."
-    }
+    },
+    "prompts_title": "저장된 프롬프트",
+    "prompts_description": "자주 보내는 프롬프트입니다. 채팅 입력란 옆의 번개 버튼에서 골라 한 번의 클릭으로 보냅니다. 사용자 지정 지침과 달리 프롬프트는 선택할 때만 전송됩니다. 텍스트를 비우면 해당 프롬프트가 삭제됩니다.",
+    "prompts_saved": "저장된 프롬프트가 업데이트되었습니다.",
+    "prompt_new": "새 프롬프트",
+    "prompt_title_label": "이름",
+    "prompt_title_placeholder": "이름, 예: 문법 검사",
+    "prompt_text_label": "프롬프트",
+    "prompt_text_placeholder": "프롬프트, 예: 이 노트의 문법과 구조를 검토하고 개선점을 제안해 줘.",
+    "prompt_remove": "이 프롬프트 삭제",
+    "prompt_add": "프롬프트 추가",
+    "prompts_save": "프롬프트 저장"
   },
   "ai_mcp": {
     "title": "외부 도구",
@@ -4507,7 +4523,10 @@
     "open_dashboard": "대시보드 열기",
     "workspace_info_text_notes": "여기서 어시스턴트는 현재 작업 공간에서만 작업합니다. 여러 작업 공간을 한 번에 검색하려면 대시보드를 열고 상단 메뉴에서 선택하세요. 그러면 어시스턴트가 모두를 읽기 전용으로 검색하고 읽습니다.",
     "workspace_info_text_dashboard": "여기서 어시스턴트는 이 작업 공간에서만 작업합니다. 대시보드 상단 메뉴에서 여러 작업 공간을 선택하면 어시스턴트가 모두를 한 번에 읽기 전용으로 검색하고 읽습니다.",
-    "workspace_info_text_multi": "어시스턴트는 이 대시보드에 표시된 모든 작업 공간의 노트를 검색하고 읽습니다. 여기서는 아무것도 변경하지 않습니다. 노트를 수정하려면 노트나 그 작업 공간을 열고 그곳에서 요청하세요. 작업 공간은 대시보드 상단 메뉴에서 선택합니다."
+    "workspace_info_text_multi": "어시스턴트는 이 대시보드에 표시된 모든 작업 공간의 노트를 검색하고 읽습니다. 여기서는 아무것도 변경하지 않습니다. 노트를 수정하려면 노트나 그 작업 공간을 열고 그곳에서 요청하세요. 작업 공간은 대시보드 상단 메뉴에서 선택합니다.",
+    "saved_prompts": "저장된 프롬프트",
+    "saved_prompts_empty": "저장된 프롬프트가 아직 없습니다. 자주 보내는 프롬프트를 저장하면 한 번의 클릭으로 보낼 수 있습니다.",
+    "saved_prompts_manage": "저장된 프롬프트 관리"
   },
   "stt_settings": {
     "title": "음성 텍스트 변환",

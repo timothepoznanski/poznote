@@ -85,6 +85,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     }
 }
 
+// Saved prompts (discussion #1678), sent from the chat in one click: one row
+// per prompt, rows left without a text are dropped
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_prompts') {
+    $titles = is_array($_POST['prompt_title'] ?? null) ? array_values($_POST['prompt_title']) : [];
+    $texts = is_array($_POST['prompt_text'] ?? null) ? array_values($_POST['prompt_text']) : [];
+    $rows = [];
+    foreach ($texts as $i => $text) {
+        $rows[] = ['title' => is_string($titles[$i] ?? null) ? $titles[$i] : '', 'prompt' => is_string($text) ? $text : ''];
+    }
+    if (poznoteSaveAiSavedPrompts($con, $rows)) {
+        $message = t('ai_settings_user.prompts_saved', [], 'Saved prompts updated.');
+    } else {
+        $error = t('ai_settings.messages.save_error', [], 'Failed to save configuration.');
+    }
+}
+
 // The Assistant tools and External tools sections have forms of their own
 $aiMcpState = poznoteAiMcpHandlePost('user', $con);
 if ($aiMcpState !== null) {
@@ -94,6 +110,7 @@ if ($aiMcpState !== null) {
 
 $aiConfig = poznoteAiUserConfig($con);
 $aiCustomInstructions = poznoteAiCustomInstructions($con);
+$aiSavedPrompts = poznoteAiSavedPrompts($con);
 $aiProvider = poznoteAiGuessProvider($aiConfig['provider'], $aiConfig['url']);
 $aiEnabled = $aiConfig['enabled'];
 $aiReasoningEffort = $aiConfig['reasoning_effort'];
@@ -281,6 +298,69 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
             </form>
         </div>
 
+        <div class="git-sync-section" id="ai-saved-prompts">
+            <h2><i class="lucide lucide-zap"></i> <?php echo t_h('ai_settings_user.prompts_title', [], 'Saved prompts'); ?></h2>
+            <p class="git-sync-description git-sync-description-left ai-mcp-intro"><?php echo t_h('ai_settings_user.prompts_description', [], 'Prompts you send often, picked from the lightning button next to the chat input and sent in one click. Unlike the custom instructions, a prompt is only sent when you pick it. Leave a text empty to remove its prompt.'); ?></p>
+
+            <form method="post" id="ai-prompts-form">
+                <input type="hidden" name="action" value="save_prompts">
+
+                <div class="git-config-fields">
+                    <?php
+                    // One fold per prompt: its name, opened on a click to show
+                    // the fields. The template is what "Add a prompt" appends.
+                    $aiRenderPromptFold = function (array $prompt, bool $open): void {
+                        $title = $prompt['title'];
+                        ?>
+                        <details class="ai-prompt"<?php echo $open ? ' open' : ''; ?>>
+                            <summary>
+                                <span class="ai-prompt-name<?php echo $title === '' ? ' ai-prompt-name-new' : ''; ?>"><?php echo $title !== '' ? htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : t_h('ai_settings_user.prompt_new', [], 'New prompt'); ?></span>
+                                <button type="button" class="ai-prompt-remove" data-action="remove-prompt"
+                                        title="<?php echo t_h('ai_settings_user.prompt_remove', [], 'Remove this prompt'); ?>"
+                                        aria-label="<?php echo t_h('ai_settings_user.prompt_remove', [], 'Remove this prompt'); ?>">
+                                    <i class="lucide lucide-trash-2"></i>
+                                </button>
+                            </summary>
+                            <div class="ai-prompt-fields">
+                                <input type="text" name="prompt_title[]" class="git-field-input" maxlength="<?php echo POZNOTE_AI_SAVED_PROMPT_TITLE_MAX; ?>"
+                                       value="<?php echo htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
+                                       placeholder="<?php echo t_h('ai_settings_user.prompt_title_placeholder', [], 'Name, for example: Check grammar'); ?>"
+                                       aria-label="<?php echo t_h('ai_settings_user.prompt_title_label', [], 'Name'); ?>">
+                                <textarea name="prompt_text[]" class="git-field-input" rows="4" maxlength="<?php echo POZNOTE_AI_SAVED_PROMPT_TEXT_MAX; ?>"
+                                          placeholder="<?php echo t_h('ai_settings_user.prompt_text_placeholder', [], 'Prompt, for example: Check the grammar and structure of this note and recommend improvements.'); ?>"
+                                          aria-label="<?php echo t_h('ai_settings_user.prompt_text_label', [], 'Prompt'); ?>"><?php echo htmlspecialchars($prompt['prompt'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></textarea>
+                            </div>
+                        </details>
+                        <?php
+                    };
+                    ?>
+                    <div class="ai-prompts-list" id="ai-prompts-list" data-new-label="<?php echo t_h('ai_settings_user.prompt_new', [], 'New prompt'); ?>">
+                        <?php
+                        foreach ($aiSavedPrompts as $aiPromptRow) {
+                            $aiRenderPromptFold($aiPromptRow, false);
+                        }
+                        // Nothing saved yet: one open fold to write the first
+                        if ($aiSavedPrompts === []) {
+                            $aiRenderPromptFold(['title' => '', 'prompt' => ''], true);
+                        }
+                        ?>
+                    </div>
+                    <template id="ai-prompt-template"><?php $aiRenderPromptFold(['title' => '', 'prompt' => ''], true); ?></template>
+
+                    <div class="git-field-actions">
+                        <button type="button" class="btn btn-secondary" id="ai-prompt-add" data-max="<?php echo POZNOTE_AI_SAVED_PROMPTS_MAX; ?>">
+                            <i class="lucide lucide-plus"></i>
+                            <?php echo t_h('ai_settings_user.prompt_add', [], 'Add a prompt'); ?>
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('ai_settings_user.prompts_save', [], 'Save prompts'); ?>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <?php poznoteAiMcpRenderBuiltinTools($con); ?>
 
         <?php poznoteAiMcpRenderSection('user', $con, $aiMcpState); ?>
@@ -294,6 +374,7 @@ $effective = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 
 
     <script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/ai-saved-prompts-form.js'); ?>"></script>
     <?php if ($userKeysAllowed): ?>
     <script>
     window.poznoteAiSettingsScope = 'user';

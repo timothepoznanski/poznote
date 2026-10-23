@@ -203,7 +203,8 @@
       "whats_new": "After an update, show the release notes of the new version once when you open your notes.",
       "login_disabled": "Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials.",
       "outbound_hosts": "Webhooks, personal AI, transcription and MCP servers and Git Sync of non-admin users only reach public internet hosts. List here the local hosts and networks they may use, such as an Ollama or n8n server on your network. Administrators are not limited.",
-      "diary_template": "Choose a note whose content every new diary entry of the {{workspace}} workspace starts with. The list shows the notes kept in a folder named Templates in that workspace. Each workspace has its own template."
+      "diary_template": "Choose a note whose content every new diary entry of the {{workspace}} workspace starts with. The list shows the notes kept in a folder named Templates in that workspace. Each workspace has its own template.",
+      "markdown_view_cycle": "Choose the views the view button of a markdown note goes through after the classic view (preview, with the pencil to edit). The views left out are skipped. With none chosen, the button is hidden. On a phone the button never goes to split mode."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -534,7 +535,8 @@
       "sidebar_offline_marks": "Show offline dot",
       "format_toolbar_mode": "Formatting toolbar",
       "workspace_activity_emails": "Shared workspace emails",
-      "diary_template": "Diary entry template"
+      "diary_template": "Diary entry template",
+      "markdown_view_cycle": "View button"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -2353,16 +2355,20 @@
         "loading": "Loading...",
         "folder": "Destination folder",
         "optional": "optional",
-        "frontmatter_warning": "If an MD note contains a folder key in a front matter, this value will override the one selected below. You must therefore ensure first that the folder already exists, otherwise the note will be created at the root of the workspace.",
-        "zip_folders_info": "ZIP with folder structure:",
+        "frontmatter_warning": "A folder key in the front matter of a Markdown file takes precedence over the destination folder. That folder must already exist, otherwise the note is created at the root of the workspace.",
         "zip_folders_description": "If your ZIP contains folders, they will be automatically created as folders in Poznote, preserving their hierarchy (subfolders included).",
         "no_folder": "No folder (root level)",
         "select_files": "Select files",
-        "files_info": "Multiple files (max {{maxIndividualFiles}}) or single ZIP file (max {{maxZipFiles}} files). These limits can be changed,",
-        "files_info_link": "see documentation",
         "supported_formats": "Supported: .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "Import individual HTML, Markdown, text or JSON files, or a ZIP archive containing multiple files.<br><br>Title will be automatically created from filename (without extension), unless a title key is defined in a front matter for MD files.<br><br><strong>Tasklists:</strong> .json files containing tasks arrays and .md files with checkbox syntax (- [ ] or - [x]) are automatically imported as tasklists.",
-        "helper": "You can select multiple files at once (Maximum 50 files). Supported formats: .html, .md, .markdown, .txt, .json"
+        "helper": "You can select multiple files at once (Maximum 50 files). Supported formats: .html, .md, .markdown, .txt, .json",
+        "dropzone_title": "Drop files here or click to browse",
+        "clear_selection": "Remove the selection",
+        "selected_count": "{{count}} files selected",
+        "limits_info": "Up to {{maxIndividualFiles}} files at once, or one ZIP archive of up to {{maxZipFiles}} files.",
+        "limits_change": "Change the limits",
+        "tips_title": "Good to know",
+        "tip_front_matter": "The front matter of Markdown files is read: title, tags, favorite, and the created and updated dates."
       },
       "s3_restore": {
         "title": "Restore from S3",
@@ -2377,7 +2383,6 @@
       "start_import": "Start Import"
     },
     "drag_drop": {
-      "individual_notes": "Drop files here",
       "complete_backup": "Drop backup ZIP here",
       "database": "Drop SQL file here",
       "notes": "Drop notes ZIP here",
@@ -4402,7 +4407,18 @@
     "instructions_saved": "Custom instructions saved.",
     "messages": {
       "incomplete": "Enter a server URL and a model before enabling your own assistant."
-    }
+    },
+    "prompts_title": "Saved prompts",
+    "prompts_description": "Prompts you send often, picked from the lightning button next to the chat input and sent in one click. Unlike the custom instructions, a prompt is only sent when you pick it. Leave a text empty to remove its prompt.",
+    "prompts_saved": "Saved prompts updated.",
+    "prompt_new": "New prompt",
+    "prompt_title_label": "Name",
+    "prompt_title_placeholder": "Name, for example: Check grammar",
+    "prompt_text_label": "Prompt",
+    "prompt_text_placeholder": "Prompt, for example: Check the grammar and structure of this note and recommend improvements.",
+    "prompt_remove": "Remove this prompt",
+    "prompt_add": "Add a prompt",
+    "prompts_save": "Save prompts"
   },
   "ai_mcp": {
     "title": "External tools",
@@ -4507,7 +4523,10 @@
     "open_dashboard": "Open the dashboard",
     "workspace_info_text_notes": "Here the assistant works in the current workspace only. To search several workspaces at once, open the dashboard and select them in the menu at the top: the assistant then searches and reads all of them, read only.",
     "workspace_info_text_dashboard": "Here the assistant works in this workspace only. Select several workspaces in the menu at the top of the dashboard: the assistant then searches and reads all of them at once, read only.",
-    "workspace_info_text_multi": "The assistant searches and reads the notes of every workspace shown on this dashboard. It changes nothing here: to edit a note, open it or its workspace and ask there. The menu at the top of the dashboard chooses the workspaces."
+    "workspace_info_text_multi": "The assistant searches and reads the notes of every workspace shown on this dashboard. It changes nothing here: to edit a note, open it or its workspace and ask there. The menu at the top of the dashboard chooses the workspaces.",
+    "saved_prompts": "Saved prompts",
+    "saved_prompts_empty": "No saved prompt yet. Save the prompts you send often to send them in one click.",
+    "saved_prompts_manage": "Manage saved prompts"
   },
   "stt_settings": {
     "title": "Transcription",

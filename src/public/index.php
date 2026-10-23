@@ -295,13 +295,14 @@ $settings = [
     'markdown_default_view_mode' => 'preview',
     'markdown_new_note_view_mode' => 'split',
     'markdown_live_show_syntax' => '1',
+    'markdown_view_cycle' => 'live,rich,split',
     'sidebar_offline_marks' => '1',
     'favorites_sort' => POZNOTE_FAVORITES_SORT_DEFAULT,
     'favorites_icon_color' => ''
 ];
 
 try {
-    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'folder_icon_opens_kanban', 'folder_count_parentheses', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_heading_underline', 'markdown_editor_word_wrap', 'markdown_live_editing', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'note_virtual_space', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'markdown_new_note_view_mode', 'markdown_live_show_syntax', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
+    $stmt = $con->query("SELECT key, value FROM settings WHERE key IN ('note_font_size', 'sidebar_font_size', 'center_note_content', 'show_note_created', 'show_note_icons', 'hide_folder_actions', 'note_list_sort', 'notes_without_folders_after_folders', 'folder_icon_opens_kanban', 'folder_count_parentheses', 'code_block_word_wrap', 'code_block_line_numbers', 'markdown_split_card_view', 'markdown_split_preview_left', 'markdown_heading_underline', 'markdown_editor_word_wrap', 'markdown_live_editing', 'markdown_colored', 'markdown_colored_custom', 'attachment_previews_in_note', 'attachments_at_bottom', 'backlinks_at_bottom', 'note_virtual_space', 'default_image_border_no_padding', 'spellcheck_html_notes', 'highlight_current_folder_tree', 'folder_tree_dim_level', 'markdown_default_view_mode', 'markdown_new_note_view_mode', 'markdown_live_show_syntax', 'markdown_view_cycle', 'sidebar_offline_marks', 'favorites_sort', 'favorites_icon_color')");
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $settings[$row['key']] = $row['value'];
         if ($row['key'] === 'markdown_new_note_view_mode') {
@@ -573,6 +574,13 @@ $spellcheck_notes = poznoteSettingEnabled($settings['spellcheck_html_notes'], fa
 // is never read as Markdown). Chosen from the note's view button, kept here:
 // <body data-markdown-live-syntax>, read by the editor bundle
 $markdown_live_show_syntax = poznoteSettingEnabled($settings['markdown_live_show_syntax'], true);
+// Views the view button of a Markdown note goes through after the classic
+// one (discussion 1677), "live,rich,split" or a part of it, "none" for none:
+// <body data-markdown-view-cycle>, read by js/markdown-view-modes.js
+$markdown_view_cycle = trim((string)$settings['markdown_view_cycle']);
+if ($markdown_view_cycle !== 'none' && !preg_match('/^(live|rich|split)(,(live|rich|split))*$/', $markdown_view_cycle)) {
+    $markdown_view_cycle = 'live,rich,split';
+}
 // Colored markdown ('0' = off, 'custom' = per-element colors chosen by the
 // user): body class + --mdc-* colours, lib/markdown-colored.php (diary.php
 // builds its <body> the same way for the journal view)
@@ -626,7 +634,7 @@ $whats_new_preview = is_file($whats_new_preview_file);
 $whats_new_preview_since = $whats_new_preview ? trim((string)@file_get_contents($whats_new_preview_file)) : '';
 ?>
 
-<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-new-note-mode="<?php echo htmlspecialchars($markdown_new_note_view_mode, ENT_QUOTES); ?>" data-markdown-live-editing="<?php echo $markdown_live_editing ? '1' : '0'; ?>" data-markdown-live-syntax="<?php echo $markdown_live_show_syntax ? '1' : '0'; ?>" data-spellcheck="<?php echo $spellcheck_notes ? '1' : '0'; ?>" data-spellcheck-lang="<?php echo htmlspecialchars(getUserLanguage(), ENT_QUOTES); ?>"<?php echo $whats_new_preview ? ' data-whats-new="preview" data-whats-new-since="' . htmlspecialchars($whats_new_preview_since, ENT_QUOTES) . '"' : ($whats_new_pending ? ' data-whats-new="1"' : ''); ?>>
+<body<?php echo $body_classes ? ' class="' . htmlspecialchars($body_classes, ENT_QUOTES) . '"' : ''; ?><?php echo $body_inline_style ? ' style="' . htmlspecialchars($body_inline_style, ENT_QUOTES) . '"' : ''; ?> data-workspace="<?php echo htmlspecialchars($workspace_filter, ENT_QUOTES); ?>" data-markdown-default-mode="<?php echo htmlspecialchars($markdown_default_view_mode, ENT_QUOTES); ?>" data-markdown-new-note-mode="<?php echo htmlspecialchars($markdown_new_note_view_mode, ENT_QUOTES); ?>" data-markdown-live-editing="<?php echo $markdown_live_editing ? '1' : '0'; ?>" data-markdown-live-syntax="<?php echo $markdown_live_show_syntax ? '1' : '0'; ?>" data-markdown-view-cycle="<?php echo htmlspecialchars($markdown_view_cycle, ENT_QUOTES); ?>" data-spellcheck="<?php echo $spellcheck_notes ? '1' : '0'; ?>" data-spellcheck-lang="<?php echo htmlspecialchars(getUserLanguage(), ENT_QUOTES); ?>"<?php echo $whats_new_preview ? ' data-whats-new="preview" data-whats-new-since="' . htmlspecialchars($whats_new_preview_since, ENT_QUOTES) . '"' : ($whats_new_pending ? ' data-whats-new="1"' : ''); ?>>
     <script>
     (function () {
         try {

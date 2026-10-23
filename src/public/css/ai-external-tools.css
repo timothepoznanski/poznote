@@ -1,8 +1,8 @@
 /*
  * External tools section of the AI assistant settings (ai_settings.php and
- * ai_settings_user.php, rendered by ai_mcp_settings.php): one fold per
- * connected MCP server, closed until it is the one being worked on, so that
- * five servers with forty tools each do not bury the rest of the page.
+ * ai_settings_user.php, rendered by ai_mcp_settings.php): one framed panel
+ * per connected MCP server, always open (the section itself folds, see
+ * js/settings-boxes.js), then the panel to add one.
  * The tool checkboxes reuse the list of allowed-users.css.
  */
 
@@ -16,34 +16,11 @@
     border-radius: var(--pz-radius-lg);
 }
 
-.ai-mcp-server summary {
+.ai-mcp-server-head {
     display: flex;
     align-items: baseline;
     gap: 10px;
     padding: 12px 14px;
-    cursor: pointer;
-    list-style: none;
-}
-
-.ai-mcp-server summary::-webkit-details-marker {
-    display: none;
-}
-
-/* The fold mark: a chevron drawn with two borders, turned when open */
-.ai-mcp-server summary::before {
-    content: '';
-    flex: 0 0 auto;
-    align-self: center;
-    width: 6px;
-    height: 6px;
-    border-right: 2px solid var(--pz-text-muted);
-    border-bottom: 2px solid var(--pz-text-muted);
-    transform: rotate(-45deg);
-    transition: transform 0.15s;
-}
-
-.ai-mcp-server[open] summary::before {
-    transform: rotate(45deg);
 }
 
 .ai-mcp-server-name {

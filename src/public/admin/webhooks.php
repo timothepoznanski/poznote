@@ -18,6 +18,7 @@ if (!isCurrentUserAdmin()) {
     exit;
 }
 
+require_once __DIR__ . '/../../db_connect.php';
 require_once __DIR__ . '/../../users/db_master.php';
 require_once __DIR__ . '/../../WebhookDispatcher.php';
 require_once __DIR__ . '/../../version_helper.php';

@@ -525,7 +525,8 @@
       "whats_new": "Após uma atualização, mostrar uma vez as notas da nova versão ao abrir as suas notas.",
       "login_disabled": "Ignora a tela de login: qualquer navegador que chegue a esta instância abre diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Ative apenas se só você consegue acessar esta instância, ou se um proxy reverso à frente dela cuida da autenticação. A API continua pedindo credenciais.",
       "outbound_hosts": "Os webhooks, os servidores pessoais de IA, transcrição e MCP e o Git Sync dos utilizadores não administradores só alcançam hosts públicos da Internet. Indique aqui os hosts e redes locais que podem usar, como um servidor Ollama ou n8n na sua rede. Os administradores não têm limites.",
-      "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo."
+      "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo.",
+      "markdown_view_cycle": "Escolha as visualizações que o botão de visualização de uma nota markdown percorre depois da visualização clássica (pré-visualização, com o lápis para editar). As visualizações não escolhidas são ignoradas. Se nenhuma for escolhida, o botão fica oculto. Num telemóvel o botão nunca passa ao modo dividido."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -891,7 +892,8 @@
       "sidebar_offline_marks": "Mostrar o ponto offline",
       "format_toolbar_mode": "Barra de formatação",
       "workspace_activity_emails": "E-mails de espaços compartilhados",
-      "diary_template": "Modelo de entrada do diário"
+      "diary_template": "Modelo de entrada do diário",
+      "markdown_view_cycle": "Botão de visualização"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -2740,16 +2742,20 @@
         "loading": "Carregando...",
         "folder": "Pasta destino",
         "optional": "opcional",
-        "frontmatter_warning": "Se uma nota MD contém uma chave folder em um front matter, este valor substituirá o selecionado abaixo. Portanto, você deve primeiro garantir que a pasta já existe, caso contrário, a nota será criada na raiz do espaço de trabalho.",
-        "zip_folders_info": "ZIP com estrutura de pastas:",
+        "frontmatter_warning": "Uma chave folder no front matter de um arquivo Markdown tem prioridade sobre a pasta de destino. Essa pasta já deve existir, caso contrário a nota é criada na raiz do espaço de trabalho.",
         "zip_folders_description": "Se o seu ZIP contiver pastas, elas serão criadas automaticamente como pastas no Poznote, preservando sua hierarquia (subpastas incluídas).",
         "no_folder": "Sem pasta (nível raiz)",
         "select_files": "Selecionar arquivos",
-        "files_info": "Vários arquivos (máx {{maxIndividualFiles}}) ou arquivo ZIP único (máx {{maxZipFiles}} arquivos). Esses limites podem ser alterados,",
-        "files_info_link": "consulte a documentação",
         "supported_formats": "Suportados: .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "Importe arquivos HTML, Markdown, texto ou JSON individuais, ou um arquivo ZIP contendo vários arquivos.<br><br>O título será criado automaticamente a partir do nome do arquivo (sem a extensão), a menos que uma chave title seja definida em um front matter para arquivos MD.<br><br><strong>Listas de tarefas:</strong> Arquivos .json contendo arrays de tarefas e arquivos .md com sintaxe de checkbox (- [ ] ou - [x]) são automaticamente importados como listas de tarefas.",
-        "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown, .txt, .json"
+        "helper": "Você pode selecionar vários arquivos de uma vez (máximo 50 arquivos). Formatos suportados: .html, .md, .markdown, .txt, .json",
+        "dropzone_title": "Solte os arquivos aqui ou clique para procurar",
+        "clear_selection": "Remover a seleção",
+        "selected_count": "{{count}} arquivos selecionados",
+        "limits_info": "Até {{maxIndividualFiles}} arquivos de uma vez, ou um arquivo ZIP com até {{maxZipFiles}} arquivos.",
+        "limits_change": "Alterar os limites",
+        "tips_title": "Bom saber",
+        "tip_front_matter": "O front matter dos arquivos Markdown é lido: título, tags, favorito e as datas de criação e de modificação."
       },
       "s3_restore": {
         "title": "Restaurar do S3",
@@ -2764,7 +2770,6 @@
       "start_import": "Iniciar Importação"
     },
     "drag_drop": {
-      "individual_notes": "Soltar arquivos aqui",
       "complete_backup": "Soltar ZIP de backup aqui",
       "database": "Soltar arquivo SQL aqui",
       "notes": "Soltar ZIP de notas aqui",
@@ -4746,7 +4751,18 @@
     "instructions_saved": "Instruções personalizadas guardadas.",
     "messages": {
       "incomplete": "Indique um URL de servidor e um modelo antes de ativar o seu próprio assistente."
-    }
+    },
+    "prompts_title": "Prompts guardados",
+    "prompts_description": "Os prompts que envia com frequência, escolhidos no botão do raio ao lado da entrada do chat e enviados com um clique. Ao contrário das instruções personalizadas, um prompt só é enviado quando o escolhe. Esvazie um texto para remover o seu prompt.",
+    "prompts_saved": "Prompts guardados atualizados.",
+    "prompt_new": "Novo prompt",
+    "prompt_title_label": "Nome",
+    "prompt_title_placeholder": "Nome, por exemplo: Verificar a gramática",
+    "prompt_text_label": "Prompt",
+    "prompt_text_placeholder": "Prompt, por exemplo: Verifica a gramática e a estrutura desta nota e sugere melhorias.",
+    "prompt_remove": "Remover este prompt",
+    "prompt_add": "Adicionar um prompt",
+    "prompts_save": "Guardar os prompts"
   },
   "ai_mcp": {
     "title": "Ferramentas externas",
@@ -4851,7 +4867,10 @@
     "open_dashboard": "Abrir o painel",
     "workspace_info_text_notes": "Aqui o assistente trabalha apenas no espaço de trabalho atual. Para pesquisar em vários espaços de trabalho de uma vez, abra o painel e selecione-os no menu no topo: o assistente pesquisa e lê então em todos, somente leitura.",
     "workspace_info_text_dashboard": "Aqui o assistente trabalha apenas neste espaço de trabalho. Selecione vários espaços de trabalho no menu no topo do painel: o assistente pesquisa e lê então em todos de uma vez, somente leitura.",
-    "workspace_info_text_multi": "O assistente pesquisa e lê as notas de todos os espaços de trabalho deste painel. Aqui não altera nada: para editar uma nota, abra-a ou abra o espaço de trabalho dela e peça ali. O menu no topo do painel escolhe os espaços de trabalho."
+    "workspace_info_text_multi": "O assistente pesquisa e lê as notas de todos os espaços de trabalho deste painel. Aqui não altera nada: para editar uma nota, abra-a ou abra o espaço de trabalho dela e peça ali. O menu no topo do painel escolhe os espaços de trabalho.",
+    "saved_prompts": "Prompts guardados",
+    "saved_prompts_empty": "Ainda não há prompts guardados. Guarde os prompts que envia com frequência para enviá-los com um clique.",
+    "saved_prompts_manage": "Gerir os prompts guardados"
   },
   "stt_settings": {
     "title": "Transcrição",

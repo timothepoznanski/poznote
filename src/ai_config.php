@@ -308,6 +308,82 @@ function poznoteSaveAiCustomInstructions(?PDO $con, string $instructions): bool 
     }
 }
 
+/** Limits of the saved prompts: how many, and the length of each field. */
+const POZNOTE_AI_SAVED_PROMPTS_MAX = 30;
+const POZNOTE_AI_SAVED_PROMPT_TITLE_MAX = 80;
+const POZNOTE_AI_SAVED_PROMPT_TEXT_MAX = 4000;
+
+/**
+ * Keep the prompts worth storing: trimmed, those without a text dropped, an
+ * empty title replaced by the start of the text, within the limits above.
+ *
+ * @param array<int, mixed> $prompts [['title' => string, 'prompt' => string], ...]
+ * @return list<array{title: string, prompt: string}>
+ */
+function poznoteAiNormalizeSavedPrompts(array $prompts): array {
+    $clean = [];
+    foreach ($prompts as $entry) {
+        if (!is_array($entry)) {
+            continue;
+        }
+        $text = str_replace(["\r\n", "\r"], "\n", trim((string)($entry['prompt'] ?? '')));
+        if ($text === '') {
+            continue;
+        }
+        $text = mb_substr($text, 0, POZNOTE_AI_SAVED_PROMPT_TEXT_MAX);
+        $title = trim(preg_replace('/\s+/u', ' ', (string)($entry['title'] ?? '')) ?? '');
+        if ($title === '') {
+            $title = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+        }
+        $clean[] = [
+            'title' => mb_substr($title, 0, POZNOTE_AI_SAVED_PROMPT_TITLE_MAX),
+            'prompt' => $text,
+        ];
+        if (count($clean) >= POZNOTE_AI_SAVED_PROMPTS_MAX) {
+            break;
+        }
+    }
+    return $clean;
+}
+
+/**
+ * Prompts the user saved to send to the assistant in one click from the chat
+ * (discussion #1678), read from the user's own database. Unlike the custom
+ * instructions, they are only sent when picked.
+ *
+ * @return list<array{title: string, prompt: string}>
+ */
+function poznoteAiSavedPrompts(?PDO $con): array {
+    if (!$con) {
+        return [];
+    }
+    try {
+        $stmt = $con->prepare("SELECT value FROM settings WHERE key = 'ai_saved_prompts'");
+        $stmt->execute();
+        $decoded = json_decode((string)($stmt->fetchColumn() ?: ''), true);
+        return is_array($decoded) ? poznoteAiNormalizeSavedPrompts($decoded) : [];
+    } catch (Exception $e) {
+        error_log('ai_config: poznoteAiSavedPrompts() failed: ' . $e->getMessage());
+        return [];
+    }
+}
+
+/** @param array<int, mixed> $prompts */
+function poznoteSaveAiSavedPrompts(?PDO $con, array $prompts): bool {
+    if (!$con) {
+        return false;
+    }
+    try {
+        $value = json_encode(poznoteAiNormalizeSavedPrompts($prompts), JSON_UNESCAPED_UNICODE);
+        $stmt = $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('ai_saved_prompts', ?)");
+        $stmt->execute([$value]);
+        return true;
+    } catch (Exception $e) {
+        error_log('Failed to save AI saved prompts: ' . $e->getMessage());
+        return false;
+    }
+}
+
 /**
  * External tools (discussion #1611): remote MCP servers whose tools the
  * assistant may call next to its own, see lib/ai-mcp.php. Off until an

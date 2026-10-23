@@ -524,7 +524,8 @@
       "whats_new": "更新后，在打开笔记时显示一次新版本的发行说明。",
       "login_disabled": "跳过登录页面：任何能访问此实例的浏览器都会直接打开您的账户，无需用户名、密码或双重验证码。仅当只有您本人能访问此实例，或其前面的反向代理负责认证时才开启。API 仍然要求凭据。",
       "outbound_hosts": "非管理员用户的 Webhook、个人 AI、转录和 MCP 服务器以及 Git Sync 只能访问公共互联网主机。在此列出允许他们使用的本地主机和网络，例如你网络中的 Ollama 或 n8n 服务器。管理员不受限制。",
-      "diary_template": "选择一篇笔记，工作区 {{workspace}} 中的每个新日记条目都以其内容开头。列表显示该工作区中名为“模板”（或 Templates）的文件夹里的笔记。每个工作区都有自己的模板。"
+      "diary_template": "选择一篇笔记，工作区 {{workspace}} 中的每个新日记条目都以其内容开头。列表显示该工作区中名为“模板”（或 Templates）的文件夹里的笔记。每个工作区都有自己的模板。",
+      "markdown_view_cycle": "选择 Markdown 笔记的视图按钮在经典视图（预览，用铅笔编辑）之后依次切换的视图。未选中的视图会被跳过。如果一个都没有选中，按钮将被隐藏。在手机上，按钮不会切换到分屏模式。"
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "在移动设备上，键盘上方的工具栏有一个 + 按钮，无论此设置为何，它都会打开同一个菜单。"
@@ -890,7 +891,8 @@
       "sidebar_offline_marks": "显示离线圆点",
       "format_toolbar_mode": "格式工具栏",
       "workspace_activity_emails": "共享工作区邮件",
-      "diary_template": "日记条目模板"
+      "diary_template": "日记条目模板",
+      "markdown_view_cycle": "视图按钮"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -2738,16 +2740,20 @@
         "loading": "加载中...",
         "folder": "目标文件夹",
         "optional": "可选",
-        "frontmatter_warning": "如果 MD 笔记在头信息 (front matter) 中包含 folder 键，此值将覆盖下方选择的文件夹。因此，您必须先确保文件夹已存在，否则笔记将在工作区根目录下创建。",
-        "zip_folders_info": "包含文件夹结构的 ZIP：",
+        "frontmatter_warning": "Markdown 文件头信息中的 folder 键优先于目标文件夹。该文件夹必须已存在，否则笔记将创建在工作区根目录下。",
         "zip_folders_description": "如果您的 ZIP 包含文件夹，它们将在 Poznote 中自动创建，并保留其层级结构（包括子文件夹）。",
         "no_folder": "无文件夹（根级）",
         "select_files": "选择文件",
-        "files_info": "多个文件（最多 {{maxIndividualFiles}} 个）或单个 ZIP 归档（最多 {{maxZipFiles}} 个文件）。这些限制可以修改，",
-        "files_info_link": "请参阅文档",
         "supported_formats": "支持：.html, .md, .markdown, .txt, .json, .zip",
         "description_html": "导入个人 HTML、Markdown、文本或 JSON 文件，或包含多个文件的 ZIP 归档。<br><br>标题将根据文件名自动创建（不含扩展名），除非在 MD 文件的前置内容中定义了 title 键。<br><br><strong>任务列表：</strong> 包含任务数组的 .json 文件和带有复选框语法的 .md 文件 (- [ ] 或 - [x]) 将被自动导入为任务列表。",
-        "helper": "您可以一次选择多个文件（最多 50 个）。支持格式：.html, .md, .markdown, .txt, .json"
+        "helper": "您可以一次选择多个文件（最多 50 个）。支持格式：.html, .md, .markdown, .txt, .json",
+        "dropzone_title": "将文件拖放到此处，或点击浏览",
+        "clear_selection": "移除所选文件",
+        "selected_count": "已选择 {{count}} 个文件",
+        "limits_info": "一次最多 {{maxIndividualFiles}} 个文件，或一个最多包含 {{maxZipFiles}} 个文件的 ZIP 压缩包。",
+        "limits_change": "修改限制",
+        "tips_title": "须知",
+        "tip_front_matter": "会读取 Markdown 文件的头信息 (front matter)：标题、标签、收藏，以及创建和修改日期。"
       },
       "s3_restore": {
         "title": "从 S3 恢复",
@@ -2762,7 +2768,6 @@
       "start_import": "开始导入"
     },
     "drag_drop": {
-      "individual_notes": "将文件拖放到此处",
       "complete_backup": "将备份 ZIP 拖放到此处",
       "database": "将 SQL 文件拖放到此处",
       "notes": "将笔记 ZIP 拖放到此处",
@@ -4842,7 +4847,18 @@
     "instructions_saved": "自定义指令已保存。",
     "messages": {
       "incomplete": "启用你自己的助手前，请填写服务器 URL 和模型。"
-    }
+    },
+    "prompts_title": "已保存的提示词",
+    "prompts_description": "常用的提示词：在聊天输入框旁的闪电按钮中选择，一键发送。与自定义指令不同，提示词只在您选择时才会发送。清空文本即可删除该提示词。",
+    "prompts_saved": "已保存的提示词已更新。",
+    "prompt_new": "新提示词",
+    "prompt_title_label": "名称",
+    "prompt_title_placeholder": "名称，例如：检查语法",
+    "prompt_text_label": "提示词",
+    "prompt_text_placeholder": "提示词，例如：检查这篇笔记的语法和结构，并提出改进建议。",
+    "prompt_remove": "删除此提示词",
+    "prompt_add": "添加提示词",
+    "prompts_save": "保存提示词"
   },
   "ai_mcp": {
     "title": "外部工具",
@@ -4947,7 +4963,10 @@
     "open_dashboard": "打开仪表板",
     "workspace_info_text_notes": "在这里，助手只在当前工作区中工作。要同时搜索多个工作区，请打开仪表板并在顶部菜单中选择它们：助手随后会以只读方式搜索和阅读所有这些工作区。",
     "workspace_info_text_dashboard": "在这里，助手只在此工作区中工作。在仪表板顶部菜单中选择多个工作区：助手随后会以只读方式同时搜索和阅读所有这些工作区。",
-    "workspace_info_text_multi": "助手会搜索和阅读此仪表板上所有工作区的笔记。它在这里不做任何修改：要编辑笔记，请打开该笔记或其工作区后再提出请求。仪表板顶部的菜单用于选择工作区。"
+    "workspace_info_text_multi": "助手会搜索和阅读此仪表板上所有工作区的笔记。它在这里不做任何修改：要编辑笔记，请打开该笔记或其工作区后再提出请求。仪表板顶部的菜单用于选择工作区。",
+    "saved_prompts": "已保存的提示词",
+    "saved_prompts_empty": "还没有已保存的提示词。保存常用的提示词，即可一键发送。",
+    "saved_prompts_manage": "管理已保存的提示词"
   },
   "stt_settings": {
     "title": "转录",

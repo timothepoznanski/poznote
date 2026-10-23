@@ -294,6 +294,21 @@ class SettingsController {
             return $normalized;
         }
 
+        // Views the view button of a Markdown note goes through after the
+        // classic one (discussion 1677): "live", "rich" and "split", in that
+        // order, or "none" when the button has nowhere to go
+        if ($key === 'markdown_view_cycle') {
+            $views = array_filter(array_map('trim', explode(',', (string) $value)), 'strlen');
+            if ($views === ['none']) {
+                return 'none';
+            }
+            if (array_diff($views, ['live', 'rich', 'split']) !== []) {
+                throw new InvalidArgumentException('invalid markdown view cycle', 400);
+            }
+            $normalized = array_values(array_intersect(['live', 'rich', 'split'], $views));
+            return $normalized === [] ? 'none' : implode(',', $normalized);
+        }
+
         // Type of the note Alt+Shift+N creates, chosen in the keyboard
         // shortcuts window (ui_customization_panel.php)
         if ($key === 'new_note_shortcut_type') {

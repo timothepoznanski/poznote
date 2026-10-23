@@ -769,7 +769,7 @@ Under **Settings > Behavior**, you can configure:
 - **Diary entry template:** a note from the workspace's `Templates` folder that every new diary entry of that workspace starts with
 - Interface language, timezone and date format, attachments and backlinks at the bottom of a note, spell check, and the keyboard shortcuts
 
-Under **Settings > Markdown**, you can configure the default view mode, the editor font, framed and coloured Markdown, and code block line numbers.
+Under **Settings > Markdown**, you can configure the default view mode, the views the view button of a note goes through (live preview, rich text, split), the editor font, framed and coloured Markdown, and code block line numbers.
 
 The theme is not a card here: the button at the bottom of the left icon rail walks through the themes, and an administrator chooses which ones it offers in **Settings > Admin Tools > Theme list**.
 

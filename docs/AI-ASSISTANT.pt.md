@@ -96,6 +96,10 @@ Cada pedido leva também `User-Agent: Poznote/<version>`, para que os registos d
 
 Cada utilizador pode dar ao assistente instruções permanentes em **Definições → O meu assistente de IA → Instruções personalizadas**, por exemplo «Quando escrever uma nota em inglês, adicione abaixo a tradução para russo, e vice-versa». O texto (até 4000 caracteres) é enviado ao modelo com cada mensagem, seja qual for a configuração que responde, a da instância ou a sua. Use-o para preferências duradouras como o tom, o idioma ou o formato das notas que o assistente escreve. Não altera o que o assistente pode fazer: as notas continuam a ser modificadas apenas quando o pede. Deixe o campo vazio para não enviar nada.
 
+## Prompts guardados
+
+Os prompts que você envia com frequência, como «Verifique a gramática e a estrutura desta nota e sugira melhorias» ou «Que perguntas de acompanhamento devo fazer?», podem ser salvos em **Definições → O meu assistente de IA → Prompts guardados**: um nome e um texto para cada um, até 30 prompts. No chat, o botão do raio ao lado da entrada mostra a lista, e um clique em um deles envia o texto como a sua mensagem, sobre a nota aberta quando ele fala de «esta nota». O que você estava digitando continua na entrada. Ao contrário das instruções personalizadas, um prompt guardado só é enviado quando você o escolhe. **Gerir os prompts guardados**, no fim da lista, abre as configurações. Para remover um prompt, clique na lixeira dele ou apague o texto e salve.
+
 ## Ferramentas externas (servidores MCP)
 
 O assistente pode chamar ferramentas oferecidas por servidores [MCP](https://modelcontextprotocol.io) remotos além das suas, por exemplo um serviço de pesquisa na web, para consultar informações atuais antes de responder ou de escrever uma nota. É o sentido inverso do [servidor MCP do Poznote](MCP-SERVER.pt.md), que permite a outros assistentes aceder às suas notas.

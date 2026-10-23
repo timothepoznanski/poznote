@@ -162,6 +162,9 @@ function handleRestoreImportClick(e) {
         case 'proceed-individual-notes-import':
             proceedWithIndividualNotesImport();
             break;
+        case 'clear-individual-notes-files':
+            clearIndividualNotesFiles();
+            break;
 
         // Custom alert
         case 'hide-custom-alert':
@@ -267,6 +270,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Setup file input change listeners for standard restore
 function setupFileInputListeners() {
+    const notesFileInput = document.getElementById('individual_notes_files');
+    if (notesFileInput) {
+        notesFileInput.addEventListener('change', renderIndividualNotesSelection);
+        // Files the browser kept across a reload or a back navigation
+        renderIndividualNotesSelection();
+    }
+
     const completeFileInput = document.getElementById('complete_backup_file');
 
     if (completeFileInput) {
@@ -1411,6 +1421,52 @@ function proceedWithAttachmentsImport() {
 }
 
 // Individual Notes Import Functions
+function formatImportFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// The line under the drop zone: the file's name, or the count of files,
+// with the total size
+function renderIndividualNotesSelection() {
+    const fileInput = document.getElementById('individual_notes_files');
+    const box = document.getElementById('individualNotesSelection');
+    if (!fileInput || !box) return;
+
+    const files = Array.from(fileInput.files || []);
+    box.hidden = files.length === 0;
+    if (!files.length) return;
+
+    const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+    const isSingleZip = files.length === 1 && files[0].name.toLowerCase().endsWith('.zip');
+    const icon = box.querySelector('.import-selection-icon');
+    if (icon) {
+        icon.classList.toggle('lucide-archive', isSingleZip);
+        icon.classList.toggle('lucide-file-text', !isSingleZip);
+    }
+
+    const nameEl = document.getElementById('individualNotesSelectionName');
+    const metaEl = document.getElementById('individualNotesSelectionMeta');
+    if (files.length === 1) {
+        nameEl.textContent = files[0].name;
+        nameEl.title = files[0].name;
+        metaEl.textContent = formatImportFileSize(totalSize);
+    } else {
+        const names = files.map(file => file.name).join(', ');
+        nameEl.textContent = tr('restore_import.sections.individual_notes.selected_count', '{{count}} files selected', { count: files.length });
+        nameEl.title = names;
+        metaEl.textContent = formatImportFileSize(totalSize) + ' · ' + names;
+    }
+}
+
+function clearIndividualNotesFiles() {
+    const fileInput = document.getElementById('individual_notes_files');
+    if (!fileInput) return;
+    fileInput.value = '';
+    renderIndividualNotesSelection();
+}
+
 function showIndividualNotesImportConfirmation() {
     const fileInput = document.getElementById('individual_notes_files');
     const workspaceSelect = document.getElementById('target_workspace_select');
@@ -1718,7 +1774,7 @@ function loadFoldersForImport(workspace) {
 // Setup drag and drop visual feedback for file inputs
 function setupDragAndDrop() {
     const fileInputs = [
-        { id: 'individual_notes_files', key: 'restore_import.drag_drop.individual_notes', fallback: 'Drop files here' },
+        { id: 'individual_notes_files', zone: '.import-dropzone' },
         { id: 'complete_backup_file', key: 'restore_import.drag_drop.complete_backup', fallback: 'Drop backup ZIP here' },
         { id: 'backup_file', key: 'restore_import.drag_drop.database', fallback: 'Drop SQL file here' },
         { id: 'notes_file', key: 'restore_import.drag_drop.notes', fallback: 'Drop notes ZIP here' },
@@ -1728,6 +1784,29 @@ function setupDragAndDrop() {
     fileInputs.forEach(config => {
         const input = document.getElementById(config.id);
         if (!input) return;
+
+        // A drop zone already says where to drop: it only takes the drag
+        // state, with no overlay on top
+        if (config.zone) {
+            const zone = input.closest(config.zone);
+            if (!zone) return;
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, preventDefaults, false);
+            });
+            ['dragenter', 'dragover'].forEach(eventName => {
+                zone.addEventListener(eventName, () => zone.classList.add('drag-over'), false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                zone.addEventListener(eventName, () => zone.classList.remove('drag-over'), false);
+            });
+            zone.addEventListener('drop', (e) => {
+                if (e.dataTransfer.files.length > 0) {
+                    input.files = e.dataTransfer.files;
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }, false);
+            return;
+        }
 
         const container = input.closest('.form-group') || input.parentElement;
         if (!container) return;

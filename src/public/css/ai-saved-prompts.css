@@ -1,0 +1,97 @@
+/*
+ * Saved prompts section of ai_settings_user.php (discussion #1678): one fold
+ * per prompt, closed on its name, with a bin on the right; opened, it shows
+ * the name and text fields. Same look as the external tools folds
+ * (ai-external-tools.css).
+ */
+
+.ai-prompts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ai-prompt {
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
+}
+
+.ai-prompt summary {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px 6px 14px;
+    cursor: pointer;
+    list-style: none;
+}
+
+.ai-prompt summary::-webkit-details-marker {
+    display: none;
+}
+
+/* The fold mark: a chevron drawn with two borders, turned when open */
+.ai-prompt summary::before {
+    content: '';
+    flex: 0 0 auto;
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid var(--pz-text-muted);
+    border-bottom: 2px solid var(--pz-text-muted);
+    transform: rotate(-45deg);
+    transition: transform 0.15s;
+}
+
+.ai-prompt[open] summary::before {
+    transform: rotate(45deg);
+}
+
+.ai-prompt-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--pz-text-strong);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* A prompt without a name yet */
+.ai-prompt-name-new {
+    color: var(--pz-text-muted);
+}
+
+.ai-prompt-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 4px 14px 14px;
+}
+
+.ai-prompt-fields textarea {
+    resize: vertical;
+}
+
+.ai-prompt-remove {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-text-subtle);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.ai-prompt-remove:hover,
+.ai-prompt-remove:focus-visible {
+    color: var(--pz-accent-text);
+}
+
+/* The dark layer gives every icon its own default colour */
+.ai-prompt-remove i {
+    color: inherit;
+}

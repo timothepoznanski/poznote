@@ -96,6 +96,10 @@ Every request also carries `User-Agent: Poznote/<version>`, so that the logs of 
 
 Each user can give the assistant standing instructions in **Settings → My AI Assistant → Custom instructions**, for example "When you write a note in English, add its Russian translation below, and the other way round". The text (up to 4000 characters) is sent to the model with every message, whichever configuration answers, the instance one or your own. Use it for lasting preferences such as tone, language or the format of the notes the assistant writes. It does not change what the assistant is allowed to do: notes are still only modified when you ask for it. Leave the field empty to send nothing.
 
+## Saved prompts
+
+Prompts you send often, such as "Check the grammar and structure of this note and recommend improvements" or "Are there any follow-up questions I should ask?", can be saved in **Settings → My AI Assistant → Saved prompts**: a name and a text for each, up to 30 prompts. In the chat, the lightning button next to the input opens them, and a click on one sends its text as your message, about the note you have open when it says "this note". Whatever you were typing stays in the input. Unlike the custom instructions, a saved prompt is only sent when you pick it. **Manage saved prompts**, at the bottom of the list, opens the settings. To remove a prompt, click its bin or empty its text, then save.
+
 ## External tools (MCP servers)
 
 The assistant can call tools offered by remote [MCP](https://modelcontextprotocol.io) servers next to its own, for example a web search service, so that it can look up current information before it answers or writes a note. This is the other direction of the [Poznote MCP server](MCP-SERVER.md), which lets other assistants reach your notes.

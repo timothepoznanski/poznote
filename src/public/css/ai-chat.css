@@ -483,6 +483,7 @@ a.ai-chat-header-btn {
 
 /* Input bar */
 .ai-chat-inputbar {
+    position: relative; /* anchors the saved prompts menu */
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -497,7 +498,8 @@ a.ai-chat-header-btn {
    that the pointer resting on the button after a click does not show a third
    colour. The colour alone is not enough: in Sepia the accent and the subtle
    text are two close browns (#1627), so the "on" look also gets a background */
-.ai-chat-external-btn {
+.ai-chat-external-btn,
+.ai-chat-prompts-btn {
     width: 34px;
     height: 34px;
     flex-shrink: 0;
@@ -513,14 +515,100 @@ a.ai-chat-header-btn {
     font-size: 18px;
 }
 
-.ai-chat-external-btn[aria-pressed="true"] {
+/* The two buttons on the left of the input go together: closer to each other
+   than to the input (the saved prompts menu between them is out of the flow) */
+.ai-chat-prompts ~ .ai-chat-external-btn {
+    margin-left: -6px;
+}
+
+.ai-chat-external-btn[aria-pressed="true"],
+.ai-chat-prompts-btn[aria-expanded="true"] {
     color: var(--pz-accent-text);
     background: rgba(var(--pz-accent-text-rgb), 0.14);
+}
+
+/* Saved prompts (discussion #1678): a menu above the input bar, one line per
+   prompt, then the link to the settings where they are written */
+.ai-chat-prompts {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: calc(100% + 6px);
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    max-height: min(320px, 50vh);
+    overflow-y: auto;
+    padding: 4px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    box-shadow: 0 4px 16px rgba(var(--pz-shadow-rgb), 0.12);
+    box-sizing: border-box;
+}
+
+.ai-chat-prompts[hidden] {
+    display: none;
+}
+
+.ai-chat-prompt,
+.ai-chat-prompts-manage {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border: none;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 13px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ai-chat-prompt {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ai-chat-prompt:hover,
+.ai-chat-prompt:focus-visible,
+.ai-chat-prompts-manage:hover,
+.ai-chat-prompts-manage:focus-visible {
+    outline: none;
+    background: rgba(var(--pz-accent-rgb), 0.1);
+    color: var(--pz-accent-text);
+}
+
+.ai-chat-prompts-manage {
+    color: var(--pz-text-muted);
+    font-size: 12.5px;
+}
+
+.ai-chat-prompt + .ai-chat-prompts-manage,
+.ai-chat-prompts-empty + .ai-chat-prompts-manage {
+    margin-top: 4px;
+    border-top: 1px solid var(--pz-border);
+    border-radius: 0 0 var(--pz-radius-sm) var(--pz-radius-sm);
+}
+
+.ai-chat-prompts-empty {
+    padding: 8px 10px;
+    color: var(--pz-text-muted);
+    font-size: 12.5px;
+    line-height: 1.4;
 }
 
 /* icons.css enlarges any lucide icon under the pointer (its hover colour is
    already ruled out for the whole panel, further down) */
 #ai-chat-panel .ai-chat-external-btn [class*="lucide-"]:hover,
+#ai-chat-panel .ai-chat-prompts-btn [class*="lucide-"]:hover,
+#ai-chat-panel .ai-chat-prompts-manage [class*="lucide-"]:hover,
 #ai-chat-panel .ai-chat-copy [class*="lucide-"]:hover {
     transform: none;
 }

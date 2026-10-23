@@ -186,6 +186,7 @@ function poznoteCssManifest(): array
             'css/git-sync.css',
             'css/allowed-users.css',
             'css/ai-external-tools.css',
+            'css/ai-saved-prompts.css',
             '@settings-shell',
             '@theme',
             '@icon-sidebar',

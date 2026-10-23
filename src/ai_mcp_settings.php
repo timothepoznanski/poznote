@@ -87,13 +87,12 @@ function poznoteAiMcpReadServerForm(array $stored): array {
 
 /**
  * Handle a form of the section. Returns null when the request is none of
- * them, else ['message' => string, 'error' => string, 'open' => id of the
- * server to show unfolded, 'draft' => bool, the refused "add" form is to be
- * shown again as it was typed].
+ * them, else ['message' => string, 'error' => string, 'draft' => bool, the
+ * refused "add" form is to be shown again as it was typed].
  */
 function poznoteAiMcpHandlePost(string $scope, ?PDO $con): ?array {
     $action = $_SERVER['REQUEST_METHOD'] === 'POST' ? (string)($_POST['action'] ?? '') : '';
-    $result = ['message' => '', 'error' => '', 'open' => '', 'draft' => false];
+    $result = ['message' => '', 'error' => '', 'draft' => false];
     $saveError = t('ai_settings.messages.save_error', [], 'Failed to save configuration.');
 
     if ($action === 'mcp_options' && $scope === 'instance') {
@@ -144,7 +143,6 @@ function poznoteAiMcpHandlePost(string $scope, ?PDO $con): ?array {
             $result['error'] = $saveError;
             return $result;
         }
-        $result['open'] = $server['id'];
         if ($check['error'] !== '') {
             $result['error'] = t('ai_mcp.messages.added_unreachable', ['error' => $check['error']], 'Server added, but it could not be checked: {{error}}');
         } else {
@@ -170,7 +168,6 @@ function poznoteAiMcpHandlePost(string $scope, ?PDO $con): ?array {
         return $result;
     }
 
-    $result['open'] = $servers[$index]['id'];
     $form = poznoteAiMcpReadServerForm($servers[$index]);
     if ($form['error'] !== '') {
         $result['error'] = $form['error'];
@@ -237,7 +234,6 @@ function poznoteAiMcpRenderSection(string $scope, ?PDO $con, ?array $state): voi
         return;
     }
     $servers = poznoteAiMcpScopeAllowed($scope) ? poznoteAiMcpLoadServers($scope, $con) : [];
-    $open = (string)($state['open'] ?? '');
     $draft = !empty($state['draft']);
     ?>
         <div class="git-sync-section" id="ai-external-tools">
@@ -287,13 +283,13 @@ function poznoteAiMcpRenderSection(string $scope, ?PDO $con, ?array $state): voi
                 $toolCount = count(array_filter(array_column($server['tools'], 'enabled')));
                 $server['headers_text'] = aiUpstreamMaskHeaders($server['headers']);
             ?>
-            <details class="ai-mcp-server" <?php echo $server['id'] === $open ? 'open' : ''; ?>>
-                <summary>
+            <div class="ai-mcp-server">
+                <div class="ai-mcp-server-head">
                     <span class="ai-mcp-server-name"><?php echo poznoteAiMcpH($server['name']); ?></span>
                     <span class="ai-mcp-server-status"><?php echo $server['enabled']
                         ? t_h('ai_mcp.server_status', ['count' => $toolCount, 'total' => count($server['tools'])], '{{count}} of {{total}} tool(s) in use')
                         : t_h('ai_mcp.server_status_off', [], 'Turned off'); ?></span>
-                </summary>
+                </div>
                 <form method="post">
                     <input type="hidden" name="action" value="mcp_server">
                     <input type="hidden" name="mcp_server_id" value="<?php echo $server['id']; ?>">
@@ -348,14 +344,14 @@ function poznoteAiMcpRenderSection(string $scope, ?PDO $con, ?array $state): voi
                         </div>
                     </div>
                 </form>
-            </details>
+            </div>
             <?php endforeach; ?>
 
             <?php if (count($servers) < AI_MCP_MAX_SERVERS): ?>
-            <details class="ai-mcp-server" <?php echo ($servers === [] || $draft) ? 'open' : ''; ?>>
-                <summary>
+            <div class="ai-mcp-server">
+                <div class="ai-mcp-server-head">
                     <span class="ai-mcp-server-name"><?php echo t_h('ai_mcp.add_title', [], 'Add a server'); ?></span>
-                </summary>
+                </div>
                 <form method="post">
                     <input type="hidden" name="action" value="mcp_add">
                     <div class="git-config-fields">
@@ -373,7 +369,7 @@ function poznoteAiMcpRenderSection(string $scope, ?PDO $con, ?array $state): voi
                         </div>
                     </div>
                 </form>
-            </details>
+            </div>
             <?php endif; ?>
             <?php endif; ?>
         </div>
