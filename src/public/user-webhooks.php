@@ -16,6 +16,9 @@ require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../settings_shell.php';
 requireSettingsPassword();
+// The account language is read from the user database: without it every t()
+// below, the shell and the icon sidebar fall back to English (#1679).
+require_once __DIR__ . '/../db_connect.php';
 
 if (!poznoteCanUseUserWebhooks()) {
     header('HTTP/1.1 403 Forbidden');
