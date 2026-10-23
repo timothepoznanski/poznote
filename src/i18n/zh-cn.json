@@ -2738,16 +2738,20 @@
         "loading": "加载中...",
         "folder": "目标文件夹",
         "optional": "可选",
-        "frontmatter_warning": "如果 MD 笔记在头信息 (front matter) 中包含 folder 键，此值将覆盖下方选择的文件夹。因此，您必须先确保文件夹已存在，否则笔记将在工作区根目录下创建。",
-        "zip_folders_info": "包含文件夹结构的 ZIP：",
+        "frontmatter_warning": "Markdown 文件头信息中的 folder 键优先于目标文件夹。该文件夹必须已存在，否则笔记将创建在工作区根目录下。",
         "zip_folders_description": "如果您的 ZIP 包含文件夹，它们将在 Poznote 中自动创建，并保留其层级结构（包括子文件夹）。",
         "no_folder": "无文件夹（根级）",
         "select_files": "选择文件",
-        "files_info": "多个文件（最多 {{maxIndividualFiles}} 个）或单个 ZIP 归档（最多 {{maxZipFiles}} 个文件）。这些限制可以修改，",
-        "files_info_link": "请参阅文档",
         "supported_formats": "支持：.html, .md, .markdown, .txt, .json, .zip",
         "description_html": "导入个人 HTML、Markdown、文本或 JSON 文件，或包含多个文件的 ZIP 归档。<br><br>标题将根据文件名自动创建（不含扩展名），除非在 MD 文件的前置内容中定义了 title 键。<br><br><strong>任务列表：</strong> 包含任务数组的 .json 文件和带有复选框语法的 .md 文件 (- [ ] 或 - [x]) 将被自动导入为任务列表。",
-        "helper": "您可以一次选择多个文件（最多 50 个）。支持格式：.html, .md, .markdown, .txt, .json"
+        "helper": "您可以一次选择多个文件（最多 50 个）。支持格式：.html, .md, .markdown, .txt, .json",
+        "dropzone_title": "将文件拖放到此处，或点击浏览",
+        "clear_selection": "移除所选文件",
+        "selected_count": "已选择 {{count}} 个文件",
+        "limits_info": "一次最多 {{maxIndividualFiles}} 个文件，或一个最多包含 {{maxZipFiles}} 个文件的 ZIP 压缩包。",
+        "limits_change": "修改限制",
+        "tips_title": "须知",
+        "tip_front_matter": "会读取 Markdown 文件的头信息 (front matter)：标题、标签、收藏，以及创建和修改日期。"
       },
       "s3_restore": {
         "title": "从 S3 恢复",
@@ -2762,7 +2766,6 @@
       "start_import": "开始导入"
     },
     "drag_drop": {
-      "individual_notes": "将文件拖放到此处",
       "complete_backup": "将备份 ZIP 拖放到此处",
       "database": "将 SQL 文件拖放到此处",
       "notes": "将笔记 ZIP 拖放到此处",

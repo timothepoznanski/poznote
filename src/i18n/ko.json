@@ -2353,16 +2353,20 @@
         "loading": "불러오는 중...",
         "folder": "대상 폴더",
         "optional": "선택사항",
-        "frontmatter_warning": "MD 노트의 머리말에 폴더 키가 포함되어 있는 경우 이 값은 아래에서 선택한 값보다 우선 적용됩니다. 따라서 먼저 폴더가 이미 존재하는지 확인해야 합니다. 그렇지 않으면 노트가 작업 공간의 루트에 생성됩니다.",
-        "zip_folders_info": "폴더 구조의 ZIP:",
+        "frontmatter_warning": "Markdown 파일 머리말의 folder 키가 대상 폴더보다 우선합니다. 해당 폴더가 이미 있어야 하며, 없으면 노트가 작업 공간의 루트에 생성됩니다.",
         "zip_folders_description": "ZIP에 폴더가 포함되어 있으면 Poznote에 폴더가 자동으로 생성되어 계층 구조(하위 폴더 포함)가 유지됩니다.",
         "no_folder": "폴더 없음(루트 수준)",
         "select_files": "파일 선택",
-        "files_info": "여러 파일(최대 {{maxIndividualFiles}}) 또는 단일 ZIP 파일(최대 {{maxZipFiles}} 파일). 이러한 한도는 변경될 수 있습니다.",
-        "files_info_link": "문서를 참조하세요",
         "supported_formats": "지원됨: .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "개별 HTML, 마크다운, 텍스트, JSON 파일 또는 여러 파일을 담은 ZIP 파일을 가져옵니다.<br><br>마크다운 파일의 front matter에 title 키가 지정되어 있지 않으면 파일 이름에서 확장자를 제외한 부분으로 노트 제목을 자동 생성합니다.<br><br><strong>할 일 목록:</strong> tasks 배열이 담긴 .json 파일과 체크박스 문법(- [ ] 또는 - [x])을 사용하는 .md 파일은 자동으로 할 일 목록으로 가져옵니다.",
-        "helper": "한 번에 여러 파일을 선택할 수 있습니다(최대 50개 파일). 지원되는 형식: .html, .md, .markdown, .txt, .json"
+        "helper": "한 번에 여러 파일을 선택할 수 있습니다(최대 50개 파일). 지원되는 형식: .html, .md, .markdown, .txt, .json",
+        "dropzone_title": "파일을 여기에 놓거나 클릭하여 찾아보기",
+        "clear_selection": "선택 항목 제거",
+        "selected_count": "{{count}}개 파일 선택됨",
+        "limits_info": "한 번에 최대 {{maxIndividualFiles}}개 파일, 또는 최대 {{maxZipFiles}}개 파일이 든 ZIP 아카이브 하나.",
+        "limits_change": "제한 변경",
+        "tips_title": "알아두기",
+        "tip_front_matter": "Markdown 파일의 머리말을 읽습니다: 제목, 태그, 즐겨찾기, 생성일과 수정일."
       },
       "s3_restore": {
         "title": "S3에서 복원",
@@ -2377,7 +2381,6 @@
       "start_import": "가져오기 시작"
     },
     "drag_drop": {
-      "individual_notes": "여기에 파일을 드롭하세요.",
       "complete_backup": "여기에 백업 ZIP을 드롭하세요.",
       "database": "여기에 SQL 파일을 드롭하세요.",
       "notes": "노트 ZIP 파일을 여기에 끌어 놓으세요",

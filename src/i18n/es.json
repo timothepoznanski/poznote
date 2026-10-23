@@ -2740,16 +2740,20 @@
         "loading": "Cargando...",
         "folder": "Carpeta destino",
         "optional": "opcional",
-        "frontmatter_warning": "Si una nota MD contiene una clave folder en un front matter, este valor anulará el seleccionado a continuación. Por lo tanto, primero debe asegurarse de que la carpeta ya existe, de lo contrario, la nota se creará en la raíz del espacio de trabajo.",
-        "zip_folders_info": "ZIP con estructura de carpetas:",
+        "frontmatter_warning": "Una clave folder en el front matter de un archivo Markdown prevalece sobre la carpeta de destino. Esa carpeta debe existir ya; si no, la nota se crea en la raíz del espacio de trabajo.",
         "zip_folders_description": "Si su ZIP contiene carpetas, se crearán automáticamente como carpetas en Poznote, preservando su jerarquía (subcarpetas incluidas).",
         "no_folder": "Sin carpeta (nivel raíz)",
         "select_files": "Seleccionar archivos",
-        "files_info": "Varios archivos (máx {{maxIndividualFiles}}) o archivo ZIP único (máx {{maxZipFiles}} archivos). Estos límites se pueden cambiar,",
-        "files_info_link": "consulte la documentación",
         "supported_formats": "Soportados: .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "Importe archivos HTML, Markdown, texto o JSON individuales, o un archivo ZIP que contenga varios archivos.<br><br>El título será creado automáticamente desde el nombre del archivo (sin la extensión), a menos que se defina una clave title en un front matter para archivos MD.<br><br><strong>Listas de tareas:</strong> Los archivos .json que contienen arrays de tareas y los archivos .md con sintaxis de checkbox (- [ ] o - [x]) se importan automáticamente como listas de tareas.",
-        "helper": "Puedes seleccionar múltiples archivos a la vez (máximo 50 archivos). Formatos soportados: .html, .md, .markdown, .txt, .json"
+        "helper": "Puedes seleccionar múltiples archivos a la vez (máximo 50 archivos). Formatos soportados: .html, .md, .markdown, .txt, .json",
+        "dropzone_title": "Suelte los archivos aquí o haga clic para examinar",
+        "clear_selection": "Quitar la selección",
+        "selected_count": "{{count}} archivos seleccionados",
+        "limits_info": "Hasta {{maxIndividualFiles}} archivos a la vez, o un archivo ZIP de hasta {{maxZipFiles}} archivos.",
+        "limits_change": "Cambiar los límites",
+        "tips_title": "Conviene saber",
+        "tip_front_matter": "Se lee el front matter de los archivos Markdown: título, etiquetas, favorito y las fechas de creación y de modificación."
       },
       "s3_restore": {
         "title": "Restaurar desde S3",
@@ -2764,7 +2768,6 @@
       "start_import": "Iniciar importación"
     },
     "drag_drop": {
-      "individual_notes": "Soltar archivos aquí",
       "complete_backup": "Soltar ZIP de respaldo aquí",
       "database": "Soltar archivo SQL aquí",
       "notes": "Soltar ZIP de notas aquí",

@@ -107,3 +107,215 @@
 .btn-with-margin-top {
     margin-top: 1rem;
 }
+
+/* Import notes form (?part=import): destination side by side, then a drop
+   zone, the limits and a "good to know" box. Its groups drop the padding
+   and frame drag-drop.css gives every .form-group, so fields, box and
+   button line up on one left edge; the drop zone draws its own drag state. */
+.import-notes-form .form-group {
+    padding: 0;
+    border: 0;
+    margin-bottom: 20px;
+}
+
+.import-notes-destination {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.import-dropzone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 28px 16px;
+    border: 2px dashed var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+}
+
+/* .form-group label is display:block with a bottom margin and bold text */
+.form-group label.import-dropzone {
+    display: flex;
+    margin-bottom: 0;
+    font-weight: var(--pz-weight-normal);
+}
+
+.import-dropzone:hover,
+.import-dropzone.drag-over,
+.import-dropzone:has(.import-dropzone-input:focus-visible) {
+    border-color: var(--pz-accent-text);
+    background: var(--pz-accent-soft);
+}
+
+.import-dropzone-icon {
+    width: 28px;
+    height: 28px;
+    background-color: var(--pz-accent-text);
+}
+
+.import-dropzone-title {
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-text);
+}
+
+.import-dropzone-hint {
+    font-size: 13px;
+    color: var(--pz-text-muted);
+}
+
+/* Kept in the DOM (and in the tab order) for the form and the browse
+   dialog, invisible over the zone */
+.import-dropzone-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.import-selection {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+}
+
+.import-selection[hidden] {
+    display: none;
+}
+
+.import-selection-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    background-color: var(--pz-text-muted);
+}
+
+.import-selection-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+
+.import-selection-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--pz-text);
+}
+
+.import-selection-meta {
+    font-size: 13px;
+    color: var(--pz-text-muted);
+}
+
+.import-selection-clear {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--pz-radius-sm);
+    background: transparent;
+    cursor: pointer;
+}
+
+.import-selection-clear .lucide {
+    width: 16px;
+    height: 16px;
+    background-color: var(--pz-text-muted);
+}
+
+.import-selection-clear:hover {
+    background: var(--pz-surface-hover);
+}
+
+/* The file limits, in a band of their own under the drop zone, with the
+   button that changes them on the admin's side */
+.import-limits {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px 12px;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--pz-accent) 30%, transparent);
+    border-radius: var(--pz-radius);
+    background: var(--pz-accent-soft);
+}
+
+.import-limits-icon {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    background-color: var(--pz-accent-text);
+}
+
+.import-limits-text {
+    font-size: 14px;
+    text-wrap: balance;
+    line-height: 1.5;
+    color: var(--pz-text);
+}
+
+.import-limits-btn.btn {
+    gap: 6px;
+    white-space: nowrap;
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.import-limits-btn .lucide {
+    width: 15px;
+    height: 15px;
+    background-color: currentColor;
+}
+
+.import-notes-tips {
+    margin-bottom: 24px;
+    padding: 12px 16px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-surface);
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--pz-text-muted);
+}
+
+.import-notes-tips-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-text);
+}
+
+.import-notes-tips-title .lucide {
+    width: 15px;
+    height: 15px;
+    background-color: var(--pz-text-muted);
+}
+
+.import-notes-tips ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.import-notes-tips li + li {
+    margin-top: 4px;
+}

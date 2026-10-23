@@ -3220,6 +3220,16 @@
         var importLimitsCard = document.getElementById('import-limits-card');
         if (importLimitsCard) {
             importLimitsCard.addEventListener('click', showImportLimitsModal);
+            // "Change the limits" link of the Import notes page: its #hash
+            // names the Storage & limits group, ?open= the dialog
+            if (new URLSearchParams(window.location.search || '').get('open') === 'import-limits') {
+                showImportLimitsModal();
+                if (window.history && typeof window.history.replaceState === 'function') {
+                    var importLimitsUrl = new URL(window.location.href);
+                    importLimitsUrl.searchParams.delete('open');
+                    window.history.replaceState(window.history.state, '', importLimitsUrl.toString());
+                }
+            }
         }
 
         // User quotas card - opens modal

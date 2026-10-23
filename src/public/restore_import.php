@@ -532,55 +532,81 @@ $s3RestoreContentOpen = $restoreImportPart === 'restore-s3' || $restoreImportPos
                 </div>
                 <div class="card-content<?php echo $restoreImportPart === 'import' ? ' open' : ''; ?>" id="individualNotesContent">
 
-            <form method="post" enctype="multipart/form-data" id="individualNotesForm">
+            <form method="post" enctype="multipart/form-data" id="individualNotesForm" class="import-notes-form">
                 <input type="hidden" name="action" value="import_individual_notes">
                 <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($restoreImportCsrfToken, ENT_QUOTES, 'UTF-8'); ?>">
-                
-                <div class="form-group form-group-spaced">
-                    <label for="target_workspace_select" class="form-label">
-                        1. <?php echo t_h('restore_import.sections.individual_notes.workspace', 'Target Workspace'); ?>
-                    </label>
-                    <select id="target_workspace_select" name="target_workspace" class="form-control form-select-styled" required>
-                        <option value=""><?php echo t_h('restore_import.sections.individual_notes.loading', 'Loading...'); ?></option>
-                    </select>
+
+                <div class="import-notes-destination">
+                    <div class="form-group">
+                        <label for="target_workspace_select" class="form-label">
+                            <?php echo t_h('restore_import.sections.individual_notes.workspace', [], 'Destination workspace'); ?>
+                        </label>
+                        <select id="target_workspace_select" name="target_workspace" class="form-control form-select-styled" required>
+                            <option value=""><?php echo t_h('restore_import.sections.individual_notes.loading', [], 'Loading...'); ?></option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="target_folder_select" class="form-label">
+                            <?php echo t_h('restore_import.sections.individual_notes.folder', [], 'Destination folder'); ?>
+                        </label>
+                        <select id="target_folder_select" name="target_folder" class="form-control form-select-styled">
+                            <option value=""><?php echo t_h('restore_import.sections.individual_notes.no_folder', [], 'No folder (root level)'); ?></option>
+                        </select>
+                    </div>
                 </div>
-                
-                <div class="form-group form-group-spaced">
-                    <label for="target_folder_select" class="form-label">
-                        2. <?php echo t_h('restore_import.sections.individual_notes.folder', 'Target Folder'); ?>
+
+                <div class="form-group">
+                    <span class="form-label"><?php echo t_h('restore_import.sections.individual_notes.select_files', [], 'Select files'); ?></span>
+                    <!-- The whole zone is the file input's label: a click
+                         browses, a drop fills the input (setupDragAndDrop) -->
+                    <label class="import-dropzone" for="individual_notes_files">
+                        <i class="lucide lucide-upload import-dropzone-icon" aria-hidden="true"></i>
+                        <span class="import-dropzone-title"><?php echo t_h('restore_import.sections.individual_notes.dropzone_title', [], 'Drop files here or click to browse'); ?></span>
+                        <span class="import-dropzone-hint"><?php echo t_h('restore_import.sections.individual_notes.supported_formats', [], 'Supported: .html, .md, .markdown, .txt, .json, .zip'); ?></span>
+                        <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.json,.zip" multiple required class="import-dropzone-input">
                     </label>
-                    <small class="form-text form-text-block form-text-danger">
-                        <?php echo t_h('restore_import.sections.individual_notes.frontmatter_warning', 'Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà'); ?>
-                    </small>
-                    <small class="form-text form-text-block form-text-info">
-                        <strong><?php echo t_h('restore_import.sections.individual_notes.zip_folders_info', 'ZIP avec structure de dossiers :'); ?></strong> <?php echo t_h('restore_import.sections.individual_notes.zip_folders_description', 'Si votre ZIP contient des dossiers, ils seront automatiquement créés comme folders dans Poznote, en préservant leur hiérarchie (sous-dossiers inclus).'); ?>
-                    </small>
-                    <select id="target_folder_select" name="target_folder" class="form-control form-select-styled">
-                        <option value=""><?php echo t_h('restore_import.sections.individual_notes.no_folder', 'No folder (root level)'); ?></option>
-                    </select>
+                    <div id="individualNotesSelection" class="import-selection" hidden>
+                        <i class="lucide lucide-file-text import-selection-icon" aria-hidden="true"></i>
+                        <span class="import-selection-text">
+                            <span class="import-selection-name" id="individualNotesSelectionName"></span>
+                            <span class="import-selection-meta" id="individualNotesSelectionMeta"></span>
+                        </span>
+                        <button type="button" class="import-selection-clear" data-action="clear-individual-notes-files" title="<?php echo t_h('restore_import.sections.individual_notes.clear_selection', [], 'Remove the selection'); ?>" aria-label="<?php echo t_h('restore_import.sections.individual_notes.clear_selection', [], 'Remove the selection'); ?>">
+                            <i class="lucide lucide-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <?php
+                    $maxIndividualFiles = (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50'));
+                    $maxZipFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
+                    ?>
+                    <div class="import-limits">
+                        <i class="lucide lucide-gauge import-limits-icon" aria-hidden="true"></i>
+                        <span class="import-limits-text"><?php echo t_h('restore_import.sections.individual_notes.limits_info', ['maxIndividualFiles' => $maxIndividualFiles, 'maxZipFiles' => $maxZipFiles], 'Up to {{maxIndividualFiles}} files at once, or one ZIP archive of up to {{maxZipFiles}} files.'); ?></span>
+                        <?php if (isCurrentUserAdmin()): ?>
+                        <!-- The limits are a safeguard an admin can raise:
+                             this opens their dialog in Settings -->
+                        <a class="btn btn-secondary import-limits-btn" href="settings.php?open=import-limits#section=<?php echo rawurlencode(POZNOTE_SETTINGS_ADMIN_SECTION); ?>&amp;group=storage-limits">
+                            <i class="lucide lucide-settings-2" aria-hidden="true"></i>
+                            <?php echo t_h('restore_import.sections.individual_notes.limits_change', [], 'Change the limits'); ?>
+                        </a>
+                        <?php endif; ?>
+                    </div>
                 </div>
-                
-                <div class="form-group form-group-spaced">
-                    <label for="individual_notes_files" class="form-label">
-                        3. <?php echo t_h('restore_import.sections.individual_notes.select_files', 'Select Files'); ?>
-                    </label>
-                    <small class="form-text text-muted form-text-muted-block">
-                        <span class="text-danger">
-                        <?php 
-                        $maxIndividualFiles = (int)(poznoteResolveGlobalSetting('import_max_individual_files', 'POZNOTE_IMPORT_MAX_INDIVIDUAL_FILES', '50'));
-                        $maxZipFiles = (int)(poznoteResolveGlobalSetting('import_max_zip_files', 'POZNOTE_IMPORT_MAX_ZIP_FILES', '300'));
-                        echo t_h('restore_import.sections.individual_notes.files_info', ['maxIndividualFiles' => $maxIndividualFiles, 'maxZipFiles' => $maxZipFiles], 'Multiple files (max {{maxIndividualFiles}}) or single ZIP archive (max {{maxZipFiles}} files). These limits can be changed,');
-                        echo ' <a href="https://github.com/timothepoznanski/poznote#import-individual-notes" target="_blank" rel="noopener">';
-                        echo t_h('restore_import.sections.individual_notes.files_info_link', 'see documentation');
-                        echo '</a>.';
-                        ?>
-                        </span><br>
-                        <?php echo t_h('restore_import.sections.individual_notes.supported_formats', 'Supported: .html, .md, .markdown, .txt, .zip'); ?>
-                    </small>
-                    <input type="file" id="individual_notes_files" name="individual_notes_files[]" accept=".html,.md,.markdown,.txt,.json,.zip" multiple required class="form-file-input">
+
+                <div class="import-notes-tips">
+                    <div class="import-notes-tips-title">
+                        <i class="lucide lucide-info" aria-hidden="true"></i>
+                        <?php echo t_h('restore_import.sections.individual_notes.tips_title', [], 'Good to know'); ?>
+                    </div>
+                    <ul>
+                        <li><?php echo t_h('restore_import.sections.individual_notes.zip_folders_description', [], 'If your ZIP contains folders, they will be automatically created as folders in Poznote, preserving their hierarchy (subfolders included).'); ?></li>
+                        <li><?php echo t_h('restore_import.sections.individual_notes.tip_front_matter', [], 'The front matter of Markdown files is read: title, tags, favorite, and the created and updated dates.'); ?></li>
+                        <li><?php echo t_h('restore_import.sections.individual_notes.frontmatter_warning', [], 'A folder key in the front matter of a Markdown file takes precedence over the destination folder. That folder must already exist, otherwise the note is created at the root of the workspace.'); ?></li>
+                    </ul>
                 </div>
-                
-                <button type="button" class="btn btn-primary btn-with-margin-top" data-action="show-individual-notes-import-confirmation" id="individualNotesImportBtn">
+
+                <button type="button" class="btn btn-primary" data-action="show-individual-notes-import-confirmation" id="individualNotesImportBtn">
                     <?php echo t_h('restore_import.buttons.start_import', 'Start Import'); ?>
                 </button>
                 

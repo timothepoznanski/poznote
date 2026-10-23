@@ -2740,16 +2740,20 @@
         "loading": "Laden...",
         "folder": "Zielordner",
         "optional": "optional",
-        "frontmatter_warning": "Wenn eine MD-Notiz einen Ordnerschlüssel in einem Front-Matter enthält, überschreibt dieser Wert den unten ausgewählten. Sie müssen daher zunächst sicherstellen, dass der Ordner bereits existiert, andernfalls wird die Notiz im Wurzelverzeichnis des Arbeitsbereichs erstellt.",
-        "zip_folders_info": "ZIP mit Ordnerstruktur:",
+        "frontmatter_warning": "Ein folder-Schlüssel im Front-Matter einer Markdown-Datei hat Vorrang vor dem Zielordner. Dieser Ordner muss bereits existieren, sonst wird die Notiz im Stammverzeichnis des Arbeitsbereichs erstellt.",
         "zip_folders_description": "Wenn Ihre ZIP-Datei Ordner enthält, werden diese automatisch als Ordner in Poznote erstellt und ihre Hierarchie (einschließlich Unterordner) beibehalten.",
         "no_folder": "Kein Ordner (Root-Ebene)",
         "select_files": "Dateien auswählen",
-        "files_info": "Mehrere Dateien (max {{maxIndividualFiles}}) oder einzelnes ZIP-Archiv (max {{maxZipFiles}} Dateien). Diese Limits können geändert werden,",
-        "files_info_link": "siehe Dokumentation",
         "supported_formats": "Unterstützt: .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "Importieren Sie einzelne HTML-, Markdown-, Text- oder JSON-Dateien oder ein ZIP-Archiv mit mehreren Dateien.<br><br>Der Titel wird automatisch aus dem Dateinamen erstellt (ohne Erweiterung), es sei denn, ein Titelschlüssel ist in einem Front-Matter für MD-Dateien definiert.<br><br><strong>Aufgabenlisten:</strong> .json-Dateien mit Aufgaben-Arrays und .md-Dateien mit Checkbox-Syntax (- [ ] oder - [x]) werden automatisch als Aufgabenlisten importiert.",
-        "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown, .txt, .json"
+        "helper": "Sie können mehrere Dateien auf einmal auswählen (Maximum 50 Dateien). Unterstützte Formate: .html, .md, .markdown, .txt, .json",
+        "dropzone_title": "Dateien hier ablegen oder zum Durchsuchen klicken",
+        "clear_selection": "Auswahl entfernen",
+        "selected_count": "{{count}} Dateien ausgewählt",
+        "limits_info": "Bis zu {{maxIndividualFiles}} Dateien auf einmal oder ein ZIP-Archiv mit höchstens {{maxZipFiles}} Dateien.",
+        "limits_change": "Limits ändern",
+        "tips_title": "Gut zu wissen",
+        "tip_front_matter": "Das Front-Matter von Markdown-Dateien wird gelesen: Titel, Tags, Favorit sowie Erstellungs- und Änderungsdatum."
       },
       "s3_restore": {
         "title": "Aus S3 wiederherstellen",
@@ -2764,7 +2768,6 @@
       "start_import": "Import starten"
     },
     "drag_drop": {
-      "individual_notes": "Dateien hier ablegen",
       "complete_backup": "Sicherungs-ZIP hier ablegen",
       "database": "SQL-Datei hier ablegen",
       "notes": "Notizen-ZIP hier ablegen",

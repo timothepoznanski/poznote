@@ -2745,16 +2745,20 @@
         "loading": "Chargement...",
         "folder": "Dossier cible",
         "optional": "optionnel",
-        "frontmatter_warning": "Si une note MD contient une clé folder dans un front matter, cette valeur écrasera celle sélectionnée ci-dessous. Il faut donc avant tout vous assurer que le dossier existe déjà, sinon la note sera créée à la racine du workspace.",
-        "zip_folders_info": "ZIP avec structure de dossiers :",
+        "frontmatter_warning": "Une clé folder dans le front matter d'un fichier Markdown l'emporte sur le dossier de destination. Ce dossier doit déjà exister, sinon la note est créée à la racine de l'espace de travail.",
         "zip_folders_description": "Si votre ZIP contient des dossiers, ils seront automatiquement créés comme folders dans Poznote, en préservant leur hiérarchie (sous-dossiers inclus).",
         "no_folder": "Aucun dossier (racine)",
         "select_files": "Sélectionner les fichiers",
-        "files_info": "Plusieurs fichiers (max {{maxIndividualFiles}}) ou archive ZIP unique (max {{maxZipFiles}} fichiers). Ces limites sont modifiables,",
-        "files_info_link": "voir la documentation",
         "supported_formats": "Formats supportés : .html, .md, .markdown, .txt, .json, .zip",
         "description_html": "Importez des fichiers HTML, Markdown, texte ou JSON individuels, ou une archive ZIP contenant plusieurs fichiers.<br><br>Le titre sera automatiquement créé à partir du nom de fichier (sans l'extension), sauf si une clé title est définie dans un front matter pour les fichiers MD.<br><br><strong>Tasklists :</strong> Les fichiers .json contenant des tableaux de tâches et les fichiers .md avec syntaxe checkbox (- [ ] ou - [x]) sont automatiquement importés comme listes de tâches.",
-        "helper": "Vous pouvez sélectionner plusieurs fichiers à la fois (maximum 50 fichiers). Formats pris en charge : .html, .md, .markdown, .txt, .json"
+        "helper": "Vous pouvez sélectionner plusieurs fichiers à la fois (maximum 50 fichiers). Formats pris en charge : .html, .md, .markdown, .txt, .json",
+        "dropzone_title": "Déposez les fichiers ici ou cliquez pour parcourir",
+        "clear_selection": "Retirer la sélection",
+        "selected_count": "{{count}} fichiers sélectionnés",
+        "limits_info": "Jusqu'à {{maxIndividualFiles}} fichiers à la fois, ou une archive ZIP de {{maxZipFiles}} fichiers au plus.",
+        "limits_change": "Modifier les limites",
+        "tips_title": "Bon à savoir",
+        "tip_front_matter": "Le front matter des fichiers Markdown est lu : titre, tags, favori, ainsi que les dates de création et de modification."
       },
       "s3_restore": {
         "title": "Restauration depuis S3",
@@ -2826,7 +2830,6 @@
       }
     },
     "drag_drop": {
-      "individual_notes": "Déposer les fichiers ici",
       "complete_backup": "Déposer le ZIP de sauvegarde ici",
       "database": "Déposer le fichier SQL ici",
       "notes": "Déposer le ZIP de notes ici",
