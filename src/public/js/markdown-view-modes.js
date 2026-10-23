@@ -1340,7 +1340,22 @@ function _mdSetLiveSyntax(shown) {
 
 // The four views of a Markdown note, in the order their button of the
 // floating stack goes through them: classic (the preview, with the pencil to
-// edit), live preview, rich text, split view. A phone has no split view.
+// edit), live preview, rich text, split view. The account picks the ones
+// after classic in Settings > Markdown (markdown_view_cycle, discussion 1677,
+// <body data-markdown-view-cycle>); a view left out is skipped, and the
+// button still leaves it when the note is in it. A phone has no split view.
+var MARKDOWN_CYCLE_VIEWS = ['live', 'rich', 'split'];
+
+function _mdGetViewCycle() {
+    var value = document.body ? document.body.getAttribute('data-markdown-view-cycle') : null;
+    if (value === null || value === '') return MARKDOWN_CYCLE_VIEWS.slice();
+    if (value === 'none') return [];
+    var chosen = value.split(',');
+    return MARKDOWN_CYCLE_VIEWS.filter(function (view) {
+        return chosen.indexOf(view) !== -1;
+    });
+}
+
 function getNextMarkdownViewState(state) {
     var isMobileViewport = false;
     try {
@@ -1348,9 +1363,13 @@ function getNextMarkdownViewState(state) {
     } catch (e) {
         isMobileViewport = false;
     }
-    if (state === 'classic') return 'live';
-    if (state === 'live') return 'rich';
-    if (state === 'rich' && !isMobileViewport) return 'split';
+    var cycle = _mdGetViewCycle().filter(function (view) {
+        return view !== 'split' || !isMobileViewport;
+    });
+    var position = MARKDOWN_CYCLE_VIEWS.indexOf(state);
+    for (var i = 0; i < cycle.length; i++) {
+        if (MARKDOWN_CYCLE_VIEWS.indexOf(cycle[i]) > position) return cycle[i];
+    }
     return 'classic';
 }
 
@@ -1379,13 +1398,15 @@ function cycleMarkdownView(noteId) {
     var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
     var mode = viewModeBtn ? viewModeBtn.getAttribute('data-current-mode') : '';
 
-    if (next === 'rich') {
-        // Same editor, the syntax no longer comes back under the caret
-        _mdSetLiveSyntax(false);
-        if (mode) updateViewModeButton(noteId, mode);
-    } else if (next === 'live') {
+    // Leaving the classic view: note where it started, preview or editor
+    if (current === 'classic' && next !== 'classic') {
         noteEntry.setAttribute('data-markdown-classic-mode', mode === 'edit' ? 'edit' : 'preview');
-        _mdSetLiveSyntax(true);
+    }
+
+    if (next === 'live' || next === 'rich') {
+        // Live preview brings the syntax back under the caret, rich text
+        // never shows it; both draw in the same editor
+        _mdSetLiveSyntax(next === 'live');
         _mdSetLiveEditing(true);
         if (mode === 'preview') {
             // The editor is the place to be now, see _mdIsLiveEditing()

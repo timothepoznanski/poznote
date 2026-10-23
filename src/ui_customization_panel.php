@@ -153,7 +153,10 @@ require_once __DIR__ . '/markdown_syntax_content.php';
              editor. Hidden until a Markdown note is open. All from
              js/ui-customization-panel.js; the cycle itself is
              cycleMarkdownView() in js/markdown-view-modes.js. A phone has no
-             split view and goes classic, live preview, rich text, classic. -->
+             split view and goes classic, live preview, rich text, classic.
+             Settings > Markdown > View button leaves views out of the cycle
+             (markdown_view_cycle, discussion 1677); with none left the
+             button is hidden. -->
         <button type="button" id="edgeSplitViewBtn" class="pz-edge-btn pz-edge-view-btn" data-action="cycle-markdown-view" hidden
             data-label-live="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live preview'); ?>"
             data-label-rich="<?php echo t_h('editor.toolbar.view_cycle_rich', [], 'Switch to rich text'); ?>"

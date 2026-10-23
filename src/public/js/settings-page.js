@@ -114,6 +114,7 @@
             'markdown_editor_word_wrap',
             'markdown_default_view_mode',
             'markdown_new_note_view_mode',
+            'markdown_view_cycle',
             'markdown_colored',
             'markdown_colored_custom',
             'code_block_word_wrap',
@@ -521,6 +522,39 @@
         };
     }
 
+    // Views the view button of a Markdown note goes through after the classic
+    // one (markdown_view_cycle, discussion 1677): one box per view, saved on
+    // each change as "live,rich,split" or a part of it, "none" when no box is
+    // ticked. Never saved: every view.
+    function initMarkdownViewCycleChecks() {
+        var group = document.getElementById('markdown-view-cycle-checks');
+        if (!group) return;
+        var boxes = Array.prototype.slice.call(group.querySelectorAll('input[type="checkbox"]'));
+
+        function load() {
+            getSetting('markdown_view_cycle', function (value) {
+                value = String(value === null || value === undefined ? '' : value).trim();
+                var chosen = value === '' ? ['live', 'rich', 'split'] : value.split(',');
+                boxes.forEach(function (box) {
+                    box.checked = chosen.indexOf(box.value) !== -1;
+                });
+            });
+        }
+
+        boxes.forEach(function (box) {
+            box.addEventListener('change', function () {
+                var chosen = boxes.filter(function (b) { return b.checked; }).map(function (b) { return b.value; });
+                saveSettingValue('markdown_view_cycle')(chosen.length ? chosen.join(',') : 'none', function (success) {
+                    if (success) return;
+                    alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
+                    load();
+                });
+            });
+        });
+
+        load();
+    }
+
     // Slash menu trigger: the key that opens the command menu, "/", "Alt + /"
     // or none, set apart for a computer (slash_menu_trigger) and a mobile
     // screen (slash_menu_trigger_mobile). "Disabled" only silences the
@@ -721,6 +755,8 @@
             }),
             save: saveSettingValue('markdown_new_note_view_mode')
         });
+
+        initMarkdownViewCycleChecks();
 
         initInlineControl('slash-menu-trigger-select', {
             load: loadSettingValue('slash_menu_trigger', normalizeSlashMenuTrigger),

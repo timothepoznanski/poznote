@@ -125,6 +125,7 @@ $settingsPageUserKeys = [
     'markdown_editor_word_wrap',
     'markdown_default_view_mode',
     'markdown_new_note_view_mode',
+    'markdown_view_cycle',
     'markdown_colored',
     'markdown_colored_custom',
     'code_block_word_wrap',
@@ -1363,6 +1364,20 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                         <option value="live"><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live preview'); ?></option>
                         <option value="rich"><?php echo t_h('modals.markdown_default_view_mode.options.rich', [], 'Rich text'); ?></option>
                     </select>
+                </div>
+            </div>
+
+            <!-- Views the view button goes through after the classic one (discussion 1677) -->
+            <div class="home-card settings-inline-card settings-card-stacks" id="markdown-view-cycle-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_view_cycle', [], 'Choose the views the view button of a markdown note goes through after the classic view (preview, with the pencil to edit). The views left out are skipped. With none chosen, the button is hidden. On a phone the button never goes to split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-repeat"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title" id="markdown-view-cycle-title"><?php echo t_h('display.cards.markdown_view_cycle', [], 'View button'); ?></span>
+                    <div class="settings-inline-control settings-inline-checks" id="markdown-view-cycle-checks" role="group" aria-labelledby="markdown-view-cycle-title">
+                        <label><input type="checkbox" value="live" checked><span><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live preview'); ?></span></label>
+                        <label><input type="checkbox" value="rich" checked><span><?php echo t_h('modals.markdown_default_view_mode.options.rich', [], 'Rich text'); ?></span></label>
+                        <label><input type="checkbox" value="split" checked><span><?php echo t_h('modals.markdown_default_view_mode.options.split_short', [], 'Split'); ?></span></label>
+                    </div>
                 </div>
             </div>
 

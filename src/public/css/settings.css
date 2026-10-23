@@ -1770,6 +1770,10 @@ html[data-theme='dark'] body:has(> .settings-shell.settings-subpage) {
     .settings-with-nav .settings-card-stacks .home-card-content > .settings-inline-control {
         margin-left: 0;
     }
+
+    .settings-with-nav .settings-card-stacks .settings-inline-checks {
+        justify-content: flex-start;
+    }
 }
 
 /* A line of explanation under the title and the control, across the row
@@ -1818,6 +1822,31 @@ html[data-theme='dark'] body:has(> .settings-shell.settings-subpage) {
     outline: none;
     border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
+}
+
+/* A few boxes ticked in the row (Markdown > View button): the labels keep
+   the select's size, the boxes the accent colour */
+.settings-inline-checks {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px 14px;
+    font-size: calc(13px * var(--settings-font-scale, 1));
+    color: var(--pz-text);
+}
+
+.settings-inline-checks label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.settings-inline-checks input[type="checkbox"] {
+    margin: 0;
+    accent-color: var(--pz-accent);
+    cursor: pointer;
 }
 
 .settings-inline-range {

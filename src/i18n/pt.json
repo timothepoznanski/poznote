@@ -525,7 +525,8 @@
       "whats_new": "Após uma atualização, mostrar uma vez as notas da nova versão ao abrir as suas notas.",
       "login_disabled": "Ignora a tela de login: qualquer navegador que chegue a esta instância abre diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Ative apenas se só você consegue acessar esta instância, ou se um proxy reverso à frente dela cuida da autenticação. A API continua pedindo credenciais.",
       "outbound_hosts": "Os webhooks, os servidores pessoais de IA, transcrição e MCP e o Git Sync dos utilizadores não administradores só alcançam hosts públicos da Internet. Indique aqui os hosts e redes locais que podem usar, como um servidor Ollama ou n8n na sua rede. Os administradores não têm limites.",
-      "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo."
+      "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo.",
+      "markdown_view_cycle": "Escolha as visualizações que o botão de visualização de uma nota markdown percorre depois da visualização clássica (pré-visualização, com o lápis para editar). As visualizações não escolhidas são ignoradas. Se nenhuma for escolhida, o botão fica oculto. Num telemóvel o botão nunca passa ao modo dividido."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -891,7 +892,8 @@
       "sidebar_offline_marks": "Mostrar o ponto offline",
       "format_toolbar_mode": "Barra de formatação",
       "workspace_activity_emails": "E-mails de espaços compartilhados",
-      "diary_template": "Modelo de entrada do diário"
+      "diary_template": "Modelo de entrada do diário",
+      "markdown_view_cycle": "Botão de visualização"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",

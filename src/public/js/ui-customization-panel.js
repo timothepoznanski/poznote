@@ -402,6 +402,9 @@
             var nextState = typeof window.getNextMarkdownViewState === 'function'
                 ? window.getNextMarkdownViewState(viewState)
                 : 'classic';
+            // No view chosen after the classic one (Settings > Markdown, or
+            // only the split view on a phone): nowhere to go, no button
+            var hasNoCycle = viewState === 'classic' && nextState === 'classic';
             // Leaving the cycle goes back to where it started: the preview, or
             // the classic editor when the pencil was on
             if (nextState === 'classic') {
@@ -412,7 +415,7 @@
             var viewLabel = viewButton.getAttribute('data-label-' + nextState) || '';
             var viewIcon = viewButton.querySelector('i');
 
-            viewButton.hidden = !isMarkdown;
+            viewButton.hidden = !isMarkdown || hasNoCycle;
             viewButton.classList.toggle('is-active', viewState !== 'classic');
             viewButton.setAttribute('data-view-state', viewState);
             viewButton.setAttribute('data-note-id', noteId);
