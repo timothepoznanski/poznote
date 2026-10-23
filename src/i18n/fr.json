@@ -4850,7 +4850,18 @@
     "instructions_saved": "Instructions personnalisées enregistrées.",
     "messages": {
       "incomplete": "Renseignez une URL de serveur et un modèle avant d'activer votre propre assistant."
-    }
+    },
+    "prompts_title": "Prompts enregistrés",
+    "prompts_description": "Les prompts que vous envoyez souvent, choisis depuis le bouton éclair à côté de la saisie du chat et envoyés en un clic. Contrairement aux instructions personnalisées, un prompt n'est envoyé que lorsque vous le choisissez. Videz un texte pour supprimer son prompt.",
+    "prompts_saved": "Prompts enregistrés mis à jour.",
+    "prompt_new": "Nouveau prompt",
+    "prompt_title_label": "Nom",
+    "prompt_title_placeholder": "Nom, par exemple : Vérifier la grammaire",
+    "prompt_text_label": "Prompt",
+    "prompt_text_placeholder": "Prompt, par exemple : Vérifie la grammaire et la structure de cette note et propose des améliorations.",
+    "prompt_remove": "Supprimer ce prompt",
+    "prompt_add": "Ajouter un prompt",
+    "prompts_save": "Enregistrer les prompts"
   },
   "ai_mcp": {
     "title": "Outils externes",
@@ -4955,7 +4966,10 @@
     "open_dashboard": "Ouvrir le tableau de bord",
     "workspace_info_text_notes": "Ici, l'assistant travaille uniquement dans l'espace de travail courant. Pour chercher dans plusieurs espaces de travail à la fois, ouvrez le tableau de bord et sélectionnez-les dans le menu en haut : l'assistant cherche et lit alors dans tous, en lecture seule.",
     "workspace_info_text_dashboard": "Ici, l'assistant travaille uniquement dans cet espace de travail. Sélectionnez plusieurs espaces de travail dans le menu en haut du tableau de bord : l'assistant cherche et lit alors dans tous à la fois, en lecture seule.",
-    "workspace_info_text_multi": "L'assistant cherche et lit les notes de tous les espaces de travail affichés sur ce tableau de bord. Il n'y modifie rien : pour changer une note, ouvrez-la ou ouvrez son espace de travail et demandez-le là. Le menu en haut du tableau de bord choisit les espaces de travail."
+    "workspace_info_text_multi": "L'assistant cherche et lit les notes de tous les espaces de travail affichés sur ce tableau de bord. Il n'y modifie rien : pour changer une note, ouvrez-la ou ouvrez son espace de travail et demandez-le là. Le menu en haut du tableau de bord choisit les espaces de travail.",
+    "saved_prompts": "Prompts enregistrés",
+    "saved_prompts_empty": "Aucun prompt enregistré pour l'instant. Enregistrez les prompts que vous envoyez souvent pour les envoyer en un clic.",
+    "saved_prompts_manage": "Gérer les prompts enregistrés"
   },
   "stt_settings": {
     "title": "Transcription",

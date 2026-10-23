@@ -96,6 +96,10 @@ Chaque requête porte aussi `User-Agent: Poznote/<version>`, afin que les journa
 
 Chaque utilisateur peut donner à l'assistant des instructions permanentes dans **Paramètres → Mon assistant IA → Instructions personnalisées**, par exemple « Quand tu écris une note en anglais, ajoute sa traduction en russe en dessous, et inversement ». Le texte (4000 caractères au maximum) est envoyé au modèle avec chaque message, quelle que soit la configuration qui répond, celle de l'instance ou la vôtre. Utilisez-le pour des préférences durables comme le ton, la langue ou le format des notes que l'assistant écrit. Il ne change pas ce que l'assistant a le droit de faire : les notes ne sont toujours modifiées que lorsque vous le demandez. Laissez le champ vide pour ne rien envoyer.
 
+## Prompts enregistrés
+
+Les prompts que vous envoyez souvent, comme « Vérifie la grammaire et la structure de cette note et propose des améliorations » ou « Quelles questions de suivi devrais-je poser ? », peuvent être enregistrés dans **Paramètres → Mon assistant IA → Prompts enregistrés** : un nom et un texte pour chacun, jusqu'à 30 prompts. Dans le chat, le bouton éclair à côté de la saisie les affiche, et un clic sur l'un d'eux envoie son texte comme votre message, à propos de la note ouverte quand il parle de « cette note ». Ce que vous étiez en train de taper reste dans la saisie. Contrairement aux instructions personnalisées, un prompt enregistré n'est envoyé que lorsque vous le choisissez. **Gérer les prompts enregistrés**, en bas de la liste, ouvre les paramètres. Pour supprimer un prompt, cliquez sur sa corbeille ou videz son texte, puis enregistrez.
+
 ## Outils externes (serveurs MCP)
 
 L'assistant peut appeler des outils proposés par des serveurs [MCP](https://modelcontextprotocol.io) distants en plus des siens, par exemple un service de recherche web, pour aller chercher des informations à jour avant de répondre ou d'écrire une note. C'est le sens inverse du [serveur MCP de Poznote](MCP-SERVER.fr.md), qui permet à d'autres assistants d'accéder à vos notes.

@@ -12,6 +12,10 @@
  * #1611), a globe button next to the input turns them on and off; the choice
  * is remembered and travels with every message.
  *
+ * A lightning button opens the prompts the user saved in the settings
+ * (discussion #1678): picking one sends it as a message, and whatever is
+ * typed in the input stays there.
+ *
  * On desktop the panel is docked as the rightmost column of the page (like
  * the outline panel), resizable by its left edge, and its open state and
  * width survive reloads. On phones it overlays the page.
@@ -807,6 +811,7 @@
         if (!p) return;
         p.classList.toggle('ai-chat-open', open);
         document.documentElement.classList.remove('ai-chat-open');
+        if (!open) setPromptsMenuOpen(false);
         if (isDesktop()) {
             try { localStorage.setItem(OPEN_KEY, open ? 'true' : 'false'); } catch (e) { /* ignore */ }
         }
@@ -944,19 +949,47 @@
         updateWorkspaceIndicator();
     }
 
+    function promptsMenu() { return document.getElementById('ai-chat-prompts'); }
+
+    function isPromptsMenuOpen() {
+        var menu = promptsMenu();
+        return !!menu && !menu.hidden;
+    }
+
+    function setPromptsMenuOpen(open) {
+        var menu = promptsMenu();
+        if (!menu) return;
+        menu.hidden = !open;
+        var btn = document.getElementById('ai-chat-prompts-btn');
+        if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+            var first = menu.querySelector('.ai-chat-prompt, .ai-chat-prompts-manage');
+            if (first) first.focus();
+        }
+    }
+
+    /** Send a saved prompt picked in the menu, as a message of its own. */
+    function sendSavedPrompt(text) {
+        setPromptsMenuOpen(false);
+        if (streaming || !text) return;
+        send(text, true);
+    }
+
     /**
      * Send the input field, or, when retryText is given, send that text
      * again after a failed turn: its bubble is still on screen, only the
-     * conversation entry (dropped by finish()) is put back.
+     * conversation entry (dropped by finish()) is put back. With fresh,
+     * the given text is a new message (a saved prompt) and the input field
+     * is left as it is.
      */
-    function send(retryText) {
+    function send(retryText, fresh) {
         if (streaming) {
             if (abortController) abortController.abort();
             return;
         }
-        var isRetry = typeof retryText === 'string';
+        var isRetry = typeof retryText === 'string' && !fresh;
         var text;
-        if (isRetry) {
+        if (typeof retryText === 'string') {
             text = retryText;
         } else {
             var input = document.getElementById('ai-chat-input');
@@ -1141,6 +1174,21 @@
                 setHistoryOpen(!isHistoryOpen());
                 return;
             }
+            if (e.target.closest('[data-action="ai-chat-prompts"]')) {
+                e.preventDefault();
+                setPromptsMenuOpen(!isPromptsMenuOpen());
+                return;
+            }
+            var promptBtn = e.target.closest('[data-action="ai-chat-prompt"]');
+            if (promptBtn) {
+                e.preventDefault();
+                sendSavedPrompt(promptBtn.getAttribute('data-prompt') || '');
+                return;
+            }
+            // A click anywhere else closes the menu
+            if (isPromptsMenuOpen() && !e.target.closest('#ai-chat-prompts')) {
+                setPromptsMenuOpen(false);
+            }
             if (e.target.closest('[data-action="ai-chat-external"]')) {
                 e.preventDefault();
                 toggleExternalTools();
@@ -1162,6 +1210,11 @@
         });
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && isWorkspaceInfoOpen()) setWorkspaceInfoOpen(false);
+            if (e.key === 'Escape' && isPromptsMenuOpen()) {
+                setPromptsMenuOpen(false);
+                var promptsBtn = document.getElementById('ai-chat-prompts-btn');
+                if (promptsBtn) promptsBtn.focus();
+            }
         });
 
         if (window.PoznotePanelBack) {

@@ -1608,6 +1608,81 @@ html[data-theme='dark'] body:has(> .settings-shell.settings-subpage) {
     background-color: var(--pz-text-subtle);
 }
 
+/* Foldable boxes of the pages (js/settings-boxes.js): the title of a box
+   folds it, a chevron on the right says which way. Folded, the box is its
+   title alone: no underline, no space under it, a tighter padding. */
+.settings-box > .settings-box-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Open, the title's click area takes in the box's padding above and beside
+   it (js/settings-boxes.js sets the three values): the whole top band of the
+   box folds it. Folded, the box itself is the click area. */
+.settings-box > .settings-box-header::after {
+    content: '';
+    position: absolute;
+    top: calc(-1 * var(--settings-box-pad-top, 0px));
+    left: calc(-1 * var(--settings-box-pad-left, 0px));
+    right: calc(-1 * var(--settings-box-pad-right, 0px));
+    bottom: 0;
+}
+
+.settings-box.settings-box-collapsed > .settings-box-header::after {
+    display: none;
+}
+
+.settings-box-toggle {
+    position: relative; /* above the click area of its title */
+    z-index: 1;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    padding: 2px;
+    border: none;
+    background: none;
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.settings-box-header:hover .settings-box-toggle,
+.settings-box-collapsed:hover .settings-box-toggle {
+    color: var(--pz-text);
+}
+
+/* Wins over the accent colour and width the boxes give their title icon */
+.settings-box-toggle .lucide {
+    width: 18px;
+    height: 18px;
+    color: inherit;
+    transition: transform 0.15s ease;
+}
+
+.settings-box.settings-box-collapsed > h2.settings-box-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.settings-box.settings-box-collapsed > h2.settings-box-header .settings-box-toggle .lucide {
+    transform: rotate(-90deg);
+}
+
+.settings-box.settings-box-collapsed > .settings-box-body {
+    display: none;
+}
+
+.settings-box.settings-box-collapsed {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    cursor: pointer;
+}
+
 /* Most pages go without the panel (settings_shell.php, 'panel' is off by
    default): they are made of framed blocks already, and a frame around
    frames adds nothing. Two classes, so it also wins over the narrow-screen

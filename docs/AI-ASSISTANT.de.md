@@ -96,6 +96,10 @@ Jede Anfrage trägt außerdem `User-Agent: Poznote/<version>`, damit die Protoko
 
 Jeder Benutzer kann dem Assistenten unter **Einstellungen → Mein KI-Assistent → Eigene Anweisungen** dauerhafte Anweisungen geben, zum Beispiel „Wenn du eine Notiz auf Englisch schreibst, füge darunter die russische Übersetzung hinzu, und umgekehrt“. Der Text (bis zu 4000 Zeichen) wird mit jeder Nachricht an das Modell gesendet, unabhängig davon, welche Konfiguration antwortet, die der Instanz oder Ihre eigene. Nutzen Sie ihn für dauerhafte Vorgaben wie Ton, Sprache oder das Format der Notizen, die der Assistent schreibt. Er ändert nicht, was der Assistent tun darf: Notizen werden weiterhin nur geändert, wenn Sie darum bitten. Lassen Sie das Feld leer, um nichts zu senden.
 
+## Gespeicherte Prompts
+
+Prompts, die Sie oft senden, etwa „Prüfe Grammatik und Aufbau dieser Notiz und schlage Verbesserungen vor“ oder „Welche Folgefragen sollte ich stellen?“, lassen sich unter **Einstellungen → Mein KI-Assistent → Gespeicherte Prompts** speichern: ein Name und ein Text für jeden, bis zu 30 Prompts. Im Chat öffnet der Blitz-Button neben der Eingabe die Liste, und ein Klick auf einen Prompt sendet seinen Text als Ihre Nachricht, bezogen auf die geöffnete Notiz, wenn er von „dieser Notiz“ spricht. Was Sie gerade tippen, bleibt in der Eingabe. Anders als die eigenen Anweisungen wird ein gespeicherter Prompt nur gesendet, wenn Sie ihn auswählen. **Gespeicherte Prompts verwalten** unten in der Liste öffnet die Einstellungen. Um einen Prompt zu entfernen, klicken Sie auf seinen Papierkorb oder leeren Sie seinen Text, und speichern Sie dann.
+
 ## Externe Tools (MCP-Server)
 
 Der Assistent kann neben seinen eigenen Tools auch Tools aufrufen, die entfernte [MCP](https://modelcontextprotocol.io)-Server anbieten, zum Beispiel einen Websuchdienst, um aktuelle Informationen nachzuschlagen, bevor er antwortet oder eine Notiz schreibt. Das ist die umgekehrte Richtung des [Poznote-MCP-Servers](MCP-SERVER.de.md), über den andere Assistenten auf Ihre Notizen zugreifen.

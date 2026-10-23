@@ -4745,7 +4745,18 @@
     "instructions_saved": "Eigene Anweisungen gespeichert.",
     "messages": {
       "incomplete": "Geben Sie eine Server-URL und ein Modell an, bevor Sie Ihren eigenen Assistenten aktivieren."
-    }
+    },
+    "prompts_title": "Gespeicherte Prompts",
+    "prompts_description": "Prompts, die Sie oft senden, ausgewählt über den Blitz-Button neben der Chat-Eingabe und mit einem Klick gesendet. Anders als die eigenen Anweisungen wird ein Prompt nur gesendet, wenn Sie ihn auswählen. Leeren Sie einen Text, um seinen Prompt zu entfernen.",
+    "prompts_saved": "Gespeicherte Prompts aktualisiert.",
+    "prompt_new": "Neuer Prompt",
+    "prompt_title_label": "Name",
+    "prompt_title_placeholder": "Name, zum Beispiel: Grammatik prüfen",
+    "prompt_text_label": "Prompt",
+    "prompt_text_placeholder": "Prompt, zum Beispiel: Prüfe Grammatik und Aufbau dieser Notiz und schlage Verbesserungen vor.",
+    "prompt_remove": "Diesen Prompt entfernen",
+    "prompt_add": "Prompt hinzufügen",
+    "prompts_save": "Prompts speichern"
   },
   "ai_mcp": {
     "title": "Externe Tools",
@@ -4850,7 +4861,10 @@
     "open_dashboard": "Dashboard öffnen",
     "workspace_info_text_notes": "Hier arbeitet der Assistent nur im aktuellen Arbeitsbereich. Um mehrere Arbeitsbereiche auf einmal zu durchsuchen, öffnen Sie das Dashboard und wählen Sie sie im Menü oben aus: Der Assistent durchsucht und liest dann alle, nur lesend.",
     "workspace_info_text_dashboard": "Hier arbeitet der Assistent nur in diesem Arbeitsbereich. Wählen Sie im Menü oben im Dashboard mehrere Arbeitsbereiche aus: Der Assistent durchsucht und liest dann alle auf einmal, nur lesend.",
-    "workspace_info_text_multi": "Der Assistent durchsucht und liest die Notizen aller Arbeitsbereiche dieses Dashboards. Er ändert hier nichts: Um eine Notiz zu bearbeiten, öffnen Sie sie oder ihren Arbeitsbereich und fragen Sie dort. Das Menü oben im Dashboard legt die Arbeitsbereiche fest."
+    "workspace_info_text_multi": "Der Assistent durchsucht und liest die Notizen aller Arbeitsbereiche dieses Dashboards. Er ändert hier nichts: Um eine Notiz zu bearbeiten, öffnen Sie sie oder ihren Arbeitsbereich und fragen Sie dort. Das Menü oben im Dashboard legt die Arbeitsbereiche fest.",
+    "saved_prompts": "Gespeicherte Prompts",
+    "saved_prompts_empty": "Noch keine gespeicherten Prompts. Speichern Sie Prompts, die Sie oft senden, um sie mit einem Klick zu senden.",
+    "saved_prompts_manage": "Gespeicherte Prompts verwalten"
   },
   "stt_settings": {
     "title": "Transkription",

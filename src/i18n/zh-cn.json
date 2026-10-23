@@ -4842,7 +4842,18 @@
     "instructions_saved": "自定义指令已保存。",
     "messages": {
       "incomplete": "启用你自己的助手前，请填写服务器 URL 和模型。"
-    }
+    },
+    "prompts_title": "已保存的提示词",
+    "prompts_description": "常用的提示词：在聊天输入框旁的闪电按钮中选择，一键发送。与自定义指令不同，提示词只在您选择时才会发送。清空文本即可删除该提示词。",
+    "prompts_saved": "已保存的提示词已更新。",
+    "prompt_new": "新提示词",
+    "prompt_title_label": "名称",
+    "prompt_title_placeholder": "名称，例如：检查语法",
+    "prompt_text_label": "提示词",
+    "prompt_text_placeholder": "提示词，例如：检查这篇笔记的语法和结构，并提出改进建议。",
+    "prompt_remove": "删除此提示词",
+    "prompt_add": "添加提示词",
+    "prompts_save": "保存提示词"
   },
   "ai_mcp": {
     "title": "外部工具",
@@ -4947,7 +4958,10 @@
     "open_dashboard": "打开仪表板",
     "workspace_info_text_notes": "在这里，助手只在当前工作区中工作。要同时搜索多个工作区，请打开仪表板并在顶部菜单中选择它们：助手随后会以只读方式搜索和阅读所有这些工作区。",
     "workspace_info_text_dashboard": "在这里，助手只在此工作区中工作。在仪表板顶部菜单中选择多个工作区：助手随后会以只读方式同时搜索和阅读所有这些工作区。",
-    "workspace_info_text_multi": "助手会搜索和阅读此仪表板上所有工作区的笔记。它在这里不做任何修改：要编辑笔记，请打开该笔记或其工作区后再提出请求。仪表板顶部的菜单用于选择工作区。"
+    "workspace_info_text_multi": "助手会搜索和阅读此仪表板上所有工作区的笔记。它在这里不做任何修改：要编辑笔记，请打开该笔记或其工作区后再提出请求。仪表板顶部的菜单用于选择工作区。",
+    "saved_prompts": "已保存的提示词",
+    "saved_prompts_empty": "还没有已保存的提示词。保存常用的提示词，即可一键发送。",
+    "saved_prompts_manage": "管理已保存的提示词"
   },
   "stt_settings": {
     "title": "转录",

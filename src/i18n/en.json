@@ -4402,7 +4402,18 @@
     "instructions_saved": "Custom instructions saved.",
     "messages": {
       "incomplete": "Enter a server URL and a model before enabling your own assistant."
-    }
+    },
+    "prompts_title": "Saved prompts",
+    "prompts_description": "Prompts you send often, picked from the lightning button next to the chat input and sent in one click. Unlike the custom instructions, a prompt is only sent when you pick it. Leave a text empty to remove its prompt.",
+    "prompts_saved": "Saved prompts updated.",
+    "prompt_new": "New prompt",
+    "prompt_title_label": "Name",
+    "prompt_title_placeholder": "Name, for example: Check grammar",
+    "prompt_text_label": "Prompt",
+    "prompt_text_placeholder": "Prompt, for example: Check the grammar and structure of this note and recommend improvements.",
+    "prompt_remove": "Remove this prompt",
+    "prompt_add": "Add a prompt",
+    "prompts_save": "Save prompts"
   },
   "ai_mcp": {
     "title": "External tools",
@@ -4507,7 +4518,10 @@
     "open_dashboard": "Open the dashboard",
     "workspace_info_text_notes": "Here the assistant works in the current workspace only. To search several workspaces at once, open the dashboard and select them in the menu at the top: the assistant then searches and reads all of them, read only.",
     "workspace_info_text_dashboard": "Here the assistant works in this workspace only. Select several workspaces in the menu at the top of the dashboard: the assistant then searches and reads all of them at once, read only.",
-    "workspace_info_text_multi": "The assistant searches and reads the notes of every workspace shown on this dashboard. It changes nothing here: to edit a note, open it or its workspace and ask there. The menu at the top of the dashboard chooses the workspaces."
+    "workspace_info_text_multi": "The assistant searches and reads the notes of every workspace shown on this dashboard. It changes nothing here: to edit a note, open it or its workspace and ask there. The menu at the top of the dashboard chooses the workspaces.",
+    "saved_prompts": "Saved prompts",
+    "saved_prompts_empty": "No saved prompt yet. Save the prompts you send often to send them in one click.",
+    "saved_prompts_manage": "Manage saved prompts"
   },
   "stt_settings": {
     "title": "Transcription",

@@ -37,6 +37,10 @@ $aiPanelExternalServers = implode(', ', array_column(
     poznoteAiMcpServersForChat($con, (int)(getAuthenticatedUserId() ?? 0)),
     'name'
 ));
+
+// Prompts the user saved in ai_settings_user.php (discussion #1678), offered
+// by the lightning button of the input bar and sent in one click
+$aiPanelSavedPrompts = poznoteAiSavedPrompts($con);
 ?>
     <!-- AI CHAT PANEL -->
     <div id="ai-chat-panel">
@@ -111,6 +115,27 @@ The assistant can search, read, create, edit, organize and delete your notes.</d
             <span class="ai-chat-context-title" id="ai-chat-context-title"></span>
         </div>
         <form id="ai-chat-form" class="ai-chat-inputbar">
+            <!-- Saved prompts; js/ai-chat.js opens the menu and sends the one picked -->
+            <button type="button" id="ai-chat-prompts-btn" class="ai-chat-prompts-btn" data-action="ai-chat-prompts" aria-expanded="false" aria-controls="ai-chat-prompts"
+                    aria-label="<?php echo t_h('ai_chat.saved_prompts', [], 'Saved prompts'); ?>" title="<?php echo t_h('ai_chat.saved_prompts', [], 'Saved prompts'); ?>">
+                <i class="lucide lucide-zap"></i>
+            </button>
+            <div class="ai-chat-prompts" id="ai-chat-prompts" hidden>
+                <?php if ($aiPanelSavedPrompts === []): ?>
+                <div class="ai-chat-prompts-empty"><?php echo t_h('ai_chat.saved_prompts_empty', [], 'No saved prompt yet. Save the prompts you send often to send them in one click.'); ?></div>
+                <?php endif; ?>
+                <?php foreach ($aiPanelSavedPrompts as $aiPanelPrompt): ?>
+                <button type="button" class="ai-chat-prompt" data-action="ai-chat-prompt"
+                        data-prompt="<?php echo htmlspecialchars($aiPanelPrompt['prompt'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
+                        title="<?php echo htmlspecialchars($aiPanelPrompt['prompt'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
+                    <?php echo htmlspecialchars($aiPanelPrompt['title'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
+                </button>
+                <?php endforeach; ?>
+                <a class="ai-chat-prompts-manage" href="<?php echo htmlspecialchars('ai_settings_user.php?' . $aiPanelSettingsQuery . '#ai-saved-prompts', ENT_QUOTES, 'UTF-8'); ?>">
+                    <i class="lucide lucide-settings"></i>
+                    <?php echo t_h('ai_chat.saved_prompts_manage', [], 'Manage saved prompts'); ?>
+                </a>
+            </div>
             <?php if ($aiPanelExternalServers !== ''): ?>
             <!-- External tools on/off; js/ai-chat.js keeps the state and the title -->
             <button type="button" id="ai-chat-external" class="ai-chat-external-btn" data-action="ai-chat-external" aria-pressed="true"

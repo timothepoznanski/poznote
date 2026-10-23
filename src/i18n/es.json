@@ -4746,7 +4746,18 @@
     "instructions_saved": "Instrucciones personalizadas guardadas.",
     "messages": {
       "incomplete": "Introduce una URL de servidor y un modelo antes de activar tu propio asistente."
-    }
+    },
+    "prompts_title": "Prompts guardados",
+    "prompts_description": "Los prompts que envía a menudo, elegidos desde el botón del rayo junto a la entrada del chat y enviados con un clic. A diferencia de las instrucciones personalizadas, un prompt solo se envía cuando lo elige. Vacíe un texto para eliminar su prompt.",
+    "prompts_saved": "Prompts guardados actualizados.",
+    "prompt_new": "Nuevo prompt",
+    "prompt_title_label": "Nombre",
+    "prompt_title_placeholder": "Nombre, por ejemplo: Revisar la gramática",
+    "prompt_text_label": "Prompt",
+    "prompt_text_placeholder": "Prompt, por ejemplo: Revisa la gramática y la estructura de esta nota y propón mejoras.",
+    "prompt_remove": "Eliminar este prompt",
+    "prompt_add": "Añadir un prompt",
+    "prompts_save": "Guardar los prompts"
   },
   "ai_mcp": {
     "title": "Herramientas externas",
@@ -4851,7 +4862,10 @@
     "open_dashboard": "Abrir el panel",
     "workspace_info_text_notes": "Aquí el asistente trabaja solo en el espacio de trabajo actual. Para buscar en varios espacios de trabajo a la vez, abre el panel y selecciónalos en el menú de arriba: el asistente busca y lee entonces en todos, en solo lectura.",
     "workspace_info_text_dashboard": "Aquí el asistente trabaja solo en este espacio de trabajo. Selecciona varios espacios de trabajo en el menú de arriba del panel: el asistente busca y lee entonces en todos a la vez, en solo lectura.",
-    "workspace_info_text_multi": "El asistente busca y lee las notas de todos los espacios de trabajo de este panel. Aquí no cambia nada: para editar una nota, ábrela o abre su espacio de trabajo y pídelo allí. El menú de arriba del panel elige los espacios de trabajo."
+    "workspace_info_text_multi": "El asistente busca y lee las notas de todos los espacios de trabajo de este panel. Aquí no cambia nada: para editar una nota, ábrela o abre su espacio de trabajo y pídelo allí. El menú de arriba del panel elige los espacios de trabajo.",
+    "saved_prompts": "Prompts guardados",
+    "saved_prompts_empty": "Aún no hay prompts guardados. Guarde los prompts que envía a menudo para enviarlos con un clic.",
+    "saved_prompts_manage": "Gestionar los prompts guardados"
   },
   "stt_settings": {
     "title": "Transcripción",
