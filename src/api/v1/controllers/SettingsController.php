@@ -45,6 +45,8 @@ class SettingsController {
         'smtp_from_name',
         'smtp_app_url',
         'smtp_reminder_cutoff_at',
+        'ai_chat_mcp_enabled',
+        'ai_chat_mcp_user_servers_enabled',
     ];
     
     /**
@@ -333,6 +335,12 @@ class SettingsController {
                 throw new InvalidArgumentException('invalid format toolbar mode', 400);
             }
             return $normalized;
+        }
+
+        // The two switches of the External tools section (ai_mcp_settings.php),
+        // saved as soon as they are flipped
+        if ($key === 'ai_chat_mcp_enabled' || $key === 'ai_chat_mcp_user_servers_enabled') {
+            return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
         if ($key === 'allow_executable_attachments' || $key === 'login_disabled') {

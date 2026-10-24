@@ -322,7 +322,8 @@ $aiLocalHost = aiChatLocalDefaultHost();
         modelHint: <?php echo json_encode(t('ai_settings.model_empty_hint', ['button' => t('ai_settings.test', [], 'Check access and list models')], 'Click "{{button}}" above, then select one.')); ?>,
         modelNoneFound: <?php echo json_encode(t('ai_settings.model_none_found', [], 'No models were returned by this server.')); ?>,
         apiKeyOptional: <?php echo json_encode(t('ai_settings.api_key_label', [], 'API key (optional)')); ?>,
-        apiKeyRequired: <?php echo json_encode(t('ai_settings.api_key_label_required', [], 'API key')); ?>
+        apiKeyRequired: <?php echo json_encode(t('ai_settings.api_key_label_required', [], 'API key')); ?>,
+        saveError: <?php echo json_encode(t('ai_settings.messages.save_error', [], 'Failed to save configuration.')); ?>
     };
     window.poznoteAiLocalHost = <?php echo json_encode($aiLocalHost); ?>;
     </script>
