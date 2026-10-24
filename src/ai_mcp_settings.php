@@ -38,9 +38,13 @@ function poznoteAiMcpCheckTarget(string $scope, array $server): array {
     return array_merge($server, ['restricted' => $restricted]);
 }
 
-/** True when the page of this scope may manage servers at all. */
+/**
+ * True when the page of this scope may manage servers at all. The admin
+ * always may, the switch off included: the chat only calls the servers once
+ * "Allow external tools" is on (poznoteAiMcpServersForChat).
+ */
 function poznoteAiMcpScopeAllowed(string $scope): bool {
-    return $scope === 'instance' ? poznoteAiMcpEnabled() : poznoteAiMcpUserServersAllowed();
+    return $scope === 'instance' ? true : poznoteAiMcpUserServersAllowed();
 }
 
 /**
@@ -243,7 +247,8 @@ function poznoteAiMcpRenderSection(string $scope, ?PDO $con, ?array $state): voi
                 : t_h('ai_mcp.description_user', [], 'Connect the assistant to remote MCP servers, a web search service for instance, so that it can call their tools next to its own. The servers added here are only used in your own conversations. Only servers reached over HTTP with an API key or custom headers are supported.'); ?></p>
 
             <?php if ($scope === 'instance'): ?>
-            <form method="post">
+            <?php // The second switch and the button sit below the servers panels, tied back to this form by their form attribute ?>
+            <form method="post" id="ai-mcp-options">
                 <input type="hidden" name="action" value="mcp_options">
                 <div class="git-config-fields">
                     <div class="form-check">
@@ -255,22 +260,6 @@ function poznoteAiMcpRenderSection(string $scope, ?PDO $con, ?array $state): voi
                             <span class="label-title"><?php echo t_h('ai_mcp.enable_label', [], 'Allow external tools'); ?></span>
                             <span class="label-desc"><?php echo t_h('ai_mcp.enable_description', [], 'The assistant may call the tools of the servers connected below, and a globe button in the chat turns them on and off. What these tools return comes from outside Poznote, and what the assistant sends them leaves this instance.'); ?></span>
                         </div>
-                    </div>
-                    <div class="form-check">
-                        <label class="switch">
-                            <input type="checkbox" name="mcp_user_servers_enabled" id="mcp_user_servers_enabled" <?php echo (string)getGlobalSetting('ai_chat_mcp_user_servers_enabled', '0') === '1' ? 'checked' : ''; ?>>
-                            <span class="slider round"></span>
-                        </label>
-                        <div class="check-label">
-                            <span class="label-title"><?php echo t_h('ai_mcp.user_servers_label', [], 'Allow users to connect their own servers'); ?></span>
-                            <span class="label-desc"><?php echo t_h('ai_mcp.user_servers_description', [], 'Every user gets an External tools section in their own AI assistant settings. Their servers are called from the Poznote server, with the keys they enter there.'); ?></span>
-                        </div>
-                    </div>
-                    <div class="git-field-actions">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="lucide lucide-save"></i>
-                            <?php echo t_h('ai_settings.save', [], 'Save Configuration'); ?>
-                        </button>
                     </div>
                 </div>
             </form>
@@ -371,6 +360,27 @@ function poznoteAiMcpRenderSection(string $scope, ?PDO $con, ?array $state): voi
                 </form>
             </div>
             <?php endif; ?>
+            <?php endif; ?>
+
+            <?php if ($scope === 'instance'): ?>
+            <div class="git-config-fields ai-mcp-options-tail">
+                <div class="form-check">
+                    <label class="switch">
+                        <input type="checkbox" form="ai-mcp-options" name="mcp_user_servers_enabled" id="mcp_user_servers_enabled" <?php echo (string)getGlobalSetting('ai_chat_mcp_user_servers_enabled', '0') === '1' ? 'checked' : ''; ?>>
+                        <span class="slider round"></span>
+                    </label>
+                    <div class="check-label">
+                        <span class="label-title"><?php echo t_h('ai_mcp.user_servers_label', [], 'Allow users to connect their own servers'); ?></span>
+                        <span class="label-desc"><?php echo t_h('ai_mcp.user_servers_description', [], 'Every user gets an External tools section in their own AI assistant settings. Their servers are called from the Poznote server, with the keys they enter there.'); ?></span>
+                    </div>
+                </div>
+                <div class="git-field-actions">
+                    <button type="submit" form="ai-mcp-options" class="btn btn-primary">
+                        <i class="lucide lucide-save"></i>
+                        <?php echo t_h('ai_settings.save', [], 'Save Configuration'); ?>
+                    </button>
+                </div>
+            </div>
             <?php endif; ?>
         </div>
     <?php
