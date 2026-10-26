@@ -951,6 +951,12 @@
     box-sizing: border-box;
 }
 
+.outbound-hosts-hint {
+    margin: 6px 0 0;
+    font-size: 12px;
+    opacity: 0.75;
+}
+
 .outbound-hosts-error {
     margin: 8px 0 0;
     font-size: 12px;

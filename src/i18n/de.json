@@ -524,9 +524,10 @@
       "local_backup": "Speichern Sie vollständige Sicherungsarchive in einem Ordner des Servers, manuell oder nach Zeitplan, und behalten Sie nur die neuesten.",
       "whats_new": "Nach einem Update die Versionshinweise der neuen Version einmal beim Öffnen deiner Notizen anzeigen.",
       "login_disabled": "Überspringt die Anmeldeseite: Jeder Browser, der diese Instanz erreicht, öffnet direkt Ihr Konto, ohne Benutzername, Passwort oder Zwei-Faktor-Code. Nur aktivieren, wenn allein Sie diese Instanz erreichen können oder ein vorgeschalteter Reverse Proxy die Authentifizierung übernimmt. Die API verlangt weiterhin Zugangsdaten.",
-      "outbound_hosts": "Webhooks, persönliche KI-, Transkriptions- und MCP-Server sowie Git Sync von Benutzern ohne Administratorrechte erreichen nur öffentliche Internet-Hosts. Listen Sie hier die lokalen Hosts und Netzwerke auf, die sie verwenden dürfen, etwa einen Ollama- oder n8n-Server in Ihrem Netzwerk. Administratoren sind nicht eingeschränkt.",
+      "outbound_hosts": "Benutzer ohne Administratorrechte können Webhooks, Git Sync und ihre eigenen KI-, Transkriptions- oder MCP-Server nur mit öffentlichen Internet-Hosts verbinden. Listen Sie hier die lokalen Hosts oder Netzwerke auf, die sie verwenden dürfen, etwa einen Ollama- oder n8n-Server. Administratoren sind nicht eingeschränkt.",
       "diary_template": "Wählen Sie eine Notiz, mit deren Inhalt jeder neue Tagebucheintrag des Arbeitsbereichs {{workspace}} beginnt. Die Liste zeigt die Notizen in einem Ordner namens Vorlagen (oder Templates) dieses Arbeitsbereichs. Jeder Arbeitsbereich hat seine eigene Vorlage.",
-      "markdown_view_cycle": "Wählen Sie die Ansichten, die der Ansichtsschalter einer Markdown-Notiz nach der klassischen Ansicht (Vorschau, mit dem Stift zum Bearbeiten) durchläuft. Nicht gewählte Ansichten werden übersprungen. Ist keine gewählt, wird der Schalter ausgeblendet. Auf einem Telefon wechselt der Schalter nie in die geteilte Ansicht."
+      "markdown_view_cycle": "Wählen Sie die Ansichten, die der Ansichtsschalter einer Markdown-Notiz nach der klassischen Ansicht (Vorschau, mit dem Stift zum Bearbeiten) durchläuft. Nicht gewählte Ansichten werden übersprungen. Ist keine gewählt, wird der Schalter ausgeblendet. Auf einem Telefon wechselt der Schalter nie in die geteilte Ansicht.",
+      "connected_apps": "Verbinden Sie Chat-Apps wie ChatGPT oder Claude über den MCP-Server mit Ihren Notizen und trennen Sie sie jederzeit."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -646,7 +647,8 @@
       "local_backup": "Lokale Sicherungen",
       "whats_new": "Neuigkeiten nach Updates",
       "login_disabled": "Ohne Anmeldung öffnen",
-      "outbound_hosts": "Zugriff auf das lokale Netzwerk"
+      "outbound_hosts": "Zugriff auf das lokale Netzwerk",
+      "connected_apps": "Verbundene Apps"
     },
     "default_credentials": {
       "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
@@ -1906,8 +1908,9 @@
     },
     "outbound_hosts": {
       "title": "Zugriff auf das lokale Netzwerk",
-      "description": "Benutzer ohne Administratorrechte können Webhooks, persönliche KI-, Transkriptions- und MCP-Server sowie Git Sync nur auf öffentliche Internet-Hosts richten. Die hier aufgeführten Hosts und Netzwerke sind ebenfalls erlaubt. Administratoren sind nie eingeschränkt.",
+      "description": "Benutzer ohne Administratorrechte können Webhooks, Git Sync und ihre eigenen KI-, Transkriptions- oder MCP-Server nur mit öffentlichen Internet-Hosts verbinden. Die hier aufgeführten Hosts und Netzwerke sind ebenfalls erlaubt. Administratoren sind nie eingeschränkt.",
       "label": "Ein Eintrag pro Zeile: ein Hostname, *.domain, eine Adresse oder ein Netzwerk",
+      "resolve_hint": "Ein Hostname muss vom Poznote-Server aus auflösbar sein, nicht nur von Ihrem Computer aus. Andernfalls geben Sie stattdessen seine Adresse ein.",
       "invalid": "Kein Hostname, keine Adresse und kein Netzwerk: {{entries}}"
     }
   },
@@ -3991,7 +3994,9 @@
       "two_factor_disabled": "Zwei-Faktor deaktiviert",
       "two_factor_reset": "Zwei-Faktor von einem Admin deaktiviert",
       "two_factor_recovery_used": "Anmeldung mit Wiederherstellungscode",
-      "two_factor_recovery_regenerated": "Wiederherstellungscodes neu erzeugt"
+      "two_factor_recovery_regenerated": "Wiederherstellungscodes neu erzeugt",
+      "oauth_app_authorized": "App verbunden (MCP)",
+      "oauth_app_revoked": "App getrennt (MCP)"
     },
     "filters": {
       "all_actions": "Alle Aktionen",
@@ -4450,7 +4455,7 @@
     "error_saving": "Fehler beim Speichern des Webhooks.",
     "error_not_found": "Webhook nicht gefunden.",
     "section_app_url": "Instanz-URL",
-    "app_url_description": "Oeffentliche URL dieser Poznote-Instanz, verwendet fuer den direkten Notiz-Link in den Payloads (data.note.url). Leer lassen, um keinen Link zu senden. Es ist dieselbe Instanz-URL, die auch die Erinnerungs-E-Mails verwenden.",
+    "app_url_description": "Oeffentliche URL dieser Poznote-Instanz, verwendet fuer den direkten Notiz-Link in den Payloads (data.note.url). Leer lassen, um keinen Link zu senden. Es ist dieselbe Instanz-URL, die auch die Erinnerungs-E-Mails verwenden. Chat-Apps, die sich mit dem MCP-Server verbinden, werden zur Anmeldung ebenfalls dorthin geschickt.",
     "app_url_saved": "Instanz-URL gespeichert.",
     "app_url_cleared": "Instanz-URL geleert. Payloads enthalten keinen direkten Notiz-Link mehr.",
     "error_invalid_app_url": "Die Instanz-URL muss mit http:// oder https:// beginnen.",
@@ -5631,5 +5636,63 @@
     "saved": "In deinen Notizen gespeichert",
     "note_title": "Neu in Poznote {{version}}",
     "versions": "Versionen"
+  },
+  "oauth_authorize": {
+    "title": "App verbinden",
+    "intro": "{{app}} möchte Ihre Poznote-Notizen verwenden.",
+    "redirect_note": "Sie werden zu {{target}} zurückgeleitet. Fahren Sie nur fort, wenn Sie dies in dieser App gestartet haben.",
+    "account_label": "Konto",
+    "level_label": "Zugriff",
+    "level_read": "Nur lesen",
+    "level_read_help": "Notizen lesen, durchsuchen und auflisten. Ändert nichts.",
+    "level_write": "Lesen und bearbeiten",
+    "level_write_help": "Außerdem Notizen, Aufgaben, Erinnerungen und Ordner erstellen und bearbeiten sowie Notizen in den Papierkorb verschieben.",
+    "level_admin": "Vollzugriff",
+    "level_admin_help": "Außerdem, was sich nicht rückgängig machen lässt: Papierkorb leeren, Arbeitsbereiche löschen, öffentliches Teilen, Einstellungen, Backups und Git-Synchronisierung.",
+    "cancel": "Abbrechen",
+    "allow": "Erlauben",
+    "footnote": "Sie können die Verbindung jederzeit unter Einstellungen, Verbundene Apps trennen.",
+    "error_title": "Diese Verbindung kann nicht fortgesetzt werden",
+    "error_unknown_client": "Die App ist bei dieser Poznote-Instanz nicht registriert. Entfernen Sie den Connector in der App und fügen Sie ihn erneut hinzu.",
+    "error_redirect_uri": "Die App möchte zu einer Adresse zurückgeleitet werden, die sie nicht registriert hat.",
+    "error_expired": "Diese Verbindungsanfrage ist abgelaufen. Beginnen Sie erneut in der App.",
+    "error_no_account": "Ihre Anmeldung hat kein aktives Konto, das diese App verwenden könnte.",
+    "name_unverified": "Die App gibt diesen Namen selbst an; Poznote prüft ihn nicht.",
+    "error_bad_request": "Die App hat eine unvollständige Anmeldeanfrage gesendet (sie muss den Authorization-Code-Flow mit PKCE S256 verwenden). Melden Sie das dem Entwickler der App.",
+    "error_bad_resource": "Die App verlangt Zugriff auf einen Server, der nicht der MCP-Server dieser Poznote-Instanz ist."
+  },
+  "connected_apps": {
+    "status": {
+      "count_one": "1 App",
+      "count_other": "{{count}} Apps",
+      "none": "Keine"
+    },
+    "level": {
+      "read": "Nur lesen",
+      "write": "Lesen und bearbeiten",
+      "admin": "Vollzugriff"
+    },
+    "modal": {
+      "title": "Verbundene Apps",
+      "description": "Chat-Apps, denen Sie die Anmeldung bei Poznote über den MCP-Server erlaubt haben, können dieses Konto mit der von Ihnen gewählten Zugriffsstufe verwenden. Eine getrennte App wird innerhalb einer Minute gestoppt und kann nur zurückkommen, indem sie Sie erneut fragt.",
+      "empty": "Keine verbundene App.",
+      "connected": "Verbunden {{date}}",
+      "last_used": "Zuletzt verwendet {{date}}",
+      "disconnect": "Trennen",
+      "confirm_disconnect": "Bestätigen",
+      "close": "Schließen",
+      "connector_label": "Connector-Adresse",
+      "connector_hint": "Um eine Chat-App zu verbinden, fügen Sie diese Adresse in ChatGPT, Claude oder Gemini als Connector (benutzerdefinierter MCP-Server) hinzu und melden Sie sich bei Poznote an, wenn die App Sie dazu auffordert. Lassen Sie Felder für Client-ID und Client-Secret leer.",
+      "copy": "Kopieren",
+      "copied": "Kopiert",
+      "sign_in_label": "Apps werden zur Anmeldung geschickt an",
+      "sign_in_missing": "Nicht gesetzt: Chat-Apps können sich erst anmelden, wenn sie gesetzt ist.",
+      "sign_in_unreachable": "Chat-Apps verbinden sich aus dem Internet über HTTPS, und diese Adresse scheint so nicht erreichbar zu sein.",
+      "sign_in_change": "Ändern (Admin-Webhooks, Instanz-URL)"
+    },
+    "errors": {
+      "load_failed": "Ihre verbundenen Apps konnten nicht geladen werden.",
+      "generic": "Etwas ist schiefgelaufen. Versuchen Sie es erneut."
+    }
   }
 }

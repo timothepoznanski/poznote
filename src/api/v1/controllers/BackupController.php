@@ -20,6 +20,12 @@ class BackupController {
     }
 
     private function requireActiveAccountOwner() {
+        // Backups belong to the account (getBackupsPath() follows the active
+        // account), so the MCP service token, which acts as the account named
+        // by X-User-ID, passes like an administrator would: a server pinned to
+        // a regular profile (POZNOTE_USER_ID) backs up that profile. Under
+        // per-caller authentication (chat apps signing in, #1681) the MCP
+        // server itself limits the backup tools to administrator callers.
         if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
             return null;
         }

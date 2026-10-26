@@ -145,7 +145,7 @@ def verify(raw_body: bytes, signature_header: str, secret: str) -> bool:
 https://poznote.example.com/index.php?note=42&workspace=Poznote
 ```
 
-该链接基于 **实例 URL** 生成，即您的 Poznote 实例的公开 URL，在 **设置 > 管理工具 > 管理员 Webhook** 的 **实例 URL** 部分中配置（仅限管理员）。它与提醒邮件使用的实例 URL 是同一个值，因此在一处设置即对两者同时生效。也可以通过 REST API（`smtp_app_url` 设置）进行设置，或者作为后备方案，使用 `POZNOTE_APP_URL`（或 `APP_URL`）环境变量。
+该链接基于 **实例 URL** 生成，即您的 Poznote 实例的公开 URL，在 **设置 > 管理工具 > 管理员 Webhook** 的 **实例 URL** 部分中配置（仅限管理员）。它与提醒邮件使用的实例 URL 是同一个值，因此在一处设置即对两者同时生效。也可以通过 REST API（`smtp_app_url` 设置）进行设置，或者作为后备方案，使用 `POZNOTE_APP_URL`（或 `APP_URL`）环境变量。通过 Poznote 登录 [MCP 服务器](MCP-SERVER.zh-cn.md) 的聊天应用也会被引导到此地址。该值为空时，会在管理员首次通过浏览器使用 Poznote 时自动填入；此后只有在此处修改时才会改变。
 
 未配置实例 URL 时，`data.note.url` 为 `null`，负载中不包含链接。
 

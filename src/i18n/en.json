@@ -202,9 +202,10 @@
       "local_backup": "Save complete backup archives into a folder of the server, manually or on a schedule, and keep only the most recent ones.",
       "whats_new": "After an update, show the release notes of the new version once when you open your notes.",
       "login_disabled": "Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials.",
-      "outbound_hosts": "Webhooks, personal AI, transcription and MCP servers and Git Sync of non-admin users only reach public internet hosts. List here the local hosts and networks they may use, such as an Ollama or n8n server on your network. Administrators are not limited.",
+      "outbound_hosts": "Non-admin users can only connect webhooks, Git Sync and their own AI, transcription or MCP servers to public internet hosts. List here the local hosts or networks they may use, such as an Ollama or n8n server. Administrators are not limited.",
       "diary_template": "Choose a note whose content every new diary entry of the {{workspace}} workspace starts with. The list shows the notes kept in a folder named Templates in that workspace. Each workspace has its own template.",
-      "markdown_view_cycle": "Choose the views the view button of a markdown note goes through after the classic view (preview, with the pencil to edit). The views left out are skipped. With none chosen, the button is hidden. On a phone the button never goes to split mode."
+      "markdown_view_cycle": "Choose the views the view button of a markdown note goes through after the classic view (preview, with the pencil to edit). The views left out are skipped. With none chosen, the button is hidden. On a phone the button never goes to split mode.",
+      "connected_apps": "Connect chat apps such as ChatGPT or Claude to your notes through the MCP server, and disconnect them at any time."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -304,7 +305,8 @@
       "local_backup": "Local Backups",
       "whats_new": "What's new after updates",
       "login_disabled": "Open without login",
-      "outbound_hosts": "Local network access"
+      "outbound_hosts": "Local network access",
+      "connected_apps": "Connected apps"
     },
     "default_credentials": {
       "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
@@ -1415,8 +1417,9 @@
     },
     "outbound_hosts": {
       "title": "Local network access",
-      "description": "Non-admin users can only point webhooks, personal AI, transcription and MCP servers and Git Sync at public internet hosts. The hosts and networks listed here are allowed as well. Administrators are never limited.",
+      "description": "Non-admin users can only connect webhooks, Git Sync and their own AI, transcription or MCP servers to public internet hosts. The hosts and networks listed here are allowed too. Administrators are never limited.",
       "label": "One entry per line: a host name, *.domain, an address or a network",
+      "resolve_hint": "A host name must resolve from the Poznote server, not only from your computer. If it does not, enter its address instead.",
       "invalid": "Not a host name, address or network: {{entries}}"
     }
   },
@@ -3490,7 +3493,9 @@
       "two_factor_disabled": "Two-factor disabled",
       "two_factor_reset": "Two-factor turned off by an admin",
       "two_factor_recovery_used": "Signed in with a recovery code",
-      "two_factor_recovery_regenerated": "Recovery codes regenerated"
+      "two_factor_recovery_regenerated": "Recovery codes regenerated",
+      "oauth_app_authorized": "App connected (MCP)",
+      "oauth_app_revoked": "App disconnected (MCP)"
     },
     "filters": {
       "all_actions": "All actions",
@@ -4082,7 +4087,7 @@
     "error_saving": "Error saving the webhook.",
     "error_not_found": "Webhook not found.",
     "section_app_url": "Instance URL",
-    "app_url_description": "Public URL of this Poznote instance, used to build the direct note link sent in the payloads (data.note.url). Leave it empty to send no link. This is the same instance URL as the one used by the reminder emails.",
+    "app_url_description": "Public URL of this Poznote instance, used to build the direct note link sent in the payloads (data.note.url). Leave it empty to send no link. This is the same instance URL as the one used by the reminder emails. Chat apps connecting to the MCP server are also sent there to sign in.",
     "app_url_saved": "Instance URL saved.",
     "app_url_cleared": "Instance URL cleared. Payloads will no longer carry a direct note link.",
     "error_invalid_app_url": "The instance URL must start with http:// or https://.",
@@ -5476,5 +5481,63 @@
     "saved": "Saved in your notes",
     "note_title": "What's new in Poznote {{version}}",
     "versions": "Versions"
+  },
+  "oauth_authorize": {
+    "title": "Connect an app",
+    "intro": "{{app}} wants to use your Poznote notes.",
+    "redirect_note": "You will be sent back to {{target}}. Only continue if you started this from that app.",
+    "account_label": "Account",
+    "level_label": "Access",
+    "level_read": "Read only",
+    "level_read_help": "Read, search and list your notes. Changes nothing.",
+    "level_write": "Read and edit",
+    "level_write_help": "Also create and edit notes, tasks, reminders and folders, and move notes to the trash.",
+    "level_admin": "Full access",
+    "level_admin_help": "Also what cannot be undone: emptying the trash, deleting workspaces, public sharing, settings, backups and Git sync.",
+    "cancel": "Cancel",
+    "allow": "Allow",
+    "footnote": "You can disconnect it at any time in Settings, Connected apps.",
+    "error_title": "This connection cannot continue",
+    "error_unknown_client": "The app is not registered with this Poznote instance. Remove the connector from the app and add it again.",
+    "error_redirect_uri": "The app asked to be sent back to an address it did not register.",
+    "error_expired": "This connection request has expired. Start again from the app.",
+    "error_no_account": "Your sign-in has no active account this app could use.",
+    "name_unverified": "The app gives this name itself; Poznote does not verify it.",
+    "error_bad_request": "The app sent an incomplete sign-in request (it must use the authorization code flow with PKCE S256). Report it to the app's developer.",
+    "error_bad_resource": "The app asked for access to a server that is not this Poznote instance's MCP server."
+  },
+  "connected_apps": {
+    "status": {
+      "count_one": "1 app",
+      "count_other": "{{count}} apps",
+      "none": "None"
+    },
+    "level": {
+      "read": "Read only",
+      "write": "Read and edit",
+      "admin": "Full access"
+    },
+    "modal": {
+      "title": "Connected apps",
+      "description": "Chat apps you allowed to sign in to Poznote through the MCP server can use this account at the access level you chose. Disconnecting one stops it within a minute; it can only come back by asking you again.",
+      "empty": "No connected app.",
+      "connected": "Connected {{date}}",
+      "last_used": "Last used {{date}}",
+      "disconnect": "Disconnect",
+      "confirm_disconnect": "Confirm",
+      "close": "Close",
+      "connector_label": "Connector address",
+      "connector_hint": "To connect a chat app, add this address as a connector (custom MCP server) in ChatGPT, Claude or Gemini, then sign in to Poznote when the app asks you to. Leave any client ID and secret fields empty.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "sign_in_label": "Apps are sent to sign in at",
+      "sign_in_missing": "Not set: chat apps cannot sign in until it is.",
+      "sign_in_unreachable": "Chat apps connect from the internet over HTTPS, and this address does not look reachable that way.",
+      "sign_in_change": "Change it (Admin Webhooks, Instance URL)"
+    },
+    "errors": {
+      "load_failed": "Could not load your connected apps.",
+      "generic": "Something went wrong. Try again."
+    }
   }
 }

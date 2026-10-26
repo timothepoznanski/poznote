@@ -137,8 +137,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ? (string)$_POST['smtp_password']
                 : smtp_setting('smtp_password', '');
 
+            // The instance URL is shared with the webhooks and the sign-in of
+            // chat apps (MCP OAuth), and this page never shows it: the address
+            // the admin happens to use now (a LAN IP, an SSH tunnel) is only a
+            // first guess, taken when neither the setting nor POZNOTE_APP_URL
+            // gives one. Changing it is done in Admin Webhooks > Instance URL.
             $existingAppUrl = smtp_setting('smtp_app_url', '');
-            $appUrl = $detectedAppUrl !== '' ? $detectedAppUrl : $existingAppUrl;
+            $envAppUrl = trim((string)_env('POZNOTE_APP_URL', _env('APP_URL', '')));
+            $appUrl = ($existingAppUrl !== '' || $envAppUrl !== '') ? $existingAppUrl : $detectedAppUrl;
             $settingsToSave = [
                 'smtp_host' => trim((string)($_POST['smtp_host'] ?? '')),
                 'smtp_port' => (string)$port,

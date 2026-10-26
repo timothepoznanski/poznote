@@ -1753,7 +1753,8 @@
             badge.textContent = count > 0
                 ? tr('settings.outbound_hosts.status_allowed', { count: count }, '{{count}} allowed')
                 : tr('settings.outbound_hosts.status_public_only', {}, 'Public only');
-            badge.className = 'setting-status ' + (count > 0 ? 'enabled' : 'disabled');
+            // Neither state is a problem: "Public only" is the safe default.
+            badge.className = 'setting-status neutral';
         });
     }
 

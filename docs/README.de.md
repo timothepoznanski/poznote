@@ -912,6 +912,40 @@ Poznote ist mehrbenutzerfähig: Jedes Profil hat eigene Notizen, Arbeitsbereiche
 - **Benutzerverwaltung**: Administratoren legen Profile unter **Einstellungen > Admin-Werkzeuge > Benutzerverwaltung** an, deaktivieren und verwalten sie, und können einem Benutzer Zugriff auf das Konto eines anderen Benutzers gewähren, ohne dessen Eigentümerschaft zu übertragen.
 - **Teilen und Zusammenarbeit**: Arbeitsbereiche, Notizen und Ordner können mit den anderen Benutzern der Instanz geteilt werden, siehe [Teilen und Zusammenarbeit](#teilen-und-zusammenarbeit).
 - **Mandantentrennung (SaaS-Modus)**: Administratoren können Benutzern ohne Administratorrechte das Auffinden der anderen Konten der Instanz, das Teilen mit ihnen oder das Registrieren persönlicher Webhooks untersagen. Für eine Familien- oder Team-Instanz lassen Sie alles deaktiviert.
+- **Zugriff auf das lokale Netzwerk**: Benutzer ohne Administratorrechte können Webhooks, Git Sync und ihre eigenen KI-, Transkriptions- oder MCP-Server nur mit öffentlichen Internet-Hosts verbinden, abgesehen von den lokalen Hosts, die ein Administrator erlaubt, siehe [Zugriff auf das lokale Netzwerk für Benutzer ohne Administratorrechte](#local-network-access).
+
+<a id="local-network-access"></a>
+<details>
+<summary><strong>Zugriff auf das lokale Netzwerk für Benutzer ohne Administratorrechte</strong></summary>
+<br>
+
+Einige Funktionen lassen den Poznote-Server selbst eine Verbindung zu einer Adresse aufbauen, die ein Benutzer eingegeben hat: Webhooks, Git Sync und seine eigenen KI-, Transkriptions- oder MCP-Server. Die Anfrage geht vom Server aus, nicht vom Browser des Benutzers. Ohne Grenze könnte also jedes Konto über Poznote den Server selbst, die anderen Docker-Container, Ihr lokales Netzwerk oder einen Cloud-Metadatendienst erreichen, also Orte, die es selbst nicht erreichen kann.
+
+Die Regel hängt deshalb davon ab, wer die Adresse eingegeben hat:
+
+- **Administratoren** sind nicht eingeschränkt: Sie kontrollieren den Server ohnehin.
+- **Andere Benutzer** können nur öffentliche Internet-Hosts verwenden. Eine lokale oder private Adresse wird abgelehnt: `localhost` und `127.0.0.1`, `10.x.x.x`, `172.16.x.x` bis `172.31.x.x`, `192.168.x.x`, `169.254.x.x`, lokale IPv6-Adressen (`fc00::/7`, `fe80::/10`) sowie jeder Name, der auf eine davon zeigt, etwa der Name eines anderen Docker-Dienstes.
+
+Was ein Administrator für die ganze Instanz einstellt (der KI-Assistent, die Transkription, die Admin-Webhooks, S3, OIDC, SMTP), ist nicht betroffen.
+
+Auf einer Familien- oder Team-Instanz brauchen Benutzer vielleicht einen Server in Ihrem Netzwerk, etwa einen Ollama-Server für ihre persönliche KI oder n8n für ihre Webhooks. Tragen Sie diese Hosts unter **Einstellungen > Admin-Werkzeuge > Integrationen > Zugriff auf das lokale Netzwerk** ein, ein Eintrag pro Zeile:
+
+| Eintrag | Was er erlaubt |
+|---|---|
+| `ollama` oder `ollama.lan` | diesen Hostnamen, egal auf welche Adresse er zeigt (ein Docker-Dienstname funktioniert) |
+| `*.home.arpa` | alle Hostnamen unter dieser Domain |
+| `192.168.1.20` | diese Adresse |
+| `192.168.1.0/24` | alle Adressen dieses Netzwerks (IPv6 geht auch, `fd00::/8`) |
+
+Ein Eintrag erlaubt alle Ports dieses Hosts. Ungültige Einträge werden beim Speichern abgelehnt, mit der Liste der zu korrigierenden. Die Karte zeigt **Nur öffentlich**, solange die Liste leer ist, sonst die Zahl der Einträge.
+
+Gut zu wissen:
+
+- Ein Hostname in der Liste muss im Poznote-Container auflösbar sein, nicht nur auf Ihrem Computer. Einen Namen, den nur Ihr Computer oder Ihr Router kennt, kann Poznote nicht auflösen, und er wird wie jeder unbekannte Name abgelehnt: Geben Sie stattdessen seine Adresse oder sein Netzwerk ein.
+- Die Adresse wird bei jeder Verbindung erneut geprüft, nicht nur beim Speichern: Das Entfernen eines Eintrags wirkt sofort, und ein Name, der später auf eine lokale Adresse zeigt, wird abgelehnt.
+- Für Benutzer ohne Administratorrechte folgt Poznote keinen Weiterleitungen, außer bei Git Sync, das jeden Schritt der Weiterleitung erneut prüft.
+
+</details>
 
 <details>
 <summary><strong>Datenablage auf der Festplatte</strong></summary>

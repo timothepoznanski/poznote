@@ -202,9 +202,10 @@
       "local_backup": "전체 백업 아카이브를 서버의 폴더에 수동으로 또는 일정에 따라 저장하고 최신 백업만 보관합니다.",
       "whats_new": "업데이트 후 노트를 열 때 새 버전의 릴리스 노트를 한 번 표시합니다.",
       "login_disabled": "로그인 화면을 건너뜁니다. 이 인스턴스에 접근하는 모든 브라우저가 사용자 이름, 비밀번호, 2단계 인증 코드 없이 내 계정을 바로 엽니다. 본인만 이 인스턴스에 접근할 수 있거나 앞단의 리버스 프록시가 인증을 처리하는 경우에만 켜세요. API는 계속 자격 증명을 요구합니다.",
-      "outbound_hosts": "관리자가 아닌 사용자의 웹훅, 개인 AI·전사·MCP 서버, Git Sync는 공개 인터넷 호스트에만 접근합니다. 네트워크의 Ollama나 n8n 서버처럼 이들이 사용할 수 있는 로컬 호스트와 네트워크를 여기에 입력하세요. 관리자는 제한되지 않습니다.",
+      "outbound_hosts": "관리자가 아닌 사용자는 웹훅, Git Sync, 개인 AI·전사·MCP 서버를 공개 인터넷 호스트에만 연결할 수 있습니다. Ollama나 n8n 서버처럼 이들이 사용할 수 있는 로컬 호스트나 네트워크를 여기에 입력하세요. 관리자는 제한되지 않습니다.",
       "diary_template": "{{workspace}} 작업 공간의 새 일기 항목이 시작될 때 사용할 내용을 담은 노트를 선택하세요. 목록에는 이 작업 공간에서 템플릿(또는 Templates)이라는 이름의 폴더에 있는 노트가 표시됩니다. 작업 공간마다 자체 템플릿이 있습니다.",
-      "markdown_view_cycle": "마크다운 노트의 보기 버튼이 기본 보기(미리보기, 연필로 편집) 다음에 거치는 보기를 선택하세요. 선택하지 않은 보기는 건너뜁니다. 아무것도 선택하지 않으면 버튼이 숨겨집니다. 휴대폰에서는 버튼이 분할 모드로 전환되지 않습니다."
+      "markdown_view_cycle": "마크다운 노트의 보기 버튼이 기본 보기(미리보기, 연필로 편집) 다음에 거치는 보기를 선택하세요. 선택하지 않은 보기는 건너뜁니다. 아무것도 선택하지 않으면 버튼이 숨겨집니다. 휴대폰에서는 버튼이 분할 모드로 전환되지 않습니다.",
+      "connected_apps": "MCP 서버를 통해 ChatGPT, Claude 같은 채팅 앱을 노트에 연결하고 언제든지 연결을 해제할 수 있습니다."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "모바일에서는 이 설정과 관계없이 키보드 위 도구 모음의 + 버튼으로 같은 메뉴를 열 수 있습니다."
@@ -304,7 +305,8 @@
       "local_backup": "로컬 백업",
       "whats_new": "업데이트 후 새로운 기능",
       "login_disabled": "로그인 없이 열기",
-      "outbound_hosts": "로컬 네트워크 접근"
+      "outbound_hosts": "로컬 네트워크 접근",
+      "connected_apps": "연결된 앱"
     },
     "default_credentials": {
       "both": "이 계정은 원래 제공된 사용자 이름과 비밀번호를 계속 사용합니다. 이 인스턴스에 접근할 수 있는 사람은 누구나 로그인할 수 있습니다.",
@@ -1415,8 +1417,9 @@
     },
     "outbound_hosts": {
       "title": "로컬 네트워크 접근",
-      "description": "관리자가 아닌 사용자는 웹훅, 개인 AI·전사·MCP 서버, Git Sync를 공개 인터넷 호스트로만 지정할 수 있습니다. 여기에 입력한 호스트와 네트워크도 허용됩니다. 관리자는 제한되지 않습니다.",
+      "description": "관리자가 아닌 사용자는 웹훅, Git Sync, 개인 AI·전사·MCP 서버를 공개 인터넷 호스트에만 연결할 수 있습니다. 여기에 입력한 호스트와 네트워크도 허용됩니다. 관리자는 제한되지 않습니다.",
       "label": "한 줄에 하나씩: 호스트 이름, *.도메인, 주소 또는 네트워크",
+      "resolve_hint": "호스트 이름은 내 컴퓨터뿐 아니라 Poznote 서버에서도 확인할 수 있어야 합니다. 그렇지 않으면 대신 주소를 입력하세요.",
       "invalid": "호스트 이름, 주소, 네트워크가 아닙니다: {{entries}}"
     }
   },
@@ -3490,7 +3493,9 @@
       "two_factor_disabled": "2단계 인증 비활성화됨",
       "two_factor_reset": "관리자가 2단계 인증을 비활성화함",
       "two_factor_recovery_used": "복구 코드로 로그인됨",
-      "two_factor_recovery_regenerated": "복구 코드가 재생성되었습니다."
+      "two_factor_recovery_regenerated": "복구 코드가 재생성되었습니다.",
+      "oauth_app_authorized": "앱 연결됨 (MCP)",
+      "oauth_app_revoked": "앱 연결 해제됨 (MCP)"
     },
     "filters": {
       "all_actions": "모든 작업",
@@ -4082,7 +4087,7 @@
     "error_saving": "웹훅을 저장하는 중에 오류가 발생했습니다.",
     "error_not_found": "웹훅을 찾을 수 없습니다.",
     "section_app_url": "인스턴스 URL",
-    "app_url_description": "페이로드(data.note.url)로 전송된 직접 노트 링크를 빌드하는 데 사용되는 이 Poznote 인스턴스의 공개 URL입니다. 링크를 보내지 않으려면 비워 두세요. 이는 알림 이메일에 사용된 것과 동일한 인스턴스 URL입니다.",
+    "app_url_description": "페이로드(data.note.url)로 전송된 직접 노트 링크를 빌드하는 데 사용되는 이 Poznote 인스턴스의 공개 URL입니다. 링크를 보내지 않으려면 비워 두세요. 이는 알림 이메일에 사용된 것과 동일한 인스턴스 URL입니다. MCP 서버에 연결하는 채팅 앱도 로그인을 위해 이 주소로 이동합니다.",
     "app_url_saved": "인스턴스 URL이 저장되었습니다.",
     "app_url_cleared": "인스턴스 URL이 삭제되었습니다. 페이로드는 더 이상 직접 노트 링크를 전달하지 않습니다.",
     "error_invalid_app_url": "인스턴스 URL은 http:// 또는 https://로 시작해야 합니다.",
@@ -5476,5 +5481,63 @@
     "saved": "노트에 저장됨",
     "note_title": "Poznote {{version}}의 새로운 기능",
     "versions": "버전"
+  },
+  "oauth_authorize": {
+    "title": "앱 연결",
+    "intro": "{{app}}에서 Poznote 노트를 사용하려고 합니다.",
+    "redirect_note": "{{target}}(으)로 돌아가게 됩니다. 해당 앱에서 시작한 경우에만 계속하세요.",
+    "account_label": "계정",
+    "level_label": "접근 권한",
+    "level_read": "읽기 전용",
+    "level_read_help": "노트를 읽고, 검색하고, 목록을 봅니다. 아무것도 변경하지 않습니다.",
+    "level_write": "읽기 및 편집",
+    "level_write_help": "노트, 작업, 알림, 폴더를 만들고 편집하며 노트를 휴지통으로 옮길 수도 있습니다.",
+    "level_admin": "전체 접근",
+    "level_admin_help": "되돌릴 수 없는 작업도 포함: 휴지통 비우기, 작업 공간 삭제, 공개 공유, 설정, 백업, Git 동기화.",
+    "cancel": "취소",
+    "allow": "허용",
+    "footnote": "설정의 연결된 앱에서 언제든지 연결을 해제할 수 있습니다.",
+    "error_title": "이 연결을 계속할 수 없습니다",
+    "error_unknown_client": "이 앱은 이 Poznote 인스턴스에 등록되어 있지 않습니다. 앱에서 커넥터를 제거한 후 다시 추가하세요.",
+    "error_redirect_uri": "앱이 등록하지 않은 주소로 돌아가도록 요청했습니다.",
+    "error_expired": "이 연결 요청이 만료되었습니다. 앱에서 다시 시작하세요.",
+    "error_no_account": "로그인에 이 앱이 사용할 수 있는 활성 계정이 없습니다.",
+    "name_unverified": "이 이름은 앱이 직접 지정한 것으로, Poznote가 확인하지 않습니다.",
+    "error_bad_request": "앱이 불완전한 로그인 요청을 보냈습니다(PKCE S256을 사용하는 인증 코드 흐름이어야 합니다). 앱 개발자에게 알려 주세요.",
+    "error_bad_resource": "앱이 이 Poznote 인스턴스의 MCP 서버가 아닌 서버에 대한 접근을 요청했습니다."
+  },
+  "connected_apps": {
+    "status": {
+      "count_one": "앱 1개",
+      "count_other": "앱 {{count}}개",
+      "none": "없음"
+    },
+    "level": {
+      "read": "읽기 전용",
+      "write": "읽기 및 편집",
+      "admin": "전체 접근"
+    },
+    "modal": {
+      "title": "연결된 앱",
+      "description": "MCP 서버를 통해 Poznote 로그인을 허용한 채팅 앱은 선택한 접근 권한으로 이 계정을 사용할 수 있습니다. 연결을 해제하면 1분 안에 중지되며, 다시 허락을 구해야만 돌아올 수 있습니다.",
+      "empty": "연결된 앱이 없습니다.",
+      "connected": "연결: {{date}}",
+      "last_used": "마지막 사용: {{date}}",
+      "disconnect": "연결 해제",
+      "confirm_disconnect": "확인",
+      "close": "닫기",
+      "connector_label": "커넥터 주소",
+      "connector_hint": "채팅 앱을 연결하려면 ChatGPT, Claude 또는 Gemini에서 이 주소를 커넥터(사용자 지정 MCP 서버)로 추가한 뒤, 앱이 요청하면 Poznote에 로그인하세요. 클라이언트 ID와 시크릿 입력란은 비워 두세요.",
+      "copy": "복사",
+      "copied": "복사됨",
+      "sign_in_label": "앱이 로그인하러 이동하는 주소",
+      "sign_in_missing": "설정되지 않음: 설정되기 전까지 채팅 앱은 로그인할 수 없습니다.",
+      "sign_in_unreachable": "채팅 앱은 인터넷에서 HTTPS로 연결하는데, 이 주소는 그렇게 접근할 수 없어 보입니다.",
+      "sign_in_change": "변경 (관리자 웹훅, 인스턴스 URL)"
+    },
+    "errors": {
+      "load_failed": "연결된 앱을 불러올 수 없습니다.",
+      "generic": "문제가 발생했습니다. 다시 시도하세요."
+    }
   }
 }

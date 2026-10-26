@@ -98,10 +98,38 @@ class SettingsController {
         return array_keys($keys);
     }
 
+    /**
+     * Reading a global setting. The MCP service token passes, whoever it acts
+     * for: the MCP server reads mcp_default_workspace this way for every
+     * caller, and its get_app_setting tool refuses global keys to callers who
+     * are not administrators itself.
+     */
     private function requireGlobalSettingsAdmin(): void {
         if (!function_exists('isCurrentUserAdmin') || !isCurrentUserAdmin()) {
             throw new RuntimeException('admin privileges required', 403);
         }
+    }
+
+    /**
+     * Writing a global setting. Through the MCP server it is the account acted
+     * for that has to be an administrator (isRequestActorAdmin()), not the
+     * service token, which always is: since #1681 any user who connected a
+     * chat app reaches the API through it, and one global write (smtp_app_url)
+     * would send everybody's links and chat-app sign-ins to another site. The
+     * MCP server refuses these keys to such callers too; this holds if its
+     * list of global keys falls behind.
+     */
+    private function requireGlobalSettingsWriteAdmin(): void {
+        if (!$this->requestActorIsAdmin()) {
+            throw new RuntimeException('admin privileges required', 403);
+        }
+    }
+
+    private function requestActorIsAdmin(): bool {
+        if (function_exists('isRequestActorAdmin')) {
+            return isRequestActorAdmin();
+        }
+        return function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
     }
 
     /**
@@ -115,7 +143,7 @@ class SettingsController {
      * admin check in loadGlobalSettings() and show().
      */
     private function requireActiveAccountOwner(): void {
-        if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+        if (function_exists('isActiveAccountOwnedForApiRequest') && !isActiveAccountOwnedForApiRequest()) {
             $message = function_exists('getActiveAccountOwnerRequiredMessage')
                 ? getActiveAccountOwnerRequiredMessage()
                 : 'This account\'s settings are not accessible because you are not the owner of this account.';
@@ -864,7 +892,7 @@ class SettingsController {
 
             // For global settings, use setGlobalSetting function
             if ($this->isGlobalSetting($key)) {
-                $this->requireGlobalSettingsAdmin();
+                $this->requireGlobalSettingsWriteAdmin();
                 require_once dirname(__DIR__, 3) . '/users/db_master.php';
                 if ($key === 'login_disabled') {
                     // Opening without a login opens ONE account: the

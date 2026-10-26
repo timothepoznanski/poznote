@@ -912,6 +912,40 @@ Poznote est multi-utilisateur : chaque profil a ses propres notes, espaces de tr
 - **Gestion des utilisateurs** : les administrateurs créent, désactivent et gèrent les profils depuis **Paramètres > Outils d'administration > Gestion des utilisateurs**, et peuvent donner à un utilisateur l'accès au compte d'un autre utilisateur sans en transférer la propriété.
 - **Partage et collaboration** : les espaces de travail, les notes et les dossiers peuvent être partagés avec les autres utilisateurs de l'instance, voir [Partage et collaboration](#partage-et-collaboration).
 - **Isolation des comptes (mode SaaS)** : les administrateurs peuvent empêcher les utilisateurs non administrateurs de découvrir les autres comptes de l'instance, de partager avec eux ou d'enregistrer des webhooks personnels. Laissez tout décoché pour une instance familiale ou d'équipe.
+- **Accès au réseau local** : les utilisateurs non administrateurs ne peuvent connecter les webhooks, Git Sync et leurs propres serveurs IA, de transcription ou MCP qu'à des hôtes publics d'Internet, en dehors des hôtes locaux qu'un administrateur autorise, voir [Accès au réseau local pour les utilisateurs non administrateurs](#local-network-access).
+
+<a id="local-network-access"></a>
+<details>
+<summary><strong>Accès au réseau local pour les utilisateurs non administrateurs</strong></summary>
+<br>
+
+Certaines fonctionnalités font se connecter le serveur Poznote lui-même à une adresse saisie par un utilisateur : les webhooks, Git Sync et ses propres serveurs IA, de transcription ou MCP. La requête part du serveur, pas du navigateur de l'utilisateur. Sans limite, n'importe quel compte pourrait donc se servir de Poznote pour atteindre le serveur lui-même, les autres conteneurs Docker, votre réseau local ou un service de métadonnées cloud, des endroits qu'il ne peut pas atteindre par lui-même.
+
+La règle dépend donc de qui a saisi l'adresse :
+
+- **Les administrateurs** ne sont pas limités : ils contrôlent déjà le serveur.
+- **Les autres utilisateurs** ne peuvent utiliser que des hôtes publics d'Internet. Une adresse locale ou privée est refusée : `localhost` et `127.0.0.1`, `10.x.x.x`, `172.16.x.x` à `172.31.x.x`, `192.168.x.x`, `169.254.x.x`, les adresses IPv6 locales (`fc00::/7`, `fe80::/10`), ainsi que tout nom qui pointe vers l'une d'elles, comme le nom d'un autre service Docker.
+
+Ce qu'un administrateur règle pour toute l'instance (l'Assistant IA, la Transcription, les webhooks d'administration, S3, OIDC, SMTP) n'est pas concerné.
+
+Sur une instance familiale ou d'équipe, les utilisateurs peuvent avoir besoin d'un serveur de votre réseau, par exemple un serveur Ollama pour leur IA personnelle ou n8n pour leurs webhooks. Listez ces hôtes dans **Paramètres > Outils d'administration > Intégrations > Accès au réseau local**, une entrée par ligne :
+
+| Entrée | Ce qu'elle autorise |
+|---|---|
+| `ollama` ou `ollama.lan` | ce nom d'hôte, quelle que soit l'adresse vers laquelle il pointe (un nom de service Docker fonctionne) |
+| `*.home.arpa` | tous les noms d'hôte sous ce domaine |
+| `192.168.1.20` | cette adresse |
+| `192.168.1.0/24` | toutes les adresses de ce réseau (l'IPv6 fonctionne aussi, `fd00::/8`) |
+
+Une entrée autorise tous les ports de cet hôte. Les entrées invalides sont refusées à l'enregistrement, avec la liste de celles à corriger. La carte affiche **Public uniquement** tant que la liste est vide, et sinon le nombre d'entrées.
+
+Bon à savoir :
+
+- Un nom d'hôte de la liste doit pouvoir être résolu depuis le conteneur Poznote, pas seulement depuis votre ordinateur. Un nom que seuls votre ordinateur ou votre box connaissent ne peut pas être résolu par Poznote, et il est refusé comme tout nom inconnu : saisissez plutôt son adresse ou son réseau.
+- L'adresse est vérifiée à chaque connexion, pas seulement à l'enregistrement : retirer une entrée prend effet tout de suite, et un nom qui se met plus tard à pointer vers une adresse locale est refusé.
+- Pour les utilisateurs non administrateurs, Poznote ne suit pas les redirections, sauf dans Git Sync, qui vérifie de nouveau chaque étape de la redirection.
+
+</details>
 
 <details>
 <summary><strong>Organisation des données sur le disque</strong></summary>

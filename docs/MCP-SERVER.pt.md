@@ -169,6 +169,18 @@ POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate m
 
 Um simples `docker compose restart mcp-server` não recarrega as variáveis de ambiente atualizadas.
 
+#### Qual modo para qual uso
+
+O servidor MCP identifica seus clientes de uma de três maneiras. A pergunta que as diferencia é **quem decide em qual conta do Poznote uma requisição atua**:
+
+| A sua situação | Modo | Quem decide a conta |
+|---|---|---|
+| Só você, com um cliente na mesma máquina (VS Code, Claude CLI) | Clássico, o padrão, opcionalmente com um [token de entrada](#token-de-autenticação-de-entrada) | A configuração do servidor: `POZNOTE_USER_ID` (perfil `1` por padrão), ou qualquer perfil que uma requisição indicar com `user_id` |
+| Várias pessoas, aplicativos de chat (ChatGPT, Claude, Gemini), ou VS Code / Claude Code acessando um servidor público | [Login a partir de aplicativos de chat](#login-a-partir-de-aplicativos-de-chat-chatgpt-claude-gemini) (`POZNOTE_MCP_AUTH_PROVIDER=poznote`) | A pessoa que faz login: sempre a própria conta |
+| Agentes que já têm tokens do seu provedor de identidade (Keycloak, Authentik, ...) | [Autenticação por chamador](#autenticação-por-chamador-opcional) (`userinfo` ou `introspection`) | O perfil vinculado à identidade do token |
+
+Assim que várias pessoas compartilharem um mesmo servidor MCP, use o segundo modo: no modo clássico, qualquer cliente pode alcançar todas as contas.
+
 #### Perfil de usuário padrão
 
 Por padrão, o servidor MCP opera como o perfil de usuário `1` (o primeiro administrador). Para fixar o servidor em outro perfil, defina `POZNOTE_USER_ID` ao iniciar o contêiner:
@@ -198,6 +210,49 @@ Depois adicione o mesmo cabeçalho à configuração do seu cliente: veja [VS Co
 
 Esse token é diferente de `data/.mcp_token`: aquele é usado pelo servidor MCP para falar *com* a API do Poznote, este é o que *o seu assistente de IA* precisa apresentar ao servidor MCP.
 
+#### Login a partir de aplicativos de chat (ChatGPT, Claude, Gemini)
+
+Os aplicativos de chat que se conectam a um servidor MCP remoto, como o ChatGPT (e o aplicativo Codex), o Claude Desktop e o claude.ai, ou o Gemini, não aceitam um token colado: eles esperam que o servidor os conduza por um login OAuth. Com `POZNOTE_MCP_AUTH_PROVIDER=poznote`, o próprio Poznote assume esse papel:
+
+1. Você adiciona `https://mcp.example.com/mcp` como conector no aplicativo, deixando vazios os campos de ID e segredo do cliente, se houver: o aplicativo se registra sozinho. Os aplicativos guardam isso nas configurações, geralmente como conectores personalizados ou servidores MCP remotos, e alguns só oferecem esse recurso em determinados planos ou em um modo de desenvolvedor.
+2. O aplicativo abre a página de login do Poznote. Você faz login como sempre (senha, autenticação de dois fatores ou SSO).
+3. Uma página de consentimento mostra o nome do aplicativo, para onde ele vai levar você de volta e a conta que vai usar, sempre a sua (nunca uma conta à qual você recebeu acesso), e permite escolher o nível de acesso: **Somente leitura**, **Leitura e edição** ou **Acesso total**, os três níveis do [escopo das ferramentas](#escopo-das-ferramentas).
+4. Você clica em **Permitir**, e o aplicativo só acessa essa conta, nesse nível.
+
+Assim, um único servidor MCP atende a instância inteira, e cada pessoa acessa apenas as próprias notas (e os espaços de trabalho compartilhados com ela). **Configurações → Minha conta → Aplicativos conectados** lista as conexões, permite desconectar qualquer uma delas e mostra a cada um o endereço do conector para colar.
+
+Requisitos:
+
+- O aplicativo de chat se conecta pela internet (o ChatGPT e o claude.ai a partir dos próprios servidores), então o servidor MCP e o Poznote precisam estar acessíveis para ele via **HTTPS**. Coloque o servidor MCP atrás do seu proxy reverso em **um (sub)domínio próprio**, por exemplo `https://mcp.example.com`: os documentos de descoberta OAuth são servidos na raiz desse endereço. Para onde o proxy encaminha o tráfego depende de onde ele roda:
+  - instalado diretamente no servidor: encaminhe para `127.0.0.1:8045` (a porta que o `docker-compose.yml` publica, `POZNOTE_MCP_PORT`);
+  - rodando ele mesmo no Docker (Nginx Proxy Manager, Traefik, Caddy, ...): `127.0.0.1` seria o próprio contêiner do proxy. Conecte o proxy à rede Docker do Poznote, `docker network connect poznote_default <proxy-container>` (a rede tem o nome da pasta do seu `docker-compose.yml`, veja `docker network ls`), e encaminhe para `mcp-server:8045`.
+- As páginas `/oauth/` do próprio Poznote precisam estar acessíveis sem outro login na frente delas (autenticação delegada, conhecida como forward auth, como Authelia ou Authentik no seu proxy): os aplicativos chamam algumas delas a partir dos próprios servidores, sem navegador para exibir uma página de login.
+- Duas variáveis no `.env`, depois recrie o contêiner (`docker compose up -d --force-recreate mcp-server`). Um `docker-compose.yml` mais antigo não as repassa ao contêiner: baixe primeiro o mais recente. Os logs do MCP então mostram `OAuth sign-in through Poznote enabled` na inicialização.
+
+```bash
+POZNOTE_MCP_AUTH_PROVIDER=poznote
+# URL pública do servidor MCP, sem /mcp
+POZNOTE_MCP_PUBLIC_URL=https://mcp.example.com
+```
+
+- A URL pública do Poznote, onde as pessoas fazem login, é a **URL da instância** de **Configurações → Ferramentas de administração → Webhooks de administrador**, a usada pelos e-mails de lembrete e pelos webhooks (`POZNOTE_APP_URL` no `.env` enquanto ela estiver vazia). Quando nenhuma das duas está definida, ela se preenche sozinha a partir do navegador de um administrador; verifique se é o endereço pelo qual as pessoas acessam o Poznote pela internet. Uma alteração chega ao servidor MCP em menos de um minuto, sem precisar reiniciar. A janela **Aplicativos conectados** mostra aos administradores o endereço em uso, com um aviso quando ele é local ou em http simples.
+
+Se não funcionar:
+
+- **O aplicativo diz que não encontra as configurações de autorização (OAuth) do servidor.** De uma máquina fora da sua rede, abra `https://mcp.example.com/.well-known/oauth-protected-resource/mcp` e `https://mcp.example.com/.well-known/oauth-authorization-server`: os dois precisam responder com JSON. Um `503` no segundo significa que a URL pública do Poznote não está definida; nenhuma resposta significa que o proxy reverso não alcança o servidor MCP.
+- **O aplicativo abre uma página de login que não carrega.** A URL da instância não está acessível para o aplicativo: veja o aviso em **Aplicativos conectados** e corrija-a em **Webhooks de administrador → URL da instância**.
+- **Os logs do MCP não mostram `OAuth sign-in through Poznote enabled` na inicialização.** As variáveis não chegam ao contêiner: verifique o `.env` e o `docker-compose.yml`, depois recrie o contêiner (um `restart` não basta).
+- **O login funciona, mas depois todas as requisições falham.** A URL do conector precisa ser exatamente `POZNOTE_MCP_PUBLIC_URL` seguida de `/mcp`; caso contrário, os logs do MCP dizem `Rejecting a token issued for ...`.
+- `docker compose logs mcp-server` informa o que o servidor recusou e por quê; `POZNOTE_DEBUG=true` acrescenta cada requisição.
+
+Regras que valem para toda conexão:
+
+- Uma conexão dura enquanto for usada: o aplicativo renova seu acesso a cada hora e precisa fazer login de novo após 90 dias sem uso. Um aplicativo desconectado pode continuar funcionando por até `POZNOTE_MCP_AUTH_CACHE_TTL` segundos (60 por padrão).
+- `POZNOTE_MCP_SCOPE` continua limitando cada conexão: **Acesso total** a um servidor configurado como `write` recebe `write`.
+- As ferramentas que agem sobre toda a instância (backups, configurações globais, informações do sistema) exigem a conta de um administrador, e uma requisição não pode indicar outra conta com `user_id`.
+- Um aplicativo conectado não pode mudar para onde os dados da conta são enviados: o repositório, o servidor e o token da sincronização Git, nem os endereços e chaves do assistente de IA e do ditado. Ele ainda pode enviar para o repositório que você configurou e puxar dele.
+- `POZNOTE_MCP_AUTH_TOKEN` é ignorado enquanto esse modo está ativo.
+
 #### Autenticação por chamador (opcional)
 
 O `POZNOTE_MCP_AUTH_TOKEN` acima é um único segredo partilhado: todos os
@@ -219,7 +274,7 @@ logs do MCP mostram `Per-caller authentication enabled` no arranque.
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(não definido, funcionalidade desligada)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(não definido, funcionalidade desligada)* | `userinfo` or `introspection` (`poznote` is described [above](#login-a-partir-de-aplicativos-de-chat-chatgpt-claude-gemini)) |
 | `POZNOTE_MCP_AUTH_URL` | *(obrigatório)* | provider endpoint |
 | `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
 | `POZNOTE_MCP_AUTH_AUDIENCE` | *(não definido, funcionalidade desligada)* | expected `aud`, comma separated; refuses a token issued for another application |
@@ -256,8 +311,7 @@ Duas consequências a conhecer antes de o ativar:
 - **As ferramentas que não levam `user_id`** (`get_system_info`, `list_backups`,
   `create_backup`, `delete_backup`) atuam como o perfil predefinido do servidor,
   pelo que ficam limitadas a chamadores cujo perfil resolvido seja
-  administrador. Por isso o perfil predefinido tem de ser administrador, já que
-  a pesquisa de perfis lê `GET /api/v1/admin/users`.
+  administrador.
 
 Com `POZNOTE_MCP_AUTH_PROVIDER` definido, tem precedência sobre
 `POZNOTE_MCP_AUTH_TOKEN`, e o servidor registra um aviso se esse token ainda
@@ -340,16 +394,25 @@ Guia completo de configuração: **[VSCODE-COPILOT.md](VSCODE-COPILOT.pt.md)**
 ### **Claude CLI**
 Guia completo de configuração: **[CLAUDE-CLI.md](CLAUDE-CLI.pt.md)**
 
+### **ChatGPT, Claude Desktop / claude.ai, Gemini**
+Os aplicativos de chat fazem login pelo Poznote: veja **[Login a partir de aplicativos de chat](#login-a-partir-de-aplicativos-de-chat-chatgpt-claude-gemini)**.
+
 ---
 
 ## Segurança
 
-Qualquer pessoa que consiga alcançar o endpoint MCP pode ler, criar, modificar e excluir todas as notas de todos os perfis (as ferramentas aceitam um argumento `user_id`), além de disparar backups, restaurações e alterações de configurações. Duas camadas evitam que isso seja um problema:
+O que um cliente que alcança o endpoint MCP pode fazer depende do [modo](#qual-modo-para-qual-uso).
+
+**Modo clássico** (o padrão). Qualquer pessoa que consiga alcançar o endpoint pode ler, criar, modificar e excluir todas as notas de todos os perfis (as ferramentas aceitam um argumento `user_id`), além de disparar backups, restaurações e alterações de configurações. Duas camadas evitam que isso seja um problema:
 
 1. **Acessibilidade de rede.** Por padrão, o endpoint só é acessível a partir da máquina local.
 2. **Token bearer de entrada** (opcional). Defina `POZNOTE_MCP_AUTH_TOKEN` e toda requisição precisará trazer `Authorization: Bearer <token>`.
 
-Com o `docker-compose.yml` padrão, a camada 1 sozinha basta. Adicione a camada 2 sempre que a porta ficar acessível a partir de algum lugar que você não controla totalmente. Para restringir o que um cliente que alcança o endpoint pode fazer, defina um [escopo das ferramentas](#escopo-das-ferramentas).
+Com o `docker-compose.yml` padrão, a camada 1 sozinha basta. Adicione a camada 2 sempre que a porta ficar acessível a partir de algum lugar que você não controla totalmente.
+
+**Login a partir de aplicativos de chat, e autenticação por chamador.** Toda requisição precisa trazer um token vinculado à conta de uma única pessoa, então um cliente só alcança essa conta, no nível que recebeu. Aqui o endpoint deve ficar acessível pela internet, atrás de HTTPS: os aplicativos de chat se conectam a partir dos próprios servidores.
+
+Em qualquer modo, um [escopo das ferramentas](#escopo-das-ferramentas) restringe o que um cliente pode fazer.
 
 ### Por que escutar só em 127.0.0.1 é normal e seguro
 
@@ -372,7 +435,7 @@ Se você instalar o servidor MCP com `pip` e executar `poznote-mcp serve` por co
 
 ### Acesso remoto
 
-Se o Poznote roda em um servidor remoto e você quer se conectar a partir da sua estação de trabalho, use o redirecionamento de portas do SSH; **não** exponha a porta publicamente:
+No modo clássico, se o Poznote roda em um servidor remoto e você quer se conectar a partir da sua estação de trabalho, use o redirecionamento de portas do SSH e **não** exponha a porta publicamente (com o [login a partir de aplicativos de chat](#login-a-partir-de-aplicativos-de-chat-chatgpt-claude-gemini), expô-la atrás de HTTPS é justamente o objetivo, e esta seção não se aplica):
 
 ```bash
 ssh -L 8045:127.0.0.1:8045 user@your-server
@@ -383,9 +446,9 @@ Depois aponte o seu assistente de IA para `http://127.0.0.1:8045/mcp`, como de c
 ### Ambientes de produção
 
 Se você precisar rotear o servidor MCP por uma rede, proteja-o com:
-- `POZNOTE_MCP_AUTH_TOKEN` (veja [Token de autenticação de entrada](#token-de-autenticação-de-entrada)), com HTTPS na frente para que o token não trafegue em texto claro
+- `POZNOTE_MCP_AUTH_TOKEN` (veja [Token de autenticação de entrada](#token-de-autenticação-de-entrada)), ou o [login pelo Poznote](#login-a-partir-de-aplicativos-de-chat-chatgpt-claude-gemini) para que cada cliente tenha o próprio token revogável vinculado a uma única conta, com HTTPS na frente para que o token não trafegue em texto claro
 - Uma VPN (Tailscale, WireGuard)
-- Opcionalmente, um proxy reverso com autenticação própria ou lista de IPs permitidos (nginx, Caddy) como camada extra
+- Opcionalmente, um proxy reverso com autenticação própria ou lista de IPs permitidos (nginx, Caddy) como camada extra, exceto com o login a partir de aplicativos de chat: os aplicativos se conectam a partir dos próprios endereços, que mudam, e não conseguem responder a outro login, então o endpoint e seus documentos `/.well-known/` precisam continuar acessíveis
 
 ### Como o servidor MCP se autentica no Poznote
 

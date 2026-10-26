@@ -1724,6 +1724,21 @@ function isApiServiceTokenRequest(): bool {
 }
 
 /**
+ * Whether the person behind the request is an administrator, for the
+ * exemptions that follow the person rather than the credential: quotas and
+ * tenant isolation. The same as isCurrentUserAdmin(), except for the MCP
+ * service token: it authenticates as the default administrator whoever the
+ * MCP caller is (since #1681, any user who connected a chat app), and acts
+ * for the account named by X-User-ID, so that account decides.
+ */
+function isRequestActorAdmin(): bool {
+    if (isApiServiceTokenRequest()) {
+        return !empty($_SESSION['user']['is_admin']);
+    }
+    return isCurrentUserAdmin();
+}
+
+/**
  * Whose editing the current request counts as, for the note edit lock.
  *
  * A note open in the app is locked by the logged-in user, and that same
@@ -2278,6 +2293,28 @@ function isActiveAccountOwnedByAuthenticatedUser(): bool {
     $activeUserId = (int)(getCurrentUserId() ?? 0);
 
     return $authenticatedUserId > 0 && $activeUserId > 0 && $authenticatedUserId === $activeUserId;
+}
+
+/**
+ * isActiveAccountOwnedByAuthenticatedUser(), counting the MCP service token
+ * as the owner of the account it acts for (X-User-ID). Used only where an
+ * MCP tool needs an owner action on its own account: workspaces, writing the
+ * account's settings, Git sync. Never for account management (password,
+ * deletion, app passwords, connected apps), which the service token cannot
+ * reach at all (UsersController::requireFullCredentials()).
+ *
+ * The service token always authenticates as the default administrator, so
+ * the plain check failed for every other account. Treating it as the owner
+ * is sound because the MCP server only acts for an account its caller owns:
+ * a chat app gets the account of whoever approved it, never one they were
+ * given access to (oauth/authorize.php, enforced on every token use), and
+ * the other modes give whoever reaches the server every account anyway.
+ */
+function isActiveAccountOwnedForApiRequest(): bool {
+    if (isApiServiceTokenRequest()) {
+        return (int)(getCurrentUserId() ?? 0) > 0;
+    }
+    return isActiveAccountOwnedByAuthenticatedUser();
 }
 
 /**

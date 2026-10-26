@@ -47,6 +47,8 @@ const ACTIVITY_LOGIN              = 'user.login';
 const ACTIVITY_LOGOUT             = 'user.logout';
 const ACTIVITY_APP_PASSWORD_CREATED = 'app_password.created';
 const ACTIVITY_APP_PASSWORD_REVOKED = 'app_password.revoked';
+const ACTIVITY_OAUTH_APP_AUTHORIZED = 'oauth_app.authorized';
+const ACTIVITY_OAUTH_APP_REVOKED = 'oauth_app.revoked';
 const ACTIVITY_STATISTICS_TOKEN_CREATED = 'statistics_token.created';
 const ACTIVITY_STATISTICS_TOKEN_REVOKED = 'statistics_token.revoked';
 const ACTIVITY_STATISTICS_PUBLIC_ENABLED = 'statistics_public.enabled';
@@ -77,6 +79,8 @@ function activityLogActions(): array {
         ACTIVITY_ACCESS_REVOKED,
         ACTIVITY_APP_PASSWORD_CREATED,
         ACTIVITY_APP_PASSWORD_REVOKED,
+        ACTIVITY_OAUTH_APP_AUTHORIZED,
+        ACTIVITY_OAUTH_APP_REVOKED,
         ACTIVITY_STATISTICS_TOKEN_CREATED,
         ACTIVITY_STATISTICS_TOKEN_REVOKED,
         ACTIVITY_STATISTICS_PUBLIC_ENABLED,

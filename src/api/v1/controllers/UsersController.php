@@ -47,6 +47,14 @@ class UsersController {
             http_response_code(403);
             return ['error' => 'This action is not available with an app password'];
         }
+        // Nor through the MCP server: a chat app, or a prompt injected into a
+        // note it reads, must never change the password, delete the account,
+        // or create credentials. No MCP tool calls these routes; this keeps a
+        // future one from being able to.
+        if (function_exists('isApiServiceTokenRequest') && isApiServiceTokenRequest()) {
+            http_response_code(403);
+            return ['error' => 'This action is not available through the MCP server'];
+        }
         return null;
     }
     
@@ -1532,6 +1540,68 @@ class UsersController {
             ]),
             'secret' => $created['secret'],
         ];
+    }
+
+    // ==================================================================
+    // Connected apps: chat apps signed in to the MCP server through
+    // Poznote's OAuth consent page (see src/lib/oauth-server.php)
+    // ==================================================================
+
+    /**
+     * GET /api/v1/users/me/connected-apps - List the apps connected to the
+     * current account. Tokens are never returned.
+     */
+    public function listConnectedApps() {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/oauth.php';
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        $rows = array_map(function ($row) {
+            foreach (['created_at', 'last_used_at'] as $field) {
+                $row[$field] = $row[$field] !== null
+                    ? $this->formatPasswordChangedAt(gmdate('Y-m-d H:i:s', (int)$row[$field]))
+                    : null;
+            }
+            return $row;
+        }, listOAuthGrantsForUser($userId));
+
+        return ['connected_apps' => $rows, 'count' => count($rows)];
+    }
+
+    /**
+     * DELETE /api/v1/users/me/connected-apps/{id} - Disconnect an app
+     * Its tokens stop working; the app has to go through the consent page
+     * again to reconnect.
+     */
+    public function revokeConnectedApp($id) {
+        if ($err = $this->requireActiveAccountOwner()) return $err;
+        if ($err = $this->requireFullCredentials()) return $err;
+
+        require_once dirname(__DIR__, 3) . '/users/oauth.php';
+        require_once dirname(__DIR__, 3) . '/ActivityLog.php';
+
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0) {
+            http_response_code(401);
+            return ['error' => 'Not authenticated'];
+        }
+
+        $appName = revokeOAuthGrantForUser($userId, (int)$id);
+        if ($appName === null) {
+            http_response_code(404);
+            return ['error' => 'Connected app not found'];
+        }
+
+        logActivity(ACTIVITY_OAUTH_APP_REVOKED, ['app' => $appName, 'grant_id' => (int)$id], 'api');
+
+        return ['success' => true];
     }
 
     /**

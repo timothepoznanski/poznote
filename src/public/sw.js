@@ -34,7 +34,9 @@ const ATTACHMENT_PATTERN = /\/api\/v1\/notes\/\d+\/attachments\/[^/]+$/;
 // trip only makes sense with the server. A logout that cannot reach the
 // server does get the offline page, which signs out on the device
 // (js/offline-app.js) and has the server session closed later.
-const NO_FALLBACK_PAGES = ['oidc_login.php', 'oidc_callback.php'];
+// authorize.php is the consent page a chat app sends the person to (OAuth for
+// the MCP server): a failure there must show its own error, as for OIDC.
+const NO_FALLBACK_PAGES = ['oidc_login.php', 'oidc_callback.php', 'authorize.php'];
 
 // A page slower than this has the server asked directly whether it is there
 // (api_health.php, answered in milliseconds). A server that answers is only

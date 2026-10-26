@@ -523,9 +523,10 @@
       "local_backup": "Enregistrez des archives de sauvegarde complètes dans un dossier du serveur, manuellement ou selon une planification, en ne conservant que les plus récentes.",
       "whats_new": "Après une mise à jour, afficher une fois les notes de la nouvelle version à l'ouverture de vos notes.",
       "login_disabled": "Passe l'écran de connexion : tout navigateur qui atteint cette instance ouvre directement votre compte, sans nom d'utilisateur, mot de passe ni code à deux facteurs. À n'activer que si vous êtes seul à pouvoir joindre cette instance, ou si un reverse proxy placé devant elle gère l'authentification. L'API continue de demander des identifiants.",
-      "outbound_hosts": "Les webhooks, les serveurs IA, de transcription et MCP personnels et Git Sync des utilisateurs non administrateurs n'atteignent que des hôtes publics d'Internet. Listez ici les hôtes et réseaux locaux qu'ils peuvent utiliser, par exemple un serveur Ollama ou n8n sur votre réseau. Les administrateurs ne sont pas limités.",
+      "outbound_hosts": "Les utilisateurs non administrateurs ne peuvent connecter les webhooks, Git Sync et leurs propres serveurs IA, de transcription ou MCP qu'à des hôtes publics d'Internet. Listez ici les hôtes ou réseaux locaux qu'ils peuvent utiliser, par exemple un serveur Ollama ou n8n. Les administrateurs ne sont pas limités.",
       "diary_template": "Choisissez une note dont le contenu sert de point de départ à chaque nouvelle entrée de journal de l'espace de travail {{workspace}}. La liste montre les notes rangées dans un dossier nommé Modèles (ou Templates) de cet espace. Chaque espace de travail a son propre modèle.",
-      "markdown_view_cycle": "Choisissez les vues que le bouton de vue d'une note markdown parcourt après la vue classique (aperçu, avec le crayon pour modifier). Les vues décochées sont sautées. Si aucune n'est cochée, le bouton est masqué. Sur un téléphone, le bouton ne passe jamais en mode partagé."
+      "markdown_view_cycle": "Choisissez les vues que le bouton de vue d'une note markdown parcourt après la vue classique (aperçu, avec le crayon pour modifier). Les vues décochées sont sautées. Si aucune n'est cochée, le bouton est masqué. Sur un téléphone, le bouton ne passe jamais en mode partagé.",
+      "connected_apps": "Connectez des applications de chat comme ChatGPT ou Claude à vos notes via le serveur MCP, et déconnectez-les à tout moment."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -645,7 +646,8 @@
       "local_backup": "Sauvegardes locales",
       "whats_new": "Nouveautés après une mise à jour",
       "login_disabled": "Ouverture sans connexion",
-      "outbound_hosts": "Accès au réseau local"
+      "outbound_hosts": "Accès au réseau local",
+      "connected_apps": "Applications connectées"
     },
     "default_credentials": {
       "both": "Ce compte utilise encore le login et le mot de passe livrés par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",
@@ -1912,8 +1914,9 @@
     },
     "outbound_hosts": {
       "title": "Accès au réseau local",
-      "description": "Les utilisateurs non administrateurs ne peuvent diriger les webhooks, les serveurs IA, de transcription et MCP personnels et Git Sync que vers des hôtes publics d'Internet. Les hôtes et réseaux listés ici sont également autorisés. Les administrateurs ne sont jamais limités.",
+      "description": "Les utilisateurs non administrateurs ne peuvent connecter les webhooks, Git Sync et leurs propres serveurs IA, de transcription ou MCP qu'à des hôtes publics d'Internet. Les hôtes et réseaux listés ici sont également autorisés. Les administrateurs ne sont jamais limités.",
       "label": "Une entrée par ligne : un nom d'hôte, *.domaine, une adresse ou un réseau",
+      "resolve_hint": "Un nom d'hôte doit pouvoir être résolu depuis le serveur Poznote, pas seulement depuis votre ordinateur. Sinon, saisissez plutôt son adresse.",
       "invalid": "Ni un nom d'hôte, ni une adresse, ni un réseau : {{entries}}"
     }
   },
@@ -4096,7 +4099,9 @@
       "two_factor_disabled": "Double authentification désactivée",
       "two_factor_reset": "Double authentification désactivée par un admin",
       "two_factor_recovery_used": "Connexion avec un code de récupération",
-      "two_factor_recovery_regenerated": "Codes de récupération régénérés"
+      "two_factor_recovery_regenerated": "Codes de récupération régénérés",
+      "oauth_app_authorized": "Application connectée (MCP)",
+      "oauth_app_revoked": "Application déconnectée (MCP)"
     },
     "filters": {
       "all_actions": "Toutes les actions",
@@ -4555,7 +4560,7 @@
     "error_saving": "Erreur lors de l'enregistrement du webhook.",
     "error_not_found": "Webhook introuvable.",
     "section_app_url": "URL de l'instance",
-    "app_url_description": "URL publique de cette instance Poznote, utilisee pour construire le lien direct vers la note envoye dans les payloads (data.note.url). Laissez vide pour n'envoyer aucun lien. Il s'agit de la meme URL d'instance que celle utilisee par les e-mails de rappel.",
+    "app_url_description": "URL publique de cette instance Poznote, utilisee pour construire le lien direct vers la note envoye dans les payloads (data.note.url). Laissez vide pour n'envoyer aucun lien. Il s'agit de la meme URL d'instance que celle utilisee par les e-mails de rappel. Les applications de chat qui se connectent au serveur MCP y sont aussi envoyées pour se connecter.",
     "app_url_saved": "URL de l'instance enregistree.",
     "app_url_cleared": "URL de l'instance effacee. Les payloads ne contiendront plus de lien direct vers la note.",
     "error_invalid_app_url": "L'URL de l'instance doit commencer par http:// ou https://.",
@@ -5736,5 +5741,63 @@
     "saved": "Enregistré dans vos notes",
     "note_title": "Nouveautés de Poznote {{version}}",
     "versions": "Versions"
+  },
+  "oauth_authorize": {
+    "title": "Connecter une application",
+    "intro": "{{app}} souhaite utiliser vos notes Poznote.",
+    "redirect_note": "Vous serez renvoyé vers {{target}}. Ne continuez que si vous avez lancé cette connexion depuis cette application.",
+    "account_label": "Compte",
+    "level_label": "Accès",
+    "level_read": "Lecture seule",
+    "level_read_help": "Lire, rechercher et lister vos notes. Ne modifie rien.",
+    "level_write": "Lecture et modification",
+    "level_write_help": "Aussi créer et modifier des notes, des tâches, des rappels et des dossiers, et mettre des notes à la corbeille.",
+    "level_admin": "Accès complet",
+    "level_admin_help": "Aussi ce qui ne peut pas être annulé : vider la corbeille, supprimer des espaces de travail, le partage public, les paramètres, les sauvegardes et la synchronisation Git.",
+    "cancel": "Annuler",
+    "allow": "Autoriser",
+    "footnote": "Vous pouvez la déconnecter à tout moment dans Paramètres, Applications connectées.",
+    "error_title": "Cette connexion ne peut pas continuer",
+    "error_unknown_client": "L'application n'est pas enregistrée auprès de cette instance Poznote. Retirez le connecteur de l'application puis ajoutez-le à nouveau.",
+    "error_redirect_uri": "L'application a demandé à être renvoyée vers une adresse qu'elle n'a pas enregistrée.",
+    "error_expired": "Cette demande de connexion a expiré. Recommencez depuis l'application.",
+    "error_no_account": "Votre connexion n'a aucun compte actif que cette application pourrait utiliser.",
+    "name_unverified": "L'application donne ce nom elle-même ; Poznote ne le vérifie pas.",
+    "error_bad_request": "L'application a envoyé une demande de connexion incomplète (elle doit utiliser le flux code d'autorisation avec PKCE S256). Signalez-le à son développeur.",
+    "error_bad_resource": "L'application demande l'accès à un serveur qui n'est pas le serveur MCP de cette instance Poznote."
+  },
+  "connected_apps": {
+    "status": {
+      "count_one": "1 application",
+      "count_other": "{{count}} applications",
+      "none": "Aucune"
+    },
+    "level": {
+      "read": "Lecture seule",
+      "write": "Lecture et modification",
+      "admin": "Accès complet"
+    },
+    "modal": {
+      "title": "Applications connectées",
+      "description": "Les applications de chat que vous avez autorisées à se connecter à Poznote via le serveur MCP peuvent utiliser ce compte avec le niveau d'accès que vous avez choisi. En déconnecter une l'arrête en moins d'une minute ; elle ne peut revenir qu'en vous le demandant à nouveau.",
+      "empty": "Aucune application connectée.",
+      "connected": "Connectée le {{date}}",
+      "last_used": "Dernière utilisation le {{date}}",
+      "disconnect": "Déconnecter",
+      "confirm_disconnect": "Confirmer",
+      "close": "Fermer",
+      "connector_label": "Adresse du connecteur",
+      "connector_hint": "Pour connecter une application de chat, ajoutez cette adresse comme connecteur (serveur MCP personnalisé) dans ChatGPT, Claude ou Gemini, puis connectez-vous à Poznote quand l'application vous le demande. Laissez vides les champs d'identifiant et de secret client.",
+      "copy": "Copier",
+      "copied": "Copié",
+      "sign_in_label": "Les applications sont envoyées se connecter sur",
+      "sign_in_missing": "Non définie : les applications de chat ne peuvent pas se connecter tant qu'elle ne l'est pas.",
+      "sign_in_unreachable": "Les applications de chat se connectent depuis Internet en HTTPS, et cette adresse ne semble pas joignable ainsi.",
+      "sign_in_change": "La modifier (Webhooks admin, URL de l'instance)"
+    },
+    "errors": {
+      "load_failed": "Impossible de charger vos applications connectées.",
+      "generic": "Une erreur s'est produite. Réessayez."
+    }
   }
 }

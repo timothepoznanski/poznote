@@ -404,9 +404,10 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
 <div id="outboundHostsModal" class="modal">
     <div class="modal-content">
         <h3><?php echo t_h('modals.outbound_hosts.title', [], 'Local network access'); ?></h3>
-        <p><?php echo t_h('modals.outbound_hosts.description', [], 'Non-admin users can only point webhooks, personal AI, transcription and MCP servers and Git Sync at public internet hosts. The hosts and networks listed here are allowed as well. Administrators are never limited.'); ?></p>
+        <p><?php echo t_h('modals.outbound_hosts.description', [], 'Non-admin users can only connect webhooks, Git Sync and their own AI, transcription or MCP servers to public internet hosts. The hosts and networks listed here are allowed too. Administrators are never limited.'); ?></p>
         <label class="outbound-hosts-label" for="outboundHostsInput"><?php echo t_h('modals.outbound_hosts.label', [], 'One entry per line: a host name, *.domain, an address or a network'); ?></label>
         <textarea id="outboundHostsInput" class="outbound-hosts-input" rows="6" spellcheck="false" autocomplete="off" placeholder="ollama.lan&#10;*.home.arpa&#10;192.168.1.0/24"></textarea>
+        <p class="outbound-hosts-hint"><?php echo t_h('modals.outbound_hosts.resolve_hint', [], 'A host name must resolve from the Poznote server, not only from your computer. If it does not, enter its address instead.'); ?></p>
         <p class="outbound-hosts-error" id="outboundHostsError" role="alert" hidden></p>
         <div class="modal-buttons">
             <button type="button" class="btn-cancel" data-action="close-modal" data-modal="outboundHostsModal"><?php echo t_h('common.cancel'); ?></button>

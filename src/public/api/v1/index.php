@@ -1056,6 +1056,16 @@ $router->delete('/users/me/app-passwords/{id}', function($params) use ($usersCon
     echo json_encode($usersController->revokeAppPassword($params['id']));
 });
 
+// Connected apps: chat apps signed in to the MCP server through the OAuth
+// consent page (oauth/authorize.php), see src/lib/oauth-server.php
+$router->get('/users/me/connected-apps', function($params) use ($usersController) {
+    echo json_encode($usersController->listConnectedApps());
+});
+
+$router->delete('/users/me/connected-apps/{id}', function($params) use ($usersController) {
+    echo json_encode($usersController->revokeConnectedApp($params['id']));
+});
+
 // Web Push: devices subscribed to the account's reminder notifications,
 // see src/lib/web-push.php and src/ReminderPushService.php
 $router->get('/users/me/push', function($params) use ($usersController) {

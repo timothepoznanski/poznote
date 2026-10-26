@@ -145,7 +145,7 @@ Os payloads que fazem referência a uma nota podem trazer um link direto em `dat
 https://poznote.example.com/index.php?note=42&workspace=Poznote
 ```
 
-O link é montado a partir da **URL da instancia**, a URL pública da sua instância do Poznote, configurada na seção **URL da instancia** de **Configurações > Ferramentas de administração > Webhooks de administrador** (apenas administradores). É o mesmo valor da URL da instância usada pelos e-mails de lembrete, então defini-la em um lugar a define para os dois. Ela também pode ser definida pela API REST (configuração `smtp_app_url`) ou, como alternativa, com a variável de ambiente `POZNOTE_APP_URL` (ou `APP_URL`).
+O link é montado a partir da **URL da instância**, a URL pública da sua instância do Poznote, configurada na seção **URL da instância** de **Configurações > Ferramentas de administração > Webhooks de administrador** (apenas administradores). É o mesmo valor da URL da instância usada pelos e-mails de lembrete, então defini-la em um lugar a define para os dois. Ela também pode ser definida pela API REST (configuração `smtp_app_url`) ou, como alternativa, com a variável de ambiente `POZNOTE_APP_URL` (ou `APP_URL`). Os aplicativos de chat que se conectam ao [servidor MCP](MCP-SERVER.pt.md) pelo Poznote também são enviados para este endereço. Enquanto estiver vazio, ele é preenchido a partir do navegador de um administrador na primeira vez que ele usa o Poznote; depois disso, só muda se for alterado aqui.
 
 Quando nenhuma URL da instância está configurada, `data.note.url` é `null` e os payloads não trazem nenhum link.
 

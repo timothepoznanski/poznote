@@ -169,6 +169,18 @@ POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate m
 
 A simple `docker compose restart mcp-server` does not reload updated environment variables.
 
+#### Which mode for which use
+
+The MCP server identifies its clients in one of three ways. The question that tells them apart is **who decides which Poznote account a request acts on**:
+
+| Your situation | Mode | Who decides the account |
+|---|---|---|
+| You alone, with a client on the same machine (VS Code, Claude CLI) | Classic, the default, optionally with an [inbound token](#inbound-authentication-token) | The server's configuration: `POZNOTE_USER_ID` (profile `1` by default), or any profile a request names with `user_id` |
+| Several people, chat apps (ChatGPT, Claude, Gemini), or VS Code / Claude Code reaching a public server | [Sign-in from chat apps](#sign-in-from-chat-apps-chatgpt-claude-gemini) (`POZNOTE_MCP_AUTH_PROVIDER=poznote`) | The person who signs in: always their own account |
+| Agents that already hold tokens from your identity provider (Keycloak, Authentik, ...) | [Per-caller authentication](#per-caller-authentication-optional) (`userinfo` or `introspection`) | The profile linked to the token's identity |
+
+As soon as several people share one MCP server, use the second mode: in classic mode every client can reach every account.
+
 #### Default user profile
 
 By default the MCP server operates as user profile `1` (the first admin). To pin the server to a different profile, set `POZNOTE_USER_ID` when starting the container:
@@ -198,6 +210,49 @@ Then add the same header to your client configuration: see [VS Code Copilot](VSC
 
 This token is separate from `data/.mcp_token`: that one is used by the MCP server to talk *to* the Poznote API, this one is what *your AI assistant* must present to the MCP server.
 
+#### Sign-in from chat apps (ChatGPT, Claude, Gemini)
+
+Chat apps that connect to a remote MCP server, such as ChatGPT (and the Codex app), Claude Desktop and claude.ai, or Gemini, do not take a pasted token: they expect the server to send them through an OAuth sign-in. With `POZNOTE_MCP_AUTH_PROVIDER=poznote`, Poznote itself plays that part:
+
+1. You add `https://mcp.example.com/mcp` as a connector in the app, leaving any client ID and secret fields empty: the app registers itself. Apps keep this in their settings, usually as custom connectors or remote MCP servers, and some only offer it on certain plans or in a developer mode.
+2. The app opens Poznote's sign-in page. You sign in the way you always do (password, two-factor or SSO).
+3. A consent page shows the app's name, where it will send you back and the account it will use, always your own (never an account you were given access to), and lets you pick the access level: **Read only**, **Read and edit** or **Full access**, the three [tool scope](#tool-scope) levels.
+4. You click **Allow**, and the app only ever reaches that account, at that level.
+
+So one MCP server serves the whole instance, each person reaching only their own notes (and the workspaces shared with them). **Settings > My Account > Connected apps** lists the connections, disconnects any of them, and gives everyone the connector address to paste.
+
+Requirements:
+
+- The chat app connects from the internet (ChatGPT and claude.ai from their own servers), so the MCP server and Poznote must both be reachable from it over **HTTPS**. Put the MCP server behind your reverse proxy on **its own (sub)domain**, e.g. `https://mcp.example.com`: the OAuth discovery documents are served at the root of that address. Where the proxy sends the traffic depends on where it runs:
+  - installed directly on the server: proxy to `127.0.0.1:8045` (the port `docker-compose.yml` publishes, `POZNOTE_MCP_PORT`);
+  - running in Docker itself (Nginx Proxy Manager, Traefik, Caddy, ...): `127.0.0.1` would be the proxy's own container. Attach the proxy to Poznote's Docker network, `docker network connect poznote_default <proxy-container>` (the network is named after the folder of your `docker-compose.yml`, see `docker network ls`), and proxy to `mcp-server:8045`.
+- Poznote's own `/oauth/` pages must be reachable without another login in front of them (forward authentication such as Authelia or Authentik on your proxy): the apps call some of them from their servers, with no browser to show a login page.
+- Two variables in `.env`, then recreate the container (`docker compose up -d --force-recreate mcp-server`). An older `docker-compose.yml` does not pass them to the container: download the latest one first. The MCP logs then show `OAuth sign-in through Poznote enabled` at startup.
+
+```bash
+POZNOTE_MCP_AUTH_PROVIDER=poznote
+# Public URL of the MCP server, without /mcp
+POZNOTE_MCP_PUBLIC_URL=https://mcp.example.com
+```
+
+- Poznote's public URL, where people sign in, is the **Instance URL** of **Settings > Admin Tools > Admin Webhooks**, the one reminder emails and webhooks use (`POZNOTE_APP_URL` in `.env` while it is empty). When neither is set, it fills itself in from an administrator's browser; check that it is the address people reach Poznote by from the internet. A change reaches the MCP server within a minute, without a restart. The **Connected apps** window shows administrators the address in use, with a warning when it is a local or plain http one.
+
+If it does not work:
+
+- **The app says it cannot find the server's authorization (OAuth) settings.** From a machine outside your network, open `https://mcp.example.com/.well-known/oauth-protected-resource/mcp` and `https://mcp.example.com/.well-known/oauth-authorization-server`: both must answer with JSON. A `503` on the second means Poznote's public URL is not set; no answer at all means the reverse proxy does not reach the MCP server.
+- **The app opens a sign-in page that does not load.** The Instance URL is not one the app can reach: see the warning in **Connected apps**, and fix it in **Admin Webhooks > Instance URL**.
+- **The MCP logs do not show `OAuth sign-in through Poznote enabled` at startup.** The variables do not reach the container: check `.env` and `docker-compose.yml`, then recreate the container (a `restart` is not enough).
+- **The sign-in works but every request then fails.** The connector URL must be exactly `POZNOTE_MCP_PUBLIC_URL` followed by `/mcp`; the MCP logs say `Rejecting a token issued for ...` otherwise.
+- `docker compose logs mcp-server` tells what the server refused and why; `POZNOTE_DEBUG=true` adds every request.
+
+Rules that hold for every connection:
+
+- A connection lasts as long as it is used: the app renews its access every hour, and has to sign in again after 90 days without use. A disconnected app can keep working for up to `POZNOTE_MCP_AUTH_CACHE_TTL` seconds (60 by default).
+- `POZNOTE_MCP_SCOPE` still caps every connection: **Full access** to a server set to `write` gets `write`.
+- The tools that act on the whole instance (backups, global settings, system information) need an administrator's account, and a request cannot name another account with `user_id`.
+- A connected app cannot change where the account's data is sent: the Git sync repository, server and token, and the endpoints and keys of the AI assistant and of dictation. It can still push to and pull from the repository you configured.
+- `POZNOTE_MCP_AUTH_TOKEN` is ignored while this mode is on.
+
 #### Per-caller authentication (optional)
 
 `POZNOTE_MCP_AUTH_TOKEN` above is one shared secret: every client presents the
@@ -218,7 +273,7 @@ logs show `Per-caller authentication enabled` at startup.
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset, feature off)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(unset, feature off)* | `userinfo` or `introspection` (`poznote` is described [above](#sign-in-from-chat-apps-chatgpt-claude-gemini)) |
 | `POZNOTE_MCP_AUTH_URL` | *(required)* | provider endpoint |
 | `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
 | `POZNOTE_MCP_AUTH_AUDIENCE` | *(unset, feature off)* | expected `aud`, comma separated; refuses a token issued for another application |
@@ -253,9 +308,7 @@ Two consequences worth knowing before enabling it:
   rather than honoured.
 - **The tools that take no `user_id`** (`get_system_info`, `list_backups`,
   `create_backup`, `delete_backup`) act as the server's default profile, so they
-  are limited to callers whose resolved profile is an administrator. The default
-  profile therefore has to be an administrator, because the profile lookup reads
-  `GET /api/v1/admin/users`.
+  are limited to callers whose resolved profile is an administrator.
 
 With `POZNOTE_MCP_AUTH_PROVIDER` set it takes precedence over
 `POZNOTE_MCP_AUTH_TOKEN`, and the server logs a warning if that token is still
@@ -338,16 +391,25 @@ Complete setup guide: **[VSCODE-COPILOT.md](VSCODE-COPILOT.md)**
 ### **Claude CLI**
 Complete setup guide: **[CLAUDE-CLI.md](CLAUDE-CLI.md)**
 
+### **ChatGPT, Claude Desktop / claude.ai, Gemini**
+Chat apps sign in through Poznote: see **[Sign-in from chat apps](#sign-in-from-chat-apps-chatgpt-claude-gemini)**.
+
 ---
 
 ## Security
 
-Anyone who can reach the MCP endpoint can read, create, modify and delete every note of every profile (tools accept a `user_id` argument), and can also trigger backups, restores and settings changes. Two layers keep that from being a problem:
+What a client that reaches the MCP endpoint can do depends on the [mode](#which-mode-for-which-use).
+
+**Classic mode** (the default). Anyone who can reach the endpoint can read, create, modify and delete every note of every profile (tools accept a `user_id` argument), and can also trigger backups, restores and settings changes. Two layers keep that from being a problem:
 
 1. **Network reachability.** The endpoint is only reachable from the local machine by default.
 2. **Inbound bearer token** (optional). Set `POZNOTE_MCP_AUTH_TOKEN` and every request must carry `Authorization: Bearer <token>`.
 
-With the default `docker-compose.yml`, layer 1 alone is enough. Add layer 2 whenever the port becomes reachable from somewhere you do not fully control. To narrow what a reachable client can do, set a [tool scope](#tool-scope).
+With the default `docker-compose.yml`, layer 1 alone is enough. Add layer 2 whenever the port becomes reachable from somewhere you do not fully control.
+
+**Sign-in from chat apps, and per-caller authentication.** Every request must carry a token bound to one person's account, so a client only reaches that account, at the level it was given. Here the endpoint is meant to be reachable from the internet, behind HTTPS: the chat apps connect from their own servers.
+
+In every mode, a [tool scope](#tool-scope) narrows what a client can do.
 
 ### Why 127.0.0.1-only is both normal and secure
 
@@ -370,7 +432,7 @@ If you install the MCP server with `pip` and run `poznote-mcp serve` yourself (s
 
 ### Remote access
 
-If Poznote runs on a remote server and you want to connect from your workstation, use SSH port forwarding — do **not** expose the port publicly:
+In classic mode, if Poznote runs on a remote server and you want to connect from your workstation, use SSH port forwarding, and do **not** expose the port publicly (with [sign-in from chat apps](#sign-in-from-chat-apps-chatgpt-claude-gemini) exposing it behind HTTPS is the point, and this section does not apply):
 
 ```bash
 ssh -L 8045:127.0.0.1:8045 user@your-server
@@ -381,9 +443,9 @@ Then point your AI assistant to `http://127.0.0.1:8045/mcp` as usual.
 ### Production environments
 
 If you must route the MCP server through a network, protect it with:
-- `POZNOTE_MCP_AUTH_TOKEN` (see [Inbound authentication token](#inbound-authentication-token)), and HTTPS in front of it so the token is not sent in clear
+- `POZNOTE_MCP_AUTH_TOKEN` (see [Inbound authentication token](#inbound-authentication-token)), or [sign-in through Poznote](#sign-in-from-chat-apps-chatgpt-claude-gemini) so every client has its own revocable token bound to one account, and HTTPS in front of it so the token is not sent in clear
 - A VPN (Tailscale, WireGuard)
-- Optionally a reverse proxy with its own authentication or IP allowlist (nginx, Caddy) as an extra layer
+- Optionally a reverse proxy with its own authentication or IP allowlist (nginx, Caddy) as an extra layer, except with sign-in from chat apps: the apps connect from their own, changing addresses and cannot answer another login, so the endpoint and its `/.well-known/` documents must stay reachable
 
 ### How the MCP server authenticates to Poznote
 

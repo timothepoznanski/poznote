@@ -5447,6 +5447,58 @@ paths:
         '404':
           description: No such app password on this profile
 
+  /users/me/connected-apps:
+    get:
+      tags: [Users]
+      summary: List the apps connected to the current account
+      description: |
+        Chat apps (ChatGPT, Claude, Gemini, ...) that signed in to the MCP server through Poznote's
+        OAuth consent page and still hold a valid connection to this account. Tokens are never returned.
+        Does NOT require X-User-ID header. Not available to requests authenticated with an app password.
+      responses:
+        '200':
+          description: Connected apps, newest first
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected_apps:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: integer }
+                        client_name: { type: string, description: Name the app registered with, or the host it redirects to }
+                        access_level: { type: string, enum: [read, write, admin] }
+                        created_at: { type: string }
+                        last_used_at: { type: string, nullable: true }
+                  count: { type: integer }
+        '403':
+          description: Requested with an app password, or for an account the caller does not own
+
+  /users/me/connected-apps/{id}:
+    delete:
+      tags: [Users]
+      summary: Disconnect an app
+      description: |
+        The app's tokens stop working (the MCP server may still accept one for up to its cache TTL,
+        60 seconds by default); it has to go through the consent page again to reconnect.
+        Does NOT require X-User-ID header. Not available to requests authenticated with an app password.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: App disconnected
+        '403':
+          description: Requested with an app password, or for an account the caller does not own
+        '404':
+          description: No such connected app on this account
+
   /users/me/two-factor:
     get:
       tags: [Users]

@@ -23,6 +23,9 @@ Inbound authentication:
     POZNOTE_MCP_AUTH_TOKEN to require "Authorization: Bearer <token>" on
     every request. Without it, keep the server bound to 127.0.0.1 (the
     default) or behind a port mapping / tunnel that only you can reach.
+    POZNOTE_MCP_AUTH_PROVIDER switches to per-caller tokens instead; its
+    'poznote' value lets chat apps (ChatGPT, Claude, Gemini) sign in through
+    Poznote with OAuth, see poznote_oauth.py.
 """
 
 import argparse
@@ -58,6 +61,7 @@ from .auth_external import (
     IdentityProviderUnavailable,
     IdentityUnmapped,
     build_external_auth_provider,
+    external_auth_enabled,
 )
 
 
@@ -252,11 +256,33 @@ class LocalOriginGuard:
         await self.app(scope, receive, send)
 
 
+class McpTrailingSlashAlias:
+    """ASGI middleware serving "/mcp/" as "/mcp" instead of redirecting.
+
+    Starlette answers "/mcp/" with a 307 to "/mcp", built from the scheme the
+    request arrived with. Behind a reverse proxy that terminates HTTPS that is
+    plain http, and MCP clients rightly refuse to follow a redirect from https
+    to http, so a connector URL pasted with a trailing slash simply failed.
+    Nothing else is served under "/mcp/".
+    """
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http" and scope.get("path") == "/mcp/":
+            scope = dict(scope, path="/mcp", raw_path=b"/mcp")
+        await self.app(scope, receive, send)
+
+
 def _build_http_middleware(token: str | None, external: bool = False) -> list[Middleware]:
     # The origin guard exists to keep a *browser page* off an unauthenticated
     # endpoint. It is redundant once any bearer check is in force, including
     # the per-caller one, so it stands down for either.
-    return [] if (token or external) else [Middleware(LocalOriginGuard)]
+    middleware = [Middleware(McpTrailingSlashAlias)]
+    if not (token or external):
+        middleware.append(Middleware(LocalOriginGuard))
+    return middleware
 
 
 def _load_inbound_auth_token(env_value: str | None = None) -> str | None:
@@ -2882,8 +2908,43 @@ GLOBAL_SETTING_KEYS = frozenset({
     'mcp_user_id', 'mcp_default_workspace', 'mcp_debug',
     'smtp_enabled', 'smtp_host', 'smtp_port', 'smtp_security', 'smtp_username',
     'smtp_password', 'smtp_from_email', 'smtp_from_name', 'smtp_app_url',
-    'smtp_reminder_cutoff_at',
+    'smtp_reminder_cutoff_at', 'outbound_allowed_hosts',
+    'ai_chat_mcp_enabled', 'ai_chat_mcp_user_servers_enabled',
 })
+
+
+# Per-account settings that decide WHERE the account's data goes, or hold the
+# credential for it: Git sync's repository, server and token, the in-app AI
+# assistant's endpoint, key, headers and MCP servers, the dictation endpoint
+# and key. Pointing Git at another repository and pushing hands over every
+# note; pointing the assistant elsewhere hands over every conversation.
+#
+# Under per-caller authentication the caller is a chat app or an agent that
+# reads notes written by others, so a prompt injected into one of them could
+# ask for exactly that. update_app_setting refuses these keys there: the app
+# can still push or pull to the repository the person configured, it cannot
+# choose another. With the shared token or none, whoever reaches the server
+# is the operator, and nothing changes.
+DESTINATION_SETTING_KEYS = frozenset({
+    'git_repo', 'git_api_base', 'git_provider', 'git_token',
+    'ai_user_url', 'ai_user_provider', 'ai_user_api_key', 'ai_user_headers', 'ai_user_mcp_servers',
+    'stt_user_url', 'stt_user_provider', 'stt_user_api_key',
+})
+
+
+def _deny_destination_setting_for_caller(key: str) -> str | None:
+    """Refuse a destination or credential setting to a per-caller client.
+
+    Returns None when the write may proceed, which includes every key outside
+    DESTINATION_SETTING_KEYS and every write without per-caller authentication.
+    """
+    if key not in DESTINATION_SETTING_KEYS or not external_auth_enabled():
+        return None
+    return json.dumps({
+        "error": f"The setting '{key}' decides where this account's data is sent, or holds "
+                 "the credential for it, and cannot be changed through a connected app. "
+                 "Change it in Poznote's settings.",
+    }, indent=2, ensure_ascii=False)
 
 
 def _deny_non_admin_caller_for_global_key(key: str | None = None) -> str | None:
@@ -3045,7 +3106,7 @@ def update_app_setting(key: str, value: str, user_id: Optional[int] = None) -> s
         value: The new value for the setting
         user_id: User profile ID to access (optional, overrides default)
     """
-    denied = _deny_non_admin_caller_for_global_key(key)
+    denied = _deny_non_admin_caller_for_global_key(key) or _deny_destination_setting_for_caller(key)
     if denied:
         return denied
     client, err = _get_client_or_error()
@@ -3329,10 +3390,16 @@ def list_shared_with_me(user_id: Optional[int] = None) -> str:
 def _log_inbound_auth_status(host: str, token: str | None) -> None:
     """Tell the operator, once at startup, how the endpoint is protected."""
     if _external_auth_provider is not None:
-        logger.info(
-            "Per-caller authentication enabled: every client must present its own "
-            "token, resolved against the configured identity provider.",
-        )
+        if (os.getenv("POZNOTE_MCP_AUTH_PROVIDER") or "").strip().lower() == "poznote":
+            logger.info(
+                "Per-caller authentication enabled: chat apps sign in through Poznote "
+                "(OAuth) and each one acts as the account approved on the consent page.",
+            )
+        else:
+            logger.info(
+                "Per-caller authentication enabled: every client must present its own "
+                "token, resolved against the configured identity provider.",
+            )
         if token:
             logger.warning(
                 "%s is also set and is being IGNORED: per-caller authentication "

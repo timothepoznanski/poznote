@@ -75,6 +75,7 @@ def test_verifier_rejects_empty_token():
 from poznote_mcp.server import (  # noqa: E402
     LocalOriginGuard,
     _build_http_middleware,
+    McpTrailingSlashAlias,
     _origin_allowed_without_token,
 )
 
@@ -120,8 +121,8 @@ def test_web_pages_from_elsewhere_are_refused(origin):
 
 
 def test_guard_is_only_installed_without_a_token():
-    assert [m.cls for m in _build_http_middleware(None)] == [LocalOriginGuard]
-    assert _build_http_middleware("abc123") == []
+    assert [m.cls for m in _build_http_middleware(None)] == [McpTrailingSlashAlias, LocalOriginGuard]
+    assert [m.cls for m in _build_http_middleware("abc123")] == [McpTrailingSlashAlias]
 
 
 def _run_guard(headers):

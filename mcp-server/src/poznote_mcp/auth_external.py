@@ -31,6 +31,17 @@ Providers
     offers introspection instead of UserInfo. Optional client credentials are
     sent as HTTP Basic when configured.
 
+``poznote``
+    Poznote itself is the authorization server (issue #1681). Chat apps such
+    as ChatGPT, Claude or Gemini discover it from this server's OAuth metadata,
+    register themselves, and send the person to Poznote's own sign-in and
+    consent page; the token they get is bound to the Poznote account picked
+    there. This server checks each token at Poznote's introspection endpoint
+    with its service token. Nothing to match or map: the token names the
+    profile (``sub``) and the access level (``poznote_level``) directly. Needs
+    POZNOTE_MCP_PUBLIC_URL (this server's public URL) and POZNOTE_APP_URL
+    (Poznote's public URL). See poznote_oauth.py.
+
 Identity mapping
 ----------------
 ``POZNOTE_MCP_IDENTITY_MATCH`` is an ordered, comma-separated list of
@@ -65,6 +76,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 from typing import Any, Callable
+from urllib.parse import urlsplit
 
 import httpx
 
@@ -94,6 +106,10 @@ AUDIENCE_ENV = "POZNOTE_MCP_AUTH_AUDIENCE"
 HEADER_ENV = "POZNOTE_MCP_AUTH_HEADER"
 SCOPE_CLAIM_ENV = "POZNOTE_MCP_SCOPE_CLAIM"
 SCOPE_MAP_ENV = "POZNOTE_MCP_SCOPE_MAP"
+PUBLIC_URL_ENV = "POZNOTE_MCP_PUBLIC_URL"
+APP_URL_ENV = "POZNOTE_APP_URL"
+SERVICE_TOKEN_FILE_ENV = "POZNOTE_SERVICE_TOKEN_FILE"
+DEFAULT_SERVICE_TOKEN_FILE = "/var/www/html/data/.mcp_token"
 
 # Tool levels, lowest first (discussion #1657). Defined here rather than in
 # server.py, which imports this module.
@@ -105,7 +121,31 @@ DEFAULT_TIMEOUT = 5.0
 DEFAULT_CACHE_TTL = 60.0
 DEFAULT_HEADER = "Authorization"
 
-SUPPORTED_PROVIDERS = ("userinfo", "introspection")
+SUPPORTED_PROVIDERS = ("userinfo", "introspection", "poznote")
+
+# The 'poznote' provider: what the token itself says, so nothing to configure.
+POZNOTE_MATCH = "id:sub"
+POZNOTE_SCOPE_CLAIM = "poznote_level"
+# Path of the MCP endpoint, part of the resource URL apps bind their tokens to
+MCP_PATH = "/mcp"
+
+
+def _http_url(raw: str | None) -> str:
+    """An http(s) URL without its trailing slash, '' when absent or not one."""
+    value = (raw or "").strip().rstrip("/")
+    return value if value.lower().startswith(("http://", "https://")) else ""
+
+
+def poznote_introspection_url(api_url: str | None = None) -> str:
+    """Poznote's introspection endpoint, next to the API this server already uses.
+
+    POZNOTE_API_URL is the internal address (http://webserver:80/api/v1 in
+    Docker), so the check never leaves the Docker network.
+    """
+    base = (api_url or os.getenv("POZNOTE_API_URL") or "http://localhost:8040/api/v1").strip().rstrip("/")
+    if base.endswith("/api/v1"):
+        base = base[: -len("/api/v1")]
+    return base + "/oauth/introspect.php"
 
 
 @dataclass(frozen=True)
@@ -132,6 +172,14 @@ class ExternalAuthConfig:
     # Claim value -> tool level. Empty: every caller gets the server's level.
     scope_claim: str = DEFAULT_SCOPE_CLAIM
     scope_map: dict[str, str] = field(default_factory=dict)
+    # 'poznote' provider only: this server's public URL and Poznote's
+    public_url: str = ""
+    app_url: str = ""
+
+    @property
+    def resource_url(self) -> str:
+        """The MCP endpoint's public URL, the resource apps bind tokens to."""
+        return self.public_url + MCP_PATH if self.public_url else ""
 
     @staticmethod
     def parse_scope_map(raw: str | None) -> dict[str, str]:
@@ -219,13 +267,16 @@ class ExternalAuthConfig:
                 f"expected one of {', '.join(SUPPORTED_PROVIDERS)}"
             )
 
+        if provider == "poznote":
+            return cls._poznote_from_env()
+
         url = (os.getenv(URL_ENV) or "").strip()
         if not url:
             raise ValueError(f"{PROVIDER_ENV} is set but {URL_ENV} is empty")
         if not url.lower().startswith(("http://", "https://")):
             raise ValueError(f"{URL_ENV} must be an http(s) URL, got {url!r}")
 
-        rules = cls.parse_match(os.getenv(MATCH_ENV, DEFAULT_MATCH))
+        rules = cls.parse_match((os.getenv(MATCH_ENV) or "").strip() or DEFAULT_MATCH)
         if not rules:
             raise ValueError(
                 f"{MATCH_ENV} resolved to no usable rules; expected e.g. {DEFAULT_MATCH!r}"
@@ -261,6 +312,59 @@ class ExternalAuthConfig:
         )
 
 
+    @classmethod
+    def _poznote_from_env(cls) -> "ExternalAuthConfig":
+        public_url = _http_url(os.getenv(PUBLIC_URL_ENV))
+        if not public_url:
+            raise ValueError(
+                f"{PROVIDER_ENV}=poznote needs {PUBLIC_URL_ENV}, the public https URL "
+                f"chat apps use to reach this MCP server (e.g. https://mcp.example.com)"
+            )
+        # Optional: without it, Poznote's public URL is the instance URL set in
+        # Poznote's own settings, read when an app asks for the metadata
+        # (poznote_oauth.AppUrlResolver), so it is set in one place only.
+        raw_app_url = (os.getenv(APP_URL_ENV) or "").strip()
+        app_url = _http_url(raw_app_url)
+        if raw_app_url and not app_url:
+            raise ValueError(f"{APP_URL_ENV} must be an http(s) URL, got {raw_app_url!r}")
+        for name, value in ((PUBLIC_URL_ENV, public_url), (APP_URL_ENV, app_url)):
+            if value.lower().startswith("http://") and not _is_local_url(value):
+                logger.warning(
+                    "%s=%s is plain http: chat apps refuse to sign in over it. "
+                    "Put HTTPS in front of it.", name, value,
+                )
+        if urlsplit(public_url).path not in ("", "/"):
+            logger.warning(
+                "%s=%s has a path: the OAuth discovery documents are served at the "
+                "root of this server, so apps will not find them under a path. Give "
+                "the MCP server its own (sub)domain.", PUBLIC_URL_ENV, public_url,
+            )
+
+        # The token says who and how much: these settings belong to the other
+        # providers. Say so rather than ignore them silently.
+        for name in (MATCH_ENV, SCOPE_CLAIM_ENV, SCOPE_MAP_ENV, AUDIENCE_ENV, HEADER_ENV,
+                     CLIENT_ID_ENV, CLIENT_SECRET_ENV):
+            if (os.getenv(name) or "").strip():
+                logger.warning("%s is set but ignored by the 'poznote' provider.", name)
+
+        return cls(
+            provider="poznote",
+            url=_http_url(os.getenv(URL_ENV)) or poznote_introspection_url(),
+            match=cls.parse_match(POZNOTE_MATCH),
+            timeout=cls._float(TIMEOUT_ENV, DEFAULT_TIMEOUT),
+            cache_ttl=cls._float(CACHE_TTL_ENV, DEFAULT_CACHE_TTL),
+            scope_claim=POZNOTE_SCOPE_CLAIM,
+            scope_map={level: level for level in SCOPE_LEVELS},
+            public_url=public_url,
+            app_url=app_url,
+        )
+
+
+def _is_local_url(url: str) -> bool:
+    host = (urlsplit(url).hostname or "").lower()
+    return host == "localhost" or host.endswith(".localhost") or host.startswith("127.") or host == "::1"
+
+
 _active_config: "ExternalAuthConfig | None" = None
 _config_loaded = False
 
@@ -272,7 +376,15 @@ def get_config() -> "ExternalAuthConfig | None":
     if not _config_loaded:
         _active_config = ExternalAuthConfig.from_env()
         _config_loaded = True
-        if _active_config:
+        if _active_config and _active_config.provider == "poznote":
+            logger.info(
+                "OAuth sign-in through Poznote enabled: apps reach %s and sign in at %s; "
+                "tokens are checked at %s",
+                _active_config.resource_url,
+                _active_config.app_url or "the instance URL set in Poznote's settings",
+                _active_config.url,
+            )
+        elif _active_config:
             logger.info(
                 "Per-caller authentication enabled: provider=%s url=%s match=%s",
                 _active_config.provider,
@@ -453,11 +565,63 @@ class IntrospectionProvider(IdentityProvider):
         return self._extract_claims(payload)
 
 
+def read_service_token() -> str:
+    """The MCP service token (data/.mcp_token), '' while it does not exist."""
+    path = (os.getenv(SERVICE_TOKEN_FILE_ENV) or "").strip() or DEFAULT_SERVICE_TOKEN_FILE
+    try:
+        with open(path, "r", encoding="utf-8") as handle:
+            return handle.read().strip()
+    except OSError:
+        return ""
+
+
+class PoznoteIntrospectionProvider(IntrospectionProvider):
+    """Poznote's own introspection endpoint, called with the service token.
+
+    The service token (data/.mcp_token) is read on every call rather than once:
+    Poznote creates the file on its first API request, which may come after
+    this server started.
+    """
+
+    def resolve(self, token: str) -> "dict[str, Any] | None":
+        service_token = read_service_token()
+        if not service_token:
+            raise IdentityProviderUnavailable(
+                "the Poznote service token is not readable yet "
+                f"({SERVICE_TOKEN_FILE_ENV} or {DEFAULT_SERVICE_TOKEN_FILE})"
+            )
+        try:
+            response = httpx.post(
+                self.config.url,
+                data={"token": token, "token_type_hint": "access_token"},
+                headers={"Accept": "application/json", "Authorization": f"Bearer {service_token}"},
+                timeout=self.config.timeout,
+            )
+        except httpx.HTTPError as exc:
+            raise IdentityProviderUnavailable(str(exc)) from exc
+
+        # 401 here means Poznote refused the SERVICE token, not the caller's:
+        # an operator problem, which must not read as "this token is invalid".
+        if response.status_code in (401, 403) or response.status_code >= 500:
+            raise IdentityProviderUnavailable(f"Poznote introspection returned {response.status_code}")
+        if response.status_code != 200:
+            logger.warning("Poznote introspection returned %s", response.status_code)
+            return None
+        try:
+            payload = response.json()
+        except ValueError:
+            logger.warning("Poznote introspection returned a non-JSON body")
+            return None
+        return self._extract_claims(payload)
+
+
 def build_provider(config: ExternalAuthConfig) -> IdentityProvider:
     if config.provider == "userinfo":
         return UserInfoProvider(config)
     if config.provider == "introspection":
         return IntrospectionProvider(config)
+    if config.provider == "poznote":
+        return PoznoteIntrospectionProvider(config)
     raise ValueError(f"Unsupported provider {config.provider!r}")
 
 
@@ -524,6 +688,19 @@ if AccessToken is not None:
                     )
                     return None
 
+            # A Poznote token names the resource the app asked it for, when
+            # the app named one (RFC 8707). One issued for another server is
+            # refused; one without an audience is fine, not every app sends it.
+            if self.config.provider == "poznote":
+                presented = {v.rstrip("/") for v in claim_values(claims, "aud")}
+                accepted = {self.config.resource_url, self.config.public_url}
+                if presented and not presented.intersection(accepted):
+                    logger.warning(
+                        "Rejecting a token issued for %s, not for this server (%s)",
+                        sorted(presented), self.config.resource_url,
+                    )
+                    return None
+
             subject = str(claims.get("sub") or claims.get("username") or "")
 
             # With a scope map, the caller's level travels as the token's only
@@ -571,6 +748,10 @@ def build_external_auth_provider() -> "Any | None":
         ) from exc
     if config is None:
         return None
+    if config.provider == "poznote":
+        from .poznote_oauth import PoznoteOAuthProvider
+
+        return PoznoteOAuthProvider(config, ExternalTokenVerifier(config))
     return ExternalTokenVerifier(config)
 
 
@@ -705,6 +886,19 @@ def _current_claims() -> "dict[str, Any] | None":
         return None
     claims = getattr(token, "claims", None)
     return dict(claims) if claims else None
+
+
+def caller_admin_claim() -> "bool | None":
+    """Under the 'poznote' provider, whether the approver of the caller's token
+    is an administrator; None under any other provider or with no auth.
+
+    A token without the claim counts as not administrator: failing closed.
+    """
+    config = get_config()
+    if config is None or config.provider != "poznote":
+        return None
+    claims = _current_claims() or {}
+    return claims.get("poznote_admin") is True
 
 
 def describe_identity(claims: dict[str, Any], rules: "list[MatchRule]") -> str:

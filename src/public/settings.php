@@ -198,6 +198,38 @@ try {
 }
 $settingsAppPasswordsActive = (int)($settingsPageConfig['appPasswords']['active_count'] ?? 0);
 
+// Connected apps card: chat apps signed in to the MCP server through the
+// OAuth consent page (see src/lib/oauth-server.php). Shown whenever that
+// sign-in is configured, so everyone finds the connector address to paste in
+// their chat app without asking the administrator, and otherwise only while
+// connections exist. The web server reads the MCP settings from the same .env.
+try {
+    require_once __DIR__ . '/../users/oauth.php';
+    $settingsConnectedAppsCount = countOAuthGrantsForUser((int)(getCurrentUserId() ?? 0));
+} catch (Exception $e) {
+    $settingsConnectedAppsCount = 0;
+}
+$settingsConnectorUrl = '';
+if (strtolower(trim((string)_env('POZNOTE_MCP_AUTH_PROVIDER', ''))) === 'poznote') {
+    $settingsMcpPublicUrl = rtrim(trim((string)_env('POZNOTE_MCP_PUBLIC_URL', '')), '/');
+    if (preg_match('#^https?://[^\s/]+#i', $settingsMcpPublicUrl)) {
+        $settingsConnectorUrl = $settingsMcpPublicUrl . '/mcp';
+    }
+}
+$settingsPageConfig['connectedApps'] = ['connector_url' => $settingsConnectorUrl];
+// Administrators also see where the apps are sent to sign in: the instance
+// URL, read the way the MCP server reads it (the setting, else the
+// environment). An upgraded instance may hold a local address there, and
+// the apps then fail with nothing visible but a line in the MCP logs.
+if ($settingsConnectorUrl !== '' && function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()) {
+    $settingsSignInUrl = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
+    if ($settingsSignInUrl === '') {
+        $settingsSignInUrl = rtrim(trim((string)_env('POZNOTE_APP_URL', _env('APP_URL', ''))), '/');
+    }
+    $settingsPageConfig['connectedApps']['sign_in_url'] = $settingsSignInUrl;
+    $settingsPageConfig['connectedApps']['sign_in_status'] = oauthSignInUrlStatus($settingsSignInUrl);
+}
+
 // Two-factor card: seed the badge like the two above.
 $settingsTwoFactorEnabled = false;
 try {
@@ -517,6 +549,28 @@ if ($canUseUserWebhooks) {
                         ?></span>
                     </div>
                 </div>
+
+                <?php if ($settingsConnectedAppsCount > 0 || $settingsConnectorUrl !== ''): ?>
+                <!-- Connected apps: chat apps signed in to the MCP server through Poznote (OAuth) -->
+                <div class="home-card" id="connected-apps-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.connected_apps', [], 'Connect chat apps such as ChatGPT or Claude to your notes through the MCP server, and disconnect them at any time.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-bot"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.connected_apps', [], 'Connected apps'); ?></span>
+                        <span id="connected-apps-status-badge" class="setting-status <?php echo $settingsConnectedAppsCount > 0 ? 'enabled' : 'disabled'; ?>"><?php
+                            if ($settingsConnectedAppsCount === 1) {
+                                echo t_h('connected_apps.status.count_one', [], '1 app');
+                            } elseif ($settingsConnectedAppsCount > 1) {
+                                echo t_h('connected_apps.status.count_other', ['count' => $settingsConnectedAppsCount], '{{count}} apps');
+                            } else {
+                                echo t_h('connected_apps.status.none', [], 'None');
+                            }
+                        ?></span>
+                    </div>
+                </div>
+                <?php endif; ?>
 
                 <?php if (getCurrentUserId() !== 1): // user ID 1 is the permanent super-admin and can never be deleted ?>
                 <!-- Delete Account -->
@@ -1576,18 +1630,6 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                         <span id="tenant-isolation-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
-
-                <!-- Local network access for non-admin users (GHSA-mr2c-9992-59wx) -->
-                <div class="home-card" id="outbound-hosts-card">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.outbound_hosts', [], 'Webhooks, personal AI, transcription and MCP servers and Git Sync of non-admin users only reach public internet hosts. List here the local hosts and networks they may use, such as an Ollama or n8n server on your network. Administrators are not limited.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon">
-                        <i class="lucide lucide-network"></i>
-                    </div>
-                    <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.outbound_hosts', [], 'Local network access'); ?></span>
-                        <span id="outbound-hosts-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
-                    </div>
-                </div>
             </div>
 
             <div class="settings-group-title" data-group="integrations"><?php echo t_h('settings.groups.integrations', [], 'Integrations'); ?></div>
@@ -1723,6 +1765,19 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                                 echo $statisticsTokenEnabled ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled');
                             }
                         ?></span>
+                    </div>
+                </div>
+
+                <!-- Local network access for non-admin users (GHSA-mr2c-9992-59wx): what
+                     the integrations of other accounts may reach -->
+                <div class="home-card" id="outbound-hosts-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.outbound_hosts', [], 'Non-admin users can only connect webhooks, Git Sync and their own AI, transcription or MCP servers to public internet hosts. List here the local hosts or networks they may use, such as an Ollama or n8n server. Administrators are not limited.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-network"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.outbound_hosts', [], 'Local network access'); ?></span>
+                        <span id="outbound-hosts-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
             </div>
@@ -2174,6 +2229,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
     <script src="js/change-password.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/change-password.js') ?: time(); ?>"></script>
     <script src="js/two-factor.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/two-factor.js') ?: time(); ?>"></script>
     <script src="js/app-passwords.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/app-passwords.js') ?: time(); ?>"></script>
+    <script src="js/connected-apps.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/connected-apps.js') ?: time(); ?>"></script>
     <?php if ($isAdmin): ?>
     <script src="js/statistics-token.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/statistics-token.js') ?: time(); ?>"></script>
     <?php endif; ?>

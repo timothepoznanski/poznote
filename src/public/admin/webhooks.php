@@ -217,10 +217,10 @@ foreach ($eventHelpDefaults as $eventName => $default) {
         </div>
     <?php endif; ?>
 
-    <div class="settings-section webhooks-section">
+    <div class="settings-section webhooks-section" id="instance-url">
         <h2><?php echo t_h('webhooks_admin.section_app_url', [], 'Instance URL'); ?></h2>
         <p class="webhooks-section-hint">
-            <?php echo t_h('webhooks_admin.app_url_description', [], 'Public URL of this Poznote instance, used to build the direct note link sent in the payloads (data.note.url). Leave it empty to send no link. This is the same instance URL as the one used by the reminder emails.'); ?>
+            <?php echo t_h('webhooks_admin.app_url_description', [], 'Public URL of this Poznote instance, used to build the direct note link sent in the payloads (data.note.url). Leave it empty to send no link. This is the same instance URL as the one used by the reminder emails. Chat apps connecting to the MCP server are also sent there to sign in.'); ?>
         </p>
         <form method="POST" action="">
             <input type="hidden" name="csrf_token" value="<?php echo webhooks_h($_SESSION['webhooks_csrf_token']); ?>">

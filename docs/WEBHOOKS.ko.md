@@ -145,7 +145,7 @@ def verify(raw_body: bytes, signature_header: str, secret: str) -> bool:
 https://poznote.example.com/index.php?note=42&workspace=Poznote
 ```
 
-링크는 **설정 > 관리자 도구 > 관리자 웹훅**의 **인스턴스 URL**에서 지정한 공개 주소로 만듭니다(관리자 전용). 알림 이메일과 같은 값을 사용하므로 한쪽에서 설정하면 둘 다 적용됩니다. REST API의 `smtp_app_url` 설정이나 대체값인 `POZNOTE_APP_URL` 또는 `APP_URL` 환경 변수로도 설정할 수 있습니다.
+링크는 **설정 > 관리자 도구 > 관리자 웹훅**의 **인스턴스 URL**에서 지정한 공개 주소로 만듭니다(관리자 전용). 알림 이메일과 같은 값을 사용하므로 한쪽에서 설정하면 둘 다 적용됩니다. REST API의 `smtp_app_url` 설정이나 대체값인 `POZNOTE_APP_URL` 또는 `APP_URL` 환경 변수로도 설정할 수 있습니다. Poznote를 통해 [MCP 서버](MCP-SERVER.ko.md)에 로그인하는 채팅 앱도 이 주소로 이동합니다. 비어 있는 동안에는 관리자가 브라우저에서 Poznote를 처음 사용할 때 자동으로 채워지며, 그 이후에는 여기서 변경할 때만 바뀝니다.
 
 인스턴스 URL이 없으면 `data.note.url`은 `null`이며 링크를 포함하지 않습니다.
 

@@ -912,6 +912,40 @@ O Poznote é multiusuário: cada perfil tem as próprias notas, espaços de trab
 - **Gerenciamento de usuários**: os administradores criam, desativam e gerenciam perfis em **Configurações > Ferramentas de administração > Gestão de utilizadores**, e podem dar a um usuário acesso à conta de outro usuário sem transferir a propriedade dela.
 - **Compartilhamento e colaboração**: espaços de trabalho, notas e pastas podem ser compartilhados com os outros usuários da instância, veja [Compartilhamento e colaboração](#compartilhamento-e-colaboração).
 - **Isolamento de contas (modo SaaS)**: os administradores podem impedir que usuários que não são administradores descubram as outras contas da instância, compartilhem com elas ou cadastrem webhooks pessoais. Deixe tudo desmarcado para uma instância familiar ou de equipe.
+- **Acesso à rede local**: usuários que não são administradores só podem conectar webhooks, o Git Sync e seus próprios servidores de IA, transcrição ou MCP a hosts públicos da internet, fora os hosts locais que um administrador permitir, veja [Acesso à rede local para usuários não administradores](#local-network-access).
+
+<a id="local-network-access"></a>
+<details>
+<summary><strong>Acesso à rede local para usuários não administradores</strong></summary>
+<br>
+
+Alguns recursos fazem o próprio servidor do Poznote se conectar a um endereço digitado por um usuário: webhooks, o Git Sync e os servidores de IA, transcrição ou MCP do próprio usuário. A requisição sai do servidor, não do navegador do usuário. Sem um limite, qualquer conta poderia usar o Poznote para alcançar o próprio servidor, os outros contêineres Docker, a sua rede local ou um serviço de metadados de nuvem, lugares que ela não consegue alcançar sozinha.
+
+Por isso a regra depende de quem digitou o endereço:
+
+- **Administradores** não têm limites: eles já controlam o servidor.
+- **Os demais usuários** só podem usar hosts públicos da internet. Um endereço local ou privado é recusado: `localhost` e `127.0.0.1`, `10.x.x.x`, de `172.16.x.x` a `172.31.x.x`, `192.168.x.x`, `169.254.x.x`, endereços IPv6 locais (`fc00::/7`, `fe80::/10`) e qualquer nome que aponte para um deles, como o nome de outro serviço Docker.
+
+O que um administrador configura para a instância inteira (o Assistente de IA, a Transcrição, os webhooks de administração, S3, OIDC, SMTP) não é afetado.
+
+Em uma instância familiar ou de equipe, os usuários podem precisar de um servidor da sua rede, por exemplo um servidor Ollama para a IA pessoal ou o n8n para os webhooks. Liste esses hosts em **Configurações > Ferramentas de administração > Integrações > Acesso à rede local**, uma entrada por linha:
+
+| Entrada | O que ela permite |
+|---|---|
+| `ollama` ou `ollama.lan` | este nome de host, seja qual for o endereço para o qual ele aponta (um nome de serviço Docker funciona) |
+| `*.home.arpa` | todos os nomes de host sob este domínio |
+| `192.168.1.20` | este endereço |
+| `192.168.1.0/24` | todos os endereços desta rede (IPv6 também funciona, `fd00::/8`) |
+
+Uma entrada permite todas as portas desse host. Entradas inválidas são recusadas ao salvar, com a lista das que precisam ser corrigidas. O cartão mostra **Apenas públicos** enquanto a lista está vazia e, caso contrário, o número de entradas.
+
+Bom saber:
+
+- Um nome de host da lista precisa ser resolvido de dentro do contêiner do Poznote, não só do seu computador. Um nome que só o seu computador ou o seu roteador conhece não pode ser resolvido pelo Poznote, e é recusado como qualquer nome desconhecido: digite o endereço ou a rede dele no lugar.
+- O endereço é verificado a cada conexão, não só ao salvar: remover uma entrada tem efeito na hora, e um nome que mais tarde passe a apontar para um endereço local é recusado.
+- Para usuários não administradores, o Poznote não segue redirecionamentos, exceto no Git Sync, que verifica de novo cada etapa do redirecionamento.
+
+</details>
 
 <details>
 <summary><strong>Organização dos dados no disco</strong></summary>

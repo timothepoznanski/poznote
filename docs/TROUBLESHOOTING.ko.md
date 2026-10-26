@@ -266,3 +266,20 @@ docker compose up -d --force-recreate webserver
 호스트 메모리보다 높게 설정하지 마세요. 실제 메모리를 넘는 요청은 커널이 안내 없이 종료하며 컨테이너 전체가 종료될 수 있습니다. 512 MB 호스트에서는 기본값을 유지하세요. 초기화 스크립트가 매 시작 시 적용하며 잘못된 값은 로그에 기록하고 기본값을 유지합니다.
 
 </details>
+
+<a id="this-address-is-not-allowed"></a>
+<details>
+<summary><strong>“This address is not allowed: it must be a public internet host”</strong></summary>
+<br>
+
+관리자가 아닌 사용자가 웹훅, Git Sync, 또는 개인 AI·전사·MCP 서버에 로컬 네트워크의 기기나 서버 자체의 주소를 입력했습니다. 이런 주소에는 관리자만 접근할 수 있습니다. 관리자는 **설정 > 관리자 도구 > 연동 > 로컬 네트워크 접근**에서 해당 호스트를 허용할 수 있습니다. [일반 사용자의 로컬 네트워크 접근](README.ko.md#local-network-access)을 참고하세요.
+
+호스트가 이미 목록에 있는데도 메시지가 계속 나온다면 Poznote 컨테이너가 그 이름을 확인하지 못하는 것입니다. 내부 네트워크에 대해 아무것도 드러내지 않도록 두 경우 모두 일부러 같은 메시지를 보여 줍니다. 컨테이너 안에서 이름을 확인하세요.
+
+```bash
+docker compose exec webserver getent hosts ollama.lan
+```
+
+명령이 아무것도 출력하지 않으면 이름 대신 호스트의 IP 주소나 네트워크를 목록에 입력하세요.
+
+</details>

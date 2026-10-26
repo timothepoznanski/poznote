@@ -482,6 +482,8 @@ class ShareController {
         }
         $scriptDir = rtrim($scriptDir, '/\\');
         $base = '//' . $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+        // Through the MCP server the request host is its internal address
+        $base = poznoteServiceTokenInstanceBaseUrl() ?? $base;
         
         return [
             'query' => $base . '/public_note.php?token=' . rawurlencode($token),

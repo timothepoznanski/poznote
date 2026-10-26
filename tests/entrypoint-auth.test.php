@@ -61,6 +61,15 @@ const NO_GATE = [
     'dark_mode_css.php'  => 'concatenates the dark theme stylesheets, reads no database',
     'offline.php'        => 'the offline page shell the service worker stores; static interface text only, every note comes from the browser',
 
+    // OAuth for chat apps signing in to the MCP server (#1681, src/lib/oauth-server.php).
+    // Each authenticates the way OAuth says it must, and none of them opens a
+    // user database.
+    'oauth/authorize.php'  => 'consent page: sends an anonymous visitor to login.php, and only issues a code to the signed-in user who approves it (isAuthenticated() plus a per-request CSRF token)',
+    'oauth/register.php'   => 'dynamic client registration (RFC 7591), open by design; a registered app gets nothing until a user approves it',
+    'oauth/token.php'      => 'token endpoint, authenticates the app (client secret or PKCE verifier) and the single-use code or rotated refresh token',
+    'oauth/revoke.php'     => 'revocation (RFC 7009), authenticates the app and only deletes grants issued to it',
+    'oauth/introspect.php' => 'introspection (RFC 7662), compares the bearer with the MCP service token in data/.mcp_token and answers nothing else',
+
     // Authenticated, but not through a gate function.
     'audio_player.php'   => 'checks isAuthenticated() by hand and answers 401, because it renders inside a contenteditable iframe where a redirect to login.php would be invisible to the user',
 ];
