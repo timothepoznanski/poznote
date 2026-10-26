@@ -1,0 +1,224 @@
+{
+  "extName": {
+    "message": "Poznote URL Saver"
+  },
+  "extDescription": {
+    "message": "表示中のページのURLやスクリーンショットを、Poznoteの新しいノートとして、または既存のノートの末尾に保存します。"
+  },
+  "optionsTitle": {
+    "message": "Poznote URL Saverの設定"
+  },
+  "settings": {
+    "message": "設定"
+  },
+  "connectTitle": {
+    "message": "Poznoteに接続"
+  },
+  "connectText": {
+    "message": "拡張機能を一度Poznoteインスタンスに接続すれば、どのページも1回のクリックで保存できます。"
+  },
+  "connect": {
+    "message": "接続"
+  },
+  "reconnect": {
+    "message": "再接続"
+  },
+  "lostAccessText": {
+    "message": "拡張機能がPoznoteインスタンスにアクセスできなくなりました。ページの保存を続けるには、再接続してください。"
+  },
+  "openPoznote": {
+    "message": "Poznoteを開く"
+  },
+  "openPoznoteTitle": {
+    "message": "Poznoteを開く（$2の$1）"
+  },
+  "destination": {
+    "message": "保存先"
+  },
+  "modeNew": {
+    "message": "新規ノート"
+  },
+  "modeNewTitle": {
+    "message": "ページを新しいノートとして保存"
+  },
+  "modeAppend": {
+    "message": "既存のノート"
+  },
+  "modeAppendTitle": {
+    "message": "ページをノートの末尾に追加"
+  },
+  "change": {
+    "message": "変更"
+  },
+  "searchNotes": {
+    "message": "ノートを検索"
+  },
+  "allWorkspaces": {
+    "message": "すべてのワークスペース"
+  },
+  "notes": {
+    "message": "ノート"
+  },
+  "saveLink": {
+    "message": "リンクを保存"
+  },
+  "saveLinkTitle": {
+    "message": "ページのアドレスを保存"
+  },
+  "screenshot": {
+    "message": "スクリーンショット"
+  },
+  "screenshotTitle": {
+    "message": "表示中のページのスクリーンショット付きでリンクを保存"
+  },
+  "loadingNotes": {
+    "message": "ノートを読み込み中..."
+  },
+  "notesLoadFailed": {
+    "message": "ノートを読み込めませんでした。"
+  },
+  "noNoteMatches": {
+    "message": "一致するノートはありません。"
+  },
+  "noNoteYet": {
+    "message": "ノートはまだありません。"
+  },
+  "pageCannotBeSaved": {
+    "message": "このページは保存できません。"
+  },
+  "pickNote": {
+    "message": "ページを追加するノートを選択してください。"
+  },
+  "capturing": {
+    "message": "ページをキャプチャ中..."
+  },
+  "screenshotFailed": {
+    "message": "スクリーンショットを撮れませんでした：$1"
+  },
+  "addingTo": {
+    "message": "$1に追加中..."
+  },
+  "addedTo": {
+    "message": "$1に追加しました。"
+  },
+  "open": {
+    "message": "開く"
+  },
+  "creatingNote": {
+    "message": "ノートを作成中..."
+  },
+  "untitledPage": {
+    "message": "無題のページ"
+  },
+  "noteCreated": {
+    "message": "ノートを作成しました。"
+  },
+  "optionsIntro": {
+    "message": "閲覧したページを、Poznoteインスタンスに保存します。"
+  },
+  "connection": {
+    "message": "接続"
+  },
+  "disconnect": {
+    "message": "接続を解除"
+  },
+  "poznoteAddress": {
+    "message": "Poznoteのアドレス"
+  },
+  "username": {
+    "message": "ユーザー名"
+  },
+  "appPassword": {
+    "message": "アプリパスワード"
+  },
+  "appPasswordHint": {
+    "message": "Poznoteの「$1」で作成してください。APIにだけアクセスでき、いつでも取り消せます。アカウントのパスワードも使えます。"
+  },
+  "appPasswordsPath": {
+    "message": "設定 > マイアカウント > アプリパスワード"
+  },
+  "whereNewNotesGo": {
+    "message": "新しいノートの保存先"
+  },
+  "workspace": {
+    "message": "ワークスペース"
+  },
+  "folder": {
+    "message": "フォルダー"
+  },
+  "footerConnected": {
+    "message": "準備ができました。どのページでも、ツールバーのPoznoteアイコンをクリックすると保存できます。"
+  },
+  "footerNotConnected": {
+    "message": "接続すると、どのページでも、ツールバーのPoznoteアイコンをクリックして保存できるようになります。"
+  },
+  "saved": {
+    "message": "保存しました"
+  },
+  "connectedAs": {
+    "message": "$1として接続中"
+  },
+  "wrongCredentials": {
+    "message": "ユーザー名またはパスワードが正しくありません。"
+  },
+  "unreachable": {
+    "message": "$1に接続できませんでした。アドレスと、インスタンスが動作していることを確認してください。"
+  },
+  "noInstance": {
+    "message": "$1で応答するPoznoteインスタンスがありません。アドレスを確認してください。"
+  },
+  "loading": {
+    "message": "読み込み中..."
+  },
+  "noFolder": {
+    "message": "フォルダーなし"
+  },
+  "fillAddressFirst": {
+    "message": "先にPoznoteのアドレスを入力してください。"
+  },
+  "fillAllFields": {
+    "message": "アドレス、ユーザー名、アプリパスワードを入力してください。"
+  },
+  "invalidAddress": {
+    "message": "このアドレスは無効です。"
+  },
+  "waitingAccess": {
+    "message": "インスタンスへのアクセスの許可を待っています..."
+  },
+  "accessDenied": {
+    "message": "ページを保存するには、拡張機能に$1へのアクセスが必要です。もう一度「接続」をクリックして、「許可」を選んでください。"
+  },
+  "checkingCredentials": {
+    "message": "認証情報を確認中..."
+  },
+  "noAccount": {
+    "message": "このインスタンスに$1という名前のアカウントはありません。"
+  },
+  "loadingWorkspaces": {
+    "message": "ワークスペースを読み込み中..."
+  },
+  "lostAccessOptions": {
+    "message": "拡張機能がインスタンスにアクセスできなくなりました。「接続」をクリックして、もう一度許可してください。"
+  },
+  "errorStatus": {
+    "message": "エラー$1：$2"
+  },
+  "untitled": {
+    "message": "無題"
+  },
+  "uploadFailed": {
+    "message": "アップロードできませんでした"
+  },
+  "unsupportedNoteType": {
+    "message": "ページを追加できるのは、HTMLまたはMarkdownのノートだけです。"
+  },
+  "noteChanged": {
+    "message": "その間にノートが変更されました。もう一度お試しください。"
+  },
+  "noteKeepsChanging": {
+    "message": "ノートが変更され続けています。少し待ってから、もう一度お試しください。"
+  },
+  "pageScreenshot": {
+    "message": "ページのスクリーンショット"
+  }
+}

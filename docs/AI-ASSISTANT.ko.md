@@ -7,7 +7,8 @@
   <a href="AI-ASSISTANT.pt.md">Português</a> ·
   <a href="AI-ASSISTANT.ru.md">Русский</a> ·
   <a href="AI-ASSISTANT.zh-cn.md">简体中文</a> ·
-  <b>한국어</b>
+  <b>한국어</b> ·
+  <a href="AI-ASSISTANT.ja.md">日本語</a>
 </p>
 <!-- /lang-selector -->
 

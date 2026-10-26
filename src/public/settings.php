@@ -601,6 +601,7 @@ if ($canUseUserWebhooks) {
                                 'zh-cn' => 'settings.language.chinese_simplified',
                                 'en' => 'settings.language.english',
                                 'fr' => 'settings.language.french',
+                                'ja' => 'settings.language.japanese',
                                 'ko' => 'settings.language.korean',
                                 'de' => 'settings.language.german',
                                 'pt' => 'settings.language.portuguese',

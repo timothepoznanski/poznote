@@ -61,6 +61,7 @@ LANGUAGES = {
     "ru": "Русский",
     "zh-cn": "简体中文",
     "ko": "한국어",
+    "ja": "日本語",
 }
 
 SELECTOR_START = "<!-- lang-selector -->"

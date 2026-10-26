@@ -99,6 +99,7 @@ $welcomeLanguageNames = [
     'ru' => 'Русский',
     'zh-cn' => '简体中文',
     'ko' => '한국어',
+    'ja' => '日本語',
 ];
 $welcomeLanguages = [];
 foreach (poznoteSupportedLanguages() as $welcomeLanguageCode) {

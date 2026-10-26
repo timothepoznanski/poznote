@@ -7,7 +7,8 @@
   <b>Português</b> ·
   <a href="CHROME-EXTENSION.ru.md">Русский</a> ·
   <a href="CHROME-EXTENSION.zh-cn.md">简体中文</a> ·
-  <a href="CHROME-EXTENSION.ko.md">한국어</a>
+  <a href="CHROME-EXTENSION.ko.md">한국어</a> ·
+  <a href="CHROME-EXTENSION.ja.md">日本語</a>
 </p>
 <!-- /lang-selector -->
 
@@ -32,7 +33,7 @@ Para mudar essas configurações depois, clique na engrenagem no topo da extens�
 
 O endereço da sua instância, exibido ao lado, é um link: clique nele para abrir o Poznote em uma nova aba, por http ou https, como você o digitou nas configurações.
 
-A extensão usa o idioma do Chrome quando ele é inglês, francês, alemão, espanhol, português, russo, coreano ou chinês simplificado, e inglês nos demais casos.
+A extensão usa o idioma do Chrome quando ele é inglês, francês, alemão, espanhol, português, russo, coreano, chinês simplificado ou japonês, e inglês nos demais casos.
 
 A senha da sua conta também funciona aqui, mas uma senha de aplicativo é a credencial mais adequada para uma extensão: ela só acessa a API, nunca a interface web nem as configurações da sua conta, fica limitada ao seu próprio perfil, e revogá-la no Poznote desconecta a extensão sem alterar mais nada. Veja [Senhas de aplicativo](README.pt.md#senhas-de-aplicativo) para a lista completa de limites.
 
