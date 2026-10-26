@@ -684,7 +684,7 @@ Poznote admite dos formatos principales de notas, cada uno adaptado a una forma 
 &nbsp;
 
 *   **Funcionalidad:** reutiliza contenido ya escrito para estandarizar tu documentación, desde una nota completa hasta un fragmento breve.
-*   **Configuración:** coloca las notas que quieres reutilizar en una carpeta llamada `Templates` (las subcarpetas también sirven). Un espacio de trabajo llamado `Templates` también funciona y se ofrece desde todos los espacios de trabajo. El nombre también se reconoce en el idioma de la interfaz (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
+*   **Configuración:** coloca las notas que quieres reutilizar en una carpeta llamada `Templates` (las subcarpetas también sirven). Un espacio de trabajo llamado `Templates` también funciona y se ofrece desde todos los espacios de trabajo. El nombre también se reconoce en el idioma de la interfaz (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`, `템플릿`, `テンプレート`).
 *   **Insertar en una nota:** escribe `/template` (o `/` seguido del título de la plantilla) en una nota de texto enriquecido o Markdown y elige una plantilla: su contenido se pega en la posición del cursor, convertido si la plantilla y la nota no son del mismo tipo.
 *   **Nueva nota a partir de una plantilla:** duplica la nota de la plantilla, o duplica una carpeta `Templates` completa para empezar un proyecto con una estructura de carpetas ya preparada.
 </details>

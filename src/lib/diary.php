@@ -465,7 +465,7 @@ function getDiaryRootFolderName(?PDO $con = null, ?string $workspace = null) {
         // All localized defaults (must match diary.folder_name in src/i18n/)
         $candidates = array_values(array_unique(array_merge(
             [$localized],
-            ['Diary', 'Journal', 'Tagebuch', 'Diario', 'Diário', 'Дневник', '日记', '日記']
+            ['Diary', 'Journal', 'Tagebuch', 'Diario', 'Diário', 'Дневник', '日记', '일기', '日記']
         )));
         $placeholders = implode(',', array_fill(0, count($candidates), '?'));
         $stmt = $con->prepare("SELECT name FROM folders WHERE name IN ($placeholders) AND workspace = ? AND parent_id IS NULL");

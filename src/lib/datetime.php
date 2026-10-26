@@ -376,7 +376,9 @@ function formatDateTime($timestamp) {
         if ($pattern) {
             return applyDateNameTokens($date->format($pattern), $date);
         }
-        return $date->format('j M Y') . ' ' . t('common.at', [], 'at') . ' ' . $date->format('H:i');
+        // Some languages (ko, ja) have no word for "at": skip it to avoid a double space
+        $at = trim((string)t('common.at', [], 'at'));
+        return $date->format('j M Y') . ($at !== '' ? ' ' . $at : '') . ' ' . $date->format('H:i');
     } catch (Exception $e) {
         $pattern = getUserDateTimeFormatPattern();
         return applyDateNameTokens(date($pattern ?: 'j M Y H:i', $timestamp), new DateTime('@' . (int)$timestamp));
