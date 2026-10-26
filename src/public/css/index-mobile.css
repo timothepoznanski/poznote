@@ -367,7 +367,9 @@ body.mobile-keyboard-open #codeBlockLanguageModal.modal,
 body.mobile-formatting-toolbar-active .pz-help-modal.modal,
 body.mobile-keyboard-open .pz-help-modal.modal,
 body.mobile-formatting-toolbar-active #dictateModal.modal,
-body.mobile-keyboard-open #dictateModal.modal {
+body.mobile-keyboard-open #dictateModal.modal,
+body.mobile-formatting-toolbar-active #templatePickerModal.modal,
+body.mobile-keyboard-open #templatePickerModal.modal {
     z-index: 2147483004 !important;
 }
 
@@ -395,7 +397,9 @@ body.mobile-keyboard-open #codeBlockLanguageModal .modal-content,
 body.mobile-formatting-toolbar-active .pz-help-modal .modal-content,
 body.mobile-keyboard-open .pz-help-modal .modal-content,
 body.mobile-formatting-toolbar-active #dictateModal .modal-content,
-body.mobile-keyboard-open #dictateModal .modal-content {
+body.mobile-keyboard-open #dictateModal .modal-content,
+body.mobile-formatting-toolbar-active #templatePickerModal .modal-content,
+body.mobile-keyboard-open #templatePickerModal .modal-content {
     z-index: 2147483005 !important;
 }
 

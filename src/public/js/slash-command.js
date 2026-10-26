@@ -423,6 +423,12 @@
             const caretOffsetWithinInsert = Math.max(0, Math.min(insertText.length, insertText.length + caretDelta));
             const caretPos = from + caretOffsetWithinInsert;
 
+            // replaceRange() focuses CodeMirror, which would reopen the phone keyboard
+            if (context.keepKeyboardClosed && typeof api.replaceRangeKeepSelection === 'function'
+                && api.replaceRangeKeepSelection(snapshot.editor, from, to, insertText, caretPos)) {
+                return true;
+            }
+
             api.replaceRange(snapshot.editor, from, to, insertText);
             if (typeof api.setSelection === 'function') {
                 api.setSelection(snapshot.editor, caretPos, caretPos);
@@ -2710,7 +2716,16 @@
             // A template cannot be pasted into itself
             excludeNoteId: currentNoteId,
             onPick: function (note) {
-                restoreInsertionFocus(insertionContext);
+                // On a phone the template goes in with the keyboard down:
+                // focusing the note again would bring it back over the text
+                // just inserted
+                if (window.matchMedia && window.matchMedia('(max-width: 800px)').matches) {
+                    insertionContext.keepKeyboardClosed = true;
+                    const active = document.activeElement;
+                    if (active && active !== document.body && typeof active.blur === 'function') active.blur();
+                } else {
+                    restoreInsertionFocus(insertionContext);
+                }
                 insertTemplate(note, insertionContext, targetType);
             },
             onCancel: function () { restoreInsertionFocus(insertionContext); }
@@ -2773,37 +2788,47 @@
         const editable = context && context.editableElement;
         if (!editable) return;
 
-        focusEditableElement(editable);
-
-        try {
-            const selection = window.getSelection();
-            const savedRange = context.savedRange;
-            if (selection) {
-                let range = (savedRange && editable.contains(savedRange.commonAncestorContainer)) ? savedRange : null;
-                if (!range) {
-                    // No caret left in this note: append rather than drop the content
-                    range = document.createRange();
-                    range.selectNodeContents(editable);
-                    range.collapse(false);
-                }
-                selection.removeAllRanges();
-                selection.addRange(range);
-            }
-        } catch (e) {
-            console.debug('slash-command: insertHtmlAtContext() failed:', e);
+        const savedRange = context.savedRange;
+        let range = (savedRange && editable.contains(savedRange.commonAncestorContainer)) ? savedRange : null;
+        if (!range) {
+            // No caret left in this note: append rather than drop the content
+            range = document.createRange();
+            range.selectNodeContents(editable);
+            range.collapse(false);
         }
 
-        // execCommand keeps the insertion in the undo stack and fires the input
-        // event the autosave listens to, like a paste does
+        // Focusing the note or selecting in it would reopen the phone keyboard:
+        // straight into the range then, off the undo stack
+        const keepKeyboardClosed = !!context.keepKeyboardClosed;
         let inserted = false;
-        try {
-            inserted = document.execCommand('insertHTML', false, html);
-        } catch (e) {
-            inserted = false;
+
+        if (!keepKeyboardClosed) {
+            focusEditableElement(editable);
+
+            try {
+                const selection = window.getSelection();
+                if (selection) {
+                    selection.removeAllRanges();
+                    selection.addRange(range);
+                }
+            } catch (e) {
+                console.debug('slash-command: insertHtmlAtContext() failed:', e);
+            }
+
+            // execCommand keeps the insertion in the undo stack and fires the input
+            // event the autosave listens to, like a paste does
+            try {
+                inserted = document.execCommand('insertHTML', false, html);
+            } catch (e) {
+                inserted = false;
+            }
         }
 
         if (!inserted) {
-            const selection = window.getSelection();
+            const selection = keepKeyboardClosed ? null : window.getSelection();
+            const target = keepKeyboardClosed
+                ? range
+                : (selection && selection.rangeCount ? selection.getRangeAt(0) : null);
             const container = document.createElement('div');
             container.innerHTML = html;
             const fragment = document.createDocumentFragment();
@@ -2811,11 +2836,10 @@
             while (container.firstChild) {
                 lastNode = fragment.appendChild(container.firstChild);
             }
-            if (selection && selection.rangeCount) {
-                const range = selection.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode(fragment);
-                if (lastNode) {
+            if (target) {
+                target.deleteContents();
+                target.insertNode(fragment);
+                if (lastNode && selection) {
                     const after = document.createRange();
                     after.setStartAfter(lastNode);
                     after.collapse(true);
