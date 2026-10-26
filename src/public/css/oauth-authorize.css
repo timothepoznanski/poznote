@@ -1,0 +1,173 @@
+/* Consent page of the OAuth sign-in used by MCP connectors (oauth/authorize.php).
+   Built on login.css: same column, logo and buttons. */
+
+.oauth-container {
+    max-width: 440px;
+}
+
+.oauth-container .login-header {
+    margin-bottom: 1.5rem;
+}
+
+.oauth-title {
+    font-size: 1.5rem;
+}
+
+.oauth-consent {
+    text-align: left;
+}
+
+.oauth-message {
+    color: var(--pz-text);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 0 0 0.5rem;
+    text-align: center;
+}
+
+.oauth-app-name {
+    font-weight: var(--pz-weight-semibold);
+    overflow-wrap: anywhere;
+}
+
+.oauth-redirect {
+    color: var(--pz-text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 0 0 1.5rem;
+    text-align: center;
+}
+
+.oauth-redirect code {
+    font-size: 0.85em;
+    overflow-wrap: anywhere;
+}
+
+.oauth-fieldset {
+    border: 0;
+    margin: 0 0 1.25rem;
+    padding: 0;
+    min-width: 0;
+}
+
+.oauth-legend {
+    color: var(--pz-text-secondary);
+    font-size: 0.875rem;
+    font-weight: var(--pz-weight-medium);
+    margin: 0 0 0.5rem;
+    padding: 0;
+}
+
+.oauth-account-single {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font-weight: var(--pz-weight-semibold);
+    overflow-wrap: anywhere;
+}
+
+.oauth-choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.oauth-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    /* login.css gives every label a medium weight */
+    font-weight: var(--pz-weight-normal);
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.oauth-choice:hover {
+    border-color: var(--pz-accent-text);
+}
+
+.oauth-choice:has(input:checked) {
+    border-color: var(--pz-accent-text);
+    background: var(--pz-accent-soft);
+}
+
+.oauth-choice input {
+    flex: 0 0 auto;
+    margin: 0.2rem 0 0;
+    accent-color: var(--pz-accent);
+}
+
+.oauth-choice-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.oauth-choice-title {
+    font-weight: var(--pz-weight-semibold);
+    overflow-wrap: anywhere;
+}
+
+.oauth-choice-help {
+    color: var(--pz-text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.oauth-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.oauth-actions .login-button {
+    flex: 1 1 0;
+    margin-top: 0;
+}
+
+/* Grey, like every Cancel in the app. Doubled class keeps it above
+   .login-button:hover from login.css. */
+.oauth-cancel-button.oauth-cancel-button {
+    background: var(--pz-neutral);
+    color: var(--pz-text-inverse);
+}
+
+.oauth-cancel-button.oauth-cancel-button:hover {
+    background: var(--pz-neutral-hover);
+}
+
+.oauth-footnote {
+    color: var(--pz-text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin: 1.25rem 0 0;
+    text-align: center;
+}
+
+html[data-theme='dark'] .oauth-choice,
+html[data-theme='dark'] .oauth-account-single {
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+}
+
+html[data-theme='dark'] .oauth-choice:has(input:checked) {
+    border-color: var(--pz-accent-text);
+    background: var(--pz-accent-soft);
+}
+
+html[data-theme='dark'] .oauth-cancel-button.oauth-cancel-button {
+    background: var(--pz-border);
+    color: var(--pz-text);
+}
+
+html[data-theme='dark'] .oauth-cancel-button.oauth-cancel-button:hover {
+    background: var(--pz-surface-sunken);
+}

@@ -26,6 +26,7 @@ require_once __DIR__ . '/lib/folders.php';
 require_once __DIR__ . '/lib/note-titles.php';
 require_once __DIR__ . '/lib/checklists.php';
 require_once __DIR__ . '/lib/tasklists.php';
+require_once __DIR__ . '/lib/branding.php';
 
 
 
@@ -83,6 +84,27 @@ function getGitProviderName($provider = null) {
  */
 function getProtocol() {
     return isSecureConnection() ? 'https' : 'http';
+}
+
+/**
+ * Base URL for the links a request hands out (public share links), when the
+ * request comes from the MCP server: the instance URL set by an administrator
+ * (Admin Webhooks > Instance URL, else POZNOTE_APP_URL). The MCP server
+ * reaches Poznote at its internal Docker address, so a link built from the
+ * request host would read //webserver/<token>, which works for nobody; a chat
+ * app passing such a link on to its user is the common case since #1681.
+ * null for any other request, which keeps building links from the address
+ * the browser used.
+ */
+function poznoteServiceTokenInstanceBaseUrl(): ?string {
+    if (!function_exists('isApiServiceTokenRequest') || !isApiServiceTokenRequest()) {
+        return null;
+    }
+    $url = function_exists('getGlobalSetting') ? rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/') : '';
+    if ($url === '' && function_exists('_env')) {
+        $url = rtrim(trim((string)_env('POZNOTE_APP_URL', _env('APP_URL', ''))), '/');
+    }
+    return preg_match('#^https?://[^/\s]+#i', $url) ? $url : null;
 }
 
 /**
@@ -258,6 +280,10 @@ function poznoteCanTargetOtherUsers() {
         return true;
     }
 
+    // The person, not the MCP service token: see isRequestActorAdmin()
+    if (function_exists('isRequestActorAdmin')) {
+        return isRequestActorAdmin();
+    }
     return function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 }
 

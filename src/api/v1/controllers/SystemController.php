@@ -501,6 +501,8 @@ class SystemController {
             $scriptDir = preg_replace('#/api/v1$#', '', $scriptDir);
             $base = getProtocol() . '://';
             $base .= $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+            // Through the MCP server the request host is its internal address
+            $base = poznoteServiceTokenInstanceBaseUrl() ?? $base;
             
             foreach ($shared_notes as &$note) {
                 $token = $note['token'];
@@ -642,6 +644,8 @@ class SystemController {
         $scriptDir = preg_replace('#/api/v1$#', '', $scriptDir);
         $base = getProtocol() . '://';
         $base .= $host . ($scriptDir ? '/' . ltrim($scriptDir, '/\\') : '');
+        // Through the MCP server the request host is its internal address
+        $base = poznoteServiceTokenInstanceBaseUrl() ?? $base;
 
         $results = [];
 

@@ -34,7 +34,9 @@ const ATTACHMENT_PATTERN = /\/api\/v1\/notes\/\d+\/attachments\/[^/]+$/;
 // trip only makes sense with the server. A logout that cannot reach the
 // server does get the offline page, which signs out on the device
 // (js/offline-app.js) and has the server session closed later.
-const NO_FALLBACK_PAGES = ['oidc_login.php', 'oidc_callback.php'];
+// authorize.php is the consent page a chat app sends the person to (OAuth for
+// the MCP server): a failure there must show its own error, as for OIDC.
+const NO_FALLBACK_PAGES = ['oidc_login.php', 'oidc_callback.php', 'authorize.php'];
 
 // A page slower than this has the server asked directly whether it is there
 // (api_health.php, answered in milliseconds). A server that answers is only
@@ -60,7 +62,8 @@ self.addEventListener('install', (event) => {
 
 // A reminder pushed by the server (ReminderPushService.php) while no page may
 // be open: this is what makes it reach a closed PWA. The payload is
-// { id, title, body, url }, url being relative to the app.
+// { id, title, body, url, icon }, url and icon being relative to the app (a
+// server from before icon was sent leaves it out).
 self.addEventListener('push', (event) => {
   let reminder = {};
   try {
@@ -71,7 +74,7 @@ self.addEventListener('push', (event) => {
   const scope = self.registration.scope;
   const options = {
     body: reminder.body || '',
-    icon: new URL('pwa/poznote-192.png', scope).href,
+    icon: new URL(typeof reminder.icon === 'string' && reminder.icon ? reminder.icon : 'pwa/poznote-192.png', scope).href,
     data: { id: reminder.id || null, url: reminder.url ? new URL(reminder.url, scope).href : '' },
   };
   // Same tag as js/reminder-notifications.js: one notification per reminder

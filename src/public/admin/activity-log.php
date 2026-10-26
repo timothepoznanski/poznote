@@ -528,8 +528,7 @@ function activityExportUrl(string $action, string $search): string {
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <script src="../js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/activity-log', ['prefix' => '../']); ?>
-    <link rel="icon" href="../favicon.ico" type="image/x-icon">
-    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <?php poznoteRenderBrandIcons('../'); ?>
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <style>
     /* Same full-width treatment as storage-stats: the log table is wider than

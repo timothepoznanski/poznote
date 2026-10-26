@@ -6,6 +6,15 @@
  * The tool checkboxes reuse the list of allowed-users.css.
  */
 
+/* "Allow users to connect their own servers" waits for "Allow external tools" */
+#ai-external-tools .form-check:has(> .switch input:disabled) {
+    opacity: 0.55;
+}
+
+#ai-external-tools .switch:has(input:disabled) .slider {
+    cursor: not-allowed;
+}
+
 .ai-mcp-intro {
     margin-bottom: 16px;
 }

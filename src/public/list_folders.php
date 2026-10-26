@@ -619,6 +619,7 @@ $currentLang = getUserLanguage();
 		}
 	</style>
 	<script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
+	<?php poznoteRenderBrandIcons(); ?>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="shared-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>" data-archive-workspace="<?php echo htmlspecialchars(POZNOTE_ARCHIVE_WORKSPACE, ENT_QUOTES, 'UTF-8'); ?>"

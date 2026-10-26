@@ -802,13 +802,33 @@ class RemindersController {
             return;
         }
 
-        $detectedUrl = $this->detectAppUrl();
-        if ($detectedUrl === '') {
+        // The detected URL is built from the Host and X-Forwarded-Host headers,
+        // which the client chooses, and the setting is instance-wide: it is
+        // the base of every reminder email and webhook link, and of the OAuth
+        // sign-in pages the MCP server sends chat apps to. So it is only ever
+        // a first guess: taken when nothing is set yet, from an administrator
+        // in a browser session. Anyone else could otherwise point everybody's
+        // links at a site of their own with one forged header, and an API
+        // client (the MCP server reaches Poznote as http://webserver) would
+        // replace the real address with its internal one. Changing it later is
+        // done in Settings > Admin Tools > Admin Webhooks or SMTP.
+        if (function_exists('hasApiAuthCredentials') && hasApiAuthCredentials()) {
+            return;
+        }
+        if (!function_exists('isCurrentUserAdmin') || !isCurrentUserAdmin()) {
+            return;
+        }
+        if (rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/') !== '') {
+            return;
+        }
+        // POZNOTE_APP_URL already says where the instance is: a guess stored
+        // in the setting would take precedence over it.
+        if (function_exists('_env') && trim((string)_env('POZNOTE_APP_URL', _env('APP_URL', ''))) !== '') {
             return;
         }
 
-        $currentUrl = rtrim(trim((string)getGlobalSetting('smtp_app_url', '')), '/');
-        if ($currentUrl === $detectedUrl) {
+        $detectedUrl = $this->detectAppUrl();
+        if ($detectedUrl === '') {
             return;
         }
 

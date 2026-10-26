@@ -169,6 +169,18 @@ POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate m
 
 `docker compose restart mcp-server`만으로는 변경된 환경 변수를 다시 읽지 않습니다.
 
+#### 용도별 모드 선택
+
+MCP 서버는 세 가지 방식 중 하나로 클라이언트를 식별합니다. 이들을 구분하는 기준은 **요청이 어떤 Poznote 계정에 작용할지 누가 정하는가**입니다.
+
+| 상황 | 모드 | 계정을 정하는 주체 |
+|---|---|---|
+| 혼자서 같은 컴퓨터의 클라이언트로 사용(VS Code, Claude CLI) | 클래식(기본값), 필요하면 [수신 연결 인증 토큰](#수신-연결-인증-토큰) 추가 | 서버 설정: `POZNOTE_USER_ID`(기본값은 프로필 `1`) 또는 요청이 `user_id`로 지정하는 모든 프로필 |
+| 여러 사용자, 채팅 앱(ChatGPT, Claude, Gemini), 또는 공개 서버에 접속하는 VS Code / Claude Code | [채팅 앱에서 로그인](#채팅-앱에서-로그인chatgpt-claude-gemini)(`POZNOTE_MCP_AUTH_PROVIDER=poznote`) | 로그인한 사람: 항상 본인 계정 |
+| ID 공급자(Keycloak, Authentik 등)의 토큰을 이미 가진 에이전트 | [호출자별 인증](#호출자별-인증선택-사항)(`userinfo` 또는 `introspection`) | 토큰의 ID에 연결된 프로필 |
+
+여러 사람이 MCP 서버 하나를 함께 쓴다면 두 번째 모드를 사용하세요. 클래식 모드에서는 모든 클라이언트가 모든 계정에 접근할 수 있습니다.
+
 #### 기본 사용자 프로필
 
 기본적으로 사용자 프로필 `1`(첫 관리자)로 동작합니다. 다른 프로필을 기본값으로 쓰려면 컨테이너 시작 시 `POZNOTE_USER_ID`를 설정하세요.
@@ -198,6 +210,49 @@ docker compose up -d --force-recreate mcp-server
 
 이 토큰은 `data/.mcp_token`과 별개입니다. 파일의 토큰은 MCP 서버가 *Poznote API에* 접속할 때 사용하며, 이 설정값은 *AI 어시스턴트*가 MCP 서버에 제시하는 토큰입니다.
 
+#### 채팅 앱에서 로그인(ChatGPT, Claude, Gemini)
+
+ChatGPT(및 Codex 앱), Claude Desktop과 claude.ai, Gemini처럼 원격 MCP 서버에 연결하는 채팅 앱은 토큰을 붙여 넣는 방식을 지원하지 않습니다. 대신 서버가 OAuth 로그인 과정으로 안내해 주기를 기대합니다. `POZNOTE_MCP_AUTH_PROVIDER=poznote`를 설정하면 Poznote가 직접 이 역할을 맡습니다.
+
+1. 앱에서 `https://mcp.example.com/mcp`를 커넥터로 추가하고, 클라이언트 ID와 시크릿 입력란이 있으면 비워 둡니다. 앱이 스스로 등록합니다. 앱은 이 항목을 설정에 두며 보통 사용자 지정 커넥터 또는 원격 MCP 서버라고 부릅니다. 일부 앱은 특정 요금제나 개발자 모드에서만 제공합니다.
+2. 앱이 Poznote 로그인 페이지를 엽니다. 평소처럼 로그인합니다(비밀번호, 2단계 인증 또는 SSO).
+3. 동의 페이지에 앱 이름, 돌아갈 주소, 앱이 사용할 계정이 표시됩니다. 이 계정은 항상 본인 계정이며, 접근 권한을 받은 다른 계정은 해당되지 않습니다. 그리고 접근 수준을 선택할 수 있습니다. 접근 수준은 **읽기 전용**, **읽기 및 편집**, **전체 접근**이며, 세 가지 [도구 범위](#도구-범위) 수준에 해당합니다.
+4. **허용**을 클릭하면 앱은 해당 계정에만, 해당 수준으로만 접근합니다.
+
+따라서 MCP 서버 하나로 인스턴스 전체를 지원하며, 각 사용자는 자신의 노트(및 자신과 공유된 작업 공간)에만 접근합니다. **설정 > 내 계정 > 연결된 앱**에서 연결 목록을 보고 원하는 연결을 해제할 수 있으며, 앱에 붙여 넣을 커넥터 주소도 모든 사용자에게 표시됩니다.
+
+요구 사항은 다음과 같습니다.
+
+- 채팅 앱은 인터넷을 통해 연결하므로(ChatGPT와 claude.ai는 자체 서버에서 연결), MCP 서버와 Poznote 모두 그 앱에서 **HTTPS**로 접근할 수 있어야 합니다. MCP 서버는 리버스 프록시 뒤 **별도의 (하위) 도메인**에 두세요. 예를 들어 `https://mcp.example.com`을 사용합니다. OAuth 검색 문서는 이 주소의 루트에서 제공됩니다. 프록시가 트래픽을 보낼 곳은 프록시가 실행되는 위치에 따라 다릅니다.
+  - 서버에 직접 설치한 경우: `127.0.0.1:8045`(`docker-compose.yml`이 공개하는 포트, `POZNOTE_MCP_PORT`)로 프록시합니다.
+  - 프록시 자체가 Docker에서 실행되는 경우(Nginx Proxy Manager, Traefik, Caddy 등): `127.0.0.1`은 프록시 자신의 컨테이너를 가리키게 됩니다. `docker network connect poznote_default <proxy-container>`로 프록시를 Poznote의 Docker 네트워크에 연결하고(네트워크 이름은 `docker-compose.yml`이 있는 폴더 이름을 따르며 `docker network ls`로 확인할 수 있습니다), `mcp-server:8045`로 프록시합니다.
+- Poznote 자체의 `/oauth/` 페이지는 앞단에 별도 로그인 없이 접근할 수 있어야 합니다(프록시에 설정한 Authelia, Authentik 같은 포워드 인증). 앱은 그중 일부를 자체 서버에서 호출하며, 로그인 페이지를 보여 줄 브라우저가 없습니다.
+- `.env`에 변수 두 개를 설정한 뒤 컨테이너를 재생성하세요(`docker compose up -d --force-recreate mcp-server`). 이전 버전의 `docker-compose.yml`은 이 변수를 컨테이너에 전달하지 않으므로 먼저 최신 버전을 내려받으세요. 그러면 시작 시 MCP 로그에 `OAuth sign-in through Poznote enabled`가 표시됩니다.
+
+```bash
+POZNOTE_MCP_AUTH_PROVIDER=poznote
+# MCP 서버 공개 URL(/mcp 제외)
+POZNOTE_MCP_PUBLIC_URL=https://mcp.example.com
+```
+
+- 사용자가 로그인하는 Poznote 공개 URL은 **설정 > 관리자 도구 > 관리자 웹훅**의 **인스턴스 URL**이며, 알림 이메일과 웹훅이 사용하는 URL입니다(비어 있는 동안에는 `.env`의 `POZNOTE_APP_URL`). 둘 다 설정되지 않았다면 관리자의 브라우저에서 자동으로 채워지므로, 인터넷에서 Poznote에 접속하는 주소가 맞는지 확인하세요. 변경 내용은 재시작 없이 1분 이내에 MCP 서버에 반영됩니다. 관리자는 **연결된 앱** 창에서 사용 중인 주소를 볼 수 있으며, 로컬 주소나 일반 http 주소라면 경고가 표시됩니다.
+
+작동하지 않는다면 다음을 확인하세요.
+
+- **앱이 서버의 인증(OAuth) 설정을 찾을 수 없다고 표시합니다.** 네트워크 외부의 컴퓨터에서 `https://mcp.example.com/.well-known/oauth-protected-resource/mcp`와 `https://mcp.example.com/.well-known/oauth-authorization-server`를 열어 보세요. 둘 다 JSON으로 응답해야 합니다. 두 번째 주소가 `503`을 반환하면 Poznote 공개 URL이 설정되지 않은 것입니다. 아무 응답이 없다면 리버스 프록시가 MCP 서버에 도달하지 못하는 것입니다.
+- **앱이 연 로그인 페이지가 로드되지 않습니다.** 앱이 인스턴스 URL에 접근할 수 없는 것입니다. **연결된 앱**의 경고를 확인하고 **관리자 웹훅 > 인스턴스 URL**에서 수정하세요.
+- **시작 시 MCP 로그에 `OAuth sign-in through Poznote enabled`가 표시되지 않습니다.** 변수가 컨테이너에 전달되지 않는 것입니다. `.env`와 `docker-compose.yml`을 확인한 뒤 컨테이너를 재생성하세요(`restart`로는 부족합니다).
+- **로그인은 되지만 이후 모든 요청이 실패합니다.** 커넥터 URL은 정확히 `POZNOTE_MCP_PUBLIC_URL` 뒤에 `/mcp`를 붙인 값이어야 합니다. 그렇지 않으면 MCP 로그에 `Rejecting a token issued for ...`가 표시됩니다.
+- `docker compose logs mcp-server`에서 서버가 무엇을 왜 거부했는지 확인할 수 있습니다. `POZNOTE_DEBUG=true`를 설정하면 모든 요청도 기록됩니다.
+
+모든 연결에 적용되는 규칙은 다음과 같습니다.
+
+- 연결은 사용하는 동안 유지됩니다. 앱은 1시간마다 접근 권한을 갱신하며, 90일 동안 사용하지 않으면 다시 로그인해야 합니다. 연결을 해제한 앱도 최대 `POZNOTE_MCP_AUTH_CACHE_TTL`초(기본값 60) 동안 계속 작동할 수 있습니다.
+- `POZNOTE_MCP_SCOPE`는 여전히 모든 연결의 상한입니다. `write`로 설정된 서버에 **전체 접근**으로 연결하면 `write`를 받습니다.
+- 인스턴스 전체에 작용하는 도구(백업, 전역 설정, 시스템 정보)는 관리자 계정이 필요하며, 요청에서 `user_id`로 다른 계정을 지정할 수 없습니다.
+- 연결된 앱은 계정 데이터가 전송되는 곳을 바꿀 수 없습니다. Git 동기화의 저장소, 서버, 토큰과 AI 어시스턴트 및 받아쓰기의 주소와 키가 이에 해당합니다. 사용자가 설정한 저장소로 푸시하고 그곳에서 풀하는 것은 계속 가능합니다.
+- 이 모드가 켜져 있는 동안 `POZNOTE_MCP_AUTH_TOKEN`은 무시됩니다.
+
 #### 호출자별 인증(선택 사항)
 
 위의 `POZNOTE_MCP_AUTH_TOKEN`은 하나의 공유 비밀입니다. 모든 클라이언트가 같은
@@ -218,7 +273,7 @@ MCP 인스턴스를 공유하면 이를 구분할 수 없습니다.
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(설정하지 않음, 기능 꺼짐)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(설정하지 않음, 기능 꺼짐)* | `userinfo` or `introspection` (`poznote` is described [above](#채팅-앱에서-로그인chatgpt-claude-gemini)) |
 | `POZNOTE_MCP_AUTH_URL` | *(필수)* | provider endpoint |
 | `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
 | `POZNOTE_MCP_AUTH_AUDIENCE` | *(설정하지 않음, 기능 꺼짐)* | expected `aud`, comma separated; refuses a token issued for another application |
@@ -250,8 +305,7 @@ ID는 그대로 거부됩니다. 기본값은 첫 번째 관리자인 프로필 
   도구가 이 인수를 받으므로, 다른 프로필을 지정한 값은 따르지 않고 거부합니다.
 - **`user_id`를 받지 않는 도구**(`get_system_info`, `list_backups`,
   `create_backup`, `delete_backup`)는 서버의 기본 프로필로 동작하므로, 확인된
-  프로필이 관리자인 호출자로 제한됩니다. 따라서 기본 프로필은 관리자여야 하며,
-  프로필 조회가 `GET /api/v1/admin/users`를 읽습니다.
+  프로필이 관리자인 호출자로 제한됩니다.
 
 `POZNOTE_MCP_AUTH_PROVIDER`가 설정되면 `POZNOTE_MCP_AUTH_TOKEN`보다 우선하며,
 그 토큰이 여전히 설정되어 있으면 서버가 경고를 기록합니다.
@@ -333,16 +387,25 @@ AI 어시스턴트가 MCP 서버에 연결하도록 설정하세요.
 ### **Claude CLI**
 전체 설정 안내: **[CLAUDE-CLI.md](CLAUDE-CLI.ko.md)**
 
+### **ChatGPT, Claude Desktop / claude.ai, Gemini**
+채팅 앱은 Poznote를 통해 로그인합니다. **[채팅 앱에서 로그인](#채팅-앱에서-로그인chatgpt-claude-gemini)**을 참고하세요.
+
 ---
 
 ## 보안
 
-MCP 엔드포인트에 접근할 수 있는 사람은 모든 프로필의 노트를 읽고 생성·수정·삭제할 수 있습니다(도구의 `user_id` 인수). 백업, 복원, 설정 변경도 가능합니다. 두 단계로 접근을 제한합니다.
+MCP 엔드포인트에 접근하는 클라이언트가 할 수 있는 작업은 [모드](#용도별-모드-선택)에 따라 다릅니다.
+
+**클래식 모드**(기본값). 엔드포인트에 접근할 수 있는 사람은 모든 프로필의 노트를 읽고 생성·수정·삭제할 수 있습니다(도구의 `user_id` 인수). 백업, 복원, 설정 변경도 가능합니다. 두 단계로 접근을 제한합니다.
 
 1. **네트워크 접근 범위.** 기본적으로 로컬 컴퓨터에서만 접속할 수 있습니다.
 2. **수신 Bearer 토큰(선택 사항).** `POZNOTE_MCP_AUTH_TOKEN`을 설정하면 모든 요청에 `Authorization: Bearer <token>`이 필요합니다.
 
-기본 `docker-compose.yml`에서는 첫 단계만으로 충분합니다. 완전히 통제하지 못하는 위치에서도 포트에 접근할 수 있다면 두 번째 단계도 적용하세요. 접근 가능한 클라이언트가 할 수 있는 작업을 좁히려면 [도구 범위](#도구-범위)를 설정하세요.
+기본 `docker-compose.yml`에서는 첫 단계만으로 충분합니다. 완전히 통제하지 못하는 위치에서도 포트에 접근할 수 있다면 두 번째 단계도 적용하세요.
+
+**채팅 앱에서 로그인과 호출자별 인증.** 모든 요청에 한 사람의 계정에 묶인 토큰이 있어야 하므로, 클라이언트는 그 계정에만, 부여받은 수준으로만 접근합니다. 이 경우 엔드포인트는 HTTPS 뒤에 두고 인터넷에서 접근할 수 있게 하는 것이 전제입니다. 채팅 앱은 자체 서버에서 연결하기 때문입니다.
+
+어떤 모드에서든 [도구 범위](#도구-범위)로 클라이언트가 할 수 있는 작업을 좁힐 수 있습니다.
 
 ### 127.0.0.1에만 공개하는 이유
 
@@ -365,7 +428,7 @@ ports:
 
 ### 원격 접속
 
-원격 서버에서 Poznote를 실행하고 작업용 컴퓨터에서 연결하려면 SSH 포트 전달을 사용하세요. 포트를 외부에 공개하지 **마세요**.
+클래식 모드에서, 원격 서버에서 Poznote를 실행하고 작업용 컴퓨터에서 연결하려면 SSH 포트 전달을 사용하세요. 포트를 외부에 공개하지 **마세요**([채팅 앱에서 로그인](#채팅-앱에서-로그인chatgpt-claude-gemini)에서는 HTTPS 뒤로 공개하는 것이 바로 목적이므로 이 섹션이 적용되지 않습니다).
 
 ```bash
 ssh -L 8045:127.0.0.1:8045 user@your-server
@@ -376,9 +439,9 @@ ssh -L 8045:127.0.0.1:8045 user@your-server
 ### 운영 환경
 
 MCP 서버에 네트워크로 접근해야 한다면 다음으로 보호하세요.
-- `POZNOTE_MCP_AUTH_TOKEN`([수신 연결 인증 토큰](#수신-연결-인증-토큰) 참고)과 토큰 평문 전송을 막는 HTTPS
+- `POZNOTE_MCP_AUTH_TOKEN`([수신 연결 인증 토큰](#수신-연결-인증-토큰) 참고) 또는 클라이언트마다 하나의 계정에 묶인 철회 가능한 토큰을 발급하는 [Poznote를 통한 로그인](#채팅-앱에서-로그인chatgpt-claude-gemini), 그리고 토큰 평문 전송을 막는 HTTPS
 - VPN(Tailscale, WireGuard)
-- 추가 보호를 위한 자체 인증 또는 IP 허용 목록이 있는 리버스 프록시(nginx, Caddy, 선택 사항)
+- 추가 보호를 위한 자체 인증 또는 IP 허용 목록이 있는 리버스 프록시(nginx, Caddy, 선택 사항). 단, 채팅 앱에서 로그인을 사용할 때는 제외합니다. 앱은 계속 바뀌는 자체 주소에서 연결하며 별도의 로그인에 응답할 수 없으므로 엔드포인트와 `/.well-known/` 문서에 계속 접근할 수 있어야 합니다.
 
 ### MCP 서버의 Poznote 인증 방식
 

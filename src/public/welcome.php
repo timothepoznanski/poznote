@@ -142,8 +142,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="js/session-guard.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderStylesheets('welcome'); ?>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <?php poznoteRenderBrandIcons(); ?>
 </head>
 <body class="welcome-page welcome-page-locked">
     <!-- The guide opens on this and nothing else: the language decides what

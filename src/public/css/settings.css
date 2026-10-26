@@ -79,6 +79,12 @@ body.settings-page {
     color: var(--pz-danger-strong);
 }
 
+/* A state that is neither good nor bad, such as a safe default. */
+.setting-status.neutral {
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-secondary);
+}
+
 .settings-current-user-badge {
     display: inline-flex;
     align-items: center;
@@ -147,13 +153,17 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 }
 
 /* App passwords modal (js/app-passwords.js): a create row, the secret shown
-   once, then one row per credential. Only --pz-* tokens, which tokens.css
+   once, then one row per credential. The connected apps modal
+   (js/connected-apps.js) reuses its list, and the secret box for the
+   connector address. Only --pz-* tokens, which tokens.css
    re-maps for the dark themes, so no dark block is needed here. */
-#appPasswordsModal .modal-content {
+#appPasswordsModal .modal-content,
+#connectedAppsModal .modal-content {
     max-width: 600px;
 }
 
-#appPasswordsModal .app-passwords-description {
+#appPasswordsModal .app-passwords-description,
+#connectedAppsModal .app-passwords-description {
     color: var(--pz-text-muted);
     line-height: 1.45;
     margin: 0 0 14px 0;
@@ -194,13 +204,15 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     padding: 9px 16px;
 }
 
-#appPasswordsModal .app-passwords-error {
+#appPasswordsModal .app-passwords-error,
+#connectedAppsModal .app-passwords-error {
     color: var(--pz-danger-text);
     margin: 0 0 10px 0;
     font-size: 0.9rem;
 }
 
-#appPasswordsModal .app-password-secret {
+#appPasswordsModal .app-password-secret,
+#connectedAppsModal .app-password-secret {
     margin: 0 0 14px 0;
     padding: 10px 12px;
     border: 1px solid var(--pz-border);
@@ -208,14 +220,16 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     background-color: var(--pz-surface);
 }
 
-#appPasswordsModal .app-password-secret-title {
+#appPasswordsModal .app-password-secret-title,
+#connectedAppsModal .app-password-secret-title {
     margin-bottom: 6px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-#appPasswordsModal .app-password-secret-row {
+#appPasswordsModal .app-password-secret-row,
+#connectedAppsModal .app-password-secret-row {
     display: flex;
     gap: 8px;
     align-items: center;
@@ -223,7 +237,8 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
 
 /* The secret is 44 characters and has to stay on one line to be selectable
    as one unit; it scrolls inside its own box rather than widening the modal. */
-#appPasswordsModal .app-password-secret-value {
+#appPasswordsModal .app-password-secret-value,
+#connectedAppsModal .app-password-secret-value {
     flex: 1 1 auto;
     min-width: 0;
     overflow-x: auto;
@@ -236,20 +251,23 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     user-select: all;
 }
 
-#appPasswordsModal .app-password-copy {
+#appPasswordsModal .app-password-copy,
+#connectedAppsModal .app-password-copy {
     flex: 0 0 auto;
     padding: 6px 14px;
 }
 
 #appPasswordsModal .app-password-secret-notice,
-#appPasswordsModal .app-password-secret-usage {
+#appPasswordsModal .app-password-secret-usage,
+#connectedAppsModal .app-password-secret-usage {
     margin: 8px 0 0 0;
     font-size: 0.9rem;
     color: var(--pz-text-muted);
     line-height: 1.45;
 }
 
-#appPasswordsModal .app-password-list {
+#appPasswordsModal .app-password-list,
+#connectedAppsModal .app-password-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -258,7 +276,8 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     overflow-y: auto;
 }
 
-#appPasswordsModal .app-password-row {
+#appPasswordsModal .app-password-row,
+#connectedAppsModal .app-password-row {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -271,19 +290,22 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     text-decoration: line-through;
 }
 
-#appPasswordsModal .app-password-main {
+#appPasswordsModal .app-password-main,
+#connectedAppsModal .app-password-main {
     flex: 1 1 auto;
     min-width: 0;
 }
 
-#appPasswordsModal .app-password-label {
+#appPasswordsModal .app-password-label,
+#connectedAppsModal .app-password-label {
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-#appPasswordsModal .app-password-meta {
+#appPasswordsModal .app-password-meta,
+#connectedAppsModal .app-password-meta {
     display: block;
     font-size: 0.85rem;
     color: var(--pz-text-muted);
@@ -294,15 +316,54 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     color: var(--pz-danger-text);
 }
 
-#appPasswordsModal .app-password-revoke {
+#appPasswordsModal .app-password-revoke,
+#connectedAppsModal .app-password-revoke {
     flex: 0 0 auto;
     padding: 4px 10px;
     font-size: 0.85rem;
 }
 
-#appPasswordsModal .app-passwords-empty {
+#appPasswordsModal .app-passwords-empty,
+#connectedAppsModal .app-passwords-empty {
     padding: 12px 0;
     color: var(--pz-text-muted);
+}
+
+/* Connected apps modal, administrators only: where chat apps are sent to
+   sign in, and a warning when that address cannot work. The warning tokens
+   switch with the theme (tokens.css), so no dark block is needed. */
+#connectedAppsModal .connected-apps-signin {
+    margin: 10px 0 14px 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--pz-text-muted);
+}
+
+#connectedAppsModal .connected-apps-signin.is-warning {
+    padding: 8px 12px;
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-warning-soft);
+    color: var(--pz-warning-strong);
+}
+
+#connectedAppsModal .connected-apps-signin-url {
+    font-family: monospace;
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+#connectedAppsModal .connected-apps-signin-warning {
+    display: block;
+    margin-top: 4px;
+}
+
+#connectedAppsModal .connected-apps-signin-change {
+    white-space: nowrap;
+}
+
+#connectedAppsModal .connected-apps-signin.is-warning .connected-apps-signin-change {
+    color: inherit;
+    text-decoration: underline;
 }
 
 /* Statistics API modal (js/statistics-token.js): the address to call, the
@@ -2178,4 +2239,74 @@ a.settings-storage-row:focus-visible {
     font-family: monospace;
     font-size: 0.8rem;
     word-break: break-all;
+}
+
+/* The note before the logo dialog: three buttons on one row on a computer.
+   Change sits between Cancel (grey) and the coffee (accent), outlined so
+   it reads as neither. */
+#customLogoNoticeModal .modal-content {
+    max-width: 560px;
+}
+
+#customLogoNoticeModal .modal-buttons {
+    margin-top: 36px;
+}
+
+.modal-buttons button.custom-logo-continue {
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border: 1px solid var(--pz-border-strong);
+}
+
+.modal-buttons button.custom-logo-continue:hover {
+    background-color: var(--pz-surface-sunken);
+}
+
+/* Logo dialog (#customLogoModal): the logo in use, at the size of the login
+   page's and a little more, then what stays Poznote's */
+.custom-logo-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 20px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-surface-sunken);
+}
+
+.custom-logo-preview-mark {
+    width: 64px;
+    height: 64px;
+}
+
+/* "Back to the Poznote logo", under the logo it would remove */
+.custom-logo-reset {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--pz-accent-text);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.custom-logo-reset:hover {
+    text-decoration: underline;
+}
+
+.custom-logo-reset[hidden] {
+    display: none;
+}
+
+.custom-logo-reset:disabled {
+    color: var(--pz-text-subtle);
+    cursor: default;
+    text-decoration: none;
+}
+
+.custom-logo-hint {
+    color: var(--pz-text-muted);
+    font-size: 0.85rem;
 }

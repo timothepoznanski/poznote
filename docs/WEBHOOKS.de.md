@@ -145,7 +145,7 @@ Payloads, die sich auf eine Notiz beziehen, können in `data.note.url` einen dir
 https://poznote.example.com/index.php?note=42&workspace=Poznote
 ```
 
-Der Link wird aus der **Instanz-URL** gebildet, der öffentlichen URL Ihrer Poznote-Instanz, die im Abschnitt **Instanz-URL** unter **Einstellungen > Admin-Werkzeuge > Admin-Webhooks** konfiguriert wird (nur für Administratoren). Es ist derselbe Wert wie die Instanz-URL, die von den Erinnerungs-E-Mails verwendet wird; wenn Sie ihn an einer Stelle setzen, gilt er also für beide. Er kann auch über die REST-API (Einstellung `smtp_app_url`) oder ersatzweise mit der Umgebungsvariable `POZNOTE_APP_URL` (oder `APP_URL`) gesetzt werden.
+Der Link wird aus der **Instanz-URL** gebildet, der öffentlichen URL Ihrer Poznote-Instanz, die im Abschnitt **Instanz-URL** unter **Einstellungen > Admin-Werkzeuge > Admin-Webhooks** konfiguriert wird (nur für Administratoren). Es ist derselbe Wert wie die Instanz-URL, die von den Erinnerungs-E-Mails verwendet wird; wenn Sie ihn an einer Stelle setzen, gilt er also für beide. Er kann auch über die REST-API (Einstellung `smtp_app_url`) oder ersatzweise mit der Umgebungsvariable `POZNOTE_APP_URL` (oder `APP_URL`) gesetzt werden. Chat-Apps, die sich über Poznote mit dem [MCP-Server](MCP-SERVER.de.md) verbinden, werden ebenfalls an diese Adresse geschickt. Solange sie leer ist, wird sie beim ersten Besuch eines Administrators aus dessen Browser übernommen; danach ändert sie sich nur, wenn sie hier geändert wird.
 
 Ist keine Instanz-URL konfiguriert, ist `data.note.url` `null`, und die Payloads enthalten keinen Link.
 

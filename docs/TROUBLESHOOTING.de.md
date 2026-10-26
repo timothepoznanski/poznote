@@ -266,3 +266,20 @@ docker compose up -d --force-recreate webserver
 Setzen Sie ihn nie höher als den Arbeitsspeicher des Hosts: Eine Anfrage, die über das hinausgeht, was der Rechner hat, wird vom Kernel ohne jede Meldung beendet und kann den ganzen Container mit sich reißen. Auf einem Host mit 512 MB behalten Sie den Standardwert bei. Der Wert wird bei jedem Start vom Init-Skript des Containers angewendet; ein ungültiger Wert wird im Log gemeldet, und der Standardwert des Images bleibt erhalten.
 
 </details>
+
+<a id="this-address-is-not-allowed"></a>
+<details>
+<summary><strong>„This address is not allowed: it must be a public internet host“</strong></summary>
+<br>
+
+Ein Benutzer ohne Administratorrechte hat die Adresse eines Geräts in Ihrem lokalen Netzwerk oder des Servers selbst eingegeben, in einem Webhook, in Git Sync oder in seinem eigenen KI-, Transkriptions- oder MCP-Server. Nur Administratoren können diese Adressen erreichen. Ein Administrator kann diesen Host unter **Einstellungen > Admin-Werkzeuge > Integrationen > Zugriff auf das lokale Netzwerk** erlauben, siehe [Zugriff auf das lokale Netzwerk für Benutzer ohne Administratorrechte](README.de.md#local-network-access).
+
+Steht der Host schon in der Liste und bleibt die Meldung, kann der Poznote-Container seinen Namen nicht auflösen: Die Meldung ist in beiden Fällen absichtlich gleich, damit sie nichts über das interne Netzwerk verrät. Prüfen Sie den Namen im Container:
+
+```bash
+docker compose exec webserver getent hosts ollama.lan
+```
+
+Gibt der Befehl nichts aus, tragen Sie statt des Namens die IP-Adresse oder das Netzwerk des Hosts in die Liste ein.
+
+</details>

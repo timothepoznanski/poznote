@@ -912,6 +912,40 @@ Poznote es multiusuario: cada perfil tiene sus propias notas, espacios de trabaj
 - **Gestión de usuarios**: los administradores crean, desactivan y gestionan perfiles desde **Configuración > Herramientas de administración > Gestión de usuarios**, y pueden dar a un usuario acceso a la cuenta de otro usuario sin transferir su propiedad.
 - **Compartir y colaboración**: los espacios de trabajo, las notas y las carpetas pueden compartirse con los demás usuarios de la instancia, consulta [Compartir y colaboración](#compartir-y-colaboración).
 - **Aislamiento de cuentas (modo SaaS)**: los administradores pueden impedir que los usuarios que no son administradores descubran las demás cuentas de la instancia, compartan con ellas o registren webhooks personales. Deja todo sin marcar para una instancia familiar o de equipo.
+- **Acceso a la red local**: los usuarios que no son administradores solo pueden conectar los webhooks, Git Sync y sus propios servidores de IA, transcripción o MCP a hosts públicos de Internet, aparte de los hosts locales que permita un administrador, consulta [Acceso a la red local para usuarios no administradores](#local-network-access).
+
+<a id="local-network-access"></a>
+<details>
+<summary><strong>Acceso a la red local para usuarios no administradores</strong></summary>
+<br>
+
+Algunas funciones hacen que el propio servidor de Poznote se conecte a una dirección escrita por un usuario: los webhooks, Git Sync y sus propios servidores de IA, transcripción o MCP. La petición sale del servidor, no del navegador del usuario. Sin un límite, cualquier cuenta podría usar Poznote para llegar al propio servidor, a los demás contenedores Docker, a tu red local o a un servicio de metadatos de la nube, sitios a los que no puede llegar por sí misma.
+
+Por eso la regla depende de quién escribió la dirección:
+
+- **Los administradores** no tienen límites: ya controlan el servidor.
+- **Los demás usuarios** solo pueden usar hosts públicos de Internet. Una dirección local o privada se rechaza: `localhost` y `127.0.0.1`, `10.x.x.x`, de `172.16.x.x` a `172.31.x.x`, `192.168.x.x`, `169.254.x.x`, las direcciones IPv6 locales (`fc00::/7`, `fe80::/10`) y cualquier nombre que apunte a una de ellas, como el nombre de otro servicio Docker.
+
+Lo que un administrador configura para toda la instancia (el Asistente de IA, la Transcripción, los webhooks de administración, S3, OIDC, SMTP) no se ve afectado.
+
+En una instancia familiar o de equipo, los usuarios pueden necesitar un servidor de tu red, por ejemplo un servidor Ollama para su IA personal o n8n para sus webhooks. Indica esos hosts en **Configuración > Herramientas de administración > Integraciones > Acceso a la red local**, una entrada por línea:
+
+| Entrada | Qué permite |
+|---|---|
+| `ollama` o `ollama.lan` | este nombre de host, sea cual sea la dirección a la que apunte (un nombre de servicio Docker funciona) |
+| `*.home.arpa` | todos los nombres de host bajo este dominio |
+| `192.168.1.20` | esta dirección |
+| `192.168.1.0/24` | todas las direcciones de esta red (IPv6 también funciona, `fd00::/8`) |
+
+Una entrada permite todos los puertos de ese host. Las entradas no válidas se rechazan al guardar, con la lista de las que hay que corregir. La tarjeta muestra **Solo públicos** mientras la lista está vacía y, si no, el número de entradas.
+
+Conviene saber:
+
+- Un nombre de host de la lista debe poder resolverse desde el contenedor de Poznote, no solo desde tu ordenador. Un nombre que solo conocen tu ordenador o tu router no lo puede resolver Poznote, y se rechaza como cualquier nombre desconocido: escribe en su lugar su dirección o su red.
+- La dirección se comprueba en cada conexión, no solo al guardar: quitar una entrada surte efecto enseguida, y un nombre que más tarde apunte a una dirección local se rechaza.
+- Para los usuarios no administradores, Poznote no sigue las redirecciones, salvo en Git Sync, que vuelve a comprobar cada paso de la redirección.
+
+</details>
 
 <details>
 <summary><strong>Organización de los datos en el disco</strong></summary>

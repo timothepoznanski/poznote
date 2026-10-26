@@ -362,6 +362,13 @@ function poznoteCssManifest(): array
             'css/login.css',
             '@theme',
         ],
+        'oauth/authorize' => [
+            'css/lucide.css',
+            '@components',
+            'css/login.css',
+            'css/oauth-authorize.css',
+            '@theme',
+        ],
         'notes_manager' => [
             'css/lucide.css',
             '@components',

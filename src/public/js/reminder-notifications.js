@@ -168,6 +168,13 @@
         if (reminder.note_id) window.location.href = noteUrl(reminder.note_id);
     }
 
+    // The instance logo when an admin set one: the page links its 192 px file
+    // (lib/branding.php), Poznote's own has no such link.
+    function notificationIcon() {
+        var link = document.querySelector('link[rel="icon"][sizes="192x192"]');
+        return link && link.href ? link.href : new URL('pwa/poznote-192.png', window.location.href).href;
+    }
+
     function show(reminder) {
         var heading = reminder.note_heading || '';
         var title = reminder.message || heading || 'Poznote';
@@ -175,7 +182,7 @@
             body: heading && heading !== title ? heading : '',
             // One tag per reminder: several open tabs show it once
             tag: 'poznote-reminder-' + reminder.id,
-            icon: new URL('pwa/poznote-192.png', window.location.href).href,
+            icon: notificationIcon(),
             data: { id: reminder.id, url: reminder.note_id ? noteUrl(reminder.note_id) : '' }
         };
 

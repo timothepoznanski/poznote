@@ -215,6 +215,8 @@ class ReminderPushService {
             'title' => $this->shorten($title),
             'body' => $heading !== '' && $heading !== $title ? $this->shorten($heading) : '',
             'url' => $url,
+            // Relative too: the instance logo, or Poznote's (lib/branding.php)
+            'icon' => poznoteNotificationIconPath(),
         ];
     }
 

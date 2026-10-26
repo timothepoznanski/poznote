@@ -169,6 +169,18 @@ POZNOTE_MCP_PORT=9000 POZNOTE_DEBUG=true docker compose up -d --force-recreate m
 
 简单执行 `docker compose restart mcp-server` 不会重新加载更新后的环境变量。
 
+#### 按用途选择模式
+
+MCP 服务器以三种方式之一识别其客户端。区分它们的关键在于**由谁决定请求作用于哪个 Poznote 账户**：
+
+| 您的情况 | 模式 | 由谁决定账户 |
+|---|---|---|
+| 只有您自己，客户端在同一台机器上（VS Code、Claude CLI） | 经典模式，即默认模式，可选配[入站令牌](#入站身份验证令牌) | 服务器配置：`POZNOTE_USER_ID`（默认为用户资料 `1`），或请求通过 `user_id` 指定的任意用户资料 |
+| 多人使用、聊天应用（ChatGPT、Claude、Gemini），或访问公开服务器的 VS Code / Claude Code | [从聊天应用登录](#从聊天应用登录chatgptclaudegemini)（`POZNOTE_MCP_AUTH_PROVIDER=poznote`） | 登录的人：始终是其本人的账户 |
+| 已持有您的身份提供方（Keycloak、Authentik 等）所签发令牌的 agent | [按调用方身份认证](#按调用方身份认证可选)（`userinfo` 或 `introspection`） | 与令牌身份关联的用户资料 |
+
+一旦多人共用一个 MCP 服务器，请使用第二种模式：在经典模式下，每个客户端都能访问每个账户。
+
 #### 默认用户资料
 
 默认情况下，MCP 服务器以用户资料 `1`（第一个管理员）的身份运行。要将服务器固定到其他用户资料，请在启动容器时设置 `POZNOTE_USER_ID`：
@@ -198,6 +210,49 @@ docker compose up -d --force-recreate mcp-server
 
 此令牌与 `data/.mcp_token` 相互独立：后者由 MCP 服务器用于与 Poznote API *通信*，前者则是*您的 AI 助手*必须向 MCP 服务器出示的令牌。
 
+#### 从聊天应用登录（ChatGPT、Claude、Gemini）
+
+连接远程 MCP 服务器的聊天应用，例如 ChatGPT（以及 Codex 应用）、Claude Desktop 和 claude.ai，或 Gemini，不接受粘贴的令牌：它们希望服务器引导它们完成 OAuth 登录。设置 `POZNOTE_MCP_AUTH_PROVIDER=poznote` 后，由 Poznote 自己承担这一角色：
+
+1. 您在应用中将 `https://mcp.example.com/mcp` 添加为连接器，如有客户端 ID 和密钥字段，请留空：应用会自行注册。应用通常把这一项放在设置中，称为自定义连接器或远程 MCP 服务器，有些应用只在特定套餐中或开发者模式下提供。
+2. 应用打开 Poznote 的登录页面。您照常登录（密码、双重验证或 SSO）。
+3. 同意页面会显示应用的名称、它将把您送回的地址以及它将使用的账户，始终是您自己的账户（绝不会是您被授予访问权限的其他账户），并让您选择访问级别：**只读**、**读取和编辑**或**完全访问**，即三个[工具范围](#工具范围)级别。
+4. 您点击**允许**后，该应用只能访问这个账户，且只能以该级别访问。
+
+因此，一个 MCP 服务器即可服务整个实例，每个人只能访问自己的笔记（以及与其共享的工作区）。**设置 → 我的账户 → 已连接的应用**会列出这些连接，可以断开其中任意一个，并向每个人提供要粘贴的连接器地址。
+
+要求：
+
+- 聊天应用从互联网连接（ChatGPT 和 claude.ai 从它们自己的服务器连接），因此 MCP 服务器和 Poznote 都必须能从那里通过 **HTTPS** 访问。请将 MCP 服务器放在反向代理之后，并使用**独立的（子）域名**，例如 `https://mcp.example.com`：OAuth 发现文档由该地址的根路径提供。代理将流量转发到哪里，取决于代理运行在哪里：
+  - 直接安装在服务器上：代理到 `127.0.0.1:8045`（即 `docker-compose.yml` 发布的端口，`POZNOTE_MCP_PORT`）；
+  - 本身运行在 Docker 中（Nginx Proxy Manager、Traefik、Caddy 等）：`127.0.0.1` 指向的会是代理自己的容器。请将代理接入 Poznote 的 Docker 网络，`docker network connect poznote_default <proxy-container>`（该网络以您的 `docker-compose.yml` 所在文件夹命名，参见 `docker network ls`），并代理到 `mcp-server:8045`。
+- Poznote 自身的 `/oauth/` 页面前面不能再有另一道登录（例如代理上的 Authelia 或 Authentik 等前置认证，即 forward auth）：应用会从它们的服务器调用其中部分页面，没有浏览器来显示登录页面。
+- 在 `.env` 中设置两个变量，然后重建容器（`docker compose up -d --force-recreate mcp-server`）。较旧的 `docker-compose.yml` 不会把它们传入容器：请先下载最新版本。之后，MCP 日志会在启动时显示 `OAuth sign-in through Poznote enabled`。
+
+```bash
+POZNOTE_MCP_AUTH_PROVIDER=poznote
+# MCP 服务器的公开 URL，不含 /mcp
+POZNOTE_MCP_PUBLIC_URL=https://mcp.example.com
+```
+
+- Poznote 的公开 URL（用户在此登录）是**设置 → 管理工具 → 管理员 Webhook**中的**实例 URL**，即提醒邮件和 Webhook 使用的那个（为空时使用 `.env` 中的 `POZNOTE_APP_URL`）。如果两者都未设置，它会从管理员的浏览器自动填入；请确认它是人们从互联网访问 Poznote 的地址。更改会在一分钟内同步到 MCP 服务器，无需重启。**已连接的应用**窗口会向管理员显示当前使用的地址，如果它是本地地址或普通 http 地址，会显示警告。
+
+如果无法正常工作：
+
+- **应用提示找不到服务器的授权（OAuth）设置。** 请从您网络之外的一台机器打开 `https://mcp.example.com/.well-known/oauth-protected-resource/mcp` 和 `https://mcp.example.com/.well-known/oauth-authorization-server`：两者都必须返回 JSON。第二个返回 `503` 表示 Poznote 的公开 URL 尚未设置；完全没有响应则表示反向代理无法访问 MCP 服务器。
+- **应用打开的登录页面无法加载。** 应用无法访问该实例 URL：请查看**已连接的应用**中的警告，并在**管理员 Webhook → 实例 URL**中修正。
+- **MCP 日志在启动时没有显示 `OAuth sign-in through Poznote enabled`。** 变量没有传入容器：请检查 `.env` 和 `docker-compose.yml`，然后重建容器（仅 `restart` 不够）。
+- **登录成功，但之后每个请求都失败。** 连接器 URL 必须恰好是 `POZNOTE_MCP_PUBLIC_URL` 后接 `/mcp`；否则 MCP 日志会显示 `Rejecting a token issued for ...`。
+- `docker compose logs mcp-server` 会说明服务器拒绝了什么以及原因；`POZNOTE_DEBUG=true` 还会记录每个请求。
+
+适用于每个连接的规则：
+
+- 连接只要在使用就一直有效：应用每小时续期一次访问权限，连续 90 天未使用后必须重新登录。已断开的应用最多还能继续工作 `POZNOTE_MCP_AUTH_CACHE_TTL` 秒（默认 60）。
+- `POZNOTE_MCP_SCOPE` 仍是每个连接的上限：以**完全访问**连接到设置为 `write` 的服务器，得到的是 `write`。
+- 作用于整个实例的工具（备份、全局设置、系统信息）需要管理员账户，并且请求不能通过 `user_id` 指定其他账户。
+- 已连接的应用不能更改账户数据的发送去向：Git 同步的仓库、服务器和令牌，以及 AI 助手和语音输入的地址与密钥。它仍然可以向您配置的仓库推送并从中拉取。
+- 启用此模式时，`POZNOTE_MCP_AUTH_TOKEN` 会被忽略。
+
 #### 按调用方身份认证（可选）
 
 上文的 `POZNOTE_MCP_AUTH_TOKEN` 是单一共享密钥：所有客户端都出示同一个令牌，
@@ -215,7 +270,7 @@ docker compose up -d --force-recreate mcp-server
 
 | variable | default | meaning |
 |---|---|---|
-| `POZNOTE_MCP_AUTH_PROVIDER` | *(未设置，功能关闭)* | `userinfo` or `introspection` |
+| `POZNOTE_MCP_AUTH_PROVIDER` | *(未设置，功能关闭)* | `userinfo` or `introspection` (`poznote` is described [above](#从聊天应用登录chatgptclaudegemini)) |
 | `POZNOTE_MCP_AUTH_URL` | *(必填)* | provider endpoint |
 | `POZNOTE_MCP_IDENTITY_MATCH` | `oidc_subject:sub` | ordered `<profile-field>:<claim>` pairs |
 | `POZNOTE_MCP_AUTH_AUDIENCE` | *(未设置，功能关闭)* | expected `aud`, comma separated; refuses a token issued for another application |
@@ -245,8 +300,7 @@ UserInfo 端点。令牌从不在本地校验，因此不透明令牌与 JWT 同
   因此指向其他配置文件的值会被拒绝，而不是被采纳。
 - **不带 `user_id` 的工具**（`get_system_info`、`list_backups`、`create_backup`、
   `delete_backup`）以服务器的默认配置文件运行，因此仅限解析出的配置文件为管理员
-  的调用方使用。因此默认配置文件必须是管理员，因为配置文件查询会读取
-  `GET /api/v1/admin/users`。
+  的调用方使用。
 
 设置了 `POZNOTE_MCP_AUTH_PROVIDER` 时，其优先级高于
 `POZNOTE_MCP_AUTH_TOKEN`；若该令牌仍然设置，服务器会记录一条警告。
@@ -328,16 +382,25 @@ curl http://127.0.0.1:8045/mcp
 ### **Claude CLI**
 完整设置指南：**[CLAUDE-CLI.md](CLAUDE-CLI.zh-cn.md)**
 
+### **ChatGPT, Claude Desktop / claude.ai, Gemini**
+聊天应用通过 Poznote 登录：参见**[从聊天应用登录](#从聊天应用登录chatgptclaudegemini)**。
+
 ---
 
 ## 安全
 
-任何能够访问 MCP 端点的人，都可以读取、创建、修改和删除每个用户资料中的每一条笔记（工具接受 `user_id` 参数），还可以触发备份、还原和设置更改。以下两层防护可以避免这成为问题：
+能够访问 MCP 端点的客户端可以做什么，取决于[模式](#按用途选择模式)。
+
+**经典模式**（默认）。任何能够访问该端点的人，都可以读取、创建、修改和删除每个用户资料中的每一条笔记（工具接受 `user_id` 参数），还可以触发备份、还原和设置更改。以下两层防护可以避免这成为问题：
 
 1. **网络可达性。** 默认情况下，只能从本机访问该端点。
 2. **入站 Bearer 令牌**（可选）。设置 `POZNOTE_MCP_AUTH_TOKEN` 后，每个请求都必须携带 `Authorization: Bearer <token>`。
 
-使用默认的 `docker-compose.yml` 时，仅第 1 层就已足够。一旦端口可以从您无法完全掌控的地方访问，请加上第 2 层。要限制能够访问端点的客户端可执行的操作，请设置[工具范围](#工具范围)。
+使用默认的 `docker-compose.yml` 时，仅第 1 层就已足够。一旦端口可以从您无法完全掌控的地方访问，请加上第 2 层。
+
+**从聊天应用登录，以及按调用方身份认证。** 每个请求都必须携带绑定到某一个人账户的令牌，因此客户端只能访问该账户，且只能以授予它的级别访问。这种情况下，端点本就应当可以从互联网访问，并位于 HTTPS 之后：聊天应用从它们自己的服务器连接。
+
+无论哪种模式，[工具范围](#工具范围)都可以限制客户端能做的操作。
 
 ### 为什么仅限 127.0.0.1 既正常又安全
 
@@ -360,7 +423,7 @@ ports:
 
 ### 远程访问
 
-如果 Poznote 运行在远程服务器上，而您想从工作站连接，请使用 SSH 端口转发，**不要**公开暴露端口：
+在经典模式下，如果 Poznote 运行在远程服务器上，而您想从工作站连接，请使用 SSH 端口转发，**不要**公开暴露端口（使用[从聊天应用登录](#从聊天应用登录chatgptclaudegemini)时，在 HTTPS 之后暴露端口正是目的所在，本节不适用）：
 
 ```bash
 ssh -L 8045:127.0.0.1:8045 user@your-server
@@ -371,9 +434,9 @@ ssh -L 8045:127.0.0.1:8045 user@your-server
 ### 生产环境
 
 如果必须通过网络路由 MCP 服务器，请用以下方式保护它：
-- `POZNOTE_MCP_AUTH_TOKEN`（参见[入站身份验证令牌](#入站身份验证令牌)），并在其前面使用 HTTPS，避免令牌以明文传输
+- `POZNOTE_MCP_AUTH_TOKEN`（参见[入站身份验证令牌](#入站身份验证令牌)），或[通过 Poznote 登录](#从聊天应用登录chatgptclaudegemini)，让每个客户端拥有绑定到单个账户、可撤销的独立令牌，并在其前面使用 HTTPS，避免令牌以明文传输
 - VPN（Tailscale、WireGuard）
-- 可选：带有自身身份验证或 IP 白名单的反向代理（nginx、Caddy），作为额外的一层防护
+- 可选：带有自身身份验证或 IP 白名单的反向代理（nginx、Caddy），作为额外的一层防护，但使用从聊天应用登录时除外：这些应用从它们自己的、不断变化的地址连接，也无法应对另一道登录，因此端点及其 `/.well-known/` 文档必须保持可访问
 
 ### MCP 服务器如何向 Poznote 进行身份验证
 

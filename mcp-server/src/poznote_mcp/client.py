@@ -8,7 +8,7 @@ from urllib.parse import quote
 import os
 import logging
 
-from .auth_external import IdentityMismatch, resolve_caller_profile
+from .auth_external import IdentityMismatch, caller_admin_claim, resolve_caller_profile
 
 logger = logging.getLogger("poznote-mcp.client")
 
@@ -151,6 +151,14 @@ class PoznoteClient:
         profile = resolve_caller_profile(self._list_profiles)
         if profile is None:
             return None
+        # Signed in through Poznote: Poznote states whether the approver is an
+        # administrator (the approver's own account is the only one a token
+        # can name, but the claim keeps that decision on Poznote's side).
+        # Trusted from that provider only, since any other identity provider
+        # could put such a claim in its tokens.
+        admin_claim = caller_admin_claim()
+        if admin_claim is not None:
+            return admin_claim
         return bool(profile.get("is_admin"))
 
     def _list_profiles(self) -> list[dict]:

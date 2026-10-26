@@ -7,6 +7,7 @@
  */
 document.addEventListener('DOMContentLoaded', function() {
     setupUserFilter();
+    setupMcpSwitches();
 
     var testBtn = document.getElementById('ai-test-btn');
     var resultEl = document.getElementById('ai-test-result');
@@ -162,6 +163,48 @@ document.addEventListener('DOMContentLoaded', function() {
         loadModels(true);
     }
 });
+
+/**
+ * The two switches of the External tools section (admin page only) save as
+ * soon as they are flipped, through the settings API: the section's server
+ * forms sit between them, so a shared Save button would have posted one
+ * form while the admin had filled in another. Users' own servers need the
+ * feature on, so their switch is only usable while the first one is.
+ */
+function setupMcpSwitches() {
+    var feature = document.getElementById('mcp_enabled');
+    var userServers = document.getElementById('mcp_user_servers_enabled');
+    if (!feature || !userServers) return;
+
+    var i18n = window.poznoteAiSettingsI18n || {};
+
+    function save(input) {
+        var key = input.getAttribute('data-global-setting');
+        input.disabled = true;
+        fetch('api/v1/settings/' + encodeURIComponent(key), {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ value: input.checked ? '1' : '0' })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+            if (!data || !data.success) throw new Error((data && data.error) || 'unknown');
+        })
+        .catch(function() {
+            // The page shows what is stored, never a change that was refused
+            input.checked = !input.checked;
+            if (i18n.saveError) window.alert(i18n.saveError);
+        })
+        .then(function() {
+            input.disabled = false;
+            userServers.disabled = !feature.checked;
+        });
+    }
+
+    feature.addEventListener('change', function() { save(feature); });
+    userServers.addEventListener('change', function() { save(userServers); });
+}
 
 /**
  * Filter the allowed-users list (admin page only). Matching is

@@ -230,23 +230,21 @@ if (isset($_GET['oidc_error'])) {
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Poznote">
     <meta name="color-scheme" content="dark light">
-    <link rel="manifest" href="<?php echo poznoteAsset('pwa/manifest.webmanifest'); ?>">
-    <link rel="apple-touch-icon" href="pwa/poznote.png">
+    <link rel="manifest" href="<?php echo htmlspecialchars(poznoteManifestHref(poznoteAsset('pwa/manifest.webmanifest')), ENT_QUOTES); ?>">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="<?php echo poznoteAsset('pwa/pwa.js'); ?>" defer></script>
     <?php if (!$renderAccountSelection): // choosing an account is done signed in ?>
     <script src="<?php echo poznoteAsset('js/push-signout.js'); ?>" defer></script>
     <?php endif; ?>
     <?php poznoteRenderStylesheets('login'); ?>
-    <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <?php poznoteRenderBrandIcons(); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
 </head>
 <body>
     <div class="login-container">
         <div class="login-header">
             <div class="logo">
-                <span class="poznote-logo logo-favicon" role="img" aria-label="<?php echo t_h('app.name', [], 'Poznote', $currentLang ?? 'en'); ?>"></span>
+                <?php echo poznoteLogoMark('logo-favicon', t('app.name', [], 'Poznote', $currentLang ?? 'en')); ?>
             </div>
             <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>
@@ -422,7 +420,17 @@ if (isset($_GET['oidc_error'])) {
             <?php endif; ?>
 
             <p class="github-link">
+                <?php if (poznoteHasCustomLogo() || $login_display_name !== ''): ?>
+                <?php // The page carries the instance's own name or logo: the
+                      // footer still says what it runs on (discussion #1336).
+                echo str_replace(
+                    '{{link}}',
+                    '<a href="https://poznote.com" target="_blank" rel="noopener">Poznote</a>',
+                    t_h('login.powered_by', [], 'Powered by {{link}}', $currentLang)
+                ); ?>
+                <?php else: ?>
                 <a href="https://poznote.com" target="_blank">poznote.com</a>
+                <?php endif; ?>
             </p>
         <?php endif; ?>
     </div>

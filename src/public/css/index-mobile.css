@@ -84,11 +84,25 @@ html {
     height: 100% !important;
 }
 
+/* One pixel taller than the screen on purpose. Chrome on Android promotes a
+   scroller that fills the viewport exactly to "implicit root scroller"
+   (root_scroller_controller.cc, FillsViewport: same size as the viewport to
+   the pixel), and treats it as the page's viewport from then on. When the
+   keyboard opens, the focused editable is scrolled into view up to that root
+   scroller, which then gets the 200 ms "leave 30% of padding on the left so
+   the field's label is visible" animation of web_view_impl.cc
+   (ComputeScaleAndScrollForEditableElementRects): with a note editor 20px
+   from the left edge and 16px from the right one, the body slid 16px back
+   towards the list and a strip of the sidebar showed. Off the exact size,
+   <body> stays an ordinary scroller and that animation goes to the real
+   viewport, which has nothing to scroll. The extra pixel is below the fold of
+   a body that never scrolls vertically; the columns size themselves on the
+   viewport units, not on <body>. */
 body {
     position: fixed !important;
     inset: 0 !important;
     width: 100% !important;
-    height: 100% !important;
+    height: calc(100% + 1px) !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     -ms-overflow-style: none !important;
@@ -367,7 +381,9 @@ body.mobile-keyboard-open #codeBlockLanguageModal.modal,
 body.mobile-formatting-toolbar-active .pz-help-modal.modal,
 body.mobile-keyboard-open .pz-help-modal.modal,
 body.mobile-formatting-toolbar-active #dictateModal.modal,
-body.mobile-keyboard-open #dictateModal.modal {
+body.mobile-keyboard-open #dictateModal.modal,
+body.mobile-formatting-toolbar-active #templatePickerModal.modal,
+body.mobile-keyboard-open #templatePickerModal.modal {
     z-index: 2147483004 !important;
 }
 
@@ -395,7 +411,9 @@ body.mobile-keyboard-open #codeBlockLanguageModal .modal-content,
 body.mobile-formatting-toolbar-active .pz-help-modal .modal-content,
 body.mobile-keyboard-open .pz-help-modal .modal-content,
 body.mobile-formatting-toolbar-active #dictateModal .modal-content,
-body.mobile-keyboard-open #dictateModal .modal-content {
+body.mobile-keyboard-open #dictateModal .modal-content,
+body.mobile-formatting-toolbar-active #templatePickerModal .modal-content,
+body.mobile-keyboard-open #templatePickerModal .modal-content {
     z-index: 2147483005 !important;
 }
 

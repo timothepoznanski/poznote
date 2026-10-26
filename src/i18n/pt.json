@@ -524,9 +524,11 @@
       "local_backup": "Salve arquivos de backup completos em uma pasta do servidor, manualmente ou conforme um agendamento, mantendo apenas os mais recentes.",
       "whats_new": "Após uma atualização, mostrar uma vez as notas da nova versão ao abrir as suas notas.",
       "login_disabled": "Ignora a tela de login: qualquer navegador que chegue a esta instância abre diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Ative apenas se só você consegue acessar esta instância, ou se um proxy reverso à frente dela cuida da autenticação. A API continua pedindo credenciais.",
-      "outbound_hosts": "Os webhooks, os servidores pessoais de IA, transcrição e MCP e o Git Sync dos utilizadores não administradores só alcançam hosts públicos da Internet. Indique aqui os hosts e redes locais que podem usar, como um servidor Ollama ou n8n na sua rede. Os administradores não têm limites.",
+      "outbound_hosts": "Os utilizadores não administradores só podem ligar os webhooks, o Git Sync e os seus próprios servidores de IA, transcrição ou MCP a hosts públicos da Internet. Indique aqui os hosts ou redes locais que podem usar, como um servidor Ollama ou n8n. Os administradores não têm limites.",
       "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo.",
-      "markdown_view_cycle": "Escolha as visualizações que o botão de visualização de uma nota markdown percorre depois da visualização clássica (pré-visualização, com o lápis para editar). As visualizações não escolhidas são ignoradas. Se nenhuma for escolhida, o botão fica oculto. Num telemóvel o botão nunca passa ao modo dividido."
+      "markdown_view_cycle": "Escolha as visualizações que o botão de visualização de uma nota markdown percorre depois da visualização clássica (pré-visualização, com o lápis para editar). As visualizações não escolhidas são ignoradas. Se nenhuma for escolhida, o botão fica oculto. Num telemóvel o botão nunca passa ao modo dividido.",
+      "connected_apps": "Conecte aplicativos de chat como ChatGPT ou Claude às suas notas pelo servidor MCP e desconecte-os quando quiser.",
+      "custom_logo": "Substituir o logótipo do Poznote pelo seu, para todos os utilizadores: no separador do navegador, na página de início de sessão, na barra de ícones e como ícone da aplicação instalada."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -646,7 +648,9 @@
       "local_backup": "Backups locais",
       "whats_new": "Novidades após uma atualização",
       "login_disabled": "Abrir sem login",
-      "outbound_hosts": "Acesso à rede local"
+      "outbound_hosts": "Acesso à rede local",
+      "connected_apps": "Aplicativos conectados",
+      "custom_logo": "Logótipo"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -696,6 +700,10 @@
     "diary_template": {
       "none": "Nenhum",
       "missing": "Nota não encontrada"
+    },
+    "custom_logo": {
+      "status_default": "Poznote",
+      "status_custom": "Personalizado"
     }
   },
   "workspaces": {
@@ -1906,9 +1914,28 @@
     },
     "outbound_hosts": {
       "title": "Acesso à rede local",
-      "description": "Os utilizadores não administradores só podem apontar webhooks, servidores pessoais de IA, transcrição e MCP e o Git Sync para hosts públicos da Internet. Os hosts e redes indicados aqui também são permitidos. Os administradores nunca têm limites.",
+      "description": "Os utilizadores não administradores só podem ligar os webhooks, o Git Sync e os seus próprios servidores de IA, transcrição ou MCP a hosts públicos da Internet. Os hosts e redes indicados aqui também são permitidos. Os administradores nunca têm limites.",
       "label": "Uma entrada por linha: um nome de host, *.domínio, um endereço ou uma rede",
+      "resolve_hint": "Um nome de host tem de ser resolvido a partir do servidor Poznote, não apenas do seu computador. Caso contrário, indique o respetivo endereço.",
       "invalid": "Não é um nome de host, endereço ou rede: {{entries}}"
+    },
+    "custom_logo_notice": {
+      "title": "Uma palavra antes de mudar o logótipo",
+      "visibility": "O Poznote é gratuito, sem publicidade nem loja. Dá-se a conhecer quando alguém o vê num ecrã e pergunta o que é. É o logótipo que responde.",
+      "donation": "Pode, claro, substituí-lo. Nesse caso, um pequeno donativo é outra forma de ajudar o Poznote a dar-se a conhecer. Obrigado ❤️, Tim",
+      "continue": "Mudar",
+      "donate": "Pagar-me um café e mudar"
+    },
+    "custom_logo": {
+      "title": "Logótipo",
+      "description": "Escolha uma imagem, quadrada se possível: é ajustada num quadrado e guardada no seu volume de dados. Substitui o logótipo para todos os utilizadores, no separador do navegador, na página de início de sessão, na barra de ícones e como ícone da aplicação instalada.",
+      "preview": "Logótipo atual",
+      "name_kept": "O nome continua a ser Poznote sob o ícone da aplicação instalada, e a página de início de sessão indica que funciona com o Poznote. Uma aplicação já instalada pode manter o ícone anterior até ser instalada de novo.",
+      "upload": "Escolher uma imagem",
+      "reset": "Voltar ao logótipo do Poznote",
+      "reset_confirm": "Voltar ao logótipo do Poznote para todos os utilizadores?",
+      "invalid": "Esta imagem não pode ser usada. Escolha um ficheiro PNG, JPEG, WebP, GIF ou SVG com 20 MB no máximo.",
+      "failed": "Não foi possível guardar o logótipo."
     }
   },
   "notes_list": {
@@ -2608,7 +2635,8 @@
       "invalid_code": "Código incorreto. Tente novamente.",
       "expired": "A etapa de verificação expirou. Entre novamente.",
       "too_many_tries": "Muitos códigos incorretos. Entre novamente."
-    }
+    },
+    "powered_by": "Com tecnologia {{link}}"
   },
   "restore_import": {
     "page": {
@@ -3992,7 +4020,9 @@
       "two_factor_disabled": "Dois fatores desativado",
       "two_factor_reset": "Dois fatores desativado por um admin",
       "two_factor_recovery_used": "Login com um código de recuperação",
-      "two_factor_recovery_regenerated": "Códigos de recuperação gerados novamente"
+      "two_factor_recovery_regenerated": "Códigos de recuperação gerados novamente",
+      "oauth_app_authorized": "Aplicativo conectado (MCP)",
+      "oauth_app_revoked": "Aplicativo desconectado (MCP)"
     },
     "filters": {
       "all_actions": "Todas as ações",
@@ -4419,7 +4449,7 @@
       "url": "URL do endpoint",
       "secret": "Segredo (opcional)",
       "events": "Eventos",
-      "app_url": "URL da instancia",
+      "app_url": "URL da instância",
       "description": "Descrição (opcional)"
     },
     "hints": {
@@ -4450,11 +4480,11 @@
     "error_no_events": "Selecione pelo menos um evento.",
     "error_saving": "Erro ao guardar o webhook.",
     "error_not_found": "Webhook não encontrado.",
-    "section_app_url": "URL da instancia",
-    "app_url_description": "URL publica desta instancia do Poznote, usada para construir o link direto para a nota enviado nos payloads (data.note.url). Deixe vazio para nao enviar nenhum link. E a mesma URL de instancia usada pelos e-mails de lembrete.",
-    "app_url_saved": "URL da instancia salva.",
-    "app_url_cleared": "URL da instancia removida. Os payloads nao incluirao mais um link direto para a nota.",
-    "error_invalid_app_url": "A URL da instancia deve comecar com http:// ou https://.",
+    "section_app_url": "URL da instância",
+    "app_url_description": "URL publica desta instancia do Poznote, usada para construir o link direto para a nota enviado nos payloads (data.note.url). Deixe vazio para nao enviar nenhum link. E a mesma URL de instancia usada pelos e-mails de lembrete. Os aplicativos de chat que se conectam ao servidor MCP também são enviados para lá para fazer login.",
+    "app_url_saved": "URL da instância salva.",
+    "app_url_cleared": "URL da instância removida. Os payloads nao incluirao mais um link direto para a nota.",
+    "error_invalid_app_url": "A URL da instância deve comecar com http:// ou https://.",
     "placeholders": {
       "description": "Para que serve este webhook"
     },
@@ -5632,5 +5662,63 @@
     "saved": "Guardado nas suas notas",
     "note_title": "Novidades do Poznote {{version}}",
     "versions": "Versões"
+  },
+  "oauth_authorize": {
+    "title": "Conectar um aplicativo",
+    "intro": "{{app}} quer usar suas notas do Poznote.",
+    "redirect_note": "Você voltará para {{target}}. Só continue se você iniciou isto a partir desse aplicativo.",
+    "account_label": "Conta",
+    "level_label": "Acesso",
+    "level_read": "Somente leitura",
+    "level_read_help": "Ler, pesquisar e listar suas notas. Não altera nada.",
+    "level_write": "Leitura e edição",
+    "level_write_help": "Também criar e editar notas, tarefas, lembretes e pastas, e mover notas para a lixeira.",
+    "level_admin": "Acesso total",
+    "level_admin_help": "Também o que não pode ser desfeito: esvaziar a lixeira, excluir espaços de trabalho, compartilhamento público, configurações, backups e sincronização Git.",
+    "cancel": "Cancelar",
+    "allow": "Permitir",
+    "footnote": "Você pode desconectá-lo a qualquer momento em Configurações, Aplicativos conectados.",
+    "error_title": "Esta conexão não pode continuar",
+    "error_unknown_client": "O aplicativo não está registrado nesta instância do Poznote. Remova o conector do aplicativo e adicione-o novamente.",
+    "error_redirect_uri": "O aplicativo pediu para voltar a um endereço que ele não registrou.",
+    "error_expired": "Este pedido de conexão expirou. Comece novamente a partir do aplicativo.",
+    "error_no_account": "Seu login não tem nenhuma conta ativa que este aplicativo possa usar.",
+    "name_unverified": "O aplicativo dá esse nome a si mesmo; o Poznote não o verifica.",
+    "error_bad_request": "O aplicativo enviou uma solicitação de login incompleta (ele deve usar o fluxo de código de autorização com PKCE S256). Informe isso ao desenvolvedor do aplicativo.",
+    "error_bad_resource": "O aplicativo pediu acesso a um servidor que não é o servidor MCP desta instância do Poznote."
+  },
+  "connected_apps": {
+    "status": {
+      "count_one": "1 aplicativo",
+      "count_other": "{{count}} aplicativos",
+      "none": "Nenhum"
+    },
+    "level": {
+      "read": "Somente leitura",
+      "write": "Leitura e edição",
+      "admin": "Acesso total"
+    },
+    "modal": {
+      "title": "Aplicativos conectados",
+      "description": "Os aplicativos de chat que você autorizou a entrar no Poznote pelo servidor MCP podem usar esta conta com o nível de acesso que você escolheu. Desconectar um o interrompe em menos de um minuto; ele só pode voltar pedindo a você novamente.",
+      "empty": "Nenhum aplicativo conectado.",
+      "connected": "Conectado em {{date}}",
+      "last_used": "Último uso em {{date}}",
+      "disconnect": "Desconectar",
+      "confirm_disconnect": "Confirmar",
+      "close": "Fechar",
+      "connector_label": "Endereço do conector",
+      "connector_hint": "Para conectar um aplicativo de chat, adicione este endereço como conector (servidor MCP personalizado) no ChatGPT, Claude ou Gemini e depois entre no Poznote quando o aplicativo pedir. Deixe vazios os campos de ID e segredo do cliente.",
+      "copy": "Copiar",
+      "copied": "Copiado",
+      "sign_in_label": "Os aplicativos são enviados para fazer login em",
+      "sign_in_missing": "Não definida: os aplicativos de chat não conseguem fazer login enquanto ela não estiver definida.",
+      "sign_in_unreachable": "Os aplicativos de chat se conectam pela Internet via HTTPS, e este endereço não parece acessível assim.",
+      "sign_in_change": "Alterar (Webhooks de administrador, URL da instância)"
+    },
+    "errors": {
+      "load_failed": "Não foi possível carregar seus aplicativos conectados.",
+      "generic": "Algo deu errado. Tente novamente."
+    }
   }
 }

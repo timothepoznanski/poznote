@@ -131,8 +131,7 @@ $aiLocalHost = aiChatLocalDefaultHost();
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
     <?php poznoteRenderStylesheets('ai_settings'); ?>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <?php poznoteRenderBrandIcons(); ?>
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
@@ -322,7 +321,8 @@ $aiLocalHost = aiChatLocalDefaultHost();
         modelHint: <?php echo json_encode(t('ai_settings.model_empty_hint', ['button' => t('ai_settings.test', [], 'Check access and list models')], 'Click "{{button}}" above, then select one.')); ?>,
         modelNoneFound: <?php echo json_encode(t('ai_settings.model_none_found', [], 'No models were returned by this server.')); ?>,
         apiKeyOptional: <?php echo json_encode(t('ai_settings.api_key_label', [], 'API key (optional)')); ?>,
-        apiKeyRequired: <?php echo json_encode(t('ai_settings.api_key_label_required', [], 'API key')); ?>
+        apiKeyRequired: <?php echo json_encode(t('ai_settings.api_key_label_required', [], 'API key')); ?>,
+        saveError: <?php echo json_encode(t('ai_settings.messages.save_error', [], 'Failed to save configuration.')); ?>
     };
     window.poznoteAiLocalHost = <?php echo json_encode($aiLocalHost); ?>;
     </script>

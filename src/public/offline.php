@@ -22,6 +22,7 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../lib/i18n.php';
 require_once __DIR__ . '/../lib/note-titles.php';
+require_once __DIR__ . '/../lib/branding.php';
 require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/index_js.php';
 require_once __DIR__ . '/index_css.php';
@@ -114,8 +115,8 @@ $assets = array_merge(
         'js/Sortable.min.js' . ($globalsQuery !== '' ? '?' . $globalsQuery : ''),
         'webfonts/Inter/static/Inter_24pt-Regular.ttf',
         'webfonts/Inter/static/Inter_24pt-SemiBold.ttf',
-        'favicon.svg',
-    ]
+    ],
+    poznoteHasCustomLogo() ? [poznoteCustomLogoUrl(512), poznoteCustomLogoUrl(192)] : ['favicon.svg']
 );
 ?>
 <!DOCTYPE html>
@@ -125,7 +126,11 @@ $assets = array_merge(
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="color-scheme" content="dark light">
     <title><?php echo $tr('offline.page_title', 'Poznote (offline)'); ?></title>
+    <?php if (poznoteHasCustomLogo()): ?>
+    <?php poznoteRenderBrandIcons(); ?>
+    <?php else: ?>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <?php endif; ?>
     <script src="<?php echo htmlspecialchars(poznoteAsset('js/theme-init.js'), ENT_QUOTES); ?>"></script>
     <link rel="stylesheet" href="<?php echo htmlspecialchars($styles[0], ENT_QUOTES); ?>">
     <link rel="stylesheet" href="<?php echo htmlspecialchars($mobileStyle, ENT_QUOTES); ?>" media="(max-width: 800px)">
@@ -142,12 +147,12 @@ $assets = array_merge(
     <!-- Opening, offline sign-in, empty device: over the app until it opens -->
     <div class="offline-screen" id="offline-screen">
         <section id="offline-loading" class="offline-center">
-            <span class="poznote-logo offline-logo" role="img" aria-label="Poznote"></span>
+            <?php echo poznoteLogoMark('offline-logo', 'Poznote'); ?>
         </section>
 
         <section id="offline-signin" class="offline-center" hidden>
             <div class="offline-card">
-                <span class="poznote-logo offline-logo" role="img" aria-label="Poznote"></span>
+                <?php echo poznoteLogoMark('offline-logo', 'Poznote'); ?>
                 <h1 class="offline-card-title">Poznote</h1>
                 <p class="offline-muted" id="offline-signin-signed-out" hidden><?php echo $tr('offline.signout.done_text', 'The notes kept offline were removed from this device.'); ?></p>
                 <p class="offline-card-intro">
@@ -180,7 +185,7 @@ $assets = array_merge(
 
         <section id="offline-empty" class="offline-center" hidden>
             <div class="offline-card">
-                <span class="poznote-logo offline-logo" role="img" aria-label="Poznote"></span>
+                <?php echo poznoteLogoMark('offline-logo', 'Poznote'); ?>
                 <h1 class="offline-card-title" id="offline-empty-title"><?php echo $tr('offline.empty.title', 'No notes available offline'); ?></h1>
                 <p class="offline-card-intro offline-empty-text" id="offline-empty-text"><?php echo $tr('offline.empty.text', 'No notes are kept on this device yet. Connect to the internet and open Poznote once: the notes you modified in the last days will then be available offline.'); ?></p>
                 <button type="button" class="btn btn-primary" id="offline-empty-retry-btn"><?php echo $tr('offline.signin.retry', 'Try to reconnect'); ?></button>

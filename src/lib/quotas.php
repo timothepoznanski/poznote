@@ -106,9 +106,14 @@ function poznoteS3BackupConfigured(): bool {
 }
 
 /**
- * Quotas restrict regular users; administrators are exempt.
+ * Quotas restrict regular users; administrators are exempt. Through the MCP
+ * server it is the account acted for that counts (see isRequestActorAdmin()),
+ * not the service token, which would exempt every chat app.
  */
 function poznoteUserQuotasApply(): bool {
+    if (function_exists('isRequestActorAdmin')) {
+        return !isRequestActorAdmin();
+    }
     return !(function_exists('isCurrentUserAdmin') && isCurrentUserAdmin());
 }
 

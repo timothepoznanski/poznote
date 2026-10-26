@@ -29,6 +29,7 @@ $diaryNoteTypeIsMarkdown = getDiaryDefaultNoteType() === 'markdown';
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
     <?php poznoteRenderStylesheets('create'); ?>
+    <?php poznoteRenderBrandIcons(); ?>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 </head>

@@ -266,3 +266,20 @@ docker compose up -d --force-recreate webserver
 Nunca defina um valor acima da memória do host: uma requisição que ultrapassa o que a máquina tem é encerrada pelo kernel sem nenhuma mensagem e pode derrubar o contêiner inteiro junto. Em um host com 512 MB, mantenha o padrão. O valor é aplicado pelo script de inicialização do contêiner a cada início; um valor inválido é informado no log e o padrão da imagem é mantido.
 
 </details>
+
+<a id="this-address-is-not-allowed"></a>
+<details>
+<summary><strong>"This address is not allowed: it must be a public internet host"</strong></summary>
+<br>
+
+Um usuário que não é administrador digitou o endereço de uma máquina da sua rede local, ou do próprio servidor, em um webhook, no Git Sync ou nos próprios servidores de IA, transcrição ou MCP. Só administradores podem alcançar esses endereços. Um administrador pode permitir esse host em **Configurações > Ferramentas de administração > Integrações > Acesso à rede local**, veja [Acesso à rede local para usuários não administradores](README.pt.md#local-network-access).
+
+Se o host já está na lista e a mensagem continua, o contêiner do Poznote não consegue resolver o nome dele: a mensagem é a mesma nos dois casos de propósito, para não revelar nada sobre a rede interna. Verifique o nome de dentro do contêiner:
+
+```bash
+docker compose exec webserver getent hosts ollama.lan
+```
+
+Se o comando não mostrar nada, coloque na lista o endereço IP ou a rede do host em vez do nome.
+
+</details>

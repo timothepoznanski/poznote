@@ -19,7 +19,7 @@ class GitSyncController {
     }
 
     private function requireActiveAccountOwner(): bool {
-        if (function_exists('isActiveAccountOwnedByAuthenticatedUser') && !isActiveAccountOwnedByAuthenticatedUser()) {
+        if (function_exists('isActiveAccountOwnedForApiRequest') && !isActiveAccountOwnedForApiRequest()) {
             http_response_code(403);
             $message = function_exists('getActiveAccountOwnerRequiredMessage')
                 ? getActiveAccountOwnerRequiredMessage()

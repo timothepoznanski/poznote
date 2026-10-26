@@ -145,7 +145,7 @@ Payloads that reference a note can carry a direct link in `data.note.url`, of th
 https://poznote.example.com/index.php?note=42&workspace=Poznote
 ```
 
-The link is built from the **Instance URL**, the public URL of your Poznote instance, configured in the **Instance URL** section of **Settings > Admin Tools > Admin Webhooks** (administrators only). It is the same value as the instance URL used by the reminder emails, so setting it in one place sets it for both. It can also be set through the REST API (`smtp_app_url` setting) or, as a fallback, with the `POZNOTE_APP_URL` (or `APP_URL`) environment variable.
+The link is built from the **Instance URL**, the public URL of your Poznote instance, configured in the **Instance URL** section of **Settings > Admin Tools > Admin Webhooks** (administrators only). It is the same value as the instance URL used by the reminder emails, so setting it in one place sets it for both. It can also be set through the REST API (`smtp_app_url` setting) or, as a fallback, with the `POZNOTE_APP_URL` (or `APP_URL`) environment variable. Chat apps that sign in to the [MCP server](MCP-SERVER.md) through Poznote are sent to this address too. While it is empty, it is filled in from an administrator's browser the first time they use Poznote; after that it only changes when it is changed here.
 
 When no Instance URL is configured, `data.note.url` is `null` and payloads carry no link.
 

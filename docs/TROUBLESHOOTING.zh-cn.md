@@ -266,3 +266,20 @@ docker compose up -d --force-recreate webserver
 切勿将其设置得高于主机的内存：超出机器实际内存的请求会被内核直接杀死，不会留下任何信息，还可能连带整个容器一起崩溃。在 512 MB 内存的主机上，请保持默认值。该值由容器的初始化脚本在每次启动时应用；如果值无效，会在日志中报告，并保留镜像的默认值。
 
 </details>
+
+<a id="this-address-is-not-allowed"></a>
+<details>
+<summary><strong>“This address is not allowed: it must be a public internet host”</strong></summary>
+<br>
+
+一位非管理员用户在 Webhook、Git Sync 或自己的 AI、转录或 MCP 服务器中，输入了你本地网络中某台机器或服务器本身的地址。只有管理员可以访问这些地址。管理员可以在 **设置 > 管理工具 > 集成 > 本地网络访问** 中允许该主机，参见[非管理员用户的本地网络访问](README.zh-cn.md#local-network-access)。
+
+如果该主机已在列表中而消息仍然出现，说明 Poznote 容器无法解析它的名称：两种情况下的消息故意相同，以免泄露内部网络的任何信息。请在容器内检查该名称：
+
+```bash
+docker compose exec webserver getent hosts ollama.lan
+```
+
+如果命令没有任何输出，请在列表中填写该主机的 IP 地址或网络，而不是它的名称。
+
+</details>

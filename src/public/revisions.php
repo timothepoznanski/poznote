@@ -107,6 +107,7 @@ $description = preg_replace('/(?:Ctrl|Strg) \+ Alt \+ S/u', '<span class="revisi
     <script src="js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('revisions'); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
+    <?php poznoteRenderBrandIcons(); ?>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="revisions-page has-icon-sidebar" data-note-type="<?php echo htmlspecialchars($noteType, ENT_QUOTES, 'UTF-8'); ?>">

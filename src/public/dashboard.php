@@ -468,6 +468,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	?>
 	<link rel="expect" href="#dashboardPageEnd" blocking="render">
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
+	<?php poznoteRenderBrandIcons(); ?>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 	<?php if ($aiChatEnabled): ?>
 	<link type="text/css" rel="stylesheet" href="<?php echo poznoteAsset('css/ai-chat.css'); ?>"/>

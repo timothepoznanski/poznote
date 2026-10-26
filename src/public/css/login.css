@@ -442,6 +442,8 @@ input[type="password"]::placeholder {
 .github-link {
     margin-top: 1rem !important;
     padding-top: 0.75rem;
+    /* "Powered by", next to the link, on an instance with its own logo or title */
+    color: var(--pz-text-muted);
     /* border-top: 1px solid #e2e8f0; */
 }
 

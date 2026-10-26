@@ -504,7 +504,7 @@ try {
     $iconSidebarHomeIsCurrent = $iconSidebarCurrentPage === 'index.php';
     ?>
     <a href="<?php echo htmlspecialchars($iconSidebarUrl('index.php'), ENT_QUOTES, 'UTF-8'); ?>" id="iconSidebarHomeBtn" class="icon-sidebar-logo" title="<?php echo $iconSidebarHomeLabel; ?>" aria-label="<?php echo $iconSidebarHomeLabel; ?>"<?php echo $iconSidebarHomeIsCurrent ? ' aria-current="page"' : ''; ?>>
-        <span class="poznote-logo" aria-hidden="true"></span>
+        <?php echo poznoteLogoMark('', null, $iconSidebarBasePath); ?>
     </a>
     <div class="icon-sidebar-scroll">
     <?php foreach ($iconSidebarItems as $iconSidebarItem): ?>
