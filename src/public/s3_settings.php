@@ -159,8 +159,7 @@ $s3Enabled = $s3Config['enabled'] === '1';
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
     <?php poznoteRenderStylesheets('s3_settings'); ?>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <?php poznoteRenderBrandIcons(); ?>
     <style>
     .s3-status-grid { display: flex; gap: 24px; flex-wrap: wrap; margin: 10px 0; justify-content: center; }
     .s3-status-item { min-width: 180px; text-align: center; }

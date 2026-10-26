@@ -23,3 +23,14 @@
     -webkit-mask-size: contain;
     mask-size: contain;
 }
+
+/* A logo an admin uploaded (lib/branding.php) keeps its own colours: the
+   element carries the image, set inline, and the mask is dropped. */
+.poznote-logo.poznote-logo-custom {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    -webkit-mask-image: none;
+    mask-image: none;
+}

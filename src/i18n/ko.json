@@ -205,7 +205,8 @@
       "outbound_hosts": "관리자가 아닌 사용자는 웹훅, Git Sync, 개인 AI·전사·MCP 서버를 공개 인터넷 호스트에만 연결할 수 있습니다. Ollama나 n8n 서버처럼 이들이 사용할 수 있는 로컬 호스트나 네트워크를 여기에 입력하세요. 관리자는 제한되지 않습니다.",
       "diary_template": "{{workspace}} 작업 공간의 새 일기 항목이 시작될 때 사용할 내용을 담은 노트를 선택하세요. 목록에는 이 작업 공간에서 템플릿(또는 Templates)이라는 이름의 폴더에 있는 노트가 표시됩니다. 작업 공간마다 자체 템플릿이 있습니다.",
       "markdown_view_cycle": "마크다운 노트의 보기 버튼이 기본 보기(미리보기, 연필로 편집) 다음에 거치는 보기를 선택하세요. 선택하지 않은 보기는 건너뜁니다. 아무것도 선택하지 않으면 버튼이 숨겨집니다. 휴대폰에서는 버튼이 분할 모드로 전환되지 않습니다.",
-      "connected_apps": "MCP 서버를 통해 ChatGPT, Claude 같은 채팅 앱을 노트에 연결하고 언제든지 연결을 해제할 수 있습니다."
+      "connected_apps": "MCP 서버를 통해 ChatGPT, Claude 같은 채팅 앱을 노트에 연결하고 언제든지 연결을 해제할 수 있습니다.",
+      "custom_logo": "모든 사용자에게 Poznote 로고 대신 자체 로고를 표시합니다. 브라우저 탭, 로그인 페이지, 아이콘 바, 설치된 앱의 아이콘에 적용됩니다."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "모바일에서는 이 설정과 관계없이 키보드 위 도구 모음의 + 버튼으로 같은 메뉴를 열 수 있습니다."
@@ -306,7 +307,8 @@
       "whats_new": "업데이트 후 새로운 기능",
       "login_disabled": "로그인 없이 열기",
       "outbound_hosts": "로컬 네트워크 접근",
-      "connected_apps": "연결된 앱"
+      "connected_apps": "연결된 앱",
+      "custom_logo": "로고"
     },
     "default_credentials": {
       "both": "이 계정은 원래 제공된 사용자 이름과 비밀번호를 계속 사용합니다. 이 인스턴스에 접근할 수 있는 사람은 누구나 로그인할 수 있습니다.",
@@ -371,6 +373,10 @@
     "diary_template": {
       "none": "없음",
       "missing": "노트를 찾을 수 없음"
+    },
+    "custom_logo": {
+      "status_default": "Poznote",
+      "status_custom": "사용자 지정"
     }
   },
   "workspaces": {
@@ -1421,6 +1427,24 @@
       "label": "한 줄에 하나씩: 호스트 이름, *.도메인, 주소 또는 네트워크",
       "resolve_hint": "호스트 이름은 내 컴퓨터뿐 아니라 Poznote 서버에서도 확인할 수 있어야 합니다. 그렇지 않으면 대신 주소를 입력하세요.",
       "invalid": "호스트 이름, 주소, 네트워크가 아닙니다: {{entries}}"
+    },
+    "custom_logo_notice": {
+      "title": "로고를 바꾸기 전에 한마디",
+      "visibility": "Poznote는 무료이며 광고도 스토어도 없습니다. 누군가 화면에서 보고 이게 뭐냐고 물을 때 알려집니다. 그 질문에 답하는 것이 로고입니다.",
+      "donation": "물론 바꾸셔도 됩니다. 그렇다면 작은 후원이 Poznote를 알리는 또 다른 방법이 됩니다. 감사합니다 ❤️, Tim",
+      "continue": "변경",
+      "donate": "커피 한 잔 사 주고 변경"
+    },
+    "custom_logo": {
+      "title": "로고",
+      "description": "가능하면 정사각형 이미지를 선택하세요. 정사각형에 맞춰 조정된 뒤 데이터 볼륨에 저장됩니다. 모든 사용자에게 브라우저 탭, 로그인 페이지, 아이콘 바, 설치된 앱의 아이콘으로 로고를 대체합니다.",
+      "preview": "현재 로고",
+      "name_kept": "설치된 앱의 아이콘 아래 이름은 Poznote로 유지되며, 로그인 페이지에는 Poznote 기반이라고 표시됩니다. 이미 설치된 앱은 다시 설치할 때까지 이전 아이콘을 유지할 수 있습니다.",
+      "upload": "이미지 선택",
+      "reset": "Poznote 로고로 되돌리기",
+      "reset_confirm": "모든 사용자에게 Poznote 로고로 되돌릴까요?",
+      "invalid": "이 이미지는 사용할 수 없습니다. 20MB 이하의 PNG, JPEG, WebP, GIF 또는 SVG 파일을 선택하세요.",
+      "failed": "로고를 저장하지 못했습니다."
     }
   },
   "notes_list": {
@@ -2224,7 +2248,8 @@
       "invalid_code": "코드가 잘못되었습니다. 다시 시도해 보세요.",
       "expired": "확인 단계가 만료되었습니다. 다시 로그인하세요.",
       "too_many_tries": "잘못된 코드가 너무 많습니다. 다시 로그인하세요."
-    }
+    },
+    "powered_by": "{{link}} 기반"
   },
   "restore_import": {
     "page": {

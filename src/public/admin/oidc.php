@@ -123,8 +123,7 @@ function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE
     <script src="../js/theme-init.js?v=<?php echo $v; ?>"></script>
     <script src="../js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php poznoteRenderStylesheets('admin/oidc', ['prefix' => '../']); ?>
-    <link rel="icon" href="../favicon.ico" type="image/x-icon">
-    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <?php poznoteRenderBrandIcons('../'); ?>
     <script src="../js/theme-manager.js?v=<?php echo $v; ?>"></script>
     <style>
         .oidc-page form {

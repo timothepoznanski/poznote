@@ -205,7 +205,8 @@
       "outbound_hosts": "Non-admin users can only connect webhooks, Git Sync and their own AI, transcription or MCP servers to public internet hosts. List here the local hosts or networks they may use, such as an Ollama or n8n server. Administrators are not limited.",
       "diary_template": "Choose a note whose content every new diary entry of the {{workspace}} workspace starts with. The list shows the notes kept in a folder named Templates in that workspace. Each workspace has its own template.",
       "markdown_view_cycle": "Choose the views the view button of a markdown note goes through after the classic view (preview, with the pencil to edit). The views left out are skipped. With none chosen, the button is hidden. On a phone the button never goes to split mode.",
-      "connected_apps": "Connect chat apps such as ChatGPT or Claude to your notes through the MCP server, and disconnect them at any time."
+      "connected_apps": "Connect chat apps such as ChatGPT or Claude to your notes through the MCP server, and disconnect them at any time.",
+      "custom_logo": "Replace the Poznote logo with your own, for every user: in the browser tab, on the login page, in the icon rail and as the icon of the installed app."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -306,7 +307,8 @@
       "whats_new": "What's new after updates",
       "login_disabled": "Open without login",
       "outbound_hosts": "Local network access",
-      "connected_apps": "Connected apps"
+      "connected_apps": "Connected apps",
+      "custom_logo": "Logo"
     },
     "default_credentials": {
       "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
@@ -371,6 +373,10 @@
     "diary_template": {
       "none": "None",
       "missing": "Note not found"
+    },
+    "custom_logo": {
+      "status_default": "Poznote",
+      "status_custom": "Custom"
     }
   },
   "workspaces": {
@@ -1421,6 +1427,24 @@
       "label": "One entry per line: a host name, *.domain, an address or a network",
       "resolve_hint": "A host name must resolve from the Poznote server, not only from your computer. If it does not, enter its address instead.",
       "invalid": "Not a host name, address or network: {{entries}}"
+    },
+    "custom_logo_notice": {
+      "title": "A word before you change the logo",
+      "visibility": "Poznote is free, with no ads and no store. It spreads when someone sees it on a screen and asks what it is. The logo is what answers.",
+      "donation": "You can of course replace it. If you do, a small donation is another way to help Poznote grow. Thank you ❤️, Tim",
+      "continue": "Change",
+      "donate": "Buy me a coffee and change"
+    },
+    "custom_logo": {
+      "title": "Logo",
+      "description": "Choose an image, square if possible: it is fitted into a square and stored in your data volume. It replaces the logo for every user, in the browser tab, on the login page, in the icon rail and as the icon of the installed app.",
+      "preview": "Current logo",
+      "name_kept": "The name stays Poznote under the icon of the installed app, and the login page says it is powered by Poznote. An app already installed may keep its former icon until it is installed again.",
+      "upload": "Choose an image",
+      "reset": "Back to the Poznote logo",
+      "reset_confirm": "Go back to the Poznote logo for every user?",
+      "invalid": "This image cannot be used. Choose a PNG, JPEG, WebP, GIF or SVG file of 20 MB at most.",
+      "failed": "The logo could not be saved."
     }
   },
   "notes_list": {
@@ -2224,7 +2248,8 @@
       "invalid_code": "Incorrect code. Try again.",
       "expired": "The verification step expired. Sign in again.",
       "too_many_tries": "Too many incorrect codes. Sign in again."
-    }
+    },
+    "powered_by": "Powered by {{link}}"
   },
   "restore_import": {
     "page": {

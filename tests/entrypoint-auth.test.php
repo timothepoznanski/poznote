@@ -60,6 +60,7 @@ const NO_GATE = [
     'index_js.php'       => 'concatenates the static scripts, reads no database',
     'dark_mode_css.php'  => 'concatenates the dark theme stylesheets, reads no database',
     'offline.php'        => 'the offline page shell the service worker stores; static interface text only, every note comes from the browser',
+    'pwa/manifest.php'   => 'the web app manifest with the custom logo as its icons (lib/branding.php); the login page links it, it reads one shipped file and the logo file dates, no database',
 
     // OAuth for chat apps signing in to the MCP server (#1681, src/lib/oauth-server.php).
     // Each authenticates the way OAuth says it must, and none of them opens a

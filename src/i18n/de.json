@@ -527,7 +527,8 @@
       "outbound_hosts": "Benutzer ohne Administratorrechte können Webhooks, Git Sync und ihre eigenen KI-, Transkriptions- oder MCP-Server nur mit öffentlichen Internet-Hosts verbinden. Listen Sie hier die lokalen Hosts oder Netzwerke auf, die sie verwenden dürfen, etwa einen Ollama- oder n8n-Server. Administratoren sind nicht eingeschränkt.",
       "diary_template": "Wählen Sie eine Notiz, mit deren Inhalt jeder neue Tagebucheintrag des Arbeitsbereichs {{workspace}} beginnt. Die Liste zeigt die Notizen in einem Ordner namens Vorlagen (oder Templates) dieses Arbeitsbereichs. Jeder Arbeitsbereich hat seine eigene Vorlage.",
       "markdown_view_cycle": "Wählen Sie die Ansichten, die der Ansichtsschalter einer Markdown-Notiz nach der klassischen Ansicht (Vorschau, mit dem Stift zum Bearbeiten) durchläuft. Nicht gewählte Ansichten werden übersprungen. Ist keine gewählt, wird der Schalter ausgeblendet. Auf einem Telefon wechselt der Schalter nie in die geteilte Ansicht.",
-      "connected_apps": "Verbinden Sie Chat-Apps wie ChatGPT oder Claude über den MCP-Server mit Ihren Notizen und trennen Sie sie jederzeit."
+      "connected_apps": "Verbinden Sie Chat-Apps wie ChatGPT oder Claude über den MCP-Server mit Ihren Notizen und trennen Sie sie jederzeit.",
+      "custom_logo": "Das Poznote-Logo für alle Benutzer durch ein eigenes ersetzen: im Browser-Tab, auf der Anmeldeseite, in der Symbolleiste und als Symbol der installierten App."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -648,7 +649,8 @@
       "whats_new": "Neuigkeiten nach Updates",
       "login_disabled": "Ohne Anmeldung öffnen",
       "outbound_hosts": "Zugriff auf das lokale Netzwerk",
-      "connected_apps": "Verbundene Apps"
+      "connected_apps": "Verbundene Apps",
+      "custom_logo": "Logo"
     },
     "default_credentials": {
       "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
@@ -698,6 +700,10 @@
     "diary_template": {
       "none": "Keine",
       "missing": "Notiz nicht gefunden"
+    },
+    "custom_logo": {
+      "status_default": "Poznote",
+      "status_custom": "Eigenes"
     }
   },
   "workspaces": {
@@ -1912,6 +1918,24 @@
       "label": "Ein Eintrag pro Zeile: ein Hostname, *.domain, eine Adresse oder ein Netzwerk",
       "resolve_hint": "Ein Hostname muss vom Poznote-Server aus auflösbar sein, nicht nur von Ihrem Computer aus. Andernfalls geben Sie stattdessen seine Adresse ein.",
       "invalid": "Kein Hostname, keine Adresse und kein Netzwerk: {{entries}}"
+    },
+    "custom_logo_notice": {
+      "title": "Ein Wort, bevor Sie das Logo ändern",
+      "visibility": "Poznote ist kostenlos, ohne Werbung und ohne Store. Es verbreitet sich, wenn jemand es auf einem Bildschirm sieht und fragt, was das ist. Das Logo gibt die Antwort.",
+      "donation": "Sie können es natürlich ersetzen. Dann ist eine kleine Spende eine andere Möglichkeit, Poznote bekannter zu machen. Danke ❤️, Tim",
+      "continue": "Ändern",
+      "donate": "Kaffee spendieren und ändern"
+    },
+    "custom_logo": {
+      "title": "Logo",
+      "description": "Wählen Sie ein Bild, möglichst quadratisch: Es wird in ein Quadrat eingepasst und in Ihrem Datenvolume gespeichert. Es ersetzt das Logo für alle Benutzer, im Browser-Tab, auf der Anmeldeseite, in der Symbolleiste und als Symbol der installierten App.",
+      "preview": "Aktuelles Logo",
+      "name_kept": "Der Name bleibt Poznote unter dem Symbol der installierten App, und die Anmeldeseite nennt Poznote als Grundlage. Eine bereits installierte App kann ihr bisheriges Symbol behalten, bis sie neu installiert wird.",
+      "upload": "Bild auswählen",
+      "reset": "Zurück zum Poznote-Logo",
+      "reset_confirm": "Für alle Benutzer zum Poznote-Logo zurückkehren?",
+      "invalid": "Dieses Bild kann nicht verwendet werden. Wählen Sie eine PNG-, JPEG-, WebP-, GIF- oder SVG-Datei mit höchstens 20 MB.",
+      "failed": "Das Logo konnte nicht gespeichert werden."
     }
   },
   "notes_list": {
@@ -2611,7 +2635,8 @@
       "invalid_code": "Falscher Code. Versuchen Sie es erneut.",
       "expired": "Der Bestätigungsschritt ist abgelaufen. Melden Sie sich erneut an.",
       "too_many_tries": "Zu viele falsche Codes. Melden Sie sich erneut an."
-    }
+    },
+    "powered_by": "Basiert auf {{link}}"
   },
   "restore_import": {
     "page": {

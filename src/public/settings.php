@@ -385,10 +385,8 @@ if ($canUseUserWebhooks) {
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
     <title><?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
-    <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $cache_v; ?>">
-    <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $cache_v; ?>">
+    <link rel="manifest" href="<?php echo htmlspecialchars(poznoteManifestHref('pwa/manifest.webmanifest?v=' . $cache_v), ENT_QUOTES); ?>">
+    <?php poznoteRenderBrandIcons('', $cache_v); ?>
     <script src="js/theme-init.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
     <script>
@@ -1898,6 +1896,25 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
             <div class="settings-group-title" data-group="appearance"><?php echo t_h('settings.groups.appearance', [], 'Appearance'); ?></div>
             <div class="settings-group">
 
+                <!-- Logo: the instance logo (lib/branding.php), set from #customLogoModal.
+                     While Poznote's logo is in place, #customLogoNoticeModal comes first
+                     and says what the logo does for Poznote (discussion 1336),
+                     js/custom-logo.js -->
+                <div class="home-card" id="custom-logo-card" data-custom-logo="<?php echo poznoteHasCustomLogo() ? '1' : '0'; ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.custom_logo', [], 'Replace the Poznote logo with your own, for every user: in the browser tab, on the login page, in the icon rail and as the icon of the installed app.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-image"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.custom_logo', [], 'Logo'); ?></span>
+                        <span id="custom-logo-badge" class="setting-status <?php echo poznoteHasCustomLogo() ? 'enabled' : 'neutral'; ?>"
+                              data-label-default="<?php echo t_h('settings.custom_logo.status_default', [], 'Poznote'); ?>"
+                              data-label-custom="<?php echo t_h('settings.custom_logo.status_custom', [], 'Custom'); ?>"><?php echo poznoteHasCustomLogo()
+                            ? t_h('settings.custom_logo.status_custom', [], 'Custom')
+                            : t_h('settings.custom_logo.status_default', [], 'Poznote'); ?></span>
+                    </div>
+                </div>
+
                 <!-- Custom CSS Path -->
                 <div class="home-card" id="custom-css-card">
                     <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.custom_css', [], 'Apply your own CSS to customize the appearance of Poznote.'); ?>"><i class="lucide lucide-help-circle"></i></span>
@@ -2123,6 +2140,43 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
         </div>
     </div>
 
+    <!-- Before the logo dialog, every time Poznote's logo is about to be
+         replaced (discussion 1336): the logo is about the only thing that still
+         says Poznote on someone else's screen.
+         Change and the coffee button both lead on, a donation is never a condition;
+         Cancel just closes it. -->
+    <div id="customLogoNoticeModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="customLogoNoticeTitle">
+        <div class="modal-content">
+            <h3 id="customLogoNoticeTitle"><?php echo t_h('modals.custom_logo_notice.title', [], 'A word before you change the logo'); ?></h3>
+            <p><?php echo t_h('modals.custom_logo_notice.visibility', [], 'Poznote is free, with no ads and no store. It spreads when someone sees it on a screen and asks what it is. The logo is what answers.'); ?></p>
+            <p><?php echo t_h('modals.custom_logo_notice.donation', [], 'You can of course replace it. If you do, a small donation is another way to help Poznote grow. Thank you ❤️, Tim'); ?></p>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" data-action="close-modal" data-modal="customLogoNoticeModal"><?php echo t_h('common.cancel', [], 'Cancel'); ?></button>
+                <button type="button" class="custom-logo-continue" id="customLogoNoticeContinueBtn"><?php echo t_h('modals.custom_logo_notice.continue', [], 'Change'); ?></button>
+                <button type="button" class="btn-primary" id="customLogoNoticeDonateBtn" data-url="https://ko-fi.com/timothepoznanski"><?php echo t_h('modals.custom_logo_notice.donate', [], 'Buy me a coffee and change'); ?></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- The instance logo (lib/branding.php, api_branding.php). The image is
+         drawn at 512 and 192 px in the browser, js/custom-logo.js. -->
+    <div id="customLogoModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="customLogoTitle">
+        <div class="modal-content">
+            <h3 id="customLogoTitle"><?php echo t_h('modals.custom_logo.title', [], 'Logo'); ?></h3>
+            <p><?php echo t_h('modals.custom_logo.description', [], 'Choose an image, square if possible: it is fitted into a square and stored in your data volume. It replaces the logo for every user, in the browser tab, on the login page, in the icon rail and as the icon of the installed app.'); ?></p>
+            <div class="custom-logo-preview">
+                <?php echo poznoteLogoMark('custom-logo-preview-mark', t('modals.custom_logo.preview', [], 'Current logo')); ?>
+                <button type="button" class="custom-logo-reset" id="customLogoResetBtn"<?php echo poznoteHasCustomLogo() ? '' : ' hidden'; ?>><?php echo t_h('modals.custom_logo.reset', [], 'Back to the Poznote logo'); ?></button>
+            </div>
+            <p class="custom-logo-hint"><?php echo t_h('modals.custom_logo.name_kept', [], 'The name stays Poznote under the icon of the installed app, and the login page says it is powered by Poznote. An app already installed may keep its former icon until it is installed again.'); ?></p>
+            <input type="file" id="customLogoFileInput" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" hidden>
+            <div class="modal-buttons">
+                <button type="button" class="btn-cancel" data-action="close-modal" data-modal="customLogoModal"><?php echo t_h('common.close', [], 'Close'); ?></button>
+                <button type="button" class="btn-primary" id="customLogoUploadBtn"><?php echo t_h('modals.custom_logo.upload', [], 'Choose an image'); ?></button>
+            </div>
+        </div>
+    </div>
+
     <!-- Rebuild the master database (Disaster Recovery card): one button, so a
          dialog instead of a page of its own. POST /api/v1/admin/repair; the
          outcome replaces the description (initMaintenanceModals() in
@@ -2232,6 +2286,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
     <script src="js/connected-apps.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/connected-apps.js') ?: time(); ?>"></script>
     <?php if ($isAdmin): ?>
     <script src="js/statistics-token.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/statistics-token.js') ?: time(); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/custom-logo.js'); ?>"></script>
     <?php endif; ?>
     <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,
          which every page carrying the rail includes. -->

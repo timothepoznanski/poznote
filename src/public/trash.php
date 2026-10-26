@@ -103,6 +103,7 @@ $trashOrderBy = $trashSort === 'created'
     <script src="js/session-guard.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderStylesheets('trash'); ?>
     <script src="js/theme-manager.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
+    <?php poznoteRenderBrandIcons(); ?>
     <?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="trash-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>" data-date-time-format="<?php echo htmlspecialchars(getUserDateTimeFormat(), ENT_QUOTES, 'UTF-8'); ?>">

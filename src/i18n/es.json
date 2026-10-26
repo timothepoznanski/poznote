@@ -527,7 +527,8 @@
       "outbound_hosts": "Los usuarios no administradores solo pueden conectar los webhooks, Git Sync y sus propios servidores de IA, transcripción o MCP a hosts públicos de Internet. Indica aquí los hosts o redes locales que pueden usar, como un servidor Ollama o n8n. Los administradores no tienen límites.",
       "diary_template": "Elija una nota cuyo contenido sirva de punto de partida para cada nueva entrada del diario del espacio de trabajo {{workspace}}. La lista muestra las notas guardadas en una carpeta llamada Plantillas (o Templates) de ese espacio. Cada espacio de trabajo tiene su propia plantilla.",
       "markdown_view_cycle": "Elija las vistas que recorre el botón de vista de una nota markdown después de la vista clásica (vista previa, con el lápiz para editar). Las vistas no elegidas se omiten. Si no se elige ninguna, el botón se oculta. En un teléfono el botón nunca pasa al modo dividido.",
-      "connected_apps": "Conecta aplicaciones de chat como ChatGPT o Claude a tus notas a través del servidor MCP y desconéctalas cuando quieras."
+      "connected_apps": "Conecta aplicaciones de chat como ChatGPT o Claude a tus notas a través del servidor MCP y desconéctalas cuando quieras.",
+      "custom_logo": "Sustituir el logo de Poznote por el suyo, para todos los usuarios: en la pestaña del navegador, en la página de inicio de sesión, en la barra de iconos y como icono de la aplicación instalada."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -648,7 +649,8 @@
       "whats_new": "Novedades tras una actualización",
       "login_disabled": "Abrir sin iniciar sesión",
       "outbound_hosts": "Acceso a la red local",
-      "connected_apps": "Aplicaciones conectadas"
+      "connected_apps": "Aplicaciones conectadas",
+      "custom_logo": "Logo"
     },
     "default_credentials": {
       "both": "Esta cuenta sigue usando el nombre de usuario y la contraseña predeterminados. Cualquiera que pueda acceder a esta instancia puede iniciar sesión.",
@@ -698,6 +700,10 @@
     "diary_template": {
       "none": "Ninguna",
       "missing": "Nota no encontrada"
+    },
+    "custom_logo": {
+      "status_default": "Poznote",
+      "status_custom": "Personalizado"
     }
   },
   "workspaces": {
@@ -1912,6 +1918,24 @@
       "label": "Una entrada por línea: un nombre de host, *.dominio, una dirección o una red",
       "resolve_hint": "Un nombre de host debe poder resolverse desde el servidor de Poznote, no solo desde tu ordenador. Si no es así, introduce su dirección.",
       "invalid": "No es un nombre de host, una dirección ni una red: {{entries}}"
+    },
+    "custom_logo_notice": {
+      "title": "Unas palabras antes de cambiar el logo",
+      "visibility": "Poznote es gratuito, sin publicidad ni tienda. Se da a conocer cuando alguien lo ve en una pantalla y pregunta qué es. Es el logo el que responde.",
+      "donation": "Por supuesto, puede sustituirlo. En ese caso, un pequeño donativo es otra forma de ayudar a que Poznote se dé a conocer. Gracias ❤️, Tim",
+      "continue": "Cambiar",
+      "donate": "Invítame a un café y cambiar"
+    },
+    "custom_logo": {
+      "title": "Logo",
+      "description": "Elija una imagen, cuadrada si es posible: se ajusta dentro de un cuadrado y se guarda en su volumen de datos. Sustituye el logo para todos los usuarios, en la pestaña del navegador, en la página de inicio de sesión, en la barra de iconos y como icono de la aplicación instalada.",
+      "preview": "Logo actual",
+      "name_kept": "El nombre sigue siendo Poznote bajo el icono de la aplicación instalada, y la página de inicio de sesión indica que funciona con Poznote. Una aplicación ya instalada puede conservar su icono anterior hasta que se vuelva a instalar.",
+      "upload": "Elegir una imagen",
+      "reset": "Volver al logo de Poznote",
+      "reset_confirm": "¿Volver al logo de Poznote para todos los usuarios?",
+      "invalid": "Esta imagen no se puede usar. Elija un archivo PNG, JPEG, WebP, GIF o SVG de 20 MB como máximo.",
+      "failed": "No se pudo guardar el logo."
     }
   },
   "notes_list": {
@@ -2611,7 +2635,8 @@
       "invalid_code": "Código incorrecto. Inténtalo de nuevo.",
       "expired": "El paso de verificación ha caducado. Inicia sesión de nuevo.",
       "too_many_tries": "Demasiados códigos incorrectos. Inicia sesión de nuevo."
-    }
+    },
+    "powered_by": "Con la tecnología de {{link}}"
   },
   "restore_import": {
     "page": {

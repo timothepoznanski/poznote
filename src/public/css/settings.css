@@ -2240,3 +2240,73 @@ a.settings-storage-row:focus-visible {
     font-size: 0.8rem;
     word-break: break-all;
 }
+
+/* The note before the logo dialog: three buttons on one row on a computer.
+   Change sits between Cancel (grey) and the coffee (accent), outlined so
+   it reads as neither. */
+#customLogoNoticeModal .modal-content {
+    max-width: 560px;
+}
+
+#customLogoNoticeModal .modal-buttons {
+    margin-top: 36px;
+}
+
+.modal-buttons button.custom-logo-continue {
+    background-color: var(--pz-surface);
+    color: var(--pz-text);
+    border: 1px solid var(--pz-border-strong);
+}
+
+.modal-buttons button.custom-logo-continue:hover {
+    background-color: var(--pz-surface-sunken);
+}
+
+/* Logo dialog (#customLogoModal): the logo in use, at the size of the login
+   page's and a little more, then what stays Poznote's */
+.custom-logo-preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 20px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: var(--pz-surface-sunken);
+}
+
+.custom-logo-preview-mark {
+    width: 64px;
+    height: 64px;
+}
+
+/* "Back to the Poznote logo", under the logo it would remove */
+.custom-logo-reset {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--pz-accent-text);
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.custom-logo-reset:hover {
+    text-decoration: underline;
+}
+
+.custom-logo-reset[hidden] {
+    display: none;
+}
+
+.custom-logo-reset:disabled {
+    color: var(--pz-text-subtle);
+    cursor: default;
+    text-decoration: none;
+}
+
+.custom-logo-hint {
+    color: var(--pz-text-muted);
+    font-size: 0.85rem;
+}

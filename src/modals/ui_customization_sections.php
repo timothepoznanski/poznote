@@ -114,6 +114,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tenant-isolation-card" checked><span><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-quotas-card" checked><span><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-logo-card" checked><span><?php echo t_h('settings.cards.custom_logo', [], 'Logo'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-fonts-card" checked><span><?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:theme-list-card" checked><span><?php echo t_h('settings.cards.theme_list', [], 'Theme list'); ?></span></label>

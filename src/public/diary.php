@@ -185,6 +185,7 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 	<script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderStylesheets('diary'); ?>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
+	<?php poznoteRenderBrandIcons(); ?>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="<?php echo htmlspecialchars($bodyClasses, ENT_QUOTES, 'UTF-8'); ?>"<?php echo $bodyStyle !== '' ? ' style="' . htmlspecialchars($bodyStyle, ENT_QUOTES, 'UTF-8') . '"' : ''; ?>

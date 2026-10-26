@@ -67,6 +67,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/session-guard.js?v=<?php echo $cache_v; ?>"></script>
 	<?php poznoteRenderStylesheets('list_tags'); ?>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
+	<?php poznoteRenderBrandIcons(); ?>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
 <body class="tags-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">

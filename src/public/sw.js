@@ -62,7 +62,8 @@ self.addEventListener('install', (event) => {
 
 // A reminder pushed by the server (ReminderPushService.php) while no page may
 // be open: this is what makes it reach a closed PWA. The payload is
-// { id, title, body, url }, url being relative to the app.
+// { id, title, body, url, icon }, url and icon being relative to the app (a
+// server from before icon was sent leaves it out).
 self.addEventListener('push', (event) => {
   let reminder = {};
   try {
@@ -73,7 +74,7 @@ self.addEventListener('push', (event) => {
   const scope = self.registration.scope;
   const options = {
     body: reminder.body || '',
-    icon: new URL('pwa/poznote-192.png', scope).href,
+    icon: new URL(typeof reminder.icon === 'string' && reminder.icon ? reminder.icon : 'pwa/poznote-192.png', scope).href,
     data: { id: reminder.id || null, url: reminder.url ? new URL(reminder.url, scope).href : '' },
   };
   // Same tag as js/reminder-notifications.js: one notification per reminder

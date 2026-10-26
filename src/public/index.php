@@ -365,10 +365,8 @@ if ($center_note_content_enabled && $width_value !== '1' && $width_value !== 'tr
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Poznote">
-    <link rel="manifest" href="pwa/manifest.webmanifest?v=<?php echo $v; ?>" crossorigin="use-credentials">
-    <link rel="icon" href="favicon.ico" sizes="512x512" type="image/png">
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="pwa/poznote.png?v=<?php echo $v; ?>">
+    <link rel="manifest" href="<?php echo htmlspecialchars(poznoteManifestHref('pwa/manifest.webmanifest?v=' . $v), ENT_QUOTES); ?>" crossorigin="use-credentials">
+    <?php poznoteRenderBrandIcons('', $v); ?>
     <script src="js/theme-init.js?v=<?php echo $v; ?>"></script>
     <script src="js/session-guard.js?v=<?php echo $v; ?>"></script>
     <?php if ($workspaceResolvedInternally !== null): ?>

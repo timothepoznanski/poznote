@@ -84,14 +84,13 @@ function oauthAuthorizeRenderPage(string $title, string $body): void {
     <title><?php echo $title; ?></title>
     <script src="../js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <?php poznoteRenderStylesheets('oauth/authorize', ['prefix' => '../']); ?>
-    <link rel="icon" href="../favicon.ico" sizes="512x512" type="image/png">
-    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <?php poznoteRenderBrandIcons('../'); ?>
 </head>
 <body>
     <div class="login-container oauth-container">
         <div class="login-header">
             <div class="logo">
-                <span class="poznote-logo logo-favicon" role="img" aria-label="Poznote"></span>
+                <?php echo poznoteLogoMark('logo-favicon', 'Poznote', '../'); ?>
             </div>
             <h1 class="login-title oauth-title"><?php echo $title; ?></h1>
         </div>

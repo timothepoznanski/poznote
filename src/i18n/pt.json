@@ -527,7 +527,8 @@
       "outbound_hosts": "Os utilizadores não administradores só podem ligar os webhooks, o Git Sync e os seus próprios servidores de IA, transcrição ou MCP a hosts públicos da Internet. Indique aqui os hosts ou redes locais que podem usar, como um servidor Ollama ou n8n. Os administradores não têm limites.",
       "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo.",
       "markdown_view_cycle": "Escolha as visualizações que o botão de visualização de uma nota markdown percorre depois da visualização clássica (pré-visualização, com o lápis para editar). As visualizações não escolhidas são ignoradas. Se nenhuma for escolhida, o botão fica oculto. Num telemóvel o botão nunca passa ao modo dividido.",
-      "connected_apps": "Conecte aplicativos de chat como ChatGPT ou Claude às suas notas pelo servidor MCP e desconecte-os quando quiser."
+      "connected_apps": "Conecte aplicativos de chat como ChatGPT ou Claude às suas notas pelo servidor MCP e desconecte-os quando quiser.",
+      "custom_logo": "Substituir o logótipo do Poznote pelo seu, para todos os utilizadores: no separador do navegador, na página de início de sessão, na barra de ícones e como ícone da aplicação instalada."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -648,7 +649,8 @@
       "whats_new": "Novidades após uma atualização",
       "login_disabled": "Abrir sem login",
       "outbound_hosts": "Acesso à rede local",
-      "connected_apps": "Aplicativos conectados"
+      "connected_apps": "Aplicativos conectados",
+      "custom_logo": "Logótipo"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -698,6 +700,10 @@
     "diary_template": {
       "none": "Nenhum",
       "missing": "Nota não encontrada"
+    },
+    "custom_logo": {
+      "status_default": "Poznote",
+      "status_custom": "Personalizado"
     }
   },
   "workspaces": {
@@ -1912,6 +1918,24 @@
       "label": "Uma entrada por linha: um nome de host, *.domínio, um endereço ou uma rede",
       "resolve_hint": "Um nome de host tem de ser resolvido a partir do servidor Poznote, não apenas do seu computador. Caso contrário, indique o respetivo endereço.",
       "invalid": "Não é um nome de host, endereço ou rede: {{entries}}"
+    },
+    "custom_logo_notice": {
+      "title": "Uma palavra antes de mudar o logótipo",
+      "visibility": "O Poznote é gratuito, sem publicidade nem loja. Dá-se a conhecer quando alguém o vê num ecrã e pergunta o que é. É o logótipo que responde.",
+      "donation": "Pode, claro, substituí-lo. Nesse caso, um pequeno donativo é outra forma de ajudar o Poznote a dar-se a conhecer. Obrigado ❤️, Tim",
+      "continue": "Mudar",
+      "donate": "Pagar-me um café e mudar"
+    },
+    "custom_logo": {
+      "title": "Logótipo",
+      "description": "Escolha uma imagem, quadrada se possível: é ajustada num quadrado e guardada no seu volume de dados. Substitui o logótipo para todos os utilizadores, no separador do navegador, na página de início de sessão, na barra de ícones e como ícone da aplicação instalada.",
+      "preview": "Logótipo atual",
+      "name_kept": "O nome continua a ser Poznote sob o ícone da aplicação instalada, e a página de início de sessão indica que funciona com o Poznote. Uma aplicação já instalada pode manter o ícone anterior até ser instalada de novo.",
+      "upload": "Escolher uma imagem",
+      "reset": "Voltar ao logótipo do Poznote",
+      "reset_confirm": "Voltar ao logótipo do Poznote para todos os utilizadores?",
+      "invalid": "Esta imagem não pode ser usada. Escolha um ficheiro PNG, JPEG, WebP, GIF ou SVG com 20 MB no máximo.",
+      "failed": "Não foi possível guardar o logótipo."
     }
   },
   "notes_list": {
@@ -2611,7 +2635,8 @@
       "invalid_code": "Código incorreto. Tente novamente.",
       "expired": "A etapa de verificação expirou. Entre novamente.",
       "too_many_tries": "Muitos códigos incorretos. Entre novamente."
-    }
+    },
+    "powered_by": "Com tecnologia {{link}}"
   },
   "restore_import": {
     "page": {
