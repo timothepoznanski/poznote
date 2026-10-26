@@ -7,7 +7,8 @@
   <a href="CHROME-EXTENSION.pt.md">Português</a> ·
   <a href="CHROME-EXTENSION.ru.md">Русский</a> ·
   <a href="CHROME-EXTENSION.zh-cn.md">简体中文</a> ·
-  <a href="CHROME-EXTENSION.ko.md">한국어</a>
+  <a href="CHROME-EXTENSION.ko.md">한국어</a> ·
+  <a href="CHROME-EXTENSION.ja.md">日本語</a>
 </p>
 <!-- /lang-selector -->
 
@@ -32,7 +33,7 @@ Um diese Einstellungen später zu ändern, klicken Sie oben in der Erweiterung a
 
 Die Adresse Ihrer Instanz daneben ist ein Link: Ein Klick öffnet Poznote in einem neuen Tab, über http oder https, so wie Sie die Adresse in den Einstellungen eingegeben haben.
 
-Die Erweiterung erscheint in der Sprache von Chrome, wenn diese Englisch, Französisch, Deutsch, Spanisch, Portugiesisch, Russisch, Koreanisch oder vereinfachtes Chinesisch ist, sonst auf Englisch.
+Die Erweiterung erscheint in der Sprache von Chrome, wenn diese Englisch, Französisch, Deutsch, Spanisch, Portugiesisch, Russisch, Koreanisch, vereinfachtes Chinesisch oder Japanisch ist, sonst auf Englisch.
 
 Ihr Kontopasswort funktioniert hier ebenfalls, doch für eine Erweiterung ist ein App-Passwort die bessere Wahl: Es erreicht nur die API, nie die Weboberfläche oder Ihre Kontoeinstellungen, es ist auf Ihr eigenes Profil beschränkt, und wenn Sie es in Poznote widerrufen, ist die Erweiterung getrennt, ohne dass sich sonst etwas ändert. Die vollständige Liste der Einschränkungen finden Sie unter [App-Passwörter](README.de.md#app-passwörter).
 
