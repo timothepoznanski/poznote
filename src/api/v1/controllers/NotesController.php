@@ -2683,6 +2683,7 @@ class NotesController {
         'шаблоны', 'шаблон',
         '模板',
         '템플릿',
+        'テンプレート',
     ];
 
     private static function isTemplateContainerName(string $name): bool {
