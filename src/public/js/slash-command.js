@@ -992,6 +992,7 @@
 
         dropSelectedSlashPlaceholder();
         openEmptyLineAtCaret(noteEntry);
+        if (typeof window.selectLineBreakAfterCaret === 'function') window.selectLineBreakAfterCaret();
 
         const marker = 'data-slash-new';
         element.setAttribute(marker, '1');
@@ -5273,7 +5274,7 @@
                 // The end offset is slashOffset + 1 (for the '/') + filter length
                 // Use the current length of text after slash as fallback
                 const textAfterSlash = textContent.substring(slashOffset + 1);
-                const spaceIndex = textAfterSlash.search(/[\s\n]/);
+                const spaceIndex = textAfterSlash.search(/[\s\n\u200B]/);
                 const actualFilterLength = spaceIndex >= 0 ? spaceIndex : textAfterSlash.length;
                 currentOffset = slashOffset + 1 + actualFilterLength;
             }
@@ -5934,8 +5935,11 @@
         const textContent = slashTextNode.textContent || '';
         const textAfterSlash = textContent.substring(slashOffset + 1);
 
-        // Find the first space or newline after the slash to limit the filter text
-        const spaceIndex = textAfterSlash.search(/[\s\n]/);
+        // Find the first space or newline after the slash to limit the filter text.
+        // A zero-width space ends it too: the line left after a checklist holds
+        // one as its caret holder, and the "/code" typed before it read as
+        // "code\u200B" and matched nothing (issue #1686)
+        const spaceIndex = textAfterSlash.search(/[\s\n\u200B]/);
         filterText = spaceIndex >= 0 ? textAfterSlash.substring(0, spaceIndex) : textAfterSlash;
 
         // Update the menu with filtered commands
