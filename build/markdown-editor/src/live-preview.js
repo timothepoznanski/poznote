@@ -382,6 +382,13 @@ function isSafeUrl(url) {
   return !scheme || ['http', 'https', 'mailto', 'tel'].includes(scheme[1])
 }
 
+// What GFM makes a link of without a scheme: www.example.com, an email address
+function autolinkHref(address) {
+  if (/^www\./i.test(address)) return 'https://' + address
+  if (/^[^\s@/:]+@[^\s@/]+\.[^\s@/]+$/.test(address)) return 'mailto:' + address
+  return address
+}
+
 function isSafeImageUrl(url) {
   const compact = String(url || '').replace(/[\u0000- \u007f]+/g, '').toLowerCase()
   return isSafeUrl(url) || compact.startsWith('data:image/') || compact.startsWith('blob:')
@@ -1132,7 +1139,7 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
           case 'Autolink': {
             const address = node.node.getChild('URL')
             if (!address) return
-            const href = doc.sliceString(address.from, address.to)
+            const href = autolinkHref(doc.sliceString(address.from, address.to))
             if (!isSafeUrl(href)) return
             decorations.push(Decoration.mark({ class: 'cm-live-link', attributes: { 'data-live-href': href } }).range(address.from, address.to))
             if (!touches(node.from, node.to)) {
@@ -2049,6 +2056,123 @@ function followLink(href) {
   }
   window.open(href, '_blank', 'noopener')
 }
+
+// The link a character of the source belongs to, for a Ctrl/Cmd + click
+// where nothing is drawn: the classic editor, and the address of a link the
+// live preview shows as written. An address to follow, or the title of a
+// [[note]]. Nothing in code.
+function findSourceLinkAt(state, at) {
+  const doc = state.doc
+  for (let node = syntaxTree(state).resolveInner(at, 1); node; node = node.parent) {
+    const name = node.name
+    if (name === 'InlineCode' || name === 'FencedCode' || name === 'CodeBlock' || name === 'HTMLTag' || name === 'HTMLBlock' || name === 'Comment' || name === 'CommentBlock') return null
+    let url = null
+    if (name === 'URL') url = node
+    else if (name === 'Link' || name === 'Image') url = node.getChild('URL')
+    if (!url) continue
+    const href = autolinkHref(doc.sliceString(url.from, url.to))
+    return isSafeUrl(href) ? { href } : null
+  }
+
+  const line = doc.lineAt(at)
+  if (line.text.indexOf('[[') === -1) return null
+  NOTE_REFERENCE_REGEX.lastIndex = 0
+  let match
+  while ((match = NOTE_REFERENCE_REGEX.exec(line.text))) {
+    const from = line.from + match.index
+    const to = from + match[0].length
+    const title = match[1].trim()
+    if (at < from || at >= to) continue
+    if (!title || line.text.charAt(match.index - 1) === '\\') return null
+    return { title }
+  }
+  return null
+}
+
+function sourceLinkAtEvent(view, event) {
+  if (!(event.ctrlKey || event.metaKey) || event.altKey) return null
+  const target = event.target && event.target.nodeType === 1 ? event.target : event.target && event.target.parentElement
+  if (!target || !view.contentDOM.contains(target)) return null
+  // a drawn link has its own handler (livePreviewPlugin), a widget its own text
+  if (target.closest('[data-live-href], [data-live-missing-note]')) return null
+  const widget = target.closest('[contenteditable="false"]')
+  if (widget && view.contentDOM.contains(widget)) return null
+  const hit = view.posAndSideAtCoords({ x: event.clientX, y: event.clientY })
+  if (!hit) return null
+  const at = hit.assoc > 0 ? hit.pos : hit.pos - 1
+  if (at < 0 || at >= view.state.doc.length) return null
+  return findSourceLinkAt(view.state, at)
+}
+
+// With Ctrl/Cmd held, the pointer says which text is a link
+const MOD_LINK_HOVER_CLASS = 'cm-mod-link-hover'
+
+const sourceLinkHover = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.view = view
+    this.pointer = null
+    this.onKey = event => {
+      if (event.key !== 'Control' && event.key !== 'Meta') return
+      this.refresh(this.pointer && Object.assign({}, this.pointer, { ctrlKey: event.ctrlKey, metaKey: event.metaKey, altKey: event.altKey }))
+    }
+    this.onBlur = () => this.refresh(null)
+    document.addEventListener('keydown', this.onKey)
+    document.addEventListener('keyup', this.onKey)
+    window.addEventListener('blur', this.onBlur)
+  }
+
+  refresh(event) {
+    let over = false
+    if (event && (event.ctrlKey || event.metaKey) && !event.altKey) {
+      const target = event.target && event.target.nodeType === 1 ? event.target : event.target && event.target.parentElement
+      const drawn = target && this.view.contentDOM.contains(target) && target.closest('[data-live-href], [data-live-missing-note]')
+      over = !!drawn || !!sourceLinkAtEvent(this.view, event)
+    }
+    this.view.contentDOM.classList.toggle(MOD_LINK_HOVER_CLASS, over)
+  }
+
+  destroy() {
+    document.removeEventListener('keydown', this.onKey)
+    document.removeEventListener('keyup', this.onKey)
+    window.removeEventListener('blur', this.onBlur)
+  }
+}, {
+  eventHandlers: {
+    mousemove(event) {
+      this.pointer = { target: event.target, clientX: event.clientX, clientY: event.clientY }
+      this.refresh(event)
+    },
+    mouseleave() {
+      this.pointer = null
+      this.refresh(null)
+    }
+  }
+})
+
+export const sourceLinkClicks = [
+  sourceLinkHover,
+  EditorView.domEventHandlers({
+    // the caret stays where it is, the click below opens the link
+    mousedown(event, view) {
+      if (event.button !== 0 || !sourceLinkAtEvent(view, event)) return false
+      event.preventDefault()
+      return true
+    },
+
+    click(event, view) {
+      const link = event.button === 0 ? sourceLinkAtEvent(view, event) : null
+      if (!link) return false
+      if (link.href) {
+        followLink(link.href)
+      } else if (typeof window.openBrokenNoteReference === 'function') {
+        // finds the note of that title, or offers to create it (js/note-reference.js)
+        window.openBrokenNoteReference(link.title, view.dom.closest('.noteentry[data-note-id]'))
+      }
+      event.preventDefault()
+      return true
+    }
+  })
+]
 
 // What stands in the middle of an empty pair until its text is typed. The
 // two halves of the pair are text of no size, and a caret drawn between them

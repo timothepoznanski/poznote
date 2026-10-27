@@ -26,7 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { Annotation, CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
-import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, getEditingTableRange, getTableCellAt, getTableCellAtSelection, getTableCellTarget, getTableBlockElement, finishTableCellEdit, focusTableCell, moveTableCell, insertTableLineBreak } from './live-preview.js'
+import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, sourceLinkClicks, getEditingTableRange, getTableCellAt, getTableCellAtSelection, getTableCellTarget, getTableBlockElement, finishTableCellEdit, focusTableCell, moveTableCell, insertTableLineBreak } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -1943,6 +1943,8 @@ function createEditor(host, options = {}) {
       markdownCodeLinePlugin,
       hangingIndentPlugin,
       livePreviewCompartment.of(createLivePreviewExtensions(!!options.livePreview)),
+      // Ctrl/Cmd + click follows a link written in the source
+      sourceLinkClicks,
       readOnlyCompartment.of(createReadOnlyExtensions(!!options.readOnly)),
       themeCompartment.of(createThemeExtensions()),
       updateListener,
