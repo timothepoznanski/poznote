@@ -4386,7 +4386,7 @@
     },
     "hints": {
       "enabled": "Wenn aktiviert, kann Poznote diesen SMTP-Anbieter zum Senden von E-Mails verwenden.",
-      "security_summary": "STARTTLS verwendet normalerweise Port 587 und wechselt nach dem Verbindungsaufbau zu TLS. SSL/TLS ist ab der Verbindung verschlüsselt, normalerweise auf Port 465. Keine verwendet keine Verschlüsselung.",
+      "security_summary": "STARTTLS verwendet normalerweise Port 587 und wechselt nach dem Verbindungsaufbau zu TLS. SSL/TLS ist ab der Verbindung verschlüsselt, normalerweise auf Port 465. „Keine“ verschlüsselt die Verbindung nicht.",
       "security_tls": "STARTTLS: Standardverbindung, danach Wechsel zu TLS, normalerweise Port 587.",
       "security_ssl": "SSL/TLS: ab der Verbindung verschlüsselt, normalerweise Port 465.",
       "security_none": "Keine: keine Verschlüsselung, nur für ein lokales Relay oder ein vertrauenswürdiges Netzwerk.",
@@ -4454,7 +4454,7 @@
     },
     "hints": {
       "secret": "Dient zum Signieren der Payload, damit der Empfänger prüfen kann, dass sie von dieser Instanz stammt.",
-      "app_url_env": "Derzeit durch die Umgebungsvariable POZNOTE_APP_URL bereitgestellt: {{url}}. Ein hier gespeicherter Wert ueberschreibt sie.",
+      "app_url_env": "Derzeit durch die Umgebungsvariable POZNOTE_APP_URL bereitgestellt: {{url}}. Ein hier gespeicherter Wert überschreibt sie.",
       "app_url_unset": "Nicht gesetzt: die Payloads enthalten derzeit keinen Notiz-Link (data.note.url ist null).",
       "description": "Wird in der Liste unten angezeigt, um Ihre Endpunkte zu unterscheiden. Sie wird nie an den Endpunkt gesendet."
     },
@@ -4481,7 +4481,7 @@
     "error_saving": "Fehler beim Speichern des Webhooks.",
     "error_not_found": "Webhook nicht gefunden.",
     "section_app_url": "Instanz-URL",
-    "app_url_description": "Oeffentliche URL dieser Poznote-Instanz, verwendet fuer den direkten Notiz-Link in den Payloads (data.note.url). Leer lassen, um keinen Link zu senden. Es ist dieselbe Instanz-URL, die auch die Erinnerungs-E-Mails verwenden. Chat-Apps, die sich mit dem MCP-Server verbinden, werden zur Anmeldung ebenfalls dorthin geschickt.",
+    "app_url_description": "Öffentliche URL dieser Poznote-Instanz, verwendet für den direkten Notiz-Link in den Payloads (data.note.url). Leer lassen, um keinen Link zu senden. Es ist dieselbe Instanz-URL, die auch die Erinnerungs-E-Mails verwenden. Chat-Apps, die sich mit dem MCP-Server verbinden, werden zur Anmeldung ebenfalls dorthin geschickt.",
     "app_url_saved": "Instanz-URL gespeichert.",
     "app_url_cleared": "Instanz-URL geleert. Payloads enthalten keinen direkten Notiz-Link mehr.",
     "error_invalid_app_url": "Die Instanz-URL muss mit http:// oder https:// beginnen.",

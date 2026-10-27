@@ -4113,7 +4113,7 @@
     "error_saving": "Webhookの保存中にエラーが発生しました。",
     "error_not_found": "Webhookが見つかりません。",
     "section_app_url": "インスタンスのURL",
-    "app_url_description": "このPoznoteインスタンスの公開URLです。ペイロードで送るノートへの直接リンク（data.note.url）を作るのに使います。空欄にするとリンクは送られません。リマインダーのメールで使うインスタンスのURLと同じものです。",
+    "app_url_description": "このPoznoteインスタンスの公開URLです。ペイロードで送るノートへの直接リンク（data.note.url）を作るのに使います。空欄にするとリンクは送られません。リマインダーのメールで使うインスタンスのURLと同じものです。MCPサーバーに接続するチャットアプリも、サインインのためにこのURLへ案内されます。",
     "app_url_saved": "インスタンスのURLを保存しました。",
     "app_url_cleared": "インスタンスのURLを消去しました。今後、ペイロードにはノートへの直接リンクが含まれません。",
     "error_invalid_app_url": "インスタンスのURLは、http://またはhttps://で始まる必要があります。",

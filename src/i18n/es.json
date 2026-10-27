@@ -4387,7 +4387,7 @@
     },
     "hints": {
       "enabled": "Cuando está activada, Poznote puede usar este proveedor SMTP para enviar correos.",
-      "security_summary": "STARTTLS suele usar el puerto 587 y cambia a TLS después de conectar. SSL/TLS se cifra desde la conexión, normalmente en el puerto 465. Ninguno no usa cifrado.",
+      "security_summary": "STARTTLS suele usar el puerto 587 y cambia a TLS después de conectar. SSL/TLS se cifra desde la conexión, normalmente en el puerto 465. «Ninguno» no cifra la conexión.",
       "security_tls": "STARTTLS: conexión estándar y luego cambio a TLS, normalmente puerto 587.",
       "security_ssl": "SSL/TLS: cifrado desde la conexión, normalmente puerto 465.",
       "security_none": "Ninguno: sin cifrado, solo para un relay local o una red de confianza.",
@@ -4419,8 +4419,8 @@
     "card_help": "Envía eventos de tus propias notas (recordatorio activado, nota creada o compartida) a servicios externos como ntfy o n8n mediante webhooks.",
     "description": "Poznote envía una solicitud HTTP POST con un payload JSON a cada endpoint registrado cuando una de tus notas activa un evento suscrito: un recordatorio que se cumple, una nota creada o compartida públicamente. Solo se ven afectadas tus propias notas. Si se define un secreto, el payload se firma con HMAC-SHA256 en la cabecera X-Poznote-Signature-256.",
     "access_denied": "Acceso denegado. Los webhooks de usuario están desactivados en esta instancia.",
-    "app_url_unset": "No hay ninguna URL de instancia configurada, por lo que los payloads no incluyen enlace directo a la nota (data.note.url es null). Pide a un administrador que la defina en la pagina Webhooks de administracion.",
-    "app_url_unset_admin": "No hay ninguna URL de instancia configurada, por lo que los payloads no incluyen enlace directo a la nota (data.note.url es null). Definela en la pagina Webhooks de administracion.",
+    "app_url_unset": "No hay ninguna URL de instancia configurada, por lo que los payloads no incluyen enlace directo a la nota (data.note.url es null). Pide a un administrador que la defina en la página Webhooks de administración.",
+    "app_url_unset_admin": "No hay ninguna URL de instancia configurada, por lo que los payloads no incluyen enlace directo a la nota (data.note.url es null). Defínela en la página Webhooks de administración.",
     "error_private_url": "Esta dirección no está permitida: un webhook debe apuntar a un host público de Internet. Un administrador puede permitir hosts locales en Ajustes, Acceso a la red local."
   },
   "webhooks_admin": {
@@ -4455,8 +4455,8 @@
     },
     "hints": {
       "secret": "Sirve para firmar la carga de modo que el receptor pueda verificar que proviene de esta instancia.",
-      "app_url_env": "Actualmente proporcionada por la variable de entorno POZNOTE_APP_URL: {{url}}. Guardar un valor aqui la sustituye.",
-      "app_url_unset": "Sin definir: los payloads no incluyen actualmente ningun enlace a la nota (data.note.url es null).",
+      "app_url_env": "Actualmente proporcionada por la variable de entorno POZNOTE_APP_URL: {{url}}. Guardar un valor aquí la sustituye.",
+      "app_url_unset": "Sin definir: los payloads no incluyen actualmente ningún enlace a la nota (data.note.url es null).",
       "description": "Se muestra en la lista siguiente para distinguir sus puntos de conexión. Nunca se envía al punto de conexión."
     },
     "status": {
@@ -4482,9 +4482,9 @@
     "error_saving": "Error al guardar el webhook.",
     "error_not_found": "Webhook no encontrado.",
     "section_app_url": "URL de la instancia",
-    "app_url_description": "URL publica de esta instancia de Poznote, usada para construir el enlace directo a la nota enviado en los payloads (data.note.url). Dejalo vacio para no enviar ningun enlace. Es la misma URL de instancia que usan los correos de recordatorio. Las aplicaciones de chat que se conectan al servidor MCP también se envían allí para iniciar sesión.",
+    "app_url_description": "URL pública de esta instancia de Poznote, usada para construir el enlace directo a la nota enviado en los payloads (data.note.url). Déjalo vacío para no enviar ningún enlace. Es la misma URL de instancia que usan los correos de recordatorio. Las aplicaciones de chat que se conectan al servidor MCP también se envían allí para iniciar sesión.",
     "app_url_saved": "URL de la instancia guardada.",
-    "app_url_cleared": "URL de la instancia borrada. Los payloads ya no incluiran un enlace directo a la nota.",
+    "app_url_cleared": "URL de la instancia borrada. Los payloads ya no incluirán un enlace directo a la nota.",
     "error_invalid_app_url": "La URL de la instancia debe empezar por http:// o https://.",
     "placeholders": {
       "description": "Para qué sirve este webhook"
