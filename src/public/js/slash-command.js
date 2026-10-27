@@ -3204,6 +3204,10 @@
                         id: 'table',
                         icon: 'lucide-table',
                         label: t('slash_menu.table', null, 'Table'),
+                        // The size picker takes the focus; executeCommand() gave it
+                        // back to the note, where Enter then broke the line instead
+                        // of inserting the table (issue #1686)
+                        noRefocus: true,
                         action: function () {
                             if (typeof window.toggleTablePicker === 'function') {
                                 window.toggleTablePicker();
@@ -3566,6 +3570,8 @@
                         id: 'table',
                         icon: 'lucide-table',
                         label: t('slash_menu.table', null, 'Table'),
+                        // The size picker takes the focus, see the HTML entry
+                        noRefocus: true,
                         action: function () {
                             // The size picker, as in HTML notes (js/toolbar-tables.js)
                             if (typeof window.toggleTablePicker === 'function') {
