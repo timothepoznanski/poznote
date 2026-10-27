@@ -195,15 +195,20 @@
     z-index: 1;
 }
 
-/* Toggle outline button */
+/* Toggle outline button. Hangs off the handle's left edge into the note
+   column, the mirror of .toggle-sidebar-btn (css/layout.css), at the top of
+   the edge: in the tab bar's row, clear of the note's scrollbar below it, and
+   in the same place open or collapsed, so the panel opens and closes from one
+   spot (issue #1687). The tab bar keeps --pz-outline-toggle-room free for it
+   at its right end (css/tabs.css). Same size, colours and hover as
+   .toggle-sidebar-btn and #iconSidebarToggle (css/icon-sidebar.css). */
 .toggle-outline-btn {
     position: absolute;
-    top: 50%;
-    right: 50%;
-    transform: translateY(-50%);
-    width: 16px;
+    top: 9px;
+    right: 0;
+    width: 20px;
     height: 25px;
-    background: var(--pz-sidebar-surface);
+    background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
     border-radius: var(--pz-radius-sm) 0 0 var(--pz-radius-sm);
     cursor: pointer;
@@ -214,20 +219,10 @@
     font-size: 0.875rem;
     padding: 0;
     transition: all 0.2s ease;
-    z-index: 10;
+    /* Over the tab bar it overlaps (#app-tab-bar is at 1000, css/tabs.css),
+       under the menus and modals */
+    z-index: 1001;
     box-shadow: 0 2px 4px rgba(var(--pz-shadow-rgb), 0.05);
-    opacity: 1;
-    pointer-events: auto;
-}
-
-body:not(.outline-collapsed) .toggle-outline-btn {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.outline-resize-handle:hover .toggle-outline-btn,
-.toggle-outline-btn:focus {
     opacity: 1;
     pointer-events: auto;
 }
@@ -257,18 +252,19 @@ body.outline-collapsed .toggle-outline-btn:disabled {
     box-shadow: none;
 }
 
-.toggle-outline-btn i {
-    transition: transform 0.3s ease;
-    width: 12px;
-    height: 12px;
-}
-
-.toggle-outline-btn .lucide,
-.toggle-outline-btn [class*="lucide-"] {
+/* The icon takes the button's colour, hover included, and keeps its rotation:
+   the global [class*="lucide-"]:hover (css/icons.css, and its dark twin at
+   (0,3,1) in css/dark-mode/icons.css) would whiten and grow the icon alone,
+   and its scale() would replace the collapsed state's rotate(). The id
+   outweighs both. */
+#toggleOutlineBtn .lucide {
     display: inline-block;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
+    color: inherit;
     background-color: currentColor;
+    transform: none;
+    transition: transform 0.3s ease;
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%;
     filter: none;
@@ -288,18 +284,29 @@ body.outline-collapsed .outline-resize-handle {
     cursor: default;
 }
 
-html.outline-collapsed .toggle-outline-btn,
-body.outline-collapsed .toggle-outline-btn {
-    right: 3px;
-    border-radius: var(--pz-radius-sm) 0 0 var(--pz-radius-sm);
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
+/* Nothing to drag: and against the window's edge the wider hit area reached
+   14px past it, a sideways scroll on pages that scroll their body (diary.php) */
+html.outline-collapsed .outline-resize-handle::before,
+body.outline-collapsed .outline-resize-handle::before {
+    display: none;
 }
 
-html.outline-collapsed .toggle-outline-btn i,
-body.outline-collapsed .toggle-outline-btn i {
+html.outline-collapsed #toggleOutlineBtn .lucide,
+body.outline-collapsed #toggleOutlineBtn .lucide {
     transform: rotate(180deg);
+}
+
+@media (min-width: 801px) {
+    /* Room the tab bar leaves at its right end for the toggle above */
+    html {
+        --pz-outline-toggle-room: 20px;
+    }
+
+    /* The toggle opens and closes the panel from the same place: no second
+       button in the panel. Phones keep the cross, they have no toggle. */
+    .outline-close-btn {
+        display: none;
+    }
 }
 
 /* Mobile: Hide resize handle and toggle button, but keep panel accessible via swipe */
@@ -383,6 +390,10 @@ body.kanban-active .toggle-outline-btn {
     display: none !important;
 }
 
+body.kanban-active {
+    --pz-outline-toggle-room: 0px;
+}
+
 /* Same when no note is open: nothing to outline (issue #1494).
    js/outline-panel.js sets the class, index.php before the first paint */
 html.outline-no-note #outline-panel,
@@ -390,6 +401,10 @@ html.outline-no-note .outline-resize-handle,
 html.outline-no-note .toggle-outline-btn,
 html.outline-no-note .outline-mobile-backdrop {
     display: none !important;
+}
+
+html.outline-no-note {
+    --pz-outline-toggle-room: 0px;
 }
 
 html[data-theme='dark'] #outline-panel {
@@ -421,13 +436,15 @@ html[data-theme='dark'] .outline-resize-handle {
 }
 
 html[data-theme='dark'] .toggle-outline-btn {
-    background: var(--pz-sidebar-surface);
+    background: var(--pz-surface);
     border-color: var(--pz-border);
+    color: var(--pz-text);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:hover {
     background: var(--pz-surface-hover);
     color: var(--pz-accent-text);
+    box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.3);
 }
 
 html[data-theme='dark'] .toggle-outline-btn:disabled,

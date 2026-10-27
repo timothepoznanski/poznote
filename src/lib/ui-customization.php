@@ -536,6 +536,8 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 // The floating stack and the scroll arrows sit left of the
                 // outline column (css/notes/noteentry.css): give them the edge.
                 $rules[] = 'html { --pz-docked-outline: 0px !important; }';
+                // No toggle at the right end of the tab bar to make room for
+                $rules[] = 'html { --pz-outline-toggle-room: 0px !important; }';
             } elseif ($id === 'note-scrollbar') {
                 // The note's thin scrollbar (css/layout.css, #1544), in the
                 // note column and the markdown split panes, gutter included.

@@ -330,7 +330,9 @@
 }
 
 /* Collapse toggle: sits at the very bottom, just right of the rail's divider
-   (level with the mini calendar). Stays put when the rail is hidden. */
+   (level with the mini calendar). Stays put when the rail is hidden. Same
+   size, colours and hover as .toggle-sidebar-btn (css/layout.css) and
+   .toggle-outline-btn (css/outline.css), issue #1687. */
 #iconSidebarToggle {
     position: fixed;
     bottom: 0;
@@ -339,7 +341,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 16px;
+    width: 20px;
     height: 25px;
     padding: 0;
     border: 1px solid var(--pz-border-strong);
@@ -366,8 +368,8 @@
    [class*="lucide-"]:hover of css/icons.css would light and grow the icon
    alone, and a tap on a phone leaves that hover stuck on it */
 #iconSidebarToggle .lucide {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     color: inherit;
     background-color: currentColor;
     transform: none;
@@ -448,7 +450,7 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
         top: 50%;
         left: 0;
         transform: translateY(-50%);
-        width: 16px;
+        width: 20px;
         height: 44px;
         display: flex;
         align-items: center;
@@ -471,8 +473,8 @@ body.icon-sidebar-collapsed #iconSidebarToggle .lucide {
 
     /* Lucide icons are masks: they take their colour from background-color */
     html.focus-mode .focus-mode-edge-handle .lucide {
-        width: 12px;
-        height: 12px;
+        width: 14px;
+        height: 14px;
         background-color: currentColor;
     }
 

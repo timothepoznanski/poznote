@@ -485,6 +485,7 @@
                     // The floating stack and the scroll arrows sit left of the
                     // outline column (css/notes/noteentry.css): give them the edge.
                     rules.push('html { --pz-docked-outline: 0px !important; }');
+                    rules.push('html { --pz-outline-toggle-room: 0px !important; }');
                 } else if (id === 'note-scrollbar') {
                     // The note's thin scrollbar (css/layout.css, #1544); see
                     // lib/ui-customization.php.
