@@ -40,7 +40,8 @@
         'pt': 'pt-BR',
         'ru': 'ru-RU',
         'zh-cn': 'zh-CN',
-        'ko': 'ko-KR'
+        'ko': 'ko-KR',
+        'ja': 'ja-JP'
     };
 
     // Translation texts

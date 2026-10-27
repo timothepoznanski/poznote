@@ -7,7 +7,8 @@
   <a href="README.pt.md">Português</a> ·
   <a href="README.ru.md">Русский</a> ·
   <a href="README.zh-cn.md">简体中文</a> ·
-  <a href="README.ko.md">한국어</a>
+  <a href="README.ko.md">한국어</a> ·
+  <a href="README.ja.md">日本語</a>
 </p>
 <!-- /lang-selector -->
 
@@ -683,7 +684,7 @@ Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschied
 &nbsp;
 
 *   **Funktion:** Verwenden Sie vorformulierte Inhalte wieder, um Ihre Dokumentation zu vereinheitlichen, von der vollständigen Notiz bis zum kurzen Textbaustein.
-*   **Einrichtung:** Legen Sie die Notizen, die Sie wiederverwenden möchten, in einen Ordner namens `Templates` (Unterordner sind erlaubt). Ein Arbeitsbereich namens `Templates` funktioniert ebenfalls und steht in jedem Arbeitsbereich zur Verfügung. Der Name wird auch in der Sprache der Oberfläche erkannt (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
+*   **Einrichtung:** Legen Sie die Notizen, die Sie wiederverwenden möchten, in einen Ordner namens `Templates` (Unterordner sind erlaubt). Ein Arbeitsbereich namens `Templates` funktioniert ebenfalls und steht in jedem Arbeitsbereich zur Verfügung. Der Name wird auch in der Sprache der Oberfläche erkannt (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`, `템플릿`, `テンプレート`).
 *   **In eine Notiz einfügen:** Tippen Sie in einer Rich-Text- oder Markdown-Notiz `/template` (oder `/` gefolgt vom Titel der Vorlage) und wählen Sie eine Vorlage aus: Ihr Inhalt wird an der Cursorposition eingefügt und umgewandelt, falls Vorlage und Notiz nicht vom selben Typ sind.
 *   **Neue Notiz aus einer Vorlage:** Duplizieren Sie die Vorlagennotiz, oder duplizieren Sie einen ganzen `Templates`-Ordner, um ein Projekt mit einer fertigen Ordnerstruktur zu beginnen.
 </details>

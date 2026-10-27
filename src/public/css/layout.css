@@ -343,12 +343,14 @@ body {
 
 /* Toggle sidebar button. Hangs off the handle's right edge into #right_pane,
    since the handle itself has no width to sit inside. The collapsed state
-   moves it clear of the icon rail's own toggle further down. */
+   moves it clear of the icon rail's own toggle further down. Same size,
+   colours and hover as #iconSidebarToggle (css/icon-sidebar.css) and
+   .toggle-outline-btn (css/outline.css), issue #1687. */
 .toggle-sidebar-btn {
     position: absolute;
     bottom: 0px;
     left: 0;
-    width: 16px;
+    width: 20px;
     height: 25px;
     background: var(--pz-bg);
     border: 1px solid var(--pz-border-strong);
@@ -379,18 +381,19 @@ body {
     box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.1);
 }
 
-.toggle-sidebar-btn i {
-    transition: transform 0.3s ease;
-    width: 12px;
-    height: 12px;
-}
-
-.toggle-sidebar-btn .lucide,
-.toggle-sidebar-btn [class*="lucide-"] {
+/* The icon takes the button's colour, hover included, and keeps its rotation:
+   the global [class*="lucide-"]:hover (css/icons.css, and its dark twin at
+   (0,3,1) in css/dark-mode/icons.css) would whiten and grow the icon alone,
+   and its scale() would replace the collapsed state's rotate(). The id
+   outweighs both. */
+#toggleSidebarBtn .lucide {
     display: inline-block;
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
+    color: inherit;
     background-color: currentColor;
+    transform: none;
+    transition: transform 0.3s ease;
     -webkit-mask-size: 100% 100%;
     mask-size: 100% 100%;
     filter: none;
@@ -411,18 +414,18 @@ body.sidebar-collapsed .resize-handle {
 
 /* Collapsed, the handle sits flush against the icon rail (or against the
    viewport edge when the rail is hidden too), which is exactly where
-   #iconSidebarToggle is pinned: same bottom, same origin, 16px wide, and a
+   #iconSidebarToggle is pinned: same bottom, same origin, 20px wide, and a
    higher z-index. Clear its width plus a gap so both stay clickable side by
    side, rail toggle first. See #iconSidebarToggle in css/icon-sidebar.css. */
 body.sidebar-collapsed .toggle-sidebar-btn {
-    left: 20px;
+    left: 24px;
     border-radius: 0 var(--pz-radius-sm) var(--pz-radius-sm) 0;
     opacity: 1;
     pointer-events: auto;
     z-index: 12;
 }
 
-body.sidebar-collapsed .toggle-sidebar-btn i {
+body.sidebar-collapsed #toggleSidebarBtn .lucide {
     transform: rotate(180deg);
 }
 

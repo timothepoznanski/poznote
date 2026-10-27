@@ -393,31 +393,6 @@ function handleHeadingStartEnter(e, selection, noteentry) {
 }
 
 /**
- * Handle arrow down navigation from note entry to checklist
- * @param {Event} e - The keyboard event
- * @param {HTMLElement} noteentry - The note entry element
- */
-function handleNavigateToChecklist(e, noteentry) {
-    var selection = window.getSelection();
-
-    if (!isCursorAtEnd(noteentry, selection)) return;
-
-    var notecard = noteentry.closest('.notecard');
-    if (!notecard) return;
-
-    var firstChecklistItem = notecard.querySelector('li.checklist-item');
-    if (!firstChecklistItem) return;
-
-    e.preventDefault();
-
-    var textSpan = firstChecklistItem.querySelector('.checklist-text');
-    if (textSpan) {
-        textSpan.focus();
-        setCursorPosition(textSpan, 0, false);
-    }
-}
-
-/**
  * Insert a line break in the current code block while keeping the caret inside it.
  * Falls back to manual DOM insertion when execCommand is unavailable.
  * @param {Selection} selection - The current selection
@@ -1132,14 +1107,6 @@ function handleNoteEntryKeydown(e) {
                 document.execCommand('italic');
             }
             return;
-        }
-    }
-
-    // Handle ArrowDown navigation to checklist
-    if (e.key === 'ArrowDown') {
-        var noteentry = target.closest('.noteentry');
-        if (noteentry) {
-            handleNavigateToChecklist(e, noteentry);
         }
     }
 }

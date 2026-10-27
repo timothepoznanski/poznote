@@ -56,6 +56,33 @@ function execHtmlListCommand(ordered) {
   return document.execCommand(ordered ? 'insertOrderedList' : 'insertUnorderedList');
 }
 
+// Before a block goes in through insertHTML on an empty line: selects the
+// line break that holds the line open, when nothing follows it, so the
+// insertion replaces it. Firefox keeps it after the block otherwise, an empty
+// line under a checklist, a quote or a toggle that the note saves and where
+// ArrowDown then lands (issue #1686). Selected, it goes with the insertion
+// and Ctrl+Z still brings it back.
+function selectLineBreakAfterCaret() {
+  var sel = window.getSelection();
+  if (!sel || !sel.rangeCount || !sel.isCollapsed) return;
+
+  var caret = sel.getRangeAt(0);
+  var node = caret.startContainer;
+  var next;
+  if (node.nodeType === 3) {
+    if (node.textContent.slice(caret.startOffset).replace(/​/g, '') !== '') return;
+    next = node.nextSibling;
+  } else {
+    next = node.childNodes[caret.startOffset] || null;
+  }
+  if (!next || next.nodeName !== 'BR' || next.nextSibling) return;
+
+  var range = caret.cloneRange();
+  range.setEndAfter(next);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
 var HTML_HEADING_SELECTOR = 'h1, h2, h3, h4, h5, h6';
 
 function isHtmlHeadingBlockChild(node) {

@@ -631,6 +631,12 @@
       return;
     }
     
+    // While the slash menu is open, Enter and the arrows are its own: this
+    // listener runs first, and Enter used to split the item instead of
+    // running the command (issue #1686)
+    if ((event.key === 'Enter' || event.key === 'ArrowUp' || event.key === 'ArrowDown')
+      && document.querySelector('.slash-command-menu')) return;
+
     // Check if we're in a checklist-text
     const textSpan = findCurrentChecklistText();
     if (!textSpan) return;
@@ -795,6 +801,7 @@
       }
       document.execCommand('insertParagraph');
     }
+    if (typeof window.selectLineBreakAfterCaret === 'function') window.selectLineBreakAfterCaret();
 
     const marker = 'data-checklist-new';
     checklist.setAttribute(marker, '1');

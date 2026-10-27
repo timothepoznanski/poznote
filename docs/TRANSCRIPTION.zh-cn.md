@@ -7,7 +7,8 @@
   <a href="TRANSCRIPTION.pt.md">Português</a> ·
   <a href="TRANSCRIPTION.ru.md">Русский</a> ·
   <b>简体中文</b> ·
-  <a href="TRANSCRIPTION.ko.md">한국어</a>
+  <a href="TRANSCRIPTION.ko.md">한국어</a> ·
+  <a href="TRANSCRIPTION.ja.md">日本語</a>
 </p>
 <!-- /lang-selector -->
 

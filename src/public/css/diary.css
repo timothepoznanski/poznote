@@ -302,6 +302,10 @@ body.diary-journal-active {
     position: sticky;
     top: 0;
     align-self: flex-start;
+    /* The body's bottom padding (css/favorites.css) would stop them 20px short
+       of the page's end: scrolled to the bottom, they slid up with the page
+       and took the toggle at the top of the edge out of sight (#1687). */
+    margin-bottom: -20px;
 }
 
 body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outlineMobileBackdrop) {

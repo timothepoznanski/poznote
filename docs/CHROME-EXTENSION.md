@@ -7,7 +7,8 @@
   <a href="CHROME-EXTENSION.pt.md">Português</a> ·
   <a href="CHROME-EXTENSION.ru.md">Русский</a> ·
   <a href="CHROME-EXTENSION.zh-cn.md">简体中文</a> ·
-  <a href="CHROME-EXTENSION.ko.md">한국어</a>
+  <a href="CHROME-EXTENSION.ko.md">한국어</a> ·
+  <a href="CHROME-EXTENSION.ja.md">日本語</a>
 </p>
 <!-- /lang-selector -->
 
@@ -32,7 +33,7 @@ To change any of this later, click the gear icon at the top of the extension.
 
 The address of your instance, shown next to it, is a link: click it to open Poznote in a new tab, over http or https as you typed it in the settings.
 
-The extension speaks Chrome's language when it is English, French, German, Spanish, Portuguese, Russian, Korean or Simplified Chinese, and English otherwise.
+The extension speaks Chrome's language when it is English, French, German, Spanish, Portuguese, Russian, Korean, Simplified Chinese or Japanese, and English otherwise.
 
 Your account password works here too, but an app password is the better credential for an extension: it reaches the API only, never the web interface or your account settings, it is limited to your own profile, and revoking it in Poznote cuts the extension off without changing anything else. See [App Passwords](../README.md#app-passwords) for the full list of limits.
 

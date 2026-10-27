@@ -10,7 +10,8 @@
     display: flex;
     align-items: flex-end;
     gap: 4px;
-    padding: 6px 8px 0;
+    /* The outline's toggle sits at the right end of the bar (css/outline.css) */
+    padding: 6px calc(8px + var(--pz-outline-toggle-room, 0px)) 0 8px;
     background: var(--pz-tabbar-bg);
     border-bottom: 1px solid var(--pz-border);
     flex-shrink: 0;
