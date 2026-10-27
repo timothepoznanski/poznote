@@ -592,6 +592,12 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :
     cursor: pointer;
 }
 
+/* Ctrl/Cmd held over a link: a click follows it (live-preview.js, sourceLinkClicks) */
+.markdown-codemirror-host .cm-content.cm-mod-link-hover,
+.markdown-codemirror-host .cm-content.cm-mod-link-hover * {
+    cursor: pointer;
+}
+
 /* A colour or a highlight chosen with nothing selected: a short mark in that
    colour where the text will go (the style comes from the tag itself) */
 .markdown-codemirror-host .cm-live-preview .cm-live-pair-color {

@@ -358,6 +358,7 @@ body.mobile-keyboard-open .slash-command-menu {
 }
 
 body.mobile-formatting-toolbar-active #linkModal.modal,
+body.mobile-keyboard-open #linkModal.modal,
 body.mobile-formatting-toolbar-active #tagsModal.modal,
 body.mobile-keyboard-open #tagsModal.modal,
 body.mobile-formatting-toolbar-active #linkedNoteSelectorModal.modal,
@@ -388,6 +389,7 @@ body.mobile-keyboard-open #templatePickerModal.modal {
 }
 
 body.mobile-formatting-toolbar-active #linkModal .modal-content,
+body.mobile-keyboard-open #linkModal .modal-content,
 body.mobile-formatting-toolbar-active #tagsModal .modal-content,
 body.mobile-keyboard-open #tagsModal .modal-content,
 body.mobile-formatting-toolbar-active #linkedNoteSelectorModal .modal-content,

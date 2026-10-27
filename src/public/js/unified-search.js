@@ -1020,8 +1020,11 @@ class SearchManager {
         // Parse search terms with support for quoted phrases
         const searchTerms = this.parseSearchTermsForValidation(searchValue);
 
-        // Check if all terms are single characters (excluding quoted phrases)
-        const allSingleChar = searchTerms.every(term => term.length === 1);
+        // Check if all terms are single characters (excluding quoted phrases).
+        // A single Han or Hangul character is often a whole word (猫, 雪, 물),
+        // so it is not refused like a single Latin letter.
+        const wholeWordChar = /^[\p{Script=Han}\p{Script=Hangul}]$/u;
+        const allSingleChar = searchTerms.every(term => term.length === 1 && !wholeWordChar.test(term));
 
         if (allSingleChar && searchTerms.length > 0) {
             this.showValidationError(
