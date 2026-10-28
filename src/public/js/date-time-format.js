@@ -68,6 +68,14 @@
             "days_short": ["日", "月", "火", "水", "木", "金", "土"],
             "months": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
             "short": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"]
+        },
+        "ca": {
+            "layout": "{wd}, {d} {month} de {y}",
+            "days": ["Diumenge", "Dilluns", "Dimarts", "Dimecres", "Dijous", "Divendres", "Dissabte"],
+            "days_short": ["Dg.", "Dl.", "Dt.", "Dc.", "Dj.", "Dv.", "Ds."],
+            "months": ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"],
+            "short": ["gen.", "febr.", "març", "abr.", "maig", "juny", "jul.", "ag.", "set.", "oct.", "nov.", "des."],
+            "months_in_date": ["de gener", "de febrer", "de març", "d'abril", "de maig", "de juny", "de juliol", "d'agost", "de setembre", "d'octubre", "de novembre", "de desembre"]
         }
     }
     /* date-names:end */;
@@ -82,7 +90,7 @@
         var names = getDateNames();
         var parts = {
             '{wd}': names.days[date.getDay()],
-            '{month}': names.months[date.getMonth()],
+            '{month}': (names.months_in_date || names.months)[date.getMonth()],
             '{m}': String(date.getMonth() + 1),
             '{d}': String(date.getDate()),
             '{y}': String(date.getFullYear())

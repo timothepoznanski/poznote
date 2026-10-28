@@ -598,6 +598,7 @@ if ($canUseUserWebhooks) {
                         <label class="home-card-title" for="language-select"><?php echo t_h('settings.language.label'); ?></label>
                         <select id="language-select" class="settings-inline-control settings-inline-select" data-control="language-select">
                             <?php foreach ([
+                                'ca' => 'settings.language.catalan',
                                 'zh-cn' => 'settings.language.chinese_simplified',
                                 'en' => 'settings.language.english',
                                 'fr' => 'settings.language.french',

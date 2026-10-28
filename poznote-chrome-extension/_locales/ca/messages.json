@@ -1,0 +1,224 @@
+{
+  "extName": {
+    "message": "Poznote URL Saver"
+  },
+  "extDescription": {
+    "message": "Desa l'URL o una captura de pantalla de la pàgina actual a Poznote, com a nota nova o al final d'una nota existent."
+  },
+  "optionsTitle": {
+    "message": "Paràmetres de Poznote URL Saver"
+  },
+  "settings": {
+    "message": "Paràmetres"
+  },
+  "connectTitle": {
+    "message": "Connexió a Poznote"
+  },
+  "connectText": {
+    "message": "Enllaceu una vegada l'extensió a la vostra instància de Poznote i deseu qualsevol pàgina amb un sol clic."
+  },
+  "connect": {
+    "message": "Connecta"
+  },
+  "reconnect": {
+    "message": "Torna a connectar"
+  },
+  "lostAccessText": {
+    "message": "L'extensió ha perdut l'accés a la vostra instància de Poznote. Torneu-la a connectar per continuar desant pàgines."
+  },
+  "openPoznote": {
+    "message": "Obre Poznote"
+  },
+  "openPoznoteTitle": {
+    "message": "Obre Poznote ($1 a $2)"
+  },
+  "destination": {
+    "message": "Destinació"
+  },
+  "modeNew": {
+    "message": "Nota nova"
+  },
+  "modeNewTitle": {
+    "message": "Desa la pàgina com a nota nova"
+  },
+  "modeAppend": {
+    "message": "Nota existent"
+  },
+  "modeAppendTitle": {
+    "message": "Afegeix la pàgina al final d'una nota"
+  },
+  "change": {
+    "message": "Canvia"
+  },
+  "searchNotes": {
+    "message": "Cerca a les notes"
+  },
+  "allWorkspaces": {
+    "message": "Tots els espais de treball"
+  },
+  "notes": {
+    "message": "Notes"
+  },
+  "saveLink": {
+    "message": "Desa l'enllaç"
+  },
+  "saveLinkTitle": {
+    "message": "Desa l'adreça de la pàgina"
+  },
+  "screenshot": {
+    "message": "Captura de pantalla"
+  },
+  "screenshotTitle": {
+    "message": "Desa l'enllaç amb una captura de pantalla de la part visible de la pàgina"
+  },
+  "loadingNotes": {
+    "message": "S'estan carregant les notes..."
+  },
+  "notesLoadFailed": {
+    "message": "No s'han pogut carregar les notes."
+  },
+  "noNoteMatches": {
+    "message": "Cap nota no coincideix."
+  },
+  "noNoteYet": {
+    "message": "Encara no hi ha cap nota."
+  },
+  "pageCannotBeSaved": {
+    "message": "Aquesta pàgina no es pot desar."
+  },
+  "pickNote": {
+    "message": "Trieu la nota on voleu afegir la pàgina."
+  },
+  "capturing": {
+    "message": "S'està capturant la pàgina..."
+  },
+  "screenshotFailed": {
+    "message": "No s'ha pogut fer la captura de pantalla: $1"
+  },
+  "addingTo": {
+    "message": "S'està afegint a $1..."
+  },
+  "addedTo": {
+    "message": "S'ha afegit a $1."
+  },
+  "open": {
+    "message": "Obre"
+  },
+  "creatingNote": {
+    "message": "S'està creant la nota..."
+  },
+  "untitledPage": {
+    "message": "Pàgina sense títol"
+  },
+  "noteCreated": {
+    "message": "S'ha creat la nota."
+  },
+  "optionsIntro": {
+    "message": "Deseu les pàgines que visiteu a la vostra instància de Poznote."
+  },
+  "connection": {
+    "message": "Connexió"
+  },
+  "disconnect": {
+    "message": "Desconnecta"
+  },
+  "poznoteAddress": {
+    "message": "Adreça de Poznote"
+  },
+  "username": {
+    "message": "Nom d'usuari"
+  },
+  "appPassword": {
+    "message": "Contrasenya d'aplicació"
+  },
+  "appPasswordHint": {
+    "message": "Creeu-ne una a Poznote, a $1. Només dona accés a l'API i es pot revocar en qualsevol moment. La contrasenya del compte també funciona."
+  },
+  "appPasswordsPath": {
+    "message": "Paràmetres > El meu compte > Contrasenyes d'aplicació"
+  },
+  "whereNewNotesGo": {
+    "message": "On es desen les notes noves"
+  },
+  "workspace": {
+    "message": "Espai de treball"
+  },
+  "folder": {
+    "message": "Carpeta"
+  },
+  "footerConnected": {
+    "message": "Tot a punt: feu clic a la icona de Poznote de la barra d'eines en qualsevol pàgina per desar-la."
+  },
+  "footerNotConnected": {
+    "message": "Un cop connectada, feu clic a la icona de Poznote de la barra d'eines en qualsevol pàgina per desar-la."
+  },
+  "saved": {
+    "message": "S'ha desat"
+  },
+  "connectedAs": {
+    "message": "Connectat com a $1"
+  },
+  "wrongCredentials": {
+    "message": "El nom d'usuari o la contrasenya no són correctes."
+  },
+  "unreachable": {
+    "message": "No s'ha pogut accedir a $1. Comproveu l'adreça i que la instància estigui en funcionament."
+  },
+  "noInstance": {
+    "message": "No respon cap instància de Poznote a $1. Comproveu l'adreça."
+  },
+  "loading": {
+    "message": "S'està carregant..."
+  },
+  "noFolder": {
+    "message": "Sense carpeta"
+  },
+  "fillAddressFirst": {
+    "message": "Primer introduïu l'adreça de Poznote."
+  },
+  "fillAllFields": {
+    "message": "Introduïu l'adreça, el nom d'usuari i la contrasenya d'aplicació."
+  },
+  "invalidAddress": {
+    "message": "Aquesta adreça no és vàlida."
+  },
+  "waitingAccess": {
+    "message": "S'està esperant l'accés a la vostra instància..."
+  },
+  "accessDenied": {
+    "message": "L'extensió necessita accés a $1 per desar pàgines. Torneu a fer clic a Connecta i trieu Permet."
+  },
+  "checkingCredentials": {
+    "message": "S'estan comprovant les credencials..."
+  },
+  "noAccount": {
+    "message": "No hi ha cap compte anomenat $1 en aquesta instància."
+  },
+  "loadingWorkspaces": {
+    "message": "S'estan carregant els espais de treball..."
+  },
+  "lostAccessOptions": {
+    "message": "L'extensió ha perdut l'accés a la vostra instància. Feu clic a Connecta per tornar-li a permetre."
+  },
+  "errorStatus": {
+    "message": "Error $1: $2"
+  },
+  "untitled": {
+    "message": "Sense títol"
+  },
+  "uploadFailed": {
+    "message": "No s'ha pogut pujar"
+  },
+  "unsupportedNoteType": {
+    "message": "Les pàgines només es poden afegir a notes HTML o Markdown."
+  },
+  "noteChanged": {
+    "message": "La nota ha canviat mentrestant; torneu-ho a provar."
+  },
+  "noteKeepsChanging": {
+    "message": "La nota no para de canviar; torneu-ho a provar d'aquí a un moment."
+  },
+  "pageScreenshot": {
+    "message": "Captura de pantalla de la pàgina"
+  }
+}
