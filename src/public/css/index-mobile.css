@@ -114,6 +114,16 @@ body {
     flex-direction: row !important;
 }
 
+/* iOS and iPadOS (WebKit, the only engine that knows -webkit-touch-callout)
+   have no implicit root scroller, so the extra pixel above buys nothing there:
+   <body> keeps the exact size of the screen it had before 6.130.0. Suspected
+   in issue #1692, where taps stopped reaching the page after a note opened. */
+@supports (-webkit-touch-callout: none) {
+    body {
+        height: 100% !important;
+    }
+}
+
 body::-webkit-scrollbar {
     display: none !important;
     /* Chrome, Safari and Opera */
