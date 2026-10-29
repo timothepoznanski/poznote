@@ -1910,6 +1910,17 @@
         main.appendChild(body);
         row.appendChild(main);
 
+        if (options.downloadUrl) {
+            var download = document.createElement('a');
+            download.className = 'custom-css-theme-download';
+            download.href = options.downloadUrl;
+            download.download = options.value;
+            download.title = tr('common.download', {}, 'Download');
+            download.setAttribute('aria-label', download.title + ': ' + options.label);
+            download.innerHTML = '<i class="lucide lucide-download" aria-hidden="true"></i>';
+            row.appendChild(download);
+        }
+
         if (options.deletable) {
             var del = document.createElement('button');
             del.type = 'button';
@@ -1954,6 +1965,7 @@
                 label: theme.filename,
                 meta: meta,
                 selected: customCssSelected === theme.filename,
+                downloadUrl: theme.url,
                 deletable: true
             }));
         });
