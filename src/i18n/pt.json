@@ -528,7 +528,8 @@
       "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo.",
       "markdown_view_cycle": "Escolha as visualizações que o botão de visualização de uma nota markdown percorre depois da visualização clássica (pré-visualização, com o lápis para editar). As visualizações não escolhidas são ignoradas. Se nenhuma for escolhida, o botão fica oculto. Num telemóvel o botão nunca passa ao modo dividido.",
       "connected_apps": "Conecte aplicativos de chat como ChatGPT ou Claude às suas notas pelo servidor MCP e desconecte-os quando quiser.",
-      "custom_logo": "Substituir o logótipo do Poznote pelo seu, para todos os utilizadores: no separador do navegador, na página de início de sessão, na barra de ícones e como ícone da aplicação instalada."
+      "custom_logo": "Substituir o logótipo do Poznote pelo seu, para todos os utilizadores: no separador do navegador, na página de início de sessão, na barra de ícones e como ícone da aplicação instalada.",
+      "two_factor_required": "Toda conta que entra com senha precisa usar a autenticação em dois fatores. Uma conta sem ela a configura no próximo login, e as sessões abertas sem ela são encerradas. A senha da conta deixa de funcionar pela API: os aplicativos usam uma senha de aplicativo. Os logins por SSO não são afetados, o provedor de identidade cuida do segundo fator deles."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "No telemóvel, a barra de ferramentas acima do teclado tem um botão + que abre o mesmo menu, seja qual for esta definição."
@@ -651,7 +652,8 @@
       "login_disabled": "Abrir sem login",
       "outbound_hosts": "Acesso à rede local",
       "connected_apps": "Aplicativos conectados",
-      "custom_logo": "Logótipo"
+      "custom_logo": "Logótipo",
+      "two_factor_required": "Exigir dois fatores"
     },
     "default_credentials": {
       "both": "Esta conta ainda usa o nome de usuário e a palavra-passe de origem. Qualquer pessoa que consiga aceder a esta instância pode entrar.",
@@ -705,6 +707,10 @@
     "custom_logo": {
       "status_default": "Poznote",
       "status_custom": "Personalizado"
+    },
+    "two_factor_required": {
+      "confirm": "Toda conta que entra com senha terá de configurar a autenticação em dois fatores no próximo login, e as sessões abertas sem ela são encerradas agora. Os aplicativos que usam a senha de uma conta pela API param de funcionar até usarem uma senha de aplicativo.",
+      "own_first": "Ative primeiro a autenticação em dois fatores na sua própria conta, no cartão Autenticação em dois fatores desta página."
     }
   },
   "workspaces": {
@@ -2635,7 +2641,10 @@
       "cancel": "Voltar ao login",
       "invalid_code": "Código incorreto. Tente novamente.",
       "expired": "A etapa de verificação expirou. Entre novamente.",
-      "too_many_tries": "Muitos códigos incorretos. Entre novamente."
+      "too_many_tries": "Muitos códigos incorretos. Entre novamente.",
+      "setup_notice": "A autenticação em dois fatores agora é obrigatória nesta instância. Entre para configurá-la.",
+      "enroll_intro": "A autenticação em dois fatores é obrigatória nesta instância. Configure-a para continuar.",
+      "enroll_submit": "Ativar e entrar"
     },
     "powered_by": "Com tecnologia {{link}}"
   },
@@ -3658,7 +3667,8 @@
         "enabled_detail": "A autenticação de dois fatores está ativada para este usuário.",
         "reset": "Desativar dois fatores",
         "confirm_reset": "Confirmar",
-        "reset_done": "Autenticação de dois fatores desativada. Este usuário agora entra apenas com a senha."
+        "reset_done": "Autenticação de dois fatores desativada. Este usuário agora entra apenas com a senha.",
+        "reset_done_required": "Autenticação em dois fatores desativada. Como ela é obrigatória, este usuário a configura novamente no próximo login."
       },
       "errors": {
         "cannot_delete_self": "Você não pode excluir seu próprio perfil",
@@ -4256,7 +4266,8 @@
       "disable_help": "Sua senha voltará a bastar para entrar. Confirme com sua senha e um código do aplicativo, ou um código de recuperação.",
       "code_or_recovery": "Código ou código de recuperação",
       "disable": "Desativar",
-      "close": "Fechar"
+      "close": "Fechar",
+      "required_by_admin": "Seu administrador exige a autenticação em dois fatores nesta instância, por isso ela não pode ser desativada. Se você perder seu dispositivo e seus códigos de recuperação, um administrador pode redefini-la."
     },
     "errors": {
       "invalid_code": "Código incorreto. Verifique o horário do seu aparelho e tente novamente.",

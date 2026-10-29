@@ -376,6 +376,101 @@ input[type="password"]::placeholder {
     text-decoration: underline;
 }
 
+/* Two-factor setup required by the administrator, then the recovery codes.
+   The QR code SVG paints its own white ground and quiet zone, so it stays
+   black on white in the dark themes: several authenticator apps refuse an
+   inverted code. */
+.totp-enroll-panel,
+.totp-enrolled-panel {
+    text-align: left;
+}
+
+.totp-enroll-help {
+    margin: 0 0 1rem;
+    text-align: center;
+    color: var(--pz-text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.totp-enroll-qr {
+    width: 200px;
+    max-width: 100%;
+    margin: 0 auto 1rem;
+    border-radius: var(--pz-radius-lg);
+    overflow: hidden;
+    line-height: 0;
+}
+
+.totp-enroll-qr svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.totp-enroll-secret-row,
+.totp-recovery-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.totp-enroll-secret {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text);
+    font-family: monospace;
+    font-size: 0.9rem;
+    user-select: all;
+}
+
+.totp-copy-button {
+    flex: 0 0 auto;
+    padding: 0.5rem 0.875rem;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
+    background: transparent;
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.totp-copy-button:hover {
+    background: rgba(var(--pz-shadow-rgb), 0.06);
+}
+
+.totp-recovery-list {
+    list-style: none;
+    margin: 0 0 0.75rem;
+    padding: 0.75rem 1rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.4rem 1rem;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+}
+
+.totp-recovery-list code {
+    color: var(--pz-text);
+    font-family: monospace;
+    font-size: 0.95rem;
+    user-select: all;
+}
+
+.totp-continue-button {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+
 .error {
     color: var(--pz-danger-text);
     margin-top: 0.5rem;

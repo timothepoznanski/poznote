@@ -543,6 +543,7 @@ Cada usuário pode ativar a autenticação de dois fatores (TOTP) em **Settings 
 - Ela protege o login com senha. Um login por SSO fica a cargo do provedor de identidade e do próprio segundo fator dele.
 - Enquanto estiver ativada, a API REST deixa de aceitar só a senha da conta: dê aos clientes uma [senha de aplicativo](#senhas-de-aplicativo), ou envie o código atual no cabeçalho `X-Poznote-OTP`.
 - Um administrador pode desativá-la para um usuário que perdeu o aparelho e os códigos de recuperação, em **Settings > Admin Tools > User Management** (janela da senha).
+- Um administrador pode torná-la obrigatória para toda conta que entra com senha, em **Settings > Admin Tools > Require two-factor**. Uma conta sem ela a configura no próximo login (QR code e primeiro código na página de login), as sessões abertas sem ela são encerradas, e o dono da conta não pode mais desativá-la. Os logins por SSO não são afetados.
 - Ativá-la ou desativá-la invalida os cookies "Remember me" existentes desse usuário.
 
 #### Senhas padrão

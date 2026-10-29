@@ -220,6 +220,12 @@ sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=
 
 `1`을 계정 ID로 바꾸세요(`sudo sqlite3 data/master.db "SELECT id, username FROM users;"`로 조회). 비밀번호만으로 다시 로그인할 수 있으며 해당 계정의 로그인 유지 쿠키는 무효화됩니다. **설정 > 2단계 인증**에서 다시 설정하세요.
 
+인스턴스에서 2단계 인증이 필수인 경우(**설정 > 관리자 도구 > 2단계 인증 필수**) 다음 로그인 때 바로 다시 설정하라는 요청이 나옵니다. 필수 설정 자체를 해제하려면:
+
+```bash
+sudo sqlite3 data/master.db "UPDATE global_settings SET value='0' WHERE key='two_factor_required';"
+```
+
 </details>
 
 <a id="the-app-stops-answering-under-load"></a>

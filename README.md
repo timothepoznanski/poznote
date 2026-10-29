@@ -543,6 +543,7 @@ Each user can turn on two-factor authentication (TOTP) from **Settings > Two-fac
 - It protects password sign-in. An SSO login is left to the identity provider and its own second factor.
 - While it is on, the REST API no longer accepts the account password on its own: give clients an [app password](#app-passwords), or send the current code in the `X-Poznote-OTP` header.
 - An administrator can turn it off for a user who lost both their device and their recovery codes, from **Settings > Admin Tools > User Management** (password dialog).
+- An administrator can make it mandatory for every account that signs in with a password, from **Settings > Admin Tools > Require two-factor**. An account without it sets it up at its next sign-in (QR code and first code on the login page), sessions opened without it end, and its owner can no longer turn it off. SSO sign-ins are not concerned.
 - Turning it on or off invalidates existing remember-me cookies for that user.
 
 #### Default passwords

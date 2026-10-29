@@ -60,7 +60,7 @@ components:
       # nosemgrep: yaml.openapi.security.use-of-basic-authentication.use-of-basic-authentication
       type: http
       scheme: basic
-      description: HTTP Basic Auth with the profile's username and either its account password (include X-User-ID for data endpoints) or an app password created in Settings > App passwords (X-User-ID implied; API only, no admin routes, no account management, works on SSO-only instances). When two-factor authentication is on for the account, the account password is only accepted together with the current code in the X-Poznote-OTP header.
+      description: HTTP Basic Auth with the profile's username and either its account password (include X-User-ID for data endpoints) or an app password created in Settings > App passwords (X-User-ID implied; API only, no admin routes, no account management, works on SSO-only instances). When two-factor authentication is on for the account, the account password is only accepted together with the current code in the X-Poznote-OTP header. When an administrator requires two-factor (global setting two_factor_required) and the account has not set it up yet, the account password is refused with 403 until the person signs in to the web interface once.
     BearerAuth:
       type: http
       scheme: bearer
@@ -5524,6 +5524,10 @@ paths:
                     type: string
                     nullable: true
                     enum: [sso_only, no_local_password]
+                  sso_login_available: { type: boolean }
+                  required_by_admin:
+                    type: boolean
+                    description: An administrator requires two-factor on the instance; it cannot be turned off
         '403':
           description: Requested with an app password
 
@@ -5639,7 +5643,7 @@ paths:
         '400':
           description: Incorrect code
         '403':
-          description: Wrong password, or requested with an app password
+          description: Wrong password, requested with an app password, or two-factor is required by the administrator (code required_by_admin)
         '409':
           description: Two-factor is not on
 
@@ -5979,7 +5983,8 @@ paths:
       summary: Switch a user's two-factor off (admin only)
       description: |
         For a user who lost their device and their recovery codes. They sign in with the password
-        alone afterwards. Recorded in the activity log.
+        alone afterwards, or set it up again at their next sign-in while two-factor is required on
+        the instance (setup_required_at_next_sign_in in the response). Recorded in the activity log.
         Requires admin privileges. Does NOT require X-User-ID header.
       parameters:
         - name: id

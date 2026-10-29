@@ -312,6 +312,7 @@ if ($isAdmin) {
         // instance configured through the environment variable.
         $settingsPageConfig['settings']['allow_executable_attachments'] = poznoteExecutableAttachmentsAllowed() ? '1' : '0';
         $settingsPageConfig['settings']['login_disabled'] = getGlobalSetting('login_disabled', '0') === '1' ? '1' : '0';
+        $settingsPageConfig['settings']['two_factor_required'] = getGlobalSetting('two_factor_required', '0') === '1' ? '1' : '0';
     } catch (Exception $e) {
         // Keep the page usable if the master database is temporarily unavailable.
         error_log('settings: failed: ' . $e->getMessage());
@@ -1603,6 +1604,18 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                         <span class="setting-status <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? 'enabled' : 'disabled'; ?>">
                             <?php echo (defined('OIDC_ENABLED') && OIDC_ENABLED) ? t_h('common.enabled', [], 'Enabled') : t_h('common.disabled', [], 'Disabled'); ?>
                         </span>
+                    </div>
+                </div>
+
+                <!-- Require two-factor (instance-wide, see isTwoFactorRequiredByAdmin()) -->
+                <div class="home-card" id="two-factor-required-card">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.two_factor_required', [], 'Every account that signs in with a password must use two-factor authentication. An account without it sets it up at its next sign-in, and sessions opened without it end. Its account password stops working through the API: apps use an app password instead. SSO sign-ins are not concerned, the identity provider handles their second factor.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-smartphone"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.two_factor_required', [], 'Require two-factor'); ?></span>
+                        <span id="two-factor-required-status" class="setting-status"><?php echo t_h('common.loading'); ?></span>
                     </div>
                 </div>
 

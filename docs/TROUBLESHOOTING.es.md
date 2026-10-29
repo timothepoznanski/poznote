@@ -220,6 +220,12 @@ sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=
 
 Sustituye `1` por el id de la cuenta (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` los lista). La contraseña sola vuelve a bastar para iniciar sesión, las cookies de «Remember me» emitidas para esa cuenta dejan de funcionar, y la autenticación de dos factores puede configurarse de nuevo desde **Settings > Two-factor authentication**.
 
+Si la autenticación de dos factores es obligatoria en la instancia (**Settings > Admin Tools > Require two-factor**), el siguiente inicio de sesión pide configurarla de nuevo de inmediato. Para levantar la obligación en sí:
+
+```bash
+sudo sqlite3 data/master.db "UPDATE global_settings SET value='0' WHERE key='two_factor_required';"
+```
+
 </details>
 
 <a id="the-app-stops-answering-under-load"></a>

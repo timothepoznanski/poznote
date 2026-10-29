@@ -206,7 +206,8 @@
       "diary_template": "Choose a note whose content every new diary entry of the {{workspace}} workspace starts with. The list shows the notes kept in a folder named Templates in that workspace. Each workspace has its own template.",
       "markdown_view_cycle": "Choose the views the view button of a markdown note goes through after the classic view (preview, with the pencil to edit). The views left out are skipped. With none chosen, the button is hidden. On a phone the button never goes to split mode.",
       "connected_apps": "Connect chat apps such as ChatGPT or Claude to your notes through the MCP server, and disconnect them at any time.",
-      "custom_logo": "Replace the Poznote logo with your own, for every user: in the browser tab, on the login page, in the icon rail and as the icon of the installed app."
+      "custom_logo": "Replace the Poznote logo with your own, for every user: in the browser tab, on the login page, in the icon rail and as the icon of the installed app.",
+      "two_factor_required": "Every account that signs in with a password must use two-factor authentication. An account without it sets it up at its next sign-in, and sessions opened without it end. Its account password stops working through the API: apps use an app password instead. SSO sign-ins are not concerned, the identity provider handles their second factor."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "On mobile, the toolbar above the keyboard has a + button that opens the same menu, whatever this is set to."
@@ -308,7 +309,8 @@
       "login_disabled": "Open without login",
       "outbound_hosts": "Local network access",
       "connected_apps": "Connected apps",
-      "custom_logo": "Logo"
+      "custom_logo": "Logo",
+      "two_factor_required": "Require two-factor"
     },
     "default_credentials": {
       "both": "This account still uses the username and the password it shipped with. Anyone who can reach this instance can sign in to it.",
@@ -378,6 +380,10 @@
     "custom_logo": {
       "status_default": "Poznote",
       "status_custom": "Custom"
+    },
+    "two_factor_required": {
+      "confirm": "Every account that signs in with a password will have to set up two-factor authentication at its next sign-in, and sessions opened without it end now. Apps that use an account password through the API stop working until they use an app password.",
+      "own_first": "Turn on two-factor authentication for your own account first, in the Two-factor authentication card of this page."
     }
   },
   "workspaces": {
@@ -2248,7 +2254,10 @@
       "cancel": "Back to sign in",
       "invalid_code": "Incorrect code. Try again.",
       "expired": "The verification step expired. Sign in again.",
-      "too_many_tries": "Too many incorrect codes. Sign in again."
+      "too_many_tries": "Too many incorrect codes. Sign in again.",
+      "setup_notice": "Two-factor authentication is now required on this instance. Sign in to set it up.",
+      "enroll_intro": "Two-factor authentication is required on this instance. Set it up to continue.",
+      "enroll_submit": "Turn on and sign in"
     },
     "powered_by": "Powered by {{link}}"
   },
@@ -3706,7 +3715,8 @@
         "enabled_detail": "Two-factor authentication is on for this user.",
         "reset": "Turn off two-factor",
         "confirm_reset": "Confirm",
-        "reset_done": "Two-factor authentication turned off. This user now signs in with their password alone."
+        "reset_done": "Two-factor authentication turned off. This user now signs in with their password alone.",
+        "reset_done_required": "Two-factor authentication turned off. Since it is required, this user sets it up again at their next sign-in."
       },
       "errors": {
         "cannot_delete_self": "You cannot delete your own profile",
@@ -3887,7 +3897,8 @@
       "disable_help": "Your password alone will sign you in again. Confirm with your password and a code from your app, or a recovery code.",
       "code_or_recovery": "Code or recovery code",
       "disable": "Turn off",
-      "close": "Close"
+      "close": "Close",
+      "required_by_admin": "Your administrator requires two-factor authentication on this instance, so it cannot be turned off. If you lose your device and your recovery codes, an administrator can reset it."
     },
     "errors": {
       "invalid_code": "Incorrect code. Check the time on your device and try again.",

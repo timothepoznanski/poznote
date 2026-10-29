@@ -220,6 +220,12 @@ sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=
 
 Замените `1` на id учётной записи (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` выводит их список). Для входа снова достаточно одного пароля, cookie «Remember me», выданные для этой учётной записи, перестают работать, а двухфакторную аутентификацию можно настроить заново в **Settings > Two-factor authentication**.
 
+Если на сервере двухфакторная аутентификация обязательна (**Settings > Admin Tools > Require two-factor**), при следующем входе сразу будет предложено настроить её заново. Чтобы снять само требование:
+
+```bash
+sudo sqlite3 data/master.db "UPDATE global_settings SET value='0' WHERE key='two_factor_required';"
+```
+
 </details>
 
 <a id="the-app-stops-answering-under-load"></a>

@@ -220,6 +220,12 @@ sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=
 
 `1`は対象のアカウントのidに置き換えます（idの一覧は`sudo sqlite3 data/master.db "SELECT id, username FROM users;"`で確認できます）。これでパスワードだけでログインできるようになり、そのアカウントに「30日間ログインしたままにする」で発行されたCookieは使えなくなります。2要素認証は「設定 > 2要素認証」から設定し直せます。
 
+インスタンスで2要素認証が必須になっている場合（**設定 > 管理ツール > 2要素認証を必須にする**）、次回のログイン時にすぐ設定し直すよう求められます。必須設定そのものを解除するには、次のコマンドを実行します。
+
+```bash
+sudo sqlite3 data/master.db "UPDATE global_settings SET value='0' WHERE key='two_factor_required';"
+```
+
 </details>
 
 <a id="the-app-stops-answering-under-load"></a>

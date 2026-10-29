@@ -528,7 +528,8 @@
       "diary_template": "Elija una nota cuyo contenido sirva de punto de partida para cada nueva entrada del diario del espacio de trabajo {{workspace}}. La lista muestra las notas guardadas en una carpeta llamada Plantillas (o Templates) de ese espacio. Cada espacio de trabajo tiene su propia plantilla.",
       "markdown_view_cycle": "Elija las vistas que recorre el botón de vista de una nota markdown después de la vista clásica (vista previa, con el lápiz para editar). Las vistas no elegidas se omiten. Si no se elige ninguna, el botón se oculta. En un teléfono el botón nunca pasa al modo dividido.",
       "connected_apps": "Conecta aplicaciones de chat como ChatGPT o Claude a tus notas a través del servidor MCP y desconéctalas cuando quieras.",
-      "custom_logo": "Sustituir el logo de Poznote por el suyo, para todos los usuarios: en la pestaña del navegador, en la página de inicio de sesión, en la barra de iconos y como icono de la aplicación instalada."
+      "custom_logo": "Sustituir el logo de Poznote por el suyo, para todos los usuarios: en la pestaña del navegador, en la página de inicio de sesión, en la barra de iconos y como icono de la aplicación instalada.",
+      "two_factor_required": "Toda cuenta que inicie sesión con contraseña debe usar la autenticación en dos pasos. Una cuenta que no la tenga la configura en su próximo inicio de sesión, y las sesiones abiertas sin ella se cierran. Su contraseña deja de funcionar a través de la API: las aplicaciones usan una contraseña de aplicación. Los inicios de sesión SSO no se ven afectados, el proveedor de identidad gestiona su segundo factor."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "En el móvil, la barra de herramientas sobre el teclado tiene un botón + que abre el mismo menú, sea cual sea este ajuste."
@@ -651,7 +652,8 @@
       "login_disabled": "Abrir sin iniciar sesión",
       "outbound_hosts": "Acceso a la red local",
       "connected_apps": "Aplicaciones conectadas",
-      "custom_logo": "Logo"
+      "custom_logo": "Logo",
+      "two_factor_required": "Exigir verificación en dos pasos"
     },
     "default_credentials": {
       "both": "Esta cuenta sigue usando el nombre de usuario y la contraseña predeterminados. Cualquiera que pueda acceder a esta instancia puede iniciar sesión.",
@@ -705,6 +707,10 @@
     "custom_logo": {
       "status_default": "Poznote",
       "status_custom": "Personalizado"
+    },
+    "two_factor_required": {
+      "confirm": "Toda cuenta que inicie sesión con contraseña tendrá que configurar la autenticación en dos pasos en su próximo inicio de sesión, y las sesiones abiertas sin ella se cierran ahora. Las aplicaciones que usan la contraseña de una cuenta a través de la API dejarán de funcionar hasta que usen una contraseña de aplicación.",
+      "own_first": "Activa primero la autenticación en dos pasos en tu propia cuenta, en la tarjeta Autenticación en dos pasos de esta página."
     }
   },
   "workspaces": {
@@ -2635,7 +2641,10 @@
       "cancel": "Volver al inicio de sesión",
       "invalid_code": "Código incorrecto. Inténtalo de nuevo.",
       "expired": "El paso de verificación ha caducado. Inicia sesión de nuevo.",
-      "too_many_tries": "Demasiados códigos incorrectos. Inicia sesión de nuevo."
+      "too_many_tries": "Demasiados códigos incorrectos. Inicia sesión de nuevo.",
+      "setup_notice": "La autenticación en dos pasos ahora es obligatoria en esta instancia. Inicia sesión para configurarla.",
+      "enroll_intro": "La autenticación en dos pasos es obligatoria en esta instancia. Configúrala para continuar.",
+      "enroll_submit": "Activar e iniciar sesión"
     },
     "powered_by": "Con la tecnología de {{link}}"
   },
@@ -3658,7 +3667,8 @@
         "enabled_detail": "La autenticación de dos factores está activada para este usuario.",
         "reset": "Desactivar dos factores",
         "confirm_reset": "Confirmar",
-        "reset_done": "Autenticación de dos factores desactivada. Este usuario inicia sesión ahora solo con su contraseña."
+        "reset_done": "Autenticación de dos factores desactivada. Este usuario inicia sesión ahora solo con su contraseña.",
+        "reset_done_required": "Autenticación en dos pasos desactivada. Como es obligatoria, este usuario la configurará de nuevo en su próximo inicio de sesión."
       },
       "errors": {
         "cannot_delete_self": "No puedes borrar tu propio perfil",
@@ -4256,7 +4266,8 @@
       "disable_help": "Tu contraseña volverá a bastar para iniciar sesión. Confirma con tu contraseña y un código de tu aplicación, o un código de recuperación.",
       "code_or_recovery": "Código o código de recuperación",
       "disable": "Desactivar",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "required_by_admin": "Tu administrador exige la autenticación en dos pasos en esta instancia, así que no se puede desactivar. Si pierdes tu dispositivo y tus códigos de recuperación, un administrador puede restablecerla."
     },
     "errors": {
       "invalid_code": "Código incorrecto. Comprueba la hora de tu dispositivo e inténtalo de nuevo.",

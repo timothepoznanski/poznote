@@ -48,9 +48,10 @@
         });
     }
 
-    // Only the two-factor step follows an accepted password on this page;
-    // any other render means the last attempt did not sign in.
-    if (!document.querySelector('.totp-challenge-form')) {
+    // Only the two-factor steps (the code, or its setup and then the recovery
+    // codes) follow an accepted password on this page; any other render means
+    // the last attempt did not sign in.
+    if (!document.querySelector('.totp-challenge-form, .totp-enroll-form, .totp-enrolled-panel')) {
         Store.clearPendingVerifier();
     }
 

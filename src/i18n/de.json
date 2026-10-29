@@ -528,7 +528,8 @@
       "diary_template": "Wählen Sie eine Notiz, mit deren Inhalt jeder neue Tagebucheintrag des Arbeitsbereichs {{workspace}} beginnt. Die Liste zeigt die Notizen in einem Ordner namens Vorlagen (oder Templates) dieses Arbeitsbereichs. Jeder Arbeitsbereich hat seine eigene Vorlage.",
       "markdown_view_cycle": "Wählen Sie die Ansichten, die der Ansichtsschalter einer Markdown-Notiz nach der klassischen Ansicht (Vorschau, mit dem Stift zum Bearbeiten) durchläuft. Nicht gewählte Ansichten werden übersprungen. Ist keine gewählt, wird der Schalter ausgeblendet. Auf einem Telefon wechselt der Schalter nie in die geteilte Ansicht.",
       "connected_apps": "Verbinden Sie Chat-Apps wie ChatGPT oder Claude über den MCP-Server mit Ihren Notizen und trennen Sie sie jederzeit.",
-      "custom_logo": "Das Poznote-Logo für alle Benutzer durch ein eigenes ersetzen: im Browser-Tab, auf der Anmeldeseite, in der Symbolleiste und als Symbol der installierten App."
+      "custom_logo": "Das Poznote-Logo für alle Benutzer durch ein eigenes ersetzen: im Browser-Tab, auf der Anmeldeseite, in der Symbolleiste und als Symbol der installierten App.",
+      "two_factor_required": "Jedes Konto, das sich mit einem Passwort anmeldet, muss die Zwei-Faktor-Authentifizierung nutzen. Ein Konto ohne sie richtet sie bei der nächsten Anmeldung ein, und ohne sie geöffnete Sitzungen werden beendet. Das Kontopasswort funktioniert nicht mehr über die API: Apps verwenden stattdessen ein App-Passwort. SSO-Anmeldungen sind nicht betroffen, der Identitätsanbieter verwaltet ihren zweiten Faktor."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Auf Mobilgeräten hat die Leiste über der Tastatur eine +-Schaltfläche, die unabhängig von dieser Einstellung dasselbe Menü öffnet."
@@ -651,7 +652,8 @@
       "login_disabled": "Ohne Anmeldung öffnen",
       "outbound_hosts": "Zugriff auf das lokale Netzwerk",
       "connected_apps": "Verbundene Apps",
-      "custom_logo": "Logo"
+      "custom_logo": "Logo",
+      "two_factor_required": "Zwei-Faktor erzwingen"
     },
     "default_credentials": {
       "both": "Dieses Konto verwendet noch den mitgelieferten Benutzernamen und das mitgelieferte Passwort. Jeder, der diese Instanz erreichen kann, kann sich anmelden.",
@@ -705,6 +707,10 @@
     "custom_logo": {
       "status_default": "Poznote",
       "status_custom": "Eigenes"
+    },
+    "two_factor_required": {
+      "confirm": "Jedes Konto, das sich mit einem Passwort anmeldet, muss bei der nächsten Anmeldung die Zwei-Faktor-Authentifizierung einrichten, und ohne sie geöffnete Sitzungen werden jetzt beendet. Apps, die ein Kontopasswort über die API verwenden, funktionieren nicht mehr, bis sie ein App-Passwort verwenden.",
+      "own_first": "Aktivieren Sie zuerst die Zwei-Faktor-Authentifizierung für Ihr eigenes Konto, in der Karte Zwei-Faktor-Authentifizierung auf dieser Seite."
     }
   },
   "workspaces": {
@@ -2635,7 +2641,10 @@
       "cancel": "Zurück zur Anmeldung",
       "invalid_code": "Falscher Code. Versuchen Sie es erneut.",
       "expired": "Der Bestätigungsschritt ist abgelaufen. Melden Sie sich erneut an.",
-      "too_many_tries": "Zu viele falsche Codes. Melden Sie sich erneut an."
+      "too_many_tries": "Zu viele falsche Codes. Melden Sie sich erneut an.",
+      "setup_notice": "Die Zwei-Faktor-Authentifizierung ist auf dieser Instanz jetzt Pflicht. Melden Sie sich an, um sie einzurichten.",
+      "enroll_intro": "Die Zwei-Faktor-Authentifizierung ist auf dieser Instanz Pflicht. Richten Sie sie ein, um fortzufahren.",
+      "enroll_submit": "Aktivieren und anmelden"
     },
     "powered_by": "Basiert auf {{link}}"
   },
@@ -3657,7 +3666,8 @@
         "enabled_detail": "Die Zwei-Faktor-Authentifizierung ist für diesen Benutzer aktiviert.",
         "reset": "Zwei-Faktor deaktivieren",
         "confirm_reset": "Bestätigen",
-        "reset_done": "Zwei-Faktor-Authentifizierung deaktiviert. Dieser Benutzer meldet sich jetzt nur mit seinem Passwort an."
+        "reset_done": "Zwei-Faktor-Authentifizierung deaktiviert. Dieser Benutzer meldet sich jetzt nur mit seinem Passwort an.",
+        "reset_done_required": "Zwei-Faktor-Authentifizierung deaktiviert. Da sie Pflicht ist, richtet dieser Benutzer sie bei der nächsten Anmeldung erneut ein."
       },
       "errors": {
         "cannot_delete_self": "Sie können Ihr eigenes Profil nicht löschen",
@@ -4255,7 +4265,8 @@
       "disable_help": "Ihr Passwort allein reicht dann wieder für die Anmeldung. Bestätigen Sie mit Ihrem Passwort und einem Code aus Ihrer App oder einem Wiederherstellungscode.",
       "code_or_recovery": "Code oder Wiederherstellungscode",
       "disable": "Deaktivieren",
-      "close": "Schließen"
+      "close": "Schließen",
+      "required_by_admin": "Ihr Administrator schreibt auf dieser Instanz die Zwei-Faktor-Authentifizierung vor, daher kann sie nicht deaktiviert werden. Wenn Sie Ihr Gerät und Ihre Wiederherstellungscodes verlieren, kann ein Administrator sie zurücksetzen."
     },
     "errors": {
       "invalid_code": "Falscher Code. Prüfen Sie die Uhrzeit Ihres Geräts und versuchen Sie es erneut.",

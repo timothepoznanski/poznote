@@ -127,12 +127,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action'] ?? '', ['
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
-// If already authenticated, redirect to home
-if (isAuthenticated()) {
+// Setting two-factor up when the administrator requires it (discussion #1478):
+// the password was accepted for an account that has no second factor, and
+// authenticate() parked the login with a new secret. A first code from the
+// app opens the account; the recovery codes are then shown on this page, once.
+$enrolledRecoveryCodes = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($_POST['action'] ?? '', ['totp_enroll', 'totp_enroll_cancel'], true)) {
+    if (!isset($_POST['csrf_token']) || !hash_equals($_SESSION['csrf_token'] ?? '', $_POST['csrf_token'])) {
+        $error = t('login.two_factor.invalid_code', [], 'Incorrect code. Try again.', $currentLang);
+    } elseif ($_POST['action'] === 'totp_enroll_cancel') {
+        cancelTotpEnrollment();
+    } elseif (getPendingTotpEnrollment() === null) {
+        $error = t('login.two_factor.expired', [], 'The verification step expired. Sign in again.', $currentLang);
+    } else {
+        $enrolledRecoveryCodes = completeTotpEnrollment((string)($_POST['totp_code'] ?? ''));
+        if ($enrolledRecoveryCodes === null && getPendingTotpLoginChallenge() === null) {
+            $error = getPendingTotpEnrollment() === null
+                ? t('login.two_factor.too_many_tries', [], 'Too many incorrect codes. Sign in again.', $currentLang)
+                : t('login.two_factor.invalid_code', [], 'Incorrect code. Try again.', $currentLang);
+        }
+    }
+
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+// If already authenticated, redirect to home (not before the recovery codes
+// of a setup that just finished are shown)
+if ($enrolledRecoveryCodes === null && isAuthenticated()) {
     poznoteRenderLoginRedirectAndExit($redirectAfter, $currentLang ?? 'en');
 }
 
-if (isAccountSelectionRequired()) {
+if ($enrolledRecoveryCodes === null && isAccountSelectionRequired()) {
     $accountSelectionProfiles = getPendingAccountSelectionProfiles();
     if (count($accountSelectionProfiles) === 1 && selectAuthenticatedAccount((int)$accountSelectionProfiles[0]['id'])) {
         poznoteRenderLoginRedirectAndExit($redirectAfter, $currentLang ?? 'en');
@@ -168,9 +193,9 @@ if ($_POST && ($_POST['action'] ?? '') !== 'select_account' && isset($_POST['use
         }
 
         poznoteRenderLoginRedirectAndExit($redirectAfter, $currentLang ?? 'en');
-    } elseif (getPendingTotpLoginChallenge() !== null) {
-        // Password accepted, second factor still owed: not an error, the page
-        // renders the code form below.
+    } elseif (getPendingTotpLoginChallenge() !== null || getPendingTotpEnrollment() !== null) {
+        // Password accepted, second factor (or its setup) still owed: not an
+        // error, the page renders the code form below.
     } else {
         $error = t('login.errors.invalid_credentials', [], 'Incorrect username or password.', $currentLang ?? 'en');
     }
@@ -179,10 +204,27 @@ if ($_POST && ($_POST['action'] ?? '') !== 'select_account' && isset($_POST['use
 }
 render_page:
 
-$renderAccountSelection = isAccountSelectionRequired();
+$renderEnrolledCodes = $enrolledRecoveryCodes !== null;
+$renderAccountSelection = !$renderEnrolledCodes && isAccountSelectionRequired();
 $accountSelectionProfiles = $renderAccountSelection ? getPendingAccountSelectionProfiles() : [];
 $authenticatedUser = $renderAccountSelection ? getAuthenticatedUser() : null;
-$renderTotpChallenge = !$renderAccountSelection && getPendingTotpLoginChallenge() !== null;
+$renderTotpChallenge = !$renderEnrolledCodes && !$renderAccountSelection && getPendingTotpLoginChallenge() !== null;
+$pendingTotpEnrollment = (!$renderEnrolledCodes && !$renderAccountSelection && !$renderTotpChallenge) ? getPendingTotpEnrollment() : null;
+$renderTotpEnrollment = $pendingTotpEnrollment !== null;
+$renderLoginStep = $renderAccountSelection || $renderTotpChallenge || $renderTotpEnrollment || $renderEnrolledCodes;
+
+// A session (or remember-me cookie) without a second factor, ended because
+// the administrator now requires one: said once, above the password form.
+$showTwoFactorSetupNotice = !$renderLoginStep && !empty($_SESSION['two_factor_setup_notice']);
+unset($_SESSION['two_factor_setup_notice']);
+
+$totpEnrollmentUri = '';
+if ($renderTotpEnrollment) {
+    require_once __DIR__ . '/../lib/totp.php';
+    $enrollmentProfile = getUserProfileById((int)$pendingTotpEnrollment['user_id']);
+    $totpIssuer = trim((string)$login_display_name) !== '' ? (string)$login_display_name : 'Poznote';
+    $totpEnrollmentUri = totpProvisioningUri((string)$pendingTotpEnrollment['secret'], (string)($enrollmentProfile['username'] ?? ''), $totpIssuer);
+}
 
 // OIDC error feedback
 if (isset($_GET['oidc_error'])) {
@@ -233,8 +275,11 @@ if (isset($_GET['oidc_error'])) {
     <link rel="manifest" href="<?php echo htmlspecialchars(poznoteManifestHref(poznoteAsset('pwa/manifest.webmanifest')), ENT_QUOTES); ?>">
     <script src="js/theme-init.js?v=<?php echo rawurlencode(poznoteGetThemeAssetVersion()); ?>"></script>
     <script src="<?php echo poznoteAsset('pwa/pwa.js'); ?>" defer></script>
-    <?php if (!$renderAccountSelection): // choosing an account is done signed in ?>
+    <?php if (!$renderAccountSelection && !$renderEnrolledCodes): // choosing an account, or reading the recovery codes, is done signed in ?>
     <script src="<?php echo poznoteAsset('js/push-signout.js'); ?>" defer></script>
+    <?php endif; ?>
+    <?php if ($renderTotpEnrollment): ?>
+    <script src="<?php echo poznoteAsset('js/qrcode-generator/qrcode.js'); ?>"></script>
     <?php endif; ?>
     <?php poznoteRenderStylesheets('login'); ?>
     <?php poznoteRenderBrandIcons(); ?>
@@ -249,7 +294,9 @@ if (isset($_GET['oidc_error'])) {
             <h1 class="login-title"><?php echo htmlspecialchars($login_display_name !== '' ? $login_display_name : 'Poznote'); ?></h1>
         </div>
 
-        <?php if (isset($_GET['expired']) && !$renderAccountSelection && !$renderTotpChallenge): ?>
+        <?php if ($showTwoFactorSetupNotice): ?>
+        <div class="info session-expired-notice"><?php echo t_h('login.two_factor.setup_notice', [], 'Two-factor authentication is now required on this instance. Sign in to set it up.', $currentLang); ?></div>
+        <?php elseif (isset($_GET['expired']) && !$renderLoginStep): ?>
         <div class="info session-expired-notice"><?php echo t_h('login.session_expired', [], 'Your session has ended. Sign in again to get back to where you were.', $currentLang); ?></div>
         <?php endif; ?>
 
@@ -270,7 +317,7 @@ if (isset($_GET['oidc_error'])) {
         $defaultAdminProfile = poznoteFindPristineDefaultProfile();
         $defaultAdminUsername = $defaultAdminProfile['username'] ?? null;
 
-        if ($defaultAdminUsername && !$renderTotpChallenge): 
+        if ($defaultAdminUsername && !$renderTotpChallenge && !$renderTotpEnrollment && !$renderEnrolledCodes):
         ?>
         <div class="admin-warning">
             <?php echo t('login.admin_warning', ['username' => $defaultAdminUsername], 'Please log in with the username <code>' . htmlspecialchars($defaultAdminUsername) . '</code> and the password <code>admin</code>. Once logged in, change your password immediately in the settings. You can also change your username.', $currentLang ?? 'en'); ?>
@@ -350,6 +397,64 @@ if (isset($_GET['oidc_error'])) {
                     <?php endif; ?>
                     <button type="submit" class="totp-cancel-button"><?php echo t_h('login.two_factor.cancel', [], 'Back to sign in', $currentLang); ?></button>
                 </form>
+            </div>
+        <?php elseif ($renderTotpEnrollment): ?>
+            <?php $totpEnrollmentSecret = (string)$pendingTotpEnrollment['secret']; ?>
+            <div class="totp-enroll-panel">
+                <p class="account-select-intro"><?php echo t_h('login.two_factor.enroll_intro', [], 'Two-factor authentication is required on this instance. Set it up to continue.', $currentLang); ?></p>
+                <p class="totp-enroll-help"><?php echo t_h('two_factor.modal.scan', [], 'Scan this QR code with your authenticator app, or enter the key by hand, then type the 6-digit code the app shows.', $currentLang); ?></p>
+
+                <!-- Drawn in the browser (js/login-page.js): the URI carries the
+                     secret and must not go to an online QR service. -->
+                <div class="totp-enroll-qr" id="totp-enroll-qr" data-otpauth-uri="<?php echo htmlspecialchars($totpEnrollmentUri, ENT_QUOTES); ?>" hidden></div>
+                <div class="totp-enroll-secret-row">
+                    <code class="totp-enroll-secret" id="totp-enroll-secret"><?php echo htmlspecialchars(trim(chunk_split($totpEnrollmentSecret, 4, ' ')), ENT_QUOTES); ?></code>
+                    <button type="button" class="totp-copy-button" data-copy-value="<?php echo htmlspecialchars($totpEnrollmentSecret, ENT_QUOTES); ?>" data-copy-select="totp-enroll-secret"
+                            data-copied-text="<?php echo t_h('two_factor.modal.copied', [], 'Copied', $currentLang); ?>"><?php echo t_h('two_factor.modal.copy', [], 'Copy', $currentLang); ?></button>
+                </div>
+
+                <form method="POST" class="totp-enroll-form" autocomplete="off">
+                    <input type="hidden" name="action" value="totp_enroll">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES); ?>">
+                    <?php if ($redirectAfter !== null): ?>
+                        <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirectAfter, ENT_QUOTES); ?>">
+                    <?php endif; ?>
+                    <div class="form-group">
+                        <?php // No autofocus: on a phone the keyboard would cover the QR code and the key. ?>
+                        <input type="text" id="totp_code" name="totp_code" class="totp-code-input" required
+                               inputmode="numeric" autocomplete="one-time-code" spellcheck="false" maxlength="16"
+                               placeholder="<?php echo t_h('two_factor.modal.code', [], '6-digit code', $currentLang); ?>">
+                        <?php if ($error): ?>
+                            <div class="error"><?php echo htmlspecialchars($error); ?></div>
+                        <?php endif; ?>
+                    </div>
+                    <button type="submit" class="login-button"><?php echo t_h('login.two_factor.enroll_submit', [], 'Turn on and sign in', $currentLang); ?></button>
+                </form>
+
+                <form method="POST" class="totp-cancel-form">
+                    <input type="hidden" name="action" value="totp_enroll_cancel">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES); ?>">
+                    <?php if ($redirectAfter !== null): ?>
+                        <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirectAfter, ENT_QUOTES); ?>">
+                    <?php endif; ?>
+                    <button type="submit" class="totp-cancel-button"><?php echo t_h('login.two_factor.cancel', [], 'Back to sign in', $currentLang); ?></button>
+                </form>
+            </div>
+        <?php elseif ($renderEnrolledCodes): ?>
+            <?php $enrolledCodesText = implode("\n", $enrolledRecoveryCodes); ?>
+            <div class="totp-enrolled-panel">
+                <p class="account-select-intro"><?php echo t_h('two_factor.modal.recovery_intro', [], 'Two-factor authentication is on. Keep these recovery codes somewhere safe, away from your phone: each one signs you in once if you lose your device. They will not be shown again.', $currentLang); ?></p>
+                <ul class="totp-recovery-list" id="totp-recovery-list">
+                    <?php foreach ($enrolledRecoveryCodes as $recoveryCode): ?>
+                        <li><code><?php echo htmlspecialchars($recoveryCode, ENT_QUOTES); ?></code></li>
+                    <?php endforeach; ?>
+                </ul>
+                <div class="totp-recovery-actions">
+                    <button type="button" class="totp-copy-button" data-copy-value="<?php echo htmlspecialchars($enrolledCodesText, ENT_QUOTES); ?>" data-copy-select="totp-recovery-list"
+                            data-copied-text="<?php echo t_h('two_factor.modal.copied', [], 'Copied', $currentLang); ?>"><?php echo t_h('two_factor.modal.copy', [], 'Copy', $currentLang); ?></button>
+                    <button type="button" class="totp-copy-button" id="totp-recovery-download" data-download-value="<?php echo htmlspecialchars($enrolledCodesText, ENT_QUOTES); ?>"><?php echo t_h('two_factor.modal.download', [], 'Download', $currentLang); ?></button>
+                </div>
+                <a class="login-button totp-continue-button" href="login.php<?php echo $redirectAfter !== null ? '?redirect=' . rawurlencode($redirectAfter) : ''; ?>"><?php echo t_h('two_factor.modal.saved_codes', [], 'I have saved my codes', $currentLang); ?></a>
             </div>
         <?php else: ?>
             <?php if ($showNormalLogin): ?>
@@ -436,10 +541,10 @@ if (isset($_GET['oidc_error'])) {
     </div>
     <?php
     $loginConfig = [
-        'focusOidc' => !$justLoggedOut && !$renderAccountSelection && !$renderTotpChallenge && !$passwordLoginVisible && function_exists('oidc_is_enabled') && oidc_is_enabled(),
+        'focusOidc' => !$justLoggedOut && !$renderLoginStep && !$passwordLoginVisible && function_exists('oidc_is_enabled') && oidc_is_enabled(),
         'showPasswordTitle' => t('login.show_password', [], 'Show password', $currentLang ?? 'en'),
         'hidePasswordTitle' => t('login.hide_password', [], 'Hide password', $currentLang ?? 'en'),
-        'oidcEnabled' => !$renderAccountSelection && !$renderTotpChallenge && function_exists('oidc_is_enabled') && oidc_is_enabled(),
+        'oidcEnabled' => !$renderLoginStep && function_exists('oidc_is_enabled') && oidc_is_enabled(),
         'redirectAfter' => $redirectAfter,
         // js/offline-login.js forgets this device's offline copies after a sign-out
         'justLoggedOut' => $justLoggedOut

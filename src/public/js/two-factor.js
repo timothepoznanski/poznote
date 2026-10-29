@@ -52,7 +52,8 @@
                 enabled_at: data.enabled_at || null,
                 recovery_codes_remaining: data.recovery_codes_remaining || 0,
                 unavailable_reason: data.unavailable_reason || null,
-                sso_login_available: !!data.sso_login_available
+                sso_login_available: !!data.sso_login_available,
+                required_by_admin: !!data.required_by_admin
             };
             renderBadge();
         }
@@ -360,6 +361,7 @@
         var remainingText = remaining === 1
             ? tr('two_factor.modal.recovery_remaining_one', {}, '1 recovery code left.')
             : tr('two_factor.modal.recovery_remaining_other', { count: remaining }, '{{count}} recovery codes left.');
+        var required = !!(status && status.required_by_admin);
         var since = status && status.enabled_at
             ? tr('two_factor.modal.enabled_since', { date: status.enabled_at }, 'Enabled since {{date}}.')
             : tr('two_factor.modal.enabled', {}, 'Two-factor authentication is on.');
@@ -376,16 +378,19 @@
             '</div>' +
             '<div class="two-factor-section">' +
                 '<div class="two-factor-section-title">' + esc(tr('two_factor.modal.disable_title', {}, 'Turn off')) + '</div>' +
-                '<p class="text-small-muted">' + esc(tr('two_factor.modal.disable_help', {}, 'Your password alone will sign you in again. Confirm with your password and a code from your app, or a recovery code.')) + '</p>' +
-                // Only the fields here: their button is the dialog's own action,
-                // next to Close, the way Delete Account places its red button.
-                '<div class="two-factor-row two-factor-fields">' +
-                    '<input type="password" id="tfDisablePassword" autocomplete="current-password" placeholder="' + esc(tr('two_factor.modal.current_password', {}, 'Current password')) + '">' +
-                    '<input type="text" id="tfDisableCode" class="two-factor-code" autocomplete="one-time-code" spellcheck="false" maxlength="16" placeholder="' + esc(tr('two_factor.modal.code_or_recovery', {}, 'Code or recovery code')) + '">' +
-                '</div>' +
+                (required
+                    // Required by the administrator: nothing to turn off here.
+                    ? '<p class="text-small-muted">' + esc(tr('two_factor.modal.required_by_admin', {}, 'Your administrator requires two-factor authentication on this instance, so it cannot be turned off. If you lose your device and your recovery codes, an administrator can reset it.')) + '</p>'
+                    : '<p class="text-small-muted">' + esc(tr('two_factor.modal.disable_help', {}, 'Your password alone will sign you in again. Confirm with your password and a code from your app, or a recovery code.')) + '</p>' +
+                      // Only the fields here: their button is the dialog's own action,
+                      // next to Close, the way Delete Account places its red button.
+                      '<div class="two-factor-row two-factor-fields">' +
+                          '<input type="password" id="tfDisablePassword" autocomplete="current-password" placeholder="' + esc(tr('two_factor.modal.current_password', {}, 'Current password')) + '">' +
+                          '<input type="text" id="tfDisableCode" class="two-factor-code" autocomplete="one-time-code" spellcheck="false" maxlength="16" placeholder="' + esc(tr('two_factor.modal.code_or_recovery', {}, 'Code or recovery code')) + '">' +
+                      '</div>') +
             '</div>',
             closeButtonHtml('two_factor.modal.close', 'Close') +
-            '<button type="button" class="btn-danger" id="tfDisableBtn">' + esc(tr('two_factor.modal.disable', {}, 'Turn off')) + '</button>'
+            (required ? '' : '<button type="button" class="btn-danger" id="tfDisableBtn">' + esc(tr('two_factor.modal.disable', {}, 'Turn off')) + '</button>')
         );
         bindClose();
 
@@ -427,8 +432,10 @@
                 });
             });
         };
-        document.getElementById('tfDisableBtn').addEventListener('click', disable);
-        onEnter('tfDisableCode', disable);
+        if (!required) {
+            document.getElementById('tfDisableBtn').addEventListener('click', disable);
+            onEnter('tfDisableCode', disable);
+        }
     }
 
     // ---------- Clipboard ----------

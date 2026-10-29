@@ -946,6 +946,9 @@ class UsersController {
             // identity keeps one way in the code does not cover. The modal says
             // so, but only where SSO exists: elsewhere it would be noise.
             'sso_login_available' => function_exists('oidc_is_enabled') && oidc_is_enabled(),
+            // Settings > Admin Tools > Require two-factor: the modal then has
+            // no way to turn it off.
+            'required_by_admin' => isTwoFactorRequiredByAdmin(),
         ];
     }
 
@@ -1076,6 +1079,12 @@ class UsersController {
             http_response_code(409);
             return ['error' => 'Two-factor authentication is not enabled'];
         }
+        // Only an administrator's reset can remove it then, and the next
+        // sign-in sets it up again.
+        if (isTwoFactorRequiredByAdmin()) {
+            http_response_code(403);
+            return ['error' => 'Two-factor authentication is required by the administrator and cannot be turned off', 'code' => 'required_by_admin'];
+        }
 
         $data = json_decode(file_get_contents('php://input'), true);
         $password = is_array($data) ? (string)($data['current_password'] ?? '') : '';
@@ -1184,7 +1193,13 @@ class UsersController {
             $user['username'] ?? null
         );
 
-        return ['success' => true, 'message' => 'Two-factor authentication disabled for this user'];
+        return [
+            'success' => true,
+            'message' => 'Two-factor authentication disabled for this user',
+            // With two-factor required, the user's next sign-in sets it up again
+            // (and their open sessions end), rather than using the password alone.
+            'setup_required_at_next_sign_in' => isTwoFactorRequiredByAdmin(),
+        ];
     }
 
     /**

@@ -22,6 +22,7 @@ class SettingsController {
         'git_sync_enabled',
         'allow_executable_attachments',
         'login_disabled',
+        'two_factor_required',
         'tenant_isolation',
         'tenant_isolation_features',
         'tenant_isolation_applied_ui_keys',
@@ -119,6 +120,23 @@ class SettingsController {
      * MCP server refuses these keys to such callers too; this holds if its
      * list of global keys falls behind.
      */
+    /**
+     * Requiring two-factor ends every password session without one
+     * (sessionMeetsRequiredTwoFactor() in auth.php), the administrator's own
+     * included: that one is asked to set up their factor first, rather than
+     * being signed out by the click. An SSO session is not concerned.
+     */
+    private function requireOwnTwoFactorBeforeRequiringIt(): void {
+        if (($_SESSION['auth_method'] ?? '') === 'oidc') {
+            return;
+        }
+        require_once dirname(__DIR__, 3) . '/users/totp.php';
+        $loginUserId = (int)(getAuthenticatedUserId() ?? 0);
+        if ($loginUserId <= 0 || !isUserTotpEnabled($loginUserId)) {
+            throw new RuntimeException('Turn on two-factor authentication for your own account first', 409);
+        }
+    }
+
     private function requireGlobalSettingsWriteAdmin(): void {
         if (!$this->requestActorIsAdmin()) {
             throw new RuntimeException('admin privileges required', 403);
@@ -371,7 +389,7 @@ class SettingsController {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
-        if ($key === 'allow_executable_attachments' || $key === 'login_disabled') {
+        if ($key === 'allow_executable_attachments' || $key === 'login_disabled' || $key === 'two_factor_required') {
             return filter_var($value, FILTER_VALIDATE_BOOL) ? '1' : '0';
         }
 
@@ -903,6 +921,9 @@ class SettingsController {
                         throw new RuntimeException('no signed-in account to open without login', 400);
                     }
                     setGlobalSetting('login_disabled_user_id', $loginDisabledAccountId > 0 ? (string)$loginDisabledAccountId : '');
+                }
+                if ($key === 'two_factor_required' && $value === '1') {
+                    $this->requireOwnTwoFactorBeforeRequiringIt();
                 }
                 setGlobalSetting($key, $value);
             } else {

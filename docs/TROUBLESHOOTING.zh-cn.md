@@ -220,6 +220,12 @@ sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=
 
 将 `1` 替换为该账户的 id（`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` 可列出所有账户）。之后仅凭密码即可登录，为该账户签发的 “Remember me” cookie 将失效，并且可以在 **Settings > Two-factor authentication** 中重新设置双重身份验证。
 
+如果实例要求使用双重身份验证（**Settings > Admin Tools > Require two-factor**），下次登录时会立即要求重新设置。若要取消这一要求本身：
+
+```bash
+sudo sqlite3 data/master.db "UPDATE global_settings SET value='0' WHERE key='two_factor_required';"
+```
+
 </details>
 
 <a id="the-app-stops-answering-under-load"></a>
