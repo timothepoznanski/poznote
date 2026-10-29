@@ -220,6 +220,12 @@ sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=
 
 Replace `1` with the id of the account (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` lists them). The password alone signs you in again, remember-me cookies issued for that account stop working, and two-factor authentication can be set up again from **Settings > Two-factor authentication**.
 
+If two-factor authentication is required on the instance (**Settings > Admin Tools > Require two-factor**), the next sign-in asks to set it up again right away. To lift the requirement itself:
+
+```bash
+sudo sqlite3 data/master.db "UPDATE global_settings SET value='0' WHERE key='two_factor_required';"
+```
+
 </details>
 
 <a id="the-app-stops-answering-under-load"></a>

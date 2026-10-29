@@ -1884,7 +1884,9 @@ $v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    successEl.textContent = <?php echo json_encode(t('multiuser.admin.two_factor.reset_done', [], 'Two-factor authentication turned off. This user now signs in with their password alone.')); ?>;
+                    successEl.textContent = data.setup_required_at_next_sign_in
+                        ? <?php echo json_encode(t('multiuser.admin.two_factor.reset_done_required', [], 'Two-factor authentication turned off. Since it is required, this user sets it up again at their next sign-in.')); ?>
+                        : <?php echo json_encode(t('multiuser.admin.two_factor.reset_done', [], 'Two-factor authentication turned off. This user now signs in with their password alone.')); ?>;
                     successEl.style.display = 'block';
                     loadPasswordStatus(userId);
                 } else {

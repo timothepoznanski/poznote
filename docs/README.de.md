@@ -543,6 +543,7 @@ Jeder Benutzer kann die Zwei-Faktor-Authentifizierung (TOTP) unter **Settings > 
 - Sie schützt die Anmeldung mit Passwort. Eine SSO-Anmeldung bleibt Sache des Identitätsanbieters und seines eigenen zweiten Faktors.
 - Solange sie aktiv ist, akzeptiert die REST-API das Kontopasswort allein nicht mehr: Geben Sie Clients ein [App-Passwort](#app-passwörter) oder senden Sie den aktuellen Code im Header `X-Poznote-OTP`.
 - Ein Administrator kann sie für einen Benutzer deaktivieren, der sowohl sein Gerät als auch seine Wiederherstellungscodes verloren hat, unter **Settings > Admin Tools > User Management** (Passwortdialog).
+- Ein Administrator kann sie unter **Settings > Admin Tools > Require two-factor** für jedes Konto, das sich mit einem Passwort anmeldet, verpflichtend machen. Ein Konto ohne sie richtet sie bei der nächsten Anmeldung ein (QR-Code und erster Code auf der Anmeldeseite), ohne sie geöffnete Sitzungen werden beendet, und der Inhaber kann sie nicht mehr deaktivieren. SSO-Anmeldungen sind nicht betroffen.
 - Das Aktivieren oder Deaktivieren macht bestehende Remember-me-Cookies dieses Benutzers ungültig.
 
 #### Standardpasswörter

@@ -543,6 +543,7 @@ Cada usuario puede activar la autenticación de dos factores (TOTP) desde **Sett
 - Protege el inicio de sesión con contraseña. Un inicio de sesión SSO queda en manos del proveedor de identidad y de su propio segundo factor.
 - Mientras está activada, la API REST ya no acepta la contraseña de la cuenta por sí sola: da a los clientes una [contraseña de aplicación](#contraseñas-de-aplicación), o envía el código actual en la cabecera `X-Poznote-OTP`.
 - Un administrador puede desactivarla para un usuario que haya perdido tanto su dispositivo como sus códigos de recuperación, desde **Settings > Admin Tools > User Management** (diálogo de contraseña).
+- Un administrador puede hacerla obligatoria para toda cuenta que inicie sesión con contraseña, desde **Settings > Admin Tools > Require two-factor**. Una cuenta que no la tenga la configura en su próximo inicio de sesión (código QR y primer código en la página de inicio de sesión), las sesiones abiertas sin ella se cierran, y su titular ya no puede desactivarla. Los inicios de sesión SSO no se ven afectados.
 - Activarla o desactivarla invalida las cookies de «Remember me» existentes de ese usuario.
 
 #### Contraseñas por defecto

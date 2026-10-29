@@ -13,8 +13,9 @@
  *
  * A row only exists once the user has proved the authenticator app works by
  * typing a first code; a setup in progress is kept in the session (see
- * UsersController::twoFactorSetup()), so an abandoned setup cannot lock
- * anyone out.
+ * UsersController::twoFactorSetup(), and beginTotpEnrollment() in auth.php
+ * for the setup an administrator requires at sign-in), so an abandoned setup
+ * cannot lock anyone out.
  *
  * Both tables are created on first use with CREATE TABLE IF NOT EXISTS, the
  * convention every master table follows (see ensureAppPasswordsTable()), so
@@ -92,6 +93,30 @@ function getUserTotpRow(int $userId): ?array {
  */
 function isUserTotpEnabled(int $userId): bool {
     return getUserTotpRow($userId) !== null;
+}
+
+/**
+ * Whether the administrator requires two-factor of every password sign-in
+ * (Settings > Admin Tools > Require two-factor, global setting
+ * two_factor_required, discussion #1478).
+ *
+ * What it changes is in auth.php: a password login without a factor goes
+ * through a setup step on the login form before any session opens
+ * (beginTotpEnrollment()), a session or remember-me cookie without one ends
+ * (sessionMeetsRequiredTwoFactor()), and the account password stops opening
+ * the API on its own (resolveApiBasicAuthUser()). SSO logins and the "Open
+ * without login" session are left alone, as they are by two-factor itself.
+ */
+function isTwoFactorRequiredByAdmin(): bool {
+    return getGlobalSetting('two_factor_required', '0') === '1';
+}
+
+/**
+ * True when a password login of this profile has to set two-factor up before
+ * it opens anything. Lets storage errors through, like isUserTotpEnabled().
+ */
+function mustSetUpTwoFactor(int $userId): bool {
+    return isTwoFactorRequiredByAdmin() && !isUserTotpEnabled($userId);
 }
 
 /**

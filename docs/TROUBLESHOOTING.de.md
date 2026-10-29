@@ -220,6 +220,12 @@ sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=
 
 Ersetzen Sie `1` durch die id des Kontos (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` listet sie auf). Das Passwort allein meldet Sie wieder an, für dieses Konto ausgestellte Remember-me-Cookies funktionieren nicht mehr, und die Zwei-Faktor-Authentifizierung lässt sich unter **Settings > Two-factor authentication** erneut einrichten.
 
+Ist die Zwei-Faktor-Authentifizierung auf der Instanz Pflicht (**Settings > Admin Tools > Require two-factor**), verlangt die nächste Anmeldung sofort, sie erneut einzurichten. So heben Sie die Pflicht selbst auf:
+
+```bash
+sudo sqlite3 data/master.db "UPDATE global_settings SET value='0' WHERE key='two_factor_required';"
+```
+
 </details>
 
 <a id="the-app-stops-answering-under-load"></a>

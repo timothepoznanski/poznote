@@ -91,6 +91,62 @@
                 });
             }
 
+            // Two-factor setup required by the administrator: the QR code is
+            // drawn here with the vendored qrcode-generator, the key typed by
+            // hand stays available under it if that fails.
+            var enrollQr = document.getElementById('totp-enroll-qr');
+            if (enrollQr && typeof window.qrcode === 'function') {
+                try {
+                    var qr = window.qrcode(0, 'M');
+                    qr.addData(enrollQr.getAttribute('data-otpauth-uri') || '');
+                    qr.make();
+                    enrollQr.innerHTML = qr.createSvgTag({ cellSize: 4, margin: 4, scalable: true });
+                    enrollQr.hidden = false;
+                } catch (qrError) {
+                    console.debug('login-page: QR code not drawn:', qrError);
+                }
+            }
+
+            // Copy buttons of the setup key and the recovery codes. Without the
+            // clipboard API (plain http) the value is selected for a manual copy.
+            Array.prototype.forEach.call(document.querySelectorAll('[data-copy-value]'), function (button) {
+                var label = button.textContent;
+                button.addEventListener('click', function () {
+                    var select = function () {
+                        var target = document.getElementById(button.getAttribute('data-copy-select') || '');
+                        if (!target) return;
+                        var range = document.createRange();
+                        range.selectNodeContents(target);
+                        var selection = window.getSelection();
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    };
+                    if (!navigator.clipboard || !navigator.clipboard.writeText) {
+                        select();
+                        return;
+                    }
+                    navigator.clipboard.writeText(button.getAttribute('data-copy-value') || '').then(function () {
+                        button.textContent = button.getAttribute('data-copied-text') || label;
+                        setTimeout(function () { button.textContent = label; }, 2000);
+                    }, select);
+                });
+            });
+
+            var recoveryDownload = document.getElementById('totp-recovery-download');
+            if (recoveryDownload) {
+                recoveryDownload.addEventListener('click', function () {
+                    var blob = new Blob([(recoveryDownload.getAttribute('data-download-value') || '') + '\n'], { type: 'text/plain' });
+                    var url = URL.createObjectURL(blob);
+                    var link = document.createElement('a');
+                    link.href = url;
+                    link.download = 'poznote-recovery-codes.txt';
+                    document.body.appendChild(link);
+                    link.click();
+                    link.remove();
+                    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+                });
+            }
+
             // OIDC login: redirect without creating a Poznote remember-me cookie.
             if (config.oidcEnabled) {
                 var oidcLoginBtn = document.getElementById('oidc-login-btn');

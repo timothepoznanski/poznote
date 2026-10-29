@@ -172,6 +172,9 @@
         if (document.getElementById('login-disabled-card')) {
             keys.push('login_disabled');
         }
+        if (document.getElementById('two-factor-required-card')) {
+            keys.push('two_factor_required');
+        }
         if (document.getElementById('tenant-isolation-card')) {
             keys.push('tenant_isolation', 'tenant_isolation_features', 'tenant_isolation_applied_ui_keys');
         }
@@ -1573,6 +1576,20 @@
             badge.textContent = enabled ? txt.enabled : txt.disabled;
             badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
             var card = document.getElementById('login-disabled-card');
+            if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
+        });
+    }
+
+    function refreshTwoFactorRequiredBadge() {
+        var badge = document.getElementById('two-factor-required-status');
+        if (!badge) return;
+
+        var txt = getTranslations();
+        getSetting('two_factor_required', function (value) {
+            var enabled = value === '1' || value === 'true';
+            badge.textContent = enabled ? txt.enabled : txt.disabled;
+            badge.className = 'setting-status ' + (enabled ? 'enabled' : 'disabled');
+            var card = document.getElementById('two-factor-required-card');
             if (card) card.setAttribute('aria-checked', enabled ? 'true' : 'false');
         });
     }
@@ -3327,6 +3344,45 @@
                     var message = tr('settings.login_disabled.confirm', {}, 'Anyone who can reach this Poznote instance will open your account directly, with no username, password or two-factor code. Only continue if you are the only one who can reach it, or if a reverse proxy handles authentication.');
                     if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
                         window.modalAlert.confirm(message, tr('settings.cards.login_disabled', {}, 'Open without login'))
+                            .then(function (confirmed) { if (confirmed) apply(); });
+                    } else if (window.confirm(message)) {
+                        apply();
+                    }
+                });
+            });
+        }
+
+        // Require two-factor: instance-wide too. Turning it on signs out every
+        // password session without a factor, so that way asks first; the
+        // server refuses it while the administrator has none of their own.
+        var twoFactorRequiredCard = document.getElementById('two-factor-required-card');
+        if (twoFactorRequiredCard) {
+            markToggleCard(twoFactorRequiredCard);
+            refreshTwoFactorRequiredBadge();
+            twoFactorRequiredCard.addEventListener('click', function () {
+                getSetting('two_factor_required', function (currentValue) {
+                    var currently = currentValue === '1' || currentValue === 'true';
+                    var apply = function () {
+                        setSetting('two_factor_required', currently ? '0' : '1', function (ok, result) {
+                            refreshTwoFactorRequiredBadge();
+                            if (ok) return;
+                            var message = result && result.error === 'Turn on two-factor authentication for your own account first'
+                                ? tr('settings.two_factor_required.own_first', {}, 'Turn on two-factor authentication for your own account first, in the Two-factor authentication card of this page.')
+                                : ((result && result.error) || tr('common.error', {}, 'Error'));
+                            if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
+                                window.modalAlert.alert(message, 'error');
+                            } else {
+                                window.alert(message);
+                            }
+                        });
+                    };
+                    if (currently) {
+                        apply();
+                        return;
+                    }
+                    var message = tr('settings.two_factor_required.confirm', {}, 'Every account that signs in with a password will have to set up two-factor authentication at its next sign-in, and sessions opened without it end now. Apps that use an account password through the API stop working until they use an app password.');
+                    if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
+                        window.modalAlert.confirm(message, tr('settings.cards.two_factor_required', {}, 'Require two-factor'))
                             .then(function (confirmed) { if (confirmed) apply(); });
                     } else if (window.confirm(message)) {
                         apply();

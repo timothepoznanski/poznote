@@ -527,7 +527,8 @@
       "diary_template": "Choisissez une note dont le contenu sert de point de départ à chaque nouvelle entrée de journal de l'espace de travail {{workspace}}. La liste montre les notes rangées dans un dossier nommé Modèles (ou Templates) de cet espace. Chaque espace de travail a son propre modèle.",
       "markdown_view_cycle": "Choisissez les vues que le bouton de vue d'une note markdown parcourt après la vue classique (aperçu, avec le crayon pour modifier). Les vues décochées sont sautées. Si aucune n'est cochée, le bouton est masqué. Sur un téléphone, le bouton ne passe jamais en mode partagé.",
       "connected_apps": "Connectez des applications de chat comme ChatGPT ou Claude à vos notes via le serveur MCP, et déconnectez-les à tout moment.",
-      "custom_logo": "Remplacer le logo Poznote par le vôtre, pour tous les utilisateurs : dans l'onglet du navigateur, sur la page de connexion, dans la barre d'icônes et comme icône de l'application installée."
+      "custom_logo": "Remplacer le logo Poznote par le vôtre, pour tous les utilisateurs : dans l'onglet du navigateur, sur la page de connexion, dans la barre d'icônes et comme icône de l'application installée.",
+      "two_factor_required": "Chaque compte qui se connecte avec un mot de passe doit utiliser l'authentification à deux facteurs. Un compte qui ne l'a pas la configure à sa prochaine connexion, et les sessions ouvertes sans elle prennent fin. Son mot de passe ne fonctionne plus via l'API : les applications utilisent un mot de passe d'application. Les connexions SSO ne sont pas concernées, le fournisseur d'identité gère leur second facteur."
     },
     "card_notes": {
       "slash_menu_trigger_mobile": "Sur mobile, la barre d'outils au-dessus du clavier a un bouton + qui ouvre le même menu, quel que soit ce réglage."
@@ -650,7 +651,8 @@
       "login_disabled": "Ouverture sans connexion",
       "outbound_hosts": "Accès au réseau local",
       "connected_apps": "Applications connectées",
-      "custom_logo": "Logo"
+      "custom_logo": "Logo",
+      "two_factor_required": "Double authentification obligatoire"
     },
     "default_credentials": {
       "both": "Ce compte utilise encore le login et le mot de passe livrés par défaut. N'importe qui pouvant joindre cette instance peut s'y connecter.",
@@ -704,6 +706,10 @@
     "custom_logo": {
       "status_default": "Poznote",
       "status_custom": "Personnalisé"
+    },
+    "two_factor_required": {
+      "confirm": "Chaque compte qui se connecte avec un mot de passe devra configurer l'authentification à deux facteurs à sa prochaine connexion, et les sessions ouvertes sans elle prennent fin maintenant. Les applications qui utilisent le mot de passe d'un compte via l'API cesseront de fonctionner jusqu'à ce qu'elles utilisent un mot de passe d'application.",
+      "own_first": "Activez d'abord l'authentification à deux facteurs pour votre propre compte, dans la carte Authentification à deux facteurs de cette page."
     }
   },
   "workspaces": {
@@ -2640,7 +2646,10 @@
       "cancel": "Retour à la connexion",
       "invalid_code": "Code incorrect. Réessayez.",
       "expired": "L'étape de vérification a expiré. Reconnectez-vous.",
-      "too_many_tries": "Trop de codes incorrects. Reconnectez-vous."
+      "too_many_tries": "Trop de codes incorrects. Reconnectez-vous.",
+      "setup_notice": "L'authentification à deux facteurs est désormais obligatoire sur cette instance. Connectez-vous pour la configurer.",
+      "enroll_intro": "L'authentification à deux facteurs est obligatoire sur cette instance. Configurez-la pour continuer.",
+      "enroll_submit": "Activer et se connecter"
     },
     "powered_by": "Propulsé par {{link}}"
   },
@@ -3658,7 +3667,8 @@
         "enabled_detail": "L'authentification à deux facteurs est activée pour cet utilisateur.",
         "reset": "Désactiver la double authentification",
         "confirm_reset": "Confirmer",
-        "reset_done": "Authentification à deux facteurs désactivée. Cet utilisateur se connecte désormais avec son seul mot de passe."
+        "reset_done": "Authentification à deux facteurs désactivée. Cet utilisateur se connecte désormais avec son seul mot de passe.",
+        "reset_done_required": "Authentification à deux facteurs désactivée. Comme elle est obligatoire, cet utilisateur la configurera de nouveau à sa prochaine connexion."
       },
       "password": "Mot de passe",
       "profile": "Sélectionnez votre profil",
@@ -4360,7 +4370,8 @@
       "disable_help": "Votre mot de passe suffira de nouveau pour vous connecter. Confirmez avec votre mot de passe et un code de votre application, ou un code de récupération.",
       "code_or_recovery": "Code ou code de récupération",
       "disable": "Désactiver",
-      "close": "Fermer"
+      "close": "Fermer",
+      "required_by_admin": "Votre administrateur impose l'authentification à deux facteurs sur cette instance, elle ne peut donc pas être désactivée. Si vous perdez votre appareil et vos codes de récupération, un administrateur peut la réinitialiser."
     },
     "errors": {
       "invalid_code": "Code incorrect. Vérifiez l'heure de votre appareil et réessayez.",

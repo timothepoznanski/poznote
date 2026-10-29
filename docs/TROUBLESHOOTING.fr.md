@@ -220,6 +220,12 @@ sudo sqlite3 data/master.db "DELETE FROM user_totp_recovery_codes WHERE user_id=
 
 Remplacez `1` par l'id du compte (`sudo sqlite3 data/master.db "SELECT id, username FROM users;"` les liste). Le mot de passe seul vous connecte de nouveau, les cookies « Remember me » émis pour ce compte cessent de fonctionner, et l'authentification à deux facteurs peut être reconfigurée depuis **Settings > Two-factor authentication**.
 
+Si l'authentification à deux facteurs est obligatoire sur l'instance (**Settings > Admin Tools > Require two-factor**), la prochaine connexion demande aussitôt de la reconfigurer. Pour lever l'obligation elle-même :
+
+```bash
+sudo sqlite3 data/master.db "UPDATE global_settings SET value='0' WHERE key='two_factor_required';"
+```
+
 </details>
 
 <a id="the-app-stops-answering-under-load"></a>

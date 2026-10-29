@@ -352,7 +352,7 @@ function startAuthenticatedUserSession(array $authUser, ?string $authMethod = nu
 
     // A login that completes, by whichever route, ends any second step left
     // pending in this session (password typed, then SSO used instead).
-    unset($_SESSION['totp_login_challenge']);
+    unset($_SESSION['totp_login_challenge'], $_SESSION['totp_enrollment'], $_SESSION['two_factor_setup_notice']);
 
     // Single hook for every interactive login: the password form, OIDC and the
     // remember-me cookie all land here. Logged at this point rather than on
@@ -571,6 +571,10 @@ function isAuthenticated() {
             }
         }
 
+        if (!sessionMeetsRequiredTwoFactor()) {
+            return false;
+        }
+
         if (isAccountSelectionRequired()) {
             return false;
         }
@@ -604,6 +608,14 @@ function isAuthenticated() {
                         $validHash = hash_equals($expectedHash, $hash);
                         $validLegacyHash = !$validHash && hash_equals($legacyExpectedHash, $hash);
                         
+                        if (($validHash || $validLegacyHash) && !rememberedLoginMeetsRequiredTwoFactor((int)$userId)) {
+                            // Remembered before two-factor was required: the
+                            // password form takes over, then the setup step.
+                            setRememberMeCookie('', time() - 3600);
+                            $_SESSION['two_factor_setup_notice'] = true;
+                            return false;
+                        }
+
                         if ($validHash || $validLegacyHash) {
                             $activeAccountSelected = startAuthenticatedUserSession($user);
                             updateUserLastLogin((int)$userId);
@@ -694,7 +706,7 @@ function signInWithoutCredentials(): bool {
 
     session_regenerate_id(true);
     setAuthenticatedIdentity($user, 'auto');
-    unset($_SESSION['totp_login_challenge']);
+    unset($_SESSION['totp_login_challenge'], $_SESSION['totp_enrollment']);
     if (!setActiveUserAccount($user)) {
         return false;
     }
@@ -1345,9 +1357,12 @@ function authenticate($username, $password, $rememberMe = false) {
         // two-factor on: the login is parked in the session and login.php asks
         // for the code (completeTotpLoginChallenge()). The failure counter is
         // left as it is, so wrong codes keep adding to it.
+        // Without a factor, an administrator who requires one gets the same
+        // parking, with a setup step instead (beginTotpEnrollment()).
         try {
             require_once __DIR__ . '/users/totp.php';
             $needsSecondFactor = isUserTotpEnabled($userId);
+            $needsSetup = !$needsSecondFactor && isTwoFactorRequiredByAdmin();
         } catch (Throwable $e) {
             // Unknown state is not "no second factor": refuse the login.
             error_log("Poznote Auth: two-factor state unreadable for user '$username': " . $e->getMessage());
@@ -1355,6 +1370,10 @@ function authenticate($username, $password, $rememberMe = false) {
         }
         if ($needsSecondFactor) {
             beginTotpLoginChallenge($user, (string)$username, (bool)$rememberMe);
+            return false;
+        }
+        if ($needsSetup) {
+            beginTotpEnrollment($user, (string)$username, (bool)$rememberMe);
             return false;
         }
 
@@ -1496,6 +1515,188 @@ function completeTotpLoginChallenge(string $code): bool {
     }
 
     return true;
+}
+
+// --- Setting two-factor up at sign-in, when the administrator requires it ---
+//
+// Same parking as the challenge above (isTwoFactorRequiredByAdmin() says
+// when): the password was right, nothing is authenticated, and the session
+// keeps the half-login under a key of its own, with a new secret for the
+// authenticator app. The account opens once a first code from the app
+// matches that secret; the factor is stored at that moment and login.php
+// shows the recovery codes, once. Longer than the code step, since the app
+// may have to be installed first.
+define('TOTP_ENROLLMENT_SECONDS', 15 * 60);
+
+function beginTotpEnrollment(array $user, string $loginIdentifier, bool $rememberMe): void {
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_regenerate_id(true);
+    }
+
+    require_once __DIR__ . '/lib/totp.php';
+    unset($_SESSION['totp_login_challenge'], $_SESSION['two_factor_setup_notice']);
+    $_SESSION['totp_enrollment'] = [
+        'user_id' => (int)$user['id'],
+        'identifier' => $loginIdentifier,
+        'remember_me' => $rememberMe,
+        'secret' => totpGenerateSecret(),
+        'expires_at' => time() + TOTP_ENROLLMENT_SECONDS,
+        'tries' => 0,
+    ];
+}
+
+/**
+ * The pending setup of this session, or null. An expired or exhausted one is
+ * dropped on the way.
+ */
+function getPendingTotpEnrollment(): ?array {
+    $enrollment = $_SESSION['totp_enrollment'] ?? null;
+    if (!is_array($enrollment)) {
+        return null;
+    }
+
+    if ((int)($enrollment['user_id'] ?? 0) <= 0
+        || (string)($enrollment['secret'] ?? '') === ''
+        || (int)($enrollment['expires_at'] ?? 0) < time()
+        || (int)($enrollment['tries'] ?? 0) >= TOTP_LOGIN_CHALLENGE_MAX_TRIES) {
+        unset($_SESSION['totp_enrollment']);
+        return null;
+    }
+
+    return $enrollment;
+}
+
+function cancelTotpEnrollment(): void {
+    unset($_SESSION['totp_enrollment']);
+}
+
+/**
+ * Finishes a password login that had to set two-factor up: checks the first
+ * code against the secret waiting in the session, stores the factor and opens
+ * the session. Returns the recovery codes, which exist in clear only in this
+ * return value, or null when the account did not open. Like authenticate(),
+ * the caller still has to check isAccountSelectionRequired().
+ *
+ * @return list<string>|null
+ */
+function completeTotpEnrollment(string $code): ?array {
+    $enrollment = getPendingTotpEnrollment();
+    if ($enrollment === null) {
+        return null;
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    require_once __DIR__ . '/users/totp.php';
+    require_once __DIR__ . '/ActivityLog.php';
+
+    $userId = (int)$enrollment['user_id'];
+    $identifier = (string)$enrollment['identifier'];
+
+    if (throttleLoginAttempt($identifier)) {
+        return null;
+    }
+
+    $user = getUserProfileById($userId);
+    if (!$user || !$user['active']) {
+        cancelTotpEnrollment();
+        return null;
+    }
+
+    try {
+        // Set up meanwhile from another browser: that factor is the one to
+        // prove, through the ordinary code step.
+        if (isUserTotpEnabled($userId)) {
+            cancelTotpEnrollment();
+            beginTotpLoginChallenge($user, $identifier, !empty($enrollment['remember_me']));
+            return null;
+        }
+        $step = totpVerifyCode((string)$enrollment['secret'], $code);
+    } catch (Throwable $e) {
+        error_log("Poznote Auth: two-factor setup failed for user $userId: " . $e->getMessage());
+        return null;
+    }
+
+    if ($step === null) {
+        recordFailedLoginAttempt($identifier);
+        $_SESSION['totp_enrollment']['tries'] = (int)$enrollment['tries'] + 1;
+        return null;
+    }
+
+    $recoveryCodes = enableUserTotp($userId, (string)$enrollment['secret'], $step);
+    if ($recoveryCodes === null) {
+        return null;
+    }
+
+    clearLoginRateLimit($identifier);
+    startAuthenticatedUserSession($user);
+    updateUserLastLogin($userId);
+    logActivity(ACTIVITY_TWO_FACTOR_ENABLED, ['at_sign_in' => true], 'web', $userId, $user['username'] ?? null);
+
+    // Signed with the new factor mixed in (bindRememberMeSecretToTotp()).
+    if (!empty($enrollment['remember_me'])) {
+        issueRememberMeCookie($user);
+    }
+
+    return $recoveryCodes;
+}
+
+/**
+ * Whether the signed-in session may go on while two-factor is required. A
+ * session opened by password before the requirement was turned on, or before
+ * an administrator reset the person's factor, has no second factor behind it:
+ * it ends here, and the next sign-in goes through the setup step. SSO and
+ * "Open without login" sessions are not concerned, as with two-factor itself.
+ * Checked once per request and login.
+ */
+function sessionMeetsRequiredTwoFactor(): bool {
+    static $verifiedLoginUserId = null;
+    $loginUserId = (int)($_SESSION['login_user_id'] ?? 0);
+    if ($loginUserId <= 0 || $verifiedLoginUserId === $loginUserId) {
+        return true;
+    }
+    // An API identity (setApiAuthenticatedUser()) was judged by the API gate,
+    // which applies the same rule to the account password and lets the other
+    // credentials (app passwords, tokens) through.
+    if (in_array($_SESSION['auth_method'] ?? '', ['oidc', 'auto'], true)
+        || !empty($_SESSION['login_user']['_api_auth_method'])) {
+        $verifiedLoginUserId = $loginUserId;
+        return true;
+    }
+
+    try {
+        require_once __DIR__ . '/users/totp.php';
+        $missing = mustSetUpTwoFactor($loginUserId);
+    } catch (Throwable $e) {
+        // Unknown state: this request is refused, the session kept for the next.
+        error_log("Poznote Auth: two-factor state unreadable for session user $loginUserId: " . $e->getMessage());
+        return false;
+    }
+    if (!$missing) {
+        $verifiedLoginUserId = $loginUserId;
+        return true;
+    }
+
+    unset($_SESSION['authenticated'], $_SESSION['user_id'], $_SESSION['user'], $_SESSION['login_user_id'],
+        $_SESSION['login_user'], $_SESSION['auth_method'], $_SESSION['account_selection_required']);
+    clearSharedWorkspaceScope();
+    $_SESSION['two_factor_setup_notice'] = true;
+    if (isset($_COOKIE[REMEMBER_ME_COOKIE]) && !headers_sent()) {
+        setRememberMeCookie('', time() - 3600);
+    }
+    return false;
+}
+
+/**
+ * The same rule for a remember-me cookie, before it opens a session.
+ */
+function rememberedLoginMeetsRequiredTwoFactor(int $userId): bool {
+    try {
+        require_once __DIR__ . '/users/totp.php';
+        return !mustSetUpTwoFactor($userId);
+    } catch (Throwable $e) {
+        error_log("Poznote Auth: two-factor state unreadable for remembered user $userId: " . $e->getMessage());
+        return false;
+    }
 }
 
 function logout() {
@@ -2037,7 +2238,7 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
         // and it is what a client configured before two-factor was switched on
         // sends on every poll: counting it would walk the account into the
         // hard block and lock its owner out of the login form.
-        if (!$credentialsValid && poznoteApiSecondFactorRejection() !== 'missing') {
+        if (!$credentialsValid && !in_array(poznoteApiSecondFactorRejection(), ['missing', 'setup_required'], true)) {
             recordFailedLoginAttempt((string)$loginIdentifier);
         }
         // A valid app password on an admin route is the one case that gets
@@ -2057,6 +2258,13 @@ function authenticateApiBasicAuth(bool $requireAdmin = false): array {
         // habit would otherwise never find out an app password is expected.
         // A wrong code was counted above like a wrong password, so the code
         // cannot be guessed at a faster rate.
+        if (!$credentialsValid && poznoteApiSecondFactorRejection() === 'setup_required') {
+            $msg = api_t('auth.api.two_factor_setup_required', [], 'Two-factor authentication is required on this instance: sign in to the web interface once to set it up, then use an app password, or send the current code in the X-Poznote-OTP header');
+            header('HTTP/1.1 403 Forbidden');
+            header('Content-Type: application/json');
+            echo json_encode(['error' => $msg]);
+            exit;
+        }
         if (!$credentialsValid && poznoteApiSecondFactorRejection() !== null) {
             $msg = poznoteApiSecondFactorRejection() === 'missing'
                 ? api_t('auth.api.two_factor_required', [], 'Two-factor authentication is enabled on this account: use an app password, or send the current code in the X-Poznote-OTP header')
@@ -2138,6 +2346,11 @@ function resolveApiBasicAuthUser(array $basicCredentials): ?array {
                 poznoteApiSecondFactorRejection($otp === '' ? 'missing' : 'invalid');
                 return null;
             }
+        } elseif (isTwoFactorRequiredByAdmin()) {
+            // Required by the administrator but not set up yet: the password
+            // alone opens nothing here either, the web sign-in sets it up.
+            poznoteApiSecondFactorRejection('setup_required');
+            return null;
         }
     } catch (Throwable $e) {
         error_log("Poznote Auth: two-factor state unreadable for API user $userId: " . $e->getMessage());

@@ -543,6 +543,7 @@ Chaque utilisateur peut activer l'authentification à deux facteurs (TOTP) depui
 - Elle protège la connexion par mot de passe. Une connexion SSO reste du ressort du fournisseur d'identité et de son propre second facteur.
 - Tant qu'elle est activée, l'API REST n'accepte plus le mot de passe du compte seul : donnez aux clients un [mot de passe d'application](#mots-de-passe-dapplication), ou envoyez le code courant dans l'en-tête `X-Poznote-OTP`.
 - Un administrateur peut la désactiver pour un utilisateur qui a perdu à la fois son appareil et ses codes de récupération, depuis **Settings > Admin Tools > User Management** (fenêtre du mot de passe).
+- Un administrateur peut la rendre obligatoire pour chaque compte qui se connecte avec un mot de passe, depuis **Settings > Admin Tools > Require two-factor**. Un compte qui ne l'a pas la configure à sa prochaine connexion (QR code et premier code sur la page de connexion), les sessions ouvertes sans elle prennent fin, et son propriétaire ne peut plus la désactiver. Les connexions SSO ne sont pas concernées.
 - L'activer ou la désactiver invalide les cookies « Remember me » existants de cet utilisateur.
 
 #### Mots de passe par défaut

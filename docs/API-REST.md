@@ -75,6 +75,8 @@ curl -u 'username:password' -H 'X-User-ID: 1' -H 'X-Poznote-OTP: 123456' \
 
 Without the header the API answers `401` with an `X-Poznote-OTP: required` response header and a message saying so. A code sent this way stays valid for its whole window (up to 90 seconds), so a script can make several requests with it. Recovery codes are not accepted here.
 
+An administrator can require two-factor authentication of every account that signs in with a password (`Settings > Admin Tools > Require two-factor`, global setting `two_factor_required`). An account that has not set it up yet then cannot use its account password over Basic auth either: the API answers `403` with a message saying so until the person signs in to the web interface once, which walks them through the setup. App passwords and Bearer tokens keep working.
+
 OIDC Bearer JWT authentication is available when OIDC is enabled. Poznote validates the token signature with the provider JWKS, checks issuer, expiration, and audience, then maps the token claims to a Poznote profile using the same OIDC linking rules as interactive login (`sub`, then a verified email; never the username). Group and user allowlists, disabled profiles, and auto-create settings are also enforced.
 
 ```bash
@@ -3522,11 +3524,13 @@ Returns whether two-factor is on.
   "enabled": true,
   "enabled_at": "2026-09-21 20:14",
   "recovery_codes_remaining": 9,
-  "unavailable_reason": null
+  "unavailable_reason": null,
+  "sso_login_available": false,
+  "required_by_admin": false
 }
 ```
 
-`unavailable_reason` is `sso_only` or `no_local_password` when the account never signs in with a local password, in which case there is no login for a second factor to protect.
+`unavailable_reason` is `sso_only` or `no_local_password` when the account never signs in with a local password, in which case there is no login for a second factor to protect. `required_by_admin` is `true` when an administrator requires two-factor on the instance, in which case it cannot be turned off.
 
 ```
 POST /users/me/two-factor/setup
@@ -3583,7 +3587,7 @@ Switch two-factor off. Both factors are asked for.
 | `current_password` | string | Yes | The account password |
 | `code` | string | Yes | 6-digit code from the app, or a recovery code |
 
-A wrong code answers `400` with `"code": "invalid_code"`, a wrong password `403` with `"code": "invalid_password"`. Both count towards the same progressive delay as failed logins, and `429` is returned once that limit is reached.
+A wrong code answers `400` with `"code": "invalid_code"`, a wrong password `403` with `"code": "invalid_password"`. Both count towards the same progressive delay as failed logins, and `429` is returned once that limit is reached. While an administrator requires two-factor, the answer is `403` with `"code": "required_by_admin"`.
 
 ### Delete My Account
 
@@ -3755,7 +3759,7 @@ curl -X POST -u 'username:password' \
 POST /admin/users/{id}/two-factor/reset
 ```
 
-Switch a user's two-factor authentication off, for someone who lost their device and their recovery codes. They sign in with the password alone afterwards and can set it up again. Answers `409` when two-factor is not on for that user. The action is recorded in the activity log.
+Switch a user's two-factor authentication off, for someone who lost their device and their recovery codes. They sign in with the password alone afterwards and can set it up again. While two-factor is required on the instance, their next sign-in sets it up again instead, and the response carries `"setup_required_at_next_sign_in": true`. Answers `409` when two-factor is not on for that user. The action is recorded in the activity log.
 
 ```bash
 curl -X POST -u 'admin:password' \
