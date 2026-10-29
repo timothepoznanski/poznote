@@ -8,7 +8,8 @@
   <a href="VSCODE-COPILOT.ru.md">Русский</a> ·
   <a href="VSCODE-COPILOT.zh-cn.md">简体中文</a> ·
   <a href="VSCODE-COPILOT.ko.md">한국어</a> ·
-  <b>日本語</b>
+  <b>日本語</b> ·
+  <a href="VSCODE-COPILOT.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 

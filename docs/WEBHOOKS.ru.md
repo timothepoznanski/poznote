@@ -8,7 +8,8 @@
   <b>Русский</b> ·
   <a href="WEBHOOKS.zh-cn.md">简体中文</a> ·
   <a href="WEBHOOKS.ko.md">한국어</a> ·
-  <a href="WEBHOOKS.ja.md">日本語</a>
+  <a href="WEBHOOKS.ja.md">日本語</a> ·
+  <a href="WEBHOOKS.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 

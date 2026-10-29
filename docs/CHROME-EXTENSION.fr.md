@@ -8,7 +8,8 @@
   <a href="CHROME-EXTENSION.ru.md">Русский</a> ·
   <a href="CHROME-EXTENSION.zh-cn.md">简体中文</a> ·
   <a href="CHROME-EXTENSION.ko.md">한국어</a> ·
-  <a href="CHROME-EXTENSION.ja.md">日本語</a>
+  <a href="CHROME-EXTENSION.ja.md">日本語</a> ·
+  <a href="CHROME-EXTENSION.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 
@@ -33,7 +34,7 @@ Pour modifier ces réglages plus tard, cliquez sur la roue dentée en haut de l'
 
 L'adresse de votre instance, affichée juste à côté, est un lien : cliquez dessus pour ouvrir Poznote dans un nouvel onglet, en http ou en https comme vous l'avez saisie dans les réglages.
 
-L'extension s'affiche dans la langue de Chrome si c'est l'anglais, le français, l'allemand, l'espagnol, le portugais, le russe, le coréen, le chinois simplifié ou le japonais, et en anglais sinon.
+L'extension s'affiche dans la langue de Chrome si c'est l'anglais, le français, l'allemand, l'espagnol, le portugais, le russe, le coréen, le chinois simplifié, le japonais ou le catalan, et en anglais sinon.
 
 Le mot de passe de votre compte fonctionne aussi ici, mais un mot de passe d'application est un meilleur choix pour une extension : il n'atteint que l'API, jamais l'interface web ni les paramètres de votre compte, il est limité à votre propre profil, et le révoquer dans Poznote coupe l'accès de l'extension sans rien changer d'autre. Consultez [Mots de passe d'application](README.fr.md#mots-de-passe-dapplication) pour la liste complète des limites.
 
