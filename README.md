@@ -8,7 +8,8 @@
   <a href="docs/README.ru.md">Русский</a> ·
   <a href="docs/README.zh-cn.md">简体中文</a> ·
   <a href="docs/README.ko.md">한국어</a> ·
-  <a href="docs/README.ja.md">日本語</a>
+  <a href="docs/README.ja.md">日本語</a> ·
+  <a href="docs/README.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 
@@ -684,7 +685,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 &nbsp;
 
 *   **Functionality:** Reuse pre-written content to standardize your documentation, from a full note to a short snippet.
-*   **Setup:** Put the notes you want to reuse in a folder named `Templates` (sub-folders are fine). A workspace named `Templates` works too and is offered from every workspace. The name is also recognized in the language of the interface (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`, `템플릿`, `テンプレート`).
+*   **Setup:** Put the notes you want to reuse in a folder named `Templates` (sub-folders are fine). A workspace named `Templates` works too and is offered from every workspace. The name is also recognized in the language of the interface (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`, `템플릿`, `テンプレート`, `Plantilles`).
 *   **Insert into a note:** Type `/template` (or `/` followed by the template's title) in a rich text or Markdown note and pick a template: its content is pasted at the cursor, converted if the template and the note are not of the same type.
 *   **New note from a template:** Duplicate the template note, or duplicate a whole `Templates` folder to start a project with a ready-made folder structure.
 </details>
