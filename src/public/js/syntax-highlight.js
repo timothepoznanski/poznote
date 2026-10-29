@@ -70,10 +70,17 @@
         return ['DIV', 'P', 'LI'].indexOf(node.tagName) !== -1;
     }
 
-    function getTextWithCodeLineBreaks(node) {
+    /**
+     * @param {Node} node
+     * @param {Array} [textNodes] - Collects {node, start} for each text node,
+     *     start being its offset in the text of the whole block
+     * @param {number} [offset] - Where the text of this node starts
+     */
+    function getTextWithCodeLineBreaks(node, textNodes, offset) {
         if (!node) return '';
 
         if (node.nodeType === Node.TEXT_NODE) {
+            if (textNodes) textNodes.push({ node: node, start: offset || 0 });
             return node.nodeValue || '';
         }
 
@@ -96,7 +103,7 @@
 
         var text = '';
         for (var i = 0; i < node.childNodes.length; i++) {
-            text += getTextWithCodeLineBreaks(node.childNodes[i]);
+            text += getTextWithCodeLineBreaks(node.childNodes[i], textNodes, (offset || 0) + text.length);
         }
 
         if (isCodeLineBlockElement(node) && !text.endsWith('\n')) {
@@ -345,7 +352,9 @@
         // After insertLineBreak, Chrome anchors the selection at the end of
         // the text node BEFORE the <br> even though the visible caret sits on
         // the next line. Count the break so the caret is restored there.
-        if (container.nodeType === Node.TEXT_NODE &&
+        // Only right after a break: text typed at the end of a line that
+        // ends in a <br> leaves the same DOM, with the caret on that line.
+        if (lastInputWasLineBreak && container.nodeType === Node.TEXT_NODE &&
             startOffset === (container.nodeValue || '').length &&
             container.nextSibling && container.nextSibling.nodeType === 1 &&
             container.nextSibling.tagName === 'BR') {
@@ -560,8 +569,27 @@
         }
     }
 
+    /**
+     * Keep the browser spell checker (spellcheck_html_notes setting) off the
+     * code of an HTML note, blocks and inline code: code is not prose, and
+     * every identifier came out underlined. The Markdown editor does the
+     * same for its code (build/markdown-editor/src/main.js). Display only:
+     * normalizeCodeBlocksForStorage() in js/notes.js strips it again.
+     */
+    function disableCodeSpellcheck(root) {
+        var elements = root.querySelectorAll ? Array.from(root.querySelectorAll('.noteentry pre, .noteentry code')) : [];
+        if ((root.tagName === 'PRE' || root.tagName === 'CODE') && root.closest && root.closest('.noteentry')) elements.push(root);
+        elements.forEach(function(element) {
+            if (element.getAttribute('spellcheck') !== 'false') {
+                element.setAttribute('spellcheck', 'false');
+            }
+        });
+    }
+
     function applyCodeLineNumbers(container) {
         var root = (container && container.querySelectorAll) ? container : document;
+
+        disableCodeSpellcheck(root);
 
         // (the choices made on the blocks of a Markdown preview, js/copy-code-on-focus.js)
         if (typeof window.restoreMarkdownPreviewLineNumbers === 'function') {
@@ -581,19 +609,378 @@
         });
     }
 
+    /**
+     * Live token colours for the code blocks of a note being edited (issue
+     * #1695). Blocks were only turned into hljs spans on load, paste and
+     * language change, so new code stayed uncoloured until a reload, and text
+     * typed next to a token went into its span and took its colour (a line
+     * opened above a comment came out as a comment). Rebuilding the spans
+     * while typing fixed that but emptied the browser's undo history: Ctrl+Z
+     * then did nothing. So an editable block keeps plain text and its tokens
+     * are painted over it as ranges (CSS Custom Highlight API), which leaves
+     * the DOM the browser edits alone. One highlight per colour group of
+     * css/syntax-highlight.css, painted by its ::highlight(pz-syntax-*) rules.
+     * Browsers without the API keep the spans drawn on load.
+     */
+    var supportsLiveTokens = typeof CSS !== 'undefined' && !!CSS.highlights &&
+        typeof Highlight === 'function' && typeof StaticRange === 'function';
+
+    var LIVE_TOKEN_GROUPS = {
+        'hljs-keyword': 'keyword', 'hljs-literal': 'keyword', 'hljs-doctag': 'keyword',
+        'hljs-template-tag': 'keyword', 'hljs-section': 'keyword',
+        'hljs-title': 'function', 'hljs-built_in': 'function', 'hljs-bullet': 'function',
+        'hljs-type': 'type',
+        'hljs-variable': 'variable', 'hljs-template-variable': 'variable', 'hljs-params': 'variable',
+        'hljs-property': 'variable', 'hljs-attr': 'variable', 'hljs-attribute': 'variable',
+        'hljs-selector-attr': 'variable',
+        'hljs-string': 'string',
+        'hljs-number': 'number',
+        'hljs-regexp': 'regexp', 'hljs-symbol': 'regexp', 'hljs-link': 'regexp',
+        'hljs-meta': 'meta',
+        'hljs-code': 'comment', 'hljs-comment': 'comment', 'hljs-formula': 'comment', 'hljs-quote': 'comment',
+        'hljs-name': 'tag', 'hljs-selector-tag': 'tag', 'hljs-selector-id': 'tag',
+        'hljs-selector-class': 'tag', 'hljs-selector-pseudo': 'tag',
+        'hljs-operator': 'text', 'hljs-punctuation': 'text', 'hljs-subst': 'text',
+        'hljs-emphasis': 'text', 'hljs-strong': 'text',
+        'hljs-addition': 'addition', 'hljs-deletion': 'deletion'
+    };
+
+    // codeEl -> Map(key -> { group, range }) currently painted
+    var liveTokenRanges = new Map();
+    // codeEl -> how long its last paint took, in ms
+    var liveTokenCost = new Map();
+    var liveTokenNodeIds = new WeakMap();
+    var nextLiveTokenNodeId = 1;
+
+    function getLiveTokenGroup(span) {
+        var classes = span.classList;
+        if (classes.contains('hljs-title') && classes.contains('class_')) return 'type';
+        if (classes.contains('hljs-variable') && classes.contains('language_')) return 'keyword';
+        if (classes.contains('hljs-char') && classes.contains('escape_')) return 'string';
+        for (var i = 0; i < classes.length; i++) {
+            if (LIVE_TOKEN_GROUPS[classes[i]]) return LIVE_TOKEN_GROUPS[classes[i]];
+        }
+        return null;
+    }
+
+    function getLiveTokenHighlight(group) {
+        var name = 'pz-syntax-' + group;
+        var highlight = CSS.highlights.get(name);
+        if (!highlight) {
+            highlight = new Highlight();
+            CSS.highlights.set(name, highlight);
+        }
+        return highlight;
+    }
+
+    function getLiveTokenNodeId(node) {
+        var id = liveTokenNodeIds.get(node);
+        if (!id) {
+            id = nextLiveTokenNodeId++;
+            liveTokenNodeIds.set(node, id);
+        }
+        return id;
+    }
+
+    function clearLiveTokens(codeEl) {
+        var painted = liveTokenRanges.get(codeEl);
+        liveTokenCost.delete(codeEl);
+        if (!painted) return;
+        painted.forEach(function(entry) {
+            getLiveTokenHighlight(entry.group).delete(entry.range);
+        });
+        liveTokenRanges.delete(codeEl);
+    }
+
+    /**
+     * The language a block is highlighted in, or null when it is not (no or
+     * unknown language tag, mermaid, plain block).
+     */
+    function getLiveTokenLanguage(codeEl) {
+        if (codeEl.classList.contains('language-mermaid') || isPlainBlockElement(codeEl)) return null;
+        var match = (codeEl.className || '').match(/language-([\w-]+)/);
+        return match && isKnownSyntaxHighlightLanguage(match[1]) ? match[1] : null;
+    }
+
+    function hasLiveTokenLineBreakInside(root) {
+        var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+        var node;
+        while ((node = walker.nextNode())) {
+            var breakAt = (node.nodeValue || '').indexOf('\n');
+            if (breakAt !== -1 && breakAt < node.nodeValue.length - 1) return true;
+        }
+        return false;
+    }
+
+    /**
+     * Bring a block to what the live tokens paint over: plain text, one text
+     * node per line. A painted range sits on a node and an offset, so an
+     * edit then only moves the ranges of its own line. Typing keeps it so
+     * (Enter inserts a <br>). What has to be redone is the text set on load
+     * or by a language change (one node), and the spans drawn while the
+     * note was still read-only, as the edit lock keeps it until granted
+     * (js/note-edit-lock.js): text typed at their edge would land in them.
+     * The block is rebuilt off the document and swapped in at once (moving
+     * the nodes one by one cost seconds on a long block), and the caret is
+     * put back at the same place in the text.
+     */
+    function prepareLiveTokenBlock(codeEl) {
+        if (!codeEl.querySelector('span[class*="hljs-"]') && !hasLiveTokenLineBreakInside(codeEl)) return;
+
+        var caret = computeCaretTextOffset(codeEl);
+
+        var fragment = document.createDocumentFragment();
+        (function copy(from, to) {
+            for (var child = from.firstChild; child; child = child.nextSibling) {
+                if (child.nodeType === Node.ELEMENT_NODE && /(?:^|\s)hljs-/.test(child.getAttribute('class') || '')) {
+                    copy(child, to);
+                } else {
+                    var clone = child.cloneNode(false);
+                    to.appendChild(clone);
+                    if (child.nodeType === Node.ELEMENT_NODE) copy(child, clone);
+                }
+            }
+        })(codeEl, fragment);
+        fragment.normalize();
+
+        var walker = document.createTreeWalker(fragment, NodeFilter.SHOW_TEXT, null);
+        var lines = [];
+        var node;
+        while ((node = walker.nextNode())) lines.push(node);
+        lines.forEach(function(textNode) {
+            var breakAt;
+            while ((breakAt = textNode.nodeValue.indexOf('\n')) !== -1 && breakAt < textNode.nodeValue.length - 1) {
+                textNode = textNode.splitText(breakAt + 1);
+            }
+        });
+
+        codeEl.replaceChildren(fragment);
+        if (caret !== null) restoreCaretAtSourceOffset(codeEl, caret);
+    }
+
+    /**
+     * restoreCaretAtTextOffset() for a block that still has its <br>s:
+     * counts them as one character, as computeCaretTextOffset() does.
+     */
+    function restoreCaretAtSourceOffset(codeEl, offset) {
+        var textNodes = [];
+        var text = '';
+        for (var i = 0; i < codeEl.childNodes.length; i++) {
+            text += getTextWithCodeLineBreaks(codeEl.childNodes[i], textNodes, text.length);
+        }
+
+        var range = document.createRange();
+        range.selectNodeContents(codeEl);
+        range.collapse(false);
+        for (var n = 0; n < textNodes.length; n++) {
+            var length = textNodes[n].node.nodeValue.length;
+            // On a boundary, the start of the next node: a line's node ends
+            // with its newline, the caret belongs to the next line then. An
+            // offset on a <br> lands at the start of the node after it.
+            if (offset < textNodes[n].start + length || (n === textNodes.length - 1 && offset <= textNodes[n].start + length)) {
+                range.setStart(textNodes[n].node, Math.max(0, offset - textNodes[n].start));
+                range.collapse(true);
+                break;
+            }
+        }
+
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    function paintLiveTokens(codeEl) {
+        // Blocks gone with the note they were in
+        liveTokenRanges.forEach(function(painted, block) {
+            if (!block.isConnected) clearLiveTokens(block);
+        });
+
+        var language = getLiveTokenLanguage(codeEl);
+        if (!language || !codeEl.isConnected || !codeEl.isContentEditable) {
+            clearLiveTokens(codeEl);
+            return;
+        }
+
+        var startedAt = performance.now();
+        prepareLiveTokenBlock(codeEl);
+        codeEl.classList.add('hljs');
+
+        var textNodes = [];
+        var text = '';
+        for (var i = 0; i < codeEl.childNodes.length; i++) {
+            text += getTextWithCodeLineBreaks(codeEl.childNodes[i], textNodes, text.length);
+        }
+
+        var result = null;
+        if (text.trim()) {
+            try {
+                result = hljs.highlight(text.replace(/\u00A0/g, ' '), { language: language, ignoreIllegals: true });
+            } catch (e) {
+                console.warn('Highlight.js error:', e);
+            }
+        }
+
+        // Token segments of the text, each with the colour group of its
+        // innermost coloured span
+        var segments = [];
+        if (result) {
+            var position = 0;
+            var tokens = document.createElement('template');
+            tokens.innerHTML = result.value;
+            (function walk(node, group) {
+                for (var child = node.firstChild; child; child = child.nextSibling) {
+                    if (child.nodeType === Node.TEXT_NODE) {
+                        var length = (child.nodeValue || '').length;
+                        if (group && group !== 'text' && length) {
+                            segments.push({ start: position, end: position + length, group: group });
+                        }
+                        position += length;
+                    } else if (child.nodeType === Node.ELEMENT_NODE) {
+                        walk(child, getLiveTokenGroup(child) || group);
+                    }
+                }
+            })(tokens.content, null);
+        }
+
+        // Only what changed goes in and out of the highlights: replacing
+        // every range on each keystroke had the browser recompute the whole
+        // block, seconds per key in a long one
+        var previous = liveTokenRanges.get(codeEl) || new Map();
+        var painted = new Map();
+        var first = 0;
+        segments.forEach(function(segment) {
+            // Text nodes come in text order, and so do segments
+            while (first < textNodes.length &&
+                textNodes[first].start + textNodes[first].node.nodeValue.length <= segment.start) {
+                first++;
+            }
+            if (first >= textNodes.length) return;
+            var last = first;
+            while (last + 1 < textNodes.length && textNodes[last + 1].start < segment.end) {
+                last++;
+            }
+
+            var startNode = textNodes[first];
+            var endNode = textNodes[last];
+            var startOffset = Math.max(0, segment.start - startNode.start);
+            var endOffset = Math.min(endNode.node.nodeValue.length, segment.end - endNode.start);
+            if (startNode === endNode && startOffset >= endOffset) return;
+
+            var key = segment.group + ':' + getLiveTokenNodeId(startNode.node) + ':' + startOffset +
+                ':' + getLiveTokenNodeId(endNode.node) + ':' + endOffset;
+            var kept = previous.get(key);
+            if (kept) {
+                previous.delete(key);
+                painted.set(key, kept);
+                return;
+            }
+
+            // Static: the browser keeps a live Range up to date on every
+            // change to the document. The block is painted again after an
+            // edit anyway.
+            var range = new StaticRange({
+                startContainer: startNode.node, startOffset: startOffset,
+                endContainer: endNode.node, endOffset: endOffset
+            });
+            getLiveTokenHighlight(segment.group).add(range);
+            painted.set(key, { group: segment.group, range: range });
+        });
+
+        previous.forEach(function(entry) {
+            getLiveTokenHighlight(entry.group).delete(entry.range);
+        });
+        liveTokenRanges.set(codeEl, painted);
+        liveTokenCost.set(codeEl, performance.now() - startedAt);
+    }
+
+    /**
+     * The highlighted code block holding the caret, if any. The input event
+     * of a contenteditable note targets the .noteentry, never the block.
+     */
+    function getEditedCodeBlock(host) {
+        var selection = window.getSelection ? window.getSelection() : null;
+        var node = selection && selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
+        var el = node && node.nodeType !== 1 ? node.parentElement : node;
+        var codeEl = el && el.closest ? el.closest('pre code[class*="language-"]') : null;
+        return codeEl && host.contains(codeEl) ? codeEl : null;
+    }
+
+    var liveTokenTimer = null;
+    var liveTokenPending = new Set();
+
+    function paintPendingLiveTokens() {
+        liveTokenTimer = null;
+        var blocks = Array.from(liveTokenPending);
+        liveTokenPending.clear();
+        blocks.forEach(paintLiveTokens);
+    }
+
+    /**
+     * Paint on the next frame, or once typing slows down when a block takes
+     * long to paint (hundreds of lines), so keys never wait on the colours.
+     */
+    function scheduleLiveTokens(codeEl) {
+        liveTokenPending.add(codeEl);
+        if (liveTokenTimer !== null) return;
+
+        var cost = 0;
+        liveTokenPending.forEach(function(block) {
+            cost = Math.max(cost, liveTokenCost.get(block) || 0);
+        });
+        if (cost < 12) {
+            liveTokenTimer = requestAnimationFrame(paintPendingLiveTokens);
+        } else {
+            liveTokenTimer = setTimeout(paintPendingLiveTokens, Math.min(cost * 4, 600));
+        }
+    }
+
+    // A note opens read-only and turns editable once its edit lock is
+    // granted (js/note-edit-lock.js): its blocks were drawn as spans
+    // meanwhile, so they are painted from then on, before any typing
+    if (supportsLiveTokens && typeof MutationObserver === 'function') {
+        new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                var entry = mutation.target;
+                if (entry.classList && entry.classList.contains('noteentry') && entry.isContentEditable &&
+                    entry.querySelector('pre code[class*="language-"]')) {
+                    applySyntaxHighlighting(entry);
+                }
+            });
+        }).observe(document.documentElement, { attributes: true, attributeFilter: ['contenteditable'], subtree: true });
+    }
+
     // Editable HTML-note blocks drift out of sync while typing (Shift+Enter
     // inserts a BR inside a .code-line wrapper, paste adds newlines, backspace
     // merges lines), so re-sync shortly after the last input.
     var editableRefreshTimer = null;
+    // Read by computeCaretTextOffset()
+    var lastInputWasLineBreak = false;
     document.addEventListener('input', function(e) {
         // Blocks with a per-block override need re-syncing even when the
         // global setting is off, so this is no longer gated on the body class.
         var host = e.target && e.target.closest ? e.target.closest('.noteentry') : null;
         if (!host || !host.isContentEditable) return;
 
+        lastInputWasLineBreak = e.inputType === 'insertLineBreak' || e.inputType === 'insertParagraph';
+
+        // Code just inserted (slash menu, toolbar, paste) before its words get checked
+        var selection = window.getSelection ? window.getSelection() : null;
+        var editedNode = selection && selection.rangeCount ? selection.getRangeAt(0).startContainer : null;
+        var editedElement = editedNode && editedNode.nodeType !== 1 ? editedNode.parentElement : editedNode;
+        var editedCode = editedElement && editedElement.closest ? editedElement.closest('pre, code') : null;
+        if (editedCode && host.contains(editedCode)) disableCodeSpellcheck(editedCode);
+
+        var editedCodeBlock = supportsLiveTokens ? getEditedCodeBlock(host) : null;
+        if (editedCodeBlock) scheduleLiveTokens(editedCodeBlock);
+
         clearTimeout(editableRefreshTimer);
         editableRefreshTimer = setTimeout(function() {
             applyCodeLineNumbers(host);
+            // A re-sync rebuilds the lines from copies, taking the painted
+            // ranges with the old nodes; a language change ends here too
+            liveTokenRanges.forEach(function(painted, codeEl) {
+                if (host.contains(codeEl)) scheduleLiveTokens(codeEl);
+            });
         }, 250);
     });
 
@@ -612,7 +999,8 @@
         // Find all code blocks with a language class
         var codeBlocks = container.querySelectorAll('pre code[class*="language-"]');
         var highlightedAnyBlock = false;
-        
+        var liveBlocks = [];
+
         codeBlocks.forEach(function(codeBlock) {
             // Skip if it's a mermaid block (handled separately)
             if (codeBlock.classList.contains('language-mermaid') ||
@@ -636,11 +1024,21 @@
             if (language && !isKnownSyntaxHighlightLanguage(language)) {
                 return;
             }
-            
+
             // Save the data-language attribute if it exists
             var dataLanguage = codeBlock.getAttribute('data-language') || 
                               (preElement ? preElement.getAttribute('data-language') : null) || 
                               language;
+
+            // Painted once the line numbers below have settled the nodes
+            if (supportsLiveTokens && codeBlock.isContentEditable) {
+                if (dataLanguage) {
+                    codeBlock.setAttribute('data-language', dataLanguage);
+                    if (preElement) preElement.setAttribute('data-language', dataLanguage);
+                }
+                liveBlocks.push(codeBlock);
+                return;
+            }
             
             // Remove hljs class to allow re-highlighting
             codeBlock.classList.remove('hljs');
@@ -665,6 +1063,7 @@
         });
 
         applyCodeLineNumbers(container);
+        liveBlocks.forEach(paintLiveTokens);
 
         if (highlightedAnyBlock) {
             scheduleSearchHighlightRefresh();

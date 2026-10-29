@@ -1121,6 +1121,12 @@ function normalizeCodeBlocksForStorage(root) {
         }
     }
 
+    // Set on all code while it is displayed (js/syntax-highlight.js)
+    var spellcheckBlocks = root.querySelectorAll('pre[spellcheck], code[spellcheck]');
+    for (var s = 0; s < spellcheckBlocks.length; s++) {
+        spellcheckBlocks[s].removeAttribute('spellcheck');
+    }
+
     var codeBlocks = root.querySelectorAll('pre code');
     for (var i = 0; i < codeBlocks.length; i++) {
         var codeBlock = codeBlocks[i];

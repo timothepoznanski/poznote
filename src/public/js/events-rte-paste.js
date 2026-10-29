@@ -143,6 +143,39 @@ function handleCodePaste(htmlData, plainText) {
 }
 
 /**
+ * Paste inside a code block: the text alone, as a plain text paste gives.
+ * A line copied out of a block put the block's own <code> on the clipboard,
+ * and pasting it back nested that element in the block (Chrome) or added a
+ * line break after it (Firefox), which the next highlight turned into blank
+ * lines (issue #1695). Markup has no meaning inside a code block anyway.
+ * Several lines go in as escaped text joined by <br>: insertText turns each
+ * newline into a new paragraph, which in Chrome splits the <code> in two.
+ * Both commands keep the whitespace and leave one undo step.
+ * @param {string} plainText - The pasted plain text
+ * @returns {boolean} True if the paste was handled
+ */
+function handleCodeBlockPaste(plainText) {
+    if (!plainText) return false;
+
+    var selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return false;
+
+    var range = selection.getRangeAt(0);
+    var start = range.startContainer.nodeType === 1 ? range.startContainer : range.startContainer.parentElement;
+    var pre = start && start.closest ? start.closest('pre') : null;
+    if (!pre || !pre.isContentEditable || !pre.contains(range.endContainer)) return false;
+
+    if (plainText.indexOf('\n') === -1) {
+        document.execCommand('insertText', false, plainText);
+    } else {
+        var escaped = plainText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        document.execCommand('insertHTML', false, escaped.split('\n').join('<br>'));
+    }
+    triggerNoteSave();
+    return true;
+}
+
+/**
  * Check if pasted text is a URL and convert to link
  * @param {string} plainText - The pasted plain text
  * @param {string} htmlData - The pasted HTML data
@@ -692,6 +725,11 @@ function setupPasteHandling() {
             plainText = plainText.replace(/\r\n?/g, '\n');
 
             // Try different paste handlers
+            if (handleCodeBlockPaste(plainText)) {
+                e.preventDefault();
+                return;
+            }
+
             if (handleIframePaste(plainText)) {
                 e.preventDefault();
                 return;
@@ -728,75 +766,11 @@ function setupPasteHandling() {
 }
 
 /**
- * Setup syntax highlighting trigger on code block input
- */
-function setupCodeBlockHighlighting() {
-    // Helper function to trigger syntax highlighting
-    function triggerHighlighting(target) {
-        var codeElement = target.tagName === 'CODE' ? target : null;
-        var preElement = target.tagName === 'PRE' ? target : (codeElement ? codeElement.closest('pre') : null);
-
-        if (!codeElement && preElement) {
-            codeElement = preElement.querySelector('code[class*="language-"]');
-        }
-
-        if (codeElement && codeElement.className && codeElement.className.includes('language-')) {
-            setTimeout(function () {
-                if (typeof window.applySyntaxHighlighting === 'function') {
-                    var pre = codeElement.closest('pre');
-                    if (pre) {
-                        window.applySyntaxHighlighting(pre);
-                    }
-                }
-            }, 50);
-        }
-    }
-
-    // Listen for input events (typing)
-    document.body.addEventListener('input', function (e) {
-        var target = e.target;
-
-        // Check if editing code element with language class
-        if (target.tagName === 'CODE' && target.className && target.className.includes('language-')) {
-            triggerHighlighting(target);
-        }
-
-        // Check if editing pre element
-        if (target.tagName === 'PRE') {
-            var codeElement = target.querySelector('code[class*="language-"]');
-            if (codeElement) {
-                triggerHighlighting(target);
-            }
-        }
-    });
-
-    // Listen for paste events
-    document.body.addEventListener('paste', function (e) {
-        var target = e.target;
-
-        // Check if pasting into code block
-        var codeElement = null;
-        if (target.tagName === 'CODE') {
-            codeElement = target;
-        } else if (target.closest) {
-            codeElement = target.closest('code');
-        }
-
-        if (codeElement && codeElement.className && codeElement.className.includes('language-')) {
-            setTimeout(function () {
-                triggerHighlighting(codeElement);
-            }, 100);
-        }
-    });
-}
-
-/**
  * Setup all link-related events
  */
 function setupLinkEvents() {
     setupLinkClickHandling();
     setupPasteHandling();
-    setupCodeBlockHighlighting();
 }
 
 // ============================================================================
