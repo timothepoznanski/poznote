@@ -164,6 +164,35 @@ html[data-theme='dark'] .hljs-deletion {
     background-color: var(--pz-danger-soft);
 }
 
+/* The same colours painted over the code blocks of a note being edited,
+   which keep plain text (live tokens in js/syntax-highlight.js, issue #1695).
+   One highlight per colour group above; a highlight paints no bold or
+   italic. The light diff grounds (#f0fff4, #ffeef0) barely show, so the
+   light diff lines get their colour only. */
+::highlight(pz-syntax-keyword) { color: var(--pz-syntax-keyword); }
+::highlight(pz-syntax-function) { color: var(--pz-syntax-function); }
+::highlight(pz-syntax-type) { color: var(--pz-syntax-type); }
+::highlight(pz-syntax-variable) { color: var(--pz-syntax-variable); }
+::highlight(pz-syntax-string) { color: var(--pz-syntax-string); }
+::highlight(pz-syntax-number) { color: var(--pz-syntax-number); }
+::highlight(pz-syntax-regexp) { color: var(--pz-syntax-regexp); }
+::highlight(pz-syntax-meta) { color: var(--pz-syntax-meta); }
+::highlight(pz-syntax-comment) { color: var(--pz-syntax-comment); }
+::highlight(pz-syntax-tag) { color: var(--pz-syntax-tag); }
+
+::highlight(pz-syntax-addition) { color: var(--pz-success-hover); }
+::highlight(pz-syntax-deletion) { color: var(--pz-danger-hover); }
+
+:where(html[data-theme='dark']) ::highlight(pz-syntax-addition) {
+    color: var(--pz-success-text);
+    background-color: var(--pz-success-soft);
+}
+
+:where(html[data-theme='dark']) ::highlight(pz-syntax-deletion) {
+    color: var(--pz-text-strong);
+    background-color: var(--pz-danger-soft);
+}
+
 /* Language badge for code blocks */
 pre[data-language]::before,
 pre:has(code[data-language])::before,

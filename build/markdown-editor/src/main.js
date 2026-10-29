@@ -178,6 +178,43 @@ const markdownCodeLinePlugin = ViewPlugin.fromClass(class {
   decorations: plugin => plugin.decorations
 })
 
+// Inline `code` is kept away from the spell checker too, backticks included
+// (HTML notes do the same for their <code>, js/syntax-highlight.js)
+const markdownInlineCodeDecoration = Decoration.mark({ attributes: { spellcheck: 'false' } })
+
+function buildMarkdownInlineCodeDecorations(view) {
+  const builder = new RangeSetBuilder()
+  const tree = syntaxTree(view.state)
+
+  for (const range of view.visibleRanges) {
+    tree.iterate({
+      from: range.from,
+      to: range.to,
+      enter(node) {
+        if (node.name !== 'InlineCode') return
+        builder.add(node.from, node.to, markdownInlineCodeDecoration)
+        return false
+      }
+    })
+  }
+
+  return builder.finish()
+}
+
+const markdownInlineCodePlugin = ViewPlugin.fromClass(class {
+  constructor(view) {
+    this.decorations = buildMarkdownInlineCodeDecorations(view)
+  }
+
+  update(update) {
+    if (update.docChanged || update.viewportChanged || syntaxTree(update.startState) !== syntaxTree(update.state)) {
+      this.decorations = buildMarkdownInlineCodeDecorations(update.view)
+    }
+  }
+}, {
+  decorations: plugin => plugin.decorations
+})
+
 // With EditorView.lineWrapping on, a long list item's wrapped portion renders
 // at column 0, visually detached from its list. A hanging indent keeps wrapped
 // display lines under the item's text: padding-left pushes the whole line right
@@ -1941,6 +1978,7 @@ function createEditor(host, options = {}) {
       lineWrappingCompartment.of(createLineWrappingExtensions(wrapsLines(lineWrapping, !!options.livePreview))),
       markdownTableLinePlugin,
       markdownCodeLinePlugin,
+      markdownInlineCodePlugin,
       hangingIndentPlugin,
       livePreviewCompartment.of(createLivePreviewExtensions(!!options.livePreview)),
       // Ctrl/Cmd + click follows a link written in the source
