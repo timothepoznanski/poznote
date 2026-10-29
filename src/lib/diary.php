@@ -124,6 +124,7 @@ function getDiaryDateFormats(): array {
  */
 function parseDiaryLongDateTitle(string $heading): ?string {
     foreach (getDateNameLocales() as $locale) {
+        $monthsInDate = $locale['months_in_date'] ?? $locale['months'];
         $alternation = function (array $names): string {
             return implode('|', array_map(function ($name) { return preg_quote($name, '/'); }, $names));
         };
@@ -131,7 +132,7 @@ function parseDiaryLongDateTitle(string $heading): ?string {
         foreach (preg_split('/(\{wd\}|\{month\}|\{m\}|\{d\}|\{y\})/', $locale['layout'], -1, PREG_SPLIT_DELIM_CAPTURE) as $piece) {
             switch ($piece) {
                 case '{wd}':    $regex .= '(?:' . $alternation($locale['days']) . ')'; break;
-                case '{month}': $regex .= '(?<mn>' . $alternation($locale['months']) . ')'; break;
+                case '{month}': $regex .= '(?<mn>' . $alternation($monthsInDate) . ')'; break;
                 case '{m}':     $regex .= '(?<m>\d{1,2})'; break;
                 case '{d}':     $regex .= '(?<d>\d{1,2})'; break;
                 case '{y}':     $regex .= '(?<y>\d{4})'; break;
@@ -142,7 +143,7 @@ function parseDiaryLongDateTitle(string $heading): ?string {
 
         if (isset($m['mn']) && $m['mn'] !== '') {
             $month = 0;
-            foreach ($locale['months'] as $index => $name) {
+            foreach ($monthsInDate as $index => $name) {
                 if (mb_strtolower($name) === mb_strtolower($m['mn'])) $month = $index + 1;
             }
         } else {
@@ -465,7 +466,7 @@ function getDiaryRootFolderName(?PDO $con = null, ?string $workspace = null) {
         // All localized defaults (must match diary.folder_name in src/i18n/)
         $candidates = array_values(array_unique(array_merge(
             [$localized],
-            ['Diary', 'Journal', 'Tagebuch', 'Diario', 'Diário', 'Дневник', '日记', '일기', '日記']
+            ['Diary', 'Journal', 'Tagebuch', 'Diario', 'Diário', 'Дневник', '日记', '일기', '日記', 'Diari']
         )));
         $placeholders = implode(',', array_fill(0, count($candidates), '?'));
         $stmt = $con->prepare("SELECT name FROM folders WHERE name IN ($placeholders) AND workspace = ? AND parent_id IS NULL");
