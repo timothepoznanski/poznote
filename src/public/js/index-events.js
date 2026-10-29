@@ -1614,8 +1614,7 @@
         // On mobile css/index-mobile.css makes <body> itself the horizontal
         // scroller (position: fixed + overflow-x: auto), so the offset lives on
         // body.scrollLeft, not on document.scrollingElement.
-        const left = document.body.scrollLeft
-            || (document.scrollingElement ? document.scrollingElement.scrollLeft : 0);
+        const left = getHorizontalScroll();
         // Past the halfway point the note pane is the one being read.
         document.body.classList.toggle('note-open', left > window.innerWidth / 2);
     }
@@ -1631,15 +1630,19 @@
     document.body.addEventListener('scroll', scheduleNoteOpenSync, { passive: true });
     window.addEventListener('scroll', scheduleNoteOpenSync, { passive: true });
 
-    function setHorizontalScroll(left) {
-        const scrollRoot = document.scrollingElement || document.documentElement;
-        scrollRoot.scrollLeft = left;
-        document.body.scrollLeft = left;
-        window.scrollTo({
-            left: left,
-            behavior: 'auto'
-        });
+    // On mobile <body> is the only horizontal scroller (css/index-mobile.css):
+    // the document itself never scrolls, so it is neither read nor written.
+    function getHorizontalScroll() {
+        return document.body.scrollLeft;
     }
+
+    function setHorizontalScroll(left) {
+        document.body.scrollLeft = left;
+    }
+
+    // iOS and iPadOS WebKit, the only engine that knows -webkit-touch-callout
+    var isIOSWebKit = !!(window.CSS && typeof CSS.supports === 'function'
+        && CSS.supports('-webkit-touch-callout', 'none'));
 
     /**
      * Re-assert the final horizontal position for a while after an animation
@@ -1684,8 +1687,7 @@
             if (!active) return;
             if (now >= deadline) { stop(); return; }
             if (correcting) {
-                const scrollRoot = document.scrollingElement || document.documentElement;
-                const current = scrollRoot.scrollLeft || document.body.scrollLeft;
+                const current = getHorizontalScroll();
                 const max = Math.max(0, document.body.scrollWidth - window.innerWidth);
                 const target = Math.max(0, Math.min(targetLeft, max));
                 if (Math.abs(current - target) > 1) {
@@ -1707,9 +1709,54 @@
         };
     }
 
-    function animateHorizontalScroll(targetLeft, durationMs, onDone) {
-        const scrollRoot = document.scrollingElement || document.documentElement;
+    /**
+     * iOS and iPadOS (issue #1692): the column change is one request to
+     * WebKit's own scroll, smooth or instant, with no frame-by-frame writes
+     * and no pin afterwards. There <body> is backed by a native scroll view in
+     * another process, and after the animated slide to a note every tap was
+     * lost until a rotation rebuilt the page's layers: the dozens of
+     * programmatic scrolls in a row are the suspect. .note-open still waits
+     * for the end of the slide, on scrollend or a timer where it is missing.
+     */
+    function scrollHorizontallyNatively(targetLeft, smooth, onDone) {
+        if (horizontalScrollPinCancel) horizontalScrollPinCancel();
 
+        let active = true;
+        let timer = null;
+
+        function stop() {
+            if (!active) return false;
+            active = false;
+            clearTimeout(timer);
+            document.body.removeEventListener('scrollend', finish);
+            window.removeEventListener('touchstart', release);
+            horizontalScrollPinTarget = null;
+            horizontalScrollPinCancel = null;
+            return true;
+        }
+
+        function finish() {
+            if (stop() && onDone) onDone();
+        }
+
+        // A finger on the screen takes over: .note-open then follows the
+        // column the swipe ends on.
+        function release() {
+            if (stop()) scheduleNoteOpenSync();
+        }
+
+        // Keeps syncNoteOpenToScroll hands off until the slide is over
+        horizontalScrollPinTarget = targetLeft;
+        horizontalScrollPinCancel = stop;
+        document.body.addEventListener('scrollend', finish);
+        window.addEventListener('touchstart', release, { passive: true });
+        // scrollend never comes when there is nothing to scroll
+        timer = setTimeout(finish, smooth && Math.abs(getHorizontalScroll() - targetLeft) > 1 ? 700 : 0);
+
+        document.body.scrollTo({ left: targetLeft, behavior: smooth ? 'smooth' : 'auto' });
+    }
+
+    function animateHorizontalScroll(targetLeft, durationMs, onDone) {
         // The requested target may exceed the real range (e.g. one full
         // viewport width while the icon rail layout leaves less to scroll).
         function clampedTarget() {
@@ -1717,7 +1764,12 @@
             return Math.max(0, Math.min(targetLeft, max));
         }
 
-        const startLeft = scrollRoot.scrollLeft || document.body.scrollLeft;
+        if (isIOSWebKit) {
+            scrollHorizontallyNatively(clampedTarget(), durationMs > 0, onDone);
+            return;
+        }
+
+        const startLeft = getHorizontalScroll();
 
         if (durationMs <= 0 || clampedTarget() === startLeft) {
             setHorizontalScroll(clampedTarget());
@@ -1740,7 +1792,7 @@
             // a fixed start: toggling .note-open mid-scroll resizes the columns
             // (icon rail) and triggers the browser's own scroll adjustment, and
             // absolute values would visibly stall and restart fighting it.
-            const current = scrollRoot.scrollLeft || document.body.scrollLeft;
+            const current = getHorizontalScroll();
             const remaining = 1 - lastEased;
             const share = remaining > 0 ? (eased - lastEased) / remaining : 1;
             lastEased = eased;
