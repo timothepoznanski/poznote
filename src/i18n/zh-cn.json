@@ -5841,5 +5841,8 @@
     },
     "change_icon": "更改图标",
     "reset": "恢复默认"
+  },
+  "note_subline_menu": {
+    "label": "标题下方"
   }
 }

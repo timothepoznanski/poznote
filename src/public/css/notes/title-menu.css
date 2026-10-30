@@ -1,7 +1,9 @@
 /* Right-click menu of the note title (colour, size, icon, reset), built by
-   js/note-title-menu.js. Same frame as the icon menu of the rail
-   (#iconContextMenu, css/profile-modal.css). */
-#noteTitleMenu {
+   js/note-title-menu.js, and the one of the line under it (what that line
+   shows), built by js/note-subline-menu.js. Same frame as the icon menu of
+   the rail (#iconContextMenu, css/profile-modal.css). */
+#noteTitleMenu,
+#noteSublineMenu {
     position: fixed;
     z-index: 10002;
     width: 232px;
@@ -13,7 +15,8 @@
     font-family: 'Inter', sans-serif;
 }
 
-#noteTitleMenu[hidden] {
+#noteTitleMenu[hidden],
+#noteSublineMenu[hidden] {
     display: none;
 }
 
@@ -124,7 +127,8 @@
     background-color: var(--pz-text-muted);
 }
 
-html[data-theme='dark'] #noteTitleMenu {
+html[data-theme='dark'] #noteTitleMenu,
+html[data-theme='dark'] #noteSublineMenu {
     background: var(--pz-surface);
 }
 
@@ -145,5 +149,65 @@ html[data-theme='dark'] #noteTitleMenu .note-title-menu-size:hover,
 html[data-theme='dark'] #noteTitleMenu .note-title-menu-size:focus-visible,
 html[data-theme='dark'] #noteTitleMenu .note-title-menu-item:hover,
 html[data-theme='dark'] #noteTitleMenu .note-title-menu-item:focus-visible {
+    background-color: var(--pz-surface-hover);
+}
+
+/* The line's menu: one entry per item, a tick when it is shown */
+#noteSublineMenu {
+    width: auto;
+    min-width: 232px;
+    max-width: 320px;
+}
+
+#noteSublineMenu .note-subline-menu-label {
+    padding: 6px 15px 6px;
+    color: var(--pz-text-muted);
+    font-size: 12px;
+}
+
+#noteSublineMenu .note-subline-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 15px;
+    border: none;
+    background: none;
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+#noteSublineMenu .note-subline-menu-item:hover:not(:disabled),
+#noteSublineMenu .note-subline-menu-item:focus-visible {
+    outline: none;
+    background-color: var(--pz-surface);
+}
+
+#noteSublineMenu .note-subline-menu-item:disabled {
+    color: var(--pz-text-muted);
+    cursor: default;
+}
+
+#noteSublineMenu .note-subline-menu-item i {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    background-color: var(--pz-accent-text);
+    visibility: hidden;
+}
+
+#noteSublineMenu .note-subline-menu-item.is-checked i {
+    visibility: visible;
+}
+
+#noteSublineMenu .note-subline-menu-item:disabled i {
+    background-color: var(--pz-text-muted);
+}
+
+html[data-theme='dark'] #noteSublineMenu .note-subline-menu-item:hover:not(:disabled),
+html[data-theme='dark'] #noteSublineMenu .note-subline-menu-item:focus-visible {
     background-color: var(--pz-surface-hover);
 }

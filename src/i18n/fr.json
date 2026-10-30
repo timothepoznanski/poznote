@@ -5849,5 +5849,8 @@
     },
     "change_icon": "Changer l'icône",
     "reset": "Rétablir par défaut"
+  },
+  "note_subline_menu": {
+    "label": "Sous le titre"
   }
 }

@@ -5745,5 +5745,8 @@
     },
     "change_icon": "Cambiar icono",
     "reset": "Restablecer valores predeterminados"
+  },
+  "note_subline_menu": {
+    "label": "Bajo el título"
   }
 }

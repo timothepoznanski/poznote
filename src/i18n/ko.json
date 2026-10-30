@@ -5589,5 +5589,8 @@
     },
     "change_icon": "아이콘 변경",
     "reset": "기본값으로 재설정"
+  },
+  "note_subline_menu": {
+    "label": "제목 아래"
   }
 }

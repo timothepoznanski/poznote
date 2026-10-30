@@ -181,6 +181,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/note-title-menu.js',
         'js/note-info-modal.js',
         'js/note-stats.js',
+        'js/note-subline-menu.js',
         'js/paste-markdown-modal.js',
         'js/insert-markdown-modal.js',
         'js/speech-to-text.js',

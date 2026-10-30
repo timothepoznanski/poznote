@@ -5744,5 +5744,8 @@
     },
     "change_icon": "Symbol ändern",
     "reset": "Auf Standard zurücksetzen"
+  },
+  "note_subline_menu": {
+    "label": "Unter dem Titel"
   }
 }

@@ -5589,5 +5589,8 @@
     },
     "change_icon": "アイコンを変更",
     "reset": "デフォルトに戻す"
+  },
+  "note_subline_menu": {
+    "label": "タイトルの下"
   }
 }

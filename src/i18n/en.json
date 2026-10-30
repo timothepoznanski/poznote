@@ -5589,5 +5589,8 @@
     },
     "change_icon": "Change icon",
     "reset": "Reset to default"
+  },
+  "note_subline_menu": {
+    "label": "Under the title"
   }
 }
