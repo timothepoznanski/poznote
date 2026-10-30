@@ -297,16 +297,19 @@ body.outline-collapsed #toggleOutlineBtn .lucide {
 }
 
 @media (min-width: 801px) {
-    /* Room the tab bar leaves at its right end for the toggle above */
+    /* Room the tab bar leaves at its right end for the toggle above. Kept
+       while the toggle is hidden for an empty outline (below): the tabs would
+       shift sideways from one note to the next otherwise */
     html {
         --pz-outline-toggle-room: 20px;
     }
+}
 
-    /* The toggle opens and closes the panel from the same place: no second
-       button in the panel. Phones keep the cross, they have no toggle. */
-    .outline-close-btn {
-        display: none;
-    }
+/* No headings to outline: no chevron to open the panel. Once open it keeps
+   its chevron and the cross to close it. js/outline-panel.js sets the class */
+html.outline-no-headings.outline-collapsed .toggle-outline-btn,
+html.outline-no-headings body.outline-collapsed .toggle-outline-btn {
+    display: none;
 }
 
 /* Mobile: Hide resize handle and toggle button, but keep panel accessible via swipe */

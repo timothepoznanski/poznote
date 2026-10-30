@@ -1079,6 +1079,8 @@
                 ' data-entry-link="1" title="' + esc(note.dated ? longDateLabel(note.entryDate) : note.heading) + '">' + esc(label) + '</a></li>';
         });
         nav.innerHTML = html;
+        // No entries: css/outline.css hides the toggle while the panel is closed
+        document.documentElement.classList.toggle('outline-no-headings', journalNotes.length === 0);
         outlineActiveId = null;
         updateOutlineActive();
     }
