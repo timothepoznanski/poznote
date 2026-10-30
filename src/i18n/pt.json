@@ -5732,5 +5732,18 @@
       "load_failed": "Não foi possível carregar seus aplicativos conectados.",
       "generic": "Algo deu errado. Tente novamente."
     }
+  },
+  "note_title_menu": {
+    "label": "Estilo do título",
+    "color": "Cor do título",
+    "size": "Tamanho do título",
+    "sizes": {
+      "small": "Pequeno",
+      "normal": "Normal",
+      "large": "Grande",
+      "xlarge": "Muito grande"
+    },
+    "change_icon": "Alterar ícone",
+    "reset": "Restaurar padrão"
   }
 }

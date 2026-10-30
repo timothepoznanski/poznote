@@ -72,6 +72,7 @@ function routeTable(): array
         'PUT /notes/{id}/color' => [OWNED, 'body' => ['color' => 'red']],
         'PUT /notes/{id}/pinned' => [OWNED, 'body' => ['pinned' => 1]],
         'PUT /notes/{id}/content-width' => [OWNED, 'body' => ['content_width' => 60]],
+        'PUT /notes/{id}/title-style' => [OWNED, 'body' => ['title_color' => '#2563eb', 'title_size' => 30]],
         'POST /notes/{id}/favorite' => [OWNED, 'body' => ['favorite' => 1]],
         'POST /notes/{id}/opened' => [OWNED],
         'POST /notes/{id}/archive' => [OWNED, 'body' => ['archived' => 1]],

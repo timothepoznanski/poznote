@@ -5576,5 +5576,18 @@
       "load_failed": "接続中のアプリを読み込めませんでした。",
       "generic": "問題が発生しました。もう一度お試しください。"
     }
+  },
+  "note_title_menu": {
+    "label": "タイトルのスタイル",
+    "color": "タイトルの色",
+    "size": "タイトルのサイズ",
+    "sizes": {
+      "small": "小",
+      "normal": "標準",
+      "large": "大",
+      "xlarge": "特大"
+    },
+    "change_icon": "アイコンを変更",
+    "reset": "デフォルトに戻す"
   }
 }

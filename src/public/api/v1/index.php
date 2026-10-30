@@ -494,6 +494,11 @@ $router->put('/notes/{id}/content-width', function($params) use ($notesControlle
     $notesController->updateContentWidth($params['id']);
 });
 
+// Per-note title colour and size (null = default look)
+$router->put('/notes/{id}/title-style', function($params) use ($notesController) {
+    $notesController->updateTitleStyle($params['id']);
+});
+
 // Duplicate a note
 $router->post('/notes/{id}/duplicate', function($params) use ($notesController) {
     $notesController->duplicate($params['id']);

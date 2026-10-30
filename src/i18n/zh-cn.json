@@ -5828,5 +5828,18 @@
       "load_failed": "无法加载已连接的应用。",
       "generic": "出了点问题，请重试。"
     }
+  },
+  "note_title_menu": {
+    "label": "标题样式",
+    "color": "标题颜色",
+    "size": "标题大小",
+    "sizes": {
+      "small": "小",
+      "normal": "正常",
+      "large": "大",
+      "xlarge": "特大"
+    },
+    "change_icon": "更改图标",
+    "reset": "恢复默认"
   }
 }

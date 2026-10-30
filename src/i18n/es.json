@@ -5732,5 +5732,18 @@
       "load_failed": "No se pudieron cargar tus aplicaciones conectadas.",
       "generic": "Algo salió mal. Inténtalo de nuevo."
     }
+  },
+  "note_title_menu": {
+    "label": "Estilo del título",
+    "color": "Color del título",
+    "size": "Tamaño del título",
+    "sizes": {
+      "small": "Pequeño",
+      "normal": "Normal",
+      "large": "Grande",
+      "xlarge": "Muy grande"
+    },
+    "change_icon": "Cambiar icono",
+    "reset": "Restablecer valores predeterminados"
   }
 }

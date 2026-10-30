@@ -1,0 +1,149 @@
+/* Right-click menu of the note title (colour, size, icon, reset), built by
+   js/note-title-menu.js. Same frame as the icon menu of the rail
+   (#iconContextMenu, css/profile-modal.css). */
+#noteTitleMenu {
+    position: fixed;
+    z-index: 10002;
+    width: 232px;
+    padding: 6px 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
+    font-family: 'Inter', sans-serif;
+}
+
+#noteTitleMenu[hidden] {
+    display: none;
+}
+
+#noteTitleMenu .note-title-menu-label {
+    padding: 6px 15px 6px;
+    color: var(--pz-text-muted);
+    font-size: 12px;
+}
+
+#noteTitleMenu .note-title-menu-swatches {
+    display: grid;
+    grid-template-columns: repeat(8, 20px);
+    gap: 6px;
+    padding: 2px 15px 8px;
+}
+
+#noteTitleMenu .note-title-menu-swatch {
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-circle);
+    cursor: pointer;
+}
+
+#noteTitleMenu .note-title-menu-swatch.is-default {
+    background: linear-gradient(135deg, transparent calc(50% - 1px), var(--pz-text-muted) calc(50% - 1px), var(--pz-text-muted) calc(50% + 1px), transparent calc(50% + 1px)), var(--pz-bg);
+}
+
+#noteTitleMenu .note-title-menu-swatch:hover,
+#noteTitleMenu .note-title-menu-swatch:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--pz-bg), 0 0 0 3px var(--pz-border-strong);
+}
+
+#noteTitleMenu .note-title-menu-swatch.is-selected {
+    box-shadow: 0 0 0 2px var(--pz-bg), 0 0 0 4px var(--pz-accent-text);
+}
+
+#noteTitleMenu .note-title-menu-sizes {
+    display: flex;
+    gap: 4px;
+    padding: 2px 15px 8px;
+}
+
+#noteTitleMenu .note-title-menu-size {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background: none;
+    color: var(--pz-text);
+    font-family: inherit;
+    font-weight: var(--pz-weight-semibold);
+    cursor: pointer;
+}
+
+#noteTitleMenu .note-title-menu-size span {
+    line-height: 1;
+}
+
+#noteTitleMenu .note-title-menu-size:hover,
+#noteTitleMenu .note-title-menu-size:focus-visible {
+    outline: none;
+    background-color: var(--pz-surface);
+}
+
+#noteTitleMenu .note-title-menu-size.is-selected {
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+}
+
+#noteTitleMenu .note-title-menu-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--pz-border);
+}
+
+#noteTitleMenu .note-title-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 9px 15px;
+    border: none;
+    background: none;
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+#noteTitleMenu .note-title-menu-item:hover,
+#noteTitleMenu .note-title-menu-item:focus-visible {
+    outline: none;
+    background-color: var(--pz-surface);
+}
+
+#noteTitleMenu .note-title-menu-item i {
+    width: 16px;
+    height: 16px;
+    color: var(--pz-text-muted);
+    background-color: var(--pz-text-muted);
+}
+
+html[data-theme='dark'] #noteTitleMenu {
+    background: var(--pz-surface);
+}
+
+html[data-theme='dark'] #noteTitleMenu .note-title-menu-swatch.is-default {
+    background: linear-gradient(135deg, transparent calc(50% - 1px), var(--pz-text-muted) calc(50% - 1px), var(--pz-text-muted) calc(50% + 1px), transparent calc(50% + 1px)), var(--pz-surface);
+}
+
+html[data-theme='dark'] #noteTitleMenu .note-title-menu-swatch:hover,
+html[data-theme='dark'] #noteTitleMenu .note-title-menu-swatch:focus-visible {
+    box-shadow: 0 0 0 2px var(--pz-surface), 0 0 0 3px var(--pz-border-strong);
+}
+
+html[data-theme='dark'] #noteTitleMenu .note-title-menu-swatch.is-selected {
+    box-shadow: 0 0 0 2px var(--pz-surface), 0 0 0 4px var(--pz-accent-text);
+}
+
+html[data-theme='dark'] #noteTitleMenu .note-title-menu-size:hover,
+html[data-theme='dark'] #noteTitleMenu .note-title-menu-size:focus-visible,
+html[data-theme='dark'] #noteTitleMenu .note-title-menu-item:hover,
+html[data-theme='dark'] #noteTitleMenu .note-title-menu-item:focus-visible {
+    background-color: var(--pz-surface-hover);
+}

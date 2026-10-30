@@ -5836,5 +5836,18 @@
       "load_failed": "Impossible de charger vos applications connectées.",
       "generic": "Une erreur s'est produite. Réessayez."
     }
+  },
+  "note_title_menu": {
+    "label": "Style du titre",
+    "color": "Couleur du titre",
+    "size": "Taille du titre",
+    "sizes": {
+      "small": "Petit",
+      "normal": "Normal",
+      "large": "Grand",
+      "xlarge": "Très grand"
+    },
+    "change_icon": "Changer l'icône",
+    "reset": "Rétablir par défaut"
   }
 }

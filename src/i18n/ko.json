@@ -5576,5 +5576,18 @@
       "load_failed": "연결된 앱을 불러올 수 없습니다.",
       "generic": "문제가 발생했습니다. 다시 시도하세요."
     }
+  },
+  "note_title_menu": {
+    "label": "제목 스타일",
+    "color": "제목 색상",
+    "size": "제목 크기",
+    "sizes": {
+      "small": "작게",
+      "normal": "보통",
+      "large": "크게",
+      "xlarge": "아주 크게"
+    },
+    "change_icon": "아이콘 변경",
+    "reset": "기본값으로 재설정"
   }
 }

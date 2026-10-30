@@ -5576,5 +5576,18 @@
       "load_failed": "Could not load your connected apps.",
       "generic": "Something went wrong. Try again."
     }
+  },
+  "note_title_menu": {
+    "label": "Title style",
+    "color": "Title color",
+    "size": "Title size",
+    "sizes": {
+      "small": "Small",
+      "normal": "Normal",
+      "large": "Large",
+      "xlarge": "Extra large"
+    },
+    "change_icon": "Change icon",
+    "reset": "Reset to default"
   }
 }

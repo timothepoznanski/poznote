@@ -37,7 +37,9 @@ input[type="radio"] {
     margin-top: 15px;
     margin-bottom: 20px;
     margin-left: -3px;
-    font-size: 24px;
+    /* --note-title-size: the per-note size from the title's right-click menu
+       (note_display.php, js/note-title-menu.js), set on the heading. */
+    font-size: var(--note-title-size, 24px);
     font-weight: var(--pz-weight-semibold);
     color: var(--pz-text);
     font-family: 'Poznote Title Emoji', 'Inter', sans-serif;

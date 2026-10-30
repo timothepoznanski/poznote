@@ -161,7 +161,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 47; // 47: entries.kanban_order, the hand-set position of a card inside a Kanban column (#1620)
+    $CURRENT_SCHEMA_VERSION = 48; // 48: entries.title_color + title_size, the per-note look of the title set from its right-click menu
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -266,6 +266,8 @@ try {
             kanban_completed DATETIME,
             trashed_at DATETIME,
             content_width INTEGER,
+            title_color TEXT,
+            title_size INTEGER,
             display_order INTEGER DEFAULT 0,
             dashboard_order INTEGER DEFAULT 0,
             kanban_order INTEGER DEFAULT 0
@@ -807,6 +809,23 @@ try {
             }
         } catch (Exception $e) {
             error_log('Could not add kanban_order column to entries: ' . $e->getMessage());
+        }
+
+        // Ensure the title style columns exist: the colour (#rrggbb, painted
+        // with the palette token like an icon colour) and the font size (px)
+        // of the note title, set from its right-click menu
+        // (js/note-title-menu.js). NULL means the default look.
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            $existingColumns = array_column($cols, 'name');
+            if (!in_array('title_color', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN title_color TEXT");
+            }
+            if (!in_array('title_size', $existingColumns)) {
+                $con->exec("ALTER TABLE entries ADD COLUMN title_size INTEGER");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add title style columns to entries: ' . $e->getMessage());
         }
 
         // Ensure the client state columns exist: the fingerprint of the editor
