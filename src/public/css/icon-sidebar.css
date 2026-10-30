@@ -871,9 +871,10 @@ button.poznote-page-title-workspace-item {
 }
 
 /* dashboard.php only: more room below the title, whose filter row sits right
-   under it. diary.php keeps the 4px set above. */
+   under it (10px here + the topbar's 12px top padding). diary.php keeps the 4px
+   set above. */
 body:not(.diary-page) .dashboard-container > .poznote-page-title {
-    margin-bottom: 22px;
+    margin-bottom: 10px;
 }
 
 /* Both put their controls inside .dashboard-topbar, which adds its own top
@@ -887,4 +888,13 @@ body:not(.diary-page) .dashboard-container > .poznote-page-title {
    to keep them apart. */
 body:not(.diary-page) .dashboard-container > .poznote-page-title + .dashboard-topbar > .board-filter-row {
     margin-top: 0;
+}
+
+/* dashboard.php only: 12px above and below the filter row once the topbar is
+   stuck to the top, with cards scrolling under it. The title's margin and the
+   negative margin here take that room back, so the page at rest does not move. */
+body:not(.diary-page) .dashboard-container > .poznote-page-title + .dashboard-topbar {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: -4px;
 }
