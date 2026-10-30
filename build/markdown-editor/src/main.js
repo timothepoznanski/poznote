@@ -90,6 +90,29 @@ const hiddenRangeField = StateField.define({
 // a class that markdown.css uses to switch them to a monospace font.
 const markdownTableLineDecoration = Decoration.line({ class: 'cm-md-table-line' })
 
+function isMarkdownTableSourceLine(text) {
+  return /^[ \t]*\|/.test(text)
+}
+
+// A wrapping editor's Home and End stop at the edges of what is in sight, and a
+// table row does not wrap (markdown.css): they go to the ends of the row (#1701)
+function moveToTableRowEnd(forward, extend) {
+  return view => {
+    const { state } = view
+    if (!view.lineWrapping || !isMarkdownTableSourceLine(state.doc.lineAt(state.selection.main.head).text)) return false
+    view.dispatch({
+      selection: EditorSelection.create(state.selection.ranges.map(range => {
+        const line = state.doc.lineAt(range.head)
+        const target = forward ? line.to : line.from
+        return extend ? EditorSelection.range(range.anchor, target) : EditorSelection.cursor(target)
+      }), state.selection.mainIndex),
+      scrollIntoView: true,
+      userEvent: 'select'
+    })
+    return true
+  }
+}
+
 function buildMarkdownTableLineDecorations(view) {
   const builder = new RangeSetBuilder()
   let lastLineFrom = -1
@@ -98,7 +121,7 @@ function buildMarkdownTableLineDecorations(view) {
     let pos = range.from
     while (pos <= range.to) {
       const line = view.state.doc.lineAt(pos)
-      if (line.from > lastLineFrom && /^[ \t]*\|/.test(line.text)) {
+      if (line.from > lastLineFrom && isMarkdownTableSourceLine(line.text)) {
         builder.add(line.from, line.from, markdownTableLineDecoration)
         lastLineFrom = line.from
       }
@@ -2014,6 +2037,8 @@ function createEditor(host, options = {}) {
       domHandlers,
       keymap.of([
         { key: 'Shift-Enter', run: insertTableLineBreak },
+        { key: 'Home', mac: 'Cmd-ArrowLeft', run: moveToTableRowEnd(false, false), shift: moveToTableRowEnd(false, true) },
+        { key: 'End', mac: 'Cmd-ArrowRight', run: moveToTableRowEnd(true, false), shift: moveToTableRowEnd(true, true) },
         { key: 'Enter', run: runMarkdownTableEnter(host) },
         { key: 'Enter', run: insertNewlineContinueMarkup },
         { key: 'Enter', run: insertNewlineAtColumnZero },

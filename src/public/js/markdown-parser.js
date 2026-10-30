@@ -684,7 +684,9 @@ function _mdRenderFencedCodeBlockHtml(codeContent, codeBlockLang, codeBlockStart
  * cell's inline markdown (parseMarkdown passes its applyInlineStyles closure).
  */
 function _mdRenderTableHtml(tableRows, tableAlignments, tableStartLine, renderCell) {
-    var tableHtml = '<table data-start-line="' + tableStartLine + '">';
+    // In a box of its own, which scrolls sideways when the table does not fit
+    // the note (css/markdown.css, #1701)
+    var tableHtml = '<div class="markdown-table-scroll"><table data-start-line="' + tableStartLine + '">';
 
     for (var r = 0; r < tableRows.length; r++) {
         var row = tableRows[r];
@@ -693,15 +695,28 @@ function _mdRenderTableHtml(tableRows, tableAlignments, tableStartLine, renderCe
         tableHtml += '<tr>';
         for (var c = 0; c < row.cells.length; c++) {
             var alignment = tableAlignments[c];
-            var alignAttr = alignment ? ' style="text-align: ' + alignment + ';"' : '';
+            var cellHtml = renderCell(row.cells[c]);
+            var cellStyle = (alignment ? 'text-align: ' + alignment + ';' : '') + _mdTableCellMinWidth(cellHtml);
+            var styleAttr = cellStyle ? ' style="' + cellStyle + '"' : '';
             // Formula cells (js/table-formulas.js) are marked for the table menu
             var formulaAttr = row.formulas && row.formulas[c] ? ' data-md-formula="' + row.formulas[c] + '"' : '';
-            tableHtml += '<' + cellTag + alignAttr + formulaAttr + '>' + renderCell(row.cells[c]) + '</' + cellTag + '>';
+            tableHtml += '<' + cellTag + styleAttr + formulaAttr + '>' + cellHtml + '</' + cellTag + '>';
         }
         tableHtml += '</tr>';
     }
 
-    return tableHtml + '</table>';
+    return tableHtml + '</table></div>';
+}
+
+/*
+ * The width a long cell asks for before the table scrolls instead of squeezing
+ * it: its text on about two lines, 18em at most. Short cells ask for nothing,
+ * so a table that fits the note keeps the columns the browser gives it.
+ */
+function _mdTableCellMinWidth(cellHtml) {
+    var length = cellHtml.replace(/<[^>]*>/g, '').length;
+    if (length < 24) return '';
+    return '--markdown-table-cell-min: ' + Math.min(18, Math.ceil(length / 4)) + 'em;';
 }
 
 /*

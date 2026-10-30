@@ -185,6 +185,10 @@ function _mdPatchMarkdownPreview(previewDiv, html) {
         if (tops[r] === before || tops[r] === after) return null;
     }
 
+    var scrollLefts = oldNodes.slice(start, oldEnd).map(function (oldNode) {
+        return oldNode.nodeType === 1 ? oldNode.scrollLeft : 0;
+    });
+
     // Everything between the two, extra nodes added since included
     var node = before ? before.nextSibling : previewDiv.firstChild;
     while (node && node !== after) {
@@ -199,6 +203,17 @@ function _mdPatchMarkdownPreview(previewDiv, html) {
         fragment.appendChild(insertedNode);
     });
     previewDiv.insertBefore(fragment, after);
+
+    // A table being edited stays scrolled where it was (#1701)
+    if (oldEnd - start === newEnd - start) {
+        inserted.forEach(function (insertedNode, index) {
+            var replaced = oldNodes[start + index];
+            if (replaced.nodeType === 1 && insertedNode.nodeType === 1 &&
+                replaced.classList.contains('markdown-table-scroll') && insertedNode.classList.contains('markdown-table-scroll')) {
+                insertedNode.scrollLeft = scrollLefts[index];
+            }
+        });
+    }
 
     if (shift) {
         for (var k = oldEnd; k < oldNodes.length; k++) {

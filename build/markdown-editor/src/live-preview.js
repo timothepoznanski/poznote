@@ -1415,6 +1415,24 @@ class RenderedBlockWidget extends WidgetType {
     return block
   }
 
+  // A table drawn again after an edit stays scrolled where it was: a wide table
+  // would otherwise jump back to its first column at each cell written (#1701)
+  updateDOM(dom) {
+    if (this.kind !== 'table' || !dom.classList.contains('cm-live-block-table')) return false
+    const scroller = dom.querySelector('.markdown-table-scroll')
+    const scrollLeft = scroller ? scroller.scrollLeft : 0
+    dom.classList.toggle('cm-live-block-folded', this.folded)
+    try {
+      dom.innerHTML = window.parseMarkdown(this.source)
+    } catch (error) {
+      dom.textContent = this.source
+    }
+    if (dom.querySelector('.math-block, .math-inline')) renderMath(dom)
+    const redrawn = dom.querySelector('.markdown-table-scroll')
+    if (redrawn) redrawn.scrollLeft = scrollLeft
+    return true
+  }
+
   destroy(dom) {
     if (dom && dom._livePreviewResizeObserver) dom._livePreviewResizeObserver.disconnect()
   }

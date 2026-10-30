@@ -592,9 +592,12 @@
     }
 
     function leaveHover(related) {
-        if (related && (related === rowHandle || related === columnHandle ||
-            (hoverTable && hoverTable.contains(related)))) return;
         clearTimeout(hoverHideTimer);
+        // (the box of a wide table counts as the table: its scrollbar is on the
+        // way to the row button)
+        const area = hoverTable ? hoverTable.closest('.markdown-table-scroll') || hoverTable : null;
+        if (related && (related === rowHandle || related === columnHandle ||
+            (area && area.contains(related)))) return;
         // (time to cross the gap between the table and a button)
         hoverHideTimer = setTimeout(hideHandles, 250);
     }
@@ -606,21 +609,25 @@
             return;
         }
         const rect = hoverTable.getBoundingClientRect();
-        const clip = getClipRect(hoverTable);
+        // A wide Markdown table scrolls in its box (#1701): the buttons go around
+        // the box, the row button under its scrollbar and the column button
+        // beside it, wherever the table is scrolled to
+        const box = hoverTable.closest('.markdown-table-scroll');
+        const edges = box ? box.getBoundingClientRect() : rect;
+        const clip = getClipRect(box || hoverTable);
         const size = 16;
         // (clear of the column resize grip along an HTML table's edge)
         const gap = 6;
 
-        const rowTop = rect.bottom + gap;
-        const rowLeft = Math.max(rect.left, clip.left);
-        const rowWidth = Math.min(rect.right, clip.right) - rowLeft;
+        const rowTop = edges.bottom + gap;
+        const rowLeft = Math.max(edges.left, clip.left);
+        const rowWidth = Math.min(edges.right, clip.right) - rowLeft;
         rowHandle.hidden = rowTop + size > clip.bottom || rowTop < clip.top || rowWidth < size;
         rowHandle.style.top = Math.round(rowTop) + 'px';
         rowHandle.style.left = Math.round(rowLeft) + 'px';
         rowHandle.style.width = Math.round(rowWidth) + 'px';
 
-        // A table wider than its box has no right edge in sight
-        const columnLeft = rect.right + gap;
+        const columnLeft = box ? Math.min(edges.right + gap, clip.right - size) : rect.right + gap;
         const columnTop = Math.max(rect.top, clip.top);
         const columnHeight = Math.min(rect.bottom, clip.bottom) - columnTop;
         columnHandle.hidden = columnLeft + size > clip.right || columnHeight < size;
