@@ -223,6 +223,8 @@ const markdownInlineCodePlugin = ViewPlugin.fromClass(class {
 // measured in px with a canvas using the editor's computed font (ch units
 // overshoot badly in the proportional app font), cached per font + prefix.
 // Inline padding is safe because markdown.css zeroes .cm-line padding here.
+// Lines of a code block are skipped: a "1." or "-" there is code, not a list
+// item, and the inline padding would override the line-number gutter (#1698).
 const listMarkerPrefixRegex = /^([ \t]*)(?:[-*+]|\d+(?:\.\d+)*\.)[ \t]+(?:\[[ xX]\][ \t]+)?/
 
 let hangingIndentMeasure = null
@@ -238,16 +240,39 @@ function getHangingIndentMeasure(view) {
   return hangingIndentMeasure
 }
 
+function getVisibleCodeBlockRanges(view) {
+  const tree = syntaxTree(view.state)
+  const ranges = []
+
+  for (const range of view.visibleRanges) {
+    tree.iterate({
+      from: range.from,
+      to: range.to,
+      enter(node) {
+        if (node.name !== 'FencedCode' && node.name !== 'CodeBlock') return
+        ranges.push({ from: node.from, to: node.to })
+        return false
+      }
+    })
+  }
+
+  return ranges
+}
+
 function buildHangingIndentDecorations(view) {
   const builder = new RangeSetBuilder()
   const measure = getHangingIndentMeasure(view)
+  const codeRanges = getVisibleCodeBlockRanges(view)
+  let codeIndex = 0
   let lastLineFrom = -1
 
   for (const range of view.visibleRanges) {
     let pos = range.from
     while (pos <= range.to) {
       const line = view.state.doc.lineAt(pos)
-      if (line.from > lastLineFrom) {
+      while (codeIndex < codeRanges.length && codeRanges[codeIndex].to < line.from) codeIndex++
+      const inCode = codeIndex < codeRanges.length && codeRanges[codeIndex].from <= line.from
+      if (line.from > lastLineFrom && !inCode) {
         const match = listMarkerPrefixRegex.exec(line.text)
         if (match && match[0].length < line.text.length) {
           let width = measure.widths.get(match[0])
@@ -274,7 +299,7 @@ const hangingIndentPlugin = ViewPlugin.fromClass(class {
   }
 
   update(update) {
-    if (update.docChanged || update.viewportChanged || update.geometryChanged) {
+    if (update.docChanged || update.viewportChanged || update.geometryChanged || syntaxTree(update.startState) !== syntaxTree(update.state)) {
       this.decorations = buildHangingIndentDecorations(update.view)
     }
   }
