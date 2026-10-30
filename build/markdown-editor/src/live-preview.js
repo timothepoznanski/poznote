@@ -1663,6 +1663,9 @@ function startTableCellEdit(view, block, cell, select) {
   cell.addEventListener('blur', onBlur)
 
   cell.focus()
+  // A wide table scrolls in its box (#1701), and focus() leaves a cell half
+  // out of it as it is: Tab to the next column would type out of sight
+  cell.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   const range = document.createRange()
   range.selectNodeContents(cell)
   if (!select) range.collapse(false)
