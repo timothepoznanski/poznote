@@ -354,6 +354,23 @@
     font-weight: var(--pz-weight-semibold);
 }
 
+/* Title colour picked in the note's title menu (notes_list.php,
+   js/note-title-menu.js). It holds on the open note too, which the weight
+   still marks: that is the note whose colour was just changed. The id and the
+   !important outrank the selected and dark rules (dark-mode/layout.css); the
+   hover keeps the accent of every other row. */
+#left_col a.links_arbo_left .note-title.has-title-color {
+    color: var(--note-title-color) !important;
+}
+
+#left_col a.links_arbo_left:hover .note-title.has-title-color {
+    color: var(--pz-accent-strong) !important;
+}
+
+html[data-theme='dark'] #left_col a.links_arbo_left:hover .note-title.has-title-color {
+    color: var(--pz-accent-text) !important;
+}
+
 /* "Other accounts" block at the bottom of the notes list (notes_list.php,
    js/other-accounts.js): one collapsible block per account this login can
    open besides the active one, its tree fetched on first expansion and shown

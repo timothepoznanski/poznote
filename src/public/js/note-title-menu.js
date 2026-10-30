@@ -15,7 +15,8 @@
  * applyStyle() does: the colour inline and !important on the field
  * (theme-init.js forces the title colour in dark mode), the size as
  * --note-title-size on the heading, which css/notes/editor.css and
- * css/notes/subline.css read for the title and its icon.
+ * css/notes/subline.css read for the title and its icon. The colour is
+ * repainted on the note's rows in the notes tree as well (paintTree()).
  */
 (function () {
     'use strict';
@@ -65,9 +66,28 @@
         };
     }
 
+    // The note's rows in the notes tree, and the shortcuts that open it
+    // (notes_list.php renders the same class and property).
+    function paintTree(noteId, color) {
+        var css = color ? (window.poznoteIconColorCss ? window.poznoteIconColorCss(color) : color) : '';
+        var selector = '#left_col a.links_arbo_left[data-note-id="' + noteId + '"] .note-title, '
+            + '#left_col a.links_arbo_left[data-linked-note-id="' + noteId + '"] .note-title';
+        document.querySelectorAll(selector).forEach(function (title) {
+            if (css) {
+                title.classList.add('has-title-color');
+                title.style.setProperty('--note-title-color', css);
+            } else {
+                title.classList.remove('has-title-color');
+                title.style.removeProperty('--note-title-color');
+                if (!title.getAttribute('style')) title.removeAttribute('style');
+            }
+        });
+    }
+
     function applyStyle(heading, style) {
         if (!heading) return;
         var input = heading.querySelector('.css-title');
+        if (input && /^inp\d+$/.test(input.id)) paintTree(input.id.slice(3), style.color);
 
         if (style.color) {
             heading.setAttribute('data-title-color', style.color);
