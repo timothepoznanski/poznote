@@ -73,8 +73,15 @@
 }
 
 /* The wrapping editor keeps the width of the note: a wide table scrolls in its
-   own box instead of widening it (#1701) */
+   own box instead of widening it (#1701). The host matters when the note opens
+   directly in the editor: its container is a flex box then
+   (js/markdown-view-modes.js), which it fills whatever its lines' length. */
 .markdown-codemirror-host .cm-content.cm-lineWrapping {
+    min-width: 0;
+}
+
+.markdown-editor-container > .markdown-codemirror-host {
+    flex: 1 1 0;
     min-width: 0;
 }
 
@@ -85,6 +92,13 @@
     width: max-content;
     min-width: 100%;
     white-space: pre;
+}
+
+/* (js/markdown-lists-tables.js pads these characters as two columns) */
+.markdown-editor .cm-md-table-wide {
+    display: inline-block;
+    width: 2ch;
+    text-align: center;
 }
 
 /* Lines of a code block (cm-md-code-line, set by the markdown editor bundle)

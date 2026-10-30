@@ -89,6 +89,11 @@ const hiddenRangeField = StateField.define({
 // visible in a fixed-width font, so lines that look like table rows are tagged with
 // a class that markdown.css uses to switch them to a monospace font.
 const markdownTableLineDecoration = Decoration.line({ class: 'cm-md-table-line' })
+// A Chinese, Japanese or Korean character takes two columns of that font, which
+// no fallback font does exactly: markdown.css gives it that width (same
+// characters as getMarkdownTableTextWidth in markdown-lists-tables.js)
+const markdownTableWideCharDecoration = Decoration.mark({ class: 'cm-md-table-wide' })
+const MARKDOWN_TABLE_WIDE_CHARS = /[\u1100-\u115F\u2E80-\u303E\u3041-\u33FF\u3400-\u4DBF\u4E00-\u9FFF\uA960-\uA97F\uAC00-\uD7FF\uF900-\uFAFF\uFE30-\uFE6F\uFF00-\uFF60\uFFE0-\uFFE6]/g
 
 function isMarkdownTableSourceLine(text) {
   return /^[ \t]*\|/.test(text)
@@ -123,6 +128,9 @@ function buildMarkdownTableLineDecorations(view) {
       const line = view.state.doc.lineAt(pos)
       if (line.from > lastLineFrom && isMarkdownTableSourceLine(line.text)) {
         builder.add(line.from, line.from, markdownTableLineDecoration)
+        for (const match of line.text.matchAll(MARKDOWN_TABLE_WIDE_CHARS)) {
+          builder.add(line.from + match.index, line.from + match.index + 1, markdownTableWideCharDecoration)
+        }
         lastLineFrom = line.from
       }
       pos = line.to + 1
