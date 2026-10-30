@@ -107,8 +107,9 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true, $withLinks = f
             return "\x01" . strlen($m[1]);
         }, $text);
         $text = preg_replace('/^ {0,3}#{1,6}\s+/m', '', $text);
-        $text = preg_replace('/!\[[^\]]*\]\([^)]*\)/', ' ', $text);
-        $text = preg_replace_callback('/\[([^\]]*)\]\(([^)]*)\)/', function ($m) use ($withLinks, &$links) {
+        // (balanced parentheses in the address: "https://en.wikipedia.org/wiki/Foo_(bar)")
+        $text = preg_replace('/!\[[^\]]*\]\((?:[^()]|\([^()]*\))*\)/', ' ', $text);
+        $text = preg_replace_callback('/\[([^\]]*)\]\(((?:[^()]|\([^()]*\))*)\)/', function ($m) use ($withLinks, &$links) {
             if (!$withLinks) return $m[1];
             // [text](<url> "title"): the target is the first word
             $parts = preg_split('/\s+/', trim($m[2]));
@@ -298,7 +299,7 @@ function extractMarkdownChecklistItems(string $markdown): array {
             continue;
         }
         // Plain-text label: links keep their text, emphasis/code markers go
-        $text = preg_replace('/!?\[([^\]]*)\]\([^)]*\)/', '$1', $m[3]);
+        $text = preg_replace('/!?\[([^\]]*)\]\((?:[^()]|\([^()]*\))*\)/', '$1', $m[3]);
         $text = str_replace(['**', '__', '~~', '`'], '', (string)$text);
         $text = trim((string)preg_replace('/\s+/u', ' ', $text));
         if ($text === '') {

@@ -1114,10 +1114,19 @@ function parseMarkdown(text) {
 
     function protectMarkdownBackslashEscapes(input) {
         return input.replace(/\\([!"#$%&'()*+,\-.\/:;<=>?@\[\\\]\\^_`{|}~])(\1*)/g, function (match, escapedChar, repeatedChars) {
+            // A backslash escapes a whole run of a delimiter ("\**"), but a
+            // bracket or a parenthesis on its own: in "[x](https://a.b/c\(d\))"
+            // the last ")" closes the link.
+            let rest = '';
+            if ('()[]'.indexOf(escapedChar) !== -1) {
+                rest = repeatedChars || '';
+                repeatedChars = '';
+                match = match.slice(0, 2);
+            }
             let placeholder = '\x00MDESC' + markdownEscapeIndex + '\x00';
             protectedMarkdownEscapes[markdownEscapeIndex] = escapeHtml(escapedChar + (repeatedChars || ''));
             markdownEscapeIndex++;
-            return rememberPlaceholderSource(placeholder, match);
+            return rememberPlaceholderSource(placeholder, match) + rest;
         });
     }
 
@@ -1162,7 +1171,16 @@ function parseMarkdown(text) {
     });
 
     // Protect links [text](url "title")
-    text = text.replace(/\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/g, function (match, linkText, url, title) {
+    text = text.replace(_mdGetMarkdownLinkRegex(), function (match, linkText, angleUrl, plainUrl, title) {
+        let url = angleUrl !== undefined ? angleUrl : plainUrl;
+
+        // "\(" and "\)" were set aside above; in an address they stand for
+        // the character itself.
+        url = url.replace(/\x00MDESC(\d+)\x00/g, function (escape, index) {
+            const escaped = protectedMarkdownEscapes[parseInt(index, 10)];
+            return escaped !== undefined ? _mdDecodeHtmlEntities(escaped) : escape;
+        });
+
         // The browser decodes character references in an attribute: decode
         // them first, so that the URL checked here is the one it would follow,
         // then write it fully escaped so that nothing is left to decode.
@@ -1426,11 +1444,9 @@ function parseMarkdown(text) {
         function linkifyPlainUrls(input) {
             var urlRegex = /(^|[\s(])((?:https?:\/\/)[^\s<]+)/g;
             return input.replace(urlRegex, function (match, prefix, url) {
-                var trailing = '';
-                while (/[),.;!?*_~]$/.test(url)) {
-                    trailing = url.slice(-1) + trailing;
-                    url = url.slice(0, -1);
-                }
+                var parts = _mdSplitAutolinkTrailing(url);
+                url = parts[0];
+                var trailing = parts[1];
                 if (!url) return match;
                 protectedUrls.push('<a href="' + _mdEscapeAttributeQuotes(url) + '" target="_blank" rel="noopener">' + url + '</a>');
                 return prefix + '\x00URL' + (protectedUrls.length - 1) + '\x00' + trailing;

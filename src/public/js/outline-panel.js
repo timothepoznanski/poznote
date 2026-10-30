@@ -633,7 +633,7 @@ function extractHeadings(noteElement) {
                         .replace(/_(.+?)_/g, '$1')                 // italic _text_
                         .replace(/~~(.+?)~~/g, '$1')               // strikethrough ~~text~~
                         .replace(/`(.+?)`/g, '$1')                 // inline code `text`
-                        .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1'); // links [text](url)
+                        .replace(/\[([^\]]+)\]\((?:[^\s()]|\([^\s()]*\)|\s+"[^"]*")*\)/g, '$1'); // links [text](url), parentheses in url balanced
                     const id = `md-heading-${lineIndex}-${text.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 
                     // Find corresponding element in preview if available.
