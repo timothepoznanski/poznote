@@ -8,7 +8,8 @@
   <a href="MCP-SERVER.ru.md">Русский</a> ·
   <b>简体中文</b> ·
   <a href="MCP-SERVER.ko.md">한국어</a> ·
-  <a href="MCP-SERVER.ja.md">日本語</a>
+  <a href="MCP-SERVER.ja.md">日本語</a> ·
+  <a href="MCP-SERVER.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 

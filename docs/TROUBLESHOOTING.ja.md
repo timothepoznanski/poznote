@@ -8,7 +8,8 @@
   <a href="TROUBLESHOOTING.ru.md">Русский</a> ·
   <a href="TROUBLESHOOTING.zh-cn.md">简体中文</a> ·
   <a href="TROUBLESHOOTING.ko.md">한국어</a> ·
-  <b>日本語</b>
+  <b>日本語</b> ·
+  <a href="TROUBLESHOOTING.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 
