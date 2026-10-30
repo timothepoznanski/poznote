@@ -95,7 +95,11 @@
     },
     "network_error": "网络错误",
     "none": "无",
-    "show_more_notes": "显示更多（还剩 {{count}} 条）"
+    "show_more_notes": "显示更多（还剩 {{count}} 条）",
+    "customize_menu": "自定义此菜单",
+    "click_toggles": "点击直接切换",
+    "click_opens_menu": "点击打开菜单",
+    "right_click_toggle_hint": "右键点击按钮，可改为点击直接切换"
   },
   "snapshot": {
     "menu_item": "修订版本",
@@ -525,7 +529,7 @@
       "login_disabled": "跳过登录页面：任何能访问此实例的浏览器都会直接打开您的账户，无需用户名、密码或双重验证码。仅当只有您本人能访问此实例，或其前面的反向代理负责认证时才开启。API 仍然要求凭据。",
       "outbound_hosts": "非管理员用户只能将 Webhook、Git Sync 和他们自己的 AI、转录或 MCP 服务器连接到公共互联网主机。在此列出允许他们使用的本地主机或网络，例如 Ollama 或 n8n 服务器。管理员不受限制。",
       "diary_template": "选择一篇笔记，工作区 {{workspace}} 中的每个新日记条目都以其内容开头。列表显示该工作区中名为“模板”（或 Templates）的文件夹里的笔记。每个工作区都有自己的模板。",
-      "markdown_view_cycle": "选择 Markdown 笔记的视图按钮在经典视图（预览，用铅笔编辑）之后依次切换的视图。未选中的视图会被跳过。如果一个都没有选中，按钮将被隐藏。在手机上，按钮不会切换到分屏模式。",
+      "markdown_view_cycle": "选择 Markdown 笔记的视图菜单在经典视图（预览，用铅笔编辑）之外提供的视图。未选中的视图不会列出。如果一个都没有选中，按钮将被隐藏。在手机上，菜单不会提供分屏模式。",
       "connected_apps": "通过 MCP 服务器将 ChatGPT、Claude 等聊天应用连接到你的笔记，并可随时断开连接。",
       "custom_logo": "为所有用户用您自己的标志替换 Poznote 标志：浏览器标签页、登录页面、图标栏以及已安装应用的图标。",
       "two_factor_required": "所有使用密码登录的账户都必须使用双重身份验证。尚未设置的账户会在下次登录时完成设置，未使用双重身份验证打开的会话将结束。账户密码将无法再通过 API 使用：应用需改用应用密码。SSO 登录不受影响，其第二重验证由身份提供商负责。"
@@ -907,7 +911,7 @@
       "format_toolbar_mode": "格式工具栏",
       "workspace_activity_emails": "共享工作区邮件",
       "diary_template": "日记条目模板",
-      "markdown_view_cycle": "视图按钮"
+      "markdown_view_cycle": "视图菜单"
     },
     "badges": {
       "font_size_default": "默认 ({{size}}px)",
@@ -1257,6 +1261,10 @@
     "paste": {
       "images_dropped_one": "有 1 张图片无法粘贴。请单独复制该图片后再粘贴。",
       "images_dropped_other": "有 {{count}} 张图片无法粘贴。请逐张复制后再粘贴。"
+    },
+    "view_menu": {
+      "title": "切换视图",
+      "classic": "经典"
     }
   },
   "info": {
@@ -1357,7 +1365,7 @@
     },
     "theme_list": {
       "title": "主题列表",
-      "description": "每次点击图标侧边栏的主题按钮，都会切换到此列表中的下一个主题。勾选要提供的主题，用箭头调整顺序，勾选某个 CSS 文件即可把它也作为主题提供。",
+      "description": "点击图标侧边栏的主题按钮会打开一个菜单，列出此列表中的主题。勾选要提供的主题，用箭头调整顺序，勾选某个 CSS 文件即可把它也作为主题提供。",
       "mode_help": "这个样式表是为浅色模式还是深色模式编写的？",
       "move_up": "上移",
       "move_down": "下移",
@@ -5828,5 +5836,21 @@
       "load_failed": "无法加载已连接的应用。",
       "generic": "出了点问题，请重试。"
     }
+  },
+  "note_title_menu": {
+    "label": "标题样式",
+    "color": "标题颜色",
+    "size": "标题大小",
+    "sizes": {
+      "small": "小",
+      "normal": "正常",
+      "large": "大",
+      "xlarge": "特大"
+    },
+    "change_icon": "更改图标",
+    "reset": "恢复默认"
+  },
+  "note_subline_menu": {
+    "label": "标题下方"
   }
 }

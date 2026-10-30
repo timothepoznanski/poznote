@@ -596,7 +596,7 @@ function poznoteCloneNoteRecord(PDO $con, int $noteId, array $options = []): ?ar
     $overrideFolder = array_key_exists('folderId', $options);
     $actorUserId    = (int)($options['actorUserId'] ?? 0);
 
-    $stmt = $con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color, content_width FROM entries WHERE id = ? AND trash = 0");
+    $stmt = $con->prepare("SELECT heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color, content_width, title_color, title_size FROM entries WHERE id = ? AND trash = 0");
     $stmt->execute([$noteId]);
     $originalNote = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$originalNote) {
@@ -665,7 +665,7 @@ function poznoteCloneNoteRecord(PDO $con, int $noteId, array $options = []): ?ar
     }
 
     // Insert new note
-    $insertStmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color, content_width, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
+    $insertStmt = $con->prepare("INSERT INTO entries (heading, entry, tags, folder, folder_id, workspace, type, attachments, icon, icon_color, color, content_width, title_color, title_size, created, updated, trash, favorite, created_by_user_id, updated_by_user_id) VALUES (?, '', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), 0, 0, ?, ?)");
     $insertStmt->execute([
         $newHeading,
         $originalNote['tags'],
@@ -678,6 +678,8 @@ function poznoteCloneNoteRecord(PDO $con, int $noteId, array $options = []): ?ar
         $originalNote['icon_color'],
         $originalNote['color'],
         $originalNote['content_width'],
+        $originalNote['title_color'],
+        $originalNote['title_size'],
         $actorUserId,
         $actorUserId
     ]);

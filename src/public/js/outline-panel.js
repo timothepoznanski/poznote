@@ -703,7 +703,11 @@ function renderOutline(headings) {
     // Clear existing outline
     outlineNav.innerHTML = '';
 
-    if (!headings || headings.length === 0) {
+    // Nothing to open: css/outline.css hides the toggle while the panel is closed
+    const isEmpty = !headings || headings.length === 0;
+    document.documentElement.classList.toggle('outline-no-headings', isEmpty);
+
+    if (isEmpty) {
         // Show empty state
         const noHeadingsText = typeof window.t === 'function' ? window.t('common.outline.no_headings', null, 'No headings in this note') : 'No headings in this note';
         outlineNav.innerHTML = `

@@ -571,7 +571,22 @@
                         $noteIconColor = !empty($row['icon_color']) ? (string)$row['icon_color'] : '';
                         $titleNoteIcon = renderEditableNoteIcon($row['id'], $heading, $noteIconRaw, $noteIconColor, 'note-title-icon', $note_type);
                     }
-                    echo '<h4 class="note-title-heading">'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.'/>';
+                    // Title look set from its right-click menu (js/note-title-menu.js,
+                    // which applies changes the same way). The colour is inline and
+                    // !important: theme-init.js forces the title colour in dark mode.
+                    // The size is a property of the heading, the icon follows it.
+                    $titleHeadingAttrs = '';
+                    $titleInputStyle = '';
+                    $titleColorCss = poznoteIconColorCss($row['title_color'] ?? '');
+                    if ($titleColorCss !== '') {
+                        $titleHeadingAttrs .= ' data-title-color="' . htmlspecialchars((string)$row['title_color'], ENT_QUOTES) . '"';
+                        $titleInputStyle = ' style="color: ' . htmlspecialchars($titleColorCss, ENT_QUOTES) . ' !important;"';
+                    }
+                    if (isset($row['title_size']) && $row['title_size'] !== '') {
+                        $titleSize = min(64, max(12, (int)$row['title_size']));
+                        $titleHeadingAttrs .= ' data-title-size="' . $titleSize . '" style="--note-title-size: ' . $titleSize . 'px;"';
+                    }
+                    echo '<h4 class="note-title-heading"'.$titleHeadingAttrs.'>'.$titleNoteIcon.'<input class="css-title" autocomplete="off" autocapitalize="off" spellcheck="false" id="inp'.$row['id'].'" type="text" placeholder="'.$titlePlaceholder.'" value="'.$titleValue.'"'.$titleReadonlyAttr.$titleInputStyle.'/>';
                     // Subline: a small line of metadata under the title, inside
                     // the heading so that it starts where the title text does,
                     // past the note icon (css/notes/subline.css). The dates,

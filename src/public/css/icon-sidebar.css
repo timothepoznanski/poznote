@@ -93,8 +93,10 @@
    #icon_sidebar is overflow:hidden, so an absolutely positioned menu would be
    clipped by the rail. js/icon-sidebar-toggle.js sets top/left. */
 /* position: fixed and placed by JS: the rail scrolls and clips, an absolutely
-   positioned menu would be cut off. */
-#iconSidebarOverflowMenu {
+   positioned menu would be cut off. The theme button's menu is built the same
+   way (js/theme-manager.js) and shares the look. */
+#iconSidebarOverflowMenu,
+#themePickerMenu {
     display: none;
     position: fixed;
     z-index: 10000;
@@ -109,8 +111,54 @@
     box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.15);
 }
 
-#iconSidebarOverflowMenu.icon-sidebar-overflow-open {
+#iconSidebarOverflowMenu.icon-sidebar-overflow-open,
+#themePickerMenu.icon-sidebar-overflow-open {
     display: block;
+}
+
+/* The theme menu lists choices, not the rail's own entries: its labels read in
+   the text colour rather than the rail's resting grey. Hover, focus and the
+   theme in use keep their accent. */
+#themePickerMenu .icon-sidebar-overflow-item:not(.icon-sidebar-overflow-item-active):not(:hover):not(:focus-visible) {
+    color: var(--pz-text);
+}
+
+/* Each theme's icon in that theme's main colour (--pz-theme-swatch-*, css/tokens.css),
+   hover and the theme in use included. js/theme-manager.js puts the class on
+   each entry; a custom theme has none and keeps the label's colour. */
+#themePickerMenu .theme-swatch-light { --pz-theme-swatch: var(--pz-theme-swatch-light); }
+#themePickerMenu .theme-swatch-dark { --pz-theme-swatch: var(--pz-theme-swatch-dark); }
+#themePickerMenu .theme-swatch-black { --pz-theme-swatch: var(--pz-theme-swatch-black); }
+#themePickerMenu .theme-swatch-lavender { --pz-theme-swatch: var(--pz-theme-swatch-lavender); }
+#themePickerMenu .theme-swatch-sepia { --pz-theme-swatch: var(--pz-theme-swatch-sepia); }
+#themePickerMenu .theme-swatch-terminal { --pz-theme-swatch: var(--pz-theme-swatch-terminal); }
+
+#themePickerMenu [data-theme-choice] .lucide {
+    color: var(--pz-theme-swatch, currentColor);
+    background-color: var(--pz-theme-swatch, currentColor);
+}
+
+/* Last line of the theme menu: a right-click on the button switches it to
+   stepping through the themes (js/theme-manager.js) */
+.icon-sidebar-overflow-hint {
+    /* As wide as the entries, never wider: a long sentence wraps instead of
+       stretching the menu */
+    width: 0;
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 6px 10px 4px;
+    color: var(--pz-text-muted);
+    font-size: 12px;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+}
+
+/* Before the last entry of the theme menu, the way to the theme list */
+.icon-sidebar-overflow-separator {
+    height: 1px;
+    margin: 6px 4px;
+    background: var(--pz-border);
 }
 
 .icon-sidebar-overflow-item {
@@ -823,9 +871,10 @@ button.poznote-page-title-workspace-item {
 }
 
 /* dashboard.php only: more room below the title, whose filter row sits right
-   under it. diary.php keeps the 4px set above. */
+   under it (10px here + the topbar's 12px top padding). diary.php keeps the 4px
+   set above. */
 body:not(.diary-page) .dashboard-container > .poznote-page-title {
-    margin-bottom: 22px;
+    margin-bottom: 10px;
 }
 
 /* Both put their controls inside .dashboard-topbar, which adds its own top
@@ -839,4 +888,13 @@ body:not(.diary-page) .dashboard-container > .poznote-page-title {
    to keep them apart. */
 body:not(.diary-page) .dashboard-container > .poznote-page-title + .dashboard-topbar > .board-filter-row {
     margin-top: 0;
+}
+
+/* dashboard.php only: 12px above and below the filter row once the topbar is
+   stuck to the top, with cards scrolling under it. The title's margin and the
+   negative margin here take that room back, so the page at rest does not move. */
+body:not(.diary-page) .dashboard-container > .poznote-page-title + .dashboard-topbar {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    margin-bottom: -4px;
 }

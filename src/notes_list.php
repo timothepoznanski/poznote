@@ -384,7 +384,13 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
 
     echo "<div class='note-list-item'>";
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
-    echo "<span class='note-title'>" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . $mentionMarker . "</span>";
+    // Colour picked in the title's right-click menu (js/note-title-menu.js,
+    // which repaints these rows the same way), css/sidebar.css paints it.
+    $titleColorCss = poznoteIconColorCss($row1['title_color'] ?? '');
+    $titleColorAttrs = $titleColorCss !== ''
+        ? " has-title-color' style='--note-title-color: " . htmlspecialchars($titleColorCss, ENT_QUOTES) . "'"
+        : "'";
+    echo "<span class='note-title" . $titleColorAttrs . ">" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . $mentionMarker . "</span>";
     echo "</a>";
     // Kept offline: marked itself, or in a kept folder and not left out
     $offlineMark = (int)($row1['offline'] ?? 0);

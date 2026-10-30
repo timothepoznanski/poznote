@@ -351,7 +351,7 @@ class NotesController {
         if (!empty($noteIds)) {
             $placeholders = implode(',', array_fill(0, count($noteIds), '?'));
             $sql = "SELECT id, heading, entry, updated, type, trash, tags, folder_id, workspace, attachments, "
-                . "icon, icon_color, color, favorite, pinned, content_width, reminder_at, linked_note_id "
+                . "icon, icon_color, color, favorite, pinned, content_width, title_color, title_size, reminder_at, linked_note_id "
                 . "FROM entries WHERE id IN ($placeholders)";
             $params = $noteIds;
             if ($scoped) {
@@ -378,6 +378,8 @@ class NotesController {
                     (string)($row['favorite'] ?? '0'),
                     (string)($row['pinned'] ?? '0'),
                     (string)($row['content_width'] ?? ''),
+                    (string)($row['title_color'] ?? ''),
+                    (string)($row['title_size'] ?? ''),
                     (string)($row['reminder_at'] ?? ''),
                     (string)($row['linked_note_id'] ?? ''),
                     (string)($row['trash'] ?? '0'),
@@ -654,7 +656,7 @@ class NotesController {
             }
 
 
-            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, display_order, dashboard_order FROM entries" . $where;
+            $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, title_color, title_size, display_order, dashboard_order FROM entries" . $where;
             
             // Handle sorting
             $notes_without_folders_after = false;
@@ -836,12 +838,12 @@ class NotesController {
             if ($id !== null && is_numeric($id)) {
                 $noteId = (int)$id;
                 if ($useWorkspaceFilter) {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, title_color, title_size, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                     $params = [$noteId, $workspace];
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
                 } else {
-                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0";
+                    $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, title_color, title_size, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0";
                     $params = [$noteId];
                     $stmt = $this->con->prepare($sql);
                     $stmt->execute($params);
@@ -861,7 +863,7 @@ class NotesController {
                 $refId = is_numeric($reference)
                     ? (int)$reference
                     : findNoteIdByTitle($this->con, $reference, $workspace, true);
-                $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
+                $sql = "SELECT id, heading, type, workspace, tags, folder, folder_id, favorite, created, updated, linked_note_id, reminder_at, icon, icon_color, color, content_width, title_color, title_size, display_order, dashboard_order, client_state_hash, client_state_version, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?";
                 $params = [$refId, $workspace];
                 $stmt = $this->con->prepare($sql);
                 $stmt->execute($params);
@@ -928,6 +930,8 @@ class NotesController {
                     'version' => $version,
                     'reminder_at' => $row['reminder_at'] ?? null,
                     'content_width' => isset($row['content_width']) ? (int)$row['content_width'] : null,
+                    'title_color' => $row['title_color'] ?? null,
+                    'title_size' => isset($row['title_size']) ? (int)$row['title_size'] : null,
                     'display_order' => (int)($row['display_order'] ?? 0),
                     'dashboard_order' => (int)($row['dashboard_order'] ?? 0),
                     // Fingerprint of the editor state the web client last saved,
@@ -1895,6 +1899,84 @@ class NotesController {
             $this->sendSuccess([
                 'message' => 'Note content width updated successfully',
                 'content_width' => $contentWidth
+            ]);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error occurred');
+        }
+    }
+
+    /**
+     * PUT /api/v1/notes/{id}/title-style
+     * Set the look of the note title, from its right-click menu.
+     * Body: { "title_color": "#2563eb", "title_size": 30 }
+     *   title_color  #rrggbb, painted with the palette token like an icon
+     *                colour; null or "" for the default colour
+     *   title_size   font size in px (12 to 64); null for the default size
+     * A field left out keeps its value, at least one must be sent.
+     *
+     * Presentation state like the content width, so it is not pushed to Git.
+     */
+    public function updateTitleStyle(string $id): void {
+        if (!is_numeric($id)) {
+            $this->sendError(400, 'Invalid note ID');
+            return;
+        }
+
+        $noteId = (int)$id;
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($input)
+            || (!array_key_exists('title_color', $input) && !array_key_exists('title_size', $input))) {
+            $this->sendError(400, 'Invalid JSON in request body: expected "title_color" and/or "title_size"');
+            return;
+        }
+
+        $sets = [];
+        $params = [];
+        if (array_key_exists('title_color', $input)) {
+            $titleColor = $input['title_color'] === null ? '' : trim((string)$input['title_color']);
+            if ($titleColor !== '' && !preg_match('/^#[0-9a-fA-F]{6}$/', $titleColor)) {
+                $this->sendError(400, 'Invalid value for "title_color": expected a #rrggbb colour, or null');
+                return;
+            }
+            $sets[] = 'title_color = ?';
+            $params[] = $titleColor === '' ? null : strtolower($titleColor);
+        }
+        if (array_key_exists('title_size', $input)) {
+            $titleSize = $input['title_size'];
+            if ($titleSize !== null) {
+                $titleSize = filter_var($titleSize, FILTER_VALIDATE_INT, ['options' => ['min_range' => 12, 'max_range' => 64]]);
+                if ($titleSize === false) {
+                    $this->sendError(400, 'Invalid value for "title_size": expected a size in px between 12 and 64, or null');
+                    return;
+                }
+            }
+            $sets[] = 'title_size = ?';
+            $params[] = $titleSize;
+        }
+
+        try {
+            $existsStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ? AND trash = 0');
+            $existsStmt->execute([$noteId]);
+            if (!$existsStmt->fetchColumn()) {
+                $this->sendError(404, 'Note not found');
+                return;
+            }
+
+            $params[] = $noteId;
+            $stmt = $this->con->prepare('UPDATE entries SET ' . implode(', ', $sets) . ' WHERE id = ?');
+            if (!$stmt->execute($params)) {
+                $this->sendError(500, 'Database error while updating title style');
+                return;
+            }
+
+            $readStmt = $this->con->prepare('SELECT title_color, title_size FROM entries WHERE id = ?');
+            $readStmt->execute([$noteId]);
+            $row = $readStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+            $this->sendSuccess([
+                'message' => 'Note title style updated successfully',
+                'title_color' => $row['title_color'] ?? null,
+                'title_size' => isset($row['title_size']) ? (int)$row['title_size'] : null
             ]);
         } catch (Exception $e) {
             $this->sendError(500, 'Database error occurred');

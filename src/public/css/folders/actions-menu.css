@@ -460,6 +460,10 @@ html.tree-keyboard-mouse-hidden #left_col a.links_arbo_left:not(.selected-note):
     color: inherit !important;
 }
 
+html.tree-keyboard-mouse-hidden #left_col a.links_arbo_left:hover .note-title.has-title-color {
+    color: var(--note-title-color) !important;
+}
+
 /* Only where the three dots hide without a hover: touch screens keep them on
    (media blocks above) */
 @media (hover: hover) and (min-width: 801px) {

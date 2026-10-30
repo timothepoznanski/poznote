@@ -1272,7 +1272,7 @@ function switchToSplitMode(noteId) {
 
 /**
  * Split view on or off. The view button of the floating stack goes through
- * cycleMarkdownView() below instead.
+ * setMarkdownView() below instead.
  */
 function toggleMarkdownSplitView(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
@@ -1338,12 +1338,12 @@ function _mdSetLiveSyntax(shown) {
     });
 }
 
-// The four views of a Markdown note, in the order their button of the
-// floating stack goes through them: classic (the preview, with the pencil to
+// The four views of a Markdown note, in the order the menu of their button
+// in the floating stack lists them: classic (the preview, with the pencil to
 // edit), live preview, rich text, split view. The account picks the ones
-// after classic in Settings > Markdown (markdown_view_cycle, discussion 1677,
-// <body data-markdown-view-cycle>); a view left out is skipped, and the
-// button still leaves it when the note is in it. A phone has no split view.
+// offered besides classic in Settings > Markdown (markdown_view_cycle,
+// discussion 1677, <body data-markdown-view-cycle>); a view left out is not
+// listed, unless the note is in it. A phone has no split view.
 var MARKDOWN_CYCLE_VIEWS = ['live', 'rich', 'split'];
 
 function _mdGetViewCycle() {
@@ -1356,13 +1356,38 @@ function _mdGetViewCycle() {
     });
 }
 
-function getNextMarkdownViewState(state) {
-    var isMobileViewport = false;
+// The view a note is in: classic, live, rich or split
+function getMarkdownViewState(noteId) {
+    var noteEntry = document.getElementById('entry' + noteId);
+    if (noteEntry && noteEntry.classList.contains('markdown-split-mode')) return 'split';
+    return _mdIsLiveEditing() ? (_mdIsRichText() ? 'rich' : 'live') : 'classic';
+}
+
+function _mdIsMobileViewport() {
     try {
-        isMobileViewport = (window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
+        return !!(window.matchMedia && window.matchMedia('(max-width: 800px)').matches);
     } catch (e) {
-        isMobileViewport = false;
+        return false;
     }
+}
+
+// What the view menu lists for a note in `state`: classic first, then the
+// views the account kept, plus the one the note is in so the menu can say
+// where it is and leave it.
+function getMarkdownViewMenuStates(state) {
+    var isMobileViewport = _mdIsMobileViewport();
+    var kept = _mdGetViewCycle();
+    return ['classic'].concat(MARKDOWN_CYCLE_VIEWS.filter(function (view) {
+        if (view === 'split' && isMobileViewport) return false;
+        return view === state || kept.indexOf(view) !== -1;
+    }));
+}
+
+// The view after `state` when the button steps through the views rather than
+// opening the menu (markdown_view_button_cycle, its right-click menu): the views the
+// account kept, in order, then back to classic.
+function getNextMarkdownViewState(state) {
+    var isMobileViewport = _mdIsMobileViewport();
     var cycle = _mdGetViewCycle().filter(function (view) {
         return view !== 'split' || !isMobileViewport;
     });
@@ -1373,10 +1398,10 @@ function getNextMarkdownViewState(state) {
     return 'classic';
 }
 
-// Where the cycle goes back to when it leaves live rendering or the split
-// view: the classic mode the note was in when it started, preview or editor
-// (noted on the note entry by cycleMarkdownView()). A note that opened live
-// has no such memory and follows the Default view mode setting.
+// Where the menu goes back to when it leaves live rendering or the split
+// view for the classic one: the classic mode the note was in before, preview
+// or editor (noted on the note entry by setMarkdownView()). A note that
+// opened live has no such memory and follows the Default view mode setting.
 function getMarkdownClassicReturnMode(noteId) {
     var noteEntry = document.getElementById('entry' + noteId);
     var remembered = noteEntry ? noteEntry.getAttribute('data-markdown-classic-mode') : '';
@@ -1385,16 +1410,16 @@ function getMarkdownClassicReturnMode(noteId) {
 }
 
 /**
- * Next view of the note, for the view button of the floating stack
- * (js/index-events.js, data-action="cycle-markdown-view").
+ * Put the note in a view (classic, live, rich or split), for the menu of the
+ * view button of the floating stack (js/ui-customization-panel.js).
  */
-function cycleMarkdownView(noteId) {
+function setMarkdownView(noteId, next) {
     var noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
     var isSplit = noteEntry.classList.contains('markdown-split-mode');
-    var current = isSplit ? 'split' : (_mdIsLiveEditing() ? (_mdIsRichText() ? 'rich' : 'live') : 'classic');
-    var next = getNextMarkdownViewState(current);
+    var current = getMarkdownViewState(noteId);
+    if (next === current) return;
     var viewModeBtn = document.querySelector('#note' + noteId + ' .markdown-view-mode-btn');
     var mode = viewModeBtn ? viewModeBtn.getAttribute('data-current-mode') : '';
 
@@ -1408,7 +1433,11 @@ function cycleMarkdownView(noteId) {
         // never shows it; both draw in the same editor
         _mdSetLiveSyntax(next === 'live');
         _mdSetLiveEditing(true);
-        if (mode === 'preview') {
+        if (isSplit) {
+            // With live rendering on, leaving the split lands in the editor
+            // at the same place
+            exitSplitMode(noteId);
+        } else if (mode === 'preview') {
             // The editor is the place to be now, see _mdIsLiveEditing()
             switchToEditMode(noteId);
         } else if (mode) {
@@ -1420,7 +1449,7 @@ function cycleMarkdownView(noteId) {
         // editor shows the raw source: a note opened next comes up in it
         switchToSplitMode(noteId);
     } else {
-        // Back to where the cycle started, and to the pencil
+        // Back to the classic view the note was in, and to the pencil
         var returnMode = getMarkdownClassicReturnMode(noteId);
         noteEntry.removeAttribute('data-markdown-classic-mode');
         _mdSetLiveEditing(false);
@@ -1434,6 +1463,14 @@ function cycleMarkdownView(noteId) {
             switchToPreviewMode(noteId);
         }
     }
+}
+
+/**
+ * Next view of the note, for the view button when it steps through the views
+ * (js/index-events.js, data-action="cycle-markdown-view").
+ */
+function cycleMarkdownView(noteId) {
+    setMarkdownView(noteId, getNextMarkdownViewState(getMarkdownViewState(noteId)));
 }
 
 // Exit split view mode (return to edit mode)
@@ -1488,8 +1525,11 @@ window.switchToPreviewMode = switchToPreviewMode;
 window.switchToSplitMode = switchToSplitMode;
 window.exitSplitMode = exitSplitMode;
 window.toggleMarkdownSplitView = toggleMarkdownSplitView;
+window.setMarkdownView = setMarkdownView;
 window.cycleMarkdownView = cycleMarkdownView;
 window.getNextMarkdownViewState = getNextMarkdownViewState;
+window.getMarkdownViewState = getMarkdownViewState;
+window.getMarkdownViewMenuStates = getMarkdownViewMenuStates;
 window.isMarkdownRichText = _mdIsRichText;
 window.getMarkdownClassicReturnMode = getMarkdownClassicReturnMode;
 window.getMarkdownContent = getMarkdownContent;

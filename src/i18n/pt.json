@@ -96,7 +96,11 @@
     },
     "network_error": "Erro de rede",
     "none": "Nenhum",
-    "show_more_notes": "Mostrar mais ({{count}} restantes)"
+    "show_more_notes": "Mostrar mais ({{count}} restantes)",
+    "customize_menu": "Personalizar este menu",
+    "click_toggles": "Alternar ao clicar",
+    "click_opens_menu": "Abrir um menu ao clicar",
+    "right_click_toggle_hint": "Clique com o botão direito no botão para alternar ao clicar"
   },
   "snapshot": {
     "menu_item": "Revisões",
@@ -526,7 +530,7 @@
       "login_disabled": "Ignora a tela de login: qualquer navegador que chegue a esta instância abre diretamente a sua conta, sem nome de usuário, senha ou código de dois fatores. Ative apenas se só você consegue acessar esta instância, ou se um proxy reverso à frente dela cuida da autenticação. A API continua pedindo credenciais.",
       "outbound_hosts": "Os utilizadores não administradores só podem ligar os webhooks, o Git Sync e os seus próprios servidores de IA, transcrição ou MCP a hosts públicos da Internet. Indique aqui os hosts ou redes locais que podem usar, como um servidor Ollama ou n8n. Os administradores não têm limites.",
       "diary_template": "Escolha uma nota cujo conteúdo serve de ponto de partida para cada nova entrada do diário do espaço de trabalho {{workspace}}. A lista mostra as notas guardadas numa pasta chamada Modelos (ou Templates) desse espaço. Cada espaço de trabalho tem o seu próprio modelo.",
-      "markdown_view_cycle": "Escolha as visualizações que o botão de visualização de uma nota markdown percorre depois da visualização clássica (pré-visualização, com o lápis para editar). As visualizações não escolhidas são ignoradas. Se nenhuma for escolhida, o botão fica oculto. Num telemóvel o botão nunca passa ao modo dividido.",
+      "markdown_view_cycle": "Escolha as visualizações que o menu de visualizações de uma nota markdown oferece além da visualização clássica (pré-visualização, com o lápis para editar). As visualizações não escolhidas não aparecem. Se nenhuma for escolhida, o botão fica oculto. Num telemóvel o menu nunca oferece o modo dividido.",
       "connected_apps": "Conecte aplicativos de chat como ChatGPT ou Claude às suas notas pelo servidor MCP e desconecte-os quando quiser.",
       "custom_logo": "Substituir o logótipo do Poznote pelo seu, para todos os utilizadores: no separador do navegador, na página de início de sessão, na barra de ícones e como ícone da aplicação instalada.",
       "two_factor_required": "Toda conta que entra com senha precisa usar a autenticação em dois fatores. Uma conta sem ela a configura no próximo login, e as sessões abertas sem ela são encerradas. A senha da conta deixa de funcionar pela API: os aplicativos usam uma senha de aplicativo. Os logins por SSO não são afetados, o provedor de identidade cuida do segundo fator deles."
@@ -908,7 +912,7 @@
       "format_toolbar_mode": "Barra de formatação",
       "workspace_activity_emails": "E-mails de espaços compartilhados",
       "diary_template": "Modelo de entrada do diário",
-      "markdown_view_cycle": "Botão de visualização"
+      "markdown_view_cycle": "Menu de visualizações"
     },
     "badges": {
       "font_size_default": "padrão ({{size}}px)",
@@ -1259,6 +1263,10 @@
     "paste": {
       "images_dropped_one": "Não foi possível colar 1 imagem. Copie-a separadamente para adicioná-la.",
       "images_dropped_other": "Não foi possível colar {{count}} imagens. Copie-as uma a uma para adicioná-las."
+    },
+    "view_menu": {
+      "title": "Mudar de visualização",
+      "classic": "Clássica"
     }
   },
   "info": {
@@ -1359,7 +1367,7 @@
     },
     "theme_list": {
       "title": "Lista de temas",
-      "description": "Cada clique no botão de tema da barra de ícones passa para o tema seguinte desta lista. Marque os que quer oferecer, ordene-os com as setas e marque um ficheiro CSS para o oferecer também como tema.",
+      "description": "O botão de tema da barra de ícones abre um menu com os temas desta lista. Marque os que quer oferecer, ordene-os com as setas e marque um ficheiro CSS para o oferecer também como tema.",
       "mode_help": "Esta folha de estilos foi escrita para o modo claro ou para o modo escuro?",
       "move_up": "Subir",
       "move_down": "Descer",
@@ -5732,5 +5740,21 @@
       "load_failed": "Não foi possível carregar seus aplicativos conectados.",
       "generic": "Algo deu errado. Tente novamente."
     }
+  },
+  "note_title_menu": {
+    "label": "Estilo do título",
+    "color": "Cor do título",
+    "size": "Tamanho do título",
+    "sizes": {
+      "small": "Pequeno",
+      "normal": "Normal",
+      "large": "Grande",
+      "xlarge": "Muito grande"
+    },
+    "change_icon": "Alterar ícone",
+    "reset": "Restaurar padrão"
+  },
+  "note_subline_menu": {
+    "label": "Abaixo do título"
   }
 }

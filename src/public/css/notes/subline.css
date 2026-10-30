@@ -187,7 +187,8 @@ body.show-note-created .note-subline {
 .innernote .note-title-heading .note-title-icon {
     grid-column: 1;
     grid-row: 1;
-    font-size: 20px;
+    /* 20px next to the default 24px title, in proportion to a resized one. */
+    font-size: calc(var(--note-title-size, 24px) * 5 / 6);
     margin: 15px 8px 20px 0;
 }
 

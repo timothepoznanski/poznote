@@ -250,7 +250,8 @@ html[data-theme='dark'] .icon-sidebar-btn-active .lucide {
 
 /* Overflow menu: a floating popup rather than part of the rail, so it takes the
    surface colours instead of the sidebar's. */
-html[data-theme='dark'] #iconSidebarOverflowMenu {
+html[data-theme='dark'] #iconSidebarOverflowMenu,
+html[data-theme='dark'] #themePickerMenu {
     background: var(--pz-surface);
     border-color: var(--pz-border);
     box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.5);

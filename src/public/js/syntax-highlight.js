@@ -984,6 +984,51 @@
         }, 250);
     });
 
+    // Arrow up in a numbered block: each line is a display:block .code-line,
+    // and Chromium does not stop on one that holds nothing but its newline.
+    // Going up, the caret jumped over every blank line (going down it does
+    // not). When the line above the caret's row is blank, the caret is put on
+    // it here; anything else is left to the browser.
+    function isBlankCodeLine(line) {
+        return !!line && line.classList && line.classList.contains('code-line') &&
+            (line.textContent === '\n' || line.textContent === '');
+    }
+
+    function isOnFirstRowOf(line, node, offset) {
+        // (a blank line has one row, and no rectangle for a caret on it)
+        if (isBlankCodeLine(line)) return true;
+        var caret = document.createRange();
+        caret.setStart(node, offset);
+        caret.collapse(true);
+        var caretRect = caret.getClientRects()[0];
+        var content = document.createRange();
+        content.selectNodeContents(line);
+        var firstRow = content.getClientRects()[0];
+        if (!caretRect || !firstRow) return false;
+        return caretRect.top < firstRow.bottom - 1;
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== 'ArrowUp' || e.ctrlKey || e.altKey || e.metaKey || e.defaultPrevented || e.isComposing) return;
+        var selection = window.getSelection ? window.getSelection() : null;
+        if (!selection || !selection.focusNode || (!e.shiftKey && !selection.isCollapsed)) return;
+        var focusNode = selection.focusNode;
+        var focusElement = focusNode.nodeType === 1 ? focusNode : focusNode.parentElement;
+        var line = focusElement && focusElement.closest ? focusElement.closest('code.code-line-numbers > .code-line') : null;
+        var host = line ? line.closest('.noteentry') : null;
+        if (!host || !host.isContentEditable) return;
+        var above = line.previousElementSibling;
+        if (!isBlankCodeLine(above) || !isOnFirstRowOf(line, focusNode, selection.focusOffset)) return;
+
+        var target = above.firstChild && above.firstChild.nodeType === 3 ? above.firstChild : above;
+        e.preventDefault();
+        if (e.shiftKey) {
+            selection.extend(target, 0);
+        } else {
+            selection.collapse(target, 0);
+        }
+    });
+
     /**
      * Apply syntax highlighting to all code blocks in a container
      * @param {HTMLElement} container - The container to search for code blocks (optional, defaults to document)

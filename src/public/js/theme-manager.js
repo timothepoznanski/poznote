@@ -1,6 +1,6 @@
 /**
  * Theme Manager for Poznote
- * Applies a theme and walks the rail button through the list of themes.
+ * Applies a theme and opens the rail button's menu of themes.
  */
 
 (function () {
@@ -248,20 +248,24 @@
     }
 
     /**
-     * Open the theme list, when the click has nowhere else to go.
+     * Open the theme list: the last entry of the rail button's menu, and
+     * window.toggleTheme when the list holds a single theme.
      *
      * Only an admin can edit that list, so nobody else is sent to it. The modal
-     * lives on settings.php: this opens it in place when already there, and
-     * follows the rail's own settings link otherwise, which is the one thing on
-     * the page that already knows the way from a subdirectory.
+     * sits next to the rail for admins (icon_sidebar.php,
+     * js/theme-list-modal.js) and opens on the page it is on. A page without
+     * the rail (public_folder.php) follows the way to settings.php instead.
      */
-    function openThemeList() {
-        if (!window.__poznoteThemeListEditable) return false;
+    function canEditThemeList() {
+        return typeof window.poznoteOpenThemeListModal === 'function';
+    }
 
-        if (typeof window.poznoteOpenThemeListModal === 'function') {
+    function openThemeList() {
+        if (canEditThemeList()) {
             window.poznoteOpenThemeListModal();
             return true;
         }
+        if (!window.__poznoteThemeListEditable) return false;
 
         var settingsLink = document.getElementById('iconSidebarSettingsBtn');
         var href = settingsLink ? (settingsLink.getAttribute('href') || '') : '';
@@ -276,9 +280,10 @@
         return true;
     }
 
-    // Step to the next theme in the list. Used by the rail button, by the other
-    // buttons carrying data-theme-toggle and by public_folder.php through
-    // window.toggleTheme.
+    // Step to the next theme in the list. Used by public_folder.php through
+    // window.toggleTheme, and by the rail button when the account chose it
+    // from the button's right-click menu (theme_button_cycle,
+    // data-theme-cycle); otherwise the rail button opens a menu (below).
     function toggleTheme() {
         // One theme means the click has nothing to switch to: it opens the list
         // so an admin can put something in it.
@@ -304,9 +309,8 @@
             : (fallbacks[theme] || theme);
     }
 
-    // Show the theme currently in use. The button walks through the list, so
-    // the title names what is applied rather than what the next click brings:
-    // the icon of a custom theme is the same for all of them.
+    // Show the theme currently in use: the title names it, since the icon of
+    // a custom theme is the same for all of them.
     function updateThemeUI(mode) {
         var appliedTheme = getForcedTheme() || resolveTheme(mode);
         var def = getThemeDef(appliedTheme);
@@ -346,19 +350,234 @@
     window.applyTheme = applyTheme;
     window.getPoznoteThemes = getThemes;
 
-    // The rail button steps to the next theme on every click. It briefly opened
-    // a picker instead, when the list was the six built-in themes and nothing
-    // could be taken out of it; the list is curated now, so a click walks it.
+    // ---------------------------------------------------------------------
+    // The menu of the rail button.
+    //
+    // A click opens the list of themes rather than stepping to the next one,
+    // and an admin finds the way to the list itself as the last entry. The
+    // account can have the click step through the list instead, from the
+    // button's right-click menu (theme_button_cycle, data-theme-cycle on the
+    // button, setThemeButtonCycles() below). Built
+    // here rather than in icon_sidebar.php, with the classes of the rail's
+    // overflow menu, so the two read the same (css/icon-sidebar.css).
+    var MENU_ID = 'themePickerMenu';
+    var MENU_OPEN_CLASS = 'icon-sidebar-overflow-open';
+    var menuButton = null;
+
+    function getMenu() {
+        var menu = document.getElementById(MENU_ID);
+        if (menu) return menu;
+
+        menu = document.createElement('div');
+        menu.id = MENU_ID;
+        menu.setAttribute('role', 'menu');
+        document.body.appendChild(menu);
+        return menu;
+    }
+
+    function isMenuOpen() {
+        var menu = document.getElementById(MENU_ID);
+        return !!menu && menu.classList.contains(MENU_OPEN_CLASS);
+    }
+
+    function closeMenu(restoreFocus) {
+        var menu = document.getElementById(MENU_ID);
+        if (menu) menu.classList.remove(MENU_OPEN_CLASS);
+        if (menuButton) {
+            menuButton.setAttribute('aria-expanded', 'false');
+            if (restoreFocus) menuButton.focus();
+        }
+        menuButton = null;
+    }
+
+    function menuItems() {
+        var menu = document.getElementById(MENU_ID);
+        return menu ? Array.prototype.slice.call(menu.querySelectorAll('.icon-sidebar-overflow-item')) : [];
+    }
+
+    // position: fixed, like the overflow menu: the rail scrolls and clips, so
+    // an absolutely positioned menu would be cut off. Beside the button, or
+    // above it when the button is not on a side of the screen.
+    function positionMenu(menu, button) {
+        var box = button.getBoundingClientRect();
+        var size = menu.getBoundingClientRect();
+        var gap = 8;
+        var left = box.right + gap;
+        if (left + size.width > window.innerWidth - gap) {
+            left = Math.max(gap, box.left - size.width - gap);
+        }
+        var top = Math.min(box.bottom - size.height, window.innerHeight - size.height - gap);
+        menu.style.left = Math.round(left) + 'px';
+        menu.style.top = Math.round(Math.max(gap, top)) + 'px';
+    }
+
+    function menuItem(icon, text) {
+        var item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'icon-sidebar-overflow-item';
+        var glyph = document.createElement('i');
+        glyph.className = 'lucide ' + icon;
+        item.appendChild(glyph);
+        var span = document.createElement('span');
+        span.textContent = text;
+        item.appendChild(span);
+        return item;
+    }
+
+    function openMenu(button) {
+        var menu = getMenu();
+        var current = getForcedTheme() || resolveTheme(getCurrentThemeMode());
+
+        menu.innerHTML = '';
+        getThemes().forEach(function (def) {
+            var item = menuItem(def.icon || 'lucide-sun', label(def.id));
+            var checked = def.id === current;
+            item.setAttribute('role', 'menuitemradio');
+            item.setAttribute('data-theme-choice', def.id);
+            item.setAttribute('aria-checked', checked ? 'true' : 'false');
+            item.classList.toggle('icon-sidebar-overflow-item-active', checked);
+            // The icon in the theme's own colour (css/icon-sidebar.css); a
+            // custom theme ("custom:file.css") has none
+            if (/^[a-z]+$/.test(def.id)) item.classList.add('theme-swatch-' + def.id);
+            menu.appendChild(item);
+        });
+
+        var separator = document.createElement('div');
+        separator.className = 'icon-sidebar-overflow-separator';
+        separator.setAttribute('role', 'separator');
+        menu.appendChild(separator);
+
+        // Only an admin can edit the list (openThemeList())
+        if (canEditThemeList()) {
+            var edit = menuItem('lucide-settings', window.t
+                ? window.t('common.customize_menu', null, 'Customize this menu')
+                : 'Customize this menu');
+            edit.setAttribute('role', 'menuitem');
+            edit.setAttribute('data-theme-list-edit', '');
+            menu.appendChild(edit);
+        }
+
+        // How to have the click step through the themes instead (the
+        // button's right-click menu, below). From the button: half the pages
+        // carrying the rail have no i18n runtime.
+        var hintText = button.getAttribute('data-label-menu-hint');
+        if (hintText) {
+            var hint = document.createElement('div');
+            hint.className = 'icon-sidebar-overflow-hint';
+            hint.setAttribute('role', 'none');
+            hint.textContent = hintText;
+            menu.appendChild(hint);
+        }
+
+        menuButton = button;
+        menu.classList.add(MENU_OPEN_CLASS);
+        button.setAttribute('aria-expanded', 'true');
+        positionMenu(menu, button);
+
+        var active = menu.querySelector('[aria-checked="true"]') || menuItems()[0];
+        if (active) active.focus();
+    }
+
     document.addEventListener('click', function (event) {
         var target = event.target;
         if (!target || typeof target.closest !== 'function') return;
 
+        var choice = target.closest('[data-theme-choice]');
+        if (choice) {
+            event.preventDefault();
+            applyTheme(choice.getAttribute('data-theme-choice'), true);
+            closeMenu(false);
+            return;
+        }
+
+        if (target.closest('[data-theme-list-edit]')) {
+            event.preventDefault();
+            closeMenu(false);
+            openThemeList();
+            return;
+        }
+
         var themeToggle = target.closest('[data-theme-toggle]');
+        if (themeToggle && themeToggle.hasAttribute('data-theme-cycle')) {
+            event.preventDefault();
+            closeMenu(false);
+            toggleTheme();
+            return;
+        }
         if (themeToggle) {
             event.preventDefault();
-            toggleTheme();
+            var reopen = !isMenuOpen() || menuButton !== themeToggle;
+            closeMenu(false);
+            if (reopen) openMenu(themeToggle);
+            return;
+        }
+
+        if (isMenuOpen() && !target.closest('#' + MENU_ID)) {
+            closeMenu(false);
         }
     });
+
+    document.addEventListener('keydown', function (event) {
+        if (!isMenuOpen()) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            closeMenu(true);
+            return;
+        }
+        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+        var items = menuItems();
+        if (!items.length) return;
+        event.preventDefault();
+        var index = items.indexOf(document.activeElement);
+        var next = event.key === 'ArrowDown' ? index + 1 : index - 1;
+        items[(next + items.length) % items.length].focus();
+    });
+
+    window.addEventListener('resize', function () {
+        if (isMenuOpen()) closeMenu(false);
+    });
+
+    // Menu or toggle, switched from the button's right-click menu and saved
+    // on the account (theme_button_cycle), applied at once to the buttons of
+    // the page
+    function setThemeButtonCycles(cycles) {
+        var toggles = document.querySelectorAll('[data-theme-toggle]');
+        for (var i = 0; i < toggles.length; i++) {
+            toggles[i].toggleAttribute('data-theme-cycle', cycles);
+            if (cycles) {
+                toggles[i].removeAttribute('aria-haspopup');
+                toggles[i].removeAttribute('aria-expanded');
+            } else {
+                toggles[i].setAttribute('aria-haspopup', 'menu');
+                toggles[i].setAttribute('aria-expanded', 'false');
+            }
+        }
+        fetch('/api/v1/settings/theme_button_cycle', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ value: cycles ? '1' : '0' })
+        }).catch(function (error) {
+            console.warn('theme-manager: click mode could not be saved:', error);
+        });
+    }
+
+    // Its entry in the rail's right-click menu (js/icon-sidebar-colors.js),
+    // naming the mode a click on it switches to. The labels come from the
+    // button: half the pages carrying the rail have no i18n runtime.
+    window.__poznoteIconContextItems = window.__poznoteIconContextItems || {};
+    window.__poznoteIconContextItems.iconSidebarThemeToggleBtn = function (button) {
+        var cycles = button.hasAttribute('data-theme-cycle');
+        return [{
+            icon: cycles ? 'lucide-list' : 'lucide-repeat',
+            label: button.getAttribute(cycles ? 'data-label-click-menu' : 'data-label-click-cycles')
+                || (cycles ? 'Open a menu on click' : 'Toggle on click'),
+            run: function () {
+                closeMenu(false);
+                setThemeButtonCycles(!cycles);
+            }
+        }];
+    };
 
     // The dictionary loads asynchronously; refresh labels once translations arrive.
     document.addEventListener('poznote:i18n:loaded', function () {

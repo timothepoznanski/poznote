@@ -1608,6 +1608,49 @@ paths:
         '404':
           description: Note not found
 
+  /notes/{id}/title-style:
+    put:
+      tags: [Notes]
+      summary: Update note title style
+      description: >
+        Set the color and the font size of the note title. A field left out
+        keeps its current value, at least one must be sent.
+      parameters:
+        - $ref: '#/components/parameters/UserIdHeader'
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title_color:
+                  type: string
+                  nullable: true
+                  example: "#2563eb"
+                  description: >
+                    `#rrggbb` color of the title text. `null` or an empty
+                    string restores the default color.
+                title_size:
+                  type: integer
+                  nullable: true
+                  minimum: 12
+                  maximum: 64
+                  example: 30
+                  description: Font size of the title in pixels, `null` for the default size.
+      responses:
+        '200':
+          description: Title style updated
+        '400':
+          description: Invalid color or size
+        '404':
+          description: Note not found
+
   /notes/{id}/convert:
     post:
       tags: [Notes]

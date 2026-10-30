@@ -59,7 +59,9 @@
 #icon_sidebar .icon-sidebar-btn [class*="lucide-"],
 #icon_sidebar .icon-sidebar-btn [class*="lucide-"]:hover,
 #iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"],
-#iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"]:hover {
+#iconSidebarOverflowMenu .icon-sidebar-overflow-item [class*="lucide-"]:hover,
+#themePickerMenu .icon-sidebar-overflow-item [class*="lucide-"],
+#themePickerMenu .icon-sidebar-overflow-item [class*="lucide-"]:hover {
     transform: none;
 }
 

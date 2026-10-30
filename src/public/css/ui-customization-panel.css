@@ -107,7 +107,7 @@ html.focus-mode .pz-edge-focus-btn {
 
 /* View of a Markdown note (classic, live rendering, split view): lit outside
    the classic state, like the toggles above. js/ui-customization-panel.js sets
-   is-active and the icon, and unhides the button for a Markdown note. */
+   is-active and the icon, and unhides its anchor for a Markdown note. */
 .pz-edge-view-btn.is-active {
     opacity: 1;
     color: var(--pz-accent-text);
@@ -153,6 +153,11 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     display: flex;
 }
 
+/* The view button's anchor (#edgeSplitViewBtn) waits for a Markdown note */
+.pz-edge-menu-anchor[hidden] {
+    display: none;
+}
+
 .page-more-menu {
     position: absolute;
     right: calc(100% + 8px);
@@ -173,6 +178,7 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
 
 .page-more-menu-item {
     width: 100%;
+    box-sizing: border-box;
     padding: 7px 14px;
     border: none;
     background: transparent;
@@ -180,6 +186,7 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     font: inherit;
     font-size: 0.9em;
     text-align: left;
+    text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
     display: flex;
@@ -214,6 +221,40 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     color: var(--pz-text-muted);
 }
 
+/* The view menu (#markdownViewMenu): the view the note is in, and a rule
+   before the way to the setting that picks the views listed */
+.page-more-menu-item[aria-checked="true"],
+.page-more-menu-item[aria-checked="true"] [class*="lucide-"],
+.page-more-menu-item[aria-checked="true"] [class*="devicon-"] {
+    color: var(--pz-accent-text);
+}
+
+.page-more-menu-item [class*="devicon-"] {
+    width: 15px;
+    color: var(--pz-text-muted);
+}
+
+.page-more-menu-separator {
+    height: 1px;
+    margin: 4px 0;
+    background: var(--pz-border);
+}
+
+/* Last line of the view menu: a right-click on the button switches it to
+   stepping through the views (js/ui-customization-panel.js). As wide as the
+   entries, never wider: the sentence wraps instead of stretching the menu. */
+.page-more-menu-hint {
+    width: 0;
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 6px 14px 4px;
+    color: var(--pz-text-muted);
+    font-size: 12px;
+    line-height: 1.35;
+    text-align: center;
+    white-space: normal;
+}
+
 .page-more-menu-state:not(:empty)::before {
     content: ': ';
 }
@@ -232,6 +273,12 @@ html[data-theme='dark'] .page-more-menu-item [class*="lucide-"] {
 html[data-theme='dark'] .page-more-menu-item:hover,
 html[data-theme='dark'] .page-more-menu-item:focus-visible {
     background-color: var(--pz-surface-hover);
+}
+
+html[data-theme='dark'] .page-more-menu-item[aria-checked="true"],
+html[data-theme='dark'] .page-more-menu-item[aria-checked="true"] [class*="lucide-"],
+html[data-theme='dark'] .page-more-menu-item[aria-checked="true"] [class*="devicon-"] {
+    color: var(--pz-accent-text);
 }
 
 /* Help modals of the "..." menu (keyboard shortcuts, Markdown syntax). Scoped

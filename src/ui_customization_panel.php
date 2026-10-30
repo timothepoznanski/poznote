@@ -129,6 +129,20 @@ $pzShortcutKeyLabels = [
     'Click' => t_h('keyboard_shortcuts.keys.click', [], 'Click'),
 ];
 $pzMoreMenuLabel = t_h('page_menu.button', [], 'More options');
+// View menu of a Markdown note. Its last entry opens the setting choosing the
+// views it lists, on settings.php, which only the owner of the account may
+// open (requireActiveAccountOwner): the rail drops its Settings link in an
+// account shared with this login, and the menu drops this entry likewise.
+$pzViewMenuLabel = t_h('editor.view_menu.title', [], 'Change view');
+// markdown_view_button_cycle, chosen from the button's right-click menu: the
+// button steps to the next view on each click, as it did before the menu, and
+// its title says where it leads
+$pzViewButtonCycles = function_exists('getSetting') && (string)getSetting('markdown_view_button_cycle', '0') === '1';
+$pzViewMenuSettingsUrl = '';
+if ($uiCustomizationPanelPage === 'notes'
+    && (!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser())) {
+    $pzViewMenuSettingsUrl = 'settings.php?open=markdown-views';
+}
 // Focus mode (discussion 1482): F11 or this button, see js/icon-sidebar-toggle.js
 $pzFocusModeLabel = t_h('focus_mode.button', [], 'Focus mode') . ' (F11)';
 require_once __DIR__ . '/markdown_syntax_content.php';
@@ -140,32 +154,71 @@ require_once __DIR__ . '/markdown_syntax_content.php';
          (note_display.php) sit under it, see css/ui-customization-panel.css. -->
     <div class="pz-edge-stack">
         <?php if ($uiCustomizationPanelPage === 'notes'): ?>
-        <!-- View of a Markdown note, one button cycling through its four
-             states: classic (preview, with the pencil to edit), live preview
+        <!-- View of a Markdown note: one button opening a menu of its four
+             views, classic (preview, with the pencil to edit), live preview
              (the editor shows the note formatted, the syntax comes back under
              the caret; discussion 1582), rich text (same, but the syntax is
              never shown and typed text is never read as Markdown) and split
              view (discussion 1482). The two live views are the account's
              markdown_live_editing and markdown_live_show_syntax settings. The
-             button shows the icon of the state it is in, lit outside the
-             classic one, and its title says where a click leads; the last one
-             goes back to where the cycle started, the preview or the classic
-             editor. Hidden until a Markdown note is open. All from
-             js/ui-customization-panel.js; the cycle itself is
-             cycleMarkdownView() in js/markdown-view-modes.js. A phone has no
-             split view and goes classic, live preview, rich text, classic.
-             Settings > Markdown > View button leaves views out of the cycle
-             (markdown_view_cycle, discussion 1677); with none left the
-             button is hidden. -->
-        <button type="button" id="edgeSplitViewBtn" class="pz-edge-btn pz-edge-view-btn" data-action="cycle-markdown-view" hidden
-            data-label-live="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live preview'); ?>"
-            data-label-rich="<?php echo t_h('editor.toolbar.view_cycle_rich', [], 'Switch to rich text'); ?>"
-            data-label-split="<?php echo t_h('editor.toolbar.view_cycle_split', [], 'Switch to split view'); ?>"
-            data-label-preview="<?php echo t_h('editor.toolbar.view_cycle_preview', [], 'Back to preview mode'); ?>"
-            data-label-edit="<?php echo t_h('editor.toolbar.view_cycle_edit', [], 'Back to edit mode'); ?>"
-            title="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live preview'); ?>" aria-label="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live preview'); ?>">
-            <i class="lucide lucide-file-text"></i>
-        </button>
+             button shows the icon of the view the note is in, lit outside the
+             classic one; going back to classic lands on the preview or the
+             classic editor, wherever the note was. Hidden until a Markdown
+             note is open. All from js/ui-customization-panel.js; the switch
+             itself is setMarkdownView() in js/markdown-view-modes.js. A phone
+             has no split view. Settings > Markdown > View menu leaves views
+             out of the menu (markdown_view_cycle, discussion 1677), and the
+             last entry leads there; with none left the button is hidden.
+             The anchor carries the id the Element visibility panel hides
+             (card:edgeSplitViewBtn), so the menu goes with the button.
+             Its right-click menu switches it to stepping through the views
+             instead (markdown_view_button_cycle, data-action
+             "cycle-markdown-view"): a click goes to the next view kept, then
+             back to classic (cycleMarkdownView()). -->
+        <div id="edgeSplitViewBtn" class="pz-edge-menu-anchor" hidden>
+            <button type="button" id="edgeViewMenuBtn" class="pz-edge-btn pz-edge-view-btn"
+                <?php if ($pzViewButtonCycles): ?>data-action="cycle-markdown-view"<?php else: ?>data-action="toggle-markdown-view-menu" aria-haspopup="true" aria-expanded="false"<?php endif; ?>
+                aria-controls="markdownViewMenu"
+                data-label-menu="<?php echo $pzViewMenuLabel; ?>"
+                data-label-live="<?php echo t_h('editor.toolbar.view_cycle_live', [], 'Switch to live preview'); ?>"
+                data-label-rich="<?php echo t_h('editor.toolbar.view_cycle_rich', [], 'Switch to rich text'); ?>"
+                data-label-split="<?php echo t_h('editor.toolbar.view_cycle_split', [], 'Switch to split view'); ?>"
+                data-label-preview="<?php echo t_h('editor.toolbar.view_cycle_preview', [], 'Back to preview mode'); ?>"
+                data-label-edit="<?php echo t_h('editor.toolbar.view_cycle_edit', [], 'Back to edit mode'); ?>"
+                data-label-click-cycles="<?php echo t_h('common.click_toggles', [], 'Toggle on click'); ?>"
+                data-label-click-menu="<?php echo t_h('common.click_opens_menu', [], 'Open a menu on click'); ?>"
+                title="<?php echo $pzViewMenuLabel; ?>" aria-label="<?php echo $pzViewMenuLabel; ?>">
+                <i class="lucide lucide-file-text"></i>
+            </button>
+            <div id="markdownViewMenu" class="page-more-menu" role="menu" hidden>
+                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="classic">
+                    <i class="lucide lucide-file-text"></i>
+                    <span><?php echo t_h('editor.view_menu.classic', [], 'Classic'); ?></span>
+                </button>
+                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="live">
+                    <i class="devicon-markdown"></i>
+                    <span><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live preview'); ?></span>
+                </button>
+                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="rich">
+                    <i class="lucide lucide-type"></i>
+                    <span><?php echo t_h('modals.markdown_default_view_mode.options.rich', [], 'Rich text'); ?></span>
+                </button>
+                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="split">
+                    <i class="lucide lucide-columns-2"></i>
+                    <span><?php echo t_h('page_menu.split_view', [], 'Split view'); ?></span>
+                </button>
+                <div class="page-more-menu-separator" role="separator"></div>
+                <?php if ($pzViewMenuSettingsUrl !== ''): ?>
+                <a id="markdownViewMenuSettings" class="page-more-menu-item" role="menuitem" href="<?php echo htmlspecialchars($pzViewMenuSettingsUrl, ENT_QUOTES, 'UTF-8'); ?>">
+                    <i class="lucide lucide-settings"></i>
+                    <span><?php echo t_h('common.customize_menu', [], 'Customize this menu'); ?></span>
+                </a>
+                <?php endif; ?>
+                <!-- How to have the click step through the views instead:
+                     the button's right-click menu -->
+                <div class="page-more-menu-hint" role="none"><?php echo t_h('common.right_click_toggle_hint', [], 'Right-click the button to toggle on click instead'); ?></div>
+            </div>
+        </div>
         <?php endif; ?>
         <button type="button" id="edgeCustomizeBtn" class="pz-edge-btn" data-action="toggle-ui-customization-panel" aria-controls="uiCustomizationPanel"
             title="<?php echo $uiCustomizationPanelTitle; ?>" aria-label="<?php echo $uiCustomizationPanelTitle; ?>">

@@ -81,7 +81,11 @@
     "unknown_error": "Unknown error",
     "none": "None",
     "show_more_notes": "Show more ({{count}} remaining)",
-    "menu": "Menu"
+    "menu": "Menu",
+    "customize_menu": "Customize this menu",
+    "click_toggles": "Toggle on click",
+    "click_opens_menu": "Open a menu on click",
+    "right_click_toggle_hint": "Right-click the button to toggle on click instead"
   },
   "snapshot": {
     "menu_item": "Revisions",
@@ -204,7 +208,7 @@
       "login_disabled": "Skip the login screen: any browser that reaches this instance opens your account directly, without username, password or two-factor code. Only turn it on if you are the only one who can reach this instance, or if a reverse proxy in front of it handles authentication. The API keeps asking for credentials.",
       "outbound_hosts": "Non-admin users can only connect webhooks, Git Sync and their own AI, transcription or MCP servers to public internet hosts. List here the local hosts or networks they may use, such as an Ollama or n8n server. Administrators are not limited.",
       "diary_template": "Choose a note whose content every new diary entry of the {{workspace}} workspace starts with. The list shows the notes kept in a folder named Templates in that workspace. Each workspace has its own template.",
-      "markdown_view_cycle": "Choose the views the view button of a markdown note goes through after the classic view (preview, with the pencil to edit). The views left out are skipped. With none chosen, the button is hidden. On a phone the button never goes to split mode.",
+      "markdown_view_cycle": "Choose the views the view menu of a markdown note offers besides the classic view (preview, with the pencil to edit). The views left out are not listed. With none chosen, the button is hidden. On a phone the menu never offers split mode.",
       "connected_apps": "Connect chat apps such as ChatGPT or Claude to your notes through the MCP server, and disconnect them at any time.",
       "custom_logo": "Replace the Poznote logo with your own, for every user: in the browser tab, on the login page, in the icon rail and as the icon of the installed app.",
       "two_factor_required": "Every account that signs in with a password must use two-factor authentication. An account without it sets it up at its next sign-in, and sessions opened without it end. Its account password stops working through the API: apps use an app password instead. SSO sign-ins are not concerned, the identity provider handles their second factor."
@@ -551,7 +555,7 @@
       "format_toolbar_mode": "Formatting toolbar",
       "workspace_activity_emails": "Shared workspace emails",
       "diary_template": "Diary entry template",
-      "markdown_view_cycle": "View button"
+      "markdown_view_cycle": "View menu"
     },
     "badges": {
       "font_size_default": "default ({{size}}px)",
@@ -868,7 +872,7 @@
     },
     "theme_list": {
       "title": "Theme list",
-      "description": "Each click on the theme button of the icon sidebar switches to the next theme in this list. Tick the ones to offer, order them with the arrows, and tick a CSS file to offer it as a theme too.",
+      "description": "The theme button of the icon sidebar opens a menu with the themes of this list. Tick the ones to offer, order them with the arrows, and tick a CSS file to offer it as a theme too.",
       "mode_help": "Is this stylesheet written for the light mode or the dark mode?",
       "move_up": "Move up",
       "move_down": "Move down",
@@ -2089,6 +2093,10 @@
     "paste": {
       "images_dropped_one": "1 image could not be pasted. Copy it on its own to add it.",
       "images_dropped_other": "{{count}} images could not be pasted. Copy them one by one to add them."
+    },
+    "view_menu": {
+      "title": "Change view",
+      "classic": "Classic"
     }
   },
   "image_menu": {
@@ -5576,5 +5584,21 @@
       "load_failed": "Could not load your connected apps.",
       "generic": "Something went wrong. Try again."
     }
+  },
+  "note_title_menu": {
+    "label": "Title style",
+    "color": "Title color",
+    "size": "Title size",
+    "sizes": {
+      "small": "Small",
+      "normal": "Normal",
+      "large": "Large",
+      "xlarge": "Extra large"
+    },
+    "change_icon": "Change icon",
+    "reset": "Reset to default"
+  },
+  "note_subline_menu": {
+    "label": "Under the title"
   }
 }

@@ -15,7 +15,7 @@
 // (renderedBlocksField below), nothing of js/markdown-parser.js is redone here.
 import { syntaxTree } from '@codemirror/language'
 import { EditorSelection, EditorState, Prec, findClusterBreak, RangeSet, RangeValue, StateEffect, StateField } from '@codemirror/state'
-import { Decoration, EditorView, ViewPlugin, WidgetType, keymap } from '@codemirror/view'
+import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, keymap } from '@codemirror/view'
 
 export const refreshLivePreviewEffect = StateEffect.define()
 
@@ -3739,6 +3739,70 @@ function arrowLeftOverHiddenMarkers(view) {
   return true
 }
 
+// Rich text, the arrow keys up and down: a line that begins with hidden
+// syntax ("## ", "**", "> ", "[") has nothing to measure at its start, the
+// markers being display: none. CodeMirror's vertical motion measures the
+// start of the line it lands in (to step over a line's top padding), took
+// the missing measure for padding and went on to the line beyond: Arrow up
+// from an empty line under a heading jumped over the heading. The line under
+// the caret is looked up here and, when the editor went past it, the caret
+// is put in it at the same x.
+// (the caret's own row is measured on a character that is drawn: hidden
+// syntax at a line's end is text at a size of nothing, its rectangle sits on
+// the baseline and the row above looked like the caret's own; a line with
+// nothing drawn, a closing fence, is left to the editor)
+function caretRowRect(view, pos, side) {
+  const line = view.state.doc.lineAt(pos)
+  const tall = rect => rect && rect.bottom - rect.top >= view.defaultLineHeight / 2
+  const rect = view.coordsAtPos(pos, side)
+  if (tall(rect)) return rect
+  for (let near = pos - 1; near >= line.from; near--) {
+    const before = view.coordsAtPos(near, 1)
+    if (tall(before)) return { left: rect ? rect.left : before.left, top: before.top, bottom: before.bottom }
+  }
+  return null
+}
+
+function verticalTargetOverHiddenStart(view, range, forward) {
+  const moved = view.moveVertically(range, forward)
+  const start = caretRowRect(view, range.head, range.assoc || (forward ? 1 : -1))
+  if (!start) return null
+  const contentRect = view.contentDOM.getBoundingClientRect()
+  const goal = moved.goalColumn != null ? moved.goalColumn : start.left - contentRect.left
+  const half = view.defaultLineHeight / 2
+  const y = forward ? start.bottom + half : start.top - half
+  if (y < contentRect.top || y > contentRect.bottom) return null
+  const block = view.lineBlockAtHeight(y - view.documentTop)
+  if (block.type !== BlockType.Text || (moved.head >= block.from && moved.head <= block.to)) return null
+  // Only the case the editor gets wrong: an edge it could not measure, or
+  // measured as a flat line on the baseline (a closing fence, hidden at a
+  // size of nothing, is all its line holds: Firefox stepped over it)
+  const edge = view.coordsAtPos(forward ? block.to : block.from, forward ? -1 : 1)
+  if (edge && edge.bottom - edge.top >= view.defaultLineHeight / 2) return null
+  const pos = view.posAtCoords({ x: contentRect.left + goal, y }, false)
+  if (pos == null || pos < block.from || pos > block.to) return null
+  return EditorSelection.cursor(pos, forward ? -1 : 1, undefined, goal)
+}
+
+function arrowVerticallyOverHiddenStarts(forward, extend) {
+  return view => {
+    if (isSyntaxRevealed()) return false
+    const { selection } = view.state
+    let fixed = false
+    const ranges = selection.ranges.map(range => {
+      if (!extend && !range.empty) return EditorSelection.cursor(forward ? range.to : range.from)
+      const corrected = verticalTargetOverHiddenStart(view, range, forward)
+      if (corrected) fixed = true
+      const target = corrected || view.moveVertically(range, forward)
+      return extend ? EditorSelection.range(range.anchor, target.head, target.goalColumn) : target
+    })
+    // The editor's own motion was right: its command runs
+    if (!fixed) return false
+    view.dispatch({ selection: EditorSelection.create(ranges, selection.mainIndex), scrollIntoView: true, userEvent: 'select' })
+    return true
+  }
+}
+
 // Backspace in the empty pair a formatting command just wrote takes the
 // pair back
 function deleteArmedPairOnBackspace(view) {
@@ -3892,6 +3956,8 @@ const richTextKeymap = Prec.highest(keymap.of([
   { key: 'ArrowRight', run: dropArmedPairOnArrow },
   { key: 'ArrowLeft', run: arrowLeftOverHiddenMarkers },
   { key: 'ArrowRight', run: arrowRightOverHiddenMarkers },
+  { key: 'ArrowUp', run: arrowVerticallyOverHiddenStarts(false, false), shift: arrowVerticallyOverHiddenStarts(false, true) },
+  { key: 'ArrowDown', run: arrowVerticallyOverHiddenStarts(true, false), shift: arrowVerticallyOverHiddenStarts(true, true) },
   { key: 'Backspace', run: deletePendingSpaceOnBackspace },
   { key: 'Mod-Backspace', run: view => deleteWordSafely(view, false) },
   { key: 'Mod-Delete', run: view => deleteWordSafely(view, true) },

@@ -667,6 +667,39 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/content-width
 ```
 
+### Set Note Title Style
+
+```
+PUT /notes/{id}/title-style
+```
+
+Set the color and the font size of the note title, as the right-click menu of the title does. A field left out keeps its current value, at least one must be sent.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title_color` | string or null | No | `#rrggbb` color of the title text, `null` or `""` for the default color. A palette color follows the theme |
+| `title_size` | integer or null | No | Font size of the title in pixels (12 to 64), `null` for the default size |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Note title style updated successfully",
+  "title_color": "#2563eb",
+  "title_size": 30
+}
+```
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"title_color": "#2563eb", "title_size": 30}' \
+  http://YOUR_SERVER/api/v1/notes/123/title-style
+```
+
 ### Set Kanban Completed State
 
 ```
