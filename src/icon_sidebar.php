@@ -772,4 +772,3 @@ $iconSidebarOrderDividerRow = static function (): string {
 </div>
 <script src="<?php echo $iconSidebarAsset('js/icon-sidebar-order.js'); ?>" defer></script>
 <?php endif; ?>
-
