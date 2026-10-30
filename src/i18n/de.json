@@ -96,7 +96,11 @@
     },
     "network_error": "Netzwerkfehler",
     "none": "Keine",
-    "show_more_notes": "Mehr anzeigen (noch {{count}})"
+    "show_more_notes": "Mehr anzeigen (noch {{count}})",
+    "customize_menu": "Dieses Menü anpassen",
+    "click_toggles": "Beim Klick umschalten",
+    "click_opens_menu": "Beim Klick ein Menü öffnen",
+    "right_click_toggle_hint": "Rechtsklick auf die Schaltfläche, um stattdessen beim Klick umzuschalten"
   },
   "snapshot": {
     "menu_item": "Versionen",
@@ -526,7 +530,7 @@
       "login_disabled": "Überspringt die Anmeldeseite: Jeder Browser, der diese Instanz erreicht, öffnet direkt Ihr Konto, ohne Benutzername, Passwort oder Zwei-Faktor-Code. Nur aktivieren, wenn allein Sie diese Instanz erreichen können oder ein vorgeschalteter Reverse Proxy die Authentifizierung übernimmt. Die API verlangt weiterhin Zugangsdaten.",
       "outbound_hosts": "Benutzer ohne Administratorrechte können Webhooks, Git Sync und ihre eigenen KI-, Transkriptions- oder MCP-Server nur mit öffentlichen Internet-Hosts verbinden. Listen Sie hier die lokalen Hosts oder Netzwerke auf, die sie verwenden dürfen, etwa einen Ollama- oder n8n-Server. Administratoren sind nicht eingeschränkt.",
       "diary_template": "Wählen Sie eine Notiz, mit deren Inhalt jeder neue Tagebucheintrag des Arbeitsbereichs {{workspace}} beginnt. Die Liste zeigt die Notizen in einem Ordner namens Vorlagen (oder Templates) dieses Arbeitsbereichs. Jeder Arbeitsbereich hat seine eigene Vorlage.",
-      "markdown_view_cycle": "Wählen Sie die Ansichten, die der Ansichtsschalter einer Markdown-Notiz nach der klassischen Ansicht (Vorschau, mit dem Stift zum Bearbeiten) durchläuft. Nicht gewählte Ansichten werden übersprungen. Ist keine gewählt, wird der Schalter ausgeblendet. Auf einem Telefon wechselt der Schalter nie in die geteilte Ansicht.",
+      "markdown_view_cycle": "Wählen Sie die Ansichten, die das Ansichtsmenü einer Markdown-Notiz neben der klassischen Ansicht (Vorschau, mit dem Stift zum Bearbeiten) anbietet. Nicht gewählte Ansichten werden nicht aufgeführt. Ist keine gewählt, wird die Schaltfläche ausgeblendet. Auf einem Telefon bietet das Menü nie die geteilte Ansicht an.",
       "connected_apps": "Verbinden Sie Chat-Apps wie ChatGPT oder Claude über den MCP-Server mit Ihren Notizen und trennen Sie sie jederzeit.",
       "custom_logo": "Das Poznote-Logo für alle Benutzer durch ein eigenes ersetzen: im Browser-Tab, auf der Anmeldeseite, in der Symbolleiste und als Symbol der installierten App.",
       "two_factor_required": "Jedes Konto, das sich mit einem Passwort anmeldet, muss die Zwei-Faktor-Authentifizierung nutzen. Ein Konto ohne sie richtet sie bei der nächsten Anmeldung ein, und ohne sie geöffnete Sitzungen werden beendet. Das Kontopasswort funktioniert nicht mehr über die API: Apps verwenden stattdessen ein App-Passwort. SSO-Anmeldungen sind nicht betroffen, der Identitätsanbieter verwaltet ihren zweiten Faktor."
@@ -908,7 +912,7 @@
       "format_toolbar_mode": "Formatierungsleiste",
       "workspace_activity_emails": "E-Mails zu geteilten Arbeitsbereichen",
       "diary_template": "Vorlage für Tagebucheinträge",
-      "markdown_view_cycle": "Ansichtsschalter"
+      "markdown_view_cycle": "Ansichtsmenü"
     },
     "badges": {
       "font_size_default": "Standard ({{size}}px)",
@@ -1259,6 +1263,10 @@
     "paste": {
       "images_dropped_one": "1 Bild konnte nicht eingefügt werden. Kopieren Sie es einzeln, um es hinzuzufügen.",
       "images_dropped_other": "{{count}} Bilder konnten nicht eingefügt werden. Kopieren Sie sie einzeln, um sie hinzuzufügen."
+    },
+    "view_menu": {
+      "title": "Ansicht wechseln",
+      "classic": "Klassisch"
     }
   },
   "info": {
@@ -1359,7 +1367,7 @@
     },
     "theme_list": {
       "title": "Theme-Liste",
-      "description": "Jeder Klick auf die Theme-Schaltfläche der Icon-Seitenleiste wechselt zum nächsten Theme dieser Liste. Haken Sie die an, die angeboten werden sollen, ordnen Sie sie mit den Pfeilen, und haken Sie eine CSS-Datei an, um sie ebenfalls als Theme anzubieten.",
+      "description": "Die Theme-Schaltfläche der Icon-Seitenleiste öffnet ein Menü mit den Themes dieser Liste. Haken Sie die an, die angeboten werden sollen, ordnen Sie sie mit den Pfeilen, und haken Sie eine CSS-Datei an, um sie ebenfalls als Theme anzubieten.",
       "mode_help": "Ist dieses Stylesheet für den hellen oder den dunklen Modus geschrieben?",
       "move_up": "Nach oben",
       "move_down": "Nach unten",

@@ -231,14 +231,25 @@
         // Every button of the rail, account group included; the overflow
         // button lists entries rather than being one.
         document.addEventListener('contextmenu', function (event) {
-            if (config.canCustomize === false) return;
             var button = event.target.closest && event.target.closest('#icon_sidebar .icon-sidebar-btn[id]');
             if (!button || button.id === 'iconSidebarOverflowBtn') return;
+            // Entries a button adds for itself (the theme button's click mode,
+            // js/theme-manager.js) come whether or not the rail can be
+            // customised
+            var items = contextItemsFor(button);
+            var canCustomize = config.canCustomize !== false;
+            if (!canCustomize && !items.length) return;
             event.preventDefault();
             var nonHideable = Array.isArray(config.nonHideable) ? config.nonHideable : [];
             openContextMenu(event, button, {
-                hideKey: nonHideable.indexOf(button.id) === -1 ? 'card:' + button.id : '',
-                onColor: function () { open(button.id); }
+                items: items,
+                hideKey: canCustomize && nonHideable.indexOf(button.id) === -1 ? 'card:' + button.id : '',
+                onColor: canCustomize ? function () { open(button.id); } : null,
+                // The icon sidebar layout modal, rendered next to the rail for
+                // whoever may customise it (js/icon-sidebar-order.js)
+                onCustomize: canCustomize && typeof window.poznoteOpenIconSidebarOrderModal === 'function'
+                    ? function () { window.poznoteOpenIconSidebarOrderModal(); }
+                    : null
             });
         });
 
@@ -378,11 +389,28 @@
      * options.hideKey  UI Customization key that hides the button, '' when
      *                  the button cannot be hidden (the entry is left out)
      */
+    // Entries a button registers for its own right-click menu:
+    // window.__poznoteIconContextItems[buttonId] = function (button) {
+    //     return [{ icon, label, run }]; }
+    // A plain global rather than a method of this file, which may load after
+    // the script registering them.
+    function contextItemsFor(button) {
+        var registry = window.__poznoteIconContextItems || {};
+        var provider = button && registry[button.id];
+        var items = typeof provider === 'function' ? provider(button) : [];
+        return Array.isArray(items) ? items : [];
+    }
+
     function openContextMenu(event, owner, options) {
         var menu = getMenu();
         closeContextMenu(false);
         options = options || {};
 
+        (options.items || []).forEach(function (item) {
+            if (item && typeof item.run === 'function') {
+                addMenuItem(menu, item.icon || 'lucide-settings', item.label || '', item.run);
+            }
+        });
         if (typeof options.onColor === 'function') {
             addMenuItem(menu, 'lucide-palette', config.menuChangeColor || 'Change icon color', options.onColor);
         }
@@ -390,6 +418,9 @@
             addMenuItem(menu, 'lucide-eye-off', config.menuHide || 'Hide button', function () {
                 hideUiKey(options.hideKey, owner);
             });
+        }
+        if (typeof options.onCustomize === 'function') {
+            addMenuItem(menu, 'lucide-settings', config.menuCustomize || 'Customize this menu', options.onCustomize);
         }
         if (!menu.firstChild) return;
 
@@ -428,7 +459,7 @@
     };
 
     // Right-click menu for any other icon button.
-    // openContextMenu(event, button, { onColor(), hideKey })
+    // openContextMenu(event, button, { items: [{ icon, label, run }], onColor(), hideKey, onCustomize() })
     window.PoznoteIconContextMenu = {
         open: openContextMenu,
         close: function () { closeContextMenu(false); }

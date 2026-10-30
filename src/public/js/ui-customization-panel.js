@@ -22,6 +22,7 @@
     var panel = null;
     var moreButton = null;
     var moreMenu = null;
+    var viewMenu = null;
     // The user's saved set, as last read from or written to the API. Locked
     // checkboxes keep their stored state on save instead of adopting the lock.
     var storedHidden = [];
@@ -364,6 +365,131 @@
         }
     }
 
+    // View menu of a Markdown note (#edgeViewMenuBtn): the views the account
+    // kept, then the way to the setting that picks them
+    function isViewMenuOpen() {
+        return !!viewMenu && !viewMenu.hidden;
+    }
+
+    function visibleViewMenuItems() {
+        return Array.prototype.filter.call(viewMenu.querySelectorAll('.page-more-menu-item'), function (item) {
+            return !item.hidden;
+        });
+    }
+
+    function setViewMenuOpen(open) {
+        var button = document.getElementById('edgeViewMenuBtn');
+        if (!viewMenu || !button) return;
+        if (open) syncNoteControls();
+        viewMenu.hidden = !open;
+        if (button.hasAttribute('aria-haspopup')) button.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) {
+            var items = visibleViewMenuItems();
+            var checked = viewMenu.querySelector('[aria-checked="true"]:not([hidden])');
+            if (checked || items.length) (checked || items[0]).focus();
+        }
+    }
+
+    // Menu or toggle, saved on the account and applied at once:
+    // js/index-events.js runs "cycle-markdown-view", initViewMenu() below
+    // "toggle-markdown-view-menu"
+    function setViewButtonCycles(cycles) {
+        var button = document.getElementById('edgeViewMenuBtn');
+        if (!button) return;
+        button.setAttribute('data-action', cycles ? 'cycle-markdown-view' : 'toggle-markdown-view-menu');
+        if (cycles) {
+            button.removeAttribute('aria-haspopup');
+            button.removeAttribute('aria-expanded');
+        } else {
+            button.setAttribute('aria-haspopup', 'true');
+            button.setAttribute('aria-expanded', 'false');
+        }
+        syncNoteControls();
+        fetch('/api/v1/settings/markdown_view_button_cycle', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ value: cycles ? '1' : '0' })
+        }).catch(function (error) {
+            console.warn('ui-customization-panel: click mode could not be saved:', error);
+        });
+    }
+
+    function initViewMenu() {
+        viewMenu = document.getElementById('markdownViewMenu');
+        var button = document.getElementById('edgeViewMenuBtn');
+        if (!viewMenu || !button) return;
+
+        document.addEventListener('click', function (e) {
+            var toggle = e.target.closest ? e.target.closest('[data-action="toggle-markdown-view-menu"]') : null;
+            if (toggle) {
+                e.preventDefault();
+                setViewMenuOpen(!isViewMenuOpen());
+                return;
+            }
+            if (!isViewMenuOpen()) return;
+
+            var choice = e.target.closest ? e.target.closest('[data-markdown-view]') : null;
+            if (choice && viewMenu.contains(choice)) {
+                e.preventDefault();
+                var noteId = button.getAttribute('data-note-id');
+                setViewMenuOpen(false);
+                if (noteId && typeof window.setMarkdownView === 'function') {
+                    window.setMarkdownView(noteId, choice.getAttribute('data-markdown-view'));
+                }
+                syncNoteControls();
+                return;
+            }
+            // The settings entry is a link and follows it; anything else closes
+            if (!viewMenu.contains(e.target) || e.target.closest('a')) setViewMenuOpen(false);
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.defaultPrevented || !isViewMenuOpen()) return;
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                setViewMenuOpen(false);
+                button.focus();
+            }
+        });
+
+        // Right-click: menu or toggle (markdown_view_button_cycle), through the
+        // rail's right-click menu (js/icon-sidebar-colors.js)
+        button.addEventListener('contextmenu', function (e) {
+            var contextMenu = window.PoznoteIconContextMenu;
+            if (!contextMenu || typeof contextMenu.open !== 'function') return;
+            e.preventDefault();
+            setViewMenuOpen(false);
+            var cycles = button.getAttribute('data-action') === 'cycle-markdown-view';
+            var items = [{
+                icon: cycles ? 'lucide-list' : 'lucide-repeat',
+                label: button.getAttribute(cycles ? 'data-label-click-menu' : 'data-label-click-cycles') || '',
+                run: function () { setViewButtonCycles(!cycles); }
+            }];
+            // The same way to the setting as the view menu's last entry, which
+            // is left out when the account is not the login's own
+            var customize = document.getElementById('markdownViewMenuSettings');
+            if (customize) {
+                items.push({
+                    icon: 'lucide-settings',
+                    label: customize.textContent.trim(),
+                    run: function () { window.location.href = customize.href; }
+                });
+            }
+            contextMenu.open(e, button, { items: items });
+        });
+
+        viewMenu.addEventListener('keydown', function (e) {
+            if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+            var items = visibleViewMenuItems();
+            if (!items.length) return;
+            e.preventDefault();
+            var index = items.indexOf(document.activeElement);
+            var next = e.key === 'ArrowDown' ? index + 1 : index - 1;
+            items[(next + items.length) % items.length].focus();
+        });
+    }
+
     // "..." menu of the floating stack
     function isMoreMenuOpen() {
         return !!moreMenu && !moreMenu.hidden;
@@ -391,38 +517,45 @@
         // while another session holds the lock (js/note-edit-lock.js)
         var isLocked = !!entry && typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteId);
 
-        // One button for the view of a Markdown note: it shows the state it is
-        // in and says where a click leads (cycleMarkdownView() in
+        // One button for the view of a Markdown note: it shows the view the
+        // note is in and opens the menu of the others (setMarkdownView() in
         // js/markdown-view-modes.js, which also knows a phone has no split).
-        var viewButton = document.getElementById('edgeSplitViewBtn');
-        if (viewButton) {
-            var isLive = typeof window.isMarkdownLiveEditingEnabled === 'function' && window.isMarkdownLiveEditingEnabled();
-            var isRich = isLive && typeof window.isMarkdownRichText === 'function' && window.isMarkdownRichText();
-            var viewState = isSplit ? 'split' : (isLive ? (isRich ? 'rich' : 'live') : 'classic');
-            var nextState = typeof window.getNextMarkdownViewState === 'function'
-                ? window.getNextMarkdownViewState(viewState)
+        var viewAnchor = document.getElementById('edgeSplitViewBtn');
+        var viewButton = document.getElementById('edgeViewMenuBtn');
+        if (viewAnchor && viewButton) {
+            var viewState = isMarkdown && typeof window.getMarkdownViewState === 'function'
+                ? window.getMarkdownViewState(noteId)
                 : 'classic';
-            // No view chosen after the classic one (Settings > Markdown, or
-            // only the split view on a phone): nowhere to go, no button
-            var hasNoCycle = viewState === 'classic' && nextState === 'classic';
-            // Leaving the cycle goes back to where it started: the preview, or
-            // the classic editor when the pencil was on
-            if (nextState === 'classic') {
-                nextState = typeof window.getMarkdownClassicReturnMode === 'function'
-                    ? window.getMarkdownClassicReturnMode(noteId)
-                    : 'preview';
-            }
-            var viewLabel = viewButton.getAttribute('data-label-' + nextState) || '';
+            var viewStates = typeof window.getMarkdownViewMenuStates === 'function'
+                ? window.getMarkdownViewMenuStates(viewState)
+                : ['classic'];
             var viewIcon = viewButton.querySelector('i');
 
-            viewButton.hidden = !isMarkdown || hasNoCycle;
-            viewButton.classList.toggle('is-active', viewState !== 'classic');
-            viewButton.setAttribute('data-view-state', viewState);
-            viewButton.setAttribute('data-note-id', noteId);
+            // No view kept besides the classic one (Settings > Markdown, or
+            // only the split view on a phone): nothing to pick, no button
+            viewAnchor.hidden = !isMarkdown || viewStates.length < 2;
+            // Stepping through the views (markdown_view_button_cycle): the
+            // title says where a click leads, back to the preview or the
+            // classic editor at the end. With the menu it names the menu.
+            var viewLabelKey = 'menu';
+            if (viewButton.getAttribute('data-action') === 'cycle-markdown-view'
+                && typeof window.getNextMarkdownViewState === 'function') {
+                viewLabelKey = window.getNextMarkdownViewState(viewState);
+                if (viewLabelKey === 'classic') {
+                    viewLabelKey = typeof window.getMarkdownClassicReturnMode === 'function'
+                        ? window.getMarkdownClassicReturnMode(noteId)
+                        : 'preview';
+                }
+            }
+            var viewLabel = viewButton.getAttribute('data-label-' + viewLabelKey) || '';
             if (viewLabel) {
                 viewButton.title = viewLabel;
                 viewButton.setAttribute('aria-label', viewLabel);
             }
+            if (viewAnchor.hidden && isViewMenuOpen()) setViewMenuOpen(false);
+            viewButton.classList.toggle('is-active', viewState !== 'classic');
+            viewButton.setAttribute('data-view-state', viewState);
+            viewButton.setAttribute('data-note-id', noteId);
             if (viewIcon) {
                 viewIcon.className = {
                     classic: 'lucide lucide-file-text',
@@ -430,6 +563,13 @@
                     rich: 'lucide lucide-type',
                     split: 'lucide lucide-columns-2'
                 }[viewState];
+            }
+            if (viewMenu) {
+                viewMenu.querySelectorAll('[data-markdown-view]').forEach(function (item) {
+                    var view = item.getAttribute('data-markdown-view');
+                    item.hidden = viewStates.indexOf(view) === -1;
+                    item.setAttribute('aria-checked', view === viewState ? 'true' : 'false');
+                });
             }
         }
 
@@ -756,6 +896,7 @@
     }
 
     function init() {
+        initViewMenu();
         initNoteControls();
         initMoreMenu();
 

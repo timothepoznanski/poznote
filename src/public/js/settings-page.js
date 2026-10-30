@@ -38,7 +38,11 @@
         // the dialog on top
         'app-passwords': 'settings-account-section-grid',
         // "All options" button of the contextual panel (ui_customization_panel.php)
-        'ui-customization': 'settings-ui-customization-section-grid'
+        'ui-customization': 'settings-ui-customization-section-grid',
+        // Last entry of the view menu of a Markdown note
+        // (ui_customization_panel.php): initMarkdownViewCycleChecks() brings
+        // the card into view
+        'markdown-views': 'settings-markdown-section-grid'
     };
 
     // The section a ?open= deep link names, or null when the param is absent
@@ -140,7 +144,6 @@
             'default_workspace',
             'date_time_format',
             'hidden_ui_elements',
-            'icon_sidebar_order',
             'settings_pinned_cards',
             'spellcheck_html_notes',
             'slash_menu_trigger',
@@ -525,13 +528,23 @@
         };
     }
 
-    // Views the view button of a Markdown note goes through after the classic
-    // one (markdown_view_cycle, discussion 1677): one box per view, saved on
-    // each change as "live,rich,split" or a part of it, "none" when no box is
+    // Views the view menu of a Markdown note lists besides the classic one
+    // (markdown_view_cycle, discussion 1677): one box per view, saved on each
+    // change as "live,rich,split" or a part of it, "none" when no box is
     // ticked. Never saved: every view.
     function initMarkdownViewCycleChecks() {
         var group = document.getElementById('markdown-view-cycle-checks');
         if (!group) return;
+
+        // Arriving from the menu's last entry (?open=markdown-views): the
+        // section is on display once the page has set itself up, the card
+        // is brought to the middle of it
+        if (deepLinkSectionGridId() === 'settings-markdown-section-grid') {
+            window.requestAnimationFrame(function () {
+                var card = group.closest('.home-card');
+                if (card && typeof card.scrollIntoView === 'function') card.scrollIntoView({ block: 'center' });
+            });
+        }
         var boxes = Array.prototype.slice.call(group.querySelectorAll('input[type="checkbox"]'));
 
         function load() {
@@ -1848,14 +1861,6 @@
     var customCssThemes = [];
     var customCssSelected = '';
     var customCssActive = '';
-    // The theme list modal works on rows rather than on the saved entries: the
-    // order of the rows IS the order the rail's button walks, so a row keeps its
-    // place whether it is ticked or not.
-    var customCssBuiltinThemes = [];
-    var customCssThemeIcon = 'lucide-palette';
-    var themeListRows = [];
-    var themeListSaved = '';
-    var customCssThemeSaved = [];
 
     // Mirrors the sanitisation api_upload_css.php applies, so the staged row
     // shows the name the file will actually be stored under.
@@ -1989,196 +1994,13 @@
     function readCustomCssState(data) {
         customCssThemes = Array.isArray(data.themes) ? data.themes : [];
         customCssActive = data.active || '';
-        customCssBuiltinThemes = Array.isArray(data.builtin_themes) ? data.builtin_themes : [];
-        customCssThemeIcon = data.custom_theme_icon || 'lucide-palette';
-        var list = data.theme_list && Array.isArray(data.theme_list.entries) ? data.theme_list.entries : [];
-        customCssThemeSaved = list.map(function (entry) {
-            return { id: entry.id, mode: entry.mode === 'dark' ? 'dark' : 'light' };
-        });
-        themeListSaved = JSON.stringify(themeListEntriesOf(buildThemeListRows()));
     }
 
-    function customCssThemeIdFor(filename) {
-        return 'custom:' + filename;
-    }
-
-    function findSavedThemeEntry(id) {
-        for (var i = 0; i < customCssThemeSaved.length; i++) {
-            if (customCssThemeSaved[i].id === id) return customCssThemeSaved[i];
+    function openThemeListModal() {
+        if (typeof window.poznoteOpenThemeListModal === 'function') {
+            window.poznoteOpenThemeListModal();
         }
-        return null;
     }
-
-    function themeChoiceLabel(id) {
-        return tr('theme.names.' + id, {}, id.charAt(0).toUpperCase() + id.slice(1));
-    }
-
-    /**
-     * One row per theme this instance has: what the admin kept first, in the
-     * order it was saved, then everything left over. Rebuilding it this way is
-     * what makes a reordering survive a reopen, and what puts a freshly
-     * uploaded stylesheet at the end rather than in the middle.
-     */
-    function buildThemeListRows() {
-        var known = {};
-        var rows = [];
-
-        var rowFor = function (id) {
-            if (known[id]) return null;
-            var saved = findSavedThemeEntry(id);
-            var file = id.indexOf('custom:') === 0 ? id.slice('custom:'.length) : '';
-            var builtin = null;
-            for (var i = 0; i < customCssBuiltinThemes.length; i++) {
-                if (customCssBuiltinThemes[i].id === id) { builtin = customCssBuiltinThemes[i]; break; }
-            }
-            if (!file && !builtin) return null;
-            known[id] = true;
-            return {
-                id: id,
-                custom: !!file,
-                icon: builtin ? builtin.icon : customCssThemeIcon,
-                label: builtin ? themeChoiceLabel(id) : file.replace(/\.css$/i, ''),
-                checked: !!saved,
-                mode: saved && saved.mode === 'dark' ? 'dark' : 'light'
-            };
-        };
-
-        var push = function (id) {
-            var row = rowFor(id);
-            if (row) rows.push(row);
-        };
-
-        customCssThemeSaved.forEach(function (entry) { push(entry.id); });
-        customCssBuiltinThemes.forEach(function (def) { push(def.id); });
-        storedCssFileNames().forEach(function (filename) { push(customCssThemeIdFor(filename)); });
-
-        return rows;
-    }
-
-    /** The stored stylesheets, plus the one staged for upload. */
-    function storedCssFileNames() {
-        var files = customCssThemes.map(function (theme) { return theme.filename; });
-        if (pendingCssFile && files.indexOf(pendingCssFileName) === -1) {
-            files.push(pendingCssFileName);
-        }
-        return files;
-    }
-
-    /** What gets saved: the ticked rows, in the order they are shown. */
-    function themeListEntriesOf(rows) {
-        var entries = [];
-        rows.forEach(function (row) {
-            if (!row.checked) return;
-            var entry = { id: row.id };
-            if (row.custom) entry.mode = row.mode;
-            entries.push(entry);
-        });
-        return entries;
-    }
-
-    function moveThemeListRow(index, delta) {
-        var target = index + delta;
-        if (target < 0 || target >= themeListRows.length) return;
-        var row = themeListRows[index];
-        themeListRows[index] = themeListRows[target];
-        themeListRows[target] = row;
-        renderThemeListChoices();
-    }
-
-    function buildThemeChoiceRow(row, index) {
-        var el = document.createElement('div');
-        el.className = 'custom-css-theme-choice';
-        el.setAttribute('data-theme-id', row.id);
-        if (row.checked) el.classList.add('selected');
-
-        var main = document.createElement('label');
-        main.className = 'custom-css-theme-choice-main';
-
-        var checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.checked = row.checked;
-        checkbox.addEventListener('change', function () {
-            row.checked = checkbox.checked;
-            el.classList.toggle('selected', row.checked);
-        });
-        main.appendChild(checkbox);
-
-        var icon = document.createElement('i');
-        icon.className = 'lucide ' + row.icon;
-        main.appendChild(icon);
-
-        var name = document.createElement('span');
-        name.className = 'custom-css-theme-choice-name';
-        name.textContent = row.label;
-        main.appendChild(name);
-        el.appendChild(main);
-
-        if (row.custom) {
-            // A stylesheet paints over one of the two modes, and which one it
-            // was written for cannot be read from the file: the admin says it.
-            var select = document.createElement('select');
-            select.className = 'custom-css-theme-choice-mode';
-            select.title = tr('modals.theme_list.mode_help', {}, 'Is this stylesheet written for the light mode or the dark mode?');
-            [['light', themeChoiceLabel('light')], ['dark', themeChoiceLabel('dark')]].forEach(function (pair) {
-                var option = document.createElement('option');
-                option.value = pair[0];
-                option.textContent = pair[1];
-                select.appendChild(option);
-            });
-            select.value = row.mode;
-            select.addEventListener('change', function () {
-                row.mode = select.value === 'dark' ? 'dark' : 'light';
-            });
-            el.appendChild(select);
-        }
-
-        var order = document.createElement('span');
-        order.className = 'custom-css-theme-order';
-        [['up', -1, 'lucide-chevron-up'], ['down', 1, 'lucide-chevron-down']].forEach(function (spec) {
-            var button = document.createElement('button');
-            button.type = 'button';
-            button.className = 'custom-css-theme-order-btn';
-            button.title = spec[0] === 'up'
-                ? tr('modals.theme_list.move_up', {}, 'Move up')
-                : tr('modals.theme_list.move_down', {}, 'Move down');
-            button.setAttribute('aria-label', button.title);
-            button.innerHTML = '<i class="lucide ' + spec[2] + '"></i>';
-            button.disabled = spec[1] < 0 ? index === 0 : index === themeListRows.length - 1;
-            button.addEventListener('click', function () { moveThemeListRow(index, spec[1]); });
-            order.appendChild(button);
-        });
-        el.appendChild(order);
-
-        return el;
-    }
-
-    function renderThemeListChoices() {
-        var box = document.getElementById('themeListChoices');
-        if (!box) return;
-
-        box.innerHTML = '';
-        themeListRows.forEach(function (row, index) {
-            box.appendChild(buildThemeChoiceRow(row, index));
-        });
-    }
-
-    function showThemeListModal() {
-        var modal = document.getElementById('themeListModal');
-        if (!modal) return;
-
-        loadCustomCssThemes(function () {
-            themeListRows = buildThemeListRows();
-            renderThemeListChoices();
-            modal.style.display = 'flex';
-        });
-    }
-
-    // js/theme-manager.js calls this when the rail's button has a single theme
-    // to offer, so the click opens the list instead of doing nothing.
-    window.poznoteOpenThemeListModal = function () {
-        if (!window.__poznoteThemeListEditable) return;
-        showThemeListModal();
-    };
 
     function refreshThemeListBadge() {
         var badge = document.getElementById('theme-list-badge');
@@ -2211,8 +2033,6 @@
             .catch(function () {
                 customCssThemes = [];
                 customCssActive = '';
-                customCssThemeSaved = [];
-                themeListSaved = '';
                 if (typeof callback === 'function') callback(false);
             });
     }
@@ -3882,66 +3702,17 @@
         if (openThemeListFromCss) {
             openThemeListFromCss.addEventListener('click', function () {
                 closeCustomCssModal();
-                showThemeListModal();
+                openThemeListModal();
             });
         }
 
         // ---- Theme list modal ----
+        // The modal lives next to the rail (icon_sidebar.php,
+        // js/theme-list-modal.js) so the theme button's menu opens it on any
+        // page; the card opens the same one.
         var themeListCard = document.getElementById('theme-list-card');
         if (themeListCard) {
-            themeListCard.addEventListener('click', showThemeListModal);
-        }
-
-        // Deep link from the rail's theme button when the list holds a single
-        // theme, so clicking it leads somewhere: settings.php?open=theme-list
-        if (new URLSearchParams(window.location.search || '').get('open') === 'theme-list') {
-            showThemeListModal();
-            if (window.history && typeof window.history.replaceState === 'function') {
-                var cleanThemeListUrl = new URL(window.location.href);
-                cleanThemeListUrl.searchParams.delete('open');
-                window.history.replaceState({}, '', cleanThemeListUrl.toString());
-            }
-        }
-
-        var cancelThemeListBtn = document.getElementById('cancelThemeListBtn');
-        if (cancelThemeListBtn) {
-            cancelThemeListBtn.addEventListener('click', function () {
-                try { closeModal('themeListModal'); } catch (e) {
-                    console.debug('settings-page: closeModal() failed:', e);
-                }
-            });
-        }
-
-        var saveThemeListBtn = document.getElementById('saveThemeListBtn');
-        if (saveThemeListBtn) {
-            saveThemeListBtn.addEventListener('click', function () {
-                var entries = themeListEntriesOf(themeListRows);
-
-                if (entries.length === 0) {
-                    alert(tr('modals.theme_list.empty', {}, 'Keep at least one theme in the list.'));
-                    return;
-                }
-
-                if (JSON.stringify(entries) === themeListSaved) {
-                    // Nothing changed - just close
-                    try { closeModal('themeListModal'); } catch (e) {
-                        console.debug('settings-page: closeModal() failed:', e);
-                    }
-                    return;
-                }
-
-                var body = new FormData();
-                body.append('action', 'theme_list');
-                body.append('entries', JSON.stringify(entries));
-                postCustomCss(body).then(function () {
-                    try { closeModal('themeListModal'); } catch (e) {
-                        console.debug('settings-page: closeModal() failed:', e);
-                    }
-                    refreshThemeListBadge();
-                    reloadOpener();
-                    window.location.reload();
-                }).catch(customCssSaveFailed);
-            });
+            themeListCard.addEventListener('click', openThemeListModal);
         }
 
         // Save import limits modal button
@@ -5673,312 +5444,16 @@
     }
 
     // ========== Icon Sidebar Order ==========
-    // The rows are rendered server-side by modals.php from the very list
-    // icon_sidebar.php used for the rail, separators included, so this only
-    // has to reorder them and track the icon colours picked on them. The rail
-    // itself is rendered in PHP, hence the reload after saving.
-
-    // Same token as POZNOTE_ICON_SIDEBAR_DIVIDER in functions.php: the
-    // data-entry-id of a separator row, repeated in the saved order for each
-    // line the user placed.
-    var ICON_SIDEBAR_DIVIDER = 'divider';
-
-    function getIconSidebarOrderList() {
-        return document.getElementById('iconSidebarOrderList');
-    }
-
-    function isIconSidebarDividerRow(row) {
-        return row.getAttribute('data-entry-id') === ICON_SIDEBAR_DIVIDER;
-    }
-
-    // A separator before the first entry, after the last, or right after
-    // another one draws nothing, and the rail drops them
-    // (poznoteTidyIconSidebarDividers()); do the same so the list shows what
-    // the rail will.
-    function tidyIconSidebarOrder(order) {
-        var tidy = [];
-        order.forEach(function (id) {
-            if (id !== ICON_SIDEBAR_DIVIDER) {
-                tidy.push(id);
-            } else if (tidy.length && tidy[tidy.length - 1] !== ICON_SIDEBAR_DIVIDER) {
-                tidy.push(id);
-            }
-        });
-        if (tidy.length && tidy[tidy.length - 1] === ICON_SIDEBAR_DIVIDER) {
-            tidy.pop();
-        }
-        return tidy;
-    }
-
-    function getIconSidebarOrderIds() {
-        var list = getIconSidebarOrderList();
-        if (!list) return [];
-
-        return tidyIconSidebarOrder(Array.prototype.map.call(list.querySelectorAll('.icon-sidebar-order-item'), function (row) {
-            return row.getAttribute('data-entry-id');
-        }).filter(function (id) {
-            return !!id;
-        }));
-    }
-
-    function createIconSidebarDividerRow() {
-        var template = document.getElementById('iconSidebarOrderDividerTemplate');
-        if (!template || !template.content) return null;
-        var row = template.content.firstElementChild;
-        return row ? row.cloneNode(true) : null;
-    }
-
-    // The saved order can name entries this page does not render (the git
-    // buttons only exist on index.php) and can miss ones it does. Walk the
-    // saved order, placing each entry it names and a separator row for each
-    // divider token, then leave the rest in declared order after it, matching
-    // poznoteApplyIconSidebarOrder() in functions.php. With no saved order the
-    // server-rendered list already shows the declared layout, so it is kept.
-    function applyIconSidebarOrderToList(order) {
-        var list = getIconSidebarOrderList();
-        if (!list) return;
-
-        order = tidyIconSidebarOrder(order);
-        if (!order.length) {
-            return;
-        }
-
-        var rows = Array.prototype.slice.call(list.querySelectorAll('.icon-sidebar-order-item'));
-        var byId = {};
-        var spareDividers = [];
-        rows.forEach(function (row) {
-            if (isIconSidebarDividerRow(row)) {
-                spareDividers.push(row);
-            } else if (!(row.getAttribute('data-entry-id') in byId)) {
-                byId[row.getAttribute('data-entry-id')] = row;
-            }
-        });
-
-        var placed = {};
-        var ordered = [];
-        order.forEach(function (id) {
-            if (id === ICON_SIDEBAR_DIVIDER) {
-                var divider = spareDividers.shift() || createIconSidebarDividerRow();
-                if (divider) ordered.push(divider);
-            } else if (byId[id] && !placed[id]) {
-                placed[id] = true;
-                ordered.push(byId[id]);
-            }
-        });
-        rows.forEach(function (row) {
-            if (!isIconSidebarDividerRow(row) && !placed[row.getAttribute('data-entry-id')]) {
-                ordered.push(row);
-            }
-        });
-
-        // Separator rows the saved order has no place for go away; the rest
-        // are re-appended in order.
-        spareDividers.forEach(function (row) {
-            row.remove();
-        });
-        ordered.forEach(function (row) {
-            list.appendChild(row);
-        });
-    }
-
-    // A new separator lands at the bottom, ready to be dragged to where the
-    // line should go.
-    function addIconSidebarDividerRow() {
-        var list = getIconSidebarOrderList();
-        var row = createIconSidebarDividerRow();
-        if (!list || !row) return;
-
-        list.appendChild(row);
-        try { row.scrollIntoView({ block: 'nearest' }); } catch (e) {
-            console.debug('settings-page: addIconSidebarDividerRow() failed:', e);
-        }
-    }
-
-    // Colours picked in this modal stay on the rows (data-icon-color) until
-    // Save, so Cancel drops them. The colour modal itself belongs to the rail
-    // (icon_sidebar.php, js/icon-sidebar-colors.js), which also paints the
-    // row's icon the way it paints the rail's.
-    function getIconSidebarColorsApi() {
-        return window.PoznoteIconSidebarColors || null;
-    }
-
-    function setIconSidebarOrderRowColor(row, color) {
-        var api = getIconSidebarColorsApi();
-        row.setAttribute('data-icon-color', color || '');
-        if (api) api.paintIcon(row.querySelector('.icon-sidebar-order-icon'), color || '');
-    }
-
-    function resetIconSidebarOrderRowColors() {
-        var list = getIconSidebarOrderList();
-        var api = getIconSidebarColorsApi();
-        if (!list || !api) return;
-
-        list.querySelectorAll('.icon-sidebar-order-item').forEach(function (row) {
-            if (!isIconSidebarDividerRow(row)) {
-                setIconSidebarOrderRowColor(row, api.getColor(row.getAttribute('data-entry-id')));
-            }
-        });
-    }
-
-    function openIconSidebarOrderRowColor(row) {
-        var api = getIconSidebarColorsApi();
-        if (!api || !row) return;
-
-        var icon = row.querySelector('.icon-sidebar-order-icon');
-        var label = row.querySelector('.icon-sidebar-order-label');
-        api.open(row.getAttribute('data-entry-id'), {
-            color: row.getAttribute('data-icon-color') || '',
-            icon: icon ? api.iconClassOf(icon) : '',
-            label: label ? label.textContent : '',
-            onApply: function (color) {
-                setIconSidebarOrderRowColor(row, color);
-            }
-        });
-    }
-
-    // Every saved colour, with the listed rows' pending ones on top. Starts
-    // from the saved map so the account buttons at the bottom of the rail,
-    // which the list does not show, keep theirs.
-    function getIconSidebarOrderColors() {
-        var api = getIconSidebarColorsApi();
-        var list = getIconSidebarOrderList();
-        var colors = api ? api.getColors() : {};
-        if (!list) return colors;
-
-        list.querySelectorAll('.icon-sidebar-order-item').forEach(function (row) {
-            if (isIconSidebarDividerRow(row) || !row.hasAttribute('data-icon-color')) return;
-            var id = row.getAttribute('data-entry-id');
-            var color = row.getAttribute('data-icon-color');
-            if (color) {
-                colors[id] = color;
-            } else {
-                delete colors[id];
-            }
-        });
-        return colors;
-    }
-
-    // SortableJS is vendored but not loaded on the settings page; pull it in on
-    // first open, exactly as js/tasklist-order-drag.js does.
-    function initIconSidebarOrderSortable() {
-        var list = getIconSidebarOrderList();
-        if (!list || list.dataset.sortable === '1') return;
-
-        if (typeof Sortable === 'undefined') {
-            if (!document.querySelector('script[data-sortable-local]')) {
-                var script = document.createElement('script');
-                script.src = (window.poznoteAssetUrl ? window.poznoteAssetUrl('js/Sortable.min.js') : 'js/Sortable.min.js');
-                script.async = true;
-                script.setAttribute('data-sortable-local', '1');
-                script.onload = initIconSidebarOrderSortable;
-                document.head.appendChild(script);
-            }
-            return;
-        }
-
-        new Sortable(list, {
-            animation: 150,
-            handle: '.icon-sidebar-order-handle',
-            draggable: '.icon-sidebar-order-item',
-            onStart: function (evt) { evt.item.classList.add('dragging'); },
-            onEnd: function (evt) { evt.item.classList.remove('dragging'); }
-        });
-
-        list.dataset.sortable = '1';
-    }
-
-    function openIconSidebarOrderModal() {
-        var modal = document.getElementById('iconSidebarOrderModal');
-        if (!modal) return;
-
-        getSetting('icon_sidebar_order', function (value) {
-            var order = [];
-            try {
-                var decoded = JSON.parse(value || '[]');
-                if (Array.isArray(decoded)) {
-                    order = decoded.filter(function (id) { return typeof id === 'string' && id; });
-                }
-            } catch (e) {
-                order = [];
-            }
-
-            applyIconSidebarOrderToList(order);
-            resetIconSidebarOrderRowColors();
-            initIconSidebarOrderSortable();
-            modal.style.display = 'flex';
-        });
-    }
-
-    // colors is optional: Reset only clears the order.
-    function saveIconSidebarOrder(order, colors) {
-        var fail = function () {
-            alert(tr('display.alerts.error_saving_preference', {}, 'Error saving preference'));
-        };
-        var done = function () {
-            try { closeModal('iconSidebarOrderModal'); } catch (e) {
-                console.debug('settings-page: saveIconSidebarOrder() failed:', e);
-            }
-            reloadOpener();
-            reloadCurrentSettingsPage();
-        };
-
-        setSetting('icon_sidebar_order', JSON.stringify(order), function (success) {
-            if (!success) {
-                fail();
-                return;
-            }
-            if (!colors) {
-                done();
-                return;
-            }
-            setSetting('icon_sidebar_colors', JSON.stringify(colors), function (colorsSaved) {
-                if (colorsSaved) {
-                    done();
-                } else {
-                    fail();
-                }
-            });
-        });
-    }
-
+    // The modal lives next to the rail (icon_sidebar.php,
+    // js/icon-sidebar-order.js), so the rail's right-click menu opens it on
+    // any page; the card opens the same one.
     function initIconSidebarOrderModal() {
         var card = document.getElementById('icon-sidebar-order-card');
         if (card) {
-            card.addEventListener('click', openIconSidebarOrderModal);
-        }
-
-        var list = getIconSidebarOrderList();
-        if (list) {
-            list.addEventListener('click', function (event) {
-                var button = event.target.closest('[data-change-color], [data-remove-divider]');
-                if (!button) return;
-                var row = button.closest('.icon-sidebar-order-item');
-                if (button.hasAttribute('data-remove-divider')) {
-                    if (row) row.remove();
-                } else {
-                    openIconSidebarOrderRowColor(row);
+            card.addEventListener('click', function () {
+                if (typeof window.poznoteOpenIconSidebarOrderModal === 'function') {
+                    window.poznoteOpenIconSidebarOrderModal();
                 }
-            });
-        }
-
-        var addDividerBtn = document.getElementById('addIconSidebarDividerBtn');
-        if (addDividerBtn) {
-            addDividerBtn.addEventListener('click', addIconSidebarDividerRow);
-        }
-
-        var saveBtn = document.getElementById('saveIconSidebarOrderBtn');
-        if (saveBtn) {
-            saveBtn.addEventListener('click', function () {
-                saveIconSidebarOrder(getIconSidebarOrderIds(), getIconSidebarOrderColors());
-            });
-        }
-
-        // Reset clears the preference, so the rail falls back to the order
-        // icon_sidebar.php declares.
-        var resetBtn = document.getElementById('resetIconSidebarOrderBtn');
-        if (resetBtn) {
-            resetBtn.addEventListener('click', function () {
-                saveIconSidebarOrder([]);
             });
         }
     }

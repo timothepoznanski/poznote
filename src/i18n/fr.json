@@ -95,7 +95,11 @@
     },
     "network_error": "Erreur réseau",
     "none": "Aucun",
-    "show_more_notes": "Afficher plus ({{count}} restantes)"
+    "show_more_notes": "Afficher plus ({{count}} restantes)",
+    "customize_menu": "Personnaliser ce menu",
+    "click_toggles": "Basculer au clic",
+    "click_opens_menu": "Ouvrir un menu au clic",
+    "right_click_toggle_hint": "Clic droit sur le bouton pour basculer au clic"
   },
   "snapshot": {
     "menu_item": "Révisions",
@@ -525,7 +529,7 @@
       "login_disabled": "Passe l'écran de connexion : tout navigateur qui atteint cette instance ouvre directement votre compte, sans nom d'utilisateur, mot de passe ni code à deux facteurs. À n'activer que si vous êtes seul à pouvoir joindre cette instance, ou si un reverse proxy placé devant elle gère l'authentification. L'API continue de demander des identifiants.",
       "outbound_hosts": "Les utilisateurs non administrateurs ne peuvent connecter les webhooks, Git Sync et leurs propres serveurs IA, de transcription ou MCP qu'à des hôtes publics d'Internet. Listez ici les hôtes ou réseaux locaux qu'ils peuvent utiliser, par exemple un serveur Ollama ou n8n. Les administrateurs ne sont pas limités.",
       "diary_template": "Choisissez une note dont le contenu sert de point de départ à chaque nouvelle entrée de journal de l'espace de travail {{workspace}}. La liste montre les notes rangées dans un dossier nommé Modèles (ou Templates) de cet espace. Chaque espace de travail a son propre modèle.",
-      "markdown_view_cycle": "Choisissez les vues que le bouton de vue d'une note markdown parcourt après la vue classique (aperçu, avec le crayon pour modifier). Les vues décochées sont sautées. Si aucune n'est cochée, le bouton est masqué. Sur un téléphone, le bouton ne passe jamais en mode partagé.",
+      "markdown_view_cycle": "Choisissez les vues que le menu des vues d'une note markdown propose en plus de la vue classique (aperçu, avec le crayon pour modifier). Les vues décochées n'y figurent pas. Si aucune n'est cochée, le bouton est masqué. Sur un téléphone, le menu ne propose jamais le mode partagé.",
       "connected_apps": "Connectez des applications de chat comme ChatGPT ou Claude à vos notes via le serveur MCP, et déconnectez-les à tout moment.",
       "custom_logo": "Remplacer le logo Poznote par le vôtre, pour tous les utilisateurs : dans l'onglet du navigateur, sur la page de connexion, dans la barre d'icônes et comme icône de l'application installée.",
       "two_factor_required": "Chaque compte qui se connecte avec un mot de passe doit utiliser l'authentification à deux facteurs. Un compte qui ne l'a pas la configure à sa prochaine connexion, et les sessions ouvertes sans elle prennent fin. Son mot de passe ne fonctionne plus via l'API : les applications utilisent un mot de passe d'application. Les connexions SSO ne sont pas concernées, le fournisseur d'identité gère leur second facteur."
@@ -908,7 +912,7 @@
       "format_toolbar_mode": "Barre de mise en forme",
       "workspace_activity_emails": "Emails des espaces partagés",
       "diary_template": "Modèle d'entrée de journal",
-      "markdown_view_cycle": "Bouton de vue"
+      "markdown_view_cycle": "Menu des vues"
     },
     "badges": {
       "font_size_default": "par défaut ({{size}}px)",
@@ -1259,6 +1263,10 @@
     "paste": {
       "images_dropped_one": "1 image n’a pas pu être collée. Copiez-la seule pour l’ajouter.",
       "images_dropped_other": "{{count}} images n’ont pas pu être collées. Copiez-les une par une pour les ajouter."
+    },
+    "view_menu": {
+      "title": "Changer de vue",
+      "classic": "Classique"
     }
   },
   "info": {
@@ -1359,7 +1367,7 @@
     },
     "theme_list": {
       "title": "Liste des thèmes",
-      "description": "Chaque clic sur le bouton thème de la barre d'icônes passe au thème suivant de cette liste. Cochez ceux à proposer, ordonnez-les avec les flèches, et cochez un fichier CSS pour le proposer aussi comme thème.",
+      "description": "Le bouton thème de la barre d'icônes ouvre un menu avec les thèmes de cette liste. Cochez ceux à proposer, ordonnez-les avec les flèches, et cochez un fichier CSS pour le proposer aussi comme thème.",
       "mode_help": "Cette feuille de style est-elle écrite pour le mode clair ou le mode sombre ?",
       "move_up": "Monter",
       "move_down": "Descendre",

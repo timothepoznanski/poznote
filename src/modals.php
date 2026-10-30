@@ -284,21 +284,6 @@ $modalsPasswordDisabledHelp = $modalsPasswordDisabledReason === 'sso_only'
     </div>
 </div>
 
-<!-- Theme List Modal: what the rail's theme button walks through, in order -->
-<div id="themeListModal" class="modal">
-    <div class="modal-content">
-        <h3><?php echo t_h('modals.theme_list.title', [], 'Theme list'); ?></h3>
-        <p><?php echo t_h('modals.theme_list.description', [], 'Each click on the theme button of the icon sidebar switches to the next theme in this list. Tick the ones to offer, order them with the arrows, and tick a CSS file to offer it as a theme too.'); ?></p>
-
-        <div id="themeListChoices" class="custom-css-theme-choices"></div>
-
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" id="cancelThemeListBtn"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveThemeListBtn"><?php echo t_h('common.save'); ?></button>
-        </div>
-    </div>
-</div>
-
 <!-- Import Limits Modal -->
 <div id="importLimitsModal" class="modal">
     <div class="modal-content">
@@ -1515,68 +1500,6 @@ include __DIR__ . '/modals/tag_folder_notes_modal.php';
         <div class="modal-buttons">
             <button type="button" class="btn-primary" data-action="navigate-tags"><?php echo t_h('tags.list_all', [], 'List all tags'); ?></button>
             <button type="button" class="btn-cancel" data-action="close-tags-modal"><?php echo t_h('common.close'); ?></button>
-        </div>
-    </div>
-</div>
-
-<?php
-// Icon Sidebar Order modal. The rows come from the list icon_sidebar.php
-// published while rendering the rail, so the modal can never offer an entry the
-// rail does not have (or miss one it gained). Only the scrolling navigation
-// group is listed: the account group at the bottom of the rail is fixed, which
-// keeps Settings reachable no matter how the rest is arranged.
-$iconSidebarOrderItems = $GLOBALS['poznoteIconSidebarOrderableItems'] ?? [];
-
-// A separator row: the list carries them among the entries (icon_sidebar.php
-// draws a line in the rail at each), and they drag like any entry.
-// Its data-entry-id is the token poznoteGetIconSidebarOrder() reads, so the
-// list's ids are the saved order as is. Rendered by a closure so the
-// <template> js/settings-page.js clones for "Add separator" is the same markup.
-$iconSidebarOrderDividerRow = static function (): string {
-    $remove = t_h('modals.icon_sidebar_order.remove_divider', [], 'Remove separator');
-    $token = htmlspecialchars(defined('POZNOTE_ICON_SIDEBAR_DIVIDER') ? POZNOTE_ICON_SIDEBAR_DIVIDER : 'divider', ENT_QUOTES, 'UTF-8');
-    return '<li class="icon-sidebar-order-item icon-sidebar-order-divider" data-entry-id="' . $token . '">'
-        . '<span class="icon-sidebar-order-handle" aria-hidden="true"><i class="lucide lucide-grip-vertical"></i></span>'
-        . '<span class="icon-sidebar-order-divider-line" aria-hidden="true"></span>'
-        . '<span class="icon-sidebar-order-divider-label">' . t_h('modals.icon_sidebar_order.divider', [], 'Separator') . '</span>'
-        . '<span class="icon-sidebar-order-divider-line" aria-hidden="true"></span>'
-        . '<span class="icon-sidebar-order-actions">'
-        . '<button type="button" class="icon-sidebar-order-action icon-sidebar-order-remove" data-remove-divider title="' . $remove . '" aria-label="' . $remove . '"><i class="lucide lucide-x"></i></button>'
-        . '</span>'
-        . '</li>';
-};
-?>
-<!-- Icon Sidebar Order Modal -->
-<div id="iconSidebarOrderModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3><?php echo t_h('modals.icon_sidebar_order.title', [], 'Icon sidebar order'); ?></h3>
-        </div>
-        <div class="modal-body">
-            <p class="ui-custom-description"><?php echo t_h('modals.icon_sidebar_order.description', [], 'Drag the entries to change the order of the buttons in the icon sidebar. Separators draw a thin line between two groups of buttons. The account buttons at the bottom of the sidebar stay in place. Click an icon to change its color. You can also right-click any button directly in the sidebar.'); ?></p>
-            <ul class="icon-sidebar-order-list" id="iconSidebarOrderList">
-            <?php foreach ($iconSidebarOrderItems as $iconSidebarOrderItem): ?>
-                <?php if (!empty($iconSidebarOrderItem['divider'])): ?>
-                <?php echo $iconSidebarOrderDividerRow(); ?>
-                <?php continue; ?>
-                <?php endif; ?>
-                <li class="icon-sidebar-order-item" data-entry-id="<?php echo htmlspecialchars($iconSidebarOrderItem['id'], ENT_QUOTES, 'UTF-8'); ?>">
-                    <span class="icon-sidebar-order-handle" aria-hidden="true"><i class="lucide lucide-grip-vertical"></i></span>
-                    <button type="button" class="icon-sidebar-order-icon-btn" data-change-color title="<?php echo t_h('modals.icon_sidebar_order.change_color', [], 'Change icon color'); ?>" aria-label="<?php echo t_h('modals.icon_sidebar_order.change_color', [], 'Change icon color'); ?>"><?php echo poznoteRenderIconSidebarIcon($iconSidebarOrderItem['icon'], $iconSidebarOrderItem['id'], 'icon-sidebar-order-icon'); ?></button>
-                    <span class="icon-sidebar-order-label"><?php echo htmlspecialchars($iconSidebarOrderItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
-                </li>
-            <?php endforeach; ?>
-            </ul>
-            <template id="iconSidebarOrderDividerTemplate"><?php echo $iconSidebarOrderDividerRow(); ?></template>
-            <button type="button" class="icon-sidebar-order-add-divider" id="addIconSidebarDividerBtn">
-                <i class="lucide lucide-plus"></i>
-                <span><?php echo t_h('modals.icon_sidebar_order.add_divider', [], 'Add separator'); ?></span>
-            </button>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" class="btn-cancel" id="resetIconSidebarOrderBtn"><?php echo t_h('modals.icon_sidebar_order.reset', [], 'Reset order'); ?></button>
-            <button type="button" class="btn-cancel" data-action="close-modal" data-modal="iconSidebarOrderModal"><?php echo t_h('common.cancel'); ?></button>
-            <button type="button" class="btn-primary" id="saveIconSidebarOrderBtn"><?php echo t_h('common.save'); ?></button>
         </div>
     </div>
 </div>

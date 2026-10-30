@@ -2,12 +2,12 @@
 /**
  * What the theme button offers, and what an admin puts in it.
  *
- * The rail button walks through a list of themes. That list used to be the six
+ * The rail button opens a menu of a list of themes. That list used to be the six
  * built-in ones, hardcoded in js/theme-manager.js; an admin can now curate it
  * from Settings > Custom CSS, drop the themes nobody uses and add the CSS files
  * uploaded to data/css/ as themes of their own.
  *
- * The list is a global setting, so every user of the instance walks through the
+ * The list is a global setting, so every user of the instance is offered the
  * same themes, and which one is applied stays a per-user choice in localStorage.
  *
  * The built-in definitions below are the PHP copy of a list that also lives in
@@ -16,7 +16,7 @@
  * list and the API can refuse an id that is not a theme.
  */
 
-/** The themes shipped with the app, in the order the button walks them. */
+/** The themes shipped with the app, in the order the button's menu lists them. */
 function poznoteBuiltinThemes(): array
 {
     return [
@@ -102,7 +102,7 @@ function poznoteDefaultThemeList(): array
  * Keeps the entries that name a theme this instance actually has.
  *
  * A stylesheet deleted from the library takes its theme entry with it, so a
- * stale list cannot leave the button cycling onto a stylesheet that is gone.
+ * stale list cannot leave the button offering a stylesheet that is gone.
  * Returns [] when nothing is left, which callers read as "not configured".
  *
  * $knownFiles names the stylesheets that exist; it defaults to what data/css/

@@ -174,8 +174,8 @@ $iconSidebarGroupDividers = static function (array $items): array {
     return $grouped;
 };
 
-// Published for the Icon Sidebar Order modal in modals.php, which settings.php
-// includes long after this file. Taking the list from here rather than
+// The rows of the icon sidebar layout modal, rendered further down this file
+// next to the rail. Taking the list from here rather than
 // restating it means the modal always offers exactly the entries the rail
 // renders, in the order it renders them, separators included, whatever a later
 // release adds. Built from the declared list, before the order is applied:
@@ -252,8 +252,6 @@ if (function_exists('poznoteTidyIconSidebarDividers')) {
     $iconSidebarOrderable = poznoteTidyIconSidebarDividers($iconSidebarOrderable);
 }
 
-$GLOBALS['poznoteIconSidebarOrderableItems'] = $iconSidebarOrderable;
-
 // Pinned extras take their place only now, so 'after' keeps holding for a user
 // who saved a custom order: that order cannot mention them, since the Icon
 // Sidebar Order modal renders on settings.php, where these page-specific
@@ -306,8 +304,10 @@ $iconSidebarDefaultCredential = function_exists('getAuthenticatedUserId')
 // page as Settings, which opens on the pinned settings (discussion #1378).
 $iconSidebarBottomItems = [
     // Theme switch. It goes nowhere, so it renders as a button rather than a
-    // link; js/theme-manager.js picks it up through data-theme-toggle, steps to
-    // the next theme of the list on each click and shows the one in use.
+    // link; js/theme-manager.js picks it up through data-theme-toggle, opens a
+    // menu of the themes of the list on each click and shows the one in use.
+    // A right-click offers to step to the next theme on each click instead, as
+    // it used to: theme_button_cycle, carried as data-theme-cycle.
     ['id' => 'iconSidebarThemeToggleBtn', 'themeToggle' => true, 'icon' => 'lucide-moon', 'label' => t('theme.toggle', [], 'Toggle theme')],
     // ?open=about lands on settings.php with the About section expanded and
     // every other section collapsed (js/settings-page.js). It is settings.php
@@ -470,6 +470,7 @@ window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
     ))),
     'menuChangeColor' => t('modals.icon_sidebar_order.change_color', [], 'Change icon color'),
     'menuHide' => t('icon_context_menu.hide', [], 'Hide button'),
+    'menuCustomize' => t('common.customize_menu', [], 'Customize this menu'),
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 </script>
 <script src="<?php echo $iconSidebarAsset('js/color-palette.js'); ?>" defer></script>
@@ -592,7 +593,11 @@ try {
     $iconSidebarClass = 'icon-sidebar-btn' . ($iconSidebarIsCurrent ? ' icon-sidebar-btn-active' : '');
     ?>
     <?php if (!empty($iconSidebarItem['themeToggle'])): ?>
-    <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="<?php echo $iconSidebarClass; ?>" data-theme-toggle title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
+    <?php $iconSidebarThemeCycles = function_exists('getSetting') && (string)getSetting('theme_button_cycle', '0') === '1'; ?>
+    <button type="button" id="<?php echo $iconSidebarItem['id']; ?>" class="<?php echo $iconSidebarClass; ?>" data-theme-toggle<?php echo $iconSidebarThemeCycles ? ' data-theme-cycle' : ' aria-haspopup="menu" aria-expanded="false"'; ?>
+        data-label-click-cycles="<?php echo t_h('common.click_toggles', [], 'Toggle on click'); ?>"
+        data-label-click-menu="<?php echo t_h('common.click_opens_menu', [], 'Open a menu on click'); ?>"
+        data-label-menu-hint="<?php echo t_h('common.right_click_toggle_hint', [], 'Right-click the button to toggle on click instead'); ?>" title="<?php echo $iconSidebarLabel; ?>" aria-label="<?php echo $iconSidebarLabel; ?>">
         <?php echo poznoteRenderIconSidebarIcon($iconSidebarItem['icon'], $iconSidebarItem['id']); ?>
     </button>
     <?php
@@ -660,3 +665,111 @@ try {
         </div>
     </div>
 </div>
+<?php
+// Theme list: what the theme button's menu offers, in order. An instance-wide
+// setting only an admin may change (api_upload_css.php requireAdmin), opened by
+// the last entry of that menu (js/theme-manager.js) on the page it is on, and
+// by the Theme list card of settings.php. Here rather than in modals.php so
+// every page with the rail has it; styled by css/profile-modal.css and
+// css/theme-list-modal.css for the same reason as the colour modal above.
+if (function_exists('isCurrentUserAdmin') && isCurrentUserAdmin()):
+    $iconSidebarThemeListStrings = [
+        'modals.theme_list.mode_help' => t('modals.theme_list.mode_help', [], 'Is this stylesheet written for the light mode or the dark mode?'),
+        'modals.theme_list.move_up' => t('modals.theme_list.move_up', [], 'Move up'),
+        'modals.theme_list.move_down' => t('modals.theme_list.move_down', [], 'Move down'),
+        'modals.theme_list.empty' => t('modals.theme_list.empty', [], 'Keep at least one theme in the list.'),
+        'display.alerts.error_saving_preference' => t('display.alerts.error_saving_preference', [], 'Error saving preference'),
+    ];
+    foreach ((function_exists('poznoteBuiltinThemes') ? poznoteBuiltinThemes() : []) as $iconSidebarBuiltinTheme) {
+        $iconSidebarThemeListStrings['theme.names.' . $iconSidebarBuiltinTheme['id']] = t('theme.names.' . $iconSidebarBuiltinTheme['id'], [], ucfirst($iconSidebarBuiltinTheme['id']));
+    }
+?>
+<link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/theme-list-modal.css'); ?>">
+<div id="themeListModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="themeListModalTitle"
+    data-api="<?php echo htmlspecialchars($iconSidebarBasePath . 'api_upload_css.php', ENT_QUOTES, 'UTF-8'); ?>"
+    data-strings="<?php echo htmlspecialchars(json_encode($iconSidebarThemeListStrings, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>">
+    <div class="modal-content">
+        <h3 id="themeListModalTitle"><?php echo t_h('modals.theme_list.title', [], 'Theme list'); ?></h3>
+        <p><?php echo t_h('modals.theme_list.description', [], 'The theme button of the icon sidebar opens a menu with the themes of this list. Tick the ones to offer, order them with the arrows, and tick a CSS file to offer it as a theme too.'); ?></p>
+
+        <div id="themeListChoices" class="custom-css-theme-choices"></div>
+
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="cancelThemeListBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveThemeListBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+<script src="<?php echo $iconSidebarAsset('js/theme-list-modal.js'); ?>" defer></script>
+<?php endif; ?>
+<?php
+// Icon sidebar layout modal: the order of the rail's buttons, the separators
+// between them and their colours. Here rather than in modals.php so the
+// "Customize this menu" entry of the rail's right-click menu opens it on any page
+// (js/icon-sidebar-order.js); the Icon sidebar layout card of settings.php
+// opens the same one. Only for the owner of the account looked at, like the
+// rest of that menu. The rows come from the list built above while rendering
+// the rail, so the modal can never offer an entry the rail does not have (or
+// miss one it gained). Only the scrolling navigation
+// group is listed: the account group at the bottom of the rail is fixed, which
+// keeps Settings reachable no matter how the rest is arranged.
+if (!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser()):
+$iconSidebarOrderItems = $iconSidebarOrderable;
+
+// A separator row: the list carries them among the entries (icon_sidebar.php
+// draws a line in the rail at each), and they drag like any entry.
+// Its data-entry-id is the token poznoteGetIconSidebarOrder() reads, so the
+// list's ids are the saved order as is. Rendered by a closure so the
+// <template> js/icon-sidebar-order.js clones for "Add separator" is the same markup.
+$iconSidebarOrderDividerRow = static function (): string {
+    $remove = t_h('modals.icon_sidebar_order.remove_divider', [], 'Remove separator');
+    $token = htmlspecialchars(defined('POZNOTE_ICON_SIDEBAR_DIVIDER') ? POZNOTE_ICON_SIDEBAR_DIVIDER : 'divider', ENT_QUOTES, 'UTF-8');
+    return '<li class="icon-sidebar-order-item icon-sidebar-order-divider" data-entry-id="' . $token . '">'
+        . '<span class="icon-sidebar-order-handle" aria-hidden="true"><i class="lucide lucide-grip-vertical"></i></span>'
+        . '<span class="icon-sidebar-order-divider-line" aria-hidden="true"></span>'
+        . '<span class="icon-sidebar-order-divider-label">' . t_h('modals.icon_sidebar_order.divider', [], 'Separator') . '</span>'
+        . '<span class="icon-sidebar-order-divider-line" aria-hidden="true"></span>'
+        . '<span class="icon-sidebar-order-actions">'
+        . '<button type="button" class="icon-sidebar-order-action icon-sidebar-order-remove" data-remove-divider title="' . $remove . '" aria-label="' . $remove . '"><i class="lucide lucide-x"></i></button>'
+        . '</span>'
+        . '</li>';
+};
+?>
+<link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/icon-sidebar-order.css'); ?>">
+<div id="iconSidebarOrderModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="iconSidebarOrderModalTitle"
+    data-error="<?php echo t_h('display.alerts.error_saving_preference', [], 'Error saving preference'); ?>">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="iconSidebarOrderModalTitle"><?php echo t_h('modals.icon_sidebar_order.title', [], 'Icon sidebar order'); ?></h3>
+        </div>
+        <div class="modal-body">
+            <p class="icon-sidebar-order-description"><?php echo t_h('modals.icon_sidebar_order.description', [], 'Drag the entries to change the order of the buttons in the icon sidebar. Separators draw a thin line between two groups of buttons. The account buttons at the bottom of the sidebar stay in place. Click an icon to change its color. You can also right-click any button directly in the sidebar.'); ?></p>
+            <ul class="icon-sidebar-order-list" id="iconSidebarOrderList">
+            <?php foreach ($iconSidebarOrderItems as $iconSidebarOrderItem): ?>
+                <?php if (!empty($iconSidebarOrderItem['divider'])): ?>
+                <?php echo $iconSidebarOrderDividerRow(); ?>
+                <?php continue; ?>
+                <?php endif; ?>
+                <li class="icon-sidebar-order-item" data-entry-id="<?php echo htmlspecialchars($iconSidebarOrderItem['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <span class="icon-sidebar-order-handle" aria-hidden="true"><i class="lucide lucide-grip-vertical"></i></span>
+                    <button type="button" class="icon-sidebar-order-icon-btn" data-change-color title="<?php echo t_h('modals.icon_sidebar_order.change_color', [], 'Change icon color'); ?>" aria-label="<?php echo t_h('modals.icon_sidebar_order.change_color', [], 'Change icon color'); ?>"><?php echo poznoteRenderIconSidebarIcon($iconSidebarOrderItem['icon'], $iconSidebarOrderItem['id'], 'icon-sidebar-order-icon'); ?></button>
+                    <span class="icon-sidebar-order-label"><?php echo htmlspecialchars($iconSidebarOrderItem['label'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></span>
+                </li>
+            <?php endforeach; ?>
+            </ul>
+            <template id="iconSidebarOrderDividerTemplate"><?php echo $iconSidebarOrderDividerRow(); ?></template>
+            <button type="button" class="icon-sidebar-order-add-divider" id="addIconSidebarDividerBtn">
+                <i class="lucide lucide-plus"></i>
+                <span><?php echo t_h('modals.icon_sidebar_order.add_divider', [], 'Add separator'); ?></span>
+            </button>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" class="btn-cancel" id="resetIconSidebarOrderBtn"><?php echo t_h('modals.icon_sidebar_order.reset', [], 'Reset order'); ?></button>
+            <button type="button" class="btn-cancel" id="cancelIconSidebarOrderBtn"><?php echo t_h('common.cancel'); ?></button>
+            <button type="button" class="btn-primary" id="saveIconSidebarOrderBtn"><?php echo t_h('common.save'); ?></button>
+        </div>
+    </div>
+</div>
+<script src="<?php echo $iconSidebarAsset('js/icon-sidebar-order.js'); ?>" defer></script>
+<?php endif; ?>
+

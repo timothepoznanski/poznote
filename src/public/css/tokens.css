@@ -465,6 +465,18 @@ html[data-theme='dark'] {
     --dm-tab-active-bg: #383838;
 }
 
+/* The main colour of each theme, whatever theme is applied: the theme
+   button's menu paints each theme's icon with its own (css/icon-sidebar.css).
+   The accent each one shows, the dark accent for a dark theme. */
+:root {
+    --pz-theme-swatch-light: #007db8;
+    --pz-theme-swatch-dark: #4a9eff;
+    --pz-theme-swatch-black: #5f94f7;
+    --pz-theme-swatch-lavender: #7a00d4;
+    --pz-theme-swatch-sepia: #8a4b12;
+    --pz-theme-swatch-terminal: #4ee87a;
+}
+
 /* ============================================
    Named themes
    ============================================
@@ -472,7 +484,8 @@ html[data-theme='dark'] {
    stays in data-theme so every rule in the app keeps working unchanged, and
    the class carries the palette. A light variant overrides the --pz-* scales,
    a dark one the --dm-*. js/theme-manager.js and js/theme-init.js hold the
-   same list; adding a theme means adding it in all three. */
+   same list; adding a theme means adding it in all three, and giving it a
+   --pz-theme-swatch-* above. */
 
 /* --- Lavender: a light theme with a neon streak -------------------------- */
 html.theme-lavender {

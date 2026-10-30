@@ -96,7 +96,11 @@
     },
     "network_error": "Error de red",
     "none": "Ninguno",
-    "show_more_notes": "Mostrar más ({{count}} restantes)"
+    "show_more_notes": "Mostrar más ({{count}} restantes)",
+    "customize_menu": "Personalizar este menú",
+    "click_toggles": "Alternar al hacer clic",
+    "click_opens_menu": "Abrir un menú al hacer clic",
+    "right_click_toggle_hint": "Clic derecho en el botón para alternar al hacer clic"
   },
   "snapshot": {
     "menu_item": "Revisiones",
@@ -526,7 +530,7 @@
       "login_disabled": "Omite la pantalla de inicio de sesión: cualquier navegador que llegue a esta instancia abre directamente su cuenta, sin usuario, contraseña ni código de dos factores. Actívelo solo si usted es el único que puede acceder a esta instancia, o si un proxy inverso situado delante se encarga de la autenticación. La API sigue pidiendo credenciales.",
       "outbound_hosts": "Los usuarios no administradores solo pueden conectar los webhooks, Git Sync y sus propios servidores de IA, transcripción o MCP a hosts públicos de Internet. Indica aquí los hosts o redes locales que pueden usar, como un servidor Ollama o n8n. Los administradores no tienen límites.",
       "diary_template": "Elija una nota cuyo contenido sirva de punto de partida para cada nueva entrada del diario del espacio de trabajo {{workspace}}. La lista muestra las notas guardadas en una carpeta llamada Plantillas (o Templates) de ese espacio. Cada espacio de trabajo tiene su propia plantilla.",
-      "markdown_view_cycle": "Elija las vistas que recorre el botón de vista de una nota markdown después de la vista clásica (vista previa, con el lápiz para editar). Las vistas no elegidas se omiten. Si no se elige ninguna, el botón se oculta. En un teléfono el botón nunca pasa al modo dividido.",
+      "markdown_view_cycle": "Elija las vistas que ofrece el menú de vistas de una nota markdown además de la vista clásica (vista previa, con el lápiz para editar). Las vistas no elegidas no aparecen. Si no se elige ninguna, el botón se oculta. En un teléfono el menú nunca ofrece el modo dividido.",
       "connected_apps": "Conecta aplicaciones de chat como ChatGPT o Claude a tus notas a través del servidor MCP y desconéctalas cuando quieras.",
       "custom_logo": "Sustituir el logo de Poznote por el suyo, para todos los usuarios: en la pestaña del navegador, en la página de inicio de sesión, en la barra de iconos y como icono de la aplicación instalada.",
       "two_factor_required": "Toda cuenta que inicie sesión con contraseña debe usar la autenticación en dos pasos. Una cuenta que no la tenga la configura en su próximo inicio de sesión, y las sesiones abiertas sin ella se cierran. Su contraseña deja de funcionar a través de la API: las aplicaciones usan una contraseña de aplicación. Los inicios de sesión SSO no se ven afectados, el proveedor de identidad gestiona su segundo factor."
@@ -908,7 +912,7 @@
       "format_toolbar_mode": "Barra de formato",
       "workspace_activity_emails": "Correos de espacios compartidos",
       "diary_template": "Plantilla de entrada del diario",
-      "markdown_view_cycle": "Botón de vista"
+      "markdown_view_cycle": "Menú de vistas"
     },
     "badges": {
       "font_size_default": "predeterminado ({{size}}px)",
@@ -1259,6 +1263,10 @@
     "paste": {
       "images_dropped_one": "No se pudo pegar 1 imagen. Cópiala por separado para añadirla.",
       "images_dropped_other": "No se pudieron pegar {{count}} imágenes. Cópialas una por una para añadirlas."
+    },
+    "view_menu": {
+      "title": "Cambiar de vista",
+      "classic": "Clásica"
     }
   },
   "info": {
@@ -1359,7 +1367,7 @@
     },
     "theme_list": {
       "title": "Lista de temas",
-      "description": "Cada clic en el botón de tema de la barra de iconos pasa al siguiente tema de esta lista. Marca los que quieras ofrecer, ordénalos con las flechas y marca un archivo CSS para ofrecerlo también como tema.",
+      "description": "El botón de tema de la barra de iconos abre un menú con los temas de esta lista. Marca los que quieras ofrecer, ordénalos con las flechas y marca un archivo CSS para ofrecerlo también como tema.",
       "mode_help": "¿Esta hoja de estilos está escrita para el modo claro o el modo oscuro?",
       "move_up": "Subir",
       "move_down": "Bajar",
