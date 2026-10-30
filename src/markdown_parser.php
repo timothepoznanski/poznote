@@ -141,11 +141,20 @@ function protectMarkdownBackslashEscapes($text, &$protectedEscapes, &$escapeInde
     $charClass = '[' . preg_quote($escapableChars, '/') . ']';
 
     return preg_replace_callback('/\\\\(' . $charClass . ')(\1*)/', function($matches) use (&$protectedEscapes, &$escapeIndex) {
-        $literal = $matches[1] . (isset($matches[2]) ? $matches[2] : '');
+        $repeated = isset($matches[2]) ? $matches[2] : '';
+        // A backslash escapes a whole run of a delimiter ("\**"), but a
+        // bracket or a parenthesis on its own: in "[x](https://a.b/c\(d\))"
+        // the last ")" closes the link. Same in js/markdown-parser.js.
+        $rest = '';
+        if (strpos('()[]', $matches[1]) !== false) {
+            $rest = $repeated;
+            $repeated = '';
+        }
+        $literal = $matches[1] . $repeated;
         $placeholder = "\x00MDESC" . $escapeIndex . "\x00";
         $protectedEscapes[$escapeIndex] = htmlspecialchars($literal, ENT_QUOTES, 'UTF-8');
         $escapeIndex++;
-        return $placeholder;
+        return $placeholder . $rest;
     }, $text);
 }
 
@@ -518,6 +527,30 @@ function isDangerousMarkdownExcalidrawAttributeValue($value) {
     return preg_match('#javascript:|vbscript:|data:(?!image/)#i', (string)$value) === 1;
 }
 
+// The address of a link or an image: no spaces, and parentheses only in
+// balanced pairs, so that "https://en.wikipedia.org/wiki/Foo_(bar)" keeps its
+// ")" and the one closing the link is still found (issue #1700). Same pattern
+// in js/markdown-source.js.
+const MARKDOWN_LINK_URL_PATTERN = '(?:[^\\s()]|\\([^\\s()]*\\))+';
+
+/**
+ * A bare address ends before the punctuation that follows it, but a ")"
+ * stays when it closes a "(" of the address itself, as on GitHub:
+ * "https://en.wikipedia.org/wiki/Foo_(bar)" keeps it, "(see https://x.y)"
+ * does not. Returns [address, trailing punctuation].
+ */
+function splitMarkdownAutolinkTrailing($url) {
+    $trailing = '';
+    while ($url !== '' && preg_match('/[),.;!?*_~]$/', $url)) {
+        if (substr($url, -1) === ')' && substr_count($url, ')') <= substr_count($url, '(')) {
+            break;
+        }
+        $trailing = substr($url, -1) . $trailing;
+        $url = substr($url, 0, -1);
+    }
+    return [$url, $trailing];
+}
+
 function normalizeMarkdownUrlForAttribute($url, $context = 'link') {
     $value = trim((string)$url);
     if ($value === '') {
@@ -780,7 +813,7 @@ function parseMarkdown($text) {
     $protectedIndex = 0;
     
     // Protect images first: ![alt](url "title") with optional {.img-with-border width=320} attributes
-    $text = preg_replace_callback('/!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)(?:\{((?=[^}]*(?:\.img-with-border(?:-no-padding)?(?=\s|})|\bwidth\s*=))[^}]*)\})?/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
+    $text = preg_replace_callback('/!\[([^\]]*)\]\((' . MARKDOWN_LINK_URL_PATTERN . ')(?:\s+"([^"]+)")?\)(?:\{((?=[^}]*(?:\.img-with-border(?:-no-padding)?(?=\s|})|\bwidth\s*=))[^}]*)\})?/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
         $alt = $matches[1];
         $url = $matches[2];
         $title = isset($matches[3]) ? $matches[3] : '';
@@ -796,11 +829,20 @@ function parseMarkdown($text) {
         return $placeholder;
     }, $text);
     
-    // Protect links [text](url "title")
-    $text = preg_replace_callback('/\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
+    // Protect links [text](url "title"), the address also written <url>
+    $text = preg_replace_callback('/\[([^\]]+)\]\((?:<([^<>\n]*)>|(' . MARKDOWN_LINK_URL_PATTERN . '))(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources, $protectedEscapes) {
         $linkText = $matches[1];
-        $url = $matches[2];
-        $title = isset($matches[3]) ? $matches[3] : '';
+        $url = (isset($matches[3]) && $matches[3] !== '') ? $matches[3] : $matches[2];
+        $title = isset($matches[4]) ? $matches[4] : '';
+
+        // "\(" and "\)" were set aside above; in an address they stand for
+        // the character itself.
+        $url = preg_replace_callback('/\x00MDESC(\d+)\x00/', function($escape) use ($protectedEscapes) {
+            $index = (int)$escape[1];
+            return isset($protectedEscapes[$index])
+                ? html_entity_decode($protectedEscapes[$index], ENT_QUOTES, 'UTF-8')
+                : $escape[0];
+        }, $url);
         $safeUrl = normalizeMarkdownUrlForAttribute($url, 'link');
         if ($safeUrl === '') {
             return $matches[0];
@@ -990,14 +1032,9 @@ function parseMarkdown($text) {
         $text = preg_replace_callback('/(^|[\s(])((?:https?:\/\/)[^\s<]+)/m', function($matches) use (&$protectedUrls) {
             $prefix = $matches[1];
             $url = $matches[2];
-            $trailing = '';
-
             // (the emphasis markers closing a format right behind the address
             // are not part of it: "**see https://x.y**")
-            while ($url !== '' && preg_match('/[),.;!?*_~]$/', $url)) {
-                $trailing = substr($url, -1) . $trailing;
-                $url = substr($url, 0, -1);
-            }
+            [$url, $trailing] = splitMarkdownAutolinkTrailing($url);
 
             if ($url === '') {
                 return $matches[0];

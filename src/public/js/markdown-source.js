@@ -20,8 +20,40 @@ function _mdEscapeHtmlAttribute(str) {
     return _mdEscapeHtml(str).replace(/\r\n|\r|\n/g, '&#10;');
 }
 
+// The address of a link or an image: no spaces, and parentheses only in
+// balanced pairs, so that "https://en.wikipedia.org/wiki/Foo_(bar)" keeps its
+// ")" and the one closing the link is still found (issue #1700). Same pattern
+// in markdown_parser.php.
+var _MD_LINK_URL_PATTERN = '(?:[^\\s()]|\\([^\\s()]*\\))+';
+
 function _mdGetMarkdownImageRegex() {
-    return /!\[([^\]]*)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)(?:\{((?=[^}]*(?:\.img-with-border(?:-no-padding)?(?=\s|})|\bwidth\s*=))[^}]*)\})?/g;
+    return new RegExp('!\\[([^\\]]*)\\]\\((' + _MD_LINK_URL_PATTERN + ')(?:\\s+"([^"]+)")?\\)(?:\\{((?=[^}]*(?:\\.img-with-border(?:-no-padding)?(?=\\s|})|\\bwidth\\s*=))[^}]*)\\})?', 'g');
+}
+
+// A link [text](url "title"), its address also written <url> (which may hold
+// spaces and any parentheses). Groups: text, <url>, url, title.
+function _mdGetMarkdownLinkRegex() {
+    return new RegExp('\\[([^\\]]+)\\]\\((?:<([^<>\\n]*)>|(' + _MD_LINK_URL_PATTERN + '))(?:\\s+"([^"]+)")?\\)', 'g');
+}
+
+// A bare address ends before the punctuation that follows it, but a ")"
+// stays when it closes a "(" of the address itself, as on GitHub:
+// "https://en.wikipedia.org/wiki/Foo_(bar)" keeps it, "(see https://x.y)"
+// does not. Returns [address, trailing punctuation].
+function _mdSplitAutolinkTrailing(url) {
+    var trailing = '';
+    while (/[),.;!?*_~]$/.test(url)) {
+        if (url.slice(-1) === ')') {
+            var opens = (url.match(/\(/g) || []).length;
+            var closes = (url.match(/\)/g) || []).length;
+            if (closes <= opens) {
+                break;
+            }
+        }
+        trailing = url.slice(-1) + trailing;
+        url = url.slice(0, -1);
+    }
+    return [url, trailing];
 }
 
 function _mdNormalizeMarkdownImageBorderClass(borderClass) {
