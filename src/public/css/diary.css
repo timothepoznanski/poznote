@@ -767,8 +767,10 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
    preview in css/markdown.css and, like there, markdown entries only; the
    theme defaults of the variables live in css/tokens.css. */
 
+/* !important for the global `h1 { color: var(--pz-text) !important }` of the
+   dark themes (css/dark-mode/components.css), which only h1 has to beat. */
 body.markdown-colored .diary-journal-markdown h1 {
-    color: var(--mdc-h1);
+    color: var(--mdc-h1) !important;
 }
 
 body.markdown-colored .diary-journal-markdown h2 {
