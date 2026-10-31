@@ -191,19 +191,19 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                 <i class="lucide lucide-file-text"></i>
             </button>
             <div id="markdownViewMenu" class="page-more-menu" role="menu" hidden>
-                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="classic">
+                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="classic" title="<?php echo t_h('editor.view_menu.classic_hint', [], 'Read the formatted note, click the pencil to edit the Markdown source.'); ?>">
                     <i class="lucide lucide-file-text"></i>
                     <span><?php echo t_h('editor.view_menu.classic', [], 'Classic'); ?></span>
                 </button>
-                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="live">
+                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="live" title="<?php echo t_h('editor.view_menu.live_hint', [], 'Edit the note already formatted: the Markdown syntax shows up around the cursor.'); ?>">
                     <i class="devicon-markdown"></i>
                     <span><?php echo t_h('modals.markdown_default_view_mode.options.live', [], 'Live preview'); ?></span>
                 </button>
-                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="rich">
+                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="rich" title="<?php echo t_h('editor.view_menu.rich_hint', [], 'Edit the note like a word processor: the Markdown syntax is never shown.'); ?>">
                     <i class="lucide lucide-type"></i>
                     <span><?php echo t_h('modals.markdown_default_view_mode.options.rich', [], 'Rich text'); ?></span>
                 </button>
-                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="split">
+                <button type="button" class="page-more-menu-item" role="menuitemradio" aria-checked="false" data-markdown-view="split" title="<?php echo t_h('editor.view_menu.split_hint', [], 'Markdown source on one side, formatted preview on the other, updated as you type.'); ?>">
                     <i class="lucide lucide-columns-2"></i>
                     <span><?php echo t_h('page_menu.split_view', [], 'Split view'); ?></span>
                 </button>
