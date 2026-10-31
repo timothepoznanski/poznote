@@ -177,6 +177,7 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
 }
 
 .page-more-menu-item {
+    position: relative;
     width: 100%;
     box-sizing: border-box;
     padding: 7px 14px;
@@ -232,6 +233,65 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
 .page-more-menu-item [class*="devicon-"] {
     width: 15px;
     color: var(--pz-text-muted);
+}
+
+/* What each view does: the help icon of the settings cards (.setting-help in
+   home/cards.css, which this page does not load). The bubble opens beside the
+   menu, positioned against the entry, so it hides none of the other views. */
+.page-more-menu-help {
+    margin-left: auto;
+    cursor: help;
+    line-height: 1;
+}
+
+.page-more-menu-help .lucide {
+    width: 13px;
+    height: 13px;
+    background-color: var(--pz-text-subtle);
+    opacity: 0.55;
+    transition: opacity 0.15s ease;
+}
+
+.page-more-menu-help:hover .lucide {
+    opacity: 1;
+}
+
+.page-more-menu-help::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 8px);
+    transform: translateY(-50%);
+    width: max-content;
+    max-width: 240px;
+    background: var(--pz-tooltip-bg);
+    color: var(--pz-tooltip-text);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.15);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: var(--pz-weight-normal);
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+    padding: 8px 10px;
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.25);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+}
+
+.page-more-menu-help:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* No hover on mobile / touch screens, same as the settings cards */
+@media (max-width: 800px), (hover: none) {
+    .page-more-menu-help {
+        display: none;
+    }
 }
 
 .page-more-menu-separator {

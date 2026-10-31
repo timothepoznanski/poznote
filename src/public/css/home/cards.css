@@ -184,8 +184,8 @@ html[data-theme='dark'] #support-card .home-card-icon {
     right: -4px;
     width: max-content;
     max-width: 240px;
-    background: #1f2937;
-    color: #f9fafb;
+    background: var(--pz-tooltip-bg);
+    color: var(--pz-tooltip-text);
     border: 1px solid rgba(var(--pz-highlight-rgb), 0.15);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.95rem;
