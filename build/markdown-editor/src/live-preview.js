@@ -1063,6 +1063,8 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
       let skipped = false
       for (let node = tree.resolveInner(from + 2, 1); node; node = node.parent) {
         if (node.name === 'Image' || node.name === 'Autolink' || node.name === 'HTMLTag' || node.name === 'URL') skipped = true
+        // "[[text]](url)" is a link whose text is "[text]"
+        if (node.name === 'Link' && node.getChild('URL')) skipped = true
       }
       if (skipped) continue
 

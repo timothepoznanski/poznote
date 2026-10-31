@@ -533,6 +533,65 @@ function isDangerousMarkdownExcalidrawAttributeValue($value) {
 // in js/markdown-source.js.
 const MARKDOWN_LINK_URL_PATTERN = '(?:[^\\s()]|\\([^\\s()]*\\))+';
 
+// The text of a link or an image: square brackets only in balanced pairs, so
+// that "[[v2] notes](url)" is one link (issue #1713), and a pair followed by
+// "(" is a link of its own, which is the one that counts. Written so that the
+// text between two pairs is one step: repeating a group for each character
+// exhausts PCRE's stack on a long text with no closing bracket, and the whole
+// note is lost. Same pattern in js/markdown-source.js.
+const MARKDOWN_LINK_TEXT_PATTERN = '[^\\[\\]]*+(?:\\[[^\\[\\]]*+\\](?!\\()[^\\[\\]]*+)*+';
+
+/**
+ * Bold, italic, strikethrough and highlight, on text already escaped.
+ */
+function applyMarkdownInlineEmphasis($text) {
+    // Bold and italic (handling nesting better by avoiding [^*] which stops at the first asterisk)
+    // Triple formatting (Bold + Italic)
+    $text = preg_replace('/\*\*\*(.*?)\*\*\*/s', '<strong><em>$1</em></strong>', $text);
+    $text = preg_replace('/(^|[^A-Za-z0-9_])___(?=\S)(.*?\S)___(?![A-Za-z0-9_])/s', '$1<strong><em>$2</em></strong>', $text);
+
+    // Bold
+    $text = preg_replace('/\*\*(.*?)\*\*/s', '<strong>$1</strong>', $text);
+    $text = preg_replace('/(^|[^A-Za-z0-9_])__(?=\S)(.*?\S)__(?![A-Za-z0-9_])/s', '$1<strong>$2</strong>', $text);
+
+    // Italic (use lookahead/lookbehind to ensure we don't match double asterisks)
+    $text = preg_replace('/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $text);
+    $text = preg_replace('/(^|[^A-Za-z0-9_])_(?=\S)(.*?\S)_(?![A-Za-z0-9_])/s', '$1<em>$2</em>', $text);
+
+    // Strikethrough: ~~text~~
+    $text = preg_replace('/~~(.*?)~~/s', '<del>$1</del>', $text);
+
+    // Highlights: ==text==
+    $text = preg_replace('/==(.*?)==/s', '<mark>$1</mark>', $text);
+
+    return $text;
+}
+
+/**
+ * The text of a [text](url) link as HTML: escaped, with its emphasis
+ * (**bold**, ...). An address in it is set aside during the emphasis passes:
+ * its "*" and "_" are not emphasis.
+ */
+function renderMarkdownLinkText($linkText) {
+    $html = htmlspecialchars($linkText, ENT_QUOTES, 'UTF-8');
+
+    $addresses = [];
+    $html = preg_replace_callback('/(^|[\s(])(https?:\/\/[^\s<]+)/m', function($matches) use (&$addresses) {
+        [$url, $trailing] = splitMarkdownAutolinkTrailing($matches[2]);
+        if ($url === '') {
+            return $matches[0];
+        }
+        $addresses[] = $url;
+        return $matches[1] . "\x00LNKTXT" . (count($addresses) - 1) . "\x00" . $trailing;
+    }, $html);
+
+    $html = applyMarkdownInlineEmphasis($html);
+
+    return preg_replace_callback('/\x00LNKTXT(\d+)\x00/', function($matches) use ($addresses) {
+        return $addresses[(int)$matches[1]];
+    }, $html);
+}
+
 /**
  * A bare address ends before the punctuation that follows it, but a ")"
  * stays when it closes a "(" of the address itself, as on GitHub:
@@ -813,7 +872,7 @@ function parseMarkdown($text) {
     $protectedIndex = 0;
     
     // Protect images first: ![alt](url "title") with optional {.img-with-border width=320} attributes
-    $text = preg_replace_callback('/!\[([^\]]*)\]\((' . MARKDOWN_LINK_URL_PATTERN . ')(?:\s+"([^"]+)")?\)(?:\{((?=[^}]*(?:\.img-with-border(?:-no-padding)?(?=\s|})|\bwidth\s*=))[^}]*)\})?/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
+    $text = preg_replace_callback('/!\[(' . MARKDOWN_LINK_TEXT_PATTERN . ')\]\((' . MARKDOWN_LINK_URL_PATTERN . ')(?:\s+"([^"]+)")?\)(?:\{((?=[^}]*(?:\.img-with-border(?:-no-padding)?(?=\s|})|\bwidth\s*=))[^}]*)\})?/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources) {
         $alt = $matches[1];
         $url = $matches[2];
         $title = isset($matches[3]) ? $matches[3] : '';
@@ -830,7 +889,7 @@ function parseMarkdown($text) {
     }, $text);
     
     // Protect links [text](url "title"), the address also written <url>
-    $text = preg_replace_callback('/\[([^\]]+)\]\((?:<([^<>\n]*)>|(' . MARKDOWN_LINK_URL_PATTERN . '))(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources, $protectedEscapes) {
+    $text = preg_replace_callback('/\[((?!\])' . MARKDOWN_LINK_TEXT_PATTERN . ')\]\((?:<([^<>\n]*)>|(' . MARKDOWN_LINK_URL_PATTERN . '))(?:\s+"([^"]+)")?\)/', function($matches) use (&$protectedElements, &$protectedIndex, &$placeholderSources, $protectedEscapes) {
         $linkText = $matches[1];
         $url = (isset($matches[3]) && $matches[3] !== '') ? $matches[3] : $matches[2];
         $title = isset($matches[4]) ? $matches[4] : '';
@@ -849,9 +908,9 @@ function parseMarkdown($text) {
         }
         $placeholder = "\x00PLNK" . $protectedIndex . "\x00";
         if ($title) {
-            $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" title="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . htmlspecialchars($linkText, ENT_QUOTES, 'UTF-8') . '</a>';
+            $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" title="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . renderMarkdownLinkText($linkText) . '</a>';
         } else {
-            $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . htmlspecialchars($linkText, ENT_QUOTES, 'UTF-8') . '</a>';
+            $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . renderMarkdownLinkText($linkText) . '</a>';
         }
         $protectedElements[$protectedIndex] = $linkTag;
         $placeholderSources[$placeholder] = $matches[0];
@@ -1045,24 +1104,7 @@ function parseMarkdown($text) {
             return $prefix . "\x00URL" . (count($protectedUrls) - 1) . "\x00" . $trailing;
         }, $text);
         
-        // Bold and italic (handling nesting better by avoiding [^*] which stops at the first asterisk)
-        // Triple formatting (Bold + Italic)
-        $text = preg_replace('/\*\*\*(.*?)\*\*\*/s', '<strong><em>$1</em></strong>', $text);
-        $text = preg_replace('/(^|[^A-Za-z0-9_])___(?=\S)(.*?\S)___(?![A-Za-z0-9_])/s', '$1<strong><em>$2</em></strong>', $text);
-        
-        // Bold
-        $text = preg_replace('/\*\*(.*?)\*\*/s', '<strong>$1</strong>', $text);
-        $text = preg_replace('/(^|[^A-Za-z0-9_])__(?=\S)(.*?\S)__(?![A-Za-z0-9_])/s', '$1<strong>$2</strong>', $text);
-        
-        // Italic (use lookahead/lookbehind to ensure we don't match double asterisks)
-        $text = preg_replace('/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/s', '<em>$1</em>', $text);
-        $text = preg_replace('/(^|[^A-Za-z0-9_])_(?=\S)(.*?\S)_(?![A-Za-z0-9_])/s', '$1<em>$2</em>', $text);
-        
-        // Strikethrough: ~~text~~
-        $text = preg_replace('/~~(.*?)~~/s', '<del>$1</del>', $text);
-
-        // Highlights: ==text==
-        $text = preg_replace('/==(.*?)==/s', '<mark>$1</mark>', $text);
+        $text = applyMarkdownInlineEmphasis($text);
 
         // The addresses set aside above, as links
         $text = preg_replace_callback('/\x00URL(\d+)\x00/', function($matches) use ($protectedUrls) {
