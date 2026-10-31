@@ -1,0 +1,8 @@
+{
+  "name": "poznote-e2e",
+  "private": true,
+  "description": "On-demand functional and visual checks, see README.md",
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}
