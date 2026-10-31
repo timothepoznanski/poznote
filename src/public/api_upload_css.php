@@ -168,7 +168,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['css_file'])) {
     // Validate MIME type (not just extension, read the first bytes)
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mime = finfo_file($finfo, $file['tmp_name']);
-    finfo_close($finfo);
 
     $allowed_mimes = ['text/css', 'text/plain', 'application/octet-stream'];
     if (!in_array($mime, $allowed_mimes, true)) {

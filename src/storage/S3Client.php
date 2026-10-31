@@ -349,7 +349,6 @@ class S3Client {
         $body = curl_exec($ch);
         $curlError = curl_error($ch);
         $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        curl_close($ch);
 
         if ($body === false && $curlError !== '') {
             throw new S3StorageException('S3 connection failed: ' . $curlError);

@@ -150,7 +150,7 @@ function webPushEncrypt(string $payload, string $p256dh, string $auth, ?array $s
     if ($receiverKey === false || $privateKey === false) {
         return null;
     }
-    $sharedSecret = openssl_pkey_derive($receiverKey, $privateKey, 32);
+    $sharedSecret = openssl_pkey_derive($receiverKey, $privateKey);
     if ($sharedSecret === false) {
         return null;
     }

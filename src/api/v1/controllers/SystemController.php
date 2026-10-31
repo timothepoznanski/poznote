@@ -216,6 +216,7 @@ class SystemController {
             ]
         ]);
         
+        http_clear_last_response_headers();
         $response = @file_get_contents('https://api.github.com/repos/timothepoznanski/poznote/releases/latest', false, $context);
 
         if ($response === false) {
@@ -228,7 +229,7 @@ class SystemController {
 
         // Extract the real HTTP status code from the response headers so we can
         // distinguish rate limiting (403/429) from a genuinely malformed body.
-        $httpStatus = $this->parseHttpStatus($http_response_header ?? []);
+        $httpStatus = $this->parseHttpStatus(http_get_last_response_headers() ?? []);
         $release = json_decode($response, true);
 
         if ($httpStatus === 403 || $httpStatus === 429) {
@@ -282,8 +283,8 @@ class SystemController {
     }
 
     /**
-     * Extract the numeric HTTP status code from a $http_response_header array
-     * as populated by file_get_contents(). Returns the code from the last
+     * Extract the numeric HTTP status code from the array returned by
+     * http_get_last_response_headers(). Returns the code from the last
      * status line (to account for redirects), or null if none is found.
      */
     private function parseHttpStatus($headers) {

@@ -400,14 +400,12 @@ function aiMcpSend(array &$session, string $method, ?array $params, ?int $id, in
     ]);
     $blocked = poznoteOutboundPrepareCurl($ch, $session['url'], !empty($session['restricted']));
     if ($blocked !== '') {
-        curl_close($ch);
         throw new RuntimeException($blocked);
     }
     curl_exec($ch);
     $errno = curl_errno($ch);
     $error = curl_error($ch);
     $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    curl_close($ch);
 
     if ($tooLarge) {
         throw new RuntimeException('the answer of the server is too large');
@@ -526,7 +524,6 @@ function aiMcpClose(array $session): void
     if (poznoteOutboundPrepareCurl($ch, $session['url'], !empty($session['restricted'])) === '') {
         curl_exec($ch);
     }
-    curl_close($ch);
 }
 
 /**

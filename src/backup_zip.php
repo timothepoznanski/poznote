@@ -367,7 +367,7 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
                     $tagsStr = implode(', ', array_map('htmlspecialchars', $tagsArray));
                 }
             }
-            $attachments = json_decode($row['attachments'], true);
+            $attachments = json_decode((string)$row['attachments'], true);
             $attachmentsStr = '';
             if (is_array($attachments) && !empty($attachments)) {
                 $attachmentLinks = [];

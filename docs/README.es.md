@@ -1519,7 +1519,7 @@ Poznote da prioridad a la sencillez y la portabilidad: sin frameworks complejos 
 <summary>Si te interesa el stack tecnológico sobre el que está construido Poznote, <strong>échale un vistazo aquí.</strong></summary>
 
 ### Backend
-- **PHP 8.x**: lenguaje de scripting del lado del servidor
+- **PHP 8.5**: lenguaje de scripting del lado del servidor
 - **SQLite 3**: base de datos relacional ligera basada en archivos
 
 ### Frontend

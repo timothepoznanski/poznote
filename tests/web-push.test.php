@@ -26,8 +26,7 @@ function webPushTestDecrypt(string $body, string $receiverPrivatePem, string $re
 
     $secret = openssl_pkey_derive(
         openssl_pkey_get_public(webPushPublicKeyPem($senderPoint)),
-        openssl_pkey_get_private($receiverPrivatePem),
-        32
+        openssl_pkey_get_private($receiverPrivatePem)
     );
     $ikm = hash_hkdf('sha256', $secret, 32, "WebPush: info\0" . $receiverPoint . $senderPoint, $authSecret);
     $key = hash_hkdf('sha256', $ikm, 16, "Content-Encoding: aes128gcm\0", $salt);

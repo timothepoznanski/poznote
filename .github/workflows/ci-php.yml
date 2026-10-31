@@ -6,7 +6,7 @@ name: CI - PHP
 # that do not exist.
 #
 # Both steps run inside the same PHP image as production (see Dockerfile) so a
-# construct that parses on the runner's PHP but not on 8.4 cannot slip through.
+# construct that parses on the runner's PHP but not on 8.5 cannot slip through.
 
 on:
   push:
@@ -66,7 +66,7 @@ on:
 # `FROM php:X.Y-fpm-alpine...` moves, three places change together:
 #
 #   1. PHP_IMAGE here            -> php:X.Y-cli
-#   2. phpstan.neon              -> phpVersion: X0Y00  (8.4 is 80400)
+#   2. phpstan.neon              -> phpVersion: X0Y00  (8.5 is 80500)
 #   3. phpstan-baseline.neon     -> regenerate, a new PHP version changes
 #                                   which deprecations PHPStan reports
 #
@@ -75,7 +75,7 @@ on:
 # the ones that do.
 # ==========================================================================
 env:
-  PHP_IMAGE: php:8.4-cli
+  PHP_IMAGE: php:8.5-cli
   PHPSTAN_VERSION: 2.2.13
   PHPSTAN_SHA256: a3293d850a9966fbef43e39d04f2b081b8eec35839126c43a54684f21b10ad69
 

@@ -3,7 +3,7 @@
  * A test runner in eighty lines, on purpose.
  *
  * Poznote ships no Composer dependencies and this is not the place to start:
- * the suite runs anywhere PHP does, including the php:8.4-cli container CI
+ * the suite runs anywhere PHP does, including the php:8.5-cli container CI
  * already uses for linting. Add a file named *.test.php in this directory and
  * run.php will pick it up.
  *

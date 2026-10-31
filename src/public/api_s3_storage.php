@@ -165,9 +165,6 @@ switch ($action) {
                 }
             }
         }
-        if ($finfo) {
-            finfo_close($finfo);
-        }
 
         echo json_encode([
             'success' => empty($errors),

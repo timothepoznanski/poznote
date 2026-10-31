@@ -18,12 +18,13 @@
 # has to be updated once. Only what genuinely differs between running as
 # root and running as "poznote" (user creation, a couple of config lines,
 # ownership, the exposed port) is repeated in the two final stages below.
-# PHP is pinned to a patch release, not the floating 8.4 tag, so a cached
-# build can never fall back below a security fix: 8.4.27 is the floor for
+# PHP is pinned to a patch release, not the floating 8.5 tag, so a cached
+# build can never fall back below a security fix: 8.5.12 is the floor for
 # CVE-2026-109618 and CVE-2026-109619 (unauthenticated RCE in PHP core).
-FROM php:8.4.27-fpm-alpine3.23 AS base
+FROM php:8.5.12-fpm-alpine3.23 AS base
 
-# Install system dependencies and PHP extensions
+# Install system dependencies and PHP extensions (OPcache is built into PHP
+# since 8.5, it has no extension to install)
 RUN apk add --no-cache \
     nginx \
     sqlite-libs \
@@ -37,7 +38,7 @@ RUN apk add --no-cache \
     libzip-dev \
     curl-dev \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install pdo pdo_sqlite zip curl opcache \
+    && docker-php-ext-install pdo pdo_sqlite zip curl \
     && docker-php-source delete \
     && apk del --no-cache .build-deps
 
