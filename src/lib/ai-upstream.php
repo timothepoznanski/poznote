@@ -20,6 +20,28 @@
 const AI_UPSTREAM_MAX_ATTEMPTS = 3;
 
 /**
+ * Why a tool call cannot be run because its arguments are not JSON, null when
+ * they are fine. Empty arguments are how some servers call a tool without any.
+ * The usual cause is a model stopped by its output limit in the middle of a
+ * long note (issue #1710): without this it heard "note_id and content are
+ * required", which says nothing of what to do about it.
+ */
+function aiToolCallArgumentsError(string $arguments, string $finishReason): ?string
+{
+    if (trim($arguments) === '') {
+        return null;
+    }
+    json_decode($arguments);
+    if (json_last_error() === JSON_ERROR_NONE) {
+        return null;
+    }
+    if ($finishReason === 'length' || $finishReason === 'max_tokens') {
+        return 'Nothing was done: this tool call was cut off because you reached your output limit. Do not send it again as it is. Send less in one call, for instance a few targeted changes, or tell the user that this is too long for this model to write in one answer.';
+    }
+    return 'Nothing was done: the arguments of this tool call are not valid JSON. Send it again with valid arguments.';
+}
+
+/**
  * True when the request never reached the point where the server started
  * answering and the reason is a network hiccup rather than a configuration
  * error. $connected says whether the TCP connection had been established

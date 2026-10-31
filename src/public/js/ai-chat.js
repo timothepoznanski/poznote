@@ -362,7 +362,7 @@
             label = t('ai_chat.tool_rename', {}, 'Renaming note #{{id}} to "{{title}}"')
                 .replace('{{id}}', args.note_id || '?')
                 .replace('{{title}}', args.new_title || '');
-        } else if (name === 'update_note_content') {
+        } else if (name === 'update_note_content' || name === 'replace_in_note') {
             label = t('ai_chat.tool_update', {}, 'Editing note #{{id}}')
                 .replace('{{id}}', args.note_id || '?');
         } else if (name === 'create_note') {
@@ -434,6 +434,7 @@
             get_note: 'lucide-file-text',
             rename_note: 'lucide-pencil',
             update_note_content: 'lucide-pencil',
+            replace_in_note: 'lucide-pencil',
             create_note: 'lucide-plus-circle',
             delete_note: 'lucide-trash-2',
             delete_folder: 'lucide-trash-2',
