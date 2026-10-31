@@ -8,7 +8,8 @@
   <a href="CHROME-EXTENSION.ru.md">Русский</a> ·
   <b>简体中文</b> ·
   <a href="CHROME-EXTENSION.ko.md">한국어</a> ·
-  <a href="CHROME-EXTENSION.ja.md">日本語</a>
+  <a href="CHROME-EXTENSION.ja.md">日本語</a> ·
+  <a href="CHROME-EXTENSION.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 
@@ -33,7 +34,7 @@
 
 旁边显示的实例地址是一个链接：点击它即可在新标签页中打开 Poznote，并按照你在设置中填写的方式使用 http 或 https。
 
-当 Chrome 的语言为英语、法语、德语、西班牙语、葡萄牙语、俄语、韩语、简体中文或日语时，扩展会使用该语言，否则使用英语。
+当 Chrome 的语言为英语、法语、德语、西班牙语、葡萄牙语、俄语、韩语、简体中文、日语或加泰罗尼亚语时，扩展会使用该语言，否则使用英语。
 
 这里也可以使用您的账户密码，但对于扩展来说，应用密码是更合适的凭据：它只能访问 API，永远无法进入网页界面或您的账户设置，仅限于您自己的资料，而且在 Poznote 中撤销它即可切断扩展的访问，不会影响其他任何东西。完整的限制列表请参阅[应用密码](README.zh-cn.md#应用密码)。
 

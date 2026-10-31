@@ -62,6 +62,7 @@ LANGUAGES = {
     "zh-cn": "简体中文",
     "ko": "한국어",
     "ja": "日本語",
+    "ca": "Català",
 }
 
 SELECTOR_START = "<!-- lang-selector -->"

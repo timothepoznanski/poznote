@@ -83,6 +83,8 @@ function getUserTimezone() {
  * so the names live here, mirrored in js/date-time-format.js. Layout: {wd}
  * weekday, {month} month name, {m} month number, {d} day, {y} year. Names are
  * written as a title shows them; parsing ignores case.
+ * An optional 'months_in_date' list replaces 'months' for {month} in the
+ * layout only, for languages whose month takes another form inside a date.
  */
 function getDateNameLocales(): array {
     return [
@@ -150,6 +152,17 @@ function getDateNameLocales(): array {
             'months'     => ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
             'short'      => ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
         ],
+        'ca' => [
+            // A date elides the preposition before a vowel ("d'octubre",
+            // "de setembre"), so the long layout takes its month names from
+            // months_in_date; MMMM and MMM keep the bare names.
+            'layout'         => '{wd}, {d} {month} de {y}',
+            'days'           => ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'],
+            'days_short'     => ['Dg.', 'Dl.', 'Dt.', 'Dc.', 'Dj.', 'Dv.', 'Ds.'],
+            'months'         => ['gener', 'febrer', 'març', 'abril', 'maig', 'juny', 'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'],
+            'short'          => ['gen.', 'febr.', 'març', 'abr.', 'maig', 'juny', 'jul.', 'ag.', 'set.', 'oct.', 'nov.', 'des.'],
+            'months_in_date' => ['de gener', 'de febrer', 'de març', "d'abril", 'de maig', 'de juny', 'de juliol', "d'agost", 'de setembre', "d'octubre", 'de novembre', 'de desembre'],
+        ],
     ];
 }
 
@@ -186,7 +199,7 @@ function formatLongDate(DateTimeInterface $date, string $lang): string {
     $locale = getDateNameLocale($lang);
     return strtr($locale['layout'], [
         '{wd}'    => $locale['days'][(int)$date->format('w')],
-        '{month}' => $locale['months'][(int)$date->format('n') - 1],
+        '{month}' => ($locale['months_in_date'] ?? $locale['months'])[(int)$date->format('n') - 1],
         '{m}'     => $date->format('n'),
         '{d}'     => $date->format('j'),
         '{y}'     => $date->format('Y'),
