@@ -8,7 +8,8 @@
   <a href="README.ru.md">Русский</a> ·
   <a href="README.zh-cn.md">简体中文</a> ·
   <a href="README.ko.md">한국어</a> ·
-  <a href="README.ja.md">日本語</a>
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 
@@ -1519,7 +1520,7 @@ Poznote privilégie la simplicité et la portabilité : pas de framework complex
 <summary>Si la stack technique sur laquelle repose Poznote vous intéresse, <strong>jetez un œil ici.</strong></summary>
 
 ### Backend
-- **PHP 8.x** : langage de script côté serveur
+- **PHP 8.5** : langage de script côté serveur
 - **SQLite 3** : base de données relationnelle légère, stockée dans un fichier
 
 ### Frontend

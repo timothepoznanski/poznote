@@ -8,7 +8,8 @@
   <a href="README.ru.md">Русский</a> ·
   <b>简体中文</b> ·
   <a href="README.ko.md">한국어</a> ·
-  <a href="README.ja.md">日本語</a>
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 
@@ -1519,7 +1520,7 @@ Poznote 注重简洁和可移植性：没有复杂的框架，没有沉重的依
 <summary>如果您对构建 Poznote 所用的技术栈感兴趣，<strong>请点击这里查看。</strong></summary>
 
 ### 后端
-- **PHP 8.x**：服务器端脚本语言
+- **PHP 8.5**：服务器端脚本语言
 - **SQLite 3**：轻量级、基于文件的关系型数据库
 
 ### 前端

@@ -89,9 +89,6 @@ function poznoteIsAcceptableExcalidrawPreviewSvg(string $svg): bool
 
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mimeType = $finfo ? finfo_buffer($finfo, $svg) : false;
-    if ($finfo) {
-        finfo_close($finfo);
-    }
     if ($mimeType !== 'image/svg+xml') {
         return false;
     }

@@ -8,7 +8,8 @@
   <a href="README.ru.md">Русский</a> ·
   <a href="README.zh-cn.md">简体中文</a> ·
   <a href="README.ko.md">한국어</a> ·
-  <b>日本語</b>
+  <b>日本語</b> ·
+  <a href="README.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 
@@ -1521,7 +1522,7 @@ Poznoteは、シンプルさと移植性を重視しています。複雑なフ�
 <summary>Poznoteを支える技術スタックに興味がある場合は、<strong>こちらをご覧ください。</strong></summary>
 
 ### バックエンド
-- **PHP 8.x**：サーバーサイドのスクリプト言語
+- **PHP 8.5**：サーバーサイドのスクリプト言語
 - **SQLite 3**：軽量なファイルベースのリレーショナルデータベース
 
 ### フロントエンド

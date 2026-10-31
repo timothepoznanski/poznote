@@ -89,6 +89,34 @@ const hiddenRangeField = StateField.define({
 // visible in a fixed-width font, so lines that look like table rows are tagged with
 // a class that markdown.css uses to switch them to a monospace font.
 const markdownTableLineDecoration = Decoration.line({ class: 'cm-md-table-line' })
+// A Chinese, Japanese or Korean character takes two columns of that font, which
+// no fallback font does exactly: markdown.css gives it that width (same
+// characters as getMarkdownTableTextWidth in markdown-lists-tables.js)
+const markdownTableWideCharDecoration = Decoration.mark({ class: 'cm-md-table-wide' })
+const MARKDOWN_TABLE_WIDE_CHARS = /[\u1100-\u115F\u2E80-\u303E\u3041-\u33FF\u3400-\u4DBF\u4E00-\u9FFF\uA960-\uA97F\uAC00-\uD7FF\uF900-\uFAFF\uFE30-\uFE6F\uFF00-\uFF60\uFFE0-\uFFE6]/g
+
+function isMarkdownTableSourceLine(text) {
+  return /^[ \t]*\|/.test(text)
+}
+
+// A wrapping editor's Home and End stop at the edges of what is in sight, and a
+// table row does not wrap (markdown.css): they go to the ends of the row (#1701)
+function moveToTableRowEnd(forward, extend) {
+  return view => {
+    const { state } = view
+    if (!view.lineWrapping || !isMarkdownTableSourceLine(state.doc.lineAt(state.selection.main.head).text)) return false
+    view.dispatch({
+      selection: EditorSelection.create(state.selection.ranges.map(range => {
+        const line = state.doc.lineAt(range.head)
+        const target = forward ? line.to : line.from
+        return extend ? EditorSelection.range(range.anchor, target) : EditorSelection.cursor(target)
+      }), state.selection.mainIndex),
+      scrollIntoView: true,
+      userEvent: 'select'
+    })
+    return true
+  }
+}
 
 function buildMarkdownTableLineDecorations(view) {
   const builder = new RangeSetBuilder()
@@ -98,8 +126,11 @@ function buildMarkdownTableLineDecorations(view) {
     let pos = range.from
     while (pos <= range.to) {
       const line = view.state.doc.lineAt(pos)
-      if (line.from > lastLineFrom && /^[ \t]*\|/.test(line.text)) {
+      if (line.from > lastLineFrom && isMarkdownTableSourceLine(line.text)) {
         builder.add(line.from, line.from, markdownTableLineDecoration)
+        for (const match of line.text.matchAll(MARKDOWN_TABLE_WIDE_CHARS)) {
+          builder.add(line.from + match.index, line.from + match.index + 1, markdownTableWideCharDecoration)
+        }
         lastLineFrom = line.from
       }
       pos = line.to + 1
@@ -2014,6 +2045,8 @@ function createEditor(host, options = {}) {
       domHandlers,
       keymap.of([
         { key: 'Shift-Enter', run: insertTableLineBreak },
+        { key: 'Home', mac: 'Cmd-ArrowLeft', run: moveToTableRowEnd(false, false), shift: moveToTableRowEnd(false, true) },
+        { key: 'End', mac: 'Cmd-ArrowRight', run: moveToTableRowEnd(true, false), shift: moveToTableRowEnd(true, true) },
         { key: 'Enter', run: runMarkdownTableEnter(host) },
         { key: 'Enter', run: insertNewlineContinueMarkup },
         { key: 'Enter', run: insertNewlineAtColumnZero },

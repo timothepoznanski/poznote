@@ -139,11 +139,9 @@ final class ApiClient
         $raw = curl_exec($ch);
         if ($raw === false) {
             $error = curl_error($ch);
-            curl_close($ch);
             throw new RuntimeException("$method $path failed: $error");
         }
         $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         $decoded = json_decode($raw, true);
         return new Response($status, $raw, is_array($decoded) ? $decoded : null);
@@ -230,12 +228,11 @@ final class BrowserSession
         $raw = curl_exec($ch);
         if ($raw === false) {
             $error = curl_error($ch);
-            curl_close($ch);
             throw new RuntimeException("$method $path failed: $error");
         }
         $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
         // Flushes the jar to disk now, not when the handle is collected.
-        curl_close($ch);
+        unset($ch);
 
         $decoded = json_decode($raw, true);
         return new Response($status, $raw, is_array($decoded) ? $decoded : null);

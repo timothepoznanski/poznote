@@ -1964,7 +1964,6 @@ class GitSync {
 
             $blocked = poznoteOutboundPrepareCurl($ch, $url, $restricted);
             if ($blocked !== '') {
-                curl_close($ch);
                 return ['error' => $blocked, 'status' => 0];
             }
 
@@ -1972,7 +1971,6 @@ class GitSync {
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $error = curl_error($ch);
             $redirectUrl = (string)curl_getinfo($ch, CURLINFO_REDIRECT_URL);
-            curl_close($ch);
 
             if ($error) {
                 return ['error' => 'cURL error: ' . $error, 'status' => 0];

@@ -513,6 +513,11 @@
 
     // ─── "+" buttons along a table under the mouse ───────────────────────────
 
+    let sourceBar = null;
+    let sourceBarThumb = null;
+    let sourceBarScroller = null;
+    let sourceBarFrame = 0;
+
     const canHover = window.matchMedia ? window.matchMedia('(hover: hover) and (pointer: fine)') : null;
 
     // A table of an HTML note being edited, or null
@@ -592,9 +597,12 @@
     }
 
     function leaveHover(related) {
-        if (related && (related === rowHandle || related === columnHandle ||
-            (hoverTable && hoverTable.contains(related)))) return;
         clearTimeout(hoverHideTimer);
+        // (the box of a wide table counts as the table: its scrollbar is on the
+        // way to the row button)
+        const area = hoverTable ? hoverTable.closest('.markdown-table-scroll') || hoverTable : null;
+        if (related && (related === rowHandle || related === columnHandle ||
+            (area && area.contains(related)))) return;
         // (time to cross the gap between the table and a button)
         hoverHideTimer = setTimeout(hideHandles, 250);
     }
@@ -606,21 +614,25 @@
             return;
         }
         const rect = hoverTable.getBoundingClientRect();
-        const clip = getClipRect(hoverTable);
+        // A wide Markdown table scrolls in its box (#1701): the buttons go around
+        // the box, the row button under its scrollbar and the column button
+        // beside it, wherever the table is scrolled to
+        const box = hoverTable.closest('.markdown-table-scroll');
+        const edges = box ? box.getBoundingClientRect() : rect;
+        const clip = getClipRect(box || hoverTable);
         const size = 16;
         // (clear of the column resize grip along an HTML table's edge)
         const gap = 6;
 
-        const rowTop = rect.bottom + gap;
-        const rowLeft = Math.max(rect.left, clip.left);
-        const rowWidth = Math.min(rect.right, clip.right) - rowLeft;
+        const rowTop = edges.bottom + gap;
+        const rowLeft = Math.max(edges.left, clip.left);
+        const rowWidth = Math.min(edges.right, clip.right) - rowLeft;
         rowHandle.hidden = rowTop + size > clip.bottom || rowTop < clip.top || rowWidth < size;
         rowHandle.style.top = Math.round(rowTop) + 'px';
         rowHandle.style.left = Math.round(rowLeft) + 'px';
         rowHandle.style.width = Math.round(rowWidth) + 'px';
 
-        // A table wider than its box has no right edge in sight
-        const columnLeft = rect.right + gap;
+        const columnLeft = box ? Math.min(edges.right + gap, clip.right - size) : rect.right + gap;
         const columnTop = Math.max(rect.top, clip.top);
         const columnHeight = Math.min(rect.bottom, clip.bottom) - columnTop;
         columnHandle.hidden = columnLeft + size > clip.right || columnHeight < size;
@@ -642,6 +654,98 @@
         createHandles();
         hoverTable = table;
         positionHandles();
+    }
+
+    // ─── Sideways bar of a table's source ────────────────────────────────────
+
+    // Table rows do not wrap, so the wrapping editor scrolls sideways for them
+    // (#1701). Its own bar is hidden and sits at the end of the note, so a bar
+    // of the page stands in for it while such rows are in sight.
+    function findTableSourceInSight() {
+        const scrollers = document.querySelectorAll('.markdown-codemirror-host:not(.markdown-editor-nowrap) .cm-scroller');
+        for (const scroller of scrollers) {
+            if (scroller.scrollWidth <= scroller.clientWidth + 1) continue;
+            const clip = getClipRect(scroller);
+            const rect = scroller.getBoundingClientRect();
+            const top = Math.max(rect.top, clip.top);
+            const bottom = Math.min(rect.bottom, clip.bottom);
+            const inSight = Array.from(scroller.querySelectorAll('.cm-md-table-line')).some(row => {
+                const rowRect = row.getBoundingClientRect();
+                return rowRect.width > scroller.clientWidth && rowRect.bottom > top && rowRect.top < bottom;
+            });
+            if (inSight) return { scroller, rect, bottom };
+        }
+        return null;
+    }
+
+    function positionSourceBar() {
+        // (a phone swipes; a tablet or a touch screen also gets the bar)
+        const found = window.innerWidth <= 800 ? null : findTableSourceInSight();
+        sourceBarScroller = found ? found.scroller : null;
+        if (!found) {
+            if (sourceBar) sourceBar.hidden = true;
+            return;
+        }
+        if (!sourceBar) createSourceBar();
+        const scroller = found.scroller;
+        const width = scroller.clientWidth;
+        const range = scroller.scrollWidth - width;
+        const thumbWidth = Math.max(40, width * width / scroller.scrollWidth);
+        sourceBar.hidden = false;
+        sourceBar.style.left = Math.round(found.rect.left + scroller.clientLeft) + 'px';
+        sourceBar.style.width = width + 'px';
+        sourceBar.style.top = Math.round(found.bottom - sourceBar.offsetHeight) + 'px';
+        sourceBarThumb.style.width = Math.round(thumbWidth) + 'px';
+        sourceBarThumb.style.left = Math.round(scroller.scrollLeft / range * (width - thumbWidth)) + 'px';
+    }
+
+    // Drawn here rather than a native scrollbar, which systems show differently
+    function createSourceBar() {
+        sourceBar = document.createElement('div');
+        sourceBar.className = 'md-table-source-bar';
+        sourceBarThumb = document.createElement('div');
+        sourceBarThumb.className = 'md-table-source-thumb';
+        sourceBar.appendChild(sourceBarThumb);
+
+        // How far the editor moves for a pixel of the bar
+        const ratio = () => {
+            const width = sourceBarScroller.clientWidth;
+            return (sourceBarScroller.scrollWidth - width) / (width - sourceBarThumb.offsetWidth);
+        };
+        let drag = null;
+        sourceBar.addEventListener('pointerdown', e => {
+            if (!sourceBarScroller || e.button !== 0) return;
+            // (the caret stays in the editor)
+            e.preventDefault();
+            if (e.target !== sourceBarThumb) {
+                // A click beside the thumb brings it there
+                const left = e.clientX - sourceBar.getBoundingClientRect().left - sourceBarThumb.offsetWidth / 2;
+                sourceBarScroller.scrollLeft = left * ratio();
+            }
+            drag = { x: e.clientX, scrollLeft: sourceBarScroller.scrollLeft };
+            sourceBar.setPointerCapture(e.pointerId);
+        });
+        sourceBar.addEventListener('pointermove', e => {
+            if (drag && sourceBarScroller) sourceBarScroller.scrollLeft = drag.scrollLeft + (e.clientX - drag.x) * ratio();
+        });
+        const endDrag = () => { drag = null; };
+        sourceBar.addEventListener('pointerup', endDrag);
+        sourceBar.addEventListener('pointercancel', endDrag);
+        // (the wheel over a sideways bar moves it sideways)
+        sourceBar.addEventListener('wheel', e => {
+            if (!sourceBarScroller) return;
+            e.preventDefault();
+            sourceBarScroller.scrollLeft += e.deltaY || e.deltaX;
+        }, { passive: false });
+        document.body.appendChild(sourceBar);
+    }
+
+    function scheduleSourceBar() {
+        if (sourceBarFrame) return;
+        sourceBarFrame = requestAnimationFrame(() => {
+            sourceBarFrame = 0;
+            positionSourceBar();
+        });
     }
 
     // ─── Following the cell in use ───────────────────────────────────────────
@@ -787,6 +891,10 @@
         document.addEventListener('mouseover', onMouseOver);
         document.addEventListener('scroll', schedulePosition, true);
         window.addEventListener('resize', schedulePosition);
+        ['scroll', 'mouseover', 'selectionchange', 'input'].forEach(type => {
+            document.addEventListener(type, scheduleSourceBar, true);
+        });
+        window.addEventListener('resize', scheduleSourceBar);
         // Selecting text hides the bar, letting go of it brings it back
         document.addEventListener('selectionchange', scheduleRefresh);
         // Typing in the source moves the table's edges

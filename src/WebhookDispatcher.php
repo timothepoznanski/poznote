@@ -525,14 +525,12 @@ class WebhookDispatcher {
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
             $blocked = poznoteOutboundPrepareCurl($ch, $url, $restricted);
             if ($blocked !== '') {
-                curl_close($ch);
                 return ['status' => 0, 'error' => $blocked];
             }
 
             $ok = curl_exec($ch);
             $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             $error = $ok === false ? (curl_error($ch) ?: 'curl error') : null;
-            curl_close($ch);
 
             return ['status' => $status, 'error' => $error];
         }
@@ -554,13 +552,12 @@ class WebhookDispatcher {
                 'follow_location' => 0,
             ],
         ]);
+        http_clear_last_response_headers();
         $ok = @file_get_contents($url, false, $ctx);
         $status = 0;
-        if (isset($http_response_header) && is_array($http_response_header)) {
-            foreach ($http_response_header as $line) {
-                if (preg_match('#^HTTP/\S+\s+(\d+)#', $line, $m)) {
-                    $status = (int)$m[1];
-                }
+        foreach (http_get_last_response_headers() ?? [] as $line) {
+            if (preg_match('#^HTTP/\S+\s+(\d+)#', $line, $m)) {
+                $status = (int)$m[1];
             }
         }
         $error = null;

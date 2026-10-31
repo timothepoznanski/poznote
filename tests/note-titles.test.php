@@ -34,9 +34,9 @@ test('a title the user chose is left alone', function () {
 // updated note whose title contained the text. A reference names one note.
 
 function noteTitleLookupDb(array $notes): PDO {
-    $con = new PDO('sqlite::memory:');
+    $con = new Pdo\Sqlite('sqlite::memory:');
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $con->sqliteCreateFunction('remove_accents', function ($text) {
+    $con->createFunction('remove_accents', function ($text) {
         return poznoteFoldAccents((string)$text);
     }, 1);
     $con->exec('CREATE TABLE entries (id INTEGER PRIMARY KEY, heading TEXT, workspace TEXT, trash INTEGER DEFAULT 0, updated TEXT)');

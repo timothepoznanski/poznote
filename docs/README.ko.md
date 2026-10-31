@@ -8,7 +8,8 @@
   <a href="README.ru.md">Русский</a> ·
   <a href="README.zh-cn.md">简体中文</a> ·
   <b>한국어</b> ·
-  <a href="README.ja.md">日本語</a>
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.ca.md">Català</a>
 </p>
 <!-- /lang-selector -->
 
@@ -1536,7 +1537,7 @@ Poznote의 `Settings > About > API REST`에서 **Swagger UI**를 열어 엔드�
 <summary>Poznote의 기술 구성에 관심이 있다면 <strong>여기를 확인하세요.</strong></summary>
 
 ### 백엔드
-- **PHP 8.x**: 서버 스크립트 언어
+- **PHP 8.5**: 서버 스크립트 언어
 - **SQLite 3**: 가벼운 파일 기반 관계형 DB
 
 ### 프런트엔드

@@ -72,6 +72,35 @@
     font-family: 'Courier New', Courier, monospace !important;
 }
 
+/* The wrapping editor keeps the width of the note: a wide table scrolls in its
+   own box instead of widening it (#1701). The host matters when the note opens
+   directly in the editor: its container is a flex box then
+   (js/markdown-view-modes.js), which it fills whatever its lines' length. */
+.markdown-codemirror-host .cm-content.cm-lineWrapping {
+    min-width: 0;
+}
+
+.markdown-editor-container > .markdown-codemirror-host {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+/* A table row stays on one line, whatever "Editor word wrap" says: wrapped, its
+   pipes no longer line up and the table cannot be read. The editor scrolls
+   sideways and follows the caret (#1701). */
+.markdown-editor .cm-line.cm-md-table-line {
+    width: max-content;
+    min-width: 100%;
+    white-space: pre;
+}
+
+/* (js/markdown-lists-tables.js pads these characters as two columns) */
+.markdown-editor .cm-md-table-wide {
+    display: inline-block;
+    width: 2ch;
+    text-align: center;
+}
+
 /* Lines of a code block (cm-md-code-line, set by the markdown editor bundle)
    keep the monospace font the rendered preview uses, instead of the app font
    the rest of the editor runs in. Same #id specificity boost as above. */
@@ -1280,6 +1309,30 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
 .noteentry table tr:nth-child(even),
 .markdown-preview table tr:nth-child(even) {
     background-color: var(--pz-surface);
+}
+
+/* A Markdown table too wide for the note scrolls sideways in its own box
+   (js/markdown-parser.js): long cells keep the width they ask for, and words
+   are never cut, not even in the editor where CodeMirror's line wrapping
+   allows it (#1701). Screen only: printed, the table fits the page. */
+@media screen {
+    :is(.noteentry, .markdown-preview) .markdown-table-scroll {
+        margin: 1em 0;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--pz-scrollbar) transparent;
+    }
+
+    .noteentry .markdown-table-scroll > table,
+    .markdown-preview .markdown-table-scroll > table {
+        margin: 0;
+    }
+
+    :is(.noteentry, .markdown-preview) .markdown-table-scroll > table :is(th, td) {
+        min-width: var(--markdown-table-cell-min, 0);
+        overflow-wrap: break-word;
+        word-break: normal;
+    }
 }
 
 /* Colored markdown (the "Colored markdown" display setting).

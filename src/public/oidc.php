@@ -81,7 +81,6 @@ function oidc_http_request($url, $method = 'GET', $headers = [], $body = null, $
         $respBody = curl_exec($ch);
         $err = curl_error($ch);
         $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        curl_close($ch);
 
         if ($respBody === false) {
             return ['ok' => false, 'status' => $status ?: 0, 'headers' => $responseHeaders, 'body' => '', 'error' => $err ?: 'curl error'];
@@ -107,15 +106,14 @@ function oidc_http_request($url, $method = 'GET', $headers = [], $body = null, $
     }
 
     $ctx = stream_context_create($opts);
+    http_clear_last_response_headers();
     $respBody = @file_get_contents($url, false, $ctx);
     $status = 0;
-    if (isset($http_response_header) && is_array($http_response_header)) {
-        // Use the LAST HTTP status line to get the final response status
-        // (after any redirects like 301/302)
-        foreach ($http_response_header as $line) {
-            if (preg_match('#^HTTP/\S+\s+(\d+)#', $line, $m)) {
-                $status = (int)$m[1];
-            }
+    // Use the LAST HTTP status line to get the final response status
+    // (after any redirects like 301/302)
+    foreach (http_get_last_response_headers() ?? [] as $line) {
+        if (preg_match('#^HTTP/\S+\s+(\d+)#', $line, $m)) {
+            $status = (int)$m[1];
         }
     }
 

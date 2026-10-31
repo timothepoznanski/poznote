@@ -121,14 +121,12 @@ function sttTranscribeFile(array $config, string $path, string $filename, string
     $restricted = ($config['source'] ?? '') === 'user' && poznoteOutboundRestrictedForUser((int)(getCurrentUserId() ?? 0));
     $blocked = poznoteOutboundPrepareCurl($ch, $url, $restricted);
     if ($blocked !== '') {
-        curl_close($ch);
         return ['ok' => false, 'error' => $blocked];
     }
     $body = curl_exec($ch);
     $curlError = curl_error($ch);
     $curlErrno = curl_errno($ch);
     $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    curl_close($ch);
 
     if ($curlErrno === CURLE_OPERATION_TIMEDOUT) {
         return ['ok' => false, 'error' => t('stt.server_errors.timeout', ['seconds' => POZNOTE_STT_UPSTREAM_TIMEOUT_SECONDS],
@@ -204,13 +202,11 @@ if ($action === 'test') {
     // The URL is the caller's own words: only an admin may probe local hosts
     $blocked = poznoteOutboundPrepareCurl($ch, $modelsUrl, !isCurrentUserAdmin());
     if ($blocked !== '') {
-        curl_close($ch);
         sttJsonError(400, $blocked);
     }
     $body = curl_exec($ch);
     $curlError = curl_error($ch);
     $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-    curl_close($ch);
 
     header('Content-Type: application/json');
     // whisper.cpp has no /v1/models at all: its 404 is a server answering, which
@@ -295,7 +291,6 @@ if ($action === 'transcribe') {
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         if ($finfo) {
             $mimeType = (string)finfo_file($finfo, $upload['tmp_name']);
-            finfo_close($finfo);
         }
     }
     // finfo reports a bare WebM container as video/webm whatever it holds, and

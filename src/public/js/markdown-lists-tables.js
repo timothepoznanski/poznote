@@ -121,8 +121,18 @@ function splitMarkdownTableLineCells(line) {
     return { indent: indentMatch ? indentMatch[0] : '', cells: cells };
 }
 
+// The columns a cell's text takes in the source: Chinese, Japanese and Korean
+// characters take two (drawn so by .cm-md-table-wide in css/markdown.css, same
+// characters in build/markdown-editor/src/main.js).
+var _MD_TABLE_WIDE_CHARS = /[\u1100-\u115F\u2E80-\u303E\u3041-\u33FF\u3400-\u4DBF\u4E00-\u9FFF\uA960-\uA97F\uAC00-\uD7FF\uF900-\uFAFF\uFE30-\uFE6F\uFF00-\uFF60\uFFE0-\uFFE6]/g;
+
+function getMarkdownTableTextWidth(text) {
+    var wide = text.match(_MD_TABLE_WIDE_CHARS);
+    return text.length + (wide ? wide.length : 0);
+}
+
 function padMarkdownTableCell(content, width, alignment) {
-    var missing = Math.max(0, width - content.length);
+    var missing = Math.max(0, width - getMarkdownTableTextWidth(content));
     if (alignment === 'right') {
         return ' '.repeat(missing) + content;
     }
@@ -272,9 +282,9 @@ function formatMarkdownTableBlock(tableLines, caret) {
             if (separatorFlags[rowIndex]) {
                 return;
             }
-            var cell = info.cells[col] || '';
-            if (cell.length > width) {
-                width = cell.length;
+            var cellWidth = getMarkdownTableTextWidth(info.cells[col] || '');
+            if (cellWidth > width) {
+                width = cellWidth;
             }
         });
         widths.push(width);
@@ -295,13 +305,13 @@ function formatMarkdownTableBlock(tableLines, caret) {
 
             var content = parsed[rowIndex].cells[col] || '';
             if (isCaretRow && col === caretInfo.cellIndex) {
-                var missing = Math.max(0, widths[col] - content.length);
+                var missing = Math.max(0, widths[col] - getMarkdownTableTextWidth(content));
                 var padBefore = alignments[col] === 'right'
                     ? missing
                     : (alignments[col] === 'center' ? Math.floor(missing / 2) : 0);
                 var prefixLength = indent.length + 2;
                 for (var j = 0; j < col; j++) {
-                    prefixLength += widths[j] + 3;
+                    prefixLength += padMarkdownTableCell(parsed[rowIndex].cells[j] || '', widths[j], alignments[j]).length + 3;
                 }
                 caretCh = prefixLength + padBefore + caretInfo.inCell;
             }

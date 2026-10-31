@@ -403,7 +403,6 @@ function convertImageToBase64($imagePath) {
     // Determine MIME type
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mimeType = finfo_file($finfo, $realPath);
-    finfo_close($finfo);
     
     // Create data URI
     $base64 = base64_encode($imageData);

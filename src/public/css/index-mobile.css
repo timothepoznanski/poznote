@@ -745,17 +745,18 @@ a.links_arbo_left::-webkit-scrollbar,
    - Prevent tables from forcing a wider-than-screen layout
    - Keep native table layout (do NOT use display:block on <table>)
    - Make the table fill the available width and let cell contents wrap
+   Markdown tables have a box of their own that scrolls (css/markdown.css, #1701).
 */
-.noteentry table,
-.markdown-preview table,
+.noteentry table:not(.markdown-table-scroll > table),
+.markdown-preview table:not(.markdown-table-scroll > table),
 .noteentry iframe:not([data-is-audio]):not(.note-audio-embed),
 .markdown-preview iframe:not([data-is-audio]):not(.note-audio-embed) {
     width: 100% !important;
     max-width: 100%;
 }
 
-.noteentry table,
-.markdown-preview table {
+.noteentry table:not(.markdown-table-scroll > table),
+.markdown-preview table:not(.markdown-table-scroll > table) {
     table-layout: fixed;
 }
 
@@ -766,10 +767,10 @@ a.links_arbo_left::-webkit-scrollbar,
     border: none;
 }
 
-.noteentry table td,
-.noteentry table th,
-.markdown-preview table td,
-.markdown-preview table th {
+.noteentry table:not(.markdown-table-scroll > table) td,
+.noteentry table:not(.markdown-table-scroll > table) th,
+.markdown-preview table:not(.markdown-table-scroll > table) td,
+.markdown-preview table:not(.markdown-table-scroll > table) th {
     min-width: 0 !important;
     overflow-wrap: anywhere;
     word-break: break-word;

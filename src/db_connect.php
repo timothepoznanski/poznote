@@ -106,7 +106,7 @@ try {
     $dbDir = dirname($dbPath);
     createDirectoryWithPermissions($dbDir);
     
-    $con = new PDO('sqlite:' . $dbPath);
+    $con = new Pdo\Sqlite('sqlite:' . $dbPath);
     $con->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $con->exec('PRAGMA journal_mode = WAL');
     $con->exec('PRAGMA busy_timeout = 30000');
@@ -114,7 +114,7 @@ try {
     $con->exec('PRAGMA synchronous = NORMAL');
         
     // Register custom SQLite function to remove accents for accent-insensitive search
-    $con->sqliteCreateFunction('remove_accents', function($text) {
+    $con->createFunction('remove_accents', function($text) {
         if (empty($text)) {
             return '';
         }
@@ -124,7 +124,7 @@ try {
     }, 1);
     
     // Register custom SQLite function to clean content for search
-    $con->sqliteCreateFunction('search_clean_entry', function($content, $type = 'note') {
+    $con->createFunction('search_clean_entry', function($content, $type = 'note') {
         if (empty($content)) {
             return '';
         }

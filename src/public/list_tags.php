@@ -38,7 +38,7 @@ $stmt->execute($search_params);
 $tags_list = []; // tag => note count
 
 while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-	$words = explode(',', $row['tags']);
+	$words = explode(',', (string)$row['tags']);
 	foreach($words as $word) {
 		$word = trim($word);
 		if (!empty($word)) {

@@ -26,8 +26,8 @@ parameters:
     # was not matched". Regenerate the baseline when you want it tidied up.
     reportUnmatchedIgnoredErrors: false
 
-    # Production runs PHP 8.4 (see Dockerfile), analyse against the same target.
-    phpVersion: 80400
+    # Production runs PHP 8.5 (see Dockerfile), analyse against the same target.
+    phpVersion: 80500
 
     # Declares the constants config.php defines at runtime (see the file).
     bootstrapFiles:

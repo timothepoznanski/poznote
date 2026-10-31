@@ -284,7 +284,7 @@ class InstanceStatistics {
         try {
             $db = new PDO('sqlite:' . $path, null, null, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::SQLITE_ATTR_OPEN_FLAGS => PDO::SQLITE_OPEN_READONLY,
+                Pdo\Sqlite::ATTR_OPEN_FLAGS => Pdo\Sqlite::OPEN_READONLY,
             ]);
             $db->exec('PRAGMA busy_timeout = 2000');
 

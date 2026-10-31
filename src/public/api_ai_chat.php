@@ -141,7 +141,6 @@ if ($action === 'test') {
     // The URL is the caller's own words: only an admin may probe local hosts
     $blocked = poznoteOutboundPrepareCurl($ch, aiChatModelsUrl($testUrl), !isCurrentUserAdmin());
     if ($blocked !== '') {
-        curl_close($ch);
         aiChatJsonError(400, $blocked);
     }
     // The settings pages only post the key when the user typed one; a field
@@ -206,7 +205,6 @@ if ($action === 'test') {
         }
         sleep(aiUpstreamRetryDelaySeconds($attempt));
     }
-    curl_close($ch);
 
     header('Content-Type: application/json');
     if ($body === false) {
@@ -1112,7 +1110,6 @@ function aiStreamRound($url, $headers, $payload, bool $restricted = false) {
     ]);
     $blocked = poznoteOutboundPrepareCurl($ch, $url, $restricted);
     if ($blocked !== '') {
-        curl_close($ch);
         $state['curlErr'] = $blocked;
         return $state;
     }
@@ -1120,7 +1117,6 @@ function aiStreamRound($url, $headers, $payload, bool $restricted = false) {
     $state['curlErr'] = curl_error($ch);
     $state['curlErrno'] = curl_errno($ch);
     $state['connected'] = curl_getinfo($ch, CURLINFO_CONNECT_TIME) > 0;
-    curl_close($ch);
     if ($ok !== false && $lineBuf !== '') {
         $handleLine(rtrim($lineBuf, "\r"));
     }

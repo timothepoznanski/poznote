@@ -78,9 +78,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
 
     $finfo = finfo_open(FILEINFO_MIME_TYPE);
     $mimeType = $finfo ? finfo_file($finfo, $file['tmp_name']) : false;
-    if ($finfo) {
-        finfo_close($finfo);
-    }
 
     if (!is_string($mimeType) || !isset($allowedTypes[$mimeType])) {
         apiFail('Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.', 400);

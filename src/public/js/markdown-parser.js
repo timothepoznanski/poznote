@@ -684,7 +684,9 @@ function _mdRenderFencedCodeBlockHtml(codeContent, codeBlockLang, codeBlockStart
  * cell's inline markdown (parseMarkdown passes its applyInlineStyles closure).
  */
 function _mdRenderTableHtml(tableRows, tableAlignments, tableStartLine, renderCell) {
-    var tableHtml = '<table data-start-line="' + tableStartLine + '">';
+    // In a box of its own, which scrolls sideways when the table does not fit
+    // the note (css/markdown.css, #1701)
+    var tableHtml = '<div class="markdown-table-scroll"><table data-start-line="' + tableStartLine + '">';
 
     for (var r = 0; r < tableRows.length; r++) {
         var row = tableRows[r];
@@ -693,15 +695,28 @@ function _mdRenderTableHtml(tableRows, tableAlignments, tableStartLine, renderCe
         tableHtml += '<tr>';
         for (var c = 0; c < row.cells.length; c++) {
             var alignment = tableAlignments[c];
-            var alignAttr = alignment ? ' style="text-align: ' + alignment + ';"' : '';
+            var cellHtml = renderCell(row.cells[c]);
+            var cellStyle = (alignment ? 'text-align: ' + alignment + ';' : '') + _mdTableCellMinWidth(cellHtml);
+            var styleAttr = cellStyle ? ' style="' + cellStyle + '"' : '';
             // Formula cells (js/table-formulas.js) are marked for the table menu
             var formulaAttr = row.formulas && row.formulas[c] ? ' data-md-formula="' + row.formulas[c] + '"' : '';
-            tableHtml += '<' + cellTag + alignAttr + formulaAttr + '>' + renderCell(row.cells[c]) + '</' + cellTag + '>';
+            tableHtml += '<' + cellTag + styleAttr + formulaAttr + '>' + cellHtml + '</' + cellTag + '>';
         }
         tableHtml += '</tr>';
     }
 
-    return tableHtml + '</table>';
+    return tableHtml + '</table></div>';
+}
+
+/*
+ * The width a long cell asks for before the table scrolls instead of squeezing
+ * it: its text on about two lines, 18em at most. Short cells ask for nothing,
+ * so a table that fits the note keeps the columns the browser gives it.
+ */
+function _mdTableCellMinWidth(cellHtml) {
+    var length = cellHtml.replace(/<[^>]*>/g, '').length;
+    if (length < 24) return '';
+    return '--markdown-table-cell-min: ' + Math.min(18, Math.ceil(length / 4)) + 'em;';
 }
 
 /*
@@ -1099,10 +1114,19 @@ function parseMarkdown(text) {
 
     function protectMarkdownBackslashEscapes(input) {
         return input.replace(/\\([!"#$%&'()*+,\-.\/:;<=>?@\[\\\]\\^_`{|}~])(\1*)/g, function (match, escapedChar, repeatedChars) {
+            // A backslash escapes a whole run of a delimiter ("\**"), but a
+            // bracket or a parenthesis on its own: in "[x](https://a.b/c\(d\))"
+            // the last ")" closes the link.
+            let rest = '';
+            if ('()[]'.indexOf(escapedChar) !== -1) {
+                rest = repeatedChars || '';
+                repeatedChars = '';
+                match = match.slice(0, 2);
+            }
             let placeholder = '\x00MDESC' + markdownEscapeIndex + '\x00';
             protectedMarkdownEscapes[markdownEscapeIndex] = escapeHtml(escapedChar + (repeatedChars || ''));
             markdownEscapeIndex++;
-            return rememberPlaceholderSource(placeholder, match);
+            return rememberPlaceholderSource(placeholder, match) + rest;
         });
     }
 
@@ -1147,7 +1171,16 @@ function parseMarkdown(text) {
     });
 
     // Protect links [text](url "title")
-    text = text.replace(/\[([^\]]+)\]\(([^\s\)]+)(?:\s+"([^"]+)")?\)/g, function (match, linkText, url, title) {
+    text = text.replace(_mdGetMarkdownLinkRegex(), function (match, linkText, angleUrl, plainUrl, title) {
+        let url = angleUrl !== undefined ? angleUrl : plainUrl;
+
+        // "\(" and "\)" were set aside above; in an address they stand for
+        // the character itself.
+        url = url.replace(/\x00MDESC(\d+)\x00/g, function (escape, index) {
+            const escaped = protectedMarkdownEscapes[parseInt(index, 10)];
+            return escaped !== undefined ? _mdDecodeHtmlEntities(escaped) : escape;
+        });
+
         // The browser decodes character references in an attribute: decode
         // them first, so that the URL checked here is the one it would follow,
         // then write it fully escaped so that nothing is left to decode.
@@ -1411,11 +1444,9 @@ function parseMarkdown(text) {
         function linkifyPlainUrls(input) {
             var urlRegex = /(^|[\s(])((?:https?:\/\/)[^\s<]+)/g;
             return input.replace(urlRegex, function (match, prefix, url) {
-                var trailing = '';
-                while (/[),.;!?*_~]$/.test(url)) {
-                    trailing = url.slice(-1) + trailing;
-                    url = url.slice(0, -1);
-                }
+                var parts = _mdSplitAutolinkTrailing(url);
+                url = parts[0];
+                var trailing = parts[1];
                 if (!url) return match;
                 protectedUrls.push('<a href="' + _mdEscapeAttributeQuotes(url) + '" target="_blank" rel="noopener">' + url + '</a>');
                 return prefix + '\x00URL' + (protectedUrls.length - 1) + '\x00' + trailing;

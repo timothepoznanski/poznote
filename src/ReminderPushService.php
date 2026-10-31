@@ -263,7 +263,6 @@ class ReminderPushService {
         curl_setopt($ch, CURLOPT_PROTOCOLS, CURLPROTO_HTTPS);
         curl_exec($ch);
         $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-        curl_close($ch);
 
         return $status;
     }

@@ -1029,7 +1029,12 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
     let match
     while ((match = urlRegex.exec(text))) {
       let url = match[2]
-      while (/[),.;!?*_~]$/.test(url)) url = url.slice(0, -1)
+      // (a ")" that closes a "(" of the address is part of it:
+      // https://en.wikipedia.org/wiki/Foo_(bar), #1700)
+      while (/[),.;!?*_~]$/.test(url)) {
+        if (url.endsWith(')') && (url.match(/\)/g) || []).length <= (url.match(/\(/g) || []).length) break
+        url = url.slice(0, -1)
+      }
       if (!url) continue
       const from = line.from + match.index + match[1].length
       const to = from + url.length
@@ -1415,6 +1420,24 @@ class RenderedBlockWidget extends WidgetType {
     return block
   }
 
+  // A table drawn again after an edit stays scrolled where it was: a wide table
+  // would otherwise jump back to its first column at each cell written (#1701)
+  updateDOM(dom) {
+    if (this.kind !== 'table' || !dom.classList.contains('cm-live-block-table')) return false
+    const scroller = dom.querySelector('.markdown-table-scroll')
+    const scrollLeft = scroller ? scroller.scrollLeft : 0
+    dom.classList.toggle('cm-live-block-folded', this.folded)
+    try {
+      dom.innerHTML = window.parseMarkdown(this.source)
+    } catch (error) {
+      dom.textContent = this.source
+    }
+    if (dom.querySelector('.math-block, .math-inline')) renderMath(dom)
+    const redrawn = dom.querySelector('.markdown-table-scroll')
+    if (redrawn) redrawn.scrollLeft = scrollLeft
+    return true
+  }
+
   destroy(dom) {
     if (dom && dom._livePreviewResizeObserver) dom._livePreviewResizeObserver.disconnect()
   }
@@ -1640,6 +1663,9 @@ function startTableCellEdit(view, block, cell, select) {
   cell.addEventListener('blur', onBlur)
 
   cell.focus()
+  // A wide table scrolls in its box (#1701), and focus() leaves a cell half
+  // out of it as it is: Tab to the next column would type out of sight
+  cell.scrollIntoView({ block: 'nearest', inline: 'nearest' })
   const range = document.createRange()
   range.selectNodeContents(cell)
   if (!select) range.collapse(false)
@@ -1662,6 +1688,32 @@ function setupTableEditing(view, block) {
     event.preventDefault()
     const text = event.clipboardData.getData('text/plain').replace(/\r\n?/g, '\n').replace(/^\n+|\n+$/g, '')
     document.execCommand('insertText', false, text)
+  })
+
+  // A link in a cell opens as it does elsewhere in the note: on a plain click
+  // in rich text, on Ctrl/Cmd + click in the live preview. The editor must not
+  // see that press: it would put a caret in the table (Ctrl + click adds one),
+  // whose source then replaces the link before the click lands (#1700).
+  const cellLinkAt = event => {
+    if (event.button !== 0 || !event.target.closest) return null
+    const anchor = event.target.closest('a[href]')
+    // (not in the cell being typed in: a click there places the caret)
+    if (!anchor || !block.contains(anchor) || anchor.closest('td, th') === block._liveEditingCell) return null
+    if (!(event.ctrlKey || event.metaKey || !isSyntaxRevealed())) return null
+    const href = anchor.getAttribute('href')
+    return isSafeUrl(href) ? href : null
+  }
+  block.addEventListener('mousedown', event => {
+    if (!cellLinkAt(event)) return
+    event.preventDefault()
+    event.stopPropagation()
+  })
+  block.addEventListener('click', event => {
+    const href = cellLinkAt(event)
+    if (!href) return
+    event.preventDefault()
+    event.stopPropagation()
+    followLink(href)
   })
 
   block.addEventListener('mousedown', event => {

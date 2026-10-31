@@ -77,7 +77,7 @@ test('through a real chunked buffer the head is rewritten once and decoys surviv
     assertSame(500, substr_count($out, '<head></head>'), 'decoys untouched');
 });
 
-test('a chunked buffer never holds more than one chunk of a body written in pieces', function () {
+test('a chunked buffer stays bounded whatever the size of a body written in pieces', function () {
     $measure = function (int $chunkSize) {
         $peak = 0;
         $base = memory_get_usage();
@@ -104,7 +104,9 @@ test('a chunked buffer never holds more than one chunk of a body written in piec
     $unbounded = $measure(0);
     $bounded = $measure(POZNOTE_OUTPUT_CHUNK_BYTES);
     assertTrue($unbounded >= 32 * 1024 * 1024, 'without a chunk size the whole body sits in memory, saw ' . $unbounded);
-    assertTrue($bounded < 3 * POZNOTE_OUTPUT_CHUNK_BYTES, 'with one it stays around a chunk, saw ' . $bounded);
+    // Three chunks at the peak: PHP doubles the buffer when a write reaches its
+    // end, and the handler receives a copy of the chunk on top of that.
+    assertTrue($bounded < 4 * POZNOTE_OUTPUT_CHUNK_BYTES, 'with one it stays around three chunks, saw ' . $bounded);
 });
 
 test('poznoteSendFile() streams a file larger than memory_limit through every buffer', function () {

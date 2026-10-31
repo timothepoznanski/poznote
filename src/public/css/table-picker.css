@@ -374,6 +374,38 @@
     outline-offset: -2px;
 }
 
+/* Sideways bar of a table's source, in sight wherever the note is scrolled to
+   (js/table-toolbar.js): the editor's own bar would be at the end of the note */
+.md-table-source-bar {
+    position: fixed;
+    z-index: 1000;
+    height: 10px;
+    touch-action: none;
+}
+
+.md-table-source-bar[hidden] {
+    display: none;
+}
+
+.md-table-source-thumb {
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-text-muted);
+    opacity: 0.6;
+}
+
+.md-table-source-bar:hover .md-table-source-thumb {
+    opacity: 0.85;
+}
+
+@media print {
+    .md-table-source-bar {
+        display: none;
+    }
+}
+
 /* Along a table under the mouse: a row below, a column on the right */
 .md-table-handle {
     position: fixed;
