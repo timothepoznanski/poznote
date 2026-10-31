@@ -124,33 +124,32 @@
 
     // Mermaid diagram starters for Markdown notes (discussion #1404). Each one
     // is a small working example, so the syntax does not have to be remembered.
-    // The aliases are the Mermaid keywords, which match in every UI language.
     var MERMAID_DIAGRAMS = [
-        { id: 'mermaid-flowchart', icon: 'lucide-network', labelKey: 'slash_menu.mermaid_flowchart', fallback: 'Flowchart', aliases: ['flowchart', 'graph'],
+        { id: 'mermaid-flowchart', icon: 'lucide-network', labelKey: 'slash_menu.mermaid_flowchart', fallback: 'Flowchart',
             source: 'flowchart TD\n    A[Start] --> B{Decision}\n    B -->|Yes| C[Step 1]\n    B -->|No| D[Step 2]\n    C --> E[End]\n    D --> E' },
-        { id: 'mermaid-sequence', icon: 'lucide-message-square', labelKey: 'slash_menu.mermaid_sequence', fallback: 'Sequence diagram', aliases: ['sequenceDiagram'],
+        { id: 'mermaid-sequence', icon: 'lucide-message-square', labelKey: 'slash_menu.mermaid_sequence', fallback: 'Sequence diagram',
             source: 'sequenceDiagram\n    participant Alice\n    participant Bob\n    Alice->>Bob: Hello Bob\n    Bob-->>Alice: Hi Alice' },
-        { id: 'mermaid-class', icon: 'lucide-boxes', labelKey: 'slash_menu.mermaid_class', fallback: 'Class diagram', aliases: ['classDiagram', 'uml'],
+        { id: 'mermaid-class', icon: 'lucide-boxes', labelKey: 'slash_menu.mermaid_class', fallback: 'Class diagram',
             source: 'classDiagram\n    class Animal {\n        +String name\n        +eat()\n    }\n    class Dog {\n        +bark()\n    }\n    Animal <|-- Dog' },
-        { id: 'mermaid-state', icon: 'lucide-circle-dot', labelKey: 'slash_menu.mermaid_state', fallback: 'State diagram', aliases: ['stateDiagram'],
+        { id: 'mermaid-state', icon: 'lucide-circle-dot', labelKey: 'slash_menu.mermaid_state', fallback: 'State diagram',
             source: 'stateDiagram-v2\n    [*] --> Draft\n    Draft --> Review\n    Review --> Draft\n    Review --> Published\n    Published --> [*]' },
-        { id: 'mermaid-er', icon: 'lucide-database', labelKey: 'slash_menu.mermaid_er', fallback: 'Entity relationship', aliases: ['erDiagram'],
+        { id: 'mermaid-er', icon: 'lucide-database', labelKey: 'slash_menu.mermaid_er', fallback: 'Entity relationship',
             source: 'erDiagram\n    CUSTOMER ||--o{ ORDER : places\n    ORDER ||--|{ LINE_ITEM : contains\n    PRODUCT ||--o{ LINE_ITEM : "ordered in"' },
-        { id: 'mermaid-gantt', icon: 'lucide-calendar', labelKey: 'slash_menu.mermaid_gantt', fallback: 'Gantt chart', aliases: ['gantt'],
+        { id: 'mermaid-gantt', icon: 'lucide-calendar', labelKey: 'slash_menu.mermaid_gantt', fallback: 'Gantt chart',
             source: 'gantt\n    title Project\n    dateFormat YYYY-MM-DD\n    section Planning\n    Research :a1, 2026-01-05, 7d\n    Design :a2, after a1, 5d\n    section Build\n    Development :after a2, 14d' },
-        { id: 'mermaid-pie', icon: 'lucide-pie-chart', labelKey: 'slash_menu.mermaid_pie', fallback: 'Pie chart', aliases: ['pie'],
+        { id: 'mermaid-pie', icon: 'lucide-pie-chart', labelKey: 'slash_menu.mermaid_pie', fallback: 'Pie chart',
             source: 'pie title Pets\n    "Dogs" : 40\n    "Cats" : 35\n    "Birds" : 25' },
-        { id: 'mermaid-mindmap', icon: 'lucide-brain', labelKey: 'slash_menu.mermaid_mindmap', fallback: 'Mindmap', aliases: ['mindmap'],
+        { id: 'mermaid-mindmap', icon: 'lucide-brain', labelKey: 'slash_menu.mermaid_mindmap', fallback: 'Mindmap',
             source: 'mindmap\n  root((Topic))\n    Idea A\n      Detail\n    Idea B\n    Idea C' },
-        { id: 'mermaid-timeline', icon: 'lucide-history', labelKey: 'slash_menu.mermaid_timeline', fallback: 'Timeline', aliases: ['timeline'],
+        { id: 'mermaid-timeline', icon: 'lucide-history', labelKey: 'slash_menu.mermaid_timeline', fallback: 'Timeline',
             source: 'timeline\n    title History\n    2024 : Event A\n    2025 : Event B : Event C\n    2026 : Event D' },
-        { id: 'mermaid-journey', icon: 'lucide-footprints', labelKey: 'slash_menu.mermaid_journey', fallback: 'User journey', aliases: ['journey'],
+        { id: 'mermaid-journey', icon: 'lucide-footprints', labelKey: 'slash_menu.mermaid_journey', fallback: 'User journey',
             source: 'journey\n    title My day\n    section Morning\n      Wake up: 3: Me\n      Coffee: 5: Me\n    section Work\n      Meetings: 2: Me, Team' },
-        { id: 'mermaid-git', icon: 'lucide-git-branch', labelKey: 'slash_menu.mermaid_git', fallback: 'Git graph', aliases: ['gitGraph'],
+        { id: 'mermaid-git', icon: 'lucide-git-branch', labelKey: 'slash_menu.mermaid_git', fallback: 'Git graph',
             source: 'gitGraph\n    commit\n    branch feature\n    checkout feature\n    commit\n    checkout main\n    commit\n    merge feature' },
-        { id: 'mermaid-quadrant', icon: 'lucide-grid', labelKey: 'slash_menu.mermaid_quadrant', fallback: 'Quadrant chart', aliases: ['quadrantChart'],
+        { id: 'mermaid-quadrant', icon: 'lucide-grid', labelKey: 'slash_menu.mermaid_quadrant', fallback: 'Quadrant chart',
             source: 'quadrantChart\n    title Priorities\n    x-axis Low effort --> High effort\n    y-axis Low impact --> High impact\n    quadrant-1 Big projects\n    quadrant-2 Quick wins\n    quadrant-3 Fill-ins\n    quadrant-4 Thankless tasks\n    Task A: [0.3, 0.8]\n    Task B: [0.7, 0.4]' },
-        { id: 'mermaid-xy', icon: 'lucide-bar-chart', labelKey: 'slash_menu.mermaid_xy', fallback: 'Bar and line chart', aliases: ['xychart', 'bar'],
+        { id: 'mermaid-xy', icon: 'lucide-bar-chart', labelKey: 'slash_menu.mermaid_xy', fallback: 'Bar and line chart',
             source: 'xychart-beta\n    title Sales\n    x-axis [Jan, Feb, Mar, Apr]\n    y-axis "Revenue" 0 --> 100\n    bar [30, 50, 70, 60]\n    line [30, 50, 70, 60]' }
     ];
 
@@ -2317,7 +2316,6 @@
             return {
                 id: 'weekday-' + english,
                 label: name.charAt(0).toUpperCase() + name.slice(1),
-                aliases: [english],
                 action: function () { insert({ mode: 'fixed', date: date }); }
             };
         });
@@ -2326,7 +2324,6 @@
             return {
                 id: id,
                 label: label,
-                aliases: [id.replace(/-/g, ' ')],
                 action: function () { insert({ mode: 'fixed', date: date }); }
             };
         };
@@ -2346,17 +2343,13 @@
         ];
 
         // The Now submenu entries show the value they insert as their label
-        // (today, the current time, both), so one click or Enter inserts it;
-        // their names stay searchable through the aliases
+        // (today, the current time, both), so one click or Enter inserts it
         const now = new Date();
-        const todayLabel = t('slash_menu.today', null, 'Today');
-        const nowTimeLabel = t('slash_menu.now_time', null, 'Current time');
-        const nowDateTimeLabel = t('slash_menu.now_datetime', null, 'Current date and time');
 
         const nowEntries = [
-            { id: 'today', icon: 'lucide-sun', label: formatSlashDate(now), aliases: ['today', todayLabel], action: function () { insert({ mode: 'fixed', date: slashDayOffset(0) }); } },
-            { id: 'now-time', icon: 'lucide-clock', label: formatSlashTime(now), aliases: ['now', 'time', nowTimeLabel], action: function () { insert({ mode: 'now-time' }); } },
-            { id: 'now-datetime', icon: 'lucide-alarm-clock', label: formatSlashDateTime(now), aliases: ['now', nowDateTimeLabel], action: function () { insert({ mode: 'now-datetime' }); } }
+            { id: 'today', icon: 'lucide-sun', label: formatSlashDate(now), action: function () { insert({ mode: 'fixed', date: slashDayOffset(0) }); } },
+            { id: 'now-time', icon: 'lucide-clock', label: formatSlashTime(now), action: function () { insert({ mode: 'now-time' }); } },
+            { id: 'now-datetime', icon: 'lucide-alarm-clock', label: formatSlashDateTime(now), action: function () { insert({ mode: 'now-datetime' }); } }
         ];
 
         const items = [
@@ -2364,11 +2357,11 @@
             { id: 'relative-date', icon: 'lucide-history', label: t('slash_menu.relative_date', null, 'Relative'), submenu: relativeDates },
             { id: 'weekday', icon: 'lucide-calendar', label: t('slash_menu.weekday', null, 'Day of the week'), submenu: weekdays },
             { id: 'insert-date', icon: 'lucide-calendar-alt', label: t('slash_menu.date', null, 'Date'), action: function () { insert({ mode: 'date' }); } },
-            { id: 'insert-time', icon: 'lucide-watch', label: t('slash_menu.time', null, 'Time'), aliases: ['time'], action: function () { insert({ mode: 'time' }); } },
+            { id: 'insert-time', icon: 'lucide-watch', label: t('slash_menu.time', null, 'Time'), action: function () { insert({ mode: 'time' }); } },
             { id: 'insert-datetime', icon: 'lucide-calendar-plus', label: t('slash_menu.date_time', null, 'Date and time'), action: function () { insert({ mode: 'datetime' }); } }
         ];
         if (withJournalLink) {
-            items.push({ id: 'journal-link', icon: 'lucide-book-open', label: t('slash_menu.journal_link', null, 'Link to diary entry'), aliases: ['diary', 'journal'], action: function () { insert({ mode: 'journal' }); } });
+            items.push({ id: 'journal-link', icon: 'lucide-book-open', label: t('slash_menu.journal_link', null, 'Link to diary entry'), action: function () { insert({ mode: 'journal' }); } });
         }
 
         // Not labelled "Date": the search flattens every entry of a section
@@ -2394,13 +2387,11 @@
                 id: 'mermaid',
                 icon: 'lucide-shapes',
                 label: t('slash_menu.mermaid', null, 'Mermaid'),
-                aliases: ['mermaid', 'diagram', 'chart'],
                 submenu: MERMAID_DIAGRAMS.map(function (d) {
                     return {
                         id: d.id,
                         icon: d.icon,
                         label: t(d.labelKey, null, d.fallback),
-                        aliases: d.aliases,
                         // Caret at the end of the last diagram line, before the closing fence
                         action: function () { insertMarkdownAtCursor('```mermaid\n' + d.source + '\n```\n', -5); }
                     };
@@ -2691,7 +2682,6 @@
             id: 'template',
             icon: 'lucide-stamp',
             label: t('slash_menu.template', null, 'Template'),
-            aliases: ['template', 'tpl', 'snippet'],
             // The picker takes the focus; the editor gets it back on pick or cancel
             noRefocus: true,
             action: openTemplatePicker
@@ -2923,9 +2913,6 @@
             label: isMarkdown
                 ? t('modals.paste_markdown.menu_item', null, 'Insert rich text')
                 : t('modals.insert_markdown.menu_item', null, 'Insert Markdown'),
-            aliases: isMarkdown
-                ? ['paste', 'rich text', 'html', 'convert']
-                : ['paste', 'markdown', 'md', 'convert'],
             // The dialog takes the focus; the insertion gives it back
             noRefocus: true,
             action: function () {
@@ -2949,7 +2936,6 @@
                 id: 'excalidraw',
                 icon: 'lucide lucide-paint-brush',
                 label: t('slash_menu.excalidraw', null, 'Excalidraw'),
-                aliases: ['diagram', 'drawing'],
                 action: function () {
                     if (typeof window.insertExcalidrawDiagram === 'function') {
                         window.insertExcalidrawDiagram();
@@ -2997,12 +2983,11 @@
             // Records from the microphone. The dialog's stop buttons insert
             // the audio or, when a transcription server is configured for this
             // user, transcribe it (js/speech-to-text.js). Needs no server, so
-            // it is offered to everyone; "dictate" and co. still find it.
+            // it is offered to everyone.
             recordAudio: {
                 id: 'record-audio',
                 icon: 'lucide lucide-mic',
                 label: t('slash_menu.record_audio', null, 'Record audio'),
-                aliases: ['record', 'recorder', 'voice note', 'audio note', 'dictate', 'voice', 'speech', 'transcribe'],
                 // The dialog closes the phone keyboard; executeCommand() must
                 // not focus the note behind it again
                 noRefocus: true,
@@ -3128,17 +3113,16 @@
                 label: t('slash_menu.list', null, 'List'),
                 submenu: [
                     { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertList(false) },
-                    { id: 'dashes', icon: 'lucide-list-dash', label: t('slash_menu.dash_list', null, 'Dash list'), aliases: ['dash', 'minus', 'hyphen'], action: () => insertList(false, 'dash') },
+                    { id: 'dashes', icon: 'lucide-list-dash', label: t('slash_menu.dash_list', null, 'Dash list'), action: () => insertList(false, 'dash') },
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertList(true) },
-                    { id: 'letters', icon: 'lucide-list-lettered', label: t('slash_menu.lettered_list', null, 'Lettered list'), aliases: ['abc', 'letters'], action: () => insertList(true, 'a') },
-                    { id: 'roman', icon: 'lucide-list-roman', label: t('slash_menu.roman_list', null, 'Roman numeral list'), aliases: ['roman'], action: () => insertList(true, 'i') },
+                    { id: 'letters', icon: 'lucide-list-lettered', label: t('slash_menu.lettered_list', null, 'Lettered list'), action: () => insertList(true, 'a') },
+                    { id: 'roman', icon: 'lucide-list-roman', label: t('slash_menu.roman_list', null, 'Roman numeral list'), action: () => insertList(true, 'i') },
                     {
                         id: 'checklist',
                         icon: 'lucide-list-check',
                         label: t('slash_menu.checklist', null, 'Checklist'),
                         // "/todo" and "/task" reach the checklist whatever the UI
                         // language; its items show up on the global tasks page
-                        aliases: ['todo', 'task'],
                         action: () => {
                             if (typeof window.insertChecklist === 'function') {
                                 window.insertChecklist();
@@ -3149,7 +3133,6 @@
                         id: 'done',
                         icon: 'lucide-check-square',
                         label: t('slash_menu.done', null, 'Done'),
-                        aliases: ['done', 'completed'],
                         action: () => {
                             if (typeof window.insertChecklist === 'function') {
                                 window.insertChecklist({ checked: true });
@@ -3469,8 +3452,8 @@
                 submenu: [
                     { id: 'bullets', icon: 'lucide-list-ul', label: t('slash_menu.bullet_list', null, 'Bullet list'), action: () => insertMarkdownPrefixAtLineStart('- ') },
                     { id: 'numbers', icon: 'lucide-list-ol', label: t('slash_menu.numbered_list', null, 'Numbered list'), action: () => insertMarkdownPrefixAtLineStart('1. ') },
-                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), aliases: ['todo', 'task'], action: () => insertMarkdownPrefixAtLineStart('- [ ] ') },
-                    { id: 'done', icon: 'lucide-check-square', label: t('slash_menu.done', null, 'Done'), aliases: ['done', 'completed'], action: () => insertMarkdownPrefixAtLineStart('- [x] ') },
+                    { id: 'checklist', icon: 'lucide-list-check', label: t('slash_menu.checklist', null, 'Checklist'), action: () => insertMarkdownPrefixAtLineStart('- [ ] ') },
+                    { id: 'done', icon: 'lucide-check-square', label: t('slash_menu.done', null, 'Done'), action: () => insertMarkdownPrefixAtLineStart('- [x] ') },
                     {
                         id: 'tasklist-embed',
                         icon: 'lucide-layout-list',
@@ -4077,7 +4060,6 @@
                 icon: 'lucide-clipboard',
                 label: t('slash_menu.paste_plain', null, 'Paste without formatting'),
                 shortcut: formatClipboardShortcut('V', true),
-                aliases: ['plain text', 'unformatted'],
                 action: () => pasteFromClipboard(true)
             });
         }
@@ -4368,14 +4350,11 @@
         return { noteType: noteType || 'note', noteEntry, editableElement };
     }
 
-    // A command matches the typed filter through its (translated) label or
-    // one of its language-independent aliases (e.g. "/todo" for Checklist)
+    // A command matches the typed filter through the words the menu shows
+    // for it, nothing hidden: a list where "h" brings up entries without an
+    // "h" cannot be read (issue #1712)
     function commandMatchesSearch(item, search) {
-        if (!item) return false;
-        if (item.label && removeAccents(item.label.toLowerCase()).includes(search)) return true;
-        return Array.isArray(item.aliases) && item.aliases.some(function (alias) {
-            return removeAccents(String(alias).toLowerCase()).includes(search);
-        });
+        return !!(item && item.label && removeAccents(item.label.toLowerCase()).includes(search));
     }
 
     // Filter slash menu commands based on search text
@@ -4813,6 +4792,7 @@
     function handleSlashMenuViewportResize() {
         if (!slashMenuElement || !slashMenuAnchorRect || submenuElement) return;
         positionMenuAtRect(slashMenuAnchorRect);
+        fitMenuToWindow();
     }
 
     // Viewport rect of the caret at offset `pos` of a textarea, measured on a
@@ -5019,6 +4999,31 @@
         filteredCommands = getFilteredCommands(filterText);
         selectedIndex = Math.min(selectedIndex, Math.max(0, filteredCommands.length - 1));
         slashMenuElement.innerHTML = buildMenuHTML();
+        fitMenuToWindow();
+        updateSelectedClass();
+    }
+
+    // Filtering flattens the submenus: a menu placed for its short full list
+    // can come out far longer and wider (issue #1712). It stays where it is,
+    // under the caret and the typed filter, and the rest scrolls. offset*
+    // rather than getBoundingClientRect(): the opening transition moves the
+    // rect.
+    function fitMenuToWindow() {
+        if (!slashMenuElement) return;
+
+        const padding = 8;
+        slashMenuElement.style.maxHeight = '';
+
+        const overflow = slashMenuElement.offsetTop + slashMenuElement.offsetHeight - (window.innerHeight - padding);
+        if (overflow > 0) {
+            const height = parseFloat(window.getComputedStyle(slashMenuElement).height);
+            slashMenuElement.style.maxHeight = (height - overflow) + 'px';
+        }
+
+        const maxLeft = window.innerWidth - slashMenuElement.offsetWidth - padding;
+        if (slashMenuElement.offsetLeft > maxLeft) {
+            slashMenuElement.style.left = Math.max(padding, maxLeft) + 'px';
+        }
     }
 
     // Display submenu (level 2) for a command with subcommands
