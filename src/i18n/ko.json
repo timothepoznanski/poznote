@@ -2097,7 +2097,11 @@
     },
     "view_menu": {
       "title": "보기 변경",
-      "classic": "기본"
+      "classic": "기본",
+      "classic_hint": "서식이 적용된 노트를 읽습니다. 연필 버튼으로 Markdown 원본을 편집합니다.",
+      "live_hint": "서식이 적용된 상태로 편집합니다. 커서 주변에만 Markdown 문법이 표시됩니다.",
+      "rich_hint": "워드프로세서처럼 편집합니다. Markdown 문법은 표시되지 않습니다.",
+      "split_hint": "한쪽에는 Markdown 원본, 다른 쪽에는 서식 미리보기가 표시되며 입력할 때마다 갱신됩니다."
     }
   },
   "image_menu": {

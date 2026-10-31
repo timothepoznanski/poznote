@@ -1267,7 +1267,11 @@
     },
     "view_menu": {
       "title": "Ansicht wechseln",
-      "classic": "Klassisch"
+      "classic": "Klassisch",
+      "classic_hint": "Die formatierte Notiz lesen, mit dem Stift die Markdown-Quelle bearbeiten.",
+      "live_hint": "Die Notiz bereits formatiert bearbeiten: Die Markdown-Syntax erscheint um den Cursor herum.",
+      "rich_hint": "Die Notiz wie in einer Textverarbeitung bearbeiten: Die Markdown-Syntax wird nie angezeigt.",
+      "split_hint": "Markdown-Quelle auf der einen Seite, formatierte Vorschau auf der anderen, beim Tippen aktualisiert."
     }
   },
   "info": {

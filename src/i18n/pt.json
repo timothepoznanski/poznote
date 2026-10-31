@@ -1267,7 +1267,11 @@
     },
     "view_menu": {
       "title": "Mudar de visualização",
-      "classic": "Clássica"
+      "classic": "Clássica",
+      "classic_hint": "Ler a nota formatada; o lápis permite editar o código Markdown.",
+      "live_hint": "Editar a nota já formatada: a sintaxe Markdown aparece em torno do cursor.",
+      "rich_hint": "Editar a nota como num processador de texto: a sintaxe Markdown nunca é mostrada.",
+      "split_hint": "Código Markdown de um lado, pré-visualização formatada do outro, atualizada enquanto escreve."
     }
   },
   "info": {

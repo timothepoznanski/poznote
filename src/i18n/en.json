@@ -2097,7 +2097,11 @@
     },
     "view_menu": {
       "title": "Change view",
-      "classic": "Classic"
+      "classic": "Classic",
+      "classic_hint": "Read the formatted note, click the pencil to edit the Markdown source.",
+      "live_hint": "Edit the note already formatted: the Markdown syntax shows up around the cursor.",
+      "rich_hint": "Edit the note like a word processor: the Markdown syntax is never shown.",
+      "split_hint": "Markdown source on one side, formatted preview on the other, updated as you type."
     }
   },
   "image_menu": {

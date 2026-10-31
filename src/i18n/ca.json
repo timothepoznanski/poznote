@@ -2097,7 +2097,11 @@
     },
     "view_menu": {
       "title": "Canvia la visualització",
-      "classic": "Clàssica"
+      "classic": "Clàssica",
+      "classic_hint": "Llegir la nota amb format; el llapis permet editar el codi Markdown.",
+      "live_hint": "Editar la nota ja amb format: la sintaxi Markdown apareix al voltant del cursor.",
+      "rich_hint": "Editar la nota com en un processador de textos: la sintaxi Markdown no es mostra mai.",
+      "split_hint": "Codi Markdown a un costat i previsualització amb format a l'altre, actualitzada mentre escrius."
     }
   },
   "image_menu": {

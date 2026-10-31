@@ -2097,7 +2097,11 @@
     },
     "view_menu": {
       "title": "表示を切り替え",
-      "classic": "クラシック"
+      "classic": "クラシック",
+      "classic_hint": "整形されたノートを読みます。鉛筆アイコンで Markdown ソースを編集します。",
+      "live_hint": "整形された状態のまま編集します。カーソル付近にだけ Markdown 記法が表示されます。",
+      "rich_hint": "ワープロのように編集します。Markdown 記法は表示されません。",
+      "split_hint": "片側に Markdown ソース、もう片側に整形プレビューを表示し、入力に合わせて更新します。"
     }
   },
   "image_menu": {

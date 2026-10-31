@@ -1267,7 +1267,11 @@
     },
     "view_menu": {
       "title": "Changer de vue",
-      "classic": "Classique"
+      "classic": "Classique",
+      "classic_hint": "Lire la note mise en forme, le crayon permet d'éditer la source Markdown.",
+      "live_hint": "Éditer la note déjà mise en forme : la syntaxe Markdown apparaît autour du curseur.",
+      "rich_hint": "Éditer la note comme dans un traitement de texte : la syntaxe Markdown n'est jamais affichée.",
+      "split_hint": "Source Markdown d'un côté, aperçu mis en forme de l'autre, mis à jour pendant la saisie."
     }
   },
   "info": {
