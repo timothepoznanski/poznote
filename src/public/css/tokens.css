@@ -151,6 +151,9 @@
        stylesheet overrides them. */
     --pz-bg: #ffffff;              /* page, card, menu and modal background */
     --pz-text-inverse: #ffffff;    /* label on an accent, dark or coloured ground */
+    /* Help bubbles (settings cards, view menu): dark in every theme */
+    --pz-tooltip-bg: #1f2937;
+    --pz-tooltip-text: #f9fafb;
     /* Search matches: the highlighter yellow, and the orange of the current one.
        Their own names, because the warning family is a text colour in several
        themes and unreadable as a fill behind black text. */

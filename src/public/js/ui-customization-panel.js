@@ -429,6 +429,9 @@
             }
             if (!isViewMenuOpen()) return;
 
+            // A click on an entry's help icon must not pick the view
+            if (e.target.closest && e.target.closest('.page-more-menu-help')) return;
+
             var choice = e.target.closest ? e.target.closest('[data-markdown-view]') : null;
             if (choice && viewMenu.contains(choice)) {
                 e.preventDefault();
