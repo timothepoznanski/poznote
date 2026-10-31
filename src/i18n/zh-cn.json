@@ -1265,7 +1265,11 @@
     },
     "view_menu": {
       "title": "切换视图",
-      "classic": "经典"
+      "classic": "经典",
+      "classic_hint": "阅读排版后的笔记，点击铅笔编辑 Markdown 源码。",
+      "live_hint": "直接在排版后的笔记中编辑：光标附近才显示 Markdown 语法。",
+      "rich_hint": "像文字处理器一样编辑：从不显示 Markdown 语法。",
+      "split_hint": "一侧是 Markdown 源码，另一侧是排版预览，输入时实时更新。"
     }
   },
   "info": {
