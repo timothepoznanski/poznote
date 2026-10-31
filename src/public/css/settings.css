@@ -1832,7 +1832,10 @@ html[data-theme='dark'] body:has(> .settings-shell.settings-subpage) {
         margin-left: 0;
     }
 
+    /* The row's width, or the boxes never wrap and leave the card */
     .settings-with-nav .settings-card-stacks .settings-inline-checks {
+        flex: 1 1 100%;
+        min-width: 0;
         justify-content: flex-start;
     }
 }

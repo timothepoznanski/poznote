@@ -255,6 +255,15 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     white-space: normal;
 }
 
+/* No right click under a finger. The separator goes with the hint when it
+   has nothing left to separate (no settings entry on another account). */
+@media (pointer: coarse) {
+    .page-more-menu-hint,
+    .page-more-menu-separator:has(+ .page-more-menu-hint) {
+        display: none;
+    }
+}
+
 .page-more-menu-state:not(:empty)::before {
     content: ': ';
 }

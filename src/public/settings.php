@@ -1393,7 +1393,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
         <div class="home-grid" id="settings-markdown-section-grid">
 
             <!-- Default View Mode (preview / edit / split / last used) -->
-            <div class="home-card settings-inline-card" id="markdown-default-view-mode-card">
+            <div class="home-card settings-inline-card settings-card-stacks" id="markdown-default-view-mode-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_default_view_mode', [], 'Choose whether markdown notes open in preview, edit or split mode.'); ?> <?php echo t_h('modals.markdown_default_view_mode.hint', [], 'A note you switch to another mode opens again in the default mode next time.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-book-open"></i></div>
                 <div class="home-card-content">
@@ -1408,7 +1408,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
             </div>
 
             <!-- View mode of a new, empty note (split / edit / live preview / rich text) -->
-            <div class="home-card settings-inline-card" id="markdown-new-note-view-mode-card">
+            <div class="home-card settings-inline-card settings-card-stacks" id="markdown-new-note-view-mode-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_new_note_view_mode', [], 'Choose whether a new markdown note opens in split, edit or live rendering mode. Live rendering is then turned on for the other notes too. On a phone a new note never opens in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-file-plus"></i></div>
                 <div class="home-card-content">
