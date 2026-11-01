@@ -995,7 +995,7 @@ La vista Accés ràpid converteix notes en una pàgina de rajoles d'enllaços, p
   <img src="speed-dial.gif" alt="Demostració de l'accés ràpid" width="100%">
 </p>
 
-Doneu l'etiqueta `speed-dial` a una nota, o trieu **Afegeix a l'accés ràpid** al menú d'una nota o una carpeta (per a una carpeta, totes les seves notes, subcarpetes incloses). Obriu la vista amb la icona de llamp de la barra d'icones de l'esquerra. Aquest botó està amagat per defecte: activeu-lo a **Paràmetres > Visualització > Visibilitat dels elements**.
+Doneu l'etiqueta `speed-dial` a una nota, o trieu **Afegeix a l'accés ràpid** al menú d'una nota o una carpeta (per a una carpeta, totes les seves notes, subcarpetes incloses). Obriu la vista amb la icona de llamp de la barra d'icones de l'esquerra.
 
 - **Un enllaç o cap:** la nota és una rajola que obre aquest enllaç, o la mateixa nota. La seva icona és la primera imatge de la nota, si no la icona del lloc, si no la primera lletra del títol.
 - **Diversos enllaços:** la nota és un grup de rajoles amb el nom de la nota i una rajola per enllaç. Una línia horitzontal (`----`) comença una fila nova, i un enllaç al voltant d'una imatge la fa servir com a icona: `[![GitHub](https://example.com/icon.png)](https://github.com)`.

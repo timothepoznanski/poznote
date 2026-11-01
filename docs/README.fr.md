@@ -994,7 +994,7 @@ La vue Accès rapide transforme des notes en une page de tuiles de liens, faite 
   <img src="speed-dial.gif" alt="Démonstration de l'accès rapide" width="100%">
 </p>
 
-Donnez le tag `speed-dial` à une note, ou choisissez **Ajouter à l'accès rapide** dans le menu d'une note ou d'un dossier (pour un dossier, toutes ses notes, sous-dossiers compris). Ouvrez la vue avec l'icône d'éclair de la barre d'icônes à gauche. Ce bouton est masqué par défaut : activez-le dans **Paramètres > Affichage > Visibilité des éléments**.
+Donnez le tag `speed-dial` à une note, ou choisissez **Ajouter à l'accès rapide** dans le menu d'une note ou d'un dossier (pour un dossier, toutes ses notes, sous-dossiers compris). Ouvrez la vue avec l'icône d'éclair de la barre d'icônes à gauche.
 
 - **Un lien ou aucun :** la note est une tuile qui ouvre ce lien, ou la note elle-même. Son icône est la première image de la note, sinon l'icône du site, sinon la première lettre du titre.
 - **Plusieurs liens :** la note est un groupe de tuiles au nom de la note, avec une tuile par lien. Une ligne horizontale (`----`) commence une nouvelle rangée, et un lien autour d'une image la prend comme icône : `[![GitHub](https://example.com/icon.png)](https://github.com)`.

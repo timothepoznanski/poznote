@@ -161,7 +161,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 50; // 50: entries.speed_dial_order; 49: the speed dial's rail entry seeded as hidden
+    $CURRENT_SCHEMA_VERSION = 50; // 50: entries.speed_dial_order
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an

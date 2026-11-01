@@ -994,7 +994,7 @@ A visualização Acesso rápido transforma notas em uma página de mosaicos de l
   <img src="speed-dial.gif" alt="Demonstração do acesso rápido" width="100%">
 </p>
 
-Dê a uma nota a etiqueta `speed-dial` ou escolha **Adicionar ao acesso rápido** no menu de uma nota ou pasta (para uma pasta, todas as suas notas, subpastas incluídas). Abra a visualização com o ícone de raio da barra de ícones à esquerda. Esse botão fica oculto por padrão: ative-o em **Configurações > Tela > Visibilidade dos elementos**.
+Dê a uma nota a etiqueta `speed-dial` ou escolha **Adicionar ao acesso rápido** no menu de uma nota ou pasta (para uma pasta, todas as suas notas, subpastas incluídas). Abra a visualização com o ícone de raio da barra de ícones à esquerda.
 
 - **Um link ou nenhum:** a nota é um mosaico que abre esse link ou a própria nota. Seu ícone é a primeira imagem da nota, senão o ícone do site, senão a primeira letra do título.
 - **Vários links:** a nota é um grupo de mosaicos com o nome da nota e um mosaico por link. Uma linha horizontal (`----`) inicia uma nova fileira, e um link em torno de uma imagem a usa como ícone: `[![GitHub](https://example.com/icon.png)](https://github.com)`.
