@@ -994,7 +994,7 @@ Die Ansicht Schnellwahl macht aus Notizen eine Seite mit Link-Kacheln, gedacht a
   <img src="speed-dial.gif" alt="Demo der Schnellwahl" width="100%">
 </p>
 
-Geben Sie einer Notiz den Tag `speed-dial` oder wählen Sie **Zur Schnellwahl hinzufügen** im Menü einer Notiz oder eines Ordners (bei einem Ordner alle seine Notizen, einschließlich Unterordnern). Öffnen Sie die Ansicht über das Blitzsymbol in der linken Symbolleiste. Diese Schaltfläche ist standardmäßig ausgeblendet: Aktivieren Sie sie unter **Einstellungen > Anzeige > Sichtbarkeit von Elementen**.
+Geben Sie einer Notiz den Tag `speed-dial` oder wählen Sie **Zur Schnellwahl hinzufügen** im Menü einer Notiz oder eines Ordners (bei einem Ordner alle seine Notizen, einschließlich Unterordnern). Öffnen Sie die Ansicht über das Blitzsymbol in der linken Symbolleiste.
 
 - **Ein Link oder keiner:** Die Notiz ist eine Kachel, die diesen Link oder die Notiz selbst öffnet. Ihr Symbol ist das erste Bild der Notiz, sonst das Symbol der Website, sonst der erste Buchstabe des Titels.
 - **Mehrere Links:** Die Notiz ist eine Kachelgruppe mit dem Namen der Notiz und einer Kachel pro Link. Eine horizontale Linie (`----`) beginnt eine neue Reihe, und ein Link um ein Bild verwendet dieses als Symbol: `[![GitHub](https://example.com/icon.png)](https://github.com)`.

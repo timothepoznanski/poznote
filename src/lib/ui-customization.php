@@ -50,9 +50,6 @@ function poznoteGetNonHideableUiKeys() {
  * The line under the note title opens with the modification date and the word
  * count only (discussion #1577): the creation date and the character and line
  * counts are one tick away, and in the note information either way.
- *
- * card:iconSidebarSpeedDialBtn is the rail entry of the speed dial (issue
- * #1714), which is empty and of no use to whoever tags no note for it.
  */
 function poznoteGetDefaultHiddenUiKeys() {
     return [
@@ -60,7 +57,6 @@ function poznoteGetDefaultHiddenUiKeys() {
         'panel:note-created-date',
         'panel:note-stats-characters',
         'panel:note-stats-lines',
-        'card:iconSidebarSpeedDialBtn',
     ];
 }
 

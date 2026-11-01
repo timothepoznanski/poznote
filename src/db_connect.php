@@ -161,7 +161,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 50; // 50: entries.speed_dial_order; 49: the speed dial's rail entry seeded as hidden
+    $CURRENT_SCHEMA_VERSION = 51; // 51: the speed dial's rail entry shown again; 50: entries.speed_dial_order
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -992,6 +992,27 @@ try {
                 $con->rollBack();
             }
             error_log('db_connect: legacy display toggle migration failed: ' . $e->getMessage());
+        }
+
+        // 6.136.0 seeded the rail entry of the speed dial as hidden, 6.136.1 shows
+        // it by default: the accounts seeded back then get it back, once.
+        if ($currentVersion > 0 && $currentVersion < 51) {
+            try {
+                $railStmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+                $railStmt->execute(['default_hidden_ui_keys_applied']);
+                $railApplied = json_decode((string)$railStmt->fetchColumn(), true);
+                $railStmt->execute(['hidden_ui_elements']);
+                $railHidden = json_decode((string)$railStmt->fetchColumn(), true);
+                if (is_array($railApplied) && is_array($railHidden)
+                    && in_array('card:iconSidebarSpeedDialBtn', $railApplied, true)
+                    && in_array('card:iconSidebarSpeedDialBtn', $railHidden, true)) {
+                    $railHidden = array_values(array_diff($railHidden, ['card:iconSidebarSpeedDialBtn']));
+                    $con->prepare("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)")
+                        ->execute(['hidden_ui_elements', json_encode($railHidden)]);
+                }
+            } catch (Exception $e) {
+                error_log('db_connect: showing the speed dial rail entry failed: ' . $e->getMessage());
+            }
         }
 
         // === Keys hidden by default (poznoteGetDefaultHiddenUiKeys) ===

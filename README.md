@@ -996,7 +996,7 @@ The Speed dial view turns notes into a page of link tiles, made to be your brows
   <img src="docs/speed-dial.gif" alt="Speed dial demo" width="100%">
 </p>
 
-Give a note the `speed-dial` tag, or choose **Add to speed dial** in the menu of a note or a folder (for a folder, all its notes, subfolders included). Open the view with the lightning icon of the left icon rail. This button is hidden by default: turn it on in **Settings > Display > Element visibility**.
+Give a note the `speed-dial` tag, or choose **Add to speed dial** in the menu of a note or a folder (for a folder, all its notes, subfolders included). Open the view with the lightning icon of the left icon rail.
 
 - **One link or none:** the note is a tile that opens this link, or the note itself. Its icon is the first image of the note, otherwise the site's icon, otherwise the first letter of the title.
 - **Several links:** the note is a group of tiles named after the note, with one tile per link. A horizontal line (`----`) starts a new row, and a link around an image uses it as icon: `[![GitHub](https://example.com/icon.png)](https://github.com)`.

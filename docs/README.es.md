@@ -994,7 +994,7 @@ La vista Acceso rápido convierte notas en una página de mosaicos de enlaces, p
   <img src="speed-dial.gif" alt="Demostración del acceso rápido" width="100%">
 </p>
 
-Da a una nota la etiqueta `speed-dial`, o elige **Añadir al acceso rápido** en el menú de una nota o una carpeta (para una carpeta, todas sus notas, subcarpetas incluidas). Abre la vista con el icono de rayo de la barra de iconos de la izquierda. Este botón está oculto por defecto: actívalo en **Configuración > Pantalla > Visibilidad de los elementos**.
+Da a una nota la etiqueta `speed-dial`, o elige **Añadir al acceso rápido** en el menú de una nota o una carpeta (para una carpeta, todas sus notas, subcarpetas incluidas). Abre la vista con el icono de rayo de la barra de iconos de la izquierda.
 
 - **Un enlace o ninguno:** la nota es un mosaico que abre ese enlace, o la propia nota. Su icono es la primera imagen de la nota, si no el icono del sitio, si no la primera letra del título.
 - **Varios enlaces:** la nota es un grupo de mosaicos con el nombre de la nota y un mosaico por enlace. Una línea horizontal (`----`) inicia una nueva fila, y un enlace alrededor de una imagen la usa como icono: `[![GitHub](https://example.com/icon.png)](https://github.com)`.
