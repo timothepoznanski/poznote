@@ -238,6 +238,48 @@ body.speed-dial-page {
     text-decoration: none;
 }
 
+/* The address, a moment after the pointer stops on the tile */
+@keyframes speedDialUrlIn {
+    from {
+        visibility: hidden;
+    }
+}
+
+@media (hover: hover) {
+    .speed-dial-tile:hover {
+        z-index: 5;
+    }
+
+    .speed-dial-link[data-url]:hover::after {
+        content: attr(data-url);
+        position: absolute;
+        top: calc(100% + 6px);
+        left: 50%;
+        transform: translateX(-50%);
+        box-sizing: border-box;
+        width: max-content;
+        max-width: 280px;
+        padding: 4px 8px;
+        border: 1px solid var(--pz-border);
+        border-radius: var(--pz-radius);
+        background: var(--pz-bg);
+        box-shadow: 0 2px 8px rgba(var(--pz-shadow-rgb), 0.15);
+        color: var(--pz-text);
+        font-size: 12px;
+        line-height: 1.3;
+        text-align: center;
+        overflow-wrap: anywhere;
+        pointer-events: none;
+        animation: speedDialUrlIn 0s linear 400ms backwards;
+    }
+
+    /* No room for it under a tile at the bottom of the window (js/speed-dial.js) */
+    .speed-dial-tile.is-url-above .speed-dial-link[data-url]:hover::after {
+        top: auto;
+        bottom: calc(100% + 6px);
+    }
+}
+
 /* A light plate in every theme: most logos and favicons are drawn for one */
 .speed-dial-icon {
     position: relative;

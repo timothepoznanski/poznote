@@ -32,6 +32,12 @@ document.addEventListener('error', function (event) {
     }
 }, true);
 
+// The address shown over a tile opens upwards at the bottom of the window
+document.addEventListener('mouseover', function (event) {
+    var tile = event.target && event.target.closest ? event.target.closest('.speed-dial-tile') : null;
+    if (tile) tile.classList.toggle('is-url-above', tile.getBoundingClientRect().bottom + 100 > window.innerHeight);
+});
+
 // Background image, from the "..." menu of the floating stack: the modal of the
 // workspaces' background (js/workspace-background.js), for the view's own image.
 document.addEventListener('DOMContentLoaded', function () {

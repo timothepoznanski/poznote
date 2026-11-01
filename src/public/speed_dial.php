@@ -73,7 +73,7 @@ function speedDialBuildItem(array $note, string $workspace): array {
 function speedDialRenderLink(array $tile, string $fallbackUrl): void {
     $esc = static fn($value) => htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
     ?>
-    <a class="speed-dial-link" draggable="false" href="<?php echo $esc($tile['link'] ?? $fallbackUrl); ?>"<?php echo $tile['link'] !== null ? ' target="_blank" rel="noopener"' : ''; ?>>
+    <a class="speed-dial-link" draggable="false" href="<?php echo $esc($tile['link'] ?? $fallbackUrl); ?>"<?php echo $tile['link'] !== null ? ' target="_blank" rel="noopener" data-url="' . $esc($tile['link']) . '"' : ''; ?>>
         <span class="speed-dial-icon">
             <span class="speed-dial-letter"><?php echo $esc($tile['letter']); ?></span>
             <?php if ($tile['image'] !== null): ?>

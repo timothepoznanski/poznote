@@ -182,10 +182,20 @@ function handleCodeBlockPaste(plainText) {
  * @returns {boolean} True if URL paste was handled
  */
 function handleUrlPaste(plainText, htmlData) {
-    // Only handle if plain text without HTML
-    if (!plainText || htmlData) return false;
+    if (!plainText) return false;
 
     var trimmedText = plainText.trim();
+
+    // HTML can come along with the address and hold nothing more (copied from a
+    // page or a document): it is still only an address. Real content, a link
+    // included, goes through the rich text paste.
+    if (htmlData) {
+        var pastedDoc = new DOMParser().parseFromString(htmlData, 'text/html');
+        if (pastedDoc.body.textContent.trim() !== trimmedText
+            || pastedDoc.body.querySelector('a[href], img, iframe, video, audio, table')) {
+            return false;
+        }
+    }
     var urlRegex = /^(https?:\/\/|ftp:\/\/)[^\s]+$/i;
 
     if (!urlRegex.test(trimmedText)) return false;
