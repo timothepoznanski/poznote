@@ -26,14 +26,22 @@ function _mdEscapeHtmlAttribute(str) {
 // in markdown_parser.php.
 var _MD_LINK_URL_PATTERN = '(?:[^\\s()]|\\([^\\s()]*\\))+';
 
+// The text of a link or an image: square brackets only in balanced pairs, so
+// that "[[v2] notes](url)" is one link (issue #1713), and a pair followed by
+// "(" is a link of its own, which is the one that counts. Written so that the
+// text between two pairs is one step: repeating a group for each character
+// overflows the stack on a long text with no closing bracket. Same pattern in
+// markdown_parser.php.
+var _MD_LINK_TEXT_PATTERN = '[^\\[\\]]*(?:\\[[^\\[\\]]*\\](?!\\()[^\\[\\]]*)*';
+
 function _mdGetMarkdownImageRegex() {
-    return new RegExp('!\\[([^\\]]*)\\]\\((' + _MD_LINK_URL_PATTERN + ')(?:\\s+"([^"]+)")?\\)(?:\\{((?=[^}]*(?:\\.img-with-border(?:-no-padding)?(?=\\s|})|\\bwidth\\s*=))[^}]*)\\})?', 'g');
+    return new RegExp('!\\[(' + _MD_LINK_TEXT_PATTERN + ')\\]\\((' + _MD_LINK_URL_PATTERN + ')(?:\\s+"([^"]+)")?\\)(?:\\{((?=[^}]*(?:\\.img-with-border(?:-no-padding)?(?=\\s|})|\\bwidth\\s*=))[^}]*)\\})?', 'g');
 }
 
 // A link [text](url "title"), its address also written <url> (which may hold
 // spaces and any parentheses). Groups: text, <url>, url, title.
 function _mdGetMarkdownLinkRegex() {
-    return new RegExp('\\[([^\\]]+)\\]\\((?:<([^<>\\n]*)>|(' + _MD_LINK_URL_PATTERN + '))(?:\\s+"([^"]+)")?\\)', 'g');
+    return new RegExp('\\[((?!\\])' + _MD_LINK_TEXT_PATTERN + ')\\]\\((?:<([^<>\\n]*)>|(' + _MD_LINK_URL_PATTERN + '))(?:\\s+"([^"]+)")?\\)', 'g');
 }
 
 // A bare address ends before the punctuation that follows it, but a ")"

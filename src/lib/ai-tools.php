@@ -21,7 +21,10 @@ require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../markdown_parser.php';
 require_once __DIR__ . '/../html_to_markdown.php';
 require_once __DIR__ . '/ai-note-diagrams.php';
+require_once __DIR__ . '/ai-note-edit.php';
 
+// Largest part of a note (in bytes of its Markdown view) one get_note hands
+// the model: a longer note takes several calls, see aiNotePage()
 define('AI_NOTE_READ_LIMIT', 16000);
 define('AI_INLINE_IMAGE_PREFIX', '/poznote-inline-image/');
 
@@ -70,8 +73,12 @@ function aiLooksLikeHtml($content) {
  * converted). The result's 'format' says what the note itself is.
  * Returns null if the note doesn't exist, is trashed, or (when $workspace is
  * given) belongs to another workspace.
+ *
+ * 'content' is the part of at most $maxLen bytes starting at $offset, and
+ * 'truncated' says more follows. 'offset', 'next_offset', 'total_length' and
+ * 'view_hash' (identifies this version of the whole view) locate that part.
  */
-function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
+function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '', $offset = 0) {
     $stmt = $con->prepare('SELECT id, heading, entry, type, tags, folder, folder_id, workspace, created, updated, favorite, reminder_at, reminder_recurrence FROM entries WHERE id = ? AND trash = 0' . ($workspace !== '' ? ' AND workspace = ?' : ''));
     $stmt->execute($workspace !== '' ? [intval($noteId), $workspace] : [intval($noteId)]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -121,11 +128,9 @@ function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
         $content = html_entity_decode(strip_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
-    $truncated = false;
-    if (strlen($content) > $maxLen) {
-        $content = substr($content, 0, $maxLen);
-        $truncated = true;
-    }
+    $viewHash = sha1($content);
+    $page = aiNotePage($content, (int)$offset, (int)$maxLen);
+    $content = $page['content'];
 
     $result = [
         'id' => (int)$note['id'],
@@ -139,10 +144,19 @@ function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '') {
         'reminder_at' => aiUtcToLocal($note['reminder_at'] ?? null),
         'format' => $format,
         'content' => $content,
-        'truncated' => $truncated,
+        'truncated' => $page['next_offset'] !== null,
+        'offset' => $page['offset'],
+        'next_offset' => $page['next_offset'],
+        'total_length' => $page['total_length'],
+        'view_hash' => $viewHash,
     ];
     if ($result['reminder_at'] !== null && !empty($note['reminder_recurrence'])) {
         $result['reminder_recurrence'] = (string)$note['reminder_recurrence'];
+    }
+    // The tasks and checkboxes cover the whole note: once, with its first part
+    if ($page['offset'] > 0) {
+        $tasks = null;
+        $checklist = null;
     }
     if ($tasks !== null) {
         $result['tasks'] = $tasks;
@@ -657,6 +671,7 @@ function aiToolHandlers(): array
         'list_recent_notes' => 'aiToolListRecentNotes',
         'rename_note' => 'aiToolRenameNote',
         'update_note_content' => 'aiToolUpdateNoteContent',
+        'replace_in_note' => 'aiToolReplaceInNote',
         'create_note' => 'aiToolCreateNote',
         'delete_note' => 'aiToolDeleteNote',
         'delete_folder' => 'aiToolDeleteFolder',
@@ -786,12 +801,24 @@ function aiToolSearchNotes($con, array $args, $chatWorkspace, $actorUserId): str
 function aiToolGetNote($con, array $args, $chatWorkspace, $actorUserId): string
 {
     $scope = aiReadScope($chatWorkspace);
-    $note = aiReadNote($con, intval($args['note_id'] ?? 0), AI_NOTE_READ_LIMIT, count($scope) === 1 ? $scope[0] : '');
+    $note = aiReadNote($con, intval($args['note_id'] ?? 0), AI_NOTE_READ_LIMIT, count($scope) === 1 ? $scope[0] : '', intval($args['offset'] ?? 0));
     if ($note !== null && !in_array($note['workspace'], $scope, true)) {
         $note = null;
     }
     if ($note === null) {
         return json_encode(['error' => 'Note not found in ' . aiReadScopeLabel($scope)]);
+    }
+    $end = $note['next_offset'] ?? $note['total_length'];
+    aiNoteReadRecord($note['id'], $note['view_hash'], $note['offset'], $end);
+    unset($note['view_hash']);
+    if ($note['next_offset'] !== null) {
+        // Next to the content, like the other hints: models skim the prompt
+        $note['paging'] = 'This is only part of the note: bytes ' . $note['offset'] . ' to ' . $end . ' of ' . $note['total_length']
+            . '. To read on, call get_note again with offset ' . $note['next_offset'] . '. Never rebuild the rest from search snippets.';
+    } elseif ($note['offset'] > 0) {
+        $note['paging'] = 'This is the last part of the note: bytes ' . $note['offset'] . ' to ' . $end . ' of ' . $note['total_length'] . '.';
+    } else {
+        unset($note['offset'], $note['next_offset'], $note['total_length']);
     }
     return json_encode($note, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 }
@@ -893,26 +920,84 @@ function aiToolUpdateNoteContent($con, array $args, $chatWorkspace, $actorUserId
     if (strlen($content) > 200000) {
         return json_encode(['error' => 'Content too large (200 KB max)']);
     }
+    $note = aiEditableNote($con, $noteId, $chatWorkspace, $editError);
+    if ($note === null) {
+        return $editError;
+    }
+    // get_note hands out long notes in parts, so a "complete new content"
+    // written before all of them were read would silently drop the others
+    $current = aiReadNote($con, $noteId, AI_NOTE_READ_LIMIT, $chatWorkspace);
+    if ($current !== null && $current['truncated'] && !aiNoteReadIsComplete($noteId, $current['view_hash'], $current['total_length'])) {
+        return json_encode(['error' => 'Nothing was changed: this long note comes in several parts and you have not read them all during this answer, so the rest would be lost. For a targeted change use replace_in_note. To rewrite the whole note, first read every part with get_note (offset = next_offset, until truncated is false), then call this tool again. Never rebuild missing parts from search snippets.']);
+    }
+    return aiWriteNoteFromMarkdown($con, $note, $content, $actorUserId);
+}
+
+/** Tool `replace_in_note`. */
+function aiToolReplaceInNote($con, array $args, $chatWorkspace, $actorUserId): string
+{
+    $noteId = intval($args['note_id'] ?? 0);
+    if ($noteId <= 0) {
+        return json_encode(['error' => 'note_id is required']);
+    }
+    $note = aiEditableNote($con, $noteId, $chatWorkspace, $editError);
+    if ($note === null) {
+        return $editError;
+    }
+    // The whole Markdown view, parts do not matter here: what the model did
+    // not name stays as it is, whether it has read it or not
+    $current = aiReadNote($con, $noteId, PHP_INT_MAX, $chatWorkspace);
+    if ($current === null) {
+        return json_encode(['error' => 'Note not found in the current workspace']);
+    }
+    $applied = aiApplyNoteReplacements($current['content'], $args['replacements'] ?? null);
+    if (isset($applied['error'])) {
+        return json_encode(['error' => $applied['error']], JSON_UNESCAPED_UNICODE);
+    }
+    if ($applied['content'] === $current['content']) {
+        return json_encode(['ok' => true, 'note_id' => $noteId, 'title' => $note['heading'], 'replaced' => 0], JSON_UNESCAPED_UNICODE);
+    }
+    if (strlen($applied['content']) > 200000) {
+        return json_encode(['error' => 'Content too large (200 KB max): nothing was changed']);
+    }
+    return aiWriteNoteFromMarkdown($con, $note, $applied['content'], $actorUserId, ['replaced' => $applied['replaced']]);
+}
+
+/**
+ * The note if the assistant may change its text right now, null otherwise with
+ * the tool result to send back in $error.
+ */
+function aiEditableNote($con, int $noteId, $chatWorkspace, ?string &$error): ?array
+{
     $stmt = $con->prepare('SELECT id, heading, type, entry FROM entries WHERE id = ? AND trash = 0 AND workspace = ?');
     $stmt->execute([$noteId, $chatWorkspace]);
     $note = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$note) {
-        return json_encode(['error' => 'Note not found in the current workspace']);
+        $error = json_encode(['error' => 'Note not found in the current workspace']);
+        return null;
     }
     $lockError = aiNoteEditLockError($noteId);
     if ($lockError !== null) {
-        return $lockError;
+        $error = $lockError;
+        return null;
     }
     $noteType = $note['type'] ?? 'note';
     if ($noteType !== 'markdown' && $noteType !== 'note') {
-        return json_encode(['error' => 'Only markdown and HTML notes can be edited (this note is of type "' . $noteType . '")']);
+        $error = json_encode(['error' => 'Only markdown and HTML notes can be edited (this note is of type "' . $noteType . '")']);
+        return null;
     }
-    // get_note truncates long notes, so a "complete new content" written
-    // from such a read would silently drop the rest: refuse instead
-    $current = aiReadNote($con, $noteId, AI_NOTE_READ_LIMIT, $chatWorkspace);
-    if ($current !== null && $current['truncated']) {
-        return json_encode(['error' => 'This note is too long for the assistant to rewrite safely: get_note only shows its first part, so the rest would be lost. Tell the user to edit it by hand.']);
-    }
+    return $note;
+}
+
+/**
+ * Save Markdown from the model as the note's new content, in the note's own
+ * format, with a revision of the previous one. Returns the tool result, with
+ * $extra added to it on success.
+ */
+function aiWriteNoteFromMarkdown($con, array $note, string $content, $actorUserId, array $extra = []): string
+{
+    $noteId = (int)$note['id'];
+    $noteType = $note['type'] ?? 'note';
     $filename = getEntryFilename($noteId, $noteType);
     $stored = is_readable($filename) ? (string)file_get_contents($filename) : (string)($note['entry'] ?? '');
     if ($noteType === 'markdown') {
@@ -942,7 +1027,7 @@ function aiToolUpdateNoteContent($con, array $args, $chatWorkspace, $actorUserId
     }
     $con->prepare('UPDATE entries SET entry = ?, updated = ?, updated_by_user_id = ? WHERE id = ?')
         ->execute([$content, gmdate('Y-m-d H:i:s'), $actorUserId, $noteId]);
-    $result = ['ok' => true, 'note_id' => $noteId, 'title' => $note['heading']];
+    $result = ['ok' => true, 'note_id' => $noteId, 'title' => $note['heading']] + $extra;
     if ($snapshotTaken) {
         $result['previous_version'] = 'saved as a revision before this change (Revisions page of the note)';
     }

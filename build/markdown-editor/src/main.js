@@ -533,6 +533,37 @@ const alignedParagraphSyntax = {
   }]
 }
 
+// "[[v2] notes](url)" is one link, as in the preview (issue #1713). The grammar
+// takes "[v2]" for a reference link, which then cancels the link around it. So
+// a pair inside a link that does get its address stays plain text. Nothing else
+// changes: "[[Title]]" and "[word]" keep the node they always had.
+const closesLinkWithAddress = (cx, from) => {
+  let depth = 0
+  for (let pos = from; pos < cx.end; pos++) {
+    const next = cx.char(pos)
+    if (next === 92) pos++
+    else if (next === 91) depth++
+    else if (next === 93 && depth-- === 0) return cx.char(pos + 1) === 40
+  }
+  return false
+}
+const bracketsInLinkTextSyntax = {
+  parseInline: [{
+    name: 'BracketsInLinkText',
+    before: 'LinkEnd',
+    parse(cx, next, pos) {
+      if (next !== 93 || cx.char(pos + 1) === 40 || cx.char(pos + 1) === 91) return -1
+      const opening = []
+      cx.parts.forEach((part, index) => {
+        if (part && typeof part.type === 'object' && /^!?\[$/.test(cx.slice(part.from, part.to))) opening.push(index)
+      })
+      if (opening.length < 2 || !closesLinkWithAddress(cx, pos + 1)) return -1
+      cx.parts[opening[opening.length - 1]] = null
+      return pos + 1
+    }
+  }]
+}
+
 // An address pasted over selected words makes them a link to it. The
 // grammar's own version of this writes "[" and "](address)" as two changes
 // around the selection, and the note ended up with "[[words]](address)": one
@@ -2010,7 +2041,7 @@ function createEditor(host, options = {}) {
       markdown({
         base: markdownLanguage,
         codeLanguages,
-        extensions: [alignedParagraphSyntax],
+        extensions: [alignedParagraphSyntax, bracketsInLinkTextSyntax],
         // (pasteUrlOverSelection below does it)
         pasteURLAsLink: false,
         addKeymap: false

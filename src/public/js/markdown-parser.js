@@ -337,12 +337,33 @@ function _mdEscapeInlineText(text) {
 }
 
 /**
+ * Bold, italic, strikethrough and highlight, on text already escaped.
+ */
+function _mdApplyInlineEmphasis(text) {
+    // Bold and italic
+    text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+    text = text.replace(/(^|[^A-Za-z0-9_])___(?=\S)([\s\S]*?\S)___(?![A-Za-z0-9_])/g, '$1<strong><em>$2</em></strong>');
+    text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/(^|[^A-Za-z0-9_])__(?=\S)([\s\S]*?\S)__(?![A-Za-z0-9_])/g, '$1<strong>$2</strong>');
+    text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+    text = text.replace(/(^|[^A-Za-z0-9_])_(?=\S)([\s\S]*?\S)_(?![A-Za-z0-9_])/g, '$1<em>$2</em>');
+
+    // Strikethrough
+    text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+
+    // Highlight
+    text = text.replace(/==([^=]+)==/g, '<mark>$1</mark>');
+
+    return text;
+}
+
+/**
  * The text of a [text](url) link as HTML.
  *
  * A link is taken out of the stream before anything is escaped, so its text
  * is escaped here. The inline tags the rest of a note may use (a coloured
- * <span style="...">, <u>, <br>) keep working inside it; any other markup is
- * shown as the text it is.
+ * <span style="...">, <u>, <br>) and its emphasis (**bold**, ...) keep working
+ * inside it; any other markup is shown as the text it is.
  */
 function _mdRenderLinkText(linkText) {
     var tagRegex = /<span\s+style="([^"]+)">|<\/span>|<br\s*\/?>|<u(?=[\s/>])([^>]*)>|<\/u>/gi;
@@ -351,6 +372,14 @@ function _mdRenderLinkText(linkText) {
     var last = 0;
     var match;
 
+    // Tags and addresses are set aside during the emphasis passes: a "*" or a
+    // "_" in a style or an address is not emphasis.
+    var setAside = [];
+    function protect(piece) {
+        setAside.push(piece);
+        return '\x00LNKTXT' + (setAside.length - 1) + '\x00';
+    }
+
     linkText = String(linkText);
     while ((match = tagRegex.exec(linkText)) !== null) {
         html += _mdEscapeInlineText(linkText.slice(last, match.index));
@@ -358,25 +387,35 @@ function _mdRenderLinkText(linkText) {
 
         var tag = match[0].toLowerCase();
         if (tag.indexOf('<span') === 0) {
-            html += '<span style="' + _mdEscapeHtml(match[1]) + '">';
+            html += protect('<span style="' + _mdEscapeHtml(match[1]) + '">');
             open.push('span');
         } else if (tag.indexOf('<br') === 0) {
-            html += '<br>';
+            html += protect('<br>');
         } else if (tag.indexOf('<u') === 0) {
-            html += '<u' + _mdSanitizePassthroughTagAttrs('u', match[2] || '') + '>';
+            html += protect('<u' + _mdSanitizePassthroughTagAttrs('u', match[2] || '') + '>');
             open.push('u');
         } else {
             // A closing tag only closes what this text opened
             var name = tag === '</span>' ? 'span' : 'u';
             if (open.length && open[open.length - 1] === name) {
                 open.pop();
-                html += '</' + name + '>';
+                html += protect('</' + name + '>');
             } else {
                 html += _mdEscapeInlineText(match[0]);
             }
         }
     }
     html += _mdEscapeInlineText(linkText.slice(last));
+
+    html = html.replace(/(^|[\s(])(https?:\/\/[^\s<]+)/g, function (whole, prefix, url) {
+        var parts = _mdSplitAutolinkTrailing(url);
+        return parts[0] ? prefix + protect(parts[0]) + parts[1] : whole;
+    });
+    html = _mdApplyInlineEmphasis(html);
+    html = html.replace(/\x00LNKTXT(\d+)\x00/g, function (whole, index) {
+        return setAside[parseInt(index, 10)];
+    });
+
     while (open.length) {
         html += '</' + open.pop() + '>';
     }
@@ -1472,19 +1511,7 @@ function parseMarkdown(text) {
         // Auto-link plain URLs like GitHub-style markdown behavior
         text = linkifyPlainUrls(text);
 
-        // Bold and italic
-        text = text.replace(/\*\*\*([^\*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
-        text = text.replace(/(^|[^A-Za-z0-9_])___(?=\S)([\s\S]*?\S)___(?![A-Za-z0-9_])/g, '$1<strong><em>$2</em></strong>');
-        text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
-        text = text.replace(/(^|[^A-Za-z0-9_])__(?=\S)([\s\S]*?\S)__(?![A-Za-z0-9_])/g, '$1<strong>$2</strong>');
-        text = text.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
-        text = text.replace(/(^|[^A-Za-z0-9_])_(?=\S)([\s\S]*?\S)_(?![A-Za-z0-9_])/g, '$1<em>$2</em>');
-
-        // Strikethrough
-        text = text.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-
-        // Highlight
-        text = text.replace(/==([^=]+)==/g, '<mark>$1</mark>');
+        text = _mdApplyInlineEmphasis(text);
 
         // The addresses set aside above, as links
         text = text.replace(/\x00URL(\d+)\x00/g, function (match, index) {

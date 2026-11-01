@@ -444,10 +444,18 @@ function poznoteAiMcpServersForChat(?PDO $con, ?int $userId): array {
  * Names of the assistant's own tools this user turned off (the names of
  * aiToolHandlers() in lib/ai-tools.php), for instance every tool that
  * changes a note while external tools are connected.
+ *
+ * replace_in_note follows update_note_content: both change a note's text, and
+ * whoever kept the assistant from doing that must not get it back from a tool
+ * added after they made that choice.
  */
 function poznoteAiDisabledTools(?PDO $con): array {
     $names = json_decode(poznoteAiUserSetting($con, 'ai_user_disabled_tools'), true);
-    return is_array($names) ? array_values(array_filter($names, 'is_string')) : [];
+    $names = is_array($names) ? array_values(array_filter($names, 'is_string')) : [];
+    if (in_array('update_note_content', $names, true) && !in_array('replace_in_note', $names, true)) {
+        $names[] = 'replace_in_note';
+    }
+    return $names;
 }
 
 function poznoteSaveAiDisabledTools(?PDO $con, array $names): bool {

@@ -178,3 +178,18 @@ test('every request names Poznote unless the configuration sets its own User-Age
         aiUpstreamIdentityHeaders('1.0', [['name' => 'user-agent', 'value' => 'my-notes']])
     );
 });
+
+// Issue #1710: a note rewrite cut by the model's output limit left JSON that
+// does not parse, and the model was told its arguments were missing.
+test('tool arguments cut by the output limit get an error that says so', function () {
+    $cut = '{"note_id":76,"content":"# Candidate';
+    assertContains('output limit', (string)aiToolCallArgumentsError($cut, 'length'));
+    assertContains('output limit', (string)aiToolCallArgumentsError($cut, 'max_tokens'));
+    assertContains('not valid JSON', (string)aiToolCallArgumentsError($cut, 'tool_calls'));
+});
+
+test('complete or empty tool arguments are not an error', function () {
+    assertSame(null, aiToolCallArgumentsError('{"note_id":76}', 'length'));
+    assertSame(null, aiToolCallArgumentsError('', 'tool_calls'));
+    assertSame(null, aiToolCallArgumentsError('  ', ''));
+});

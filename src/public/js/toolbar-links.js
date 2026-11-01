@@ -15,9 +15,10 @@ function findMarkdownLinkAround(markdownEditor, offsets) {
   let lineEnd = source.indexOf('\n', to);
   if (lineEnd === -1) lineEnd = source.length;
   const line = source.slice(lineStart, lineEnd);
-  // (not an image, not an escaped bracket; the address may hold balanced
-  // parentheses, "https://en.wikipedia.org/wiki/Foo_(bar)", or be <url>)
-  const linkInLine = /(^|[^!\\])\[((?:[^\]\\\n]|\\.)*)\]\((?:<([^<>\n]*)>|((?:[^\s()]|\([^\s()]*\))+))(?:\s+"[^"]*")?\)/g;
+  // (not an image, not an escaped bracket; the text may hold balanced brackets,
+  // "[[v2] notes](url)", the address balanced parentheses,
+  // "https://en.wikipedia.org/wiki/Foo_(bar)", or be <url>)
+  const linkInLine = /(^|[^!\\])\[((?:[^\[\]\\\n]|\\.|\[(?:[^\[\]\\\n]|\\.)*\](?!\())*)\]\((?:<([^<>\n]*)>|((?:[^\s()]|\([^\s()]*\))+))(?:\s+"[^"]*")?\)/g;
   let found;
   while ((found = linkInLine.exec(line))) {
     const linkStart = lineStart + found.index + found[1].length;
@@ -51,7 +52,7 @@ function addLinkToNote() {
         : null;
 
       // Check if selection looks like a markdown link
-      const linkPattern = /\[([^\]]+)\]\(<?((?:[^\s()]|\([^\s()]*\))+)>?\)/;
+      const linkPattern = /\[((?!\])[^\[\]]*(?:\[[^\[\]]*\](?!\()[^\[\]]*)*)\]\(<?((?:[^\s()]|\([^\s()]*\))+)>?\)/;
       const match = selectedText.match(linkPattern);
       
       let existingUrl = 'https://';
