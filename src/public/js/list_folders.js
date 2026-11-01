@@ -248,7 +248,8 @@
             noteCount: parseInt(button.getAttribute('data-note-count'), 10) || 0,
             shared: button.getAttribute('data-shared') === '1',
             favorite: button.getAttribute('data-favorite') === '1',
-            offline: button.getAttribute('data-offline') === '1'
+            offline: button.getAttribute('data-offline') === '1',
+            speedDial: button.getAttribute('data-speed-dial') === '1'
         };
     }
 
@@ -278,6 +279,12 @@
         });
         menu.querySelectorAll('.favorite-state-not-favorite').forEach(function(item) {
             item.style.display = folder.favorite ? 'none' : '';
+        });
+        menu.querySelectorAll('.speed-dial-state-on').forEach(function(item) {
+            item.style.display = folder.noteCount > 0 && folder.speedDial ? '' : 'none';
+        });
+        menu.querySelectorAll('.speed-dial-state-off').forEach(function(item) {
+            item.style.display = folder.noteCount > 0 && !folder.speedDial ? '' : 'none';
         });
         menu.querySelectorAll('.offline-state-kept').forEach(function(item) {
             item.style.display = folder.offline ? '' : 'none';
@@ -364,6 +371,13 @@
         },
         'tag-folder-notes': function(folder) {
             callFn('showTagFolderNotesDialog', folder.id, folder.name, folder.noteCount);
+        },
+        'toggle-folder-speed-dial': function(folder) {
+            if (folder.speedDial) {
+                callFn('removeFolderFromSpeedDial', folder.id);
+            } else {
+                callFn('showTagFolderNotesDialog', folder.id, folder.name, folder.noteCount, 'speed-dial');
+            }
         },
         'share-folder': function(folder) {
             callFn('openPublicFolderShareModal', folder.id);

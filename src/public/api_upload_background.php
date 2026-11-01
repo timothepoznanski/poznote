@@ -28,6 +28,10 @@ $workspace = trim((string)($workspace ?? ''));
 $workspaceSegment = getWorkspaceBackgroundSegment($workspace);
 $responseWorkspace = $workspace !== '' ? $workspace : 'default';
 
+// The speed dial (issue #1714) keeps an image of its own next to the workspace's:
+// shown in full there, it would not suit the faint background of the notes.
+$filePrefix = ($_GET['scope'] ?? $_POST['scope'] ?? '') === 'speed_dial' ? 'speed-dial' : 'background';
+
 // Create user backgrounds directory with workspace subdirectory if it doesn't exist
 $user_dir = __DIR__ . '/../data/users/' . $user_id;
 $backgrounds_dir = $user_dir . '/backgrounds';
@@ -85,13 +89,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
     }
     
     // Delete old background if exists
-    $old_files = glob($workspace_backgrounds_dir . '/background.*');
+    $old_files = glob($workspace_backgrounds_dir . '/' . $filePrefix . '.*');
     foreach ($old_files as $old_file) {
         @unlink($old_file);
     }
     
     // Save new background
-    $filename = 'background.' . $allowedTypes[$mimeType];
+    $filename = $filePrefix . '.' . $allowedTypes[$mimeType];
     $destination = $workspace_backgrounds_dir . '/' . $filename;
     
     if (move_uploaded_file($file['tmp_name'], $destination)) {
@@ -105,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['background'])) {
 
 // Handle delete
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE' || (isset($_POST['_method']) && $_POST['_method'] === 'DELETE')) {
-    $files = glob($workspace_backgrounds_dir . '/background.*');
+    $files = glob($workspace_backgrounds_dir . '/' . $filePrefix . '.*');
     foreach ($files as $file) {
         @unlink($file);
     }
@@ -115,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE' || (isset($_POST['_method']) && $_PO
 
 // Handle GET - check if background exists
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    $files = glob($workspace_backgrounds_dir . '/background.*');
+    $files = glob($workspace_backgrounds_dir . '/' . $filePrefix . '.*');
     if (!empty($files)) {
         $file = basename($files[0]);
         $url = '/data/users/' . $user_id . '/backgrounds/' . rawurlencode($workspaceSegment) . '/' . $file . '?v=' . filemtime($files[0]);

@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/lib/note-sort.php';
+require_once __DIR__ . '/lib/speed-dial.php';
 
 // Constants
 define('FAVORITES_FOLDER_NAME', 'Favorites');
@@ -454,6 +455,17 @@ function renderFolderActionsMenu($currentWorkspace = '') {
     $menu .= "<span>" . t_h('modals.tag_folder_notes.title', [], 'Tag all notes') . "</span>";
     $menu .= "</div>";
 
+    // Adding is the same dialog, with the tag of the speed dial filled in.
+    // Removing takes the place of adding once all the notes are in it.
+    $menu .= "<div class='folder-actions-menu-item requires-notes speed-dial-state-off' data-action='toggle-folder-speed-dial'>";
+    $menu .= "<i class='lucide lucide-zap'></i>";
+    $menu .= "<span>" . t_h('speed_dial.add', [], 'Add to speed dial') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='folder-actions-menu-item requires-notes speed-dial-state-on active-state' data-action='toggle-folder-speed-dial'>";
+    $menu .= "<i class='lucide lucide-zap'></i>";
+    $menu .= "<span>" . t_h('speed_dial.remove', [], 'Remove from speed dial') . "</span>";
+    $menu .= "</div>";
+
     // Share folder action: two variants, the client shows the one matching
     // the folder's shared state (data-shared on the toggle). Not in a
     // workspace shared with this login, where public links are the owner's.
@@ -562,7 +574,7 @@ function renderFolderActionsMenu($currentWorkspace = '') {
  *                       share like the toolbar button does
  * @return string HTML for the note actions toggle
  */
-function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false, $isShared = false, $sharedViaFolderName = null) {
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false, $isShared = false, $sharedViaFolderName = null, $inSpeedDial = false) {
     $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
     $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
@@ -580,6 +592,7 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
         . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " data-offline='" . ($isOffline ? '1' : '0') . "'"
         . " data-shared='" . ($isShared ? '1' : '0') . "'"
+        . " data-speed-dial='" . ($inSpeedDial ? '1' : '0') . "'"
         . (!$isShared && $sharedViaFolderName !== null
             ? " data-shared-via-folder='1' data-shared-folder-name='" . htmlspecialchars((string)$sharedViaFolderName, ENT_QUOTES) . "'"
             : '')
@@ -663,6 +676,17 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<div class='note-actions-menu-item favorite-state-not-favorite' data-action='toggle-favorite'>";
     $menu .= "<i class='lucide lucide-star'></i>";
     $menu .= "<span>" . t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites') . "</span>";
+    $menu .= "</div>";
+
+    // The tag of the speed dial: two variants like Favorite, from data-speed-dial
+    // on the toggle or the tags of the open note (setNoteSpeedDial())
+    $menu .= "<div class='note-actions-menu-item note-real-only speed-dial-state-on active-state' data-action='toggle-speed-dial'>";
+    $menu .= "<i class='lucide lucide-zap'></i>";
+    $menu .= "<span>" . t_h('speed_dial.remove', [], 'Remove from speed dial') . "</span>";
+    $menu .= "</div>";
+    $menu .= "<div class='note-actions-menu-item note-real-only speed-dial-state-off' data-action='toggle-speed-dial'>";
+    $menu .= "<i class='lucide lucide-zap'></i>";
+    $menu .= "<span>" . t_h('speed_dial.add', [], 'Add to speed dial') . "</span>";
     $menu .= "</div>";
 
     // Keep offline: the note stays in the browser whatever its date (Offline

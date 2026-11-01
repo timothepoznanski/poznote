@@ -1,17 +1,19 @@
 /* Notes Manager page styles */
 
-/* The body only grows as tall as the list, so the canvas below it shows the
-   html ground: in dark mode that is --dm-content-bg while the body takes
-   --pz-chrome-bg. Paint the canvas with the body's colour. */
+/* Grey page and white cards, like the Tasks page (css/tasks-page.css); the dark
+   rules at the end keep the dark page. The body only grows as tall as the list,
+   so the canvas below it shows the html ground: in dark mode that is
+   --dm-content-bg while the body takes --pz-chrome-bg. Paint the canvas with
+   the body's colour. */
 html:has(body.notes-manager-page) {
-    background-color: var(--bg-color, var(--pz-bg));
+    background-color: var(--pz-surface);
 }
 
 body.notes-manager-page {
     margin: 0;
     padding: 20px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    background-color: var(--bg-color, var(--pz-bg));
+    background-color: var(--pz-surface);
     color: var(--text-color, var(--pz-text));
 }
 
@@ -143,7 +145,7 @@ html[data-theme='dark'] .nm-collapse-btn:hover {
     max-width: 900px;
     margin: 0 auto 16px;
     padding: 12px 14px;
-    background: var(--bulk-bar-bg, var(--pz-surface));
+    background: var(--bulk-bar-bg, var(--pz-bg));
     border: 1px solid var(--bulk-bar-border, var(--pz-border));
     border-radius: var(--pz-radius-lg);
     transition: opacity 0.2s, transform 0.2s;
@@ -304,37 +306,47 @@ html[data-theme='dark'] .nm-folder-option-selected {
 /* ── Folder section ──────────────────────────────────────────────────── */
 .nm-folder-section {
     margin-bottom: 8px;
+    background: var(--pz-bg);
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
     overflow: hidden;
 }
 
+/* Same header as the cards of the Tasks page (css/tasks-page.css) */
 .nm-folder-header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 14px;
-    background: var(--folder-header-bg, var(--pz-surface));
+    gap: 10px;
+    padding: 12px 14px 8px;
     cursor: pointer;
     user-select: none;
-    transition: background 0.15s;
 }
 
-.nm-folder-header:hover {
-    background: var(--folder-header-hover, var(--pz-surface-hover));
+/* A collapsed card only shows its header: same space above and below */
+.nm-folder-section.nm-collapsed .nm-folder-header {
+    padding-bottom: 12px;
 }
 
 .nm-folder-chevron {
     flex-shrink: 0;
-    color: var(--muted-color, var(--pz-text-subtle));
+    width: 24px;
+    height: 24px;
+    color: var(--pz-text-muted);
+    font-size: 16px;
     display: flex;
     align-items: center;
+    justify-content: center;
+}
+
+.nm-folder-header:hover .nm-folder-chevron {
+    color: var(--pz-accent-text);
 }
 
 .nm-folder-label {
     flex: 1;
-    font-weight: var(--pz-weight-semibold);
-    font-size: 14px;
+    min-width: 0;
+    font-weight: var(--pz-weight-medium);
+    font-size: 16px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -352,32 +364,11 @@ html[data-theme='dark'] .nm-folder-option-selected {
     white-space: nowrap;
 }
 
-.nm-group-select-btn {
-    flex-shrink: 0;
-    background: none;
-    border: none;
-    padding: 4px 6px;
-    cursor: pointer;
-    color: var(--muted-color, var(--pz-text-subtle));
-    border-radius: var(--pz-radius-sm);
-    display: flex;
-    align-items: center;
-    transition: color 0.15s, background 0.15s;
-}
-
-.nm-group-select-btn:hover {
-    color: var(--pz-accent-text);
-    background: rgba(var(--pz-accent-rgb), 0.08);
-}
-
 .nm-folder-count {
     flex-shrink: 0;
     font-size: 12px;
-    font-weight: var(--pz-weight-medium);
-    padding: 1px 8px;
-    border-radius: var(--pz-radius-lg);
-    background: var(--badge-bg-subtle, var(--pz-surface-sunken));
-    color: var(--muted-color, var(--pz-text-muted));
+    font-variant-numeric: tabular-nums;
+    color: var(--pz-text-muted);
 }
 
 /* ── Note rows ───────────────────────────────────────────────────────── */
@@ -406,6 +397,7 @@ html[data-theme='dark'] .nm-folder-option-selected {
     background: var(--row-selected-bg, var(--pz-surface-hover));
 }
 
+.nm-group-checkbox,
 .nm-note-checkbox {
     flex-shrink: 0;
     width: 16px;
@@ -637,15 +629,21 @@ html[data-theme='dark'] .nm-folder-option-selected {
 }
 
 /* ── Dark mode overrides ─────────────────────────────────────────────── */
-html[data-theme='dark'] .nm-folder-header {
-    background: var(--folder-header-bg, var(--pz-bg));
+html[data-theme='dark']:has(body.notes-manager-page),
+html[data-theme='dark'] body.notes-manager-page {
+    background-color: var(--bg-color, var(--pz-bg));
 }
 
-html[data-theme='dark'] .nm-folder-header:hover {
-    background: var(--folder-header-hover, var(--pz-surface));
+html[data-theme='dark'] .nm-folder-chevron {
+    color: var(--pz-text);
+}
+
+html[data-theme='dark'] .nm-folder-header:hover .nm-folder-chevron {
+    color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .nm-folder-section {
+    background: var(--pz-surface);
     border-color: var(--border-color, var(--pz-border));
 }
 
@@ -702,7 +700,9 @@ html[data-theme='dark'] .nm-folder-option-selected {
 
     .notes-manager-container   { padding: 10px; }
 
-    .nm-folder-header          { padding: 10px; }
+    .nm-folder-header          { padding: 10px 10px 8px; }
+
+    .nm-folder-section.nm-collapsed .nm-folder-header { padding-bottom: 10px; }
 
     .nm-note-row               { padding: 5px 10px; }
 

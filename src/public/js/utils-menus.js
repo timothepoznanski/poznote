@@ -28,11 +28,27 @@ function populateFolderActionsMenu(menu, toggle) {
     menu.querySelectorAll('[data-action]').forEach(function (item) {
         item.setAttribute('data-folder-id', folderId);
         item.setAttribute('data-folder-name', folderName);
+        item.setAttribute('data-note-count', String(noteCount));
     });
 
     // Items only relevant when the folder contains notes
     menu.querySelectorAll('.requires-notes').forEach(function (item) {
         item.style.display = noteCount > 0 ? '' : 'none';
+    });
+
+    // Speed dial item: "Remove" once all the notes of the folder and its
+    // subfolders are in it, read from their rows as they can change one by one
+    var folderHeader = document.querySelector('.folder-header[data-folder-id="' + folderId + '"]');
+    var noteToggles = folderHeader ? Array.prototype.slice.call(folderHeader.querySelectorAll('.folder-content .note-actions-toggle')) : [];
+    var allInSpeedDial = noteToggles.length > 0 && noteToggles.every(function (noteToggle) {
+        var rendered = noteToggle.getAttribute('data-speed-dial') === '1';
+        return window.noteInSpeedDial ? window.noteInSpeedDial(noteToggle.getAttribute('data-note-id'), rendered) : rendered;
+    });
+    menu.querySelectorAll('.speed-dial-state-on').forEach(function (item) {
+        item.style.display = noteCount > 0 && allInSpeedDial ? '' : 'none';
+    });
+    menu.querySelectorAll('.speed-dial-state-off').forEach(function (item) {
+        item.style.display = noteCount > 0 && !allInSpeedDial ? '' : 'none';
     });
 
     // Share item: show the variant matching the folder's shared state
@@ -303,7 +319,7 @@ function closeFolderActionsMenu(folderId) {
     clearFolderActionsToggleOpen();
 }
 
-function showTagFolderNotesDialog(folderId, folderName, noteCount) {
+function showTagFolderNotesDialog(folderId, folderName, noteCount, presetTag) {
     var modal = document.getElementById('tagFolderNotesModal');
     var input = document.getElementById('tagFolderNotesInput');
     if (!modal || !input) return;
@@ -316,7 +332,6 @@ function showTagFolderNotesDialog(folderId, folderName, noteCount) {
     var countText = document.getElementById('tagFolderNotesCountText');
     var errorMessage = document.getElementById('tagFolderNotesErrorMessage');
     var suggestions = document.getElementById('tagFolderNotesSuggestions');
-    var includeSubfolders = document.getElementById('tagFolderNotesIncludeSubfolders');
 
     if (sourceName) sourceName.textContent = folderName || '';
     if (countText) {
@@ -326,8 +341,7 @@ function showTagFolderNotesDialog(folderId, folderName, noteCount) {
     }
     if (errorMessage) errorMessage.textContent = '';
     if (suggestions) suggestions.style.display = 'none';
-    if (includeSubfolders) includeSubfolders.checked = false;
-    input.value = '';
+    input.value = presetTag || '';
 
     if (typeof openModal === 'function') {
         openModal('tagFolderNotesModal');
@@ -336,6 +350,74 @@ function showTagFolderNotesDialog(folderId, folderName, noteCount) {
     }
     input.focus();
 }
+
+// An open note saves the tags of its field: it has to learn the ones just given
+// to it, or its next save takes them away.
+function refreshOpenNotesTags() {
+    if (typeof convertTagsToEditable !== 'function') return;
+    document.querySelectorAll('input[id^="tags"]').forEach(function(input) {
+        var noteId = input.id.slice(4);
+        if (!/^\d+$/.test(noteId)) return;
+        fetch('/api/v1/notes/' + noteId, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (!data.success || !data.note) return;
+                input.value = String(data.note.tags || '').split(/[,\s]+/).filter(Boolean).join(' ');
+                convertTagsToEditable(noteId);
+            })
+            .catch(function(error) { console.error('refreshOpenNotesTags failed', error); });
+    });
+}
+
+// The state the menus read, on the rows of the notes the server changed. The
+// page of the folders has no such rows: it renders the state, so it reloads,
+// after a moment for the toast.
+function syncSpeedDialAfterFolderChange(noteIds, inSpeedDial) {
+    (noteIds || []).forEach(function(noteId) {
+        document.querySelectorAll('.note-actions-toggle[data-note-id="' + noteId + '"]').forEach(function(toggle) {
+            toggle.setAttribute('data-speed-dial', inSpeedDial ? '1' : '0');
+        });
+    });
+    if (!document.querySelector('.note-actions-toggle')) {
+        setTimeout(function() { window.location.reload(); }, 1000);
+    }
+}
+
+// "Remove from speed dial" of a folder: at once, adding it back is as easy
+function removeFolderFromSpeedDial(folderId) {
+    var label = function(key, fallback) {
+        return window.t ? window.t(key, null, fallback) : fallback;
+    };
+    fetch('/api/v1/folders/' + encodeURIComponent(folderId) + '/tags', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({
+            tags: ['speed-dial'],
+            workspace: document.body.getAttribute('data-workspace') || '',
+            include_subfolders: true
+        })
+    })
+        .then(function(response) {
+            return response.json().then(function(data) {
+                if (!response.ok || !data.success) throw new Error(data.error || data.message || 'HTTP ' + response.status);
+                return data;
+            });
+        })
+        .then(function(data) {
+            var message = data.updated_count === 1
+                ? label('speed_dial.folder_removed_one', '1 note removed from the speed dial')
+                : label('speed_dial.folder_removed_other', '{{count}} notes removed from the speed dial');
+            window.poznoteShowToast(message.replace('{{count}}', String(data.updated_count)));
+            refreshOpenNotesTags();
+            syncSpeedDialAfterFolderChange(data.note_ids, false);
+        })
+        .catch(function(error) {
+            console.error('removeFolderFromSpeedDial failed', error);
+            showNotificationPopup(label('speed_dial.remove_error', 'Could not remove the note from the speed dial'), 'error');
+        });
+}
+window.removeFolderFromSpeedDial = removeFolderFromSpeedDial;
 
 function executeTagFolderNotes() {
     var modal = document.getElementById('tagFolderNotesModal');
@@ -358,7 +440,6 @@ function executeTagFolderNotes() {
     }
 
     var workspace = document.body.getAttribute('data-workspace') || '';
-    var includeSubfolders = document.getElementById('tagFolderNotesIncludeSubfolders');
     fetch('/api/v1/folders/' + encodeURIComponent(modal.dataset.folderId) + '/tags', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -366,7 +447,7 @@ function executeTagFolderNotes() {
         body: JSON.stringify({
             tags: tags,
             workspace: workspace,
-            include_subfolders: !!(includeSubfolders && includeSubfolders.checked)
+            include_subfolders: true
         })
     })
         .then(function(response) {
@@ -378,10 +459,10 @@ function executeTagFolderNotes() {
         .then(function(data) {
             var message = data.updated_count === 1 ? modal.dataset.msgSuccessOne : modal.dataset.msgSuccessOther;
             if (data.updated_count === 0) message = modal.dataset.msgSuccessNone;
-            if (typeof showNotificationPopup === 'function') {
-                showNotificationPopup((message || '').replace('{{count}}', String(data.updated_count || 0)), 'success');
-            }
+            window.poznoteShowToast((message || '').replace('{{count}}', String(data.updated_count || 0)));
             if (typeof closeModal === 'function') closeModal('tagFolderNotesModal');
+            if (data.updated_count > 0) refreshOpenNotesTags();
+            if (tags.indexOf('speed-dial') !== -1) syncSpeedDialAfterFolderChange(data.note_ids, true);
         })
         .catch(function(error) {
             if (errorMessage) errorMessage.textContent = error.message;
@@ -519,6 +600,17 @@ function populateNoteActionsMenu(menu, toggle) {
     });
     menu.querySelectorAll('.favorite-state-not-favorite').forEach(function (item) {
         item.style.display = isFavorite ? 'none' : '';
+    });
+
+    // Speed dial item: same, a shortcut row keeps neither (.note-real-only)
+    var inSpeedDial = window.noteInSpeedDial
+        ? window.noteInSpeedDial(noteId, toggle.getAttribute('data-speed-dial') === '1')
+        : toggle.getAttribute('data-speed-dial') === '1';
+    menu.querySelectorAll('.speed-dial-state-on').forEach(function (item) {
+        item.style.display = !isLinkedNote && inSpeedDial ? '' : 'none';
+    });
+    menu.querySelectorAll('.speed-dial-state-off').forEach(function (item) {
+        item.style.display = !isLinkedNote && !inSpeedDial ? '' : 'none';
     });
 
     // Keep offline item: "Stop" for a note marked "Keep offline", and for

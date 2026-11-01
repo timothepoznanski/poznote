@@ -27,7 +27,9 @@
  * them back in as a flyout while the mouse is over it (html.focus-mode-peek).
  * The state is persisted, so it follows the user from page to page until
  * turned off: F11, the button of the floating stack
- * (ui_customization_panel.php) or window.PoznoteFocusMode.
+ * (ui_customization_panel.php) or window.PoznoteFocusMode. A page opened with
+ * ?focus=1 or ?focus=0 (issue #1714, a browser start page) is the exception: it
+ * says for itself and leaves the stored state alone.
  */
 (function () {
     'use strict';
@@ -619,6 +621,13 @@
 
     var focusPeekTimer = null;
 
+    // ?focus=1 or ?focus=0, read once: opening another note drops it from the
+    // URL (js/note-loader.js) but this page stays as it was asked to be.
+    var focusUrlOverride = (function () {
+        var value = new URLSearchParams(window.location.search).get('focus');
+        return value === '1' || value === '0' ? value : null;
+    })();
+
     // '1' is on. 'true' (the first version) and '2' (the second step of the
     // two-step cycle that followed) both meant focus mode was on, so they
     // still read as on.
@@ -627,6 +636,7 @@
     }
 
     function readFocusMode() {
+        if (focusUrlOverride !== null) return focusUrlOverride === '1';
         try {
             return isStoredOn(localStorage.getItem(FOCUS_STORAGE_KEY));
         } catch (error) {
@@ -635,6 +645,7 @@
     }
 
     function persistFocusMode(on) {
+        if (focusUrlOverride !== null) return;
         try {
             localStorage.setItem(FOCUS_STORAGE_KEY, on ? '1' : '0');
         } catch (error) {
@@ -790,7 +801,7 @@
 
         // Another tab of the same account turning it on or off
         window.addEventListener('storage', function (event) {
-            if (event.key !== FOCUS_STORAGE_KEY) return;
+            if (event.key !== FOCUS_STORAGE_KEY || focusUrlOverride !== null) return;
             applyFocusMode(isStoredOn(event.newValue));
         });
     }

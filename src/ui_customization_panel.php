@@ -8,7 +8,8 @@
  * option is seen where it happens instead of from the settings page.
  *
  * The including page sets $uiCustomizationPanelPage ('notes' for index.php,
- * 'dashboard' for dashboard.php, 'settings' for settings.php):
+ * 'dashboard' for dashboard.php, 'settings' for settings.php, 'speed-dial' for
+ * speed_dial.php):
  * js/ui-customization-panel.js keeps the sections of
  * modals/ui_customization_sections.php whose data-ui-pages lists it. It needs js/ui-customization.js (the runtime that applies the keys) and
  * css/ui-customization-panel.css plus css/modals/ui-customization.css for the
@@ -234,11 +235,13 @@ require_once __DIR__ . '/markdown_syntax_content.php';
             <i class="lucide lucide-bot"></i>
         </button>
         <?php endif; ?>
+        <?php if ($uiCustomizationPanelPage !== 'speed-dial'): ?>
         <button type="button" id="edgeFocusModeBtn" class="pz-edge-btn pz-edge-focus-btn" data-action="toggle-focus-mode" aria-pressed="false"
             title="<?php echo $pzFocusModeLabel; ?>" aria-label="<?php echo $pzFocusModeLabel; ?>">
             <i class="lucide lucide-maximize-2 pz-edge-focus-icon-on"></i>
             <i class="lucide lucide-minimize-2 pz-edge-focus-icon-off"></i>
         </button>
+        <?php endif; ?>
         <div class="pz-edge-menu-anchor">
             <button type="button" id="pageMoreMenuBtn" class="pz-edge-btn page-more-menu-btn" data-action="toggle-page-more-menu"
                 aria-haspopup="true" aria-controls="pageMoreMenu" aria-expanded="false"
@@ -253,6 +256,13 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     <i class="lucide lucide-eye-off"></i>
                     <span><?php echo $uiCustomizationPanelTitle; ?></span>
                 </button>
+                <?php if ($uiCustomizationPanelPage === 'speed-dial'): ?>
+                <!-- The view's background image (js/speed-dial.js) -->
+                <button type="button" id="edgeMenuSpeedDialBackground" class="page-more-menu-item" role="menuitem" data-action="open-speed-dial-background">
+                    <i class="lucide lucide-image"></i>
+                    <span><?php echo t_h('modals.background_image.title', [], 'Background Image Settings'); ?></span>
+                </button>
+                <?php endif; ?>
                 <?php if ($uiCustomizationPanelPage === 'notes'): ?>
                 <!-- The open note (discussion 1482). Width and Information
                      (at the end of the menu) used to be toolbar buttons;

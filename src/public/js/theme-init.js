@@ -524,12 +524,15 @@ window.__poznoteClearUserStorage = function (userId) {
         if (!def) return; // 'inter' or unknown value -> bundled Inter
 
         style.textContent =
-            // The regular face answers 300 as well as 400: css/fonts.css bundles a
-            // real Inter Light, and without this range a page asking for 300
-            // would keep drawing that Light while its neighbours switch to the
-            // chosen font. System stacks have no Light to offer, so the chosen
-            // font's regular stands in and the page stays one family.
-            "@font-face { font-family: 'Inter'; src: " + localSrc(def.regular) + "; font-weight: 300 400; font-style: normal; } " +
+            // The regular also answers 300: css/fonts.css bundles a real Inter
+            // Light, and without this face a page asking for 300 would keep
+            // drawing that Light while its neighbours switch to the chosen font.
+            // System stacks have no Light to offer, so the chosen font's regular
+            // stands in and the page stays one family. Two faces and not a range
+            // "300 400": on a page with css/fonts.css, Chromium prefers its exact
+            // 400 to a range, and the regular text would stay in Inter.
+            "@font-face { font-family: 'Inter'; src: " + localSrc(def.regular) + "; font-weight: 300; font-style: normal; } " +
+            "@font-face { font-family: 'Inter'; src: " + localSrc(def.regular) + "; font-weight: 400; font-style: normal; } " +
             "@font-face { font-family: 'Inter'; src: " + localSrc(def.semibold) + "; font-weight: 600; font-style: normal; }";
         document.documentElement.appendChild(style);
     }

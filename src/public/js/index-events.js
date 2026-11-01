@@ -834,6 +834,15 @@
                     toggleFavorite(noteId);
                 }
                 break;
+            case 'toggle-speed-dial':
+                // The variant clicked says what to do
+                if (noteId && typeof window.setNoteSpeedDial === 'function') {
+                    var toolbarElForSpeedDial = target.closest('.note-edit-toolbar');
+                    var menuElForSpeedDial = toolbarElForSpeedDial && toolbarElForSpeedDial.querySelector('.mobile-toolbar-menu');
+                    if (menuElForSpeedDial) menuElForSpeedDial.hidden = true;
+                    window.setNoteSpeedDial(noteId, target.classList.contains('speed-dial-state-off'));
+                }
+                break;
             case 'toggle-offline':
                 // The variant clicked says what to do: "Stop" also shows for
                 // a note this browser keeps on its own (recent, favorite...)

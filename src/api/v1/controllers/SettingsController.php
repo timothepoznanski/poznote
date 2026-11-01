@@ -643,6 +643,22 @@ class SettingsController {
             return $color;
         }
 
+        // Colours of the group labels of the speed dial (js/speed-dial.js)
+        if ($key === 'speed_dial_label_colors') {
+            $decoded = json_decode((string) $value, true);
+            if (!is_array($decoded)) {
+                throw new InvalidArgumentException('value must be a JSON object of label colors', 400);
+            }
+            require_once __DIR__ . '/../../../lib/speed-dial.php';
+            return json_encode(poznoteSpeedDialNormalizeLabelColors($decoded), JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE);
+        }
+
+        // Size of the tiles of the speed dial (js/speed-dial.js)
+        if ($key === 'speed_dial_tile_size') {
+            require_once __DIR__ . '/../../../lib/speed-dial.php';
+            return (string) poznoteSpeedDialTileSize($value);
+        }
+
         // Button => #rrggbb maps painted on the icon rail
         // (poznoteNormalizeIconSidebarColors()) and the note toolbar
         // (poznoteNormalizeToolbarIconColors()).

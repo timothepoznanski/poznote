@@ -21,10 +21,6 @@
 			<span class="tag-folder-notes-suggestions-label"><?php echo t_h('modals.tag_folder_notes.existing_tags', [], 'Existing tags'); ?></span>
 			<div id="tagFolderNotesSuggestionList" class="tag-folder-notes-suggestion-list"></div>
 		</div>
-		<label class="tag-folder-notes-option" id="tagFolderNotesSubfoldersOption" style="display: none;">
-			<input type="checkbox" id="tagFolderNotesIncludeSubfolders">
-			<span><?php echo t_h('modals.tag_folder_notes.include_subfolders', [], 'Include the notes of subfolders'); ?></span>
-		</label>
 		<div class="modal-info-message">
 			<span id="tagFolderNotesCountText"></span>
 		</div>

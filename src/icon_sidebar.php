@@ -89,6 +89,7 @@ $iconSidebarIsAboutView = $iconSidebarCurrentPage === 'settings.php' && (($_GET[
 $iconSidebarItems = [
     ['id' => 'iconSidebarDashboardBtn', 'group' => 'home', 'url' => $iconSidebarUrl('dashboard.php'), 'page' => 'dashboard.php', 'icon' => 'lucide-layout-dashboard', 'label' => t('common.back_to_home', [], 'Dashboard')],
     ['id' => 'iconSidebarGraphBtn', 'group' => 'home', 'url' => $iconSidebarUrl('graph.php'), 'page' => 'graph.php', 'icon' => 'lucide-network', 'label' => t('home.graph', [], 'Graph')],
+    ['id' => 'iconSidebarSpeedDialBtn', 'group' => 'home', 'url' => $iconSidebarUrl('speed_dial.php'), 'page' => 'speed_dial.php', 'icon' => 'lucide-zap', 'label' => t('speed_dial.title', [], 'Speed dial')],
     ['id' => 'iconSidebarNotesBtn', 'group' => 'content', 'url' => $iconSidebarUrl('notes_manager.php'), 'page' => 'notes_manager.php', 'icon' => 'lucide-sticky-note', 'label' => t('common.notes', [], 'Notes')],
     ['id' => 'iconSidebarTasksBtn', 'group' => 'content', 'url' => $iconSidebarUrl('tasks.php'), 'page' => 'tasks.php', 'icon' => 'lucide-list-todo', 'label' => t('tasks_page.title', [], 'Tasks')],
     ['id' => 'iconSidebarFoldersBtn', 'group' => 'content', 'url' => $iconSidebarUrl('list_folders.php'), 'page' => 'list_folders.php', 'icon' => 'lucide-folder-open', 'label' => t('home.folders', [], 'Folders')],
@@ -481,12 +482,14 @@ window.PoznoteIconSidebarColorsConfig = <?php echo json_encode([
 // rail paints; js/icon-sidebar-toggle.js owns both afterwards. Focus mode goes
 // on <html> so the notes column and the rows around the note's title, which come later in
 // the page, never paint at all (css/focus-mode.css). '1' is on; 'true' and '2'
-// are what earlier versions stored for on.
+// are what earlier versions stored for on. ?focus=1 or ?focus=0 in the URL
+// (issue 1714) outranks the stored value, for this page only.
 try {
     if (localStorage.getItem('iconSidebarCollapsed') === 'true') {
         document.body.classList.add('icon-sidebar-collapsed');
     }
-    var pzFocus = localStorage.getItem('focusMode');
+    var pzFocusParam = new URLSearchParams(window.location.search).get('focus');
+    var pzFocus = pzFocusParam === '1' || pzFocusParam === '0' ? pzFocusParam : localStorage.getItem('focusMode');
     if (pzFocus === '1' || pzFocus === '2' || pzFocus === 'true') {
         document.documentElement.classList.add('focus-mode');
     }

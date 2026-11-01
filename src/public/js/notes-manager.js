@@ -83,6 +83,7 @@
     // every note (filteredNotes), drawn or not.
     var ROW_BATCH_SIZE = 200;
     var renderQueue = null; // {groups, groupIndex, noteIndex, notesList, remaining, folderById}
+    var groupCheckboxes = []; // [{checkbox, notes}] one per drawn folder section
 
     // ── DOM refs ─────────────────────────────────────────────────────────────
     var nmSpinner        = document.getElementById('nmSpinner');
@@ -368,6 +369,7 @@
     function renderNotes() {
         nmContainer.innerHTML = '';
         renderQueue = null;
+        groupCheckboxes = [];
 
         if (filteredNotes.length === 0) {
             show(nmEmptyMessage);
@@ -477,6 +479,7 @@
     function setSectionCollapsed(section, collapsed) {
         var chevron = section.querySelector('.nm-folder-chevron');
         var notesList = section.querySelector('.nm-notes-list');
+        section.classList.toggle('nm-collapsed', collapsed);
         chevron.classList.toggle('nm-open', !collapsed);
         chevron.innerHTML = '<i class="lucide lucide-chevron-' + (collapsed ? 'right' : 'down') + '"></i>';
         notesList.style.display = collapsed ? 'none' : '';
@@ -525,8 +528,8 @@
         });
     }
 
-    // Header (name, select-all, count, collapse) and row list of one folder group.
-    // The count and the select-all button cover the whole group, drawn or not.
+    // Header (select-all, collapse, name, count) and row list of one folder group.
+    // The count and the select-all checkbox cover the whole group, drawn or not.
     function buildFolderSection(key, notes, folderById) {
         var section = document.createElement('div');
         section.className = 'nm-folder-section';
@@ -542,10 +545,11 @@
         var folderLabel = document.createElement('span');
         folderLabel.className = 'nm-folder-label';
 
-        var groupSelectAll = document.createElement('button');
-        groupSelectAll.className = 'nm-group-select-btn';
+        var groupSelectAll = document.createElement('input');
+        groupSelectAll.type = 'checkbox';
+        groupSelectAll.className = 'nm-group-checkbox';
         groupSelectAll.title = cfg.txtSelectAllFolder;
-        groupSelectAll.innerHTML = '<i class="lucide lucide-check-square"></i>';
+        groupSelectAll.setAttribute('aria-label', cfg.txtSelectAllFolder);
 
         if (key === '__none__') {
             folderLabel.innerHTML = '<i class="lucide lucide-folder-open" style="color: var(--icon-color, #94a3b8);"></i> '
@@ -563,8 +567,10 @@
         }
 
         var notesInGroup = notes;
-        groupSelectAll.addEventListener('click', function (e) {
-            e.stopPropagation();
+        var groupEntry = { checkbox: groupSelectAll, notes: notesInGroup };
+        groupCheckboxes.push(groupEntry);
+        syncGroupCheckbox(groupEntry);
+        groupSelectAll.addEventListener('change', function () {
             var allChecked = notesInGroup.every(function (n) { return selectedIds.has(n.id); });
             notesInGroup.forEach(function (n) {
                 if (allChecked) selectedIds.delete(n.id);
@@ -577,9 +583,9 @@
             updateBulkBar();
         });
 
+        header.appendChild(groupSelectAll);
         header.appendChild(chevron);
         header.appendChild(folderLabel);
-        header.appendChild(groupSelectAll);
 
         // Note count badge
         var badge = document.createElement('span');
@@ -591,7 +597,7 @@
         var notesList = document.createElement('div');
         notesList.className = 'nm-notes-list';
         header.addEventListener('click', function (e) {
-            if (e.target.closest('.nm-group-select-btn') || e.target.closest('input')) return;
+            if (e.target.closest('input')) return;
             var collapse = !collapsedGroupKeys.has(key);
             if (collapse) collapsedGroupKeys.add(key);
             else          collapsedGroupKeys.delete(key);
@@ -679,6 +685,14 @@
             nmBulkActionSelect.value = '';
         }
         nmSelectedCount.textContent = count + ' ' + cfg.txtSelected;
+        groupCheckboxes.forEach(syncGroupCheckbox);
+    }
+
+    // Checked when the whole folder is selected, a dash when only part of it is
+    function syncGroupCheckbox(entry) {
+        var selected = entry.notes.filter(function (n) { return selectedIds.has(n.id); }).length;
+        entry.checkbox.checked = selected === entry.notes.length;
+        entry.checkbox.indeterminate = selected > 0 && selected < entry.notes.length;
     }
 
     nmSelectAllBtn.addEventListener('click', function () {

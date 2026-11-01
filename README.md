@@ -82,6 +82,7 @@ https://discord.gg/fuEV6uqf4N
 - [Personalization](#personalization)
 - [Multi-users](#multi-users)
 - [Sharing and collaboration](#sharing-and-collaboration)
+- [Speed dial](#speed-dial)
 - [Activity Log](#activity-log)
 - [Webhooks](#webhooks)
 - [Git Synchronization](#git-synchronization)
@@ -986,6 +987,22 @@ Poznote offers several ways to work with the other users of your instance, each 
 - **Share a note or a folder**: **Share** in the note's menu, or in the folder's menu, creates a link to that note or folder alone. The link can be public, protected by a password, or restricted to some users of the instance, who sign in to open it, and it can allow editing. The **Shares** page of the icon rail lists your shares, and what the others shared with you under **Shared with me**.
 - **Give access to a whole account**: an administrator can let a user open another user's account from **Settings > Admin Tools > User Management**, without transferring its ownership. The user switches to it from the **Accounts** section of the workspace menu.
 - **Editing the same note**: one person edits at a time. When a note is locked, the read-only banner offers to **take over**: the previous editor's screen turns read-only and their unsaved changes stay in their browser, offered again once the note is free. An open note picks up changes made elsewhere within a few seconds. For a **Markdown** note with unsaved edits on both sides, the two sets of changes are merged automatically when they touch different lines, and a banner lets you choose when they overlap. Rich-text notes are never merged, you choose which version to keep. Keep scripts and other code in fenced code blocks (```` ``` ````): raw HTML outside a code block is sanitized on save, which can make an otherwise clean merge look like a conflict.
+
+## Speed dial
+
+The Speed dial view turns notes into a page of link tiles, made to be your browser's start page.
+
+<p align="center">
+  <img src="docs/speed-dial.gif" alt="Speed dial demo" width="100%">
+</p>
+
+Give a note the `speed-dial` tag, or choose **Add to speed dial** in the menu of a note or a folder (for a folder, all its notes, subfolders included). Open the view with the lightning icon of the left icon rail. This button is hidden by default: turn it on in **Settings > Display > Element visibility**.
+
+- **One link or none:** the note is a tile that opens this link, or the note itself. Its icon is the first image of the note, otherwise the site's icon, otherwise the first letter of the title.
+- **Several links:** the note is a group of tiles named after the note, with one tile per link. A horizontal line (`----`) starts a new row, and a link around an image uses it as icon: `[![GitHub](https://example.com/icon.png)](https://github.com)`.
+- **Group name:** a click opens the note, a right-click changes the color of its label.
+- **Arrange the view:** drag tiles and groups to move them, and change their size with the button next to the filter. The **...** menu at the bottom right sets a background image, and the eye button hides what you do not need.
+- **Browser start page:** use `speed_dial.php?workspace=Name&focus=1` after your Poznote address. `focus=1` also hides the icon rail.
 
 ## Activity Log
 

@@ -718,6 +718,9 @@ $router->post('/folders/{id}/empty', function($params) use ($foldersController) 
 $router->post('/folders/{id}/tags', function($params) use ($foldersController) {
     $foldersController->addTags($params['id']);
 });
+$router->delete('/folders/{id}/tags', function($params) use ($foldersController) {
+    $foldersController->removeTags($params['id']);
+});
 
 // Update folder icon
 $router->put('/folders/{id}/icon', function($params) use ($foldersController) {

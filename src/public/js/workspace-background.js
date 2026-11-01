@@ -1,5 +1,6 @@
 // Workspace Background Image Management
-// Handles background images per workspace
+// Handles background images per workspace, and the one the speed dial keeps of
+// its own (issue #1714): shown in full there, so its opacity goes up to 100%
 
 (function() {
     'use strict';
@@ -7,21 +8,29 @@
     let currentWorkspace = null;
     let currentBackgroundUrl = null;
     let pendingFile = null;
+    let currentScope = '';
 
-    var OPACITY_DEFAULT = 25;
+    var SPEED_DIAL_SCOPE = 'speed_dial';
     var OPACITY_MIN = 5;
-    var OPACITY_MAX = 25;
 
-    function buildOpacitySettingKey(workspace) {
-        return 'background_opacity_' + workspace;
+    function opacityMax() {
+        return currentScope === SPEED_DIAL_SCOPE ? 100 : 25;
     }
 
+    function buildOpacitySettingKey(workspace) {
+        return (currentScope === SPEED_DIAL_SCOPE ? 'speed_dial_background_opacity_' : 'background_opacity_') + workspace;
+    }
+
+    function scopeParam() {
+        return currentScope ? '&scope=' + currentScope : '';
+    }
+
+    // The highest value is also the default
     function normalizeOpacity(value) {
         var parsed = parseInt(value, 10);
-        if (isNaN(parsed)) return OPACITY_DEFAULT;
+        if (isNaN(parsed)) return opacityMax();
         if (parsed < OPACITY_MIN) return OPACITY_MIN;
-        if (parsed > OPACITY_MAX) return OPACITY_MAX;
-        return parsed;
+        return Math.min(parsed, opacityMax());
     }
 
     function getBackgroundOpacity(workspace, callback) {
@@ -36,10 +45,10 @@
                 if (j && j.success) {
                     callback(normalizeOpacity(j.value));
                 } else {
-                    callback(OPACITY_DEFAULT);
+                    callback(opacityMax());
                 }
             })
-            .catch(function() { callback(OPACITY_DEFAULT); });
+            .catch(function() { callback(opacityMax()); });
     }
 
     function setBackgroundOpacity(workspace, opacity, callback) {
@@ -58,6 +67,10 @@
                 if (callback) callback(false);
             });
     }
+
+    window.openSpeedDialBackgroundModal = function(workspace) {
+        openBackgroundModalForWorkspace(workspace, SPEED_DIAL_SCOPE);
+    };
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -157,7 +170,7 @@
         });
     }
 
-    function openBackgroundModalForWorkspace(workspace) {
+    function openBackgroundModalForWorkspace(workspace, scope) {
         const modal = document.getElementById('backgroundImageModal');
         const preview = document.getElementById('backgroundPreview');
         const opacityInput = document.getElementById('backgroundOpacityInput');
@@ -166,11 +179,13 @@
         if (!modal) return;
 
         currentWorkspace = workspace;
+        currentScope = scope || '';
         pendingFile = null;
 
         // Load current settings for this workspace
-        opacityInput.value = OPACITY_DEFAULT;
-        document.getElementById('backgroundOpacityValue').textContent = OPACITY_DEFAULT;
+        opacityInput.max = opacityMax();
+        opacityInput.value = opacityMax();
+        document.getElementById('backgroundOpacityValue').textContent = opacityMax();
 
         getBackgroundOpacity(workspace, function(savedOpacity) {
             opacityInput.value = savedOpacity;
@@ -179,14 +194,14 @@
         });
 
         // Check if background exists for this workspace
-        fetch('api_upload_background.php?workspace=' + encodeURIComponent(workspace))
+        fetch('api_upload_background.php?workspace=' + encodeURIComponent(workspace) + scopeParam())
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.exists) {
                     currentBackgroundUrl = data.url;
                     preview.style.backgroundImage = `url('${data.url}')`;
                     const currentOpacity = normalizeOpacity(opacityInput.value);
-                    const previewOpacity = Math.min(currentOpacity, OPACITY_MAX);
+                    const previewOpacity = Math.min(currentOpacity, opacityMax());
                     preview.style.opacity = previewOpacity / 100;
                     preview.querySelector('.no-background-text').style.display = 'none';
                     removeBtn.style.display = 'inline-block';
@@ -203,6 +218,13 @@
             });
 
         modal.style.display = 'flex';
+    }
+
+    // The speed dial draws its image itself (public/speed_dial.php)
+    function finishSave() {
+        const reload = currentScope === SPEED_DIAL_SCOPE;
+        closeBackgroundModal();
+        if (reload) window.location.reload();
     }
 
     function closeBackgroundModal() {
@@ -231,8 +253,8 @@
         const reader = new FileReader();
         reader.onload = function(e) {
             const opacityInput = document.getElementById('backgroundOpacityInput');
-            const opacity = opacityInput ? opacityInput.value : 25;
-            const previewOpacity = Math.min(opacity, 25);
+            const opacity = opacityInput ? opacityInput.value : opacityMax();
+            const previewOpacity = Math.min(opacity, opacityMax());
             preview.style.backgroundImage = `url('${e.target.result}')`;
             preview.style.opacity = previewOpacity / 100;
             preview.querySelector('.no-background-text').style.display = 'none';
@@ -257,7 +279,7 @@
     function updatePreviewOpacity(value) {
         const preview = document.getElementById('backgroundPreview');
         if (preview && preview.style.backgroundImage && preview.style.backgroundImage !== 'none') {
-            const previewOpacity = Math.min(value, 25);
+            const previewOpacity = Math.min(value, opacityMax());
             preview.style.opacity = previewOpacity / 100;
         }
     }
@@ -289,7 +311,7 @@
                 deleteWorkspaceBackground(opacity);
             } else {
                 // Just close the modal (opacity already saved)
-                closeBackgroundModal();
+                finishSave();
             }
         });
     }
@@ -298,6 +320,7 @@
         const formData = new FormData();
         formData.append('background', file);
         formData.append('workspace', currentWorkspace);
+        if (currentScope) formData.append('scope', currentScope);
 
         fetch('api_upload_background.php', {
             method: 'POST',
@@ -306,8 +329,8 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                localStorage.setItem('backgroundImageUrl_' + currentWorkspace, data.url);
-                closeBackgroundModal();
+                if (!currentScope) localStorage.setItem('backgroundImageUrl_' + currentWorkspace, data.url);
+                finishSave();
             } else {
                 if (typeof window.showError === 'function') {
                     window.showError(data.error || (typeof window.t === 'function' ? window.t('workspace_background.upload_error', null, 'Error uploading image') : 'Error uploading image'));
@@ -326,14 +349,14 @@
     }
 
     function deleteWorkspaceBackground(opacity) {
-        fetch('api_upload_background.php?workspace=' + encodeURIComponent(currentWorkspace), {
+        fetch('api_upload_background.php?workspace=' + encodeURIComponent(currentWorkspace) + scopeParam(), {
             method: 'DELETE'
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                localStorage.removeItem('backgroundImageUrl_' + currentWorkspace);
-                closeBackgroundModal();
+                if (!currentScope) localStorage.removeItem('backgroundImageUrl_' + currentWorkspace);
+                finishSave();
             } else {
                 if (typeof window.showError === 'function') {
                     window.showError(data.error || (typeof window.t === 'function' ? window.t('workspace_background.remove_error', null, 'Error removing image') : 'Error removing image'));

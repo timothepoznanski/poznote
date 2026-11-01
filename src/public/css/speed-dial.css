@@ -1,0 +1,380 @@
+/* Speed dial (public/speed_dial.php, issue #1714) */
+
+html.speed-dial-page {
+    overflow: auto !important;
+    height: auto !important;
+}
+
+/* A row, for the Element visibility column docked on the right
+   (ui_customization_panel.php), which is the last flex child of <body> */
+body.speed-dial-page {
+    display: flex;
+    align-items: flex-start;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+.speed-dial-background {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* On a picture, what is written directly on the page gets a ground of its own */
+.has-speed-dial-background .speed-dial-label,
+.has-speed-dial-background .speed-dial-empty {
+    padding: 2px 8px;
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+}
+
+.speed-dial-container {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.speed-dial-container > .poznote-page-title {
+    margin-bottom: 32px;
+}
+
+/* The filter stays on the centre of the page, the button at its left. With no
+   room to spare, the filter takes what the button leaves. */
+.speed-dial-toolbar {
+    display: grid;
+    grid-template-columns: 1fr minmax(0, 500px) 1fr;
+    column-gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.speed-dial-toolbar #speedDialFilter {
+    grid-column: 2;
+    margin-bottom: 0;
+}
+
+.speed-dial-size {
+    position: relative;
+    grid-column: 1;
+    justify-self: end;
+}
+
+.speed-dial-size-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.speed-dial-size-btn:hover,
+.speed-dial-size-btn:focus-visible,
+.speed-dial-size-btn[aria-expanded="true"] {
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+}
+
+.speed-dial-size-popover {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-sizing: border-box;
+    width: 220px;
+    padding: 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
+    color: var(--pz-text);
+    font-size: 13px;
+}
+
+.speed-dial-size-popover[hidden] {
+    display: none;
+}
+
+.speed-dial-size-popover input {
+    width: 100%;
+    margin: 0;
+    accent-color: var(--pz-accent);
+}
+
+#speedDialFilter .home-search-input {
+    padding-left: 12px;
+    font-family: inherit;
+}
+
+.speed-dial-empty {
+    margin: 20px 0;
+    text-align: center;
+    white-space: pre-line;
+    color: var(--pz-text-muted);
+}
+
+.speed-dial-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+/* A note with several links: its title, then a row of tiles per part of the
+   note. It takes a line of its own among the single tiles. */
+.speed-dial-group {
+    position: relative;
+    flex: 0 0 100%;
+    box-sizing: border-box;
+    padding: 8px 0;
+}
+
+.speed-dial-group-title {
+    margin-bottom: 14px;
+    text-align: center;
+}
+
+/* A label, in the colour of its menu (js/speed-dial.js). Mixed with the page's
+   colours, so that it reads on any theme and on a background picture. */
+.speed-dial-group-name {
+    --speed-dial-label-color: var(--pz-accent-text);
+    display: inline-block;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 4px 12px;
+    border: 1px solid color-mix(in srgb, var(--speed-dial-label-color) 35%, var(--pz-bg));
+    border-radius: var(--pz-radius-pill);
+    background: color-mix(in srgb, var(--speed-dial-label-color) 12%, var(--pz-bg));
+    color: color-mix(in srgb, var(--speed-dial-label-color) 75%, var(--pz-text));
+    font-size: 13px;
+    font-weight: var(--pz-weight-medium);
+    line-height: 1.3;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.speed-dial-group-name:hover,
+.speed-dial-group-name:focus-visible {
+    border-color: var(--speed-dial-label-color);
+    background: color-mix(in srgb, var(--speed-dial-label-color) 22%, var(--pz-bg));
+    text-decoration: none;
+}
+
+.speed-dial-group-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+}
+
+.speed-dial-group-row[hidden] {
+    display: none;
+}
+
+.speed-dial-group-rule {
+    margin: 16px 0;
+    border: 0;
+    border-top: 1px solid var(--pz-border);
+}
+
+/* A rule ending the note: what comes next is as far from it as the row above */
+.speed-dial-group:has(> .speed-dial-group-rule:last-child) {
+    padding-bottom: 0;
+}
+
+.speed-dial-group-rule:last-child {
+    margin-bottom: 0;
+}
+
+/* The rows left by a filter are no longer the rows of the note */
+.speed-dial-grid.is-filtered .speed-dial-group-rule {
+    display: none;
+}
+
+.speed-dial-grid.is-filtered .speed-dial-group-rule + .speed-dial-group-row {
+    margin-top: 16px;
+}
+
+.speed-dial-tile {
+    position: relative;
+    width: min(var(--speed-dial-tile-width), 100%);
+    box-sizing: border-box;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-xl);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.speed-dial-tile:hover,
+.speed-dial-tile:focus-within {
+    border-color: var(--pz-accent-text);
+    transform: translateY(-2px);
+}
+
+.speed-dial-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--speed-dial-tile-width) * 0.07);
+    padding: calc(var(--speed-dial-tile-width) * 0.114) calc(var(--speed-dial-tile-width) * 0.07) calc(var(--speed-dial-tile-width) * 0.086);
+    color: var(--pz-text);
+    text-decoration: none;
+}
+
+/* A light plate in every theme: most logos and favicons are drawn for one */
+.speed-dial-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(var(--speed-dial-tile-width) * 0.457);
+    height: calc(var(--speed-dial-tile-width) * 0.457);
+    overflow: hidden;
+    border-radius: var(--pz-radius-xl);
+    background: var(--pz-text-inverse);
+}
+
+.speed-dial-icon img {
+    position: absolute;
+    inset: 12.5%;
+    width: 75%;
+    height: 75%;
+    object-fit: contain;
+    background: var(--pz-text-inverse);
+    visibility: hidden;
+}
+
+.speed-dial-icon img.is-loaded {
+    visibility: visible;
+}
+
+/* A moment before the letter shows under an icon still loading, so that an
+   icon arriving as soon as the page has loaded does not flash it first */
+@keyframes speedDialLetterIn {
+    from {
+        visibility: hidden;
+    }
+}
+
+.speed-dial-icon:has(img) .speed-dial-letter {
+    animation: speedDialLetterIn 0s linear 300ms backwards;
+}
+
+.speed-dial-letter {
+    font-size: calc(var(--speed-dial-tile-width) * 0.2);
+    color: var(--pz-accent);
+}
+
+.speed-dial-label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(11px, calc(var(--speed-dial-tile-width) * 0.1), 18px);
+}
+
+.speed-dial-edit {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: flex;
+    padding: 4px;
+    color: var(--pz-text-muted);
+    text-decoration: none;
+    opacity: 0;
+}
+
+.speed-dial-tile:hover .speed-dial-edit,
+.speed-dial-edit:focus-visible {
+    opacity: 1;
+}
+
+.speed-dial-edit:hover {
+    color: var(--pz-accent-text);
+}
+
+/* Dragging, as on the dashboard (css/dashboard.css): the tile fades and the
+   target shows an accent bar on the edge it will land on */
+.speed-dial-item.is-dragging {
+    opacity: 0.45;
+    transform: none;
+}
+
+.speed-dial-item.drop-before::after,
+.speed-dial-item.drop-after::after {
+    content: '';
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    width: 3px;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-accent);
+    pointer-events: none;
+}
+
+.speed-dial-item.drop-before::after {
+    left: -2px;
+}
+
+.speed-dial-item.drop-after::after {
+    right: -2px;
+}
+
+/* Above or below a group, which takes the whole width */
+.speed-dial-group.drop-before::after,
+.speed-dial-group.drop-after::after {
+    left: 0;
+    right: 0;
+    width: auto;
+    height: 3px;
+}
+
+.speed-dial-group.drop-before::after {
+    top: -2px;
+    bottom: auto;
+}
+
+.speed-dial-group.drop-after::after {
+    top: auto;
+    bottom: -2px;
+}
+
+/* The copy that follows a finger */
+.speed-dial-ghost {
+    position: fixed;
+    z-index: 1000;
+    margin: 0;
+    pointer-events: none;
+    transform-origin: center;
+}
+
+/* No hover to reveal it on a touch screen */
+@media (hover: none) {
+    .speed-dial-edit {
+        opacity: 1;
+    }
+
+    /* A long press drags the tile: no selection, no browser link menu */
+    .speed-dial-item {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+    }
+}

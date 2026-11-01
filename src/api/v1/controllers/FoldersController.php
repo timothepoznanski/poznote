@@ -31,6 +31,7 @@
 
 require_once __DIR__ . '/../../../note_loader.php';
 require_once __DIR__ . '/../../../lib/note-sort.php';
+require_once __DIR__ . '/../../../lib/speed-dial.php';
 
 class FoldersController {
     private PDO $db;
@@ -2386,6 +2387,76 @@ class FoldersController {
             'message' => "Tagged $updatedCount notes",
             'tags' => $tags,
             'notes_count' => count($notes),
+            'note_ids' => array_map('intval', array_column($notes, 'id')),
+            'updated_count' => $updatedCount,
+            'include_subfolders' => $includeSubfolders
+        ]);
+    }
+
+    /**
+     * DELETE /api/v1/folders/{id}/tags - Remove tags from every note of a folder
+     *
+     * Same body as POST. Tags compare without regard to case, each note keeps
+     * its other tags, and notes left unchanged keep their modification date.
+     */
+    public function removeTags(string $id): void {
+        $folderId = (int)$id;
+        if ($folderId <= 0) {
+            $this->sendError('Invalid folder ID', 400);
+            return;
+        }
+
+        $data = $this->getInputData();
+        $tags = array_map('mb_strtolower', $this->normalizeTagList($data['tags'] ?? null));
+        if (empty($tags)) {
+            $this->sendError('At least one tag is required', 400);
+            return;
+        }
+
+        $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : '';
+        $folderStmt = $this->db->prepare("SELECT id, workspace FROM folders WHERE id = ?");
+        $folderStmt->execute([$folderId]);
+        $folder = $folderStmt->fetch(PDO::FETCH_ASSOC);
+        if (!$folder) {
+            $this->sendError('Folder not found', 404);
+            return;
+        }
+        if ($workspace !== '' && $folder['workspace'] !== $workspace) {
+            $this->sendError('Folder belongs to a different workspace', 400);
+            return;
+        }
+
+        $includeSubfolders = !empty($data['include_subfolders'])
+            && filter_var($data['include_subfolders'], FILTER_VALIDATE_BOOLEAN);
+        $folderIds = $includeSubfolders ? $this->collectFolderTreeIds($folderId) : [$folderId];
+        $placeholders = implode(',', array_fill(0, count($folderIds), '?'));
+        $notesStmt = $this->db->prepare("SELECT id, tags FROM entries WHERE trash = 0 AND folder_id IN ($placeholders)");
+        $notesStmt->execute($folderIds);
+        $notes = $notesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $actorUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+        $updateStmt = $this->db->prepare(
+            "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = ? WHERE id = ?"
+        );
+
+        $updatedCount = 0;
+        foreach ($notes as $note) {
+            $current = $this->normalizeTagList($note['tags'] ?? '');
+            $kept = array_filter($current, static fn($tag) => !in_array(mb_strtolower($tag), $tags, true));
+            if (count($kept) === count($current)) {
+                continue;
+            }
+            if ($updateStmt->execute([implode(', ', $kept), $actorUserId, (int)$note['id']])) {
+                $updatedCount++;
+            }
+        }
+
+        $this->sendJson([
+            'success' => true,
+            'message' => "Untagged $updatedCount notes",
+            'tags' => $tags,
+            'notes_count' => count($notes),
+            'note_ids' => array_map('intval', array_column($notes, 'id')),
             'updated_count' => $updatedCount,
             'include_subfolders' => $includeSubfolders
         ]);
@@ -3127,7 +3198,7 @@ class FoldersController {
      *
      * Body: { "note_id": 12, "target_note_id": 34, "position": "before"|"after",
      *         "workspace": "Poznote" (optional check),
-     *         "scope": "sidebar" (default) | "dashboard" | "kanban" }
+     *         "scope": "sidebar" (default) | "dashboard" | "kanban" | "speed_dial" }
      *
      * With scope "dashboard" the rank goes to entries.dashboard_order, the
      * column the dashboard sorts its cards on, and nothing else changes (see
@@ -3136,7 +3207,9 @@ class FoldersController {
      * Kanban column under the board's Custom sort. There an optional
      * "visible_order" (note ids) gives the order the siblings were shown in
      * when it was not the saved one, a board sorted by date or tag: the drop
-     * is then made in what the user was looking at, as in the sidebar.
+     * is then made in what the user was looking at, as in the sidebar. Scope
+     * "speed_dial" ranks in entries.speed_dial_order; both notes must carry
+     * the speed dial's tag, in any folder of the workspace.
      */
     public function reorderNote(): void {
         $data = $this->getInputData();
@@ -3162,12 +3235,12 @@ class FoldersController {
             return;
         }
 
-        if (!in_array($scope, ['sidebar', 'dashboard', 'kanban'], true)) {
-            $this->sendError('scope must be sidebar, dashboard or kanban', 400);
+        if (!in_array($scope, ['sidebar', 'dashboard', 'kanban', 'speed_dial'], true)) {
+            $this->sendError('scope must be sidebar, dashboard, kanban or speed_dial', 400);
             return;
         }
 
-        $stmt = $this->db->prepare('SELECT id, heading, folder, folder_id, workspace FROM entries WHERE id = ? AND trash = 0');
+        $stmt = $this->db->prepare('SELECT id, heading, folder, folder_id, workspace, tags FROM entries WHERE id = ? AND trash = 0');
         $stmt->execute([$noteId]);
         $note = $stmt->fetch(PDO::FETCH_ASSOC);
         $stmt->execute([$targetNoteId]);
@@ -3192,6 +3265,15 @@ class FoldersController {
         $targetFolderId = $targetNote['folder_id'] !== null ? (int)$targetNote['folder_id'] : null;
         $currentFolderId = $note['folder_id'] !== null ? (int)$note['folder_id'] : null;
         $changesFolder = $currentFolderId !== $targetFolderId;
+
+        if ($scope === 'speed_dial') {
+            if (!poznoteHasSpeedDialTag((string)$note['tags']) || !poznoteHasSpeedDialTag((string)$targetNote['tags'])) {
+                $this->sendError('Speed dial reordering needs two notes of the speed dial', 400);
+                return;
+            }
+            $this->reorderNoteOnBoard($scope, $note, $targetNoteId, $position, $targetWorkspace, $currentFolderId);
+            return;
+        }
 
         if ($scope !== 'sidebar') {
             // Cards are only rearranged among the siblings shown together on
@@ -3319,9 +3401,10 @@ class FoldersController {
     }
 
     /**
-     * Board variant of reorderNote(), for the dashboard and the Kanban view:
-     * same before/after contract, but the rank goes to the board's own column
-     * (entries.dashboard_order or entries.kanban_order) and nothing else
+     * Board variant of reorderNote(), for the dashboard, the Kanban view and
+     * the speed dial: same before/after contract, but the rank goes to the
+     * board's own column (entries.dashboard_order, entries.kanban_order or
+     * entries.speed_dial_order) and nothing else
      * changes. The sidebar order (display_order), the tree's sort mode and
      * the note's 'updated' date are untouched, so arranging a board never
      * reorders the sidebar, and the sidebar's sort never rearranges a board.
@@ -3332,7 +3415,7 @@ class FoldersController {
      * dashboard.php). In a Kanban column: the same placed order without the
      * pinned rule (see kanban_content.php); completed cards are numbered
      * along with the others although their section shows them by completion
-     * date.
+     * date. On the speed dial: the same placed order, all folders together.
      *
      * @param int[] $visibleOrder Sibling ids in the order they were shown,
      *                            when that was not the saved order; siblings
@@ -3340,8 +3423,11 @@ class FoldersController {
      */
     private function reorderNoteOnBoard(string $scope, array $note, int $targetNoteId, string $position, string $workspace, ?int $folderId, array $visibleOrder = []): void {
         $noteId = (int)$note['id'];
-        $orderColumn = $scope === 'kanban' ? 'kanban_order' : 'dashboard_order';
-        $orderedIds = $this->getOrderedBoardSiblingNoteIds($orderColumn, $workspace, $folderId, $noteId);
+        $orderColumns = ['kanban' => 'kanban_order', 'dashboard' => 'dashboard_order', 'speed_dial' => 'speed_dial_order'];
+        $orderColumn = $orderColumns[$scope];
+        $orderedIds = $scope === 'speed_dial'
+            ? $this->getOrderedSpeedDialNoteIds($workspace, $noteId)
+            : $this->getOrderedBoardSiblingNoteIds($orderColumn, $workspace, $folderId, $noteId);
         if ($visibleOrder) {
             $shown = array_values(array_intersect($visibleOrder, $orderedIds));
             $orderedIds = array_merge($shown, array_values(array_diff($orderedIds, $shown)));
@@ -3411,6 +3497,25 @@ class FoldersController {
                 return self::compareNotesPlacedOrder($a, $b, $orderColumn);
             });
         }
+
+        return array_map(function ($row) {
+            return (int)$row['id'];
+        }, $rows);
+    }
+
+    /**
+     * Ids of the other tiles of a workspace's speed dial, in the order
+     * speed_dial.php shows them, excluding one note.
+     */
+    private function getOrderedSpeedDialNoteIds(string $workspace, int $excludeNoteId): array {
+        $stmt = $this->db->prepare('SELECT id, tags, updated, speed_dial_order FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND tags LIKE ?');
+        $stmt->execute([$workspace, $excludeNoteId, '%' . POZNOTE_SPEED_DIAL_TAG . '%']);
+        $rows = array_filter($stmt->fetchAll(PDO::FETCH_ASSOC), function ($row) {
+            return poznoteHasSpeedDialTag((string)$row['tags']);
+        });
+        usort($rows, function ($a, $b) {
+            return self::compareNotesPlacedOrder($a, $b, 'speed_dial_order');
+        });
 
         return array_map(function ($row) {
             return (int)$row['id'];

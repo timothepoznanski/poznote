@@ -414,8 +414,12 @@ function initializeMarkdownNote(noteId) {
     try {
         var params = new URLSearchParams(window.location.search || '');
         forceSplitForNewMarkdown = params.get('md_split') === '1';
+        // ?view=preview (issue #1714, a note used as a start page) opens like a
+        // search result: rendered, whatever the account's view. Opening another
+        // note drops it from the URL (js/note-loader.js).
         isSearchContext = (params.get('search') && params.get('search').trim() !== '') ||
-                         (params.get('tags_search') && params.get('tags_search').trim() !== '');
+                         (params.get('tags_search') && params.get('tags_search').trim() !== '') ||
+                         params.get('view') === 'preview';
 
         // Clean up the URL parameter after reading it
         if (forceSplitForNewMarkdown) {

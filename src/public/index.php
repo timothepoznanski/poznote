@@ -769,7 +769,7 @@ $whats_new_preview_since = $whats_new_preview ? trim((string)@file_get_contents(
     // A shortcut without its own icon inherits the icon of the note it links to,
     // and the title colour too: opening it opens that note, whose title menu
     // set the colour.
-    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, offline, created, updated, type, linked_note_id, reminder_at, display_order, "
+    $query_left_secure = "SELECT id, heading, folder, folder_id, favorite, offline, created, updated, type, linked_note_id, reminder_at, display_order, tags, "
         . "COALESCE(NULLIF(icon, ''), (SELECT o.icon FROM entries o WHERE o.id = entries.linked_note_id)) AS icon, "
         . "CASE WHEN NULLIF(icon, '') IS NULL THEN (SELECT o.icon_color FROM entries o WHERE o.id = entries.linked_note_id) ELSE icon_color END AS icon_color, "
         . "COALESCE(NULLIF(title_color, ''), (SELECT o.title_color FROM entries o WHERE o.id = entries.linked_note_id)) AS title_color "

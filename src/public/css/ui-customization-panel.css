@@ -884,9 +884,11 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
     color: var(--pz-danger-text);
 }
 
-/* dashboard.php scrolls the body: pin the column like the AI chat panel */
+/* dashboard.php and speed_dial.php scroll the body: pin the column like the AI
+   chat panel */
 @media (min-width: 801px) {
-    body.dashboard-page #uiCustomizationPanel {
+    body.dashboard-page #uiCustomizationPanel,
+    body.speed-dial-page #uiCustomizationPanel {
         position: sticky;
         top: 0;
     }

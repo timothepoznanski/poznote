@@ -1905,7 +1905,6 @@
       "empty_folder": "Ce dossier est vide",
       "error": "Impossible d'étiqueter les notes",
       "existing_tags": "Étiquettes existantes",
-      "include_subfolders": "Inclure les notes des sous-dossiers",
       "no_tags": "Saisissez au moins une étiquette",
       "placeholder": "Étiquettes, séparées par des virgules",
       "prompt_prefix": "Ajouter des étiquettes à toutes les notes de",
@@ -5862,5 +5861,31 @@
   },
   "note_subline_menu": {
     "label": "Sous le titre"
+  },
+  "speed_dial": {
+    "title": "Accès rapide",
+    "empty": "Votre accès rapide est vide.\n\nPour ajouter une tuile, utilisez « Ajouter à l'accès rapide » dans le menu d'une note ou d'un dossier, ou donnez le tag « {{tag}} » à une note.\n\nUn clic sur la tuile ouvre le premier lien de la note, ou la note elle-même si elle n'a pas de lien.\nSon icône est la première image de la note, sinon l'icône du site, sinon la première lettre du titre.\n\nUne note avec plusieurs liens devient un groupe de tuiles sous son titre, et une ligne horizontale (----) commence une nouvelle rangée.\nUn clic sur le titre d'un groupe ouvre la note, un clic droit change sa couleur.",
+    "edit_note": "Ouvrir la note",
+    "label_color": "Couleur de l'étiquette",
+    "tile_size": "Taille des tuiles",
+    "add": "Ajouter à l'accès rapide",
+    "added": "Ajouté à l'accès rapide",
+    "add_error": "Impossible d'ajouter la note à l'accès rapide",
+    "remove": "Retirer de l'accès rapide",
+    "removed": "Retiré de l'accès rapide",
+    "remove_error": "Impossible de retirer la note de l'accès rapide",
+    "folder_removed_one": "1 note retirée de l'accès rapide",
+    "folder_removed_other": "{{count}} notes retirées de l'accès rapide",
+    "visibility": {
+      "title": "Titre de la page",
+      "workspace": "Sélecteur de workspace",
+      "icons": "Icônes des tuiles",
+      "labels": "Noms des tuiles",
+      "edit": "Bouton Ouvrir la note",
+      "frame": "Cadres des tuiles",
+      "group_titles": "Titres des groupes",
+      "group_rules": "Séparateurs des groupes",
+      "size": "Bouton de taille des tuiles"
+    }
   }
 }

@@ -1897,7 +1897,6 @@
       "empty_folder": "此文件夹为空",
       "error": "无法为笔记添加标签",
       "existing_tags": "已有标签",
-      "include_subfolders": "包含子文件夹中的笔记",
       "no_tags": "请至少输入一个标签",
       "placeholder": "标签，用逗号分隔",
       "prompt_prefix": "为",
@@ -5854,5 +5853,31 @@
   },
   "note_subline_menu": {
     "label": "标题下方"
+  },
+  "speed_dial": {
+    "title": "快速访问",
+    "empty": "你的快速访问是空的。\n\n要添加磁贴,请在笔记或文件夹的菜单中使用“添加到快速访问”,或为笔记添加标签“{{tag}}”。\n\n点击磁贴会打开笔记中的第一个链接；如果没有链接，则打开笔记本身。\n磁贴图标为笔记中的第一张图片，其次是网站图标，最后是标题的首字母。\n\n包含多个链接的笔记会在其标题下显示为一组磁贴,水平线(----)开始新的一行。\n单击分组标题可打开笔记,右键单击可更改其颜色。",
+    "edit_note": "打开笔记",
+    "label_color": "标签颜色",
+    "tile_size": "磁贴大小",
+    "add": "添加到快速访问",
+    "added": "已添加到快速访问",
+    "add_error": "无法将笔记添加到快速访问",
+    "remove": "从快速访问中移除",
+    "removed": "已从快速访问中移除",
+    "remove_error": "无法从快速访问中移除笔记",
+    "folder_removed_one": "已从快速访问中移除 1 条笔记",
+    "folder_removed_other": "已从快速访问中移除 {{count}} 条笔记",
+    "visibility": {
+      "title": "页面标题",
+      "workspace": "工作区选择器",
+      "icons": "磁贴图标",
+      "labels": "磁贴名称",
+      "edit": "“打开笔记”按钮",
+      "frame": "磁贴边框",
+      "group_titles": "分组标题",
+      "group_rules": "分组分隔线",
+      "size": "磁贴大小按钮"
+    }
   }
 }

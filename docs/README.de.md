@@ -82,6 +82,7 @@ https://discord.gg/fuEV6uqf4N
 - [Personalisierung](#personalisierung)
 - [Mehrbenutzerbetrieb](#mehrbenutzerbetrieb)
 - [Teilen und Zusammenarbeit](#teilen-und-zusammenarbeit)
+- [Schnellwahl](#schnellwahl)
 - [Aktivitätsprotokoll](#aktivitätsprotokoll)
 - [Webhooks](#webhooks)
 - [Git-Synchronisierung](#git-synchronisierung)
@@ -984,6 +985,22 @@ Poznote bietet mehrere Wege, mit den anderen Benutzern Ihrer Instanz zu arbeiten
 - **Eine Notiz oder einen Ordner teilen**: **Teilen** im Menü der Notiz oder im Menü des Ordners erstellt einen Link nur zu dieser Notiz oder diesem Ordner. Der Link kann öffentlich sein, durch ein Passwort geschützt oder auf bestimmte Benutzer der Instanz beschränkt, die sich zum Öffnen anmelden, und er kann das Bearbeiten erlauben. Die Seite **Freigaben** der Symbolleiste listet Ihre Freigaben auf, und unter **Mit mir geteilt** das, was andere mit Ihnen geteilt haben.
 - **Zugriff auf ein ganzes Konto gewähren**: Ein Administrator kann einem Benutzer unter **Einstellungen > Admin-Werkzeuge > Benutzerverwaltung** erlauben, das Konto eines anderen Benutzers zu öffnen, ohne dessen Eigentümerschaft zu übertragen. Der Benutzer wechselt über den Abschnitt **Konten** des Arbeitsbereichsmenüs dorthin.
 - **Dieselbe Notiz bearbeiten**: Es bearbeitet immer nur eine Person. Ist eine Notiz gesperrt, bietet das schreibgeschützte Banner an, die Bearbeitung zu **übernehmen**: Der Bildschirm der anderen Person wird schreibgeschützt, ihre ungespeicherten Änderungen bleiben in ihrem Browser und werden erneut angeboten, sobald die Notiz frei ist. Eine geöffnete Notiz übernimmt anderswo gemachte Änderungen innerhalb weniger Sekunden. Bei einer **Markdown**-Notiz mit ungespeicherten Änderungen auf beiden Seiten werden die beiden Änderungen automatisch zusammengeführt, wenn sie verschiedene Zeilen betreffen; überschneiden sie sich, lässt Sie ein Banner wählen. Rich-Text-Notizen werden nie zusammengeführt, Sie wählen die Version, die bleibt. Halten Sie Skripte und anderen Code in eingezäunten Codeblöcken (```` ``` ````): rohes HTML außerhalb eines Codeblocks wird beim Speichern bereinigt, wodurch eine an sich saubere Zusammenführung wie ein Konflikt aussehen kann.
+
+## Schnellwahl
+
+Die Ansicht Schnellwahl macht aus Notizen eine Seite mit Link-Kacheln, gedacht als Startseite Ihres Browsers.
+
+<p align="center">
+  <img src="speed-dial.gif" alt="Demo der Schnellwahl" width="100%">
+</p>
+
+Geben Sie einer Notiz den Tag `speed-dial` oder wählen Sie **Zur Schnellwahl hinzufügen** im Menü einer Notiz oder eines Ordners (bei einem Ordner alle seine Notizen, einschließlich Unterordnern). Öffnen Sie die Ansicht über das Blitzsymbol in der linken Symbolleiste. Diese Schaltfläche ist standardmäßig ausgeblendet: Aktivieren Sie sie unter **Einstellungen > Anzeige > Sichtbarkeit von Elementen**.
+
+- **Ein Link oder keiner:** Die Notiz ist eine Kachel, die diesen Link oder die Notiz selbst öffnet. Ihr Symbol ist das erste Bild der Notiz, sonst das Symbol der Website, sonst der erste Buchstabe des Titels.
+- **Mehrere Links:** Die Notiz ist eine Kachelgruppe mit dem Namen der Notiz und einer Kachel pro Link. Eine horizontale Linie (`----`) beginnt eine neue Reihe, und ein Link um ein Bild verwendet dieses als Symbol: `[![GitHub](https://example.com/icon.png)](https://github.com)`.
+- **Gruppenname:** Ein Klick öffnet die Notiz, ein Rechtsklick ändert die Farbe des Labels.
+- **Ansicht anordnen:** Ziehen Sie Kacheln und Gruppen, um sie zu verschieben, und ändern Sie ihre Größe mit der Schaltfläche neben dem Filter. Das Menü **...** unten rechts legt ein Hintergrundbild fest, und die Augen-Schaltfläche blendet aus, was Sie nicht brauchen.
+- **Browser-Startseite:** Verwenden Sie `speed_dial.php?workspace=Name&focus=1` nach Ihrer Poznote-Adresse. `focus=1` blendet auch die Symbolleiste aus.
 
 ## Aktivitätsprotokoll
 
