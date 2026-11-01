@@ -105,3 +105,12 @@ test('the size of the tiles is a width the slider offers', function () {
     assertSame(140, poznoteSpeedDialTileSize('large'));
     assertSame(140, poznoteSpeedDialTileSize('1px;}'));
 });
+
+test('a rich text note gives the addresses written as plain text too', function () {
+    $rows = poznoteSpeedDialParseHtml('<p>https://a.example/x?a=1&amp;b=2.</p><p><img src="https://img.example/i.png" data-x="https://attr.example"> https://b.example&nbsp;</p><hr><a href="https://c.example">https://c.example</a><pre>https://code.example</pre><code>https://inline.example</code>');
+    assertSame(2, count($rows));
+    assertSame(['https://a.example/x?a=1&b=2', 'https://b.example'], array_column($rows[0], 'url'));
+    assertSame('', $rows[0][0]['label']);
+    assertSame(['https://c.example'], array_column($rows[1], 'url'));
+    assertSame([], poznoteSpeedDialParseHtml('<p>no address</p><hr><img src="https://img.example/i.png">'));
+});

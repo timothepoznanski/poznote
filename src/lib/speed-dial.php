@@ -79,12 +79,18 @@ function poznoteSpeedDialParseMarkdown(string $raw): array {
 }
 
 /**
- * The same for a rich text note: its <a href> elements, rows split by <hr>.
+ * The same for a rich text note: its <a href> elements and the addresses written
+ * as plain text, rows split by <hr>. Tags are matched whole, so that no address
+ * is read from an attribute, and code is left out.
  *
  * @return array<int, array<int, array{url: string, label: string, image: ?string}>>
  */
 function poznoteSpeedDialParseHtml(string $raw): array {
-    if (!preg_match_all('/<a\b([^>]*)>(.*?)<\/a>|<hr\b[^>]*>/is', $raw, $matches, PREG_SET_ORDER)) return [];
+    $pattern = '/<a\b([^>]*)>(.*?)<\/a>'
+        . '|<(?:pre|code|script|style)\b.*?<\/(?:pre|code|script|style)>'
+        . '|<[^>]+>'
+        . '|https?:\/\/[^\s<>"\']+/is';
+    if (!preg_match_all($pattern, $raw, $matches, PREG_SET_ORDER)) return [];
 
     $attribute = static function (string $attributes, string $name): string {
         return preg_match('/\b' . $name . '\s*=\s*(?:"([^"]*)"|\'([^\']*)\')/i', $attributes, $m)
@@ -95,7 +101,13 @@ function poznoteSpeedDialParseHtml(string $raw): array {
     $rows = [[]];
     foreach ($matches as $m) {
         if (!isset($m[2])) {
-            $rows[] = [];
+            if (stripos($m[0], 'http') === 0) {
+                // A no-break space ends the address too, it is one character once decoded
+                $url = preg_split('/[\s\x{00A0}]/u', html_entity_decode($m[0], ENT_QUOTES | ENT_HTML5, 'UTF-8'))[0];
+                $rows[count($rows) - 1][] = poznoteSpeedDialLink(rtrim($url, '.,;:!?)…'), '');
+            } elseif (preg_match('/^<hr\b/i', $m[0])) {
+                $rows[] = [];
+            }
             continue;
         }
         $url = $attribute($m[1], 'href');
