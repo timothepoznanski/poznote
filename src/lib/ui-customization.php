@@ -50,6 +50,9 @@ function poznoteGetNonHideableUiKeys() {
  * The line under the note title opens with the modification date and the word
  * count only (discussion #1577): the creation date and the character and line
  * counts are one tick away, and in the note information either way.
+ *
+ * card:iconSidebarSpeedDialBtn is the rail entry of the speed dial (issue
+ * #1714), which is empty and of no use to whoever tags no note for it.
  */
 function poznoteGetDefaultHiddenUiKeys() {
     return [
@@ -57,6 +60,7 @@ function poznoteGetDefaultHiddenUiKeys() {
         'panel:note-created-date',
         'panel:note-stats-characters',
         'panel:note-stats-lines',
+        'card:iconSidebarSpeedDialBtn',
     ];
 }
 
@@ -437,6 +441,7 @@ function poznoteGetToolbarMenuActions() {
         'btn-uncheck-all' => ['uncheck-all-tasks'],
         'btn-print' => ['print-note'],
         'btn-archive' => ['archive-note'],
+        'btn-speed-dial' => ['toggle-speed-dial'],
         'btn-open-tasks-page' => ['open-tasks-page'],
     ];
 }
@@ -552,6 +557,22 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
                 $rules[] = '.pz-edge-stack { bottom: 10px !important; }';
             } elseif ($id === 'tasklist-progress') {
                 $rules[] = '.tasklist-progress { display: none !important; }';
+            } elseif ($id === 'speed-dial-workspace') {
+                // The parts of the speed dial repeated on each tile, and the
+                // workspace chip its page shares with others (issue #1714)
+                $rules[] = '.speed-dial-container .poznote-page-title-workspace { display: none !important; }';
+            } elseif ($id === 'speed-dial-edit') {
+                $rules[] = '.speed-dial-edit { display: none !important; }';
+            } elseif ($id === 'speed-dial-labels') {
+                $rules[] = '.speed-dial-label { display: none !important; }';
+            } elseif ($id === 'speed-dial-icons') {
+                $rules[] = '.speed-dial-icon { display: none !important; }';
+            } elseif ($id === 'speed-dial-group-titles') {
+                $rules[] = '.speed-dial-group-title { display: none !important; }';
+            } elseif ($id === 'speed-dial-group-rules') {
+                $rules[] = '.speed-dial-group-rule { visibility: hidden !important; }';
+            } elseif ($id === 'speed-dial-frame') {
+                $rules[] = '.speed-dial-tile { border-color: transparent !important; background: transparent !important; }';
             } elseif ($id === 'preview-code-block-delete') {
                 // The bin button of a code block in the markdown preview, which
                 // the preview has no other use for and which a misclick next to

@@ -410,6 +410,11 @@
 
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-duplicate"><i class="lucide lucide-copy"></i> '.t_h('common.duplicate', [], 'Duplicate').'</button>';
                     echo '<button type="button" class="dropdown-item mobile-toolbar-item" role="menuitem" data-action="trigger-mobile-action" data-selector=".btn-move"><i class="lucide lucide-folder-output"></i> '.t_h('common.move', [], 'Move').'</button>';
+                    if ($note_type !== 'linked') {
+                        // Two variants, shown as the menu opens (js/clickable-tags.js)
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item speed-dial-state-on" role="menuitem" data-action="toggle-speed-dial" data-note-id="'.$row['id'].'" style="display: none;"><i class="lucide lucide-zap"></i> '.t_h('speed_dial.remove', [], 'Remove from speed dial').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item speed-dial-state-off" role="menuitem" data-action="toggle-speed-dial" data-note-id="'.$row['id'].'"><i class="lucide lucide-zap"></i> '.t_h('speed_dial.add', [], 'Add to speed dial').'</button>';
+                    }
                     // Archive: files the note away in the archive workspace with
                     // its folder path. Hidden once that workspace is the one open,
                     // where the action has nothing left to do.

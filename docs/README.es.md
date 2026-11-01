@@ -82,6 +82,7 @@ https://discord.gg/fuEV6uqf4N
 - [Personalización](#personalización)
 - [Multiusuario](#multiusuario)
 - [Compartir y colaboración](#compartir-y-colaboración)
+- [Acceso rápido](#acceso-rápido)
 - [Registro de actividad](#registro-de-actividad)
 - [Webhooks](#webhooks)
 - [Sincronización Git](#sincronización-git)
@@ -984,6 +985,22 @@ Poznote ofrece varias formas de trabajar con los demás usuarios de tu instancia
 - **Compartir una nota o una carpeta**: **Compartir** en el menú de la nota, o en el de la carpeta, crea un enlace solo a esa nota o carpeta. El enlace puede ser público, estar protegido por contraseña o reservado a algunos usuarios de la instancia, que inician sesión para abrirlo, y puede permitir la edición. La página **Compartidos** de la barra de iconos lista tus elementos compartidos, y lo que otros han compartido contigo en **Compartido conmigo**.
 - **Dar acceso a una cuenta completa**: un administrador puede permitir que un usuario abra la cuenta de otro usuario desde **Configuración > Herramientas de administración > Gestión de usuarios**, sin transferir su propiedad. El usuario cambia a ella desde la sección **Cuentas** del menú de espacios de trabajo.
 - **Editar la misma nota**: solo una persona edita a la vez. Cuando una nota está bloqueada, el banner de solo lectura ofrece **tomar el control**: la pantalla de la otra persona pasa a solo lectura y sus cambios sin guardar se quedan en su navegador, y se le ofrecen de nuevo cuando la nota queda libre. Una nota abierta recoge en pocos segundos los cambios hechos en otro sitio. En una nota **Markdown** con cambios sin guardar en ambos lados, los dos conjuntos de cambios se fusionan automáticamente cuando tocan líneas distintas, y un banner te deja elegir cuando se solapan. Las notas de texto enriquecido nunca se fusionan, eliges qué versión conservar. Mantén los scripts y demás código en bloques de código delimitados (```` ``` ````): el HTML sin procesar fuera de un bloque de código se sanea al guardar, lo que puede hacer que una fusión limpia parezca un conflicto.
+
+## Acceso rápido
+
+La vista Acceso rápido convierte notas en una página de mosaicos de enlaces, pensada como página de inicio de tu navegador.
+
+<p align="center">
+  <img src="speed-dial.gif" alt="Demostración del acceso rápido" width="100%">
+</p>
+
+Da a una nota la etiqueta `speed-dial`, o elige **Añadir al acceso rápido** en el menú de una nota o una carpeta (para una carpeta, todas sus notas, subcarpetas incluidas). Abre la vista con el icono de rayo de la barra de iconos de la izquierda. Este botón está oculto por defecto: actívalo en **Configuración > Pantalla > Visibilidad de los elementos**.
+
+- **Un enlace o ninguno:** la nota es un mosaico que abre ese enlace, o la propia nota. Su icono es la primera imagen de la nota, si no el icono del sitio, si no la primera letra del título.
+- **Varios enlaces:** la nota es un grupo de mosaicos con el nombre de la nota y un mosaico por enlace. Una línea horizontal (`----`) inicia una nueva fila, y un enlace alrededor de una imagen la usa como icono: `[![GitHub](https://example.com/icon.png)](https://github.com)`.
+- **Nombre del grupo:** un clic abre la nota, un clic derecho cambia el color de su etiqueta.
+- **Organizar la vista:** arrastra mosaicos y grupos para moverlos, y cambia su tamaño con el botón junto al filtro. El menú **...** abajo a la derecha define una imagen de fondo, y el botón del ojo oculta lo que no necesites.
+- **Página de inicio del navegador:** usa `speed_dial.php?workspace=Name&focus=1` después de tu dirección de Poznote. `focus=1` también oculta la barra de iconos.
 
 ## Registro de actividad
 

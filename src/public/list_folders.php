@@ -51,6 +51,17 @@ $folders = sortFolders($folders, poznoteNormalizeNoteSort(getSetting('note_list_
 // index.php) rather than flat, so subfolders read as belonging to their parent.
 $folderTree = buildFolderHierarchy($folders);
 
+// Notes in the speed dial by folder: "Remove from speed dial" once they all are.
+// LIKE also matches "my-speed-dial-notes": the whole tag has to be there.
+$speedDialNotesByFolder = [];
+$speedDialStmt = $con->prepare("SELECT folder_id, tags FROM entries WHERE trash = 0 AND folder_id IS NOT NULL AND tags LIKE ?");
+$speedDialStmt->execute(['%' . POZNOTE_SPEED_DIAL_TAG . '%']);
+while ($speedDialRow = $speedDialStmt->fetch(PDO::FETCH_ASSOC)) {
+	if (poznoteHasSpeedDialTag((string)$speedDialRow['tags'])) {
+		$speedDialNotesByFolder[(int)$speedDialRow['folder_id']] = ($speedDialNotesByFolder[(int)$speedDialRow['folder_id']] ?? 0) + 1;
+	}
+}
+
 // Folders shared publicly: the actions menu shows the matching share variant
 $sharedFolderIds = [];
 try {
@@ -60,6 +71,28 @@ try {
 	}
 } catch (Exception $e) {
 	$sharedFolderIds = [];
+}
+
+/**
+ * The notes of a folder and its subfolders, as in the sidebar: what the actions
+ * on the folder act on.
+ */
+function countFolderTreeNotes($folder) {
+	$count = (int)$folder['note_count'];
+	foreach ($folder['children'] ?? [] as $child) {
+		$count += countFolderTreeNotes($child);
+	}
+	return $count;
+}
+
+/** The same for those in the speed dial. */
+function countFolderTreeSpeedDialNotes($folder) {
+	global $speedDialNotesByFolder;
+	$count = (int)($speedDialNotesByFolder[(int)$folder['id']] ?? 0);
+	foreach ($folder['children'] ?? [] as $child) {
+		$count += countFolderTreeSpeedDialNotes($child);
+	}
+	return $count;
 }
 
 /**
@@ -173,6 +206,20 @@ function folderListActions() {
 			'requires_notes' => true,
 		],
 		[
+			'action' => 'toggle-folder-speed-dial',
+			'icon' => 'lucide-zap',
+			'label' => t_h('speed_dial.add', [], 'Add to speed dial'),
+			'state_class' => 'speed-dial-state-off',
+			'requires_notes' => true,
+		],
+		[
+			'action' => 'toggle-folder-speed-dial',
+			'icon' => 'lucide-zap',
+			'label' => t_h('speed_dial.remove', [], 'Remove from speed dial'),
+			'state_class' => 'speed-dial-state-on active-state',
+			'requires_notes' => true,
+		],
+		[
 			'action' => 'change-folder-icon',
 			'icon' => 'lucide-palette',
 			'label' => t_h('notes_list.folder_actions.change_icon', [], 'Change icon'),
@@ -246,7 +293,8 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 
 	// Folder identity, carried by every action button of the row
 	$folderAttrs = ' data-folder-id="' . $folder_id . '" data-folder-name="' . $folder_name . '"'
-		. ' data-note-count="' . $note_count . '" data-shared="' . $is_shared . '"'
+		. ' data-note-count="' . countFolderTreeNotes($folder) . '" data-shared="' . $is_shared . '"'
+		. ' data-speed-dial="' . (countFolderTreeNotes($folder) > 0 && countFolderTreeSpeedDialNotes($folder) === countFolderTreeNotes($folder) ? '1' : '0') . '"'
 		. ' data-favorite="' . $is_favorite . '" data-offline="' . $is_offline . '"';
 
 	echo '<div class="folder-list-actions">';
@@ -746,6 +794,14 @@ $currentLang = getUserLanguage();
 					<div class="folder-actions-menu-item requires-notes" data-action="tag-folder-notes">
 						<i class="lucide lucide-tag"></i>
 						<span><?php echo t_h('modals.tag_folder_notes.title', [], 'Tag all notes'); ?></span>
+					</div>
+					<div class="folder-actions-menu-item requires-notes speed-dial-state-off" data-action="toggle-folder-speed-dial">
+						<i class="lucide lucide-zap"></i>
+						<span><?php echo t_h('speed_dial.add', [], 'Add to speed dial'); ?></span>
+					</div>
+					<div class="folder-actions-menu-item requires-notes speed-dial-state-on active-state" data-action="toggle-folder-speed-dial">
+						<i class="lucide lucide-zap"></i>
+						<span><?php echo t_h('speed_dial.remove', [], 'Remove from speed dial'); ?></span>
 					</div>
 					<div class="folder-actions-menu-item active-state share-state-shared" data-action="share-folder">
 						<i class="lucide lucide-share-2"></i>

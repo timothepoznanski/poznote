@@ -155,7 +155,7 @@
 
 <!-- Icon Rail Section (icon_sidebar.php): the narrow column of icons on the far
      left of every page, kept apart from the sidebar next to it. -->
-<div class="ui-custom-section" data-ui-pages="notes dashboard settings" data-ui-section-id="icon-rail">
+<div class="ui-custom-section" data-ui-pages="notes dashboard settings speed-dial" data-ui-section-id="icon-rail">
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon rail'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.icon_rail_hint', [], 'Narrow column of icons on the far left of every page.'); ?></p>
 <div class="ui-custom-items">
@@ -171,6 +171,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTasksBtn" checked><span><?php echo t_h('tasks_page.title', [], 'Tasks'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarMentionsBtn" checked><span><?php echo t_h('mentions.title', [], 'Mentions'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGraphBtn" checked><span><?php echo t_h('home.graph', [], 'Graph'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarSpeedDialBtn" checked><span><?php echo t_h('speed_dial.title', [], 'Speed dial'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPushBtn" checked><span>Push</span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarGitPullBtn" checked><span>Pull</span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarThemeToggleBtn" checked><span><?php echo t_h('modals.ui_customization.theme_toggle', [], 'Theme toggle'); ?></span></label>
@@ -214,6 +215,7 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-duplicate" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-move" checked><span><?php echo t_h('common.move', [], 'Move'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-archive" checked><span><?php echo t_h('archive.menu_item', [], 'Archive note'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-speed-dial" checked><span><?php echo t_h('speed_dial.add', [], 'Add to speed dial'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-create-linked-note" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create linked note'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-download" checked><span><?php echo t_h('common.download', [], 'Download'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-print" checked><span><?php echo t_h('common.print', [], 'Print'); ?></span></label>
@@ -320,14 +322,14 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-stats-lines" checked><span><?php echo t_h('modals.ui_customization.note_stats_lines', [], 'Show line count'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-info-icon" checked><span><?php echo t_h('modals.ui_customization.note_info_icon', [], 'Show information icon under the note title'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-icons" checked><span><?php echo t_h('display.cards.show_note_icons', [], 'Show note icons'); ?></span></label>
-    <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeCustomizeBtn" checked><span><?php echo t_h('modals.ui_customization.panel_title', [], 'Element visibility'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes dashboard settings speed-dial"><input type="checkbox" data-ui-key="card:edgeCustomizeBtn" checked><span><?php echo t_h('modals.ui_customization.panel_title', [], 'Element visibility'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard"><input type="checkbox" data-ui-key="card:edgeAiChatBtn" checked><span><?php echo t_h('ai_chat.toolbar_button', [], 'AI assistant'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeFocusModeBtn" checked><span><?php echo t_h('focus_mode.button', [], 'Focus mode'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeSplitViewBtn" checked><span><?php echo t_h('page_menu.markdown_view', [], 'Markdown view (classic, live preview, rich text, split)'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeMenuNoteWidth" checked><span><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages="notes"><input type="checkbox" data-ui-key="card:edgeMenuNoteInfo" checked><span><?php echo t_h('common.information', [], 'Information'); ?></span></label>
-    <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeMenuShortcuts" checked><span><?php echo t_h('keyboard_shortcuts.menu_item', [], 'Keyboard shortcuts'); ?></span></label>
-    <label class="ui-custom-item" data-ui-pages="notes dashboard settings"><input type="checkbox" data-ui-key="card:edgeMenuMarkdownSyntax" checked><span><?php echo t_h('markdown_syntax.menu_item', [], 'Markdown syntax'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes dashboard settings speed-dial"><input type="checkbox" data-ui-key="card:edgeMenuShortcuts" checked><span><?php echo t_h('keyboard_shortcuts.menu_item', [], 'Keyboard shortcuts'); ?></span></label>
+    <label class="ui-custom-item" data-ui-pages="notes dashboard settings speed-dial"><input type="checkbox" data-ui-key="card:edgeMenuMarkdownSyntax" checked><span><?php echo t_h('markdown_syntax.menu_item', [], 'Markdown syntax'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:restrict-users" checked><span><?php echo t_h('modals.ui_customization.share_restrict_users', [], 'Share: restrict to specific users'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="share:protocol-toggle" checked><span><?php echo t_h('modals.ui_customization.share_protocol_toggle', [], 'Share: HTTPS toggle'); ?></span></label>
     <label class="ui-custom-item" data-ui-pages=""><input type="checkbox" data-ui-key="card:directCopyRestoreCard" checked><span><?php echo t_h('modals.ui_customization.direct_copy_restore_section', [], 'Restore page: "Restore when standard restore doesn\'t work" section'); ?></span></label>
@@ -342,6 +344,23 @@
 <div class="ui-custom-items">
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:new-workspace" checked><span><?php echo t_h('workspaces.menu.new_workspace', [], 'New workspace'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:edit-workspaces" checked><span><?php echo t_h('workspaces.menu.edit_workspaces', [], 'Edit workspaces'); ?></span></label>
+</div>
+</div>
+
+<!-- Speed dial Section -->
+<div class="ui-custom-section" data-ui-pages="speed-dial">
+<h4 class="ui-custom-section-title"><span><?php echo t_h('speed_dial.title', [], 'Speed dial'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<div class="ui-custom-items">
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:speedDialTitle" checked><span><?php echo t_h('speed_dial.visibility.title', [], 'Page title'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-workspace" checked><span><?php echo t_h('speed_dial.visibility.workspace', [], 'Workspace selector'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:speedDialFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-group-titles" checked><span><?php echo t_h('speed_dial.visibility.group_titles', [], 'Group titles'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-group-rules" checked><span><?php echo t_h('speed_dial.visibility.group_rules', [], 'Group separators'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-frame" checked><span><?php echo t_h('speed_dial.visibility.frame', [], 'Tile frames'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-icons" checked><span><?php echo t_h('speed_dial.visibility.icons', [], 'Tile icons'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-labels" checked><span><?php echo t_h('speed_dial.visibility.labels', [], 'Tile names'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:speedDialSize" checked><span><?php echo t_h('speed_dial.visibility.size', [], 'Tile size button'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-edit" checked><span><?php echo t_h('speed_dial.visibility.edit', [], 'Open the note button'); ?></span></label>
 </div>
 </div>
 
@@ -370,6 +389,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:cut-folder" checked><span><?php echo t_h('notes_list.folder_actions.cut_folder', [], 'Cut'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:paste-into-folder" checked><span><?php echo t_h('notes_list.folder_actions.paste_into_folder', [], 'Paste into folder'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:download-folder" checked><span><?php echo t_h('notes_list.folder_actions.download_folder', [], 'Download folder'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:toggle-folder-speed-dial" checked><span><?php echo t_h('speed_dial.add', [], 'Add to speed dial'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:share-folder" checked><span><?php echo t_h('notes_list.folder_actions.share_folder', [], 'Make public'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:rename-folder" checked><span><?php echo t_h('notes_list.folder_actions.rename_folder', [], 'Rename'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:archive-folder" checked><span><?php echo t_h('archive.folder_menu_item', [], 'Archive folder'); ?></span></label>
@@ -386,6 +406,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-share-modal" checked><span><?php echo t_h('notes_list.note_actions.share_note', [], 'Share note'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-favorite" checked><span><?php echo t_h('notes_list.folder_actions.add_favorite', [], 'Add to favorites'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:toggle-speed-dial" checked><span><?php echo t_h('speed_dial.add', [], 'Add to speed dial'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:duplicate-note" checked><span><?php echo t_h('common.duplicate', [], 'Duplicate'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:create-note-shortcut" checked><span><?php echo t_h('editor.toolbar.create_linked_note', [], 'Create shortcut'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:show-move-folder-dialog" checked><span><?php echo t_h('notes_list.note_actions.move_note', [], 'Move note'); ?></span></label>

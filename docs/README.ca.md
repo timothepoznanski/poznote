@@ -82,6 +82,7 @@ https://discord.gg/fuEV6uqf4N
 - [Personalització](#personalització)
 - [Diversos usuaris](#diversos-usuaris)
 - [Compartició i col·laboració](#compartició-i-collaboració)
+- [Accés ràpid](#accés-ràpid)
 - [Registre d'activitat](#registre-dactivitat)
 - [Webhooks](#webhooks)
 - [Sincronització amb Git](#sincronització-amb-git)
@@ -985,6 +986,22 @@ El Poznote ofereix diverses maneres de treballar amb els altres usuaris de la in
 - **Compartir una nota o una carpeta**: **Comparteix**, al menú de la nota o de la carpeta, crea un enllaç només a aquella nota o carpeta. L'enllaç pot ser públic, estar protegit amb una contrasenya o restringit a alguns usuaris de la instància, que inicien la sessió per obrir-lo, i pot permetre l'edició. La pàgina **Comparticions** de la barra d'icones llista les vostres comparticions, i el que els altres han compartit amb vós a **Compartits amb mi**.
 - **Donar accés a tot un compte**: un administrador pot permetre que un usuari obri el compte d'un altre usuari des de **Paràmetres > Eines d'administració > Gestió d'usuaris**, sense transferir-ne la propietat. L'usuari hi canvia des de la secció **Comptes** del menú d'espais de treball.
 - **Editar la mateixa nota**: només una persona edita alhora. Quan una nota està bloquejada, el bàner de només lectura ofereix **Pren el control**: la pantalla de l'editor anterior passa a només lectura i els seus canvis no desats es queden al seu navegador, i se li tornen a oferir quan la nota queda lliure. Una nota oberta recull en pocs segons els canvis fets en un altre lloc. En una nota **Markdown** amb edicions no desades a tots dos costats, els dos conjunts de canvis es combinen automàticament quan toquen línies diferents, i un bàner us permet triar quan se superposen. Les notes de text enriquit no es combinen mai: trieu quina versió voleu conservar. Poseu els scripts i altre codi en blocs de codi delimitats (```` ``` ````): l'HTML sense processar fora d'un bloc de codi se sanititza en desar, cosa que pot fer que una combinació que seria neta sembli un conflicte.
+
+## Accés ràpid
+
+La vista Accés ràpid converteix notes en una pàgina de rajoles d'enllaços, pensada com a pàgina d'inici del navegador.
+
+<p align="center">
+  <img src="speed-dial.gif" alt="Demostració de l'accés ràpid" width="100%">
+</p>
+
+Doneu l'etiqueta `speed-dial` a una nota, o trieu **Afegeix a l'accés ràpid** al menú d'una nota o una carpeta (per a una carpeta, totes les seves notes, subcarpetes incloses). Obriu la vista amb la icona de llamp de la barra d'icones de l'esquerra. Aquest botó està amagat per defecte: activeu-lo a **Paràmetres > Visualització > Visibilitat dels elements**.
+
+- **Un enllaç o cap:** la nota és una rajola que obre aquest enllaç, o la mateixa nota. La seva icona és la primera imatge de la nota, si no la icona del lloc, si no la primera lletra del títol.
+- **Diversos enllaços:** la nota és un grup de rajoles amb el nom de la nota i una rajola per enllaç. Una línia horitzontal (`----`) comença una fila nova, i un enllaç al voltant d'una imatge la fa servir com a icona: `[![GitHub](https://example.com/icon.png)](https://github.com)`.
+- **Nom del grup:** un clic obre la nota, un clic dret canvia el color de la seva etiqueta.
+- **Organitzar la vista:** arrossegueu rajoles i grups per moure'ls, i canvieu-ne la mida amb el botó del costat del filtre. El menú **...** a baix a la dreta defineix una imatge de fons, i el botó de l'ull amaga el que no necessiteu.
+- **Pàgina d'inici del navegador:** feu servir `speed_dial.php?workspace=Name&focus=1` després de la vostra adreça de Poznote. `focus=1` també amaga la barra d'icones.
 
 ## Registre d'activitat
 

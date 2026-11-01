@@ -82,6 +82,7 @@ https://discord.gg/fuEV6uqf4N
 - [Personnalisation](#personnalisation)
 - [Multi-utilisateurs](#multi-utilisateurs)
 - [Partage et collaboration](#partage-et-collaboration)
+- [Accès rapide](#accès-rapide)
 - [Journal d'activité](#journal-dactivité)
 - [Webhooks](#webhooks)
 - [Synchronisation Git](#synchronisation-git)
@@ -984,6 +985,22 @@ Poznote propose plusieurs façons de travailler avec les autres utilisateurs de 
 - **Partager une note ou un dossier** : **Partager** dans le menu de la note, ou dans celui du dossier, crée un lien vers cette note ou ce dossier seulement. Le lien peut être public, protégé par un mot de passe, ou réservé à certains utilisateurs de l'instance, qui se connectent pour l'ouvrir, et il peut autoriser la modification. La page **Partages** de la barre d'icônes liste vos partages, et ce que les autres ont partagé avec vous sous **Partagé avec moi**.
 - **Donner accès à un compte entier** : un administrateur peut permettre à un utilisateur d'ouvrir le compte d'un autre utilisateur depuis **Paramètres > Outils d'administration > Gestion des utilisateurs**, sans en transférer la propriété. L'utilisateur y passe depuis la section **Comptes** du menu des espaces de travail.
 - **Modifier la même note** : une seule personne modifie à la fois. Quand une note est verrouillée, le bandeau en lecture seule propose de **prendre la main** : l'écran de l'autre personne passe en lecture seule et ses modifications non enregistrées restent dans son navigateur, proposées à nouveau dès que la note est libre. Une note ouverte récupère en quelques secondes les modifications faites ailleurs. Pour une note **Markdown** avec des modifications non enregistrées des deux côtés, les deux séries de modifications sont fusionnées automatiquement quand elles touchent des lignes différentes, et un bandeau vous laisse choisir quand elles se chevauchent. Les notes en texte riche ne sont jamais fusionnées, vous choisissez la version à garder. Mettez les scripts et autres codes dans des blocs de code délimités (```` ``` ````) : le HTML brut hors bloc de code est assaini à l'enregistrement, ce qui peut faire passer une fusion propre pour un conflit.
+
+## Accès rapide
+
+La vue Accès rapide transforme des notes en une page de tuiles de liens, faite pour servir de page de démarrage à votre navigateur.
+
+<p align="center">
+  <img src="speed-dial.gif" alt="Démonstration de l'accès rapide" width="100%">
+</p>
+
+Donnez le tag `speed-dial` à une note, ou choisissez **Ajouter à l'accès rapide** dans le menu d'une note ou d'un dossier (pour un dossier, toutes ses notes, sous-dossiers compris). Ouvrez la vue avec l'icône d'éclair de la barre d'icônes à gauche. Ce bouton est masqué par défaut : activez-le dans **Paramètres > Affichage > Visibilité des éléments**.
+
+- **Un lien ou aucun :** la note est une tuile qui ouvre ce lien, ou la note elle-même. Son icône est la première image de la note, sinon l'icône du site, sinon la première lettre du titre.
+- **Plusieurs liens :** la note est un groupe de tuiles au nom de la note, avec une tuile par lien. Une ligne horizontale (`----`) commence une nouvelle rangée, et un lien autour d'une image la prend comme icône : `[![GitHub](https://example.com/icon.png)](https://github.com)`.
+- **Nom du groupe :** un clic ouvre la note, un clic droit change la couleur de son étiquette.
+- **Organiser la vue :** faites glisser les tuiles et les groupes pour les déplacer, et changez leur taille avec le bouton à côté du filtre. Le menu **...** en bas à droite définit une image de fond, et le bouton en forme d'œil masque ce dont vous n'avez pas besoin.
+- **Page de démarrage du navigateur :** utilisez `speed_dial.php?workspace=Name&focus=1` après votre adresse Poznote. `focus=1` masque aussi la barre d'icônes.
 
 ## Journal d'activité
 

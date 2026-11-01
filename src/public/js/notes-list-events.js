@@ -247,6 +247,13 @@
                     window.showTagFolderNotesDialog(folderData.id, folderData.name, folderData.noteCount);
                 }
             },
+            'toggle-folder-speed-dial': function () {
+                if (element.classList.contains('speed-dial-state-on')) {
+                    window.removeFolderFromSpeedDial(folderData.id);
+                } else if (typeof window.showTagFolderNotesDialog === 'function') {
+                    window.showTagFolderNotesDialog(folderData.id, folderData.name, folderData.noteCount, 'speed-dial');
+                }
+            },
             'rename-folder': function () {
                 if (typeof window.editFolderName === 'function') {
                     window.editFolderName(folderData.id, folderData.name);
@@ -426,7 +433,7 @@
         // Folder menu actions
         var folderMenuActions = [
             'create-note-in-folder', 'move-folder-files', 'move-entire-folder',
-            'duplicate-folder', 'download-folder', 'tag-folder-notes', 'rename-folder', 'archive-folder', 'delete-folder',
+            'duplicate-folder', 'download-folder', 'tag-folder-notes', 'toggle-folder-speed-dial', 'rename-folder', 'archive-folder', 'delete-folder',
             'change-folder-icon', 'share-folder', 'favorite-folder', 'offline-folder',
             'show-only-folder'
         ];

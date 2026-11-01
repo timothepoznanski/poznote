@@ -40,6 +40,7 @@
         'btn-uncheck-all': ['uncheck-all-tasks'],
         'btn-print': ['print-note'],
         'btn-archive': ['archive-note'],
+        'btn-speed-dial': ['toggle-speed-dial'],
         'btn-open-tasks-page': ['open-tasks-page']
     };
 
@@ -497,6 +498,20 @@
                     rules.push('.pz-edge-stack { bottom: 10px !important; }');
                 } else if (id === 'tasklist-progress') {
                     rules.push('.tasklist-progress { display: none !important; }');
+                } else if (id === 'speed-dial-workspace') {
+                    rules.push('.speed-dial-container .poznote-page-title-workspace { display: none !important; }');
+                } else if (id === 'speed-dial-edit') {
+                    rules.push('.speed-dial-edit { display: none !important; }');
+                } else if (id === 'speed-dial-labels') {
+                    rules.push('.speed-dial-label { display: none !important; }');
+                } else if (id === 'speed-dial-icons') {
+                    rules.push('.speed-dial-icon { display: none !important; }');
+                } else if (id === 'speed-dial-group-titles') {
+                    rules.push('.speed-dial-group-title { display: none !important; }');
+                } else if (id === 'speed-dial-group-rules') {
+                    rules.push('.speed-dial-group-rule { visibility: hidden !important; }');
+                } else if (id === 'speed-dial-frame') {
+                    rules.push('.speed-dial-tile { border-color: transparent !important; background: transparent !important; }');
                 } else if (id === 'preview-code-block-delete') {
                     // Issue #1406: the markdown preview edits nothing else, and
                     // the bin sits next to the copy button, so a misclick costs

@@ -69,6 +69,83 @@ function initializeClickableTags() {
     });
 }
 
+function isSpeedDialTag(tag) {
+    return tag.toLowerCase() === 'speed-dial';
+}
+
+/**
+ * Whether a note is in the speed dial (public/speed_dial.php), that is, has its
+ * tag. The field of an open note knows best: its tag row can change it at any time.
+ * @param {string|number} noteId - The note
+ * @param {boolean} rendered - What the page was rendered with, for a note not open
+ * @returns {boolean}
+ */
+function noteInSpeedDial(noteId, rendered) {
+    const tagsInput = document.getElementById('tags' + noteId);
+    return tagsInput ? tagsInput.value.split(/[,\s]+/).some(isSpeedDialTag) : rendered;
+}
+window.noteInSpeedDial = noteInSpeedDial;
+
+/**
+ * "Add to" and "Remove from speed dial" of the note menus: gives the note the
+ * tag or takes it away. Read from the server, since the note may not be the one
+ * open; when it is, its field follows, or the next save would send the old tags
+ * back.
+ * @param {string|number} noteId - The note
+ * @param {boolean} add - Add it, or remove it
+ */
+function setNoteSpeedDial(noteId, add) {
+    const label = (key, fallback) => (window.t ? window.t(key, null, fallback) : fallback);
+
+    fetch('/api/v1/notes/' + encodeURIComponent(noteId), {
+        credentials: 'same-origin',
+        headers: { 'Accept': 'application/json' }
+    })
+        .then(response => response.json().then(data => {
+            if (!response.ok || !data.success) throw new Error(data.error || data.message || 'HTTP ' + response.status);
+            const tags = String(data.note.tags || '').split(/[,\s]+/).filter(Boolean).filter(tag => !isSpeedDialTag(tag));
+            if (add) tags.push('speed-dial');
+            return fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/tags', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ tags: tags })
+            }).then(response => response.json().then(saved => {
+                if (!response.ok || !saved.success) throw new Error(saved.error || saved.message || 'HTTP ' + response.status);
+                const tagsInput = document.getElementById('tags' + noteId);
+                if (tagsInput) {
+                    tagsInput.value = tags.join(' ');
+                    convertTagsToEditable(noteId);
+                }
+                document.querySelectorAll('.note-actions-toggle[data-note-id="' + noteId + '"]').forEach(toggle => {
+                    toggle.setAttribute('data-speed-dial', add ? '1' : '0');
+                });
+                window.poznoteShowToast(add
+                    ? label('speed_dial.added', 'Added to the speed dial')
+                    : label('speed_dial.removed', 'Removed from the speed dial'));
+            }));
+        }))
+        .catch(error => {
+            console.error('setNoteSpeedDial failed', error);
+            showNotificationPopup(add
+                ? label('speed_dial.add_error', 'Could not add the note to the speed dial')
+                : label('speed_dial.remove_error', 'Could not remove the note from the speed dial'), 'error');
+        });
+}
+window.setNoteSpeedDial = setNoteSpeedDial;
+
+// The toolbar's menu shows the variant of the moment, as it opens. In the capture
+// phase, ahead of the click that opens it.
+document.addEventListener('click', function (event) {
+    const button = event.target.closest ? event.target.closest('.mobile-more-btn') : null;
+    const menu = button && button.parentNode ? button.parentNode.querySelector('.mobile-toolbar-menu') : null;
+    const item = menu ? menu.querySelector('.speed-dial-state-on') : null;
+    if (!item) return;
+    const inSpeedDial = noteInSpeedDial(item.getAttribute('data-note-id'), false);
+    item.style.display = inSpeedDial ? '' : 'none';
+    menu.querySelector('.speed-dial-state-off').style.display = inSpeedDial ? 'none' : '';
+}, true);
+
 /**
  * Convert tags input to editable tags display with inline editing
  * @param {string} noteId - The ID of the note to convert tags for

@@ -1400,7 +1400,6 @@
       "empty_folder": "This folder is empty",
       "error": "Could not tag the notes",
       "existing_tags": "Existing tags",
-      "include_subfolders": "Include the notes of subfolders",
       "no_tags": "Enter at least one tag",
       "placeholder": "Tags, separated by commas",
       "prompt_prefix": "Add tags to every note in",
@@ -5602,5 +5601,31 @@
   },
   "note_subline_menu": {
     "label": "Under the title"
+  },
+  "speed_dial": {
+    "title": "Speed dial",
+    "empty": "Your speed dial is empty.\n\nTo add a tile, use \"Add to speed dial\" in the menu of a note or folder, or give a note the tag \"{{tag}}\".\n\nClicking the tile opens the first link in the note, or the note itself if it has no link.\nIts icon is the first image in the note, otherwise the site's icon, otherwise the first letter of the title.\n\nA note with several links becomes a group of tiles under its title, and a horizontal line (----) starts a new row.\nClicking the title of a group opens the note, and right-clicking it changes its color.",
+    "edit_note": "Open the note",
+    "label_color": "Label color",
+    "tile_size": "Tile size",
+    "add": "Add to speed dial",
+    "added": "Added to the speed dial",
+    "add_error": "Could not add the note to the speed dial",
+    "remove": "Remove from speed dial",
+    "removed": "Removed from the speed dial",
+    "remove_error": "Could not remove the note from the speed dial",
+    "folder_removed_one": "1 note removed from the speed dial",
+    "folder_removed_other": "{{count}} notes removed from the speed dial",
+    "visibility": {
+      "title": "Page title",
+      "workspace": "Workspace selector",
+      "icons": "Tile icons",
+      "labels": "Tile names",
+      "edit": "Open the note button",
+      "frame": "Tile frames",
+      "group_titles": "Group titles",
+      "group_rules": "Group separators",
+      "size": "Tile size button"
+    }
   }
 }

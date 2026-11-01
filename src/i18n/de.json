@@ -1899,7 +1899,6 @@
       "empty_folder": "Dieser Ordner ist leer",
       "error": "Die Notizen konnten nicht getaggt werden",
       "existing_tags": "Vorhandene Tags",
-      "include_subfolders": "Notizen aus Unterordnern einbeziehen",
       "no_tags": "Geben Sie mindestens einen Tag ein",
       "placeholder": "Tags, durch Kommas getrennt",
       "prompt_prefix": "Allen Notizen in",
@@ -5757,5 +5756,31 @@
   },
   "note_subline_menu": {
     "label": "Unter dem Titel"
+  },
+  "speed_dial": {
+    "title": "Schnellwahl",
+    "empty": "Deine Schnellwahl ist leer.\n\nUm eine Kachel hinzuzufügen, verwenden Sie „Zur Schnellwahl hinzufügen“ im Menü einer Notiz oder eines Ordners, oder geben Sie einer Notiz den Tag „{{tag}}“.\n\nEin Klick auf die Kachel öffnet den ersten Link der Notiz oder die Notiz selbst, wenn sie keinen Link enthält.\nIhr Symbol ist das erste Bild der Notiz, sonst das Symbol der Website, sonst der erste Buchstabe des Titels.\n\nEine Notiz mit mehreren Links wird zu einer Kachelgruppe unter ihrem Titel, und eine horizontale Linie (----) beginnt eine neue Reihe.\nEin Klick auf den Titel einer Gruppe öffnet die Notiz, ein Rechtsklick ändert seine Farbe.",
+    "edit_note": "Notiz öffnen",
+    "label_color": "Farbe des Labels",
+    "tile_size": "Kachelgröße",
+    "add": "Zur Schnellwahl hinzufügen",
+    "added": "Zur Schnellwahl hinzugefügt",
+    "add_error": "Die Notiz konnte nicht zur Schnellwahl hinzugefügt werden",
+    "remove": "Aus der Schnellwahl entfernen",
+    "removed": "Aus der Schnellwahl entfernt",
+    "remove_error": "Die Notiz konnte nicht aus der Schnellwahl entfernt werden",
+    "folder_removed_one": "1 Notiz aus der Schnellwahl entfernt",
+    "folder_removed_other": "{{count}} Notizen aus der Schnellwahl entfernt",
+    "visibility": {
+      "title": "Seitentitel",
+      "workspace": "Arbeitsbereichsauswahl",
+      "icons": "Kachelsymbole",
+      "labels": "Kachelnamen",
+      "edit": "Schaltfläche „Notiz öffnen“",
+      "frame": "Kachelrahmen",
+      "group_titles": "Gruppentitel",
+      "group_rules": "Gruppentrennlinien",
+      "size": "Schaltfläche für die Kachelgröße"
+    }
   }
 }

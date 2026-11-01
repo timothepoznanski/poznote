@@ -22,6 +22,11 @@ test('the JS runtime knows every default-hidden key too', function () {
     $js = file_get_contents(dirname(__DIR__) . '/src/public/js/ui-customization.js');
 
     foreach (poznoteGetDefaultHiddenUiKeys() as $key) {
+        // The runtime hides any card: key by its id, with one generic rule
+        if (strpos($key, 'card:') === 0) {
+            assertContains("rules.push('#' + id + ' { display: none !important; }')", $js);
+            continue;
+        }
         foreach (explode("\n", poznoteBuildUiCustomizationRules([$key])) as $rule) {
             $selector = trim(strstr($rule, '{', true));
             if ($selector === '') {

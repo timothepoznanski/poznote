@@ -29,6 +29,17 @@ window.poznoteToastStack = function () {
     return stack;
 };
 
+// The toast of a save (js/keyboard-shortcuts.js), for what needs no acknowledging
+window.poznoteShowToast = function (text) {
+    var notification = document.createElement('div');
+    notification.className = 'save-notification';
+    notification.setAttribute('role', 'status');
+    notification.innerHTML = '<div class="save-notification-inner"><div class="save-notification-check">✓</div><span></span></div>';
+    notification.querySelector('span').textContent = text;
+    window.poznoteToastStack().appendChild(notification);
+    setTimeout(function () { notification.remove(); }, 2000);
+};
+
 function showNotificationPopup(message, type) {
     type = type || 'success';
 

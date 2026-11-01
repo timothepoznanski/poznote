@@ -161,7 +161,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 48; // 48: entries.title_color + title_size, the per-note look of the title set from its right-click menu
+    $CURRENT_SCHEMA_VERSION = 50; // 50: entries.speed_dial_order; 49: the speed dial's rail entry seeded as hidden
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -270,6 +270,7 @@ try {
             title_size INTEGER,
             display_order INTEGER DEFAULT 0,
             dashboard_order INTEGER DEFAULT 0,
+            speed_dial_order INTEGER DEFAULT 0,
             kanban_order INTEGER DEFAULT 0
         )');
 
@@ -794,6 +795,19 @@ try {
             $con->exec('CREATE INDEX IF NOT EXISTS idx_entries_folder_dashboard_order ON entries(workspace, folder_id, dashboard_order)');
         } catch (Exception $e) {
             error_log('Could not add dashboard_order column to entries: ' . $e->getMessage());
+        }
+
+        // Ensure speed_dial_order column exists: the position of a tile on the
+        // speed dial, same convention as dashboard_order. A column of its own
+        // because the tiles of a workspace come from all its folders, while
+        // dashboard_order ranks the notes of one folder.
+        try {
+            $cols = $con->query("PRAGMA table_info(entries)")->fetchAll(PDO::FETCH_ASSOC);
+            if (!in_array('speed_dial_order', array_column($cols, 'name'))) {
+                $con->exec("ALTER TABLE entries ADD COLUMN speed_dial_order INTEGER DEFAULT 0");
+            }
+        } catch (Exception $e) {
+            error_log('Could not add speed_dial_order column to entries: ' . $e->getMessage());
         }
 
         // Ensure kanban_order column exists: the position of a card inside a

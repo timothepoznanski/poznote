@@ -46,6 +46,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    font-family: inherit;
 }
 
 #uploadBackgroundBtn {
@@ -124,4 +125,3 @@ html[data-theme='dark'] .background-preview-container {
 html[data-theme='dark'] .background-opacity-control input[type="range"] {
     background: var(--pz-surface-sunken);
 }
-

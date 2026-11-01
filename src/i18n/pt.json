@@ -1899,7 +1899,6 @@
       "empty_folder": "Esta pasta está vazia",
       "error": "Não foi possível adicionar etiquetas às notas",
       "existing_tags": "Etiquetas existentes",
-      "include_subfolders": "Incluir as notas das subpastas",
       "no_tags": "Digite pelo menos uma etiqueta",
       "placeholder": "Etiquetas, separadas por vírgulas",
       "prompt_prefix": "Adicionar etiquetas a todas as notas de",
@@ -5758,5 +5757,31 @@
   },
   "note_subline_menu": {
     "label": "Abaixo do título"
+  },
+  "speed_dial": {
+    "title": "Acesso rápido",
+    "empty": "O seu acesso rápido está vazio.\n\nPara adicionar um mosaico, use «Adicionar ao acesso rápido» no menu de uma nota ou pasta, ou atribua a etiqueta «{{tag}}» a uma nota.\n\nUm clique no mosaico abre a primeira ligação da nota, ou a própria nota se não tiver ligações.\nO seu ícone é a primeira imagem da nota; caso contrário, o ícone do site; caso contrário, a primeira letra do título.\n\nUma nota com vários links torna-se um grupo de mosaicos sob o seu título, e uma linha horizontal (----) inicia uma nova fila.\nUm clique no título de um grupo abre a nota, e um clique direito muda a sua cor.",
+    "edit_note": "Abrir a nota",
+    "label_color": "Cor da etiqueta",
+    "tile_size": "Tamanho dos mosaicos",
+    "add": "Adicionar ao acesso rápido",
+    "added": "Adicionado ao acesso rápido",
+    "add_error": "Não foi possível adicionar a nota ao acesso rápido",
+    "remove": "Remover do acesso rápido",
+    "removed": "Removido do acesso rápido",
+    "remove_error": "Não foi possível remover a nota do acesso rápido",
+    "folder_removed_one": "1 nota removida do acesso rápido",
+    "folder_removed_other": "{{count}} notas removidas do acesso rápido",
+    "visibility": {
+      "title": "Título da página",
+      "workspace": "Seletor de espaço de trabalho",
+      "icons": "Ícones dos mosaicos",
+      "labels": "Nomes dos mosaicos",
+      "edit": "Botão Abrir a nota",
+      "frame": "Molduras dos mosaicos",
+      "group_titles": "Títulos dos grupos",
+      "group_rules": "Separadores dos grupos",
+      "size": "Botão de tamanho dos mosaicos"
+    }
   }
 }

@@ -1400,7 +1400,6 @@
       "empty_folder": "Aquesta carpeta és buida",
       "error": "No s'han pogut etiquetar les notes",
       "existing_tags": "Etiquetes existents",
-      "include_subfolders": "Inclou les notes de les subcarpetes",
       "no_tags": "Introduïu almenys una etiqueta",
       "placeholder": "Etiquetes, separades per comes",
       "prompt_prefix": "Afegeix etiquetes a totes les notes de",
@@ -5602,5 +5601,31 @@
   },
   "note_subline_menu": {
     "label": "Sota el títol"
+  },
+  "speed_dial": {
+    "title": "Accés ràpid",
+    "empty": "El teu accés ràpid és buit.\n\nPer afegir una rajola, feu servir «Afegeix a l'accés ràpid» al menú d'una nota o carpeta, o doneu l'etiqueta «{{tag}}» a una nota.\n\nEn fer clic al mosaic s'obre el primer enllaç de la nota, o la mateixa nota si no té cap enllaç.\nLa seva icona és la primera imatge de la nota; si no, la icona del lloc; si no, la primera lletra del títol.\n\nUna nota amb diversos enllaços es converteix en un grup de rajoles sota el seu títol, i una línia horitzontal (----) comença una fila nova.\nUn clic al títol d'un grup obre la nota, i un clic dret en canvia el color.",
+    "edit_note": "Obre la nota",
+    "label_color": "Color de l'etiqueta",
+    "tile_size": "Mida de les rajoles",
+    "add": "Afegeix a l'accés ràpid",
+    "added": "S'ha afegit a l'accés ràpid",
+    "add_error": "No s'ha pogut afegir la nota a l'accés ràpid",
+    "remove": "Treu de l'accés ràpid",
+    "removed": "S'ha tret de l'accés ràpid",
+    "remove_error": "No s'ha pogut treure la nota de l'accés ràpid",
+    "folder_removed_one": "S'ha tret 1 nota de l'accés ràpid",
+    "folder_removed_other": "S'han tret {{count}} notes de l'accés ràpid",
+    "visibility": {
+      "title": "Títol de la pàgina",
+      "workspace": "Selector d'espai de treball",
+      "icons": "Icones dels mosaics",
+      "labels": "Noms dels mosaics",
+      "edit": "Botó Obre la nota",
+      "frame": "Marcs dels mosaics",
+      "group_titles": "Títols dels grups",
+      "group_rules": "Separadors dels grups",
+      "size": "Botó de mida de les rajoles"
+    }
   }
 }
