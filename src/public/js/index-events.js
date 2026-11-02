@@ -145,7 +145,7 @@
     var noteScrollButtonsUpdateQueued = false;
     var noteScrollLockEdge = null;
     var noteScrollLockId = 0;
-    var NOTE_SCROLL_EDGE_TIMEOUT_MS = 12000;
+    var NOTE_SCROLL_SETTLE_MS = 400;
 
     function getNoteScrollTargets(triggerEl) {
         var noteCard = triggerEl && triggerEl.closest ? triggerEl.closest('.notecard') : null;
@@ -190,17 +190,7 @@
     function scrollElementToEdge(element, edge) {
         if (!element) return;
 
-        var top = edge === 'top' ? 0 : getNoteScrollMaxTop(element);
-        var behavior = isReducedMotionPreferred() ? 'auto' : 'smooth';
-
-        if (typeof element.scrollTo === 'function') {
-            element.scrollTo({
-                top: top,
-                behavior: behavior
-            });
-        } else {
-            element.scrollTop = top;
-        }
+        element.scrollTop = edge === 'top' ? 0 : getNoteScrollMaxTop(element);
     }
 
     function scrollNoteToEdge(triggerEl, edge) {
@@ -213,7 +203,7 @@
         targets.forEach(function (target) {
             scrollElementToEdge(target, edge);
         });
-        waitForNoteScrollEdge(targets, edge, lockId, performance.now());
+        holdNoteScrollEdge(targets, edge, lockId, performance.now());
     }
 
     function areNoteScrollTargetsAtEdge(targets, edge) {
@@ -233,28 +223,23 @@
         });
     }
 
-    function waitForNoteScrollEdge(targets, edge, lockId, startedAt, lastScrollTop) {
+    // CodeMirror only estimates the lines off screen and corrects its height
+    // once it has measured those the jump landed on: stay on the edge meanwhile.
+    function holdNoteScrollEdge(targets, edge, lockId, startedAt) {
         if (lockId !== noteScrollLockId) return;
 
-        if (areNoteScrollTargetsAtEdge(targets, edge) || performance.now() - startedAt > NOTE_SCROLL_EDGE_TIMEOUT_MS) {
+        if (performance.now() - startedAt > NOTE_SCROLL_SETTLE_MS) {
             noteScrollLockEdge = null;
             scheduleUpdateNoteScrollButtons();
             return;
         }
 
-        // If scroll position hasn't changed for ~300ms, the smooth scroll may have stalled — nudge it
-        var currentScrollTops = targets.map(function (t) { return t ? t.scrollTop : 0; });
-        if (lastScrollTop !== undefined && performance.now() - startedAt > 300) {
-            var stalled = targets.every(function (t, i) {
-                return !t || Math.abs(t.scrollTop - lastScrollTop[i]) < 1;
-            });
-            if (stalled && !areNoteScrollTargetsAtEdge(targets, edge)) {
-                targets.forEach(function (target) { scrollElementToEdge(target, edge); });
-            }
+        if (!areNoteScrollTargetsAtEdge(targets, edge)) {
+            targets.forEach(function (target) { scrollElementToEdge(target, edge); });
         }
 
         requestAnimationFrame(function () {
-            waitForNoteScrollEdge(targets, edge, lockId, startedAt, currentScrollTops);
+            holdNoteScrollEdge(targets, edge, lockId, startedAt);
         });
     }
 
