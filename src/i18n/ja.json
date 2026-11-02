@@ -5616,6 +5616,19 @@
     "remove_error": "ノートをスピードダイヤルから削除できませんでした",
     "folder_removed_one": "1 件のノートをスピードダイヤルから削除しました",
     "folder_removed_other": "{{count}} 件のノートをスピードダイヤルから削除しました",
+    "new_button": "新しいスピードダイヤル",
+    "default_name": "デフォルト",
+    "new_modal_title": "新しいスピードダイヤルを作成",
+    "name_placeholder": "スピードダイヤルの名前",
+    "rename_title": "スピードダイヤルの名前を変更",
+    "delete_confirm": "このスピードダイヤルを削除しますか?ノートは残り、そのタグだけが外れます。",
+    "board_error": "スピードダイヤルを保存できませんでした。",
+    "board_exists": "この名前のスピードダイヤルはすでにあります。",
+    "board_invalid": "この名前は使用できません。",
+    "choose_title": "スピードダイヤル",
+    "choose_item": "スピードダイヤル...",
+    "folder_added_one": "1 件のノートをスピードダイヤルに追加しました",
+    "folder_added_other": "{{count}} 件のノートをスピードダイヤルに追加しました",
     "visibility": {
       "title": "ページタイトル",
       "workspace": "ワークスペースセレクター",
@@ -5625,7 +5638,8 @@
       "frame": "タイルの枠",
       "group_titles": "グループのタイトル",
       "group_rules": "グループの区切り線",
-      "size": "タイルサイズのボタン"
+      "size": "タイルサイズのボタン",
+      "boards": "スピードダイヤルの一覧"
     }
   }
 }

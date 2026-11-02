@@ -5772,6 +5772,19 @@
     "remove_error": "Não foi possível remover a nota do acesso rápido",
     "folder_removed_one": "1 nota removida do acesso rápido",
     "folder_removed_other": "{{count}} notas removidas do acesso rápido",
+    "new_button": "Novo acesso rápido",
+    "default_name": "Padrão",
+    "new_modal_title": "Criar um novo acesso rápido",
+    "name_placeholder": "Nome do acesso rápido",
+    "rename_title": "Renomear o acesso rápido",
+    "delete_confirm": "Excluir este acesso rápido? As notas permanecem, apenas perdem a etiqueta.",
+    "board_error": "Não foi possível salvar o acesso rápido.",
+    "board_exists": "Já existe um acesso rápido com este nome.",
+    "board_invalid": "Este nome não pode ser usado.",
+    "choose_title": "Acessos rápidos",
+    "choose_item": "Acessos rápidos...",
+    "folder_added_one": "1 nota adicionada ao acesso rápido",
+    "folder_added_other": "{{count}} notas adicionadas ao acesso rápido",
     "visibility": {
       "title": "Título da página",
       "workspace": "Seletor de espaço de trabalho",
@@ -5781,7 +5794,8 @@
       "frame": "Molduras dos mosaicos",
       "group_titles": "Títulos dos grupos",
       "group_rules": "Separadores dos grupos",
-      "size": "Botão de tamanho dos mosaicos"
+      "size": "Botão de tamanho dos mosaicos",
+      "boards": "Lista de acessos rápidos"
     }
   }
 }

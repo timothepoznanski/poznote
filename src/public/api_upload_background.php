@@ -30,7 +30,13 @@ $responseWorkspace = $workspace !== '' ? $workspace : 'default';
 
 // The speed dial (issue #1714) keeps an image of its own next to the workspace's:
 // shown in full there, it would not suit the faint background of the notes.
-$filePrefix = ($_GET['scope'] ?? $_POST['scope'] ?? '') === 'speed_dial' ? 'speed-dial' : 'background';
+$filePrefix = 'background';
+if (($_GET['scope'] ?? $_POST['scope'] ?? '') === 'speed_dial') {
+    require_once __DIR__ . '/../lib/speed-dial.php';
+    $speedDialBoard = (string)($_GET['board'] ?? $_POST['board'] ?? POZNOTE_SPEED_DIAL_TAG);
+    $speedDialKey = poznoteSpeedDialIsBoardTag($speedDialBoard) ? poznoteSpeedDialBackgroundKey($speedDialBoard) : '';
+    $filePrefix = $speedDialKey !== '' ? 'speed-dial-' . $speedDialKey : 'speed-dial';
+}
 
 // Create user backgrounds directory with workspace subdirectory if it doesn't exist
 $user_dir = __DIR__ . '/../data/users/' . $user_id;

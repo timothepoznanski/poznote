@@ -396,7 +396,7 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     $offlineMark = (int)($row1['offline'] ?? 0);
     $isOffline = $offlineMark > 0
         || ($offlineMark === 0 && isset($offline_kept_folder_ids[(int)($row1['folder_id'] ?? 0)]));
-    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), $isOffline, isNoteShared($noteDbId), getSharedAncestorFolderName($folderId), poznoteHasSpeedDialTag((string)($row1['tags'] ?? '')));
+    echo generateNoteActions($noteDbId, $noteTitle, $noteType, $folderId, $folderName, !empty($row1['favorite']), $isOffline, isNoteShared($noteDbId), getSharedAncestorFolderName($folderId), poznoteSpeedDialTagsOf((string)($row1['tags'] ?? '')));
     echo "</div>";
     echo "<div class='pxbetweennotes'></div>";
 }

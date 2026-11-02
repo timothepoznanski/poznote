@@ -359,6 +359,8 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-frame" checked><span><?php echo t_h('speed_dial.visibility.frame', [], 'Tile frames'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-icons" checked><span><?php echo t_h('speed_dial.visibility.icons', [], 'Tile icons'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-labels" checked><span><?php echo t_h('speed_dial.visibility.labels', [], 'Tile names'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:speedDialSwitcher" checked><span><?php echo t_h('speed_dial.visibility.boards', [], 'List of speed dials'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:speedDialNewBtn" checked><span><?php echo t_h('speed_dial.new_button', [], 'New speed dial'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:speedDialSize" checked><span><?php echo t_h('speed_dial.visibility.size', [], 'Tile size button'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-edit" checked><span><?php echo t_h('speed_dial.visibility.edit', [], 'Open the note button'); ?></span></label>
 </div>

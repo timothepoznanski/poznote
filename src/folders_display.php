@@ -465,6 +465,11 @@ function renderFolderActionsMenu($currentWorkspace = '') {
     $menu .= "<i class='lucide lucide-zap'></i>";
     $menu .= "<span>" . t_h('speed_dial.remove', [], 'Remove from speed dial') . "</span>";
     $menu .= "</div>";
+    // Both give way to this one once the workspace has several speed dials
+    $menu .= "<div class='folder-actions-menu-item requires-notes speed-dial-state-choose' data-action='toggle-folder-speed-dial'>";
+    $menu .= "<i class='lucide lucide-zap'></i>";
+    $menu .= "<span>" . t_h('speed_dial.choose_item', [], 'Speed dials...') . "</span>";
+    $menu .= "</div>";
 
     // Share folder action: two variants, the client shows the one matching
     // the folder's shared state (data-shared on the toggle). Not in a
@@ -574,7 +579,7 @@ function renderFolderActionsMenu($currentWorkspace = '') {
  *                       share like the toolbar button does
  * @return string HTML for the note actions toggle
  */
-function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false, $isShared = false, $sharedViaFolderName = null, $inSpeedDial = false) {
+function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderName, $isFavorite = false, $isOffline = false, $isShared = false, $sharedViaFolderName = null, $speedDialTags = []) {
     $htmlNoteId = htmlspecialchars((string)$noteId, ENT_QUOTES);
     $htmlNoteTitle = htmlspecialchars((string)$noteTitle, ENT_QUOTES);
     $htmlNoteType = htmlspecialchars((string)$noteType, ENT_QUOTES);
@@ -592,7 +597,7 @@ function generateNoteActions($noteId, $noteTitle, $noteType, $folderId, $folderN
         . " data-favorite='" . ($isFavorite ? '1' : '0') . "'"
         . " data-offline='" . ($isOffline ? '1' : '0') . "'"
         . " data-shared='" . ($isShared ? '1' : '0') . "'"
-        . " data-speed-dial='" . ($inSpeedDial ? '1' : '0') . "'"
+        . " data-speed-dial='" . htmlspecialchars(implode(' ', $speedDialTags), ENT_QUOTES) . "'"
         . (!$isShared && $sharedViaFolderName !== null
             ? " data-shared-via-folder='1' data-shared-folder-name='" . htmlspecialchars((string)$sharedViaFolderName, ENT_QUOTES) . "'"
             : '')
@@ -687,6 +692,11 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     $menu .= "<div class='note-actions-menu-item note-real-only speed-dial-state-off' data-action='toggle-speed-dial'>";
     $menu .= "<i class='lucide lucide-zap'></i>";
     $menu .= "<span>" . t_h('speed_dial.add', [], 'Add to speed dial') . "</span>";
+    $menu .= "</div>";
+    // Both give way to this one once the workspace has several speed dials
+    $menu .= "<div class='note-actions-menu-item note-real-only speed-dial-state-choose' data-action='toggle-speed-dial'>";
+    $menu .= "<i class='lucide lucide-zap'></i>";
+    $menu .= "<span>" . t_h('speed_dial.choose_item', [], 'Speed dials...') . "</span>";
     $menu .= "</div>";
 
     // Keep offline: the note stays in the browser whatever its date (Offline

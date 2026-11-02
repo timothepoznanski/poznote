@@ -9,12 +9,98 @@ const POZNOTE_SPEED_DIAL_TILE_MIN = 80;
 const POZNOTE_SPEED_DIAL_TILE_MAX = 260;
 const POZNOTE_SPEED_DIAL_TILE_DEFAULT = 140;
 
-/** @param string $tags entries.tags, comma separated */
-function poznoteHasSpeedDialTag(string $tags): bool {
+/**
+ * @param string $tags entries.tags, comma separated
+ * @param string $board The tag of a speed dial: the default one, or speed-dial-<name>
+ */
+function poznoteHasSpeedDialTag(string $tags, string $board = POZNOTE_SPEED_DIAL_TAG): bool {
+    $board = mb_strtolower($board, 'UTF-8');
     foreach (explode(',', $tags) as $tag) {
-        if (mb_strtolower(trim($tag), 'UTF-8') === POZNOTE_SPEED_DIAL_TAG) return true;
+        if (mb_strtolower(trim($tag), 'UTF-8') === $board) return true;
     }
     return false;
+}
+
+/** The tag of a speed dial, default or named. */
+function poznoteSpeedDialIsBoardTag(string $tag): bool {
+    $tag = mb_strtolower($tag, 'UTF-8');
+    return $tag === POZNOTE_SPEED_DIAL_TAG
+        || (strncmp($tag, POZNOTE_SPEED_DIAL_TAG . '-', strlen(POZNOTE_SPEED_DIAL_TAG) + 1) === 0
+            && strlen($tag) > strlen(POZNOTE_SPEED_DIAL_TAG) + 1);
+}
+
+/**
+ * The tags of speed dials among the tags of a note, in lower case.
+ *
+ * @return string[]
+ */
+function poznoteSpeedDialTagsOf(string $tags): array {
+    $found = [];
+    foreach (explode(',', $tags) as $tag) {
+        $tag = mb_strtolower(trim($tag), 'UTF-8');
+        if (poznoteSpeedDialIsBoardTag($tag)) $found[$tag] = true;
+    }
+    return array_keys($found);
+}
+
+/**
+ * The tag of a new speed dial named $name, as the tags of notes are written:
+ * spaces become underscores. Null when the name cannot make one.
+ */
+function poznoteSpeedDialTagFromName(string $name): ?string {
+    $slug = preg_replace('/[\s,]+/u', '_', trim($name)) ?? '';
+    if ($slug === '' || mb_strlen($slug, 'UTF-8') > 50 || preg_match('/[\/\\\\:*?"<>|&\'#%]/', $slug)) {
+        return null;
+    }
+    return POZNOTE_SPEED_DIAL_TAG . '-' . $slug;
+}
+
+/** The name of a speed dial, from its tag. The default one has none: it goes by the view's title. */
+function poznoteSpeedDialBoardName(string $tag): ?string {
+    if (mb_strtolower($tag, 'UTF-8') === POZNOTE_SPEED_DIAL_TAG) return null;
+    return str_replace('_', ' ', substr($tag, strlen(POZNOTE_SPEED_DIAL_TAG) + 1));
+}
+
+/**
+ * The speed dials of a workspace: the default one, those created in the view
+ * (an empty one has no note to be found through) and the tags in use.
+ *
+ * @param string[] $registered What the setting speed_dial_boards_<workspace> lists
+ * @param string[] $noteTags entries.tags of the notes
+ * @return string[]
+ */
+function poznoteSpeedDialMergeBoards(array $registered, array $noteTags): array {
+    $boards = [POZNOTE_SPEED_DIAL_TAG => POZNOTE_SPEED_DIAL_TAG];
+    foreach ($registered as $tag) {
+        if (is_string($tag) && poznoteSpeedDialIsBoardTag($tag)) {
+            $boards += [mb_strtolower($tag, 'UTF-8') => $tag];
+        }
+    }
+    foreach ($noteTags as $tags) {
+        foreach (explode(',', (string)$tags) as $tag) {
+            $tag = trim($tag);
+            if (poznoteSpeedDialIsBoardTag($tag)) {
+                $boards += [mb_strtolower($tag, 'UTF-8') => $tag];
+            }
+        }
+    }
+    return array_values($boards);
+}
+
+/** @return string[] The speed dials of a workspace, the default one first */
+function poznoteSpeedDialBoards(PDO $con, string $workspace): array {
+    $stmt = $con->prepare("SELECT tags FROM entries WHERE trash = 0 AND workspace = ? AND tags LIKE ?");
+    $stmt->execute([$workspace, '%' . POZNOTE_SPEED_DIAL_TAG . '-%']);
+    $settingStmt = $con->prepare("SELECT value FROM settings WHERE key = ?");
+    $settingStmt->execute(['speed_dial_boards_' . $workspace]);
+    $registered = json_decode((string)$settingStmt->fetchColumn(), true);
+    return poznoteSpeedDialMergeBoards(is_array($registered) ? $registered : [], $stmt->fetchAll(PDO::FETCH_COLUMN));
+}
+
+/** What tells the image and the opacity of a speed dial from the others': empty for the default one. */
+function poznoteSpeedDialBackgroundKey(string $tag): string {
+    $tag = mb_strtolower($tag, 'UTF-8');
+    return $tag === POZNOTE_SPEED_DIAL_TAG ? '' : substr(md5($tag), 0, 10);
 }
 
 /** Only http(s), the address ends up in an href. */

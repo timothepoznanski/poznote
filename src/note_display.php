@@ -414,6 +414,7 @@
                         // Two variants, shown as the menu opens (js/clickable-tags.js)
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item speed-dial-state-on" role="menuitem" data-action="toggle-speed-dial" data-note-id="'.$row['id'].'" style="display: none;"><i class="lucide lucide-zap"></i> '.t_h('speed_dial.remove', [], 'Remove from speed dial').'</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item speed-dial-state-off" role="menuitem" data-action="toggle-speed-dial" data-note-id="'.$row['id'].'"><i class="lucide lucide-zap"></i> '.t_h('speed_dial.add', [], 'Add to speed dial').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item speed-dial-state-choose" role="menuitem" data-action="toggle-speed-dial" data-note-id="'.$row['id'].'" style="display: none;"><i class="lucide lucide-zap"></i> '.t_h('speed_dial.choose_item', [], 'Speed dials...').'</button>';
                     }
                     // Archive: files the note away in the archive workspace with
                     // its folder path. Hidden once that workspace is the one open,

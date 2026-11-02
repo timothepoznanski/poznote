@@ -873,3 +873,12 @@ html[data-theme='dark'] .note-palette-remove:hover {
     background-color: var(--pz-icon);
     flex: none;
 }
+
+/* Which speed dials a note or a folder is on (modals/speed_dial_boards_modal.php) */
+.speed-dial-boards-list label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    cursor: pointer;
+}

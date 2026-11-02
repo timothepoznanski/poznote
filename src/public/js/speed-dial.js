@@ -49,6 +49,183 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Several speed dials, as the diary has several journals: "New speed dial" asks
+// for a name, and a right-click or a long press on a pill renames or deletes it
+// (api/v1/speed-dial/boards.php). The default one has no menu: it cannot change.
+document.addEventListener('DOMContentLoaded', function () {
+    var bar = document.getElementById('speedDialBoards');
+    if (!bar) return;
+
+    var workspace = document.body.getAttribute('data-workspace') || '';
+    var menu = null;
+
+    function txt(name) {
+        return bar.getAttribute('data-txt-' + name) || '';
+    }
+
+    function boardUrl(tag) {
+        return 'speed_dial.php?workspace=' + encodeURIComponent(workspace) + (tag ? '&board=' + encodeURIComponent(tag) : '');
+    }
+
+    function send(method, fields) {
+        fields.workspace = workspace;
+        var options = {
+            method: method,
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify(fields)
+        };
+        return fetch('api/v1/speed-dial/boards.php', options).then(function (response) {
+            return response.json().catch(function () { return {}; });
+        }).then(function (result) {
+            if (result.success) return result;
+            throw new Error(result.code === 'exists' ? txt('exists') : (result.code === 'invalid_name' ? txt('invalid') : txt('error')));
+        });
+    }
+
+    // Same markup as js/modal-alerts.js, so it matches the app's other dialogs
+    function openNameModal(title, value, confirmText, submit) {
+        var overlay = document.createElement('div');
+        overlay.className = 'alert-modal-overlay show';
+        overlay.innerHTML =
+            '<div class="alert-modal speed-dial-name-modal">' +
+                '<div class="alert-modal-header"><h3 class="alert-modal-title"></h3></div>' +
+                '<div class="alert-modal-body">' +
+                    '<input type="text" class="speed-dial-name-input" maxlength="50">' +
+                    '<p class="speed-dial-name-error" hidden></p>' +
+                '</div>' +
+                '<div class="alert-modal-footer">' +
+                    '<button type="button" class="alert-modal-button secondary"></button>' +
+                    '<button type="button" class="alert-modal-button primary"></button>' +
+                '</div>' +
+            '</div>';
+        overlay.querySelector('.alert-modal-title').textContent = title;
+        var input = overlay.querySelector('input');
+        var error = overlay.querySelector('.speed-dial-name-error');
+        var cancel = overlay.querySelector('.secondary');
+        var confirm = overlay.querySelector('.primary');
+        input.placeholder = txt('placeholder');
+        input.value = value;
+        cancel.textContent = txt('cancel');
+        confirm.textContent = confirmText;
+        document.body.appendChild(overlay);
+
+        function close() {
+            overlay.remove();
+        }
+
+        function go() {
+            var name = input.value.trim();
+            if (!name) {
+                input.focus();
+                return;
+            }
+            if (name === value) {
+                close();
+                return;
+            }
+            confirm.disabled = true;
+            submit(name).catch(function (err) {
+                confirm.disabled = false;
+                error.textContent = err.message;
+                error.hidden = false;
+                input.focus();
+            });
+        }
+
+        cancel.addEventListener('click', close);
+        confirm.addEventListener('click', go);
+        overlay.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                go();
+            } else if (event.key === 'Escape') {
+                event.stopPropagation();
+                close();
+            }
+        });
+        input.focus();
+        input.select();
+    }
+
+    function closeMenu() {
+        if (menu) menu.remove();
+        menu = null;
+    }
+
+    function openMenu(event, pill) {
+        closeMenu();
+        menu = document.createElement('div');
+        menu.className = 'speed-dial-board-menu';
+        menu.setAttribute('role', 'menu');
+        [
+            { label: txt('rename'), icon: 'lucide-pencil', run: function () {
+                openNameModal(txt('rename-title'), pill.getAttribute('data-name'), txt('rename'), function (name) {
+                    return send('PATCH', { tag: pill.getAttribute('data-tag'), name: name }).then(function (result) {
+                        window.location.href = boardUrl(result.tag);
+                    });
+                });
+            } },
+            { label: txt('delete'), icon: 'lucide-trash-2', danger: true, run: function () {
+                window.modalAlert.confirm(txt('delete-confirm'), pill.getAttribute('data-name'), { danger: true, confirmText: txt('delete') }).then(function (confirmed) {
+                    if (!confirmed) return;
+                    send('DELETE', { tag: pill.getAttribute('data-tag') }).then(function () {
+                        window.location.href = boardUrl('');
+                    }).catch(function (err) {
+                        window.modalAlert.alert(err.message, 'error');
+                    });
+                });
+            } }
+        ].forEach(function (entry) {
+            var item = document.createElement('button');
+            item.type = 'button';
+            item.setAttribute('role', 'menuitem');
+            item.className = 'speed-dial-board-menu-item' + (entry.danger ? ' danger' : '');
+            item.innerHTML = '<i class="lucide ' + entry.icon + '"></i><span></span>';
+            item.querySelector('span').textContent = entry.label;
+            item.addEventListener('click', function () {
+                closeMenu();
+                entry.run();
+            });
+            menu.appendChild(item);
+        });
+        document.body.appendChild(menu);
+        var rect = menu.getBoundingClientRect();
+        menu.style.left = Math.max(8, Math.min(event.clientX, window.innerWidth - rect.width - 8)) + 'px';
+        menu.style.top = Math.max(8, Math.min(event.clientY, window.innerHeight - rect.height - 8)) + 'px';
+    }
+
+    var newButton = document.getElementById('speedDialNewBtn');
+    if (newButton) {
+        newButton.addEventListener('click', function () {
+            openNameModal(txt('new-title'), '', txt('create'), function (name) {
+                return send('POST', { name: name }).then(function (result) {
+                    window.location.href = boardUrl(result.tag);
+                });
+            });
+        });
+    }
+
+    // Only for the owner of the account
+    if (bar.hasAttribute('data-can-edit')) {
+        bar.addEventListener('contextmenu', function (event) {
+            var pill = event.target.closest ? event.target.closest('.speed-dial-board[data-tag]') : null;
+            if (!pill || event.shiftKey) return;
+            event.preventDefault();
+            openMenu(event, pill);
+        });
+    }
+
+    document.addEventListener('mousedown', function (event) {
+        if (menu && !menu.contains(event.target)) closeMenu();
+    }, true);
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeMenu();
+    }, true);
+    window.addEventListener('blur', closeMenu);
+    window.addEventListener('resize', closeMenu);
+});
+
 // Size of the tiles: the button opens a slider, which resizes them as it moves
 // and saves on release, in the setting speed_dial_tile_size. speed_dial.php
 // renders the width on <body>, css/speed-dial.css derives the rest from it.
@@ -376,7 +553,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 note_id: parseInt(tile.getAttribute('data-note-id'), 10),
                 target_note_id: parseInt(target.tile.getAttribute('data-note-id'), 10),
                 position: target.position,
-                workspace: workspace
+                workspace: workspace,
+                board: document.body.getAttribute('data-board') || ''
             })
         }).then(function (response) {
             return window.readApiJson(response).then(function (data) {

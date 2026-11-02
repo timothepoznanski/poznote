@@ -825,7 +825,11 @@
                     var toolbarElForSpeedDial = target.closest('.note-edit-toolbar');
                     var menuElForSpeedDial = toolbarElForSpeedDial && toolbarElForSpeedDial.querySelector('.mobile-toolbar-menu');
                     if (menuElForSpeedDial) menuElForSpeedDial.hidden = true;
-                    window.setNoteSpeedDial(noteId, target.classList.contains('speed-dial-state-off'));
+                    if (target.classList.contains('speed-dial-state-choose')) {
+                        window.openSpeedDialBoardsModal({ noteId: noteId });
+                    } else {
+                        window.setNoteSpeedDial(noteId, target.classList.contains('speed-dial-state-off'));
+                    }
                 }
                 break;
             case 'toggle-offline':

@@ -51,14 +51,14 @@ $folders = sortFolders($folders, poznoteNormalizeNoteSort(getSetting('note_list_
 // index.php) rather than flat, so subfolders read as belonging to their parent.
 $folderTree = buildFolderHierarchy($folders);
 
-// Notes in the speed dial by folder: "Remove from speed dial" once they all are.
+// Notes of each speed dial by folder: "Remove from speed dial" once they all are.
 // LIKE also matches "my-speed-dial-notes": the whole tag has to be there.
 $speedDialNotesByFolder = [];
 $speedDialStmt = $con->prepare("SELECT folder_id, tags FROM entries WHERE trash = 0 AND folder_id IS NOT NULL AND tags LIKE ?");
 $speedDialStmt->execute(['%' . POZNOTE_SPEED_DIAL_TAG . '%']);
 while ($speedDialRow = $speedDialStmt->fetch(PDO::FETCH_ASSOC)) {
-	if (poznoteHasSpeedDialTag((string)$speedDialRow['tags'])) {
-		$speedDialNotesByFolder[(int)$speedDialRow['folder_id']] = ($speedDialNotesByFolder[(int)$speedDialRow['folder_id']] ?? 0) + 1;
+	foreach (poznoteSpeedDialTagsOf((string)$speedDialRow['tags']) as $speedDialTag) {
+		$speedDialNotesByFolder[(int)$speedDialRow['folder_id']][$speedDialTag] = ($speedDialNotesByFolder[(int)$speedDialRow['folder_id']][$speedDialTag] ?? 0) + 1;
 	}
 }
 
@@ -85,14 +85,30 @@ function countFolderTreeNotes($folder) {
 	return $count;
 }
 
-/** The same for those in the speed dial. */
+/**
+ * The notes of each speed dial in a folder and its subfolders.
+ *
+ * @return array<string, int> Tag => number of notes
+ */
 function countFolderTreeSpeedDialNotes($folder) {
 	global $speedDialNotesByFolder;
-	$count = (int)($speedDialNotesByFolder[(int)$folder['id']] ?? 0);
+	$counts = $speedDialNotesByFolder[(int)$folder['id']] ?? [];
 	foreach ($folder['children'] ?? [] as $child) {
-		$count += countFolderTreeSpeedDialNotes($child);
+		foreach (countFolderTreeSpeedDialNotes($child) as $tag => $count) {
+			$counts[$tag] = ($counts[$tag] ?? 0) + $count;
+		}
 	}
-	return $count;
+	return $counts;
+}
+
+/** The speed dials all the notes of a folder and its subfolders are on, separated by a space. */
+function folderTreeSpeedDialTags($folder) {
+	$total = countFolderTreeNotes($folder);
+	$tags = [];
+	foreach (countFolderTreeSpeedDialNotes($folder) as $tag => $count) {
+		if ($count === $total) $tags[] = $tag;
+	}
+	return implode(' ', $tags);
 }
 
 /**
@@ -220,6 +236,13 @@ function folderListActions() {
 			'requires_notes' => true,
 		],
 		[
+			'action' => 'toggle-folder-speed-dial',
+			'icon' => 'lucide-zap',
+			'label' => t_h('speed_dial.choose_item', [], 'Speed dials...'),
+			'state_class' => 'speed-dial-state-choose',
+			'requires_notes' => true,
+		],
+		[
 			'action' => 'change-folder-icon',
 			'icon' => 'lucide-palette',
 			'label' => t_h('notes_list.folder_actions.change_icon', [], 'Change icon'),
@@ -294,7 +317,7 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	// Folder identity, carried by every action button of the row
 	$folderAttrs = ' data-folder-id="' . $folder_id . '" data-folder-name="' . $folder_name . '"'
 		. ' data-note-count="' . countFolderTreeNotes($folder) . '" data-shared="' . $is_shared . '"'
-		. ' data-speed-dial="' . (countFolderTreeNotes($folder) > 0 && countFolderTreeSpeedDialNotes($folder) === countFolderTreeNotes($folder) ? '1' : '0') . '"'
+		. ' data-speed-dial="' . htmlspecialchars(folderTreeSpeedDialTags($folder), ENT_QUOTES) . '"'
 		. ' data-favorite="' . $is_favorite . '" data-offline="' . $is_offline . '"';
 
 	echo '<div class="folder-list-actions">';
@@ -803,6 +826,10 @@ $currentLang = getUserLanguage();
 						<i class="lucide lucide-zap"></i>
 						<span><?php echo t_h('speed_dial.remove', [], 'Remove from speed dial'); ?></span>
 					</div>
+					<div class="folder-actions-menu-item requires-notes speed-dial-state-choose" data-action="toggle-folder-speed-dial">
+						<i class="lucide lucide-zap"></i>
+						<span><?php echo t_h('speed_dial.choose_item', [], 'Speed dials...'); ?></span>
+					</div>
 					<div class="folder-actions-menu-item active-state share-state-shared" data-action="share-folder">
 						<i class="lucide lucide-share-2"></i>
 						<span><?php echo t_h('notes_list.folder_actions.is_public', [], 'Is public'); ?></span>
@@ -943,6 +970,7 @@ $currentLang = getUserLanguage();
 	// Folder icon picker markup, shared with index.php
 	include __DIR__ . '/../modals/folder_icon_modal.php';
 	include __DIR__ . '/../modals/tag_folder_notes_modal.php';
+	include __DIR__ . '/../modals/speed_dial_boards_modal.php';
 	?>
 
 	<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>

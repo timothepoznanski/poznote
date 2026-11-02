@@ -1001,6 +1001,7 @@ Give a note the `speed-dial` tag, or choose **Add to speed dial** in the menu of
 - **One link or none:** the note is a tile that opens this link, or the note itself. Its icon is the first image of the note, otherwise the site's icon, otherwise the first letter of the title.
 - **Several links:** the note is a group of tiles named after the note, with one tile per link. A horizontal line (`----`) starts a new row, and a link around an image uses it as icon: `[![GitHub](https://example.com/icon.png)](https://github.com)`.
 - **Group name:** a click opens the note, a right-click changes the color of its label.
+- **Several speed dials:** **New speed dial** creates another one, and pills switch between them (for example Work and Home). Each one is a tag, such as `speed-dial-Work`, with its own background image. A right-click on a pill renames or deletes it: deleting keeps the notes. The menus of notes and folders then open **Speed dials...** to pick which ones they are on.
 - **Arrange the view:** drag tiles and groups to move them, and change their size with the button next to the filter. The **...** menu at the bottom right sets a background image, and the eye button hides what you do not need.
 - **Browser start page:** use `speed_dial.php?workspace=Name&focus=1` after your Poznote address. `focus=1` also hides the icon rail.
 

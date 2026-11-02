@@ -248,7 +248,9 @@
                 }
             },
             'toggle-folder-speed-dial': function () {
-                if (element.classList.contains('speed-dial-state-on')) {
+                if (element.classList.contains('speed-dial-state-choose')) {
+                    window.openSpeedDialBoardsModal({ folderId: folderData.id });
+                } else if (element.classList.contains('speed-dial-state-on')) {
                     window.removeFolderFromSpeedDial(folderData.id);
                 } else if (typeof window.showTagFolderNotesDialog === 'function') {
                     window.showTagFolderNotesDialog(folderData.id, folderData.name, folderData.noteCount, 'speed-dial');

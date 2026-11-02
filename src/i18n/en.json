@@ -5616,6 +5616,19 @@
     "remove_error": "Could not remove the note from the speed dial",
     "folder_removed_one": "1 note removed from the speed dial",
     "folder_removed_other": "{{count}} notes removed from the speed dial",
+    "new_button": "New speed dial",
+    "default_name": "Default",
+    "new_modal_title": "Create a new speed dial",
+    "name_placeholder": "Speed dial name",
+    "rename_title": "Rename speed dial",
+    "delete_confirm": "Delete this speed dial? Its notes stay, they only lose its tag.",
+    "board_error": "Could not save the speed dial.",
+    "board_exists": "A speed dial with this name already exists.",
+    "board_invalid": "This name cannot be used.",
+    "choose_title": "Speed dials",
+    "choose_item": "Speed dials...",
+    "folder_added_one": "1 note added to the speed dial",
+    "folder_added_other": "{{count}} notes added to the speed dial",
     "visibility": {
       "title": "Page title",
       "workspace": "Workspace selector",
@@ -5625,7 +5638,8 @@
       "frame": "Tile frames",
       "group_titles": "Group titles",
       "group_rules": "Group separators",
-      "size": "Tile size button"
+      "size": "Tile size button",
+      "boards": "List of speed dials"
     }
   }
 }

@@ -999,6 +999,7 @@ Donnez le tag `speed-dial` à une note, ou choisissez **Ajouter à l'accès rapi
 - **Un lien ou aucun :** la note est une tuile qui ouvre ce lien, ou la note elle-même. Son icône est la première image de la note, sinon l'icône du site, sinon la première lettre du titre.
 - **Plusieurs liens :** la note est un groupe de tuiles au nom de la note, avec une tuile par lien. Une ligne horizontale (`----`) commence une nouvelle rangée, et un lien autour d'une image la prend comme icône : `[![GitHub](https://example.com/icon.png)](https://github.com)`.
 - **Nom du groupe :** un clic ouvre la note, un clic droit change la couleur de son étiquette.
+- **Plusieurs accès rapides :** **Nouvel accès rapide** en crée un autre, et des pastilles permettent de passer de l'un à l'autre (par exemple Travail et Maison). Chacun est un tag, comme `speed-dial-Travail`, avec sa propre image de fond. Un clic droit sur une pastille le renomme ou le supprime : la suppression conserve les notes. Les menus des notes et des dossiers ouvrent alors **Accès rapides...** pour choisir ceux où elles figurent.
 - **Organiser la vue :** faites glisser les tuiles et les groupes pour les déplacer, et changez leur taille avec le bouton à côté du filtre. Le menu **...** en bas à droite définit une image de fond, et le bouton en forme d'œil masque ce dont vous n'avez pas besoin.
 - **Page de démarrage du navigateur :** utilisez `speed_dial.php?workspace=Name&focus=1` après votre adresse Poznote. `focus=1` masque aussi la barre d'icônes.
 

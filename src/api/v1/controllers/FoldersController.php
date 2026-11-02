@@ -34,6 +34,9 @@ require_once __DIR__ . '/../../../lib/note-sort.php';
 require_once __DIR__ . '/../../../lib/speed-dial.php';
 
 class FoldersController {
+    // The speed dial a reorder happens on (scope speed_dial)
+    private string $speedDialBoard = POZNOTE_SPEED_DIAL_TAG;
+
     private PDO $db;
     
     public function __construct(PDO $db) {
@@ -3267,10 +3270,13 @@ class FoldersController {
         $changesFolder = $currentFolderId !== $targetFolderId;
 
         if ($scope === 'speed_dial') {
-            if (!poznoteHasSpeedDialTag((string)$note['tags']) || !poznoteHasSpeedDialTag((string)$targetNote['tags'])) {
+            $board = (string)($data['board'] ?? POZNOTE_SPEED_DIAL_TAG);
+            if (!poznoteSpeedDialIsBoardTag($board)
+                || !poznoteHasSpeedDialTag((string)$note['tags'], $board) || !poznoteHasSpeedDialTag((string)$targetNote['tags'], $board)) {
                 $this->sendError('Speed dial reordering needs two notes of the speed dial', 400);
                 return;
             }
+            $this->speedDialBoard = $board;
             $this->reorderNoteOnBoard($scope, $note, $targetNoteId, $position, $targetWorkspace, $currentFolderId);
             return;
         }
@@ -3508,10 +3514,11 @@ class FoldersController {
      * speed_dial.php shows them, excluding one note.
      */
     private function getOrderedSpeedDialNoteIds(string $workspace, int $excludeNoteId): array {
+        $board = $this->speedDialBoard;
         $stmt = $this->db->prepare('SELECT id, tags, updated, speed_dial_order FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND tags LIKE ?');
         $stmt->execute([$workspace, $excludeNoteId, '%' . POZNOTE_SPEED_DIAL_TAG . '%']);
-        $rows = array_filter($stmt->fetchAll(PDO::FETCH_ASSOC), function ($row) {
-            return poznoteHasSpeedDialTag((string)$row['tags']);
+        $rows = array_filter($stmt->fetchAll(PDO::FETCH_ASSOC), function ($row) use ($board) {
+            return poznoteHasSpeedDialTag((string)$row['tags'], $board);
         });
         usort($rows, function ($a, $b) {
             return self::compareNotesPlacedOrder($a, $b, 'speed_dial_order');

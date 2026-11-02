@@ -5616,6 +5616,19 @@
     "remove_error": "No s'ha pogut treure la nota de l'accés ràpid",
     "folder_removed_one": "S'ha tret 1 nota de l'accés ràpid",
     "folder_removed_other": "S'han tret {{count}} notes de l'accés ràpid",
+    "new_button": "Nou accés ràpid",
+    "default_name": "Predeterminat",
+    "new_modal_title": "Crea un nou accés ràpid",
+    "name_placeholder": "Nom de l'accés ràpid",
+    "rename_title": "Canvia el nom de l'accés ràpid",
+    "delete_confirm": "Voleu suprimir aquest accés ràpid? Les seves notes es conserven, només perden la seva etiqueta.",
+    "board_error": "No s'ha pogut desar l'accés ràpid.",
+    "board_exists": "Ja existeix un accés ràpid amb aquest nom.",
+    "board_invalid": "Aquest nom no es pot fer servir.",
+    "choose_title": "Accessos ràpids",
+    "choose_item": "Accessos ràpids...",
+    "folder_added_one": "S'ha afegit 1 nota a l'accés ràpid",
+    "folder_added_other": "S'han afegit {{count}} notes a l'accés ràpid",
     "visibility": {
       "title": "Títol de la pàgina",
       "workspace": "Selector d'espai de treball",
@@ -5625,7 +5638,8 @@
       "frame": "Marcs dels mosaics",
       "group_titles": "Títols dels grups",
       "group_rules": "Separadors dels grups",
-      "size": "Botó de mida de les rajoles"
+      "size": "Botó de mida de les rajoles",
+      "boards": "Llista d'accessos ràpids"
     }
   }
 }

@@ -50,49 +50,6 @@
     border-bottom: 1.5px solid var(--pz-border);
 }
 
-/* Header actions: same .btn style as admin/users.php, centered.
-   Labels never wrap inside a button; on narrow screens the row wraps. */
-.diary-actions {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 0 4px;
-}
-
-.diary-actions .btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
-/* Phones keep both buttons on one row: a long label wraps inside its
-   button instead, and the two stretch to the same height. */
-@media (max-width: 600px) {
-    .diary-actions {
-        flex-wrap: nowrap;
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    .diary-actions .btn {
-        flex: 0 1 auto;
-        min-width: 0;
-        justify-content: center;
-        text-align: center;
-        padding: 8px 10px;
-        line-height: 1.25;
-        white-space: normal;
-    }
-
-    .diary-actions .btn .lucide {
-        flex-shrink: 0;
-    }
-}
-
 /* favorites.css provides .btn/.btn-secondary but not .btn-primary
    (dark mode is covered by css/dark-mode/components.css) */
 .diary-page .btn-primary {
@@ -104,15 +61,36 @@
     background: var(--pz-accent-hover);
 }
 
-/* Diary switcher: one pill per diary (a lone diary too, so its name shows) */
+/* Diary switcher: one pill per diary, once there are several */
 .diary-switcher {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 8px;
-    /* 16px above (4px from .diary-actions) and 16px below, the filter row stays put */
     padding: 12px 0 0;
+}
+
+/* On a phone the buttons leave no room beside them: the filter gets its own line */
+@media (max-width: 600px) {
+    .diary-page .board-filter-row {
+        flex-wrap: wrap;
+        gap: 8px 2px;
+    }
+
+    .diary-page .board-filter-row .dashboard-color-filter-btn,
+    .diary-page .board-filter-row .board-view-btn:not(.board-view-layout-toggle) {
+        width: 32px;
+    }
+
+    .diary-page .board-filter-row .board-view-controls {
+        gap: 2px;
+    }
+
+    .diary-page .board-filter-row .dashboard-topbar-filter {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
 }
 
 .diary-switcher + .board-filter-row {

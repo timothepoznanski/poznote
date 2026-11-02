@@ -5868,6 +5868,19 @@
     "remove_error": "无法从快速访问中移除笔记",
     "folder_removed_one": "已从快速访问中移除 1 条笔记",
     "folder_removed_other": "已从快速访问中移除 {{count}} 条笔记",
+    "new_button": "新建快速访问",
+    "default_name": "默认",
+    "new_modal_title": "创建新的快速访问",
+    "name_placeholder": "快速访问名称",
+    "rename_title": "重命名快速访问",
+    "delete_confirm": "删除此快速访问?其笔记会保留,只是失去它的标签。",
+    "board_error": "无法保存快速访问。",
+    "board_exists": "已存在同名的快速访问。",
+    "board_invalid": "不能使用此名称。",
+    "choose_title": "快速访问",
+    "choose_item": "快速访问...",
+    "folder_added_one": "已将 1 条笔记添加到快速访问",
+    "folder_added_other": "已将 {{count}} 条笔记添加到快速访问",
     "visibility": {
       "title": "页面标题",
       "workspace": "工作区选择器",
@@ -5877,7 +5890,8 @@
       "frame": "磁贴边框",
       "group_titles": "分组标题",
       "group_rules": "分组分隔线",
-      "size": "磁贴大小按钮"
+      "size": "磁贴大小按钮",
+      "boards": "快速访问列表"
     }
   }
 }

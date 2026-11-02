@@ -5771,6 +5771,19 @@
     "remove_error": "Die Notiz konnte nicht aus der Schnellwahl entfernt werden",
     "folder_removed_one": "1 Notiz aus der Schnellwahl entfernt",
     "folder_removed_other": "{{count}} Notizen aus der Schnellwahl entfernt",
+    "new_button": "Neue Schnellwahl",
+    "default_name": "Standard",
+    "new_modal_title": "Neue Schnellwahl erstellen",
+    "name_placeholder": "Name der Schnellwahl",
+    "rename_title": "Schnellwahl umbenennen",
+    "delete_confirm": "Diese Schnellwahl löschen? Ihre Notizen bleiben erhalten, sie verlieren nur den Tag.",
+    "board_error": "Die Schnellwahl konnte nicht gespeichert werden.",
+    "board_exists": "Eine Schnellwahl mit diesem Namen existiert bereits.",
+    "board_invalid": "Dieser Name kann nicht verwendet werden.",
+    "choose_title": "Schnellwahlen",
+    "choose_item": "Schnellwahlen...",
+    "folder_added_one": "1 Notiz zur Schnellwahl hinzugefügt",
+    "folder_added_other": "{{count}} Notizen zur Schnellwahl hinzugefügt",
     "visibility": {
       "title": "Seitentitel",
       "workspace": "Arbeitsbereichsauswahl",
@@ -5780,7 +5793,8 @@
       "frame": "Kachelrahmen",
       "group_titles": "Gruppentitel",
       "group_rules": "Gruppentrennlinien",
-      "size": "Schaltfläche für die Kachelgröße"
+      "size": "Schaltfläche für die Kachelgröße",
+      "boards": "Liste der Schnellwahlen"
     }
   }
 }
