@@ -5487,6 +5487,7 @@
     "emoji": "按名称插入表情",
     "indent": "增加或减少列表项缩进",
     "checklist_toggle": "勾选或取消勾选清单项",
+    "note_reference_open": "在 [[笔记链接]] 上:打开笔记,或创建笔记",
     "tree_move": "移动到上方或下方的笔记或文件夹",
     "tree_open_folder": "展开文件夹，或进入其中",
     "tree_close_folder": "折叠文件夹，或返回上级文件夹",

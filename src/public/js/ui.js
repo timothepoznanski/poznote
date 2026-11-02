@@ -270,6 +270,7 @@ function initializeBrowserHistory() {
 // Confirmation modal functions
 var confirmedActionCallback = null;
 var saveAndExitActionCallback = null;
+var confirmReturnFocus = null;
 
 function showConfirmModal(title, message, callback, options, saveAndExitCallback) {
     var modal = document.getElementById('confirmModal');
@@ -325,10 +326,23 @@ function showConfirmModal(title, message, callback, options, saveAndExitCallback
     }
 
     modal.style.display = 'flex';
+
+    // options.focusConfirm: the window answers the keyboard, Enter confirms and
+    // Esc goes back where the focus was
+    if (options && options.focusConfirm && confirmBtn) {
+        confirmReturnFocus = document.activeElement;
+        // Enter still held from the shortcut that opened the window is no answer
+        confirmBtn.onkeydown = function(e) { if (e.repeat) e.preventDefault(); };
+        confirmBtn.focus();
+    }
 }
 
 function closeConfirmModal() {
     document.getElementById('confirmModal').style.display = 'none';
+    if (confirmReturnFocus) {
+        confirmReturnFocus.focus();
+        confirmReturnFocus = null;
+    }
     confirmedActionCallback = null;
     saveAndExitActionCallback = null;
 }

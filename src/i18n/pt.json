@@ -5391,6 +5391,7 @@
     "emoji": "Inserir um emoji pelo nome",
     "indent": "Aumentar ou diminuir o recuo de um item de lista",
     "checklist_toggle": "Marcar ou desmarcar um item da checklist",
+    "note_reference_open": "Num [[link de nota]]: abrir a nota ou criá-la",
     "tree_move": "Ir para a nota ou pasta acima ou abaixo",
     "tree_open_folder": "Abrir uma pasta ou entrar nela",
     "tree_close_folder": "Fechar uma pasta ou subir para a que a contém",

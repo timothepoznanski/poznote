@@ -5226,6 +5226,7 @@
     "emoji": "Insert an emoji by its name",
     "indent": "Indent or outdent a list item",
     "checklist_toggle": "Check or uncheck a checklist item",
+    "note_reference_open": "On a [[note link]]: open the note, or create it",
     "tree_move": "Move to the note or folder above or below",
     "tree_open_folder": "Open a folder, or step into it",
     "tree_close_folder": "Close a folder, or go up to the one holding the row",

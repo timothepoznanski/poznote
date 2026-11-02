@@ -5226,6 +5226,7 @@
     "emoji": "Insereix un emoji pel nom",
     "indent": "Augmenta o redueix el sagnat d'un element de llista",
     "checklist_toggle": "Marca o desmarca un element d'una llista de comprovació",
+    "note_reference_open": "En un [[enllaç de nota]]: obre la nota o crea-la",
     "tree_move": "Ves a la nota o la carpeta de dalt o de baix",
     "tree_open_folder": "Obre una carpeta o entra-hi",
     "tree_close_folder": "Tanca una carpeta o puja a la que conté la fila",

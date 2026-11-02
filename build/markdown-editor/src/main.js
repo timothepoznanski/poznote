@@ -26,7 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { Annotation, CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
-import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, sourceLinkClicks, getEditingTableRange, getTableCellAt, getTableCellAtSelection, getTableCellTarget, getTableBlockElement, finishTableCellEdit, focusTableCell, moveTableCell, insertTableLineBreak } from './live-preview.js'
+import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, sourceLinkClicks, getEditingTableRange, getTableCellAt, getTableCellAtSelection, getTableCellTarget, getTableBlockElement, finishTableCellEdit, focusTableCell, moveTableCell, insertTableLineBreak, openNoteReferenceAtCaret } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -2089,6 +2089,7 @@ function createEditor(host, options = {}) {
       domHandlers,
       keymap.of([
         { key: 'Shift-Enter', run: insertTableLineBreak },
+        { key: 'Mod-Enter', run: openNoteReferenceAtCaret },
         { key: 'Home', mac: 'Cmd-ArrowLeft', run: moveToTableRowEnd(false, false), shift: moveToTableRowEnd(false, true) },
         { key: 'End', mac: 'Cmd-ArrowRight', run: moveToTableRowEnd(true, false), shift: moveToTableRowEnd(true, true) },
         { key: 'Enter', run: runMarkdownTableEnter(host) },

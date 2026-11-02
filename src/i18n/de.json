@@ -5390,6 +5390,7 @@
     "emoji": "Emoji über seinen Namen einfügen",
     "indent": "Listenelement ein- oder ausrücken",
     "checklist_toggle": "Checklistenelement abhaken oder zurücksetzen",
+    "note_reference_open": "Auf einem [[Notizlink]]: Notiz öffnen oder erstellen",
     "tree_move": "Zur Notiz oder zum Ordner darüber oder darunter wechseln",
     "tree_open_folder": "Einen Ordner öffnen oder hineingehen",
     "tree_close_folder": "Einen Ordner schließen oder zum übergeordneten Ordner wechseln",
