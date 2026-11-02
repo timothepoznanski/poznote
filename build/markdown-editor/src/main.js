@@ -213,7 +213,7 @@ const markdownCodeLinePlugin = ViewPlugin.fromClass(class {
 
 // Inline `code` is kept away from the spell checker too, backticks included
 // (HTML notes do the same for their <code>, js/syntax-highlight.js)
-const markdownInlineCodeDecoration = Decoration.mark({ attributes: { spellcheck: 'false' } })
+const markdownInlineCodeDecoration = Decoration.mark({ class: 'cm-md-inline-code', attributes: { spellcheck: 'false' } })
 
 function buildMarkdownInlineCodeDecorations(view) {
   const builder = new RangeSetBuilder()
@@ -1237,6 +1237,17 @@ function getInstance(host) {
   return host ? instances.get(host) : null
 }
 
+// For a size that changed through CSS alone: clicks would still resolve against
+// the line heights CodeMirror measured before. requestMeasure() alone does not
+// read them again while .cm-content keeps its height, which its min-height
+// does as long as the text is shorter than the pane.
+function remeasureLines(host) {
+  const instance = getInstance(host)
+  if (!instance) return
+  instance.view.viewState.mustMeasureContent = true
+  instance.view.requestMeasure()
+}
+
 function getValue(host) {
   const instance = getInstance(host)
   return instance ? instance.view.state.doc.toString() : ''
@@ -2175,6 +2186,7 @@ window.PoznoteMarkdownCodeMirror = {
   createEditor,
   destroyEditor,
   destroyEditorsWithin,
+  remeasureLines,
   getValue,
   getLength,
   sliceText,

@@ -109,6 +109,20 @@
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
 }
 
+/* They also take the size the Font size setting gives code blocks. The language
+   badge of the live view keeps its own, relative to the line. */
+.markdown-editor .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line),
+.markdown-editor .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line) span:not(.cm-live-code-lang) {
+    font-size: var(--code-block-font-size, 15px) !important;
+}
+
+/* Inline `code` of the source views, same setting (the live view has its own
+   rule, .cm-live-inline-code) */
+.markdown-editor .cm-editor:not(.cm-live-preview) :is(#poznote-md-code-font-boost, .cm-md-inline-code),
+.markdown-editor .cm-editor:not(.cm-live-preview) :is(#poznote-md-code-font-boost, .cm-md-inline-code) * {
+    font-size: var(--code-block-font-size, 15px) !important;
+}
+
 .markdown-editor:empty:before {
     content: attr(data-ph);
     color: var(--pz-text-subtle);
@@ -860,6 +874,11 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :
 
 .markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-live-inline-code) {
     font-size: 0.9em !important;
+}
+
+/* Outside a heading, which it follows, the size of the Font size setting */
+.markdown-editor .cm-live-preview .cm-line:not(.cm-live-heading) :is(#poznote-md-live-size-boost, .cm-live-inline-code) {
+    font-size: var(--code-block-font-size, 15px) !important;
 }
 
 .markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-live-inline-code) * {
