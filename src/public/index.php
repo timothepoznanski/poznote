@@ -736,7 +736,8 @@ $whats_new_preview_since = $whats_new_preview ? trim((string)@file_get_contents(
     // instance one, which is opt-in per user (see the allowed-users list in
     // ai_settings.php).
     $aiChatConfig = poznoteResolveAiChatConfig($con, (int)(getAuthenticatedUserId() ?? 0));
-    $aiChatEnabled = $aiChatConfig['available'];
+    // Its tools write to the workspace, which a read-only share refuses
+    $aiChatEnabled = $aiChatConfig['available'] && !(function_exists('isSharedWorkspaceReadOnly') && isSharedWorkspaceReadOnly());
 
     // Icon-only left rail mirroring the dashboard topbar actions
     // (see .dashboard-topbar-actions in dashboard.php). The navigation entries

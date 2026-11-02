@@ -121,6 +121,10 @@ if ($iconSidebarMentionUserId > 0 && poznoteMentionWorkspaces($iconSidebarMentio
 $iconSidebarSharedScopeActive = function_exists('isSharedWorkspaceScopeActive') && isSharedWorkspaceScopeActive();
 if ($iconSidebarSharedScopeActive) {
     $iconSidebarHiddenPages = ['notes_manager.php', 'shared.php', 'trash.php', 'offline_notes.php'];
+    // Same for the pages a read-only share does not open (auth.php)
+    if (function_exists('isSharedWorkspaceReadOnly') && isSharedWorkspaceReadOnly()) {
+        $iconSidebarHiddenPages = array_merge($iconSidebarHiddenPages, ['dashboard.php', 'speed_dial.php', 'tasks.php', 'list_folders.php', 'diary.php']);
+    }
     $iconSidebarItems = array_values(array_filter($iconSidebarItems, static function (array $item) use ($iconSidebarHiddenPages): bool {
         return !in_array($item['page'] ?? '', $iconSidebarHiddenPages, true);
     }));
@@ -368,6 +372,7 @@ if (function_exists('getSharedWorkspacesForLogin')) {
             'ownerUsername' => (string)$iconSidebarSharedRow['owner_username'],
             'workspace' => (string)$iconSidebarSharedRow['workspace_name'],
             'current' => !empty($iconSidebarSharedRow['current']),
+            'readOnly' => !empty($iconSidebarSharedRow['read_only']),
         ];
     }
 }
@@ -443,12 +448,19 @@ $iconSidebarProfileStrings = [
 ];
 ?>
 <link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/profile-modal.css'); ?>">
+<?php if (function_exists('isSharedWorkspaceReadOnly') && isSharedWorkspaceReadOnly()): ?>
+<link rel="stylesheet" href="<?php echo $iconSidebarAsset('css/shared-workspace-readonly.css'); ?>">
+<?php endif; ?>
 <script>
 window.PoznoteProfileI18n = <?php echo json_encode($iconSidebarProfileStrings, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 // False while the active account is not the login's own (a workspace shared
 // with it, an account granted to it): the scripts then leave out what only
 // its owner may do, such as creating a workspace or editing the list.
 window.PoznoteActiveAccountIsOwn = <?php echo (!function_exists('isActiveAccountOwnedByAuthenticatedUser') || isActiveAccountOwnedByAuthenticatedUser()) ? 'true' : 'false'; ?>;
+<?php if (function_exists('isSharedWorkspaceReadOnly') && isSharedWorkspaceReadOnly()): ?>
+// Read by the scripts and css/shared-workspace-readonly.css, on every page
+document.body.classList.add('shared-workspace-readonly');
+<?php endif; ?>
 <?php if (!empty($iconSidebarAccountSwitch)): ?>
 window.PoznoteAccountSwitch = <?php echo json_encode($iconSidebarAccountSwitch, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE); ?>;
 <?php endif; ?>

@@ -808,7 +808,7 @@
       },
       "confirm": {
         "title": "共享工作区",
-        "message": "选择可以打开工作区“{{workspace}}”的用户。他们会在自己的工作区菜单中看到它，并可以编辑其中的笔记和文件夹。"
+        "message": "选择可以打开工作区“{{workspace}}”的用户。他们会在自己的工作区菜单中找到它。在每个名称旁边，选择对方可以编辑其笔记和文件夹，还是只能阅读。"
       },
       "messages": {
         "disabled": "该工作区已不再共享",
@@ -821,7 +821,9 @@
       },
       "options": {
         "users_loading": "正在加载用户...",
-        "no_users_found": "未找到其他用户"
+        "no_users_found": "未找到其他用户",
+        "can_edit": "可编辑",
+        "read_only": "只读"
       },
       "status": {
         "not_shared": "未共享"
@@ -4702,7 +4704,8 @@
     "take_over_confirm": "{{user}} 正在编辑此笔记。如果您接管，对方的编辑器将变为只读，其尚未保存的更改会保留在其设备上。是否继续？",
     "take_over_failed": "无法接管此笔记。",
     "taken_over_notice": "您已接管此笔记的编辑。",
-    "lost_unsaved_kept": "您在此处未保存的更改已保留在此设备上，笔记空闲后会再次提供。"
+    "lost_unsaved_kept": "您在此处未保存的更改已保留在此设备上，笔记空闲后会再次提供。",
+    "read_only_share": "此工作区以只读模式与您共享。"
   },
   "live_refresh": {
     "note_changed": "此笔记已在本标签页之外被修改。",

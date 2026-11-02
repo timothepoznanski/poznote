@@ -201,6 +201,8 @@ function openTaskEditModal(taskId, noteId, currentText, lastFocusedElement, opti
 
 // Edit task text
 function editTask(taskId, noteId) {
+    if (isSharedWorkspaceReadOnlyTasks()) return;
+
     const taskItem = document.querySelector(`[data-task-id="${taskId}"]`);
     if (!taskItem) return;
 
@@ -278,6 +280,7 @@ function editTask(taskId, noteId) {
 
 // Save task edit
 function saveTaskEdit(taskId, noteId, newText) {
+    if (isSharedWorkspaceReadOnlyTasks()) return;
     if (!newText) return;
 
     const noteEntry = document.getElementById('entry' + noteId);

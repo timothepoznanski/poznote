@@ -418,7 +418,7 @@
       },
       "confirm": {
         "title": "Comparteix l'espai de treball",
-        "message": "Trieu els usuaris que poden obrir l'espai de treball «{{workspace}}». El trobaran al menú d'espais de treball i en podran editar les notes i les carpetes."
+        "message": "Tria els usuaris que poden obrir l'espai de treball \"{{workspace}}\". El trobaran al seu menú d'espais de treball. Al costat de cada nom, tria si poden editar-ne les notes i carpetes o només llegir-les."
       },
       "messages": {
         "disabled": "L'espai de treball ja no es comparteix",
@@ -431,7 +431,9 @@
       },
       "options": {
         "users_loading": "S'estan carregant els usuaris...",
-        "no_users_found": "No s'ha trobat cap altre usuari"
+        "no_users_found": "No s'ha trobat cap altre usuari",
+        "can_edit": "Pot editar",
+        "read_only": "Només lectura"
       },
       "status": {
         "not_shared": "No compartit"
@@ -4237,7 +4239,8 @@
     "take_over_confirm": "{{user}} està editant aquesta nota. Si en preneu el control, el seu editor passarà a només lectura i els canvis que encara no hagi desat es quedaran al seu dispositiu. Voleu continuar?",
     "take_over_failed": "No es pot prendre el control d'aquesta nota.",
     "taken_over_notice": "Heu pres el control de l'edició d'aquesta nota.",
-    "lost_unsaved_kept": "Els canvis no desats d'aquí es conserven en aquest dispositiu i se us tornaran a oferir quan la nota quedi lliure."
+    "lost_unsaved_kept": "Els canvis no desats d'aquí es conserven en aquest dispositiu i se us tornaran a oferir quan la nota quedi lliure.",
+    "read_only_share": "Aquest espai de treball s'ha compartit amb tu en mode de només lectura."
   },
   "live_refresh": {
     "note_changed": "Aquesta nota s'ha modificat fora d'aquesta pestanya.",

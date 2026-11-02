@@ -809,7 +809,7 @@
       },
       "confirm": {
         "title": "Partager l'espace de travail",
-        "message": "Choisissez les utilisateurs qui peuvent ouvrir l'espace de travail « {{workspace}} ». Ils le retrouveront dans leur menu des espaces de travail et pourront modifier ses notes et ses dossiers."
+        "message": "Choisissez les utilisateurs qui peuvent ouvrir l'espace de travail \"{{workspace}}\". Ils le trouveront dans leur menu des espaces de travail. À côté de chaque nom, choisissez s'ils peuvent modifier ses notes et dossiers ou seulement les lire."
       },
       "messages": {
         "disabled": "L'espace de travail n'est plus partagé",
@@ -822,7 +822,9 @@
       },
       "options": {
         "users_loading": "Chargement des utilisateurs...",
-        "no_users_found": "Aucun autre utilisateur trouvé"
+        "no_users_found": "Aucun autre utilisateur trouvé",
+        "can_edit": "Peut modifier",
+        "read_only": "Lecture seule"
       },
       "status": {
         "not_shared": "Non partagé"
@@ -4710,7 +4712,8 @@
     "take_over_confirm": "{{user}} est en train de modifier cette note. Si vous prenez la main, son éditeur passe en lecture seule et ses modifications non encore enregistrées restent sur son appareil. Continuer ?",
     "take_over_failed": "Impossible de prendre la main sur cette note.",
     "taken_over_notice": "Vous avez pris la main sur cette note.",
-    "lost_unsaved_kept": "Vos modifications non enregistrées ici sont conservées sur cet appareil et vous seront proposées à nouveau dès que la note sera libre."
+    "lost_unsaved_kept": "Vos modifications non enregistrées ici sont conservées sur cet appareil et vous seront proposées à nouveau dès que la note sera libre.",
+    "read_only_share": "Cet espace de travail est partagé avec vous en lecture seule."
   },
   "live_refresh": {
     "note_changed": "Cette note a été modifiée en dehors de cet onglet.",

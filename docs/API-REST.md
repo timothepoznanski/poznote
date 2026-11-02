@@ -1879,12 +1879,12 @@ curl -u 'username:password' \
     { "_type": "shared_with_me_note", "note_id": 12, "heading": "Roadmap", "workspace": "Poznote", "owner_id": 1, "owner_name": "alice", "url": "http://YOUR_SERVER/abc123" }
   ],
   "shared_workspaces": [
-    { "workspace": "Ankh Labs", "owner_id": 1, "owner_name": "alice" }
+    { "workspace": "Ankh Labs", "owner_id": 1, "owner_name": "alice", "read_only": false }
   ]
 }
 ```
 
-A shared workspace is listed so that a client knows it exists, it cannot be opened through the API. Its notes live in the owner's profile, and API credentials act on their own profile only, the same rule as for account-access grants (see [Multi-User Mode](#multi-user-mode)). Open it from the workspace menu of the web interface, under *Shared with me*.
+A shared workspace is listed so that a client knows it exists, it cannot be opened through the API. Its notes live in the owner's profile, and API credentials act on their own profile only, the same rule as for account-access grants (see [Multi-User Mode](#multi-user-mode)). Open it from the workspace menu of the web interface, under *Shared with me*. `read_only` is `true` when the owner lets this user read the workspace but not change it: every request that writes is then refused with a `403`.
 
 ---
 

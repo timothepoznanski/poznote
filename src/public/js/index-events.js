@@ -16,6 +16,10 @@
 (function () {
     'use strict';
 
+    function isSharedWorkspaceReadOnly() {
+        return !!(document.body && document.body.classList.contains('shared-workspace-readonly'));
+    }
+
     function blurAfterPointerActivation(element, event) {
         if (!element || typeof element.blur !== 'function') return;
         if (event && event.detail === 0) return;
@@ -897,6 +901,9 @@
                 }
                 break;
             case 'show-move-folder-dialog':
+                if (isSharedWorkspaceReadOnly()) {
+                    break;
+                }
                 if (noteId && typeof showMoveFolderDialog === 'function') {
                     const fId = target.dataset.folderId;
                     const fName = target.dataset.folder;
@@ -904,11 +911,17 @@
                 }
                 break;
             case 'create-note-shortcut':
+                if (isSharedWorkspaceReadOnly()) {
+                    break;
+                }
                 if (noteId && typeof window.openLinkedNoteFolderSelectorModal === 'function') {
                     window.openLinkedNoteFolderSelectorModal(noteId, target.dataset.noteTitle || '');
                 }
                 break;
             case 'archive-note':
+                if (isSharedWorkspaceReadOnly()) {
+                    break;
+                }
                 if (noteId && typeof archiveNote === 'function') {
                     // The toolbar menu stays open on its own item clicks, and
                     // would sit on top of the confirmation.
@@ -946,6 +959,9 @@
                 }
                 break;
             case 'rename-note':
+                if (isSharedWorkspaceReadOnly()) {
+                    break;
+                }
                 if (noteId && typeof window.renameNote === 'function') {
                     window.renameNote(noteId, target.dataset.noteTitle || '');
                 }

@@ -418,7 +418,7 @@
       },
       "confirm": {
         "title": "Share workspace",
-        "message": "Pick the users who can open workspace \"{{workspace}}\". They will find it in their workspace menu and can edit its notes and folders."
+        "message": "Pick the users who can open workspace \"{{workspace}}\". They will find it in their workspace menu. Next to each name, choose whether they can edit its notes and folders or only read them."
       },
       "messages": {
         "disabled": "Workspace is no longer shared",
@@ -431,7 +431,9 @@
       },
       "options": {
         "users_loading": "Loading users...",
-        "no_users_found": "No other users found"
+        "no_users_found": "No other users found",
+        "can_edit": "Can edit",
+        "read_only": "Read only"
       },
       "status": {
         "not_shared": "Not shared"
@@ -4237,7 +4239,8 @@
     "take_over_confirm": "{{user}} is currently editing this note. If you take over, their editor becomes read-only and the changes they have not saved yet stay on their device. Continue?",
     "take_over_failed": "Unable to take over this note.",
     "taken_over_notice": "You took over editing this note.",
-    "lost_unsaved_kept": "Your unsaved changes here are kept on this device and offered again once the note is free."
+    "lost_unsaved_kept": "Your unsaved changes here are kept on this device and offered again once the note is free.",
+    "read_only_share": "This workspace is shared with you in read-only mode."
   },
   "live_refresh": {
     "note_changed": "This note was modified outside this tab.",

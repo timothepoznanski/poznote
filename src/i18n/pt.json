@@ -809,7 +809,7 @@
       },
       "confirm": {
         "title": "Compartilhar espaço de trabalho",
-        "message": "Escolha os usuários que podem abrir o espaço de trabalho \"{{workspace}}\". Eles o encontrarão no menu de espaços de trabalho e poderão editar suas notas e pastas."
+        "message": "Escolha os utilizadores que podem abrir o espaço de trabalho \"{{workspace}}\". Vão encontrá-lo no menu de espaços de trabalho. Ao lado de cada nome, escolha se podem editar as notas e pastas ou apenas lê-las."
       },
       "messages": {
         "disabled": "O espaço de trabalho não está mais compartilhado",
@@ -822,7 +822,9 @@
       },
       "options": {
         "users_loading": "Carregando usuários...",
-        "no_users_found": "Nenhum outro usuário encontrado"
+        "no_users_found": "Nenhum outro usuário encontrado",
+        "can_edit": "Pode editar",
+        "read_only": "Só leitura"
       },
       "status": {
         "not_shared": "Não compartilhado"
@@ -4606,7 +4608,8 @@
     "take_over_confirm": "{{user}} está a editar esta nota. Se assumir a edição, o editor dessa pessoa passa a só leitura e as alterações ainda não guardadas ficam no dispositivo dela. Continuar?",
     "take_over_failed": "Não foi possível assumir a edição desta nota.",
     "taken_over_notice": "Assumiu a edição desta nota.",
-    "lost_unsaved_kept": "As suas alterações por guardar ficam neste dispositivo e serão propostas de novo assim que a nota estiver livre."
+    "lost_unsaved_kept": "As suas alterações por guardar ficam neste dispositivo e serão propostas de novo assim que a nota estiver livre.",
+    "read_only_share": "Este espaço de trabalho é partilhado consigo em modo de só leitura."
   },
   "live_refresh": {
     "note_changed": "Esta nota foi modificada fora desta aba.",

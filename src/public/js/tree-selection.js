@@ -55,6 +55,10 @@
         return (typeof window.t === 'function') ? window.t(key, vars || null, fallback) : fallback;
     }
 
+    function isReadOnly() {
+        return !!(document.body && document.body.classList.contains('shared-workspace-readonly'));
+    }
+
     function hasModifier(e) {
         return isMacPlatform ? e.metaKey : (e.ctrlKey || e.metaKey);
     }
@@ -431,8 +435,8 @@
     // that had it is blurred by hand: otherwise the Del that follows would
     // erase a character in the note instead of reaching the tree.
     function handleMouseDown(e) {
-        if (e.button !== 0) return;
-        if (!(e.shiftKey || hasModifier(e)) || e.altKey) return;
+        if (e.button !== 0 || isReadOnly()) return;
+        if (isReadOnly() || !(e.shiftKey || hasModifier(e)) || e.altKey) return;
         if (!rowFromTarget(e.target)) return;
         e.preventDefault();
         var active = document.activeElement;
@@ -442,7 +446,7 @@
     }
 
     function handleClick(e) {
-        if (e.button !== 0) return;
+        if (e.button !== 0 || isReadOnly()) return;
         var target = e.target;
         if (!target || !target.closest || !target.closest('#left_col')) return;
         if (menuEl && menuEl.contains(target)) return;
@@ -472,7 +476,7 @@
 
     // Two quick modifier clicks are also a dblclick, which would open the note in a new tab
     function handleDblClick(e) {
-        if (!(e.shiftKey || hasModifier(e)) || e.altKey) return;
+        if (isReadOnly() || !(e.shiftKey || hasModifier(e)) || e.altKey) return;
         if (!rowFromTarget(e.target)) return;
         e.preventDefault();
         e.stopPropagation();
@@ -480,6 +484,7 @@
 
     function handleContextMenu(e) {
         closeMenu();
+        if (isReadOnly()) return;
         var row = rowFromTarget(e.target);
         if (!row) return;
 

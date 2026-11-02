@@ -3401,6 +3401,9 @@ paths:
                           type: integer
                         owner_name:
                           type: string
+                        read_only:
+                          type: boolean
+                          description: The owner lets this user read the workspace but not change it
 
   /folders/{id}/share:
     get:

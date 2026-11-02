@@ -809,7 +809,7 @@
       },
       "confirm": {
         "title": "Arbeitsbereich teilen",
-        "message": "Wählen Sie die Benutzer, die den Arbeitsbereich „{{workspace}}“ öffnen dürfen. Sie finden ihn in ihrem Arbeitsbereichsmenü und können seine Notizen und Ordner bearbeiten."
+        "message": "Wählen Sie die Benutzer aus, die den Arbeitsbereich \"{{workspace}}\" öffnen können. Sie finden ihn in ihrem Arbeitsbereichsmenü. Legen Sie neben jedem Namen fest, ob die Person Notizen und Ordner bearbeiten oder nur lesen kann."
       },
       "messages": {
         "disabled": "Der Arbeitsbereich wird nicht mehr geteilt",
@@ -822,7 +822,9 @@
       },
       "options": {
         "users_loading": "Benutzer werden geladen...",
-        "no_users_found": "Keine anderen Benutzer gefunden"
+        "no_users_found": "Keine anderen Benutzer gefunden",
+        "can_edit": "Kann bearbeiten",
+        "read_only": "Nur lesen"
       },
       "status": {
         "not_shared": "Nicht geteilt"
@@ -4605,7 +4607,8 @@
     "take_over_confirm": "{{user}} bearbeitet diese Notiz gerade. Wenn Sie übernehmen, wird der Editor der anderen Person schreibgeschützt und ihre noch nicht gespeicherten Änderungen bleiben auf ihrem Gerät. Fortfahren?",
     "take_over_failed": "Diese Notiz konnte nicht übernommen werden.",
     "taken_over_notice": "Sie haben die Bearbeitung dieser Notiz übernommen.",
-    "lost_unsaved_kept": "Ihre hier nicht gespeicherten Änderungen bleiben auf diesem Gerät erhalten und werden erneut angeboten, sobald die Notiz frei ist."
+    "lost_unsaved_kept": "Ihre hier nicht gespeicherten Änderungen bleiben auf diesem Gerät erhalten und werden erneut angeboten, sobald die Notiz frei ist.",
+    "read_only_share": "Dieser Arbeitsbereich wird schreibgeschützt mit Ihnen geteilt."
   },
   "live_refresh": {
     "note_changed": "Diese Notiz wurde außerhalb dieses Tabs geändert.",

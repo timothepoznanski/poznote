@@ -481,6 +481,8 @@
         if (!isHorizontal && !isRename && !isOpen && !Object.prototype.hasOwnProperty.call(STEPS, key)) return;
 
         if (!hasTree() || !treeOwnsKeyboard(e.target)) return;
+        // Renaming from the keyboard is the one key here that writes
+        if (isRename && !!(document.body && document.body.classList.contains('shared-workspace-readonly'))) return;
         if (isTextEditingContext(e.target) || isModalOpen() || isRowMenuOpen()) return;
 
         // One sweep of the tree per key press, shared by the move and by the
