@@ -238,7 +238,7 @@ function folderListActions() {
 		[
 			'action' => 'toggle-folder-speed-dial',
 			'icon' => 'lucide-zap',
-			'label' => t_h('speed_dial.choose_item', [], 'Speed dials...'),
+			'label' => t_h('speed_dial.choose_item', [], 'Add to a speed dial'),
 			'state_class' => 'speed-dial-state-choose',
 			'requires_notes' => true,
 		],
@@ -828,7 +828,8 @@ $currentLang = getUserLanguage();
 					</div>
 					<div class="folder-actions-menu-item requires-notes speed-dial-state-choose" data-action="toggle-folder-speed-dial">
 						<i class="lucide lucide-zap"></i>
-						<span><?php echo t_h('speed_dial.choose_item', [], 'Speed dials...'); ?></span>
+						<span><?php echo t_h('speed_dial.choose_item', [], 'Add to a speed dial'); ?></span>
+						<i class="lucide lucide-chevron-right speed-dial-submenu-arrow"></i>
 					</div>
 					<div class="folder-actions-menu-item active-state share-state-shared" data-action="share-folder">
 						<i class="lucide lucide-share-2"></i>
@@ -970,7 +971,7 @@ $currentLang = getUserLanguage();
 	// Folder icon picker markup, shared with index.php
 	include __DIR__ . '/../modals/folder_icon_modal.php';
 	include __DIR__ . '/../modals/tag_folder_notes_modal.php';
-	include __DIR__ . '/../modals/speed_dial_boards_modal.php';
+	include __DIR__ . '/../modals/speed_dial_submenu.php';
 	?>
 
 	<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>

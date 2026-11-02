@@ -5885,8 +5885,7 @@
     "board_error": "Impossible d'enregistrer l'accès rapide.",
     "board_exists": "Un accès rapide porte déjà ce nom.",
     "board_invalid": "Ce nom ne peut pas être utilisé.",
-    "choose_title": "Accès rapides",
-    "choose_item": "Accès rapides...",
+    "choose_item": "Ajouter à un accès rapide",
     "folder_added_one": "1 note ajoutée à l'accès rapide",
     "folder_added_other": "{{count}} notes ajoutées à l'accès rapide",
     "visibility": {

@@ -5625,8 +5625,7 @@
     "board_error": "No s'ha pogut desar l'accés ràpid.",
     "board_exists": "Ja existeix un accés ràpid amb aquest nom.",
     "board_invalid": "Aquest nom no es pot fer servir.",
-    "choose_title": "Accessos ràpids",
-    "choose_item": "Accessos ràpids...",
+    "choose_item": "Afegeix a un accés ràpid",
     "folder_added_one": "S'ha afegit 1 nota a l'accés ràpid",
     "folder_added_other": "S'han afegit {{count}} notes a l'accés ràpid",
     "visibility": {

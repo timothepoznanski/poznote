@@ -5625,8 +5625,7 @@
     "board_error": "빠른 실행을 저장할 수 없습니다.",
     "board_exists": "같은 이름의 빠른 실행이 이미 있습니다.",
     "board_invalid": "이 이름은 사용할 수 없습니다.",
-    "choose_title": "빠른 실행",
-    "choose_item": "빠른 실행...",
+    "choose_item": "빠른 실행 중 하나에 추가",
     "folder_added_one": "빠른 실행에 노트 1개를 추가했습니다",
     "folder_added_other": "빠른 실행에 노트 {{count}}개를 추가했습니다",
     "visibility": {

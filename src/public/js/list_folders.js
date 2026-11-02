@@ -368,9 +368,7 @@
             callFn('showTagFolderNotesDialog', folder.id, folder.name, folder.noteCount);
         },
         'toggle-folder-speed-dial': function(folder) {
-            if (document.getElementById('speedDialBoardsModal')) {
-                callFn('openSpeedDialBoardsModal', { folderId: folder.id, tags: folder.speedDialTags });
-            } else if (folder.speedDialTags.indexOf('speed-dial') !== -1) {
+            if (folder.speedDialTags.indexOf('speed-dial') !== -1) {
                 callFn('removeFolderFromSpeedDial', folder.id);
             } else {
                 callFn('showTagFolderNotesDialog', folder.id, folder.name, folder.noteCount, 'speed-dial');

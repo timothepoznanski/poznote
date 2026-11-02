@@ -360,7 +360,7 @@ function refreshOpenNotesTags() {
 
 // The variant of the speed dial entries a menu shows
 function syncSpeedDialMenuItems(menu, available, inDefault) {
-    var several = !!document.getElementById('speedDialBoardsModal');
+    var several = !!document.getElementById('speedDialSubmenu');
     var show = function(selector, shown) {
         menu.querySelectorAll(selector).forEach(function(item) {
             item.style.display = available && shown ? '' : 'none';
@@ -399,10 +399,10 @@ function syncSpeedDialAfterFolderChange(noteIds, tag, inBoard) {
         });
     });
     if (document.querySelector('.note-actions-toggle')) return;
-    // While the choice of speed dials is open, it waits for it to close
-    var chooser = document.getElementById('speedDialBoardsModal');
-    if (chooser && chooser.offsetParent !== null) {
-        chooser.setAttribute('data-reload-on-close', '1');
+    // While the list of speed dials is open, it waits for it to close
+    var list = document.getElementById('speedDialSubmenu');
+    if (list && !list.hidden) {
+        list.setAttribute('data-reload-on-close', '1');
     } else {
         setTimeout(function() { window.location.reload(); }, 1000);
     }
@@ -450,58 +450,128 @@ function removeFolderFromSpeedDial(folderId) {
 }
 window.removeFolderFromSpeedDial = removeFolderFromSpeedDial;
 
-// The speed dials of a note or a folder, once the workspace has several: a box
-// per speed dial, each one applied as soon as it changes.
-function openSpeedDialBoardsModal(target) {
-    var modal = document.getElementById('speedDialBoardsModal');
-    if (!modal) return;
-    var boxes = modal.querySelectorAll('input[data-tag]');
+// "Add to a speed dial", once the workspace has several: the list opens beside
+// the entry, on hover or click, ticks the ones the note or folder is on, and each
+// box is applied as it changes, so several can be ticked in a row: the list stays
+// open until the pointer leaves it. The list is outside the menus, which clip or
+// close on what happens in them, so the entry is dealt with ahead of them, in the
+// capture phase, immediately: a listener of the same phase closes the note menu
+// on any click in it.
+(function () {
+    var currentItem = null;
+    var closeTimer = null;
 
-    modal.onclick = function(event) {
-        if (modal.hasAttribute('data-reload-on-close') && event.target.closest('[data-action="close-modal"]')) {
-            window.location.reload();
+    function submenu() {
+        return document.getElementById('speedDialSubmenu');
+    }
+
+    function tagsOf(item) {
+        var noteId = item.getAttribute('data-note-id');
+        var folderId = item.getAttribute('data-folder-id');
+        if (item.getAttribute('data-action') === 'toggle-speed-dial' && noteId) {
+            var row = document.querySelector('.note-actions-toggle[data-note-id="' + noteId + '"]');
+            return window.noteSpeedDialTags(noteId, row ? row.getAttribute('data-speed-dial') : '');
         }
-    };
+        // The page of the folders has no rows of notes: its button says
+        var button = document.querySelector('.folder-list-menu-btn[data-folder-id="' + folderId + '"]');
+        return button
+            ? (button.getAttribute('data-speed-dial') || '').split(' ').filter(Boolean)
+            : folderRowsSpeedDialTags(folderId);
+    }
 
-    function open(tags) {
-        boxes.forEach(function(box) {
-            box.checked = tags.indexOf(box.getAttribute('data-tag')) !== -1;
-            box.disabled = false;
-            box.onchange = function() {
-                var add = box.checked;
-                var tag = box.getAttribute('data-name');
-                box.disabled = true;
-                var done = target.noteId
-                    ? window.setNoteSpeedDial(target.noteId, add, tag)
-                    : setFolderSpeedDial(target.folderId, tag, add);
-                done.then(function(saved) {
-                    box.disabled = false;
-                    if (!saved) box.checked = !add;
-                });
-            };
+    function close() {
+        var list = submenu();
+        clearTimeout(closeTimer);
+        if (list) list.hidden = true;
+        currentItem = null;
+        if (list && list.hasAttribute('data-reload-on-close')) window.location.reload();
+    }
+
+    function open(item) {
+        var list = submenu();
+        if (!list) return;
+        clearTimeout(closeTimer);
+        if (currentItem === item && !list.hidden) return;
+        currentItem = item;
+
+        var tags = tagsOf(item);
+        list.querySelectorAll('.speed-dial-submenu-item').forEach(function (row) {
+            setBox(row, tags.indexOf(row.getAttribute('data-tag').toLowerCase()) !== -1);
         });
-        if (typeof openModal === 'function') {
-            openModal('speedDialBoardsModal');
-        } else {
-            modal.style.display = 'flex';
-        }
+
+        list.hidden = false;
+        var margin = 8;
+        var itemRect = item.getBoundingClientRect();
+        var listRect = list.getBoundingClientRect();
+        var left = itemRect.right + 4;
+        if (left + listRect.width > window.innerWidth - margin) left = itemRect.left - listRect.width - 4;
+        list.style.left = Math.max(margin, left) + 'px';
+        list.style.top = Math.max(margin, Math.min(itemRect.top - 6, window.innerHeight - listRect.height - margin)) + 'px';
     }
 
-    if (target.noteId) {
-        fetch('/api/v1/notes/' + encodeURIComponent(target.noteId), { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
-            .then(function(response) { return response.json(); })
-            .then(function(data) {
-                open(String((data.note && data.note.tags) || '').toLowerCase().split(/[,\s]+/).filter(Boolean));
-            })
-            .catch(function(error) {
-                console.error('openSpeedDialBoardsModal failed', error);
-                open([]);
-            });
-    } else {
-        open(target.tags || folderRowsSpeedDialTags(target.folderId));
+    function setBox(row, on) {
+        row.classList.toggle('is-on', on);
+        row.setAttribute('aria-checked', on ? 'true' : 'false');
     }
-}
-window.openSpeedDialBoardsModal = openSpeedDialBoardsModal;
+
+    function apply(row) {
+        var item = currentItem;
+        var tag = row.getAttribute('data-tag');
+        var add = !row.classList.contains('is-on');
+        var noteId = item.getAttribute('data-note-id');
+        setBox(row, add);
+        row.disabled = true;
+        var saved = item.getAttribute('data-action') === 'toggle-speed-dial'
+            ? window.setNoteSpeedDial(noteId, add, tag, true)
+            : setFolderSpeedDial(item.getAttribute('data-folder-id'), tag, add);
+        saved.then(function (done) {
+            row.disabled = false;
+            if (!done) setBox(row, !add);
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest) return;
+        var row = event.target.closest('.speed-dial-submenu-item');
+        if (row) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (currentItem) apply(row);
+            return;
+        }
+        var item = event.target.closest('.speed-dial-state-choose');
+        if (item) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            open(item);
+            return;
+        }
+        close();
+    }, true);
+
+    document.addEventListener('mouseover', function (event) {
+        var list = submenu();
+        if (!list || !event.target.closest) return;
+        var item = event.target.closest('.speed-dial-state-choose');
+        if (item) {
+            open(item);
+        } else if (event.target.closest('#speedDialSubmenu')) {
+            clearTimeout(closeTimer);
+        } else if (!list.hidden) {
+            clearTimeout(closeTimer);
+            closeTimer = setTimeout(close, 250);
+        }
+    }, true);
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') close();
+    }, true);
+    document.addEventListener('scroll', function (event) {
+        var list = submenu();
+        if (list && !list.contains(event.target)) close();
+    }, true);
+    window.addEventListener('resize', close);
+})();
 
 function executeTagFolderNotes() {
     var modal = document.getElementById('tagFolderNotesModal');

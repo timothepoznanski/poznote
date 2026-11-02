@@ -5625,8 +5625,7 @@
     "board_error": "スピードダイヤルを保存できませんでした。",
     "board_exists": "この名前のスピードダイヤルはすでにあります。",
     "board_invalid": "この名前は使用できません。",
-    "choose_title": "スピードダイヤル",
-    "choose_item": "スピードダイヤル...",
+    "choose_item": "いずれかのスピードダイヤルに追加",
     "folder_added_one": "1 件のノートをスピードダイヤルに追加しました",
     "folder_added_other": "{{count}} 件のノートをスピードダイヤルに追加しました",
     "visibility": {

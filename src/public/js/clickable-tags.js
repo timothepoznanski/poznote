@@ -92,9 +92,10 @@ window.noteSpeedDialTags = noteSpeedDialTags;
  * @param {string|number} noteId - The note
  * @param {boolean} add - Add it, or remove it
  * @param {string} [board] - The tag of the speed dial, the default one otherwise
+ * @param {boolean} [quiet] - No toast: the box ticked in the menu says it already
  * @returns {Promise<boolean>} Whether it was saved
  */
-function setNoteSpeedDial(noteId, add, board = 'speed-dial') {
+function setNoteSpeedDial(noteId, add, board = 'speed-dial', quiet = false) {
     const label = (key, fallback) => (window.t ? window.t(key, null, fallback) : fallback);
     const lowerBoard = board.toLowerCase();
 
@@ -123,9 +124,11 @@ function setNoteSpeedDial(noteId, add, board = 'speed-dial') {
                     if (add) others.push(lowerBoard);
                     toggle.setAttribute('data-speed-dial', others.join(' '));
                 });
-                window.poznoteShowToast(add
-                    ? label('speed_dial.added', 'Added to the speed dial')
-                    : label('speed_dial.removed', 'Removed from the speed dial'));
+                if (!quiet) {
+                    window.poznoteShowToast(add
+                        ? label('speed_dial.added', 'Added to the speed dial')
+                        : label('speed_dial.removed', 'Removed from the speed dial'));
+                }
                 return true;
             }));
         }))

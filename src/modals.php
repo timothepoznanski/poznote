@@ -1330,7 +1330,7 @@ $pzNoteInfoRows = [
 <?php // Folder icon picker, shared with list_folders.php
 include __DIR__ . '/modals/folder_icon_modal.php';
 include __DIR__ . '/modals/tag_folder_notes_modal.php';
-include __DIR__ . '/modals/speed_dial_boards_modal.php';
+include __DIR__ . '/modals/speed_dial_submenu.php';
 ?>
 <!-- Linked Note Selector Modal -->
 <div id="linkedNoteSelectorModal" class="modal">

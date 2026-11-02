@@ -5781,8 +5781,7 @@
     "board_error": "Não foi possível salvar o acesso rápido.",
     "board_exists": "Já existe um acesso rápido com este nome.",
     "board_invalid": "Este nome não pode ser usado.",
-    "choose_title": "Acessos rápidos",
-    "choose_item": "Acessos rápidos...",
+    "choose_item": "Adicionar a um acesso rápido",
     "folder_added_one": "1 nota adicionada ao acesso rápido",
     "folder_added_other": "{{count}} notas adicionadas ao acesso rápido",
     "visibility": {

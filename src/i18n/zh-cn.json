@@ -5877,8 +5877,7 @@
     "board_error": "无法保存快速访问。",
     "board_exists": "已存在同名的快速访问。",
     "board_invalid": "不能使用此名称。",
-    "choose_title": "快速访问",
-    "choose_item": "快速访问...",
+    "choose_item": "添加到一个快速访问",
     "folder_added_one": "已将 1 条笔记添加到快速访问",
     "folder_added_other": "已将 {{count}} 条笔记添加到快速访问",
     "visibility": {

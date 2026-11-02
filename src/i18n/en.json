@@ -5625,8 +5625,7 @@
     "board_error": "Could not save the speed dial.",
     "board_exists": "A speed dial with this name already exists.",
     "board_invalid": "This name cannot be used.",
-    "choose_title": "Speed dials",
-    "choose_item": "Speed dials...",
+    "choose_item": "Add to a speed dial",
     "folder_added_one": "1 note added to the speed dial",
     "folder_added_other": "{{count}} notes added to the speed dial",
     "visibility": {

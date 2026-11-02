@@ -468,7 +468,8 @@ function renderFolderActionsMenu($currentWorkspace = '') {
     // Both give way to this one once the workspace has several speed dials
     $menu .= "<div class='folder-actions-menu-item requires-notes speed-dial-state-choose' data-action='toggle-folder-speed-dial'>";
     $menu .= "<i class='lucide lucide-zap'></i>";
-    $menu .= "<span>" . t_h('speed_dial.choose_item', [], 'Speed dials...') . "</span>";
+    $menu .= "<span>" . t_h('speed_dial.choose_item', [], 'Add to a speed dial') . "</span>";
+    $menu .= "<i class='lucide lucide-chevron-right speed-dial-submenu-arrow'></i>";
     $menu .= "</div>";
 
     // Share folder action: two variants, the client shows the one matching
@@ -696,7 +697,8 @@ function renderNoteActionsMenu($currentWorkspace = '') {
     // Both give way to this one once the workspace has several speed dials
     $menu .= "<div class='note-actions-menu-item note-real-only speed-dial-state-choose' data-action='toggle-speed-dial'>";
     $menu .= "<i class='lucide lucide-zap'></i>";
-    $menu .= "<span>" . t_h('speed_dial.choose_item', [], 'Speed dials...') . "</span>";
+    $menu .= "<span>" . t_h('speed_dial.choose_item', [], 'Add to a speed dial') . "</span>";
+    $menu .= "<i class='lucide lucide-chevron-right speed-dial-submenu-arrow'></i>";
     $menu .= "</div>";
 
     // Keep offline: the note stays in the browser whatever its date (Offline

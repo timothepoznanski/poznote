@@ -5780,8 +5780,7 @@
     "board_error": "Die Schnellwahl konnte nicht gespeichert werden.",
     "board_exists": "Eine Schnellwahl mit diesem Namen existiert bereits.",
     "board_invalid": "Dieser Name kann nicht verwendet werden.",
-    "choose_title": "Schnellwahlen",
-    "choose_item": "Schnellwahlen...",
+    "choose_item": "Zu einer Schnellwahl hinzufügen",
     "folder_added_one": "1 Notiz zur Schnellwahl hinzugefügt",
     "folder_added_other": "{{count}} Notizen zur Schnellwahl hinzugefügt",
     "visibility": {
