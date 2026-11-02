@@ -201,7 +201,9 @@ const markdownCodeLinePlugin = ViewPlugin.fromClass(class {
   }
 
   update(update) {
-    if (update.docChanged || update.viewportChanged) {
+    // The parser reaches a block far down the note after the view is built
+    // (returning to a tab, scrolled to it), with no other change to the view
+    if (update.docChanged || update.viewportChanged || syntaxTree(update.startState) !== syntaxTree(update.state)) {
       this.decorations = buildMarkdownCodeLineDecorations(update.view)
     }
   }
