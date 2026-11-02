@@ -92,6 +92,7 @@ function poznoteGetIndexCssGroups(): array {
             'css/modals/specific-modals.css',
             'css/modals/attachments.css',
             'css/modals/share-modal.css',
+            'css/modals/share-settings-modal.css',
             'css/modals/alerts-utilities.css',
             'css/modals/responsive.css',
             'css/modals/reminders.css',

@@ -972,6 +972,7 @@ $currentLang = getUserLanguage();
 	include __DIR__ . '/../modals/folder_icon_modal.php';
 	include __DIR__ . '/../modals/tag_folder_notes_modal.php';
 	include __DIR__ . '/../modals/speed_dial_submenu.php';
+	include __DIR__ . '/../share_settings_config.php';
 	?>
 
 	<script src="<?php echo poznoteAsset('js/globals.js'); ?>"></script>
@@ -997,6 +998,7 @@ $currentLang = getUserLanguage();
 	     it the share status lookup threw and an already shared folder was
 	     offered a new share -->
 	<script src="<?php echo poznoteAsset('js/pwa-helpers.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/share-settings-modal.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/share.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/color-palette.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/folder-icon.js'); ?>"></script>

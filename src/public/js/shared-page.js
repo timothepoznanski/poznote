@@ -10,71 +10,36 @@
         var body = document.body;
         return {
             workspace: body.getAttribute('data-workspace') || '',
-            currentUserId: parseInt(body.getAttribute('data-current-user-id') || '0', 10),
             txtError: body.getAttribute('data-txt-error') || 'Error',
             txtUntitled: body.getAttribute('data-txt-untitled') || 'Untitled',
             txtEditToken: body.getAttribute('data-txt-edit-token') || 'Click to edit token',
-            txtTokenUpdateFailed: body.getAttribute('data-txt-token-update-failed') || 'Failed to update token',
-            txtCustomToken: body.getAttribute('data-txt-custom-token') || 'Custom token (optional)',
-            txtCustomTokenPlaceholder: body.getAttribute('data-txt-custom-token-placeholder') || 'my_custom_token-1',
-            txtUseHttps: body.getAttribute('data-txt-use-https') || 'HTTPS',
-            txtSearchIndexable: body.getAttribute('data-txt-search-indexable') || 'Allow indexing by search engines',
-            txtSearchIndexableMobile: body.getAttribute('data-txt-search-indexable-mobile') || 'Allow indexing',
             txtPasswordLabel: body.getAttribute('data-txt-password-label') || 'Password',
-            txtPasswordPlaceholder: body.getAttribute('data-txt-password-placeholder') || 'Enter a password',
-            txtShowPassword: body.getAttribute('data-txt-show-password') || 'Show password',
-            txtHidePassword: body.getAttribute('data-txt-hide-password') || 'Hide password',
-
-
-            txtRenew: body.getAttribute('data-txt-renew') || 'Renew',
             txtOpen: body.getAttribute('data-txt-open') || 'Open public view',
             txtCopyUrl: body.getAttribute('data-txt-copy-url') || 'Copy URL',
             txtUrlCopied: body.getAttribute('data-txt-url-copied') || 'URL copied!',
-            txtShareLinkCopied: body.getAttribute('data-txt-share-link-copied') || 'Share link copied to clipboard!',
             txtRevoke: body.getAttribute('data-txt-revoke') || 'Revoke',
-            txtRevokeModalTitle: body.getAttribute('data-txt-revoke-modal-title') || 'Revoke share',
-            txtRevokeModalText: body.getAttribute('data-txt-revoke-modal-text') || 'You can permanently delete this share, or keep it and make it inaccessible until you enable it again.',
-            txtRevokeModalTextDisabled: body.getAttribute('data-txt-revoke-modal-text-disabled') || 'This share is currently inaccessible. You can make it accessible again, or permanently delete it.',
             txtRevokeModalTextViaFolder: body.getAttribute('data-txt-revoke-modal-text-via-folder') || 'This note is shared through a folder. You can make just this note inaccessible; the folder share and its other notes are not affected.',
             txtRevokeModalTextViaFolderDisabled: body.getAttribute('data-txt-revoke-modal-text-via-folder-disabled') || 'This note is currently inaccessible. You can make it accessible again through its folder share.',
             txtRevokeModalTextViaFolderParentDisabled: body.getAttribute('data-txt-revoke-modal-text-via-folder-parent-disabled') || 'This note is inaccessible because its folder share has been made inaccessible. Make the folder share accessible again to restore access.',
-            txtOk: body.getAttribute('data-txt-ok') || 'OK',
-            txtRevokeDelete: body.getAttribute('data-txt-revoke-delete') || 'Delete permanently',
-            txtRevokeDisable: body.getAttribute('data-txt-revoke-disable') || 'Make inaccessible',
-            txtRevokeEnable: body.getAttribute('data-txt-revoke-enable') || 'Make accessible again',
             txtShareDisabledBadge: body.getAttribute('data-txt-share-disabled-badge') || 'Inaccessible',
             txtShareDisabledHelp: body.getAttribute('data-txt-share-disabled-help') || 'This share is inaccessible: the link no longer works until you make it accessible again.',
-            txtTaskPermissions: body.getAttribute('data-txt-task-permissions') || 'Permissions',
-            txtTaskReadOnly: body.getAttribute('data-txt-task-read-only') || 'Read only',
-            txtTaskCheckOnly: body.getAttribute('data-txt-task-check-only') || 'Check or uncheck only',
-            txtTaskFull: body.getAttribute('data-txt-task-full') || 'Full edit',
-            txtNoteEditable: body.getAttribute('data-txt-note-editable') || 'Allow text editing',
-            txtFolderEditable: body.getAttribute('data-txt-folder-editable') || 'Allow note editing',
 
             txtNoteSharedThroughFolder: body.getAttribute('data-txt-note-shared-through-folder') || 'Note shared through folder',
             txtFolderSharedThroughParent: body.getAttribute('data-txt-folder-shared-through-parent') || 'Folder shared through parent folder',
             txtNoFilterResults: body.getAttribute('data-txt-no-filter-results') || 'No items match your search.',
             txtTableName: body.getAttribute('data-txt-table-name') || 'Name',
-            txtTableFolder: body.getAttribute('data-txt-table-folder') || 'Path / Folder',
             txtTableToken: body.getAttribute('data-txt-table-token') || 'Token',
 
             txtTokenHelp: body.getAttribute('data-txt-token-help') || 'The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.',
             txtTableActions: body.getAttribute('data-txt-table-actions') || 'Actions',
 
             txtCancel: body.getAttribute('data-txt-cancel') || 'Cancel',
-            txtSave: body.getAttribute('data-txt-save') || 'Save',
             txtViaFolder: body.getAttribute('data-txt-via-folder') || 'Shared via folder',
 
             txtNoSharedNotes: body.getAttribute('data-txt-no-shared-notes') || 'No shared notes yet.',
             txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
-            hideRestrictUsers: body.getAttribute('data-hide-restrict-users') === '1',
-            hideProtocolToggle: body.getAttribute('data-hide-protocol-toggle') === '1',
-            txtRestrictUsers: body.getAttribute('data-txt-restrict-users') || 'Restrict to specific users',
-            txtRestrictUsersMobile: body.getAttribute('data-txt-restrict-users-mobile') || 'Restrict',
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
             txtRestrictedHelp: body.getAttribute('data-txt-restricted-help') || 'When restricted, only the listed users can access this share after logging in.',
-            txtNoUsersFound: body.getAttribute('data-txt-no-users-found') || 'No other users found',
-            txtUsersLoading: body.getAttribute('data-txt-users-loading') || 'Loading users...',
 
             txtSharedBy: body.getAttribute('data-txt-shared-by') || 'Shared by',
             txtNoSharedWithMe: body.getAttribute('data-txt-no-shared-with-me') || 'Nothing has been shared with you yet.',
@@ -86,6 +51,16 @@
     }
 
     var config = getConfig();
+
+    // The share settings dialog and the helpers it shares with this page
+    var shareSettings = window.PoznoteShareSettings;
+    var showShareToast = shareSettings.showErrorToast;
+    var showRevokeShareModal = shareSettings.showRevokeModal;
+    var showCopyToast = shareSettings.showCopyToast;
+    var copyTextToClipboard = shareSettings.copyTextToClipboard;
+    var normalizePublicUrl = shareSettings.normalizePublicUrl;
+    var buildNotePublicUrl = shareSettings.buildNotePublicUrl;
+    var buildFolderPublicUrl = shareSettings.buildFolderPublicUrl;
 
     function blurAfterPointerActivation(element, event) {
         if (!element || typeof element.blur !== 'function') return;
@@ -108,13 +83,34 @@
     var filteredItems = [];
     var filterText = '';
     var filterType = 'all';
-    var pendingEditorRequest = null;
-    var pendingEditorHandled = false;
     var sharedFolderLookup = {};
     var COLLAPSED_FOLDERS_STORAGE_KEY = 'poznote.shared.collapsedFolders';
     var currentHierarchyBranchMeta = {};
     var currentCollapsibleFolderIds = [];
     var collapsedFolderIds = loadCollapsedFolderIds();
+    var SORT_STORAGE_KEY = 'poznote.shared.sort';
+    var SORT_MODES = ['name', 'updated', 'shared'];
+    var sortMode = loadSortMode();
+
+    function loadSortMode() {
+        try {
+            var stored = window.localStorage ? window.localStorage.getItem(SORT_STORAGE_KEY) : null;
+            return SORT_MODES.indexOf(stored) !== -1 ? stored : 'name';
+        } catch (error) {
+            return 'name';
+        }
+    }
+
+    function saveSortMode() {
+        try {
+            if (window.localStorage) {
+                window.localStorage.setItem(SORT_STORAGE_KEY, sortMode);
+            }
+        } catch (error) {
+            // Ignore storage failures and keep the UI functional.
+            console.debug('shared-page: saveSortMode() failed:', error);
+        }
+    }
 
     function loadCollapsedFolderIds() {
         try {
@@ -187,40 +183,6 @@
         }
     }
 
-    function isMobileShareModalView() {
-        return !!(window.matchMedia && window.matchMedia('(max-width: 680px)').matches);
-    }
-
-    function getShareModalLabel(desktopText, mobileText) {
-        return isMobileShareModalView() && mobileText ? mobileText : desktopText;
-    }
-
-    function showShareToast(message, parentEl) {
-        var container = parentEl || document.querySelector('.shared-content') || document.body;
-        var existing = container.querySelector('.share-toast');
-        if (existing) existing.remove();
-        var toast = document.createElement('div');
-        toast.className = 'share-toast alert alert-danger';
-        toast.style.position = parentEl ? 'relative' : 'fixed';
-        if (!parentEl) {
-            toast.style.top = '20px';
-            toast.style.left = '50%';
-            toast.style.transform = 'translateX(-50%)';
-            toast.style.zIndex = '10001';
-            toast.style.maxWidth = '400px';
-            toast.style.minWidth = '200px';
-            toast.style.textAlign = 'center';
-            toast.style.boxShadow = '0 4px 16px rgba(220, 53, 69, 0.2)';
-        }
-        toast.textContent = message;
-        if (parentEl) {
-            container.insertBefore(toast, container.firstChild);
-        } else {
-            document.body.appendChild(toast);
-        }
-        setTimeout(function() { if (toast.parentNode) toast.remove(); }, 5000);
-    }
-
     function buildEditModalOptions(item) {
         if (!item) return null;
 
@@ -238,6 +200,11 @@
                 hasPassword: noteHasPassword,
                 passwordValue: item.passwordValue || '',
                 allowedUsers: item.allowed_users || null,
+                revoke: {
+                    isDisabled: !!item.disabled,
+                    onDeleted: loadSharedNotes,
+                    onToggled: loadSharedNotes
+                },
                 onSave: function(updates) {
                     return updateNoteShareSettings(item.note_id, updates);
                 }
@@ -257,6 +224,12 @@
                 hasPassword: folderHasPassword,
                 passwordValue: item.passwordValue || '',
                 allowedUsers: item.allowed_users || null,
+                // A folder shared through its parent has no share of its own
+                revoke: item.is_direct ? {
+                    isDisabled: !!item.disabled,
+                    onDeleted: loadSharedNotes,
+                    onToggled: loadSharedNotes
+                } : null,
                 onSave: function(updates) {
                     return updateFolderShareSettings(item.folder_id, updates);
                 }
@@ -269,46 +242,13 @@
     function openEditModalForItem(item) {
         var modalOptions = buildEditModalOptions(item);
         if (modalOptions) {
-            showEditTokenModal(modalOptions);
+            modalOptions.onTokenChanged = function(oldToken, newToken) {
+                if (syncFilterWithUpdatedToken(oldToken, newToken)) {
+                    applyFilter();
+                }
+            };
+            shareSettings.show(modalOptions);
         }
-    }
-
-    function clearPendingEditorRequestFromUrl() {
-        if (!window.history || typeof window.history.replaceState !== 'function') {
-            return;
-        }
-
-        var nextUrl = new URL(window.location.href);
-        nextUrl.searchParams.delete('auto_edit');
-        nextUrl.searchParams.delete('item_type');
-        nextUrl.searchParams.delete('item_id');
-        window.history.replaceState({}, '', nextUrl.toString());
-    }
-
-    function maybeOpenRequestedShareEditor() {
-        if (!pendingEditorRequest || pendingEditorHandled) {
-            return;
-        }
-
-        var targetItem = allItems.find(function(item) {
-            if (item._type !== pendingEditorRequest.itemType) {
-                return false;
-            }
-
-            if (pendingEditorRequest.itemType === 'note') {
-                return String(item.note_id) === pendingEditorRequest.itemId;
-            }
-
-            return String(item.folder_id) === pendingEditorRequest.itemId;
-        });
-
-        if (!targetItem) {
-            return;
-        }
-
-        pendingEditorHandled = true;
-        openEditModalForItem(targetItem);
-        clearPendingEditorRequestFromUrl();
     }
 
     // ========== Navigation ==========
@@ -345,7 +285,16 @@
         return true;
     }
 
+    function updateSortControl() {
+        var sortSelect = document.getElementById('sharedSortSelect');
+        if (sortSelect) {
+            // Shares received from other users carry no dates to sort on
+            sortSelect.classList.toggle('initially-hidden', filterType === 'shared_with_me');
+        }
+    }
+
     function applyFilter() {
+        updateSortControl();
         filteredItems = allItems.filter(function(item) {
             if (filterType === 'notes' && item._type !== 'note') return false;
             if (filterType === 'folders' && item._type !== 'folder') return false;
@@ -415,7 +364,7 @@
         } else {
             params.delete('type');
         }
-        // Keep non-filter params (workspace, auto_edit, etc.) intact
+        // Keep non-filter params (workspace, etc.) intact
         var newSearch = params.toString();
         var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '');
         window.history.replaceState(null, '', newUrl);
@@ -536,18 +485,31 @@
         });
     }
 
-    function sortByFolderPathAndName(items, getName) {
-        return items.slice().sort(function(a, b) {
-            var pathA = (a.folder_path || '').toLowerCase();
-            var pathB = (b.folder_path || '').toLowerCase();
-            if (pathA !== pathB) {
-                return pathA.localeCompare(pathB);
-            }
+    function getItemSortName(item) {
+        if (item._type === 'folder') {
+            return (item.folder_path || item.folder_name || '').toLowerCase();
+        }
+        return (item.heading || item.folder_name || config.txtUntitled).toLowerCase();
+    }
 
-            var nameA = getName(a).toLowerCase();
-            var nameB = getName(b).toLowerCase();
-            return nameA.localeCompare(nameB);
-        });
+    function getItemSortDate(item) {
+        if (sortMode === 'updated') {
+            return item.updated || '';
+        }
+        return item.shared_date || item.created || '';
+    }
+
+    // Dates come newest first; an item without the date goes after the others,
+    // and ties fall back on the name.
+    function compareItems(a, b) {
+        if (sortMode !== 'name') {
+            var dateA = getItemSortDate(a);
+            var dateB = getItemSortDate(b);
+            if (dateA !== dateB) {
+                return dateA < dateB ? 1 : -1;
+            }
+        }
+        return getItemSortName(a).localeCompare(getItemSortName(b));
     }
 
     function buildAllViewSequence(items) {
@@ -582,21 +544,9 @@
             orderedItems.push(item);
         });
 
-        folders = sortByFolderPathAndName(folders, function(folder) {
-            return folder.folder_name || '';
-        });
-
-        notes = notes.slice().sort(function(a, b) {
-            var folderPathA = (a.folder_path || '').toLowerCase();
-            var folderPathB = (b.folder_path || '').toLowerCase();
-            if (folderPathA !== folderPathB) {
-                return folderPathA.localeCompare(folderPathB);
-            }
-
-            var headingA = (a.heading || config.txtUntitled).toLowerCase();
-            var headingB = (b.heading || config.txtUntitled).toLowerCase();
-            return headingA.localeCompare(headingB);
-        });
+        orderedItems.sort(compareItems);
+        folders.sort(compareItems);
+        notes.sort(compareItems);
 
         notes.forEach(function(note) {
             var folderId = note.folder_id != null ? String(note.folder_id) : '';
@@ -619,12 +569,6 @@
                 foldersByParentId[parentKey] = [];
             }
             foldersByParentId[parentKey].push(folder);
-        });
-
-        Object.keys(foldersByParentId).forEach(function(parentKey) {
-            foldersByParentId[parentKey] = sortByFolderPathAndName(foldersByParentId[parentKey], function(folder) {
-                return folder.folder_name || '';
-            });
         });
 
         function appendFolderBranch(folder, depth) {
@@ -655,11 +599,7 @@
             standaloneNotes = standaloneNotes.concat(notesByFolderId[folderKey]);
         });
 
-        standaloneNotes = standaloneNotes.slice().sort(function(a, b) {
-            var headingA = (a.heading || config.txtUntitled).toLowerCase();
-            var headingB = (b.heading || config.txtUntitled).toLowerCase();
-            return headingA.localeCompare(headingB);
-        });
+        standaloneNotes.sort(compareItems);
 
         standaloneNotes.forEach(function(note) {
             delete note._renderAsChildOfFolderId;
@@ -808,7 +748,6 @@
                     return;
                 }
                 applyFilter();
-                maybeOpenRequestedShareEditor();
             })
             .catch(function(error) {
                 if (spinner) spinner.style.display = 'none';
@@ -825,68 +764,19 @@
     // ========== Note API actions ==========
 
     function revokeNoteShare(noteId) {
-        fetch('/api/v1/notes/' + noteId + '/share', {
-            method: 'DELETE',
-            headers: { 'Accept': 'application/json' },
-            credentials: 'same-origin'
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.error) throw new Error(data.error);
-            if (data.revoked) {
-                loadSharedNotes();
-            }
-        })
-        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
+        shareSettings.deleteShare('note', noteId)
+            .then(function() { loadSharedNotes(); })
+            .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
     function setNoteShareDisabled(noteId, disabled) {
-        fetch('/api/v1/notes/' + noteId + '/share', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ disabled: disabled ? 1 : 0 })
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.error) throw new Error(data.error);
-            loadSharedNotes();
-        })
-        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
+        shareSettings.setShareDisabled('note', noteId, disabled)
+            .then(function() { loadSharedNotes(); })
+            .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
     function updateNoteShareSettings(noteId, updates) {
-        var payload = {};
-        if (Object.prototype.hasOwnProperty.call(updates, 'custom_token') && updates.custom_token) {
-            payload.custom_token = updates.custom_token;
-        }
-        if (Object.prototype.hasOwnProperty.call(updates, 'access_mode')) {
-            payload.access_mode = updates.access_mode;
-        }
-        if (Object.prototype.hasOwnProperty.call(updates, 'indexable')) {
-            payload.indexable = updates.indexable ? 1 : 0;
-        }
-        if (Object.prototype.hasOwnProperty.call(updates, 'password')) {
-            payload.password = updates.password;
-        }
-        if (Object.prototype.hasOwnProperty.call(updates, 'allowed_users')) {
-            payload.allowed_users = updates.allowed_users;
-        }
-
-        if (Object.keys(payload).length === 0) {
-            return Promise.resolve({ success: true });
-        }
-
-        return fetch('/api/v1/notes/' + noteId + '/share', {
-            method: 'PATCH',
-            credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify(payload)
-        })
-        .then(function(resp) {
-            if (resp.ok) return resp.json();
-            return resp.json().then(function(e) { throw new Error(e.error || config.txtTokenUpdateFailed); });
-        })
+        return shareSettings.patchNoteShare(noteId, updates)
         .then(function(data) {
             var idx = sharedNotes.findIndex(function(n) { return n.note_id == noteId; });
             if (idx !== -1) {
@@ -911,79 +801,26 @@
             mergeItems();
             applyFilter();
             return data;
-        })
-        .catch(function(err) {
-            throw err;
         });
     }
 
     // ========== Folder API actions ==========
 
     function revokeFolderShare(folderId) {
-        fetch('/api/v1/folders/' + folderId + '/share', {
-            method: 'DELETE',
-            headers: { 'Accept': 'application/json' },
-            credentials: 'same-origin'
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.error) throw new Error(data.error);
-            if (data.revoked) {
-                loadSharedNotes();
-            }
-        })
-        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
+        shareSettings.deleteShare('folder', folderId)
+            .then(function() { loadSharedNotes(); })
+            .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
     function setFolderShareDisabled(folderId, disabled) {
-        fetch('/api/v1/folders/' + folderId + '/share', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify({ disabled: disabled ? 1 : 0 })
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            if (data.error) throw new Error(data.error);
-            loadSharedNotes();
-        })
-        .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
+        shareSettings.setShareDisabled('folder', folderId, disabled)
+            .then(function() { loadSharedNotes(); })
+            .catch(function(error) { showShareToast(config.txtError + ': ' + error.message); });
     }
 
     function updateFolderShareSettings(folderId, updates) {
-        var payload = {};
-        if (Object.prototype.hasOwnProperty.call(updates, 'custom_token') && updates.custom_token) {
-            if (updates.custom_token.length < 4) {
-                return Promise.reject(new Error('Token must be at least 4 characters'));
-            }
-            payload.custom_token = updates.custom_token;
-        }
-        if (Object.prototype.hasOwnProperty.call(updates, 'indexable')) {
-            payload.indexable = updates.indexable ? 1 : 0;
-        }
-        if (Object.prototype.hasOwnProperty.call(updates, 'password')) {
-            payload.password = updates.password;
-        }
-        if (Object.prototype.hasOwnProperty.call(updates, 'access_mode') && updates.access_mode !== undefined) {
-            payload.access_mode = updates.access_mode;
-        }
-        if (Object.prototype.hasOwnProperty.call(updates, 'allowed_users')) {
-            payload.allowed_users = updates.allowed_users;
-        }
-
-        if (Object.keys(payload).length === 0) {
-            return Promise.resolve({ success: true });
-        }
-
-        return fetch('/api/v1/folders/' + folderId + '/share', {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            credentials: 'same-origin',
-            body: JSON.stringify(payload)
-        })
-        .then(function(response) { return response.json(); })
+        return shareSettings.patchFolderShare(folderId, updates)
         .then(function(data) {
-            if (data.error) throw new Error(data.error);
             var folder = sharedFolders.find(function(f) { return f.folder_id == folderId; });
             if (folder) {
                 if (Object.prototype.hasOwnProperty.call(updates, 'custom_token') && updates.custom_token) {
@@ -1009,33 +846,10 @@
             mergeItems();
             applyFilter();
             return data;
-        })
-        .catch(function(error) { throw error; });
+        });
     }
 
     // ========== UI Helpers ==========
-
-    function buildNotePublicUrl(token) {
-        return new URL(encodeURIComponent(token), window.location.origin + '/').href;
-    }
-
-    function buildFolderPublicUrl(token) {
-        return new URL('folder/' + encodeURIComponent(token), window.location.origin + '/').href;
-    }
-
-    // The API builds absolute URLs from the Host header, which loses the port
-    // behind a proxy that forwards the host without it (#1628). Public pages
-    // live on the same origin as this page, so keep the server's path and take
-    // the scheme, host and port the browser is on, as the share dialog does.
-    function normalizePublicUrl(url) {
-        if (!url) return '';
-        try {
-            var parsed = new URL(url, window.location.origin + '/');
-            return new URL(parsed.pathname + parsed.search + parsed.hash, window.location.origin + '/').href;
-        } catch (error) {
-            return url;
-        }
-    }
 
     function shouldExpandAllFolders() {
         return currentCollapsibleFolderIds.some(function(folderId) {
@@ -1123,99 +937,12 @@
         }
     }
 
-    function generateRandomToken() {
-        var bytes = new Uint8Array(16);
-        if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
-            window.crypto.getRandomValues(bytes);
-        } else {
-            for (var index = 0; index < bytes.length; index++) {
-                bytes[index] = Math.floor(Math.random() * 256);
-            }
-        }
-
-        var parts = [];
-        for (var i = 0; i < bytes.length; i++) {
-            parts.push(bytes[i].toString(16).padStart(2, '0'));
-        }
-        return parts.join('');
-    }
-
-    function copyTextToClipboard(text) {
-        if (!text) return Promise.reject(new Error(config.txtError));
-
-        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-            return navigator.clipboard.writeText(text).catch(function() {
-                return fallbackCopyText(text);
-            });
-        }
-
-        return fallbackCopyText(text);
-    }
-
-    function fallbackCopyText(text) {
-        return new Promise(function(resolve, reject) {
-            try {
-                var textarea = document.createElement('textarea');
-                textarea.value = text;
-                textarea.setAttribute('readonly', 'readonly');
-                textarea.style.position = 'fixed';
-                textarea.style.left = '-9999px';
-                document.body.appendChild(textarea);
-                textarea.select();
-                textarea.setSelectionRange(0, textarea.value.length);
-
-                var success = document.execCommand('copy');
-                document.body.removeChild(textarea);
-
-                if (success) {
-                    resolve();
-                    return;
-                }
-            } catch (error) {
-                reject(error);
-                return;
-            }
-
-            window.prompt('Copy this URL', text);
-            resolve();
-        });
-    }
-
     function copyItemUrl(url) {
         return copyTextToClipboard(url).then(function() {
             showCopyToast(getConfig().txtUrlCopied);
         }).catch(function() {
             window.prompt('Copy this URL', url);
         });
-    }
-
-    // Same confirmation wording as the workspace share flow
-    function copyShareLink(url) {
-        return copyTextToClipboard(url).then(function() {
-            showCopyToast(getConfig().txtShareLinkCopied);
-        }).catch(function() {
-            window.prompt('Copy this URL', url);
-        });
-    }
-
-    function showCopyToast(message) {
-        var existing = document.getElementById('shared-copy-toast');
-        if (existing) existing.remove();
-        var toast = document.createElement('div');
-        toast.id = 'shared-copy-toast';
-        toast.textContent = message;
-        toast.style.cssText = 'position:fixed;top:16px;right:16px;z-index:2147483647;background:#2d3748;color:#e2e8f0;padding:10px 16px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:14px;font-weight:500;opacity:0;transition:opacity 160ms ease-in-out,transform 160ms ease-in-out;transform:translateY(-6px);pointer-events:none;border:1px solid rgba(255,255,255,0.1);';
-        document.body.appendChild(toast);
-        toast.offsetHeight;
-        toast.style.opacity = '1';
-        toast.style.transform = 'translateY(0)';
-        setTimeout(function() {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-6px)';
-            setTimeout(function() { try { toast.remove(); } catch (e) {
-                console.debug('shared-page: showCopyToast() failed:', e);
-            } }, 220);
-        }, 1800);
     }
 
     function renderTokenCell(token, fallbackText) {
@@ -1236,524 +963,6 @@
 
         wrapper.appendChild(content);
         return wrapper;
-    }
-
-    function buildPreviewUrlForModal(options, token, protocol) {
-        var nextToken = token || options.token || '';
-        var nextProtocol = protocol || options.protocol || getPreferredPublicUrlProtocol();
-        var rawUrl = options.itemType === 'folder'
-            ? buildFolderPublicUrl(nextToken)
-            : buildNotePublicUrl(nextToken);
-
-        return applyProtocolToPublicUrl(normalizePublicUrl(rawUrl), nextProtocol);
-    }
-
-    function showEditTokenModal(options) {
-        var modal = document.createElement('div');
-        modal.className = 'modal shared-edit-token-modal';
-        modal.style.display = 'flex';
-        var initialPasswordValue = options.passwordValue || '';
-        var passwordDirty = false;
-
-        var content = document.createElement('div');
-        content.className = 'modal-content shared-edit-token-modal-content';
-
-        var titleBlock = document.createElement('div');
-        titleBlock.className = 'shared-edit-token-modal-title';
-        var title = document.createElement('h3');
-        var titleText = document.createElement('span');
-        titleText.className = 'shared-edit-token-modal-title-link';
-        title.appendChild(titleText);
-        titleBlock.appendChild(title);
-
-        var titleCopyBtn = document.createElement('button');
-        titleCopyBtn.type = 'button';
-        titleCopyBtn.className = 'btn btn-secondary shared-edit-token-url-copy';
-        titleCopyBtn.title = config.txtCopyUrl;
-        titleCopyBtn.setAttribute('aria-label', config.txtCopyUrl);
-        titleCopyBtn.innerHTML = '<i class="lucide lucide-copy"></i>';
-        titleCopyBtn.addEventListener('click', function() {
-            copyShareLink(titleText.textContent);
-        });
-        titleBlock.appendChild(titleCopyBtn);
-
-        content.appendChild(titleBlock);
-
-        var tokenRow = document.createElement('div');
-        tokenRow.className = 'shared-edit-token-field-row';
-
-        var tokenLabel = document.createElement('div');
-        tokenLabel.className = 'shared-edit-token-field-label shared-edit-token-label-with-help';
-
-        var tokenLabelText = document.createElement('span');
-        tokenLabelText.className = 'shared-edit-token-label-text';
-        tokenLabelText.textContent = config.txtCustomToken;
-
-        var tokenHelp = document.createElement('span');
-        tokenHelp.className = 'shared-header-help';
-        tokenHelp.tabIndex = 0;
-        tokenHelp.setAttribute('aria-label', config.txtTokenHelp);
-        tokenHelp.innerHTML = '<i class="lucide lucide-help-circle"></i>';
-
-        var tokenHelpTooltip = document.createElement('span');
-        tokenHelpTooltip.className = 'shared-header-help-tooltip';
-        tokenHelpTooltip.textContent = config.txtTokenHelp;
-        tokenHelp.appendChild(tokenHelpTooltip);
-
-        tokenLabel.appendChild(tokenLabelText);
-        tokenLabel.appendChild(tokenHelp);
-        tokenRow.appendChild(tokenLabel);
-
-        var tokenValue = document.createElement('div');
-        tokenValue.className = 'shared-edit-token-field-value';
-
-        var tokenFieldGroup = document.createElement('div');
-        tokenFieldGroup.className = 'shared-edit-token-inline-group';
-
-        var input = document.createElement('input');
-        input.type = 'text';
-        input.value = options.token || '';
-        input.placeholder = config.txtCustomTokenPlaceholder;
-        input.className = 'modal-password-input';
-        input.style.width = '100%';
-        input.style.padding = '8px 10px';
-        input.style.borderRadius = '6px';
-        input.style.border = '1px solid #ddd';
-        input.style.boxSizing = 'border-box';
-        input.style.margin = '0';
-
-        var renewBtn = document.createElement('button');
-        renewBtn.type = 'button';
-        renewBtn.className = 'btn btn-secondary shared-edit-token-inline-renew';
-        renewBtn.title = config.txtRenew;
-        renewBtn.setAttribute('aria-label', config.txtRenew);
-        renewBtn.innerHTML = '<i class="lucide lucide-refresh-cw"></i>';
-
-        tokenFieldGroup.appendChild(input);
-        tokenFieldGroup.appendChild(renewBtn);
-        tokenValue.appendChild(tokenFieldGroup);
-        tokenRow.appendChild(tokenValue);
-        content.appendChild(tokenRow);
-
-        var passwordRow = document.createElement('div');
-        passwordRow.className = 'shared-edit-token-field-row';
-
-        var passwordLabel = document.createElement('label');
-        passwordLabel.className = 'shared-edit-token-field-label';
-        passwordLabel.textContent = config.txtPasswordLabel;
-        passwordRow.appendChild(passwordLabel);
-
-        var passwordValue = document.createElement('div');
-        passwordValue.className = 'shared-edit-token-field-value';
-
-        var passwordFieldGroup = document.createElement('div');
-        passwordFieldGroup.className = 'shared-edit-token-inline-group';
-
-        var passwordInput = document.createElement('input');
-        passwordInput.type = 'text';
-        passwordInput.value = initialPasswordValue;
-        passwordInput.placeholder = config.txtPasswordPlaceholder;
-        passwordInput.className = 'modal-password-input';
-        passwordInput.style.width = '100%';
-        passwordInput.style.padding = '8px 10px';
-        passwordInput.style.borderRadius = '6px';
-        passwordInput.style.border = '1px solid #ddd';
-        passwordInput.style.boxSizing = 'border-box';
-        passwordInput.style.margin = '0';
-
-        var togglePasswordBtn = document.createElement('button');
-        togglePasswordBtn.type = 'button';
-        togglePasswordBtn.className = 'btn btn-secondary shared-edit-token-password-toggle';
-        togglePasswordBtn.title = config.txtHidePassword;
-        togglePasswordBtn.setAttribute('aria-label', config.txtHidePassword);
-        togglePasswordBtn.innerHTML = '<i class="lucide lucide-eye-off"></i>';
-
-        function updatePasswordToggleState() {
-            var isVisible = passwordInput.type === 'text';
-            togglePasswordBtn.title = isVisible ? config.txtHidePassword : config.txtShowPassword;
-            togglePasswordBtn.setAttribute('aria-label', isVisible ? config.txtHidePassword : config.txtShowPassword);
-            togglePasswordBtn.innerHTML = isVisible
-                ? '<i class="lucide lucide-eye-off"></i>'
-                : '<i class="lucide lucide-eye"></i>';
-        }
-
-        togglePasswordBtn.addEventListener('click', function() {
-            passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-            updatePasswordToggleState();
-            passwordInput.focus();
-            var valueLength = passwordInput.value.length;
-            if (typeof passwordInput.setSelectionRange === 'function') {
-                passwordInput.setSelectionRange(valueLength, valueLength);
-            }
-        });
-
-        passwordInput.addEventListener('input', function() {
-            passwordDirty = true;
-        });
-        updatePasswordToggleState();
-
-        passwordFieldGroup.appendChild(passwordInput);
-        passwordFieldGroup.appendChild(togglePasswordBtn);
-        passwordValue.appendChild(passwordFieldGroup);
-        passwordRow.appendChild(passwordValue);
-        content.appendChild(passwordRow);
-
-        var permissionsSelect = null;
-        var permissionOptions = null;
-        if (options.itemType === 'note' && options.noteType === 'tasklist') {
-            permissionOptions = [
-                { value: 'read_only', label: config.txtTaskReadOnly },
-                { value: 'check_only', label: config.txtTaskCheckOnly },
-                { value: 'full', label: config.txtTaskFull }
-            ];
-            options.accessMode = options.accessMode || 'full';
-        } else if (options.itemType === 'note' && (options.noteType === 'markdown' || options.noteType === 'note' || !options.noteType)) {
-            // HTML/markdown notes: read-only by default, or public text editing.
-            permissionOptions = [
-                { value: 'read_only', label: config.txtTaskReadOnly },
-                { value: 'edit', label: config.txtNoteEditable }
-            ];
-            options.accessMode = options.accessMode === 'edit' ? 'edit' : 'read_only';
-        } else if (options.itemType === 'folder') {
-            // Folder shares: read-only by default, or let visitors edit the
-            // notes the folder contains (like single-note edit shares).
-            permissionOptions = [
-                { value: 'read_only', label: config.txtTaskReadOnly },
-                { value: 'edit', label: config.txtFolderEditable }
-            ];
-            options.accessMode = options.accessMode === 'edit' ? 'edit' : 'read_only';
-        }
-
-        if (permissionOptions) {
-            var permissionsRow = document.createElement('div');
-            permissionsRow.className = 'shared-edit-token-field-row';
-
-            var permissionsLabel = document.createElement('label');
-            permissionsLabel.className = 'shared-edit-token-field-label';
-            permissionsLabel.textContent = config.txtTaskPermissions;
-            permissionsRow.appendChild(permissionsLabel);
-
-            var permissionsValue = document.createElement('div');
-            permissionsValue.className = 'shared-edit-token-field-value';
-
-            permissionsSelect = document.createElement('select');
-            permissionsSelect.className = 'modal-password-input';
-            permissionsSelect.style.width = '100%';
-            permissionsSelect.style.padding = '8px 10px';
-            permissionsSelect.style.borderRadius = '6px';
-            permissionsSelect.style.border = '1px solid #ddd';
-            permissionsSelect.style.boxSizing = 'border-box';
-            permissionsSelect.style.margin = '0';
-
-            permissionOptions.forEach(function(option) {
-                var selectOption = document.createElement('option');
-                selectOption.value = option.value;
-                selectOption.textContent = option.label;
-                permissionsSelect.appendChild(selectOption);
-            });
-
-            permissionsSelect.value = options.accessMode;
-            permissionsValue.appendChild(permissionsSelect);
-            permissionsRow.appendChild(permissionsValue);
-            content.appendChild(permissionsRow);
-        }
-
-        var protocolWrap = document.createElement('div');
-        protocolWrap.className = 'share-protocol-wrap';
-        protocolWrap.style.marginTop = '14px';
-
-        var protocolLabel = document.createElement('label');
-        protocolLabel.className = 'share-indexable-label';
-        protocolLabel.style.display = 'flex';
-        protocolLabel.style.alignItems = 'center';
-        protocolLabel.style.justifyContent = 'space-between';
-        protocolLabel.style.width = '100%';
-
-        var protocolText = document.createElement('span');
-        protocolText.className = 'indexable-label-text';
-        protocolText.textContent = config.txtUseHttps;
-
-        var protocolToggle = document.createElement('label');
-        protocolToggle.className = 'toggle-switch';
-        var protocolCheckbox = document.createElement('input');
-        protocolCheckbox.type = 'checkbox';
-        protocolCheckbox.checked = (options.protocol || getPreferredPublicUrlProtocol()) === 'https';
-        var protocolSlider = document.createElement('span');
-        protocolSlider.className = 'toggle-slider';
-        protocolToggle.appendChild(protocolCheckbox);
-        protocolToggle.appendChild(protocolSlider);
-        protocolLabel.appendChild(protocolText);
-        protocolLabel.appendChild(protocolToggle);
-        protocolWrap.appendChild(protocolLabel);
-        if (!config.hideProtocolToggle) {
-            content.appendChild(protocolWrap);
-        }
-
-        var indexableWrap = document.createElement('div');
-        indexableWrap.className = 'share-indexable-wrap';
-        indexableWrap.style.marginTop = '14px';
-
-        var indexableLabel = document.createElement('label');
-        indexableLabel.className = 'share-indexable-label';
-        indexableLabel.style.display = 'flex';
-        indexableLabel.style.alignItems = 'center';
-        indexableLabel.style.justifyContent = 'space-between';
-        indexableLabel.style.width = '100%';
-
-        var indexableText = document.createElement('span');
-        indexableText.className = 'indexable-label-text';
-        indexableText.textContent = getShareModalLabel(config.txtSearchIndexable, config.txtSearchIndexableMobile);
-
-        var indexableToggle = document.createElement('label');
-        indexableToggle.className = 'toggle-switch';
-        var indexableCheckbox = document.createElement('input');
-        indexableCheckbox.type = 'checkbox';
-        indexableCheckbox.checked = !!options.indexable;
-        var indexableSlider = document.createElement('span');
-        indexableSlider.className = 'toggle-slider';
-        indexableToggle.appendChild(indexableCheckbox);
-        indexableToggle.appendChild(indexableSlider);
-        indexableLabel.appendChild(indexableText);
-        indexableLabel.appendChild(indexableToggle);
-        indexableWrap.appendChild(indexableLabel);
-        content.appendChild(indexableWrap);
-
-        // ---- User restriction section ----
-        var restrictUsersWrap = document.createElement('div');
-        restrictUsersWrap.className = 'share-restrict-users-wrap';
-        restrictUsersWrap.style.marginTop = '14px';
-
-        var restrictToggleLabel = document.createElement('label');
-        restrictToggleLabel.className = 'share-indexable-label';
-        restrictToggleLabel.style.display = 'flex';
-        restrictToggleLabel.style.alignItems = 'center';
-        restrictToggleLabel.style.justifyContent = 'space-between';
-        restrictToggleLabel.style.width = '100%';
-
-        var restrictText = document.createElement('span');
-        restrictText.className = 'indexable-label-text';
-        restrictText.textContent = getShareModalLabel(config.txtRestrictUsers, config.txtRestrictUsersMobile);
-
-        var restrictToggle = document.createElement('label');
-        restrictToggle.className = 'toggle-switch';
-        var restrictCheckbox = document.createElement('input');
-        restrictCheckbox.type = 'checkbox';
-        restrictCheckbox.checked = !!(options.allowedUsers && options.allowedUsers.length > 0);
-        var restrictSlider = document.createElement('span');
-        restrictSlider.className = 'toggle-slider';
-        restrictToggle.appendChild(restrictCheckbox);
-        restrictToggle.appendChild(restrictSlider);
-        restrictToggleLabel.appendChild(restrictText);
-        restrictToggleLabel.appendChild(restrictToggle);
-        restrictUsersWrap.appendChild(restrictToggleLabel);
-
-        var userListContainer = document.createElement('div');
-        userListContainer.className = 'share-user-list-container';
-        userListContainer.style.display = restrictCheckbox.checked ? 'block' : 'none';
-
-        var userListLoading = document.createElement('div');
-        userListLoading.className = 'share-user-list-message';
-        userListLoading.textContent = config.txtUsersLoading;
-        userListContainer.appendChild(userListLoading);
-
-        restrictUsersWrap.appendChild(userListContainer);
-        if (!config.hideRestrictUsers) {
-            content.appendChild(restrictUsersWrap);
-        }
-
-        var availableUsers = [];
-        var selectedUserIds = (options.allowedUsers && Array.isArray(options.allowedUsers))
-            ? options.allowedUsers.map(function(id) { return parseInt(id, 10); })
-            : [];
-
-        function renderUserCheckboxes() {
-            userListContainer.innerHTML = '';
-            if (availableUsers.length === 0) {
-                var noUsers = document.createElement('div');
-                noUsers.className = 'share-user-list-message';
-                noUsers.textContent = config.txtNoUsersFound;
-                userListContainer.appendChild(noUsers);
-                return;
-            }
-
-            availableUsers.forEach(function(user) {
-                var row = document.createElement('label');
-                row.className = 'share-user-list-row';
-
-                var cb = document.createElement('input');
-                cb.type = 'checkbox';
-                cb.value = user.id;
-                cb.checked = selectedUserIds.indexOf(user.id) !== -1;
-                cb.addEventListener('change', function() {
-                    if (cb.checked) {
-                        if (selectedUserIds.indexOf(user.id) === -1) {
-                            selectedUserIds.push(user.id);
-                        }
-                    } else {
-                        selectedUserIds = selectedUserIds.filter(function(id) { return id !== user.id; });
-                    }
-                });
-
-                var displayName = document.createElement('span');
-                displayName.className = 'share-user-list-name';
-                displayName.textContent = user.username;
-
-                row.appendChild(cb);
-                row.appendChild(displayName);
-                userListContainer.appendChild(row);
-            });
-        }
-
-        function loadAvailableUsers() {
-            fetch('/api/v1/users/profiles', {
-                credentials: 'same-origin',
-                headers: { 'Accept': 'application/json' }
-            })
-            .then(function(resp) { return resp.json(); })
-            .then(function(users) {
-                availableUsers = (users || []).filter(function(u) {
-                    return parseInt(u.id, 10) !== config.currentUserId;
-                }).map(function(u) {
-                    return { id: parseInt(u.id, 10), username: u.username };
-                });
-                renderUserCheckboxes();
-            })
-            .catch(function() {
-                userListContainer.innerHTML = '';
-                var errMsg = document.createElement('div');
-                errMsg.className = 'share-user-list-message is-error';
-                errMsg.textContent = config.txtError;
-                userListContainer.appendChild(errMsg);
-            });
-        }
-
-        restrictCheckbox.addEventListener('change', function() {
-            userListContainer.style.display = restrictCheckbox.checked ? 'block' : 'none';
-            if (restrictCheckbox.checked && availableUsers.length === 0) {
-                loadAvailableUsers();
-            }
-            if (!restrictCheckbox.checked) {
-                selectedUserIds = [];
-            }
-        });
-
-        if (restrictCheckbox.checked && !config.hideRestrictUsers) {
-            loadAvailableUsers();
-        }
-        // ---- End user restriction section ----
-
-        var actions = document.createElement('div');
-        actions.className = 'shared-edit-token-modal-actions';
-
-        var cancelBtn = document.createElement('button');
-        cancelBtn.className = 'btn btn-danger';
-        cancelBtn.textContent = config.txtCancel;
-
-        var saveBtn = document.createElement('button');
-        saveBtn.className = 'btn btn-primary';
-        saveBtn.textContent = config.txtSave;
-
-        function closeModal() {
-            if (modal.parentNode) {
-                document.body.removeChild(modal);
-            }
-        }
-
-        function updatePreviewUrl() {
-            var previewUrl = buildPreviewUrlForModal(options, input.value.trim() || options.token, protocolCheckbox.checked ? 'https' : 'http');
-            titleText.textContent = previewUrl;
-            titleText.title = previewUrl;
-        }
-
-        cancelBtn.addEventListener('click', closeModal);
-        renewBtn.addEventListener('click', function() {
-            input.value = generateRandomToken();
-            updatePreviewUrl();
-            input.focus();
-        });
-        protocolCheckbox.addEventListener('change', updatePreviewUrl);
-        input.addEventListener('input', updatePreviewUrl);
-        saveBtn.addEventListener('click', function() {
-            var nextToken = input.value.trim();
-            var nextProtocol = protocolCheckbox.checked ? 'https' : 'http';
-            var nextIndexable = !!indexableCheckbox.checked;
-            var nextPassword = passwordInput.value.trim();
-            var nextAccessMode = permissionsSelect ? permissionsSelect.value : undefined;
-            var tokenChanged = !!nextToken && nextToken !== options.token;
-            var protocolChanged = nextProtocol !== (options.protocol || getPreferredPublicUrlProtocol());
-            var indexableChanged = nextIndexable !== !!options.indexable;
-            var accessModeChanged = !!permissionsSelect && nextAccessMode !== (options.accessMode || 'full');
-            var passwordShouldBeSaved = passwordDirty;
-
-            // Determine allowed_users change
-            var nextAllowedUsers = restrictCheckbox.checked ? selectedUserIds.slice() : null;
-            var prevAllowedUsers = options.allowedUsers || null;
-            var allowedUsersChanged = !config.hideRestrictUsers && JSON.stringify(nextAllowedUsers) !== JSON.stringify(prevAllowedUsers);
-
-            // Saving always hands the user the link they just configured
-            var savedUrl = buildPreviewUrlForModal(options, nextToken || options.token, nextProtocol);
-
-            if ((!nextToken || !tokenChanged) && !protocolChanged && !indexableChanged && !accessModeChanged && !passwordShouldBeSaved && !allowedUsersChanged) {
-                copyShareLink(savedUrl);
-                closeModal();
-                return;
-            }
-
-            saveBtn.disabled = true;
-            options.onSave({
-                custom_token: tokenChanged ? nextToken : undefined,
-                access_mode: accessModeChanged ? nextAccessMode : undefined,
-                indexable: nextIndexable,
-                password: passwordShouldBeSaved ? nextPassword : undefined,
-                protocol: nextProtocol,
-                allowed_users: allowedUsersChanged ? nextAllowedUsers : undefined
-            })
-                .then(function() {
-                    setPreferredPublicUrlProtocol(nextProtocol);
-                    copyShareLink(savedUrl);
-                    if (tokenChanged && syncFilterWithUpdatedToken(options.token, nextToken)) {
-                        applyFilter();
-                    } else if (protocolChanged || indexableChanged || accessModeChanged || passwordShouldBeSaved) {
-                        mergeItems();
-                        applyFilter();
-                    }
-                    closeModal();
-                })
-                .catch(function(error) {
-                    showShareToast(config.txtError + ': ' + (error.message || config.txtTokenUpdateFailed), content);
-                    saveBtn.disabled = false;
-                });
-        });
-
-        input.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                saveBtn.click();
-            }
-            if (event.key === 'Escape') {
-                event.preventDefault();
-                closeModal();
-            }
-        });
-
-        actions.appendChild(cancelBtn);
-        actions.appendChild(saveBtn);
-        content.appendChild(actions);
-        modal.appendChild(content);
-        document.body.appendChild(modal);
-        updatePasswordToggleState();
-        updatePreviewUrl();
-
-        var pressedOnBackdrop = false;
-        modal.addEventListener('mousedown', function(event) {
-            pressedOnBackdrop = (event.target === modal);
-        });
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal && pressedOnBackdrop) {
-                closeModal();
-            }
-            pressedOnBackdrop = false;
-        });
     }
 
     // ========== Rendering ==========
@@ -1834,7 +1043,7 @@
 
         list.appendChild(header);
 
-        var itemsToRender = filteredItems;
+        var itemsToRender = filteredItems.slice().sort(compareItems);
 
         if (filterType === 'all' || filterType === 'folders') {
             var hierarchyPresentation = buildHierarchyPresentation(buildAllViewSequence(filteredItems));
@@ -1842,6 +1051,11 @@
             itemsToRender = hierarchyPresentation.visibleItems;
         } else {
             updateTreeToolbar(null);
+            // A flat list: drop the indent the tree view left on these items
+            itemsToRender.forEach(function(item) {
+                delete item._renderAsChildOfFolderId;
+                delete item._hierarchyDepth;
+            });
         }
 
         itemsToRender.forEach(function(item) {
@@ -1989,85 +1203,6 @@
         disabledIcon.title = config.txtShareDisabledHelp || config.txtShareDisabledBadge;
         disabledIcon.setAttribute('aria-label', config.txtShareDisabledHelp || config.txtShareDisabledBadge);
         container.appendChild(disabledIcon);
-    }
-
-    // Revoke flow: the user chooses between deleting the share for good and
-    // keeping it but toggling its public accessibility.
-    function showRevokeShareModal(options) {
-        var modal = document.createElement('div');
-        modal.className = 'modal shared-revoke-modal';
-        modal.style.display = 'flex';
-
-        var content = document.createElement('div');
-        content.className = 'modal-content shared-revoke-modal-content';
-
-        var title = document.createElement('h3');
-        title.textContent = config.txtRevokeModalTitle;
-        content.appendChild(title);
-
-        var text = document.createElement('p');
-        text.className = 'shared-revoke-modal-text';
-        text.textContent = options.text
-            || (options.isDisabled ? config.txtRevokeModalTextDisabled : config.txtRevokeModalText);
-        content.appendChild(text);
-
-        var actions = document.createElement('div');
-        actions.className = 'shared-revoke-modal-actions';
-
-        function closeModal() {
-            if (modal.parentNode) {
-                document.body.removeChild(modal);
-            }
-        }
-
-        // With no action to offer the modal is purely informational: a single
-        // OK button replaces Cancel.
-        var isInformational = !options.onToggle && !options.onDelete;
-        var cancelBtn = document.createElement('button');
-        cancelBtn.className = isInformational ? 'btn btn-primary' : 'btn btn-secondary';
-        cancelBtn.textContent = isInformational ? (config.txtOk || 'OK') : config.txtCancel;
-        cancelBtn.addEventListener('click', closeModal);
-
-        var toggleBtn = document.createElement('button');
-        toggleBtn.className = 'btn btn-primary';
-        toggleBtn.innerHTML = '<i class="lucide ' + (options.isDisabled ? 'lucide-eye' : 'lucide-eye-off') + '" style="margin-right: 6px;"></i>';
-        toggleBtn.appendChild(document.createTextNode(options.isDisabled ? config.txtRevokeEnable : config.txtRevokeDisable));
-        toggleBtn.addEventListener('click', function() {
-            closeModal();
-            if (options.onToggle) options.onToggle(!options.isDisabled);
-        });
-
-        var deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn btn-danger';
-        deleteBtn.innerHTML = '<i class="lucide lucide-trash-2" style="margin-right: 6px;"></i>';
-        deleteBtn.appendChild(document.createTextNode(config.txtRevokeDelete));
-        deleteBtn.addEventListener('click', function() {
-            closeModal();
-            if (options.onDelete) options.onDelete();
-        });
-
-        // One action per line, Cancel last.
-        if (options.onToggle) {
-            actions.appendChild(toggleBtn);
-        }
-        if (options.onDelete) {
-            actions.appendChild(deleteBtn);
-        }
-        actions.appendChild(cancelBtn);
-        content.appendChild(actions);
-        modal.appendChild(content);
-        document.body.appendChild(modal);
-
-        var pressedOnBackdrop = false;
-        modal.addEventListener('mousedown', function(event) {
-            pressedOnBackdrop = (event.target === modal);
-        });
-        modal.addEventListener('click', function(event) {
-            if (event.target === modal && pressedOnBackdrop) {
-                closeModal();
-            }
-            pressedOnBackdrop = false;
-        });
     }
 
     function appendRestrictedIndicator(container) {
@@ -2530,22 +1665,21 @@
             });
         });
 
+        var sortSelect = document.getElementById('sharedSortSelect');
+        if (sortSelect) {
+            sortSelect.value = sortMode;
+            sortSelect.addEventListener('change', function() {
+                sortMode = this.value;
+                saveSortMode();
+                renderItems();
+            });
+        }
+
         // Text filter
         var filterInput = document.getElementById('filterInput');
         var clearFilterBtn = document.getElementById('clearFilterBtn');
 
         var urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('auto_edit') === '1') {
-            var requestedItemType = urlParams.get('item_type');
-            var requestedItemId = urlParams.get('item_id');
-            if ((requestedItemType === 'note' || requestedItemType === 'folder') && requestedItemId) {
-                pendingEditorRequest = {
-                    itemType: requestedItemType,
-                    itemId: String(requestedItemId)
-                };
-            }
-        }
-
         var initialFilter = urlParams.get('filter');
         if (initialFilter && filterInput) {
             filterInput.value = initialFilter;

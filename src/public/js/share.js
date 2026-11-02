@@ -371,12 +371,7 @@ async function createPublicShare(noteId) {
             updateSharedCount(1);
 
             closeModal('shareModal');
-            openSharedManagementPage({
-                itemType: 'note',
-                itemId: noteId,
-                token: extractShareTokenFromUrl(data.url),
-                workspace: data.workspace || ''
-            });
+            openPublicShareModal(noteId);
         } else if (data && data.error) {
             const errorMsg = (window.t ? window.t('index.share_modal.error_prefix', null, 'Error: ') : 'Error: ') + data.error;
             if (typeof showNotificationPopup === 'function') {
@@ -411,23 +406,10 @@ function extractShareTokenFromUrl(url) {
 
 function buildSharedManagementUrl(options) {
     const sharedUrl = new URL('shared.php', window.location.href);
-    const itemType = options && options.itemType ? options.itemType : 'note';
-    const itemId = options && options.itemId ? options.itemId : null;
     const workspace = options && options.workspace ? options.workspace : '';
-    const autoEdit = options && Object.prototype.hasOwnProperty.call(options, 'autoEdit')
-        ? !!options.autoEdit
-        : true;
 
-    if (itemType === 'folder') {
-        sharedUrl.searchParams.set('type', 'folders');
-    }
     if (workspace) {
         sharedUrl.searchParams.set('workspace', workspace);
-    }
-    if (itemId && autoEdit) {
-        sharedUrl.searchParams.set('auto_edit', '1');
-        sharedUrl.searchParams.set('item_type', itemType);
-        sharedUrl.searchParams.set('item_id', String(itemId));
     }
 
     return sharedUrl.toString();
@@ -444,8 +426,8 @@ function openSharedManagementPage(options) {
 
 /**
  * Show the modal offering to create a public URL for a note.
- * Notes that are already shared are handled by the shared management page
- * (see openPublicShareModal), so this modal only covers the not-yet-shared case.
+ * Notes that are already shared open their settings dialog instead (see
+ * openPublicShareModal), so this modal only covers the not-yet-shared case.
  * @param {Object} options - Modal options
  * @param {string} options.noteId - The note ID
  */
@@ -531,7 +513,12 @@ async function getPublicShare(noteId) {
                 url: data.url, 
                 workspace: data.workspace || '',
                 noteType: data.noteType || 'note',
-                accessMode: data.accessMode || 'full'
+                accessMode: data.accessMode || 'full',
+                indexable: !!Number(data.indexable),
+                hasPassword: !!data.hasPassword,
+                passwordValue: data.passwordValue || '',
+                allowedUsers: data.allowed_users || null,
+                disabled: !!Number(data.disabled)
             };
         }
         return {
@@ -561,15 +548,36 @@ async function openPublicShareModal(noteId, sourceEl) {
 
     const shareInfo = await getPublicShare(noteId);
 
-    // Already shared: managing an existing share happens on the shared page
+    // Already shared: its settings open over the note (#1721)
     if (shareInfo.shared && shareInfo.url) {
         markShareIconShared(noteId, true);
-        openSharedManagementPage({
+        window.PoznoteShareSettings.show({
             itemType: 'note',
             itemId: noteId,
             token: extractShareTokenFromUrl(shareInfo.url),
-            workspace: shareInfo.workspace,
-            autoEdit: false
+            noteType: shareInfo.noteType,
+            protocol: getPreferredPublicUrlProtocol(),
+            accessMode: shareInfo.accessMode,
+            indexable: shareInfo.indexable,
+            hasPassword: shareInfo.hasPassword,
+            passwordValue: shareInfo.passwordValue,
+            allowedUsers: shareInfo.allowedUsers,
+            revoke: {
+                isDisabled: shareInfo.disabled,
+                onDeleted: function () {
+                    // A shared folder holding the note can still expose it
+                    getPublicShare(noteId).then(function (info) {
+                        markShareIconShared(noteId, !!info.sharedViaFolder);
+                        if (!info.sharedViaFolder) {
+                            updateSharedCount(-1);
+                        }
+                    });
+                },
+                onToggled: function () {}
+            },
+            onSave: function (updates) {
+                return window.PoznoteShareSettings.patchNoteShare(noteId, updates);
+            }
         });
         return;
     }
@@ -647,7 +655,7 @@ function showSharedViaFolderModal(noteId, folderName, folderShare) {
     cancelBtn.onclick = function () { closeModal('sharedViaFolderModal'); };
     buttonsDiv.appendChild(cancelBtn);
 
-    // With the folder share known, its editor (on the shares page) replaces
+    // With the folder share known, its settings dialog replaces
     // the plain "View shares" link, which would only add a fourth button.
     if (folderShare && folderShare.folderId) {
         const editFolderShareBtn = document.createElement('button');
@@ -658,13 +666,7 @@ function showSharedViaFolderModal(noteId, folderName, folderShare) {
             : 'Edit folder share';
         editFolderShareBtn.onclick = function () {
             closeModal('sharedViaFolderModal');
-            // Lands on the Folders tab with that folder's share editor open
-            openSharedManagementPage({
-                itemType: 'folder',
-                itemId: folderShare.folderId,
-                workspace: folderShare.workspace || (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '',
-                autoEdit: true
-            });
+            openPublicFolderShareModal(folderShare.folderId);
         };
         buttonsDiv.appendChild(editFolderShareBtn);
     } else {
@@ -676,10 +678,8 @@ function showSharedViaFolderModal(noteId, folderName, folderShare) {
             : 'View shares';
         viewSharesBtn.onclick = function () {
             closeModal('sharedViaFolderModal');
-            // No itemType: land on the "All" tab of shared.php
             openSharedManagementPage({
-                workspace: (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || '',
-                autoEdit: false
+                workspace: (typeof getSelectedWorkspace === 'function' ? getSelectedWorkspace() : '') || ''
             });
         };
         buttonsDiv.appendChild(viewSharesBtn);
@@ -909,12 +909,7 @@ async function createPublicFolderShare(folderId) {
 
             refreshNotesListAfterFolderAction(folderId);
             closeModal('folderShareModal');
-            openSharedManagementPage({
-                itemType: 'folder',
-                itemId: folderId,
-                token: extractShareTokenFromUrl(data.url),
-                workspace: data.workspace || ''
-            });
+            openPublicFolderShareModal(folderId);
         }
 
     } catch (error) {
@@ -945,7 +940,13 @@ async function getPublicFolderShare(folderId) {
             return {
                 shared: true,
                 url: applyProtocolToPublicUrl(data.url, preferredProtocol),
-                workspace: data.workspace
+                workspace: data.workspace,
+                accessMode: data.accessMode || 'read_only',
+                indexable: !!Number(data.indexable),
+                hasPassword: !!data.hasPassword,
+                passwordValue: data.passwordValue || '',
+                allowedUsers: data.allowed_users || null,
+                disabled: !!Number(data.disabled)
             };
         }
         return { shared: false };
@@ -964,14 +965,28 @@ async function openPublicFolderShareModal(folderId) {
 
     const info = await getPublicFolderShare(folderId);
 
-    // Already shared: managing an existing share happens on the shared page
+    // Already shared: its settings open over the page (#1721)
     if (info.shared && info.url) {
-        openSharedManagementPage({
+        window.PoznoteShareSettings.show({
             itemType: 'folder',
             itemId: folderId,
             token: extractShareTokenFromUrl(info.url),
-            workspace: info.workspace,
-            autoEdit: false
+            protocol: getPreferredPublicUrlProtocol(),
+            accessMode: info.accessMode,
+            indexable: info.indexable,
+            hasPassword: info.hasPassword,
+            passwordValue: info.passwordValue,
+            allowedUsers: info.allowedUsers,
+            revoke: {
+                isDisabled: info.disabled,
+                onDeleted: function () {
+                    refreshNotesListAfterFolderAction(folderId);
+                },
+                onToggled: function () {}
+            },
+            onSave: function (updates) {
+                return window.PoznoteShareSettings.patchFolderShare(folderId, updates);
+            }
         });
         return;
     }
@@ -980,8 +995,8 @@ async function openPublicFolderShareModal(folderId) {
 }
 
 // Show the modal offering to create a public URL for a folder.
-// Folders that are already shared are handled by the shared management page
-// (see openPublicFolderShareModal), so this modal only covers the not-yet-shared case.
+// Folders that are already shared open their settings dialog instead (see
+// openPublicFolderShareModal), so this modal only covers the not-yet-shared case.
 function showFolderShareModal(options) {
     const existing = document.getElementById('folderShareModal');
     if (existing) existing.parentNode.removeChild(existing);

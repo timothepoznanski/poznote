@@ -124,6 +124,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/emoji-autocomplete.js',
         'js/mention-autocomplete.js',
         'js/pwa-helpers.js',
+        'js/share-settings-modal.js',
         'js/share.js',
         'js/reminders.js',
         'js/notifications-modal.js',

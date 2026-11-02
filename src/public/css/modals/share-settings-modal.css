@@ -1,0 +1,578 @@
+/* Share settings dialog (js/share-settings-modal.js). The class of its own
+   keeps these rules off the workspace share dialog, which also carries
+   .shared-edit-token-modal. */
+
+.shared-header-help {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted, var(--pz-text-muted));
+    cursor: help;
+}
+
+.shared-header-help i {
+    font-size: 14px;
+}
+
+.shared-header-help-tooltip {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 260px;
+    max-width: 320px;
+    padding: 10px 12px;
+    border-radius: var(--pz-radius-lg);
+    background: rgba(20, 20, 20, 0.94);
+    color: var(--pz-text-inverse);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: var(--pz-weight-normal);
+    letter-spacing: normal;
+    line-height: 1.45;
+    text-transform: none;
+    white-space: normal;
+    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.18);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.16s ease, visibility 0.16s ease;
+    z-index: 20;
+}
+
+.shared-header-help:hover .shared-header-help-tooltip,
+.shared-header-help:focus .shared-header-help-tooltip,
+.shared-header-help:focus-visible .shared-header-help-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title h3 {
+    min-width: 0;
+    margin: 0;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title-link {
+    display: block;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    text-decoration: none;
+    color: var(--text-color, var(--pz-text));
+    font-size: 15px;
+    font-weight: var(--pz-weight-normal);
+    line-height: 1.45;
+    letter-spacing: 0;
+    font-family: "JetBrains Mono", "Fira Code", monospace;
+    background: rgba(var(--pz-accent-rgb), 0.06);
+    border-radius: var(--pz-radius);
+    box-sizing: border-box;
+    min-height: 38px;
+    padding: 8px 10px;
+    cursor: default;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-content {
+    width: fit-content;
+    min-width: min(720px, calc(100vw - 32px));
+    max-width: min(760px, calc(100vw - 32px));
+    max-height: min(850px, calc(100vh - 32px));
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+    padding: 18px 20px 20px;
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.08);
+    box-shadow: 0 24px 60px rgba(var(--pz-shadow-rgb), 0.2);
+}
+
+body .shared-edit-token-modal.share-settings-modal {
+    padding: 16px;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 0 0 14px;
+    margin-bottom: 2px;
+    border-bottom: 1px solid rgba(var(--pz-shadow-rgb), 0.1);
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title h3 {
+    flex: 1 1 auto;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-url-copy {
+    flex: 0 0 auto;
+    margin-left: auto;
+    min-width: 48px;
+    /* The height of the one-line URL next to them */
+    height: 38px;
+    padding: 0 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* The note page colours icons on its own: here they follow their button */
+body .shared-edit-token-modal.share-settings-modal .btn i[class*="lucide-"] {
+    color: inherit;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: nowrap;
+    margin-top: 14px;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-label {
+    flex: 0 0 170px;
+    font-size: 15px;
+    font-weight: var(--pz-weight-medium);
+    color: var(--text-color, var(--pz-text));
+    white-space: nowrap;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-label-with-help {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-label-with-help .shared-header-help {
+    flex: 0 0 auto;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-label-with-help .shared-header-help-tooltip {
+    left: 0;
+    transform: none;
+    min-width: 240px;
+    max-width: min(320px, calc(100vw - 64px));
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value input {
+    width: 100%;
+    margin: 0 !important;
+}
+
+body .shared-edit-token-modal.share-settings-modal .modal-password-input,
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value select {
+    min-height: 44px;
+    padding: 10px 12px;
+    border-radius: var(--pz-radius-lg);
+    border: 1px solid var(--pz-border-strong);
+    background: var(--pz-bg);
+    color: var(--text-color, var(--pz-text));
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+body .shared-edit-token-modal.share-settings-modal .modal-password-input:focus,
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value select:focus {
+    border-color: rgba(var(--pz-accent-rgb), 0.7);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.14);
+    outline: none;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-inline-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-inline-group input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-inline-renew {
+    flex: 0 0 auto;
+    min-width: 48px;
+    min-height: 44px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-password-toggle {
+    flex: 0 0 auto;
+    min-width: 48px;
+    min-height: 44px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-protocol-wrap,
+body .shared-edit-token-modal.share-settings-modal .share-indexable-wrap,
+body .shared-edit-token-modal.share-settings-modal .share-restrict-users-wrap {
+    margin-top: 2px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(var(--pz-shadow-rgb), 0.1);
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-indexable-label {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100%;
+    gap: 16px;
+    min-width: 0;
+}
+
+body .shared-edit-token-modal.share-settings-modal .indexable-label-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    line-height: 1.45;
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-user-list-container {
+    margin-top: 12px;
+    padding: 12px 14px;
+    border-radius: var(--pz-radius-xl);
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.1);
+    background: color-mix(in srgb, var(--pz-text) 2.5%, transparent);
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-user-list-message {
+    font-size: 13px;
+    color: var(--pz-text-muted);
+    padding: 4px 0;
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-user-list-message.is-error {
+    color: var(--pz-danger-hover);
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-user-list-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-user-list-row + .share-user-list-row {
+    border-top: 1px solid rgba(var(--pz-shadow-rgb), 0.07);
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-user-list-row input[type="checkbox"] {
+    margin-top: 2px;
+}
+
+body .shared-edit-token-modal.share-settings-modal .share-user-list-name {
+    min-width: 0;
+    line-height: 1.45;
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    overflow-x: hidden;
+    flex-shrink: 0;
+    position: sticky;
+    bottom: -20px;
+    z-index: 1;
+    margin-top: 16px;
+    margin-left: -20px;
+    margin-right: -20px;
+    margin-bottom: -20px;
+    padding: 14px 20px 20px;
+    border-top: 1px solid var(--border-color, var(--pz-border));
+    background: var(--pz-bg);
+}
+
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-actions > .btn {
+    width: auto !important;
+    min-width: 120px;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
+    display: inline-flex !important;
+    align-self: stretch;
+    align-items: center;
+    justify-content: center !important;
+    height: auto !important;
+    white-space: nowrap;
+}
+
+/* A text label here, not the list's icon: it needs the stronger amber */
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-actions > .btn-share-disabled,
+body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-actions > .btn-share-disabled:hover {
+    background: color-mix(in srgb, var(--pz-warning) 22%, transparent);
+    color: var(--pz-warning-strong);
+}
+
+
+
+/* Action button of a share made inaccessible: same amber eye-off as the
+   badge next to the share name, still opens the revoke modal. */
+.btn-share-disabled {
+    background: color-mix(in srgb, var(--pz-warning) 15%, transparent);
+    color: var(--pz-warning-text-hover);
+    border: none;
+}
+
+.btn-share-disabled:hover {
+    background: color-mix(in srgb, var(--pz-warning) 30%, transparent);
+}
+
+/* Revoke modal: delete for good, or toggle public accessibility. The
+   actions stack one per line, all at the width of the dialog. */
+body .modal.shared-revoke-modal .shared-revoke-modal-content {
+    width: min(440px, calc(100vw - 32px));
+    max-width: none;
+    box-sizing: border-box;
+    padding: 18px 20px 20px;
+    border: 1px solid rgba(var(--pz-shadow-rgb), 0.08);
+    box-shadow: 0 24px 60px rgba(var(--pz-shadow-rgb), 0.2);
+}
+
+body .modal.shared-revoke-modal .shared-revoke-modal-text {
+    margin: 10px 0 18px;
+    color: var(--text-muted, var(--pz-text-muted));
+    line-height: 1.5;
+}
+
+body .modal.shared-revoke-modal .shared-revoke-modal-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+body .modal.shared-revoke-modal .shared-revoke-modal-actions > .btn {
+    width: 100% !important;
+    margin: 0 !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center !important;
+    height: auto !important;
+    white-space: normal;
+}
+
+@media (max-width: 680px) {
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-content {
+        max-width: none;
+        width: 100%;
+        max-height: calc(100vh - 20px);
+        border-radius: var(--pz-radius-2xl);
+        padding: 16px;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title {
+        padding-bottom: 12px;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-label {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value {
+        width: 100%;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-inline-group {
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-inline-renew,
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-url-copy,
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-password-toggle {
+        width: 48px !important;
+        min-width: 48px;
+        max-width: 48px;
+        align-self: auto;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title-link {
+        font-size: 14px;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .share-indexable-label {
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: flex-start !important;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .indexable-label-text {
+        white-space: normal;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .share-indexable-label .toggle-switch {
+        margin-left: auto;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .share-protocol-wrap,
+    body .shared-edit-token-modal.share-settings-modal .share-indexable-wrap,
+    body .shared-edit-token-modal.share-settings-modal .share-restrict-users-wrap {
+        padding-top: 12px;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .share-user-list-container {
+        max-height: 180px;
+        padding: 10px 12px;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-actions {
+        justify-content: stretch !important;
+        padding-top: 14px;
+        padding-bottom: 16px;
+        bottom: -16px;
+        margin-top: 18px;
+        margin-left: -16px;
+        margin-right: -16px;
+        margin-bottom: -16px;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-actions > .btn {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+}
+
+html[data-theme='dark'] .shared-header-help {
+    color: var(--pz-text-strong);
+}
+
+html[data-theme='dark'] .shared-header-help:hover,
+html[data-theme='dark'] .shared-header-help:focus,
+html[data-theme='dark'] .shared-header-help:focus-visible {
+    color: var(--pz-text-inverse);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title h3,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-label,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .indexable-label-text,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value label,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value span {
+    color: var(--pz-text-strong);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title-link {
+    color: var(--pz-text-strong);
+    background: color-mix(in srgb, var(--pz-accent-text-hover) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--pz-accent-text-hover) 14%, transparent);
+    /* Its border stays inside the 38px shared with the buttons */
+    padding: 7px 9px;
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title-link:hover {
+    color: var(--pz-text-strong);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-content {
+    background: linear-gradient(180deg, var(--pz-bg) 0%, var(--pz-bg) 100%);
+    border-color: rgba(var(--pz-highlight-rgb), 0.08);
+    box-shadow: 0 28px 64px rgba(var(--pz-shadow-rgb), 0.48);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-title {
+    border-bottom-color: rgba(var(--pz-highlight-rgb), 0.08);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-modal-actions {
+    border-top-color: rgba(var(--pz-highlight-rgb), 0.08);
+    background: rgba(var(--pz-highlight-rgb), 0.02);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value input,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value select,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .modal-password-input {
+    background-color: var(--pz-surface-hover);
+    border-color: var(--pz-border);
+    color: var(--pz-text-strong);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value input::placeholder,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value select::placeholder,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .modal-password-input::placeholder {
+    color: var(--pz-text);
+    opacity: 1;
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value input:focus,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-field-value select:focus,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .modal-password-input:focus {
+    border-color: var(--pz-accent-text-hover);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pz-accent-text-hover) 18%, transparent);
+    outline: none;
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-inline-renew,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-url-copy,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-password-toggle {
+    background: var(--pz-surface-sunken);
+    border-color: var(--pz-surface-strong-hover);
+    color: var(--pz-text-strong);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-inline-renew:hover,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-url-copy:hover,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .shared-edit-token-password-toggle:hover {
+    background: var(--pz-surface-sunken);
+    color: var(--pz-text-inverse);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .share-protocol-wrap,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .share-indexable-wrap,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .share-restrict-users-wrap {
+    border-top-color: rgba(var(--pz-highlight-rgb), 0.08);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .share-user-list-container {
+    background: rgba(var(--pz-highlight-rgb), 0.03);
+    border-color: rgba(var(--pz-highlight-rgb), 0.08);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .share-user-list-row + .share-user-list-row {
+    border-top-color: rgba(var(--pz-highlight-rgb), 0.08);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .share-user-list-message,
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .share-user-list-name {
+    color: var(--pz-text-strong);
+}
+
+html[data-theme='dark'] body .shared-edit-token-modal.share-settings-modal .share-user-list-message.is-error {
+    color: var(--pz-danger-text);
+}

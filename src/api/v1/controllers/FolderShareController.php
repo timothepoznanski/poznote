@@ -38,7 +38,7 @@ class FolderShareController {
             $folderWorkspace = $folderRow['workspace'] ?? '';
             
             // Get share info
-            $stmt = $this->con->prepare('SELECT token, indexable, password, password_encrypted, allowed_users, access_mode FROM shared_folders WHERE folder_id = ? LIMIT 1');
+            $stmt = $this->con->prepare('SELECT token, indexable, password, password_encrypted, allowed_users, access_mode, disabled FROM shared_folders WHERE folder_id = ? LIMIT 1');
             $stmt->execute([$folderId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -64,7 +64,8 @@ class FolderShareController {
                 'passwordValue' => poznoteDecryptSharePassword($row['password_encrypted'] ?? ''),
                 'workspace' => $folderWorkspace,
                 'allowed_users' => $allowedUsers,
-                'accessMode' => $this->sanitizeAccessMode($row['access_mode'] ?? 'read_only')
+                'accessMode' => $this->sanitizeAccessMode($row['access_mode'] ?? 'read_only'),
+                'disabled' => (int)($row['disabled'] ?? 0)
             ]);
             
         } catch (Exception $e) {
