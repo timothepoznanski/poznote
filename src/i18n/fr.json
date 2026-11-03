@@ -809,7 +809,7 @@
       },
       "confirm": {
         "title": "Partager l'espace de travail",
-        "message": "Choisissez les utilisateurs qui peuvent ouvrir l'espace de travail « {{workspace}} ». Ils le retrouveront dans leur menu des espaces de travail et pourront modifier ses notes et ses dossiers."
+        "message": "Choisissez les utilisateurs qui peuvent ouvrir l'espace de travail \"{{workspace}}\". Ils le trouveront dans leur menu des espaces de travail. À côté de chaque nom, choisissez s'ils peuvent modifier ses notes et dossiers ou seulement les lire."
       },
       "messages": {
         "disabled": "L'espace de travail n'est plus partagé",
@@ -822,7 +822,9 @@
       },
       "options": {
         "users_loading": "Chargement des utilisateurs...",
-        "no_users_found": "Aucun autre utilisateur trouvé"
+        "no_users_found": "Aucun autre utilisateur trouvé",
+        "can_edit": "Peut modifier",
+        "read_only": "Lecture seule"
       },
       "status": {
         "not_shared": "Non partagé"
@@ -991,6 +993,7 @@
     "search_in_notes": "Rechercher dans les notes",
     "search_in_tags": "Rechercher dans les tags",
     "toggle_date_filter": "Afficher/masquer le filtre de date",
+    "help_toggle": "Comment chercher",
     "created_from": "Créée à partir du",
     "created_to": "Créée jusqu'au",
     "validation": {
@@ -998,7 +1001,23 @@
       "single_letter_warning": "La recherche avec des mots d’une seule lettre peut retourner trop de résultats. Essayez d’utiliser des mots plus longs pour une recherche plus précise.",
       "invalid_date_range": "La date de début doit être antérieure ou égale à la date de fin."
     },
-    "placeholder_account": "Rechercher dans {{account}}..."
+    "placeholder_account": "Rechercher dans {{account}}...",
+    "help": {
+      "title": "Comment chercher",
+      "words_example": "budget réunion",
+      "words": "Les notes qui contiennent tous ces mots, dans n'importe quel ordre",
+      "phrase_example": "\"réunion hebdo\"",
+      "phrase": "Ces mots collés, dans cet ordre",
+      "partial_example": "réun",
+      "partial": "Un bout de mot suffit. Majuscules et accents sont ignorés",
+      "tags_example": "travail urgent",
+      "tags": "Avec l'icône des tags : les notes qui ont tous ces tags",
+      "both": "Avec les deux icônes : les notes dont le texte ou les tags correspondent",
+      "key_enter": "Entrée",
+      "key_shift": "Maj",
+      "navigate_next": "Appuyé à nouveau : résultat suivant, puis la note suivante",
+      "navigate_previous": "Résultat précédent dans la note"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ Modifications non enregistrées\n\nVous avez des modifications non enregistrées qui seront perdues si vous changez maintenant.\n\nCliquez sur OK pour enregistrer et continuer, ou Annuler pour rester.\n(L’enregistrement automatique se déclenche 2 secondes après avoir arrêté de saisir)",
@@ -3051,6 +3070,10 @@
     "filter_all": "Tout",
     "filter_notes": "Notes",
     "filter_folders": "Dossiers",
+    "sort_label": "Trier les partages",
+    "sort_name": "Trier par nom",
+    "sort_updated": "Trier par dernière modification",
+    "sort_shared": "Trier par date de partage",
     "no_shared_notes": "Aucune note partagée pour le moment.",
     "no_shared_folders": "Aucun dossier partagé pour le moment.",
     "no_shares": "Aucun partage pour le moment.",
@@ -4706,7 +4729,8 @@
     "take_over_confirm": "{{user}} est en train de modifier cette note. Si vous prenez la main, son éditeur passe en lecture seule et ses modifications non encore enregistrées restent sur son appareil. Continuer ?",
     "take_over_failed": "Impossible de prendre la main sur cette note.",
     "taken_over_notice": "Vous avez pris la main sur cette note.",
-    "lost_unsaved_kept": "Vos modifications non enregistrées ici sont conservées sur cet appareil et vous seront proposées à nouveau dès que la note sera libre."
+    "lost_unsaved_kept": "Vos modifications non enregistrées ici sont conservées sur cet appareil et vous seront proposées à nouveau dès que la note sera libre.",
+    "read_only_share": "Cet espace de travail est partagé avec vous en lecture seule."
   },
   "live_refresh": {
     "note_changed": "Cette note a été modifiée en dehors de cet onglet.",
@@ -4781,6 +4805,8 @@
     },
     "filters": {
       "button": "Filtres",
+      "favorites": "Favoris",
+      "favorites_only": "Favoris uniquement",
       "color": "Couleur",
       "modified": "Dernière modification",
       "tags": "Tags",
@@ -5491,6 +5517,7 @@
     "emoji": "Insérer un emoji par son nom",
     "indent": "Indenter ou désindenter un élément de liste",
     "checklist_toggle": "Cocher ou décocher un élément de checklist",
+    "note_reference_open": "Sur un [[lien de note]] : ouvrir la note, ou la créer",
     "tree_move": "Aller à la note ou au dossier au-dessus ou en dessous",
     "tree_open_folder": "Ouvrir un dossier, ou y entrer",
     "tree_close_folder": "Fermer un dossier, ou remonter à celui qui contient la ligne",
@@ -5876,6 +5903,18 @@
     "remove_error": "Impossible de retirer la note de l'accès rapide",
     "folder_removed_one": "1 note retirée de l'accès rapide",
     "folder_removed_other": "{{count}} notes retirées de l'accès rapide",
+    "new_button": "Nouvel accès rapide",
+    "default_name": "Par défaut",
+    "new_modal_title": "Créer un nouvel accès rapide",
+    "name_placeholder": "Nom de l'accès rapide",
+    "rename_title": "Renommer l'accès rapide",
+    "delete_confirm": "Supprimer cet accès rapide ? Ses notes restent, elles perdent seulement son tag.",
+    "board_error": "Impossible d'enregistrer l'accès rapide.",
+    "board_exists": "Un accès rapide porte déjà ce nom.",
+    "board_invalid": "Ce nom ne peut pas être utilisé.",
+    "choose_item": "Ajouter à un accès rapide",
+    "folder_added_one": "1 note ajoutée à l'accès rapide",
+    "folder_added_other": "{{count}} notes ajoutées à l'accès rapide",
     "visibility": {
       "title": "Titre de la page",
       "workspace": "Sélecteur de workspace",
@@ -5885,7 +5924,8 @@
       "frame": "Cadres des tuiles",
       "group_titles": "Titres des groupes",
       "group_rules": "Séparateurs des groupes",
-      "size": "Bouton de taille des tuiles"
+      "size": "Bouton de taille des tuiles",
+      "boards": "Liste des accès rapides"
     }
   }
 }

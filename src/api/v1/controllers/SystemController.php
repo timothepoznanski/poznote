@@ -755,6 +755,7 @@ class SystemController {
                 'workspace'  => $row['workspace_name'],
                 'owner_id'   => $row['owner_user_id'],
                 'owner_name' => $row['owner_username'],
+                'read_only'  => $row['read_only'],
             ];
         }
 

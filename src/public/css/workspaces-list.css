@@ -554,16 +554,35 @@ html[data-theme='dark'] .ws-tag-chip {
     color: var(--pz-danger-hover);
 }
 
+.shared-edit-token-modal .share-user-list-entry {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 10px;
+}
+
+.shared-edit-token-modal .share-user-list-entry + .share-user-list-entry {
+    border-top: 1px solid var(--pz-surface-hover);
+}
+
 .shared-edit-token-modal .share-user-list-row {
     display: flex;
+    flex: 1;
+    min-width: 0;
     align-items: center;
     gap: 8px;
     padding: 9px 10px;
     color: var(--pz-text-strong);
 }
 
-.shared-edit-token-modal .share-user-list-row + .share-user-list-row {
-    border-top: 1px solid var(--pz-surface-hover);
+.shared-edit-token-modal .share-user-list-permission {
+    flex-shrink: 0;
+    width: auto;
+    height: auto;
+    min-height: 0;
+    margin: 0;
+    padding: 2px 6px;
+    font-size: 13px;
 }
 
 .shared-edit-token-modal .share-user-list-name {

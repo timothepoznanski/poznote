@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Right-click context menu
         tagsList.addEventListener('contextmenu', function(e) {
             const tagItem = e.target.closest('.tag-item');
+            if (document.body.classList.contains('shared-workspace-readonly')) {
+                return;
+            }
             if (tagItem && tagItem.dataset.tag) {
                 e.preventDefault();
                 showTagContextMenu(e.pageX, e.pageY, tagItem);

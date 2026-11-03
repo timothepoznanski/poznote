@@ -156,9 +156,15 @@
         flex-wrap: wrap;
     }
 
-    .offline-list-page .offline-reason-select {
+    .offline-list-page .offline-reason-select,
+    .shared-sort-select {
         order: 1;
         flex: 1 1 100%;
+    }
+
+    /* Shares page: its tree button stays under the sort, not above it */
+    .shared-filter-tree-actions {
+        order: 2;
     }
 
     .filter-type-btn {

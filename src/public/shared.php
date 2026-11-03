@@ -112,71 +112,38 @@ usort($shared_folders, function($a, $b) {
 </head>
 <body class="shared-page shared-table-page has-icon-sidebar"
       data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>"
-      data-current-user-id="<?php echo (int)$_SESSION['user_id']; ?>"
       data-txt-error="<?php echo t_h('common.error', [], 'Error'); ?>"
       data-txt-untitled="<?php echo t_h('common.untitled', [], 'Untitled'); ?>"
 	data-txt-edit-token="<?php echo t_h('index.public_modal.manage', [], 'Edit'); ?>"
-      data-txt-token-update-failed="<?php echo t_h('public.token_update_failed', [], 'Failed to update token'); ?>"
-	data-txt-custom-token="<?php echo t_h('public.table.token', [], 'Token'); ?>"
-	data-txt-custom-token-placeholder="<?php echo t_h('index.public_modal.custom_token_placeholder', [], 'my_custom_token-1'); ?>"
-	data-txt-use-https="<?php echo t_h('index.folder_share_modal.use_https', [], 'HTTPS'); ?>"
-	data-txt-search-indexable="<?php echo t_h('index.public_modal.indexable', [], 'Allow indexing by search engines'); ?>"
-	data-txt-search-indexable-mobile="<?php echo t_h('index.public_modal.indexable_mobile', [], 'Allow indexing'); ?>"
 	data-txt-password-label="<?php echo t_h('index.public_modal.password', [], 'Password (optional)'); ?>"
-      data-txt-password-placeholder="<?php echo t_h('index.public_modal.password_placeholder', [], 'Enter a password'); ?>"
-	data-txt-show-password="<?php echo t_h('login.show_password', [], 'Show password'); ?>"
-	data-txt-hide-password="<?php echo t_h('login.hide_password', [], 'Hide password'); ?>"
       data-txt-network-error="<?php echo t_h('common.network_error', [], 'Network error'); ?>"
-	data-txt-renew="<?php echo t_h('index.public_modal.renew_token', [], 'Renew token'); ?>"
       data-txt-open="<?php echo t_h('public.actions.open', [], 'Open public view'); ?>"
       data-txt-revoke="<?php echo t_h('public.actions.revoke', [], 'Revoke'); ?>"
-      data-txt-revoke-modal-title="<?php echo t_h('public.revoke_modal.title', [], 'Revoke share'); ?>"
-      data-txt-revoke-modal-text="<?php echo t_h('public.revoke_modal.text', [], 'You can permanently delete this share, or keep it and make it inaccessible until you enable it again.'); ?>"
-      data-txt-revoke-modal-text-disabled="<?php echo t_h('public.revoke_modal.text_disabled', [], 'This share is currently inaccessible. You can make it accessible again, or permanently delete it.'); ?>"
       data-txt-revoke-modal-text-via-folder="<?php echo t_h('public.revoke_modal.text_via_folder', [], 'This note is shared through a folder. You can make just this note inaccessible; the folder share and its other notes are not affected.'); ?>"
       data-txt-revoke-modal-text-via-folder-disabled="<?php echo t_h('public.revoke_modal.text_via_folder_disabled', [], 'This note is currently inaccessible. You can make it accessible again through its folder share.'); ?>"
       data-txt-revoke-modal-text-via-folder-parent-disabled="<?php echo t_h('public.revoke_modal.text_via_folder_parent_disabled', [], 'This note is inaccessible because its folder share has been made inaccessible. Make the folder share accessible again to restore access.'); ?>"
-      data-txt-ok="<?php echo t_h('common.ok', [], 'OK'); ?>"
-      data-txt-revoke-delete="<?php echo t_h('public.revoke_modal.delete', [], 'Delete permanently'); ?>"
-      data-txt-revoke-disable="<?php echo t_h('public.revoke_modal.disable', [], 'Make inaccessible'); ?>"
-      data-txt-revoke-enable="<?php echo t_h('public.revoke_modal.enable', [], 'Make accessible again'); ?>"
       data-txt-share-disabled-badge="<?php echo t_h('public.disabled_badge', [], 'Inaccessible'); ?>"
       data-txt-share-disabled-help="<?php echo t_h('public.disabled_help', [], 'This share is inaccessible: the link no longer works until you make it accessible again.'); ?>"
-	data-txt-task-permissions="<?php echo t_h('index.task_permissions.title', [], 'Permissions'); ?>"
-	data-txt-task-read-only="<?php echo t_h('index.task_permissions.read_only', [], 'Read only'); ?>"
-	data-txt-task-check-only="<?php echo t_h('index.task_permissions.check_only', [], 'Check or uncheck only'); ?>"
-	data-txt-task-full="<?php echo t_h('index.task_permissions.full', [], 'Full edit'); ?>"
-	data-txt-note-editable="<?php echo t_h('index.note_permissions.editable', [], 'Allow text editing'); ?>"
-	data-txt-folder-editable="<?php echo t_h('index.folder_permissions.editable', [], 'Allow note editing'); ?>"
 	data-txt-note-shared-through-folder="<?php echo t_h('public.note_shared_through_folder', [], 'Note shared through folder'); ?>"
 	data-txt-folder-shared-through-parent="<?php echo t_h('public.folder_shared_through_parent', [], 'Folder shared through parent folder'); ?>"
       data-txt-no-filter-results="<?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?>"
 	data-txt-table-name="<?php echo t_h('public.table.name', [], 'Name'); ?>"
-	data-txt-table-folder="<?php echo t_h('public.table.path', [], 'Path / Folder'); ?>"
 	data-txt-table-token="<?php echo t_h('public.table.token', [], 'Token'); ?>"
 	data-txt-token-help="<?php echo t_h('public.token_help', [], 'The token is the unique part you choose in the public link. For example, using project-2026 gives https://your-domain.example/project-2026 for a note, or https://your-domain.example/folder/project-2026 for a folder.'); ?>"
 	data-txt-table-actions="<?php echo t_h('public.table.actions', [], 'Actions'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
-      data-txt-save="<?php echo t_h('common.save', [], 'Save'); ?>"
       data-txt-via-folder="<?php echo t_h('public.via_folder', [], 'Shared via folder'); ?>"
       data-txt-filter-all="<?php echo t_h('public.filter_all', [], 'All'); ?>"
       data-txt-filter-notes="<?php echo t_h('public.filter_notes', [], 'Notes'); ?>"
       data-txt-filter-folders="<?php echo t_h('public.filter_folders', [], 'Folders'); ?>"
 	data-txt-no-shared-notes="<?php echo t_h('public.no_shared_notes', [], 'No shared notes yet.'); ?>"
 	data-txt-no-shared-folders="<?php echo t_h('public.no_shared_folders', [], 'No shared folders yet.'); ?>"
-	data-hide-restrict-users="<?php echo (!poznoteCanTargetOtherUsers() || poznoteIsUiElementHidden('share:restrict-users')) ? '1' : '0'; ?>"
-	data-hide-protocol-toggle="<?php echo poznoteIsUiElementHidden('share:protocol-toggle') ? '1' : '0'; ?>"
-	data-txt-restrict-users="<?php echo t_h('public.restrict_users', [], 'Restrict to specific users'); ?>"
-	data-txt-restrict-users-mobile="<?php echo t_h('public.restrict_users_mobile', [], 'Restrict'); ?>"
 	data-txt-restricted-badge="<?php echo t_h('public.restricted_badge', [], 'Restricted'); ?>"
 	data-txt-restricted-help="<?php echo t_h('public.restricted_help', [], 'When restricted, only the listed users can access this share after logging in.'); ?>"
-      data-txt-no-users-found="<?php echo t_h('public.no_users_found', [], 'No other users found'); ?>"
-      data-txt-users-loading="<?php echo t_h('public.users_loading', [], 'Loading users...'); ?>"
       data-txt-shared-by="<?php echo t_h('public.shared_by', [], 'Shared by'); ?>"
       data-txt-no-shared-with-me="<?php echo t_h('public.no_shared_with_me', [], 'Nothing has been shared with you yet.'); ?>"
       data-txt-copy-url="<?php echo t_h('public.actions.copy_url', [], 'Copy URL'); ?>"
       data-txt-url-copied="<?php echo t_h('public.actions.url_copied', [], 'URL copied!'); ?>"
-      data-txt-share-link-copied="<?php echo t_h('workspaces.share.messages.url_copied', [], 'Share link copied to clipboard!'); ?>"
       data-txt-login-required-title="<?php echo t_h('public.login_required_title', [], 'Login Required'); ?>"
 	data-txt-access-denied-title="<?php echo t_h('public.access_denied_title', [], 'Access Denied'); ?>"
 	data-txt-expand-folder="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>"
@@ -190,6 +157,7 @@ usort($shared_folders, function($a, $b) {
 	</script>
 
 	<?php include __DIR__ . '/../icon_sidebar.php'; ?>
+	<?php include __DIR__ . '/../share_settings_config.php'; ?>
 
 	<div class="shared-container">
 		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-share-2"></i> <?php echo t_h('home.shares', [], 'Shares'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
@@ -227,6 +195,11 @@ usort($shared_folders, function($a, $b) {
 					</button>
 				</div>
 				<div id="filterStats" class="filter-stats initially-hidden"></div>
+				<select id="sharedSortSelect" class="shared-sort-select" aria-label="<?php echo t_h('public.sort_label', [], 'Sort shares'); ?>">
+					<option value="name"><?php echo t_h('public.sort_name', [], 'Sort by name'); ?></option>
+					<option value="updated"><?php echo t_h('public.sort_updated', [], 'Sort by last edit'); ?></option>
+					<option value="shared"><?php echo t_h('public.sort_shared', [], 'Sort by share date'); ?></option>
+				</select>
 				<div class="shared-filter-tree-actions initially-hidden" id="sharedTreeToolbar">
 					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary">
 						<i class="lucide lucide-chevron-down" style="margin-right: 6px;"></i>
@@ -252,6 +225,7 @@ usort($shared_folders, function($a, $b) {
 	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/pwa-helpers.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/share-settings-modal.js'); ?>"></script>
 	<script src="js/shared-page.js?v=<?php echo @filemtime('js/shared-page.js') ?: time(); ?>"></script>
 </body>
 </html>

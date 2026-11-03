@@ -497,7 +497,9 @@ function validateActiveAccountAccess(): bool {
         return true;
     }
 
-    if ($scope !== null && isWorkspaceSharedWithUser($activeUserId, $scope['workspace'], $authUserId)) {
+    $permission = $scope !== null ? getWorkspaceSharePermission($activeUserId, $scope['workspace'], $authUserId) : null;
+    if ($permission !== null) {
+        $_SESSION['shared_workspace_scope']['read_only'] = $permission !== 'write';
         $verified = $key;
         return true;
     }
@@ -722,9 +724,9 @@ function signInWithoutCredentials(): bool {
 //
 // A workspace shared with an account (workspaces.php > Share, recorded in
 // master.db workspace_shares) is opened by switching to the owner's account
-// with the session confined to that one workspace: the grantee reads and
-// edits it as the owner would, but the owner's other workspaces, trash of
-// those, settings and backups stay out of reach. The scope sits in the
+// with the session confined to that one workspace: the grantee reads it and,
+// unless the share is read-only, edits it as the owner would, but the owner's
+// other workspaces, trash of those, settings and backups stay out of reach. The scope sits in the
 // session next to the active account and is checked again on every request
 // (validateActiveAccountAccess), so revoking the share ends the session's
 // access at the next call.
@@ -739,11 +741,21 @@ function getSharedWorkspaceScope(): ?array {
     if ($ownerUserId <= 0 || $workspaceName === '' || $ownerUserId !== (int)($_SESSION['user_id'] ?? 0)) {
         return null;
     }
-    return ['owner_user_id' => $ownerUserId, 'workspace' => $workspaceName];
+    return ['owner_user_id' => $ownerUserId, 'workspace' => $workspaceName, 'read_only' => !empty($scope['read_only'])];
 }
 
 function isSharedWorkspaceScopeActive(): bool {
     return getSharedWorkspaceScope() !== null;
+}
+
+/**
+ * True in a workspace shared with this login for reading only. The flag is
+ * read from master.db on every request (validateActiveAccountAccess), so
+ * changing a share applies at the next call.
+ */
+function isSharedWorkspaceReadOnly(): bool {
+    $scope = getSharedWorkspaceScope();
+    return $scope !== null && $scope['read_only'];
 }
 
 function getSharedWorkspaceScopeName(): ?string {
@@ -801,7 +813,8 @@ function openSharedWorkspace(int $ownerUserId, string $workspaceName = ''): bool
     }
 
     require_once __DIR__ . '/users/db_master.php';
-    if (!isWorkspaceSharedWithUser($ownerUserId, $workspaceName, $authUserId)) {
+    $permission = getWorkspaceSharePermission($ownerUserId, $workspaceName, $authUserId);
+    if ($permission === null) {
         return false;
     }
 
@@ -814,7 +827,7 @@ function openSharedWorkspace(int $ownerUserId, string $workspaceName = ''): bool
     if (!setActiveUserAccount($owner)) {
         return false;
     }
-    $_SESSION['shared_workspace_scope'] = ['owner_user_id' => $ownerUserId, 'workspace' => $workspaceName];
+    $_SESSION['shared_workspace_scope'] = ['owner_user_id' => $ownerUserId, 'workspace' => $workspaceName, 'read_only' => $permission !== 'write'];
 
     if ($previousUserId !== $ownerUserId) {
         unset(
@@ -907,6 +920,14 @@ function enforceSharedWorkspaceScopeAccess(): void {
         'api_export_attachments.php', 'api_backup_job.php', 'api_restore_upload.php',
         'api_s3_backup.php', 'api_local_backup.php', 'api_s3_storage.php', 'api_upload_css.php',
     ];
+    // Pages that edit as they go, with no way of showing what they hold
+    // without it: the notes they show open from the workspace's notes list.
+    if ($scope['read_only']) {
+        $restrictedPages = array_merge($restrictedPages, [
+            'dashboard.php', 'tasks.php', 'diary.php', 'speed_dial.php', 'list_folders.php', 'favorites.php', 'revisions.php',
+            'create.php', 'excalidraw_editor.php', 'share-target.php',
+        ]);
+    }
     $isAdminPath = strpos($scriptName, '/admin/') !== false;
     if (in_array($baseName, $restrictedScripts, true)) {
         denyAccountAccessResponse('This action is not available in a workspace shared with you', 403);
@@ -916,7 +937,35 @@ function enforceSharedWorkspaceScopeAccess(): void {
         exit;
     }
 
+    if ($scope['read_only']) {
+        enforceSharedWorkspaceReadOnly($scriptName);
+    }
+
     enforceSharedWorkspaceScopeOnRequest($scope);
+}
+
+/**
+ * A read-only share refuses every request that is not a read, whatever a new
+ * endpoint turns out to be. What is let through changes nothing in the
+ * workspace: the search of index.php and the exports post a form, the person
+ * dealing with a mention or a push subscription writes to their own account,
+ * and "opened" and "seen" are no-ops for a borrowed account. db_connect.php
+ * also opens the owner's database with query_only, for what a GET would write.
+ */
+function enforceSharedWorkspaceReadOnly(string $scriptName): void {
+    $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+    if (in_array($method, ['GET', 'HEAD', 'OPTIONS'], true)) {
+        return;
+    }
+    // By full name: the API's front controller is an index.php too
+    if (in_array(ltrim($scriptName, '/'), ['index.php', 'api_export_note.php', 'api_download_note.php'], true)) {
+        return;
+    }
+    $path = (string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH);
+    if (preg_match('#/api/v1/(mentions/\d+/\d+/handled|notes/\d+/opened|system/whats-new/seen|users/me/push/subscriptions)/?$#', $path)) {
+        return;
+    }
+    denyAccountAccessResponse('This workspace is shared with you in read-only mode', 403);
 }
 
 /**

@@ -45,14 +45,143 @@ body.speed-dial-page {
     margin-bottom: 32px;
 }
 
+/* The speed dials of the workspace, as the journals of the diary (css/diary.css) */
+.speed-dial-boards {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.speed-dial-switcher {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.speed-dial-board {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-pill);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.speed-dial-board:hover {
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+    text-decoration: none;
+}
+
+.speed-dial-board.is-active {
+    border-color: var(--pz-accent);
+    background: var(--pz-accent);
+    color: var(--pz-text-inverse);
+}
+
+.speed-dial-board-new {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 33px;
+    padding: 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-text-muted);
+    cursor: pointer;
+}
+
+.speed-dial-board-new:hover,
+.speed-dial-board-new:focus-visible {
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+}
+
+.speed-dial-board-menu {
+    position: fixed;
+    z-index: 10002;
+    min-width: 160px;
+    padding: 6px 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
+}
+
+.speed-dial-board-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 14px;
+    border: 0;
+    background: none;
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.speed-dial-board-menu-item:hover,
+.speed-dial-board-menu-item:focus-visible {
+    outline: none;
+    background: var(--pz-surface);
+}
+
+.speed-dial-board-menu-item.danger {
+    color: var(--pz-danger, var(--pz-color-red));
+}
+
+.speed-dial-name-input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font: inherit;
+}
+
+.speed-dial-name-error {
+    margin: 8px 0 0;
+    color: var(--pz-danger, var(--pz-color-red));
+    font-size: 13px;
+}
+
 /* The filter stays on the centre of the page, the button at its left. With no
    room to spare, the filter takes what the button leaves. */
 .speed-dial-toolbar {
     display: grid;
-    grid-template-columns: 1fr minmax(0, 500px) 1fr;
+    grid-template-columns: 1fr minmax(0, 420px) 1fr;
     column-gap: 8px;
     align-items: center;
     margin-bottom: 16px;
+}
+
+.speed-dial-toolbar.is-empty {
+    display: flex;
+    justify-content: center;
+}
+
+.speed-dial-toolbar-actions {
+    display: flex;
+    gap: 8px;
+    grid-column: 1;
+    justify-self: end;
 }
 
 .speed-dial-toolbar #speedDialFilter {
@@ -62,16 +191,14 @@ body.speed-dial-page {
 
 .speed-dial-size {
     position: relative;
-    grid-column: 1;
-    justify-self: end;
 }
 
 .speed-dial-size-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 33px;
     padding: 0;
     border: 1px solid var(--pz-border);
     border-radius: var(--pz-radius-lg);
@@ -116,9 +243,20 @@ body.speed-dial-page {
     accent-color: var(--pz-accent);
 }
 
+/* The size of the filter and buttons of the diary and the dashboard */
 #speedDialFilter .home-search-input {
-    padding-left: 12px;
+    box-sizing: border-box;
+    height: 31px;
+    padding: 7px 36px 7px 12px;
     font-family: inherit;
+    font-size: 13px;
+    box-shadow: none;
+}
+
+.speed-dial-board-new i,
+.speed-dial-size-btn i {
+    width: 18px;
+    height: 18px;
 }
 
 .speed-dial-empty {
@@ -332,12 +470,14 @@ body.speed-dial-page {
     font-size: clamp(11px, calc(var(--speed-dial-tile-width) * 0.1), 18px);
 }
 
+/* 16px down to the default tile size, then smaller with the tile */
 .speed-dial-edit {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: clamp(3px, calc(var(--speed-dial-tile-width) * 0.043), 6px);
+    right: clamp(3px, calc(var(--speed-dial-tile-width) * 0.043), 6px);
     display: flex;
-    padding: 4px;
+    padding: clamp(2px, calc(var(--speed-dial-tile-width) * 0.029), 4px);
+    font-size: clamp(11px, calc(var(--speed-dial-tile-width) * 0.115), 16px);
     color: var(--pz-text-muted);
     text-decoration: none;
     opacity: 0;

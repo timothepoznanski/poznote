@@ -179,7 +179,7 @@ light and the dark mode:
     controls   --pz-neutral --pz-neutral-hover --pz-disabled
                --pz-scrollbar --pz-scrollbar-hover
     icons      --pz-icon --pz-icon-hover
-    marks      --pz-mark --pz-mark-active --pz-mark-active-border --pz-selection
+    marks      --pz-mark --pz-mark-active --pz-mark-active-text --pz-selection
     depth      --pz-shadow-rgb --pz-highlight-rgb
     palette    --pz-color-red ... --pz-color-gray, each with a derived -soft
 

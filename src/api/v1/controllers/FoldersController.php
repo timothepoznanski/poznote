@@ -23,6 +23,7 @@
  *   GET    /api/v1/folders/suggested    - Get suggested folders
  *   POST   /api/v1/folders/move-files   - Move all files from one folder to another
  *   POST   /api/v1/folders/{id}/tags   - Add tags to every note of a folder
+ *   POST   /api/v1/notes/favorites/tags - Add tags to every favorite note of a workspace
  *   POST   /api/v1/notes/{id}/folder    - Move note to folder (in NotesController)
  *   POST   /api/v1/notes/{id}/archive   - Move note to the Archives workspace
  *   POST   /api/v1/folders/{id}/archive - Move folder, subfolders and notes to the Archives workspace
@@ -34,6 +35,9 @@ require_once __DIR__ . '/../../../lib/note-sort.php';
 require_once __DIR__ . '/../../../lib/speed-dial.php';
 
 class FoldersController {
+    // The speed dial a reorder happens on (scope speed_dial)
+    private string $speedDialBoard = POZNOTE_SPEED_DIAL_TAG;
+
     private PDO $db;
     
     public function __construct(PDO $db) {
@@ -2360,27 +2364,7 @@ class FoldersController {
         $notesStmt->execute($folderIds);
         $notes = $notesStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $actorUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
-        $updateStmt = $this->db->prepare(
-            "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = ? WHERE id = ?"
-        );
-
-        $updatedCount = 0;
-        foreach ($notes as $note) {
-            $current = $this->normalizeTagList($note['tags'] ?? '');
-            $merged = $current;
-            foreach ($tags as $tag) {
-                if (!in_array($tag, $merged, true)) {
-                    $merged[] = $tag;
-                }
-            }
-            if (count($merged) === count($current)) {
-                continue;
-            }
-            if ($updateStmt->execute([implode(', ', $merged), $actorUserId, (int)$note['id']])) {
-                $updatedCount++;
-            }
-        }
+        $updatedCount = $this->addTagsToNotes($notes, $tags);
 
         $this->sendJson([
             'success' => true,
@@ -2434,6 +2418,112 @@ class FoldersController {
         $notesStmt->execute($folderIds);
         $notes = $notesStmt->fetchAll(PDO::FETCH_ASSOC);
 
+        $updatedCount = $this->removeTagsFromNotes($notes, $tags);
+
+        $this->sendJson([
+            'success' => true,
+            'message' => "Untagged $updatedCount notes",
+            'tags' => $tags,
+            'notes_count' => count($notes),
+            'note_ids' => array_map('intval', array_column($notes, 'id')),
+            'updated_count' => $updatedCount,
+            'include_subfolders' => $includeSubfolders
+        ]);
+    }
+
+    /**
+     * POST /api/v1/notes/favorites/tags - Add tags to every favorite note of a workspace
+     *
+     * Body (JSON): tags (as for a folder) and workspace, required since the
+     * Favorites section is per workspace. Only the notes marked favorite: the
+     * notes of a favorite folder are that folder's, its own menu tags them.
+     */
+    public function addFavoritesTags(): void {
+        $this->tagFavorites(true);
+    }
+
+    /**
+     * DELETE /api/v1/notes/favorites/tags - Remove tags from every favorite note
+     *
+     * Same body as POST, tags compare without regard to case.
+     */
+    public function removeFavoritesTags(): void {
+        $this->tagFavorites(false);
+    }
+
+    private function tagFavorites(bool $add): void {
+        $data = $this->getInputData();
+        $tags = $this->normalizeTagList($data['tags'] ?? null);
+        if (empty($tags)) {
+            $this->sendError('At least one tag is required', 400);
+            return;
+        }
+        $workspace = isset($data['workspace']) ? trim((string)$data['workspace']) : '';
+        if ($workspace === '') {
+            $this->sendError('workspace is required', 400);
+            return;
+        }
+
+        $notesStmt = $this->db->prepare("SELECT id, tags FROM entries WHERE trash = 0 AND favorite = 1 AND workspace = ?");
+        $notesStmt->execute([$workspace]);
+        $notes = $notesStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $updatedCount = $add
+            ? $this->addTagsToNotes($notes, $tags)
+            : $this->removeTagsFromNotes($notes, array_map('mb_strtolower', $tags));
+
+        $this->sendJson([
+            'success' => true,
+            'message' => ($add ? 'Tagged' : 'Untagged') . " $updatedCount notes",
+            'tags' => $tags,
+            'notes_count' => count($notes),
+            'note_ids' => array_map('intval', array_column($notes, 'id')),
+            'updated_count' => $updatedCount
+        ]);
+    }
+
+    /**
+     * Merge tags into what each note already has. Notes that already carry
+     * them all are left alone and keep their modification date.
+     *
+     * @param array $notes Rows with id and tags
+     * @param string[] $tags Normalized tags
+     * @return int Number of notes changed
+     */
+    private function addTagsToNotes(array $notes, array $tags): int {
+        $actorUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
+        $updateStmt = $this->db->prepare(
+            "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = ? WHERE id = ?"
+        );
+
+        $updatedCount = 0;
+        foreach ($notes as $note) {
+            $current = $this->normalizeTagList($note['tags'] ?? '');
+            $merged = $current;
+            foreach ($tags as $tag) {
+                if (!in_array($tag, $merged, true)) {
+                    $merged[] = $tag;
+                }
+            }
+            if (count($merged) === count($current)) {
+                continue;
+            }
+            if ($updateStmt->execute([implode(', ', $merged), $actorUserId, (int)$note['id']])) {
+                $updatedCount++;
+            }
+        }
+        return $updatedCount;
+    }
+
+    /**
+     * Take tags away from each note, the others kept. Notes without them are
+     * left alone and keep their modification date.
+     *
+     * @param array $notes Rows with id and tags
+     * @param string[] $tags Normalized tags in lower case
+     * @return int Number of notes changed
+     */
+    private function removeTagsFromNotes(array $notes, array $tags): int {
         $actorUserId = (int)(getAuthenticatedUserId() ?? getCurrentUserId() ?? ($_SESSION['user_id'] ?? 0));
         $updateStmt = $this->db->prepare(
             "UPDATE entries SET tags = ?, updated = CURRENT_TIMESTAMP, updated_by_user_id = ? WHERE id = ?"
@@ -2450,16 +2540,7 @@ class FoldersController {
                 $updatedCount++;
             }
         }
-
-        $this->sendJson([
-            'success' => true,
-            'message' => "Untagged $updatedCount notes",
-            'tags' => $tags,
-            'notes_count' => count($notes),
-            'note_ids' => array_map('intval', array_column($notes, 'id')),
-            'updated_count' => $updatedCount,
-            'include_subfolders' => $includeSubfolders
-        ]);
+        return $updatedCount;
     }
 
     /**
@@ -3267,10 +3348,13 @@ class FoldersController {
         $changesFolder = $currentFolderId !== $targetFolderId;
 
         if ($scope === 'speed_dial') {
-            if (!poznoteHasSpeedDialTag((string)$note['tags']) || !poznoteHasSpeedDialTag((string)$targetNote['tags'])) {
+            $board = (string)($data['board'] ?? POZNOTE_SPEED_DIAL_TAG);
+            if (!poznoteSpeedDialIsBoardTag($board)
+                || !poznoteHasSpeedDialTag((string)$note['tags'], $board) || !poznoteHasSpeedDialTag((string)$targetNote['tags'], $board)) {
                 $this->sendError('Speed dial reordering needs two notes of the speed dial', 400);
                 return;
             }
+            $this->speedDialBoard = $board;
             $this->reorderNoteOnBoard($scope, $note, $targetNoteId, $position, $targetWorkspace, $currentFolderId);
             return;
         }
@@ -3508,10 +3592,11 @@ class FoldersController {
      * speed_dial.php shows them, excluding one note.
      */
     private function getOrderedSpeedDialNoteIds(string $workspace, int $excludeNoteId): array {
+        $board = $this->speedDialBoard;
         $stmt = $this->db->prepare('SELECT id, tags, updated, speed_dial_order FROM entries WHERE trash = 0 AND workspace = ? AND id != ? AND tags LIKE ?');
         $stmt->execute([$workspace, $excludeNoteId, '%' . POZNOTE_SPEED_DIAL_TAG . '%']);
-        $rows = array_filter($stmt->fetchAll(PDO::FETCH_ASSOC), function ($row) {
-            return poznoteHasSpeedDialTag((string)$row['tags']);
+        $rows = array_filter($stmt->fetchAll(PDO::FETCH_ASSOC), function ($row) use ($board) {
+            return poznoteHasSpeedDialTag((string)$row['tags'], $board);
         });
         usort($rows, function ($a, $b) {
             return self::compareNotesPlacedOrder($a, $b, 'speed_dial_order');

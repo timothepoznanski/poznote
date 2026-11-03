@@ -154,12 +154,11 @@
     /* Help bubbles (settings cards, view menu): dark in every theme */
     --pz-tooltip-bg: #1f2937;
     --pz-tooltip-text: #f9fafb;
-    /* Search matches: the highlighter yellow, and the orange of the current one.
-       Their own names, because the warning family is a text colour in several
-       themes and unreadable as a fill behind black text. */
-    --pz-mark: #ffff00;
-    --pz-mark-active: #ff9d00;
-    --pz-mark-active-border: #d35400;
+    /* Search matches: a pale yellow, and a bright orange for the current one.
+       Dark text keeps a contrast of 4.5 or more on both. */
+    --pz-mark: #fff59d;
+    --pz-mark-active: #f97316;
+    --pz-mark-active-text: var(--pz-text);
 
     /* The colour palette users pick from (issue #1408): text colour, highlight,
        slash menu, and the icons of folders, notes, the icon rail and the
@@ -344,9 +343,12 @@ html[data-theme='dark'] {
     --dm-warning: #ffc107;
     --dm-warning-hover: #e0a800;
     --dm-warning-soft: #665500;
-    --pz-mark: var(--dm-warning);
-    --pz-mark-active: var(--dm-warning-hover);
-    --pz-mark-active-border: var(--dm-warning-hover);
+    /* Search matches, mixed like the highlights below so light text keeps a
+       contrast of 4.4 or more */
+    --pz-mark: var(--pz-color-yellow-soft);
+    /* The current match stays bright, so its text turns dark (contrast 6.8) */
+    --pz-mark-active: var(--pz-color-orange);
+    --pz-mark-active-text: var(--pz-bg);
 
     /* The user palette, lighter so it reads as text and icons on a dark
        ground (contrast 5.1 to 10.2 on #252526). Highlights are mixed with

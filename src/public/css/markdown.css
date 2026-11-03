@@ -109,6 +109,20 @@
     font-family: "Segoe UI Mono", "SF Mono", Monaco, Menlo, Consolas, "Ubuntu Mono", "Liberation Mono", "Courier New", monospace !important;
 }
 
+/* They also take the size the Font size setting gives code blocks. The language
+   badge of the live view keeps its own, relative to the line. */
+.markdown-editor .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line),
+.markdown-editor .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line) span:not(.cm-live-code-lang) {
+    font-size: var(--code-block-font-size, 15px) !important;
+}
+
+/* Inline `code` of the source views, same setting (the live view has its own
+   rule, .cm-live-inline-code) */
+.markdown-editor .cm-editor:not(.cm-live-preview) :is(#poznote-md-code-font-boost, .cm-md-inline-code),
+.markdown-editor .cm-editor:not(.cm-live-preview) :is(#poznote-md-code-font-boost, .cm-md-inline-code) * {
+    font-size: var(--code-block-font-size, 15px) !important;
+}
+
 .markdown-editor:empty:before {
     content: attr(data-ph);
     color: var(--pz-text-subtle);
@@ -862,6 +876,11 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :
     font-size: 0.9em !important;
 }
 
+/* Outside a heading, which it follows, the size of the Font size setting */
+.markdown-editor .cm-live-preview .cm-line:not(.cm-live-heading) :is(#poznote-md-live-size-boost, .cm-live-inline-code) {
+    font-size: var(--code-block-font-size, 15px) !important;
+}
+
 .markdown-editor .cm-live-preview :is(#poznote-md-live-size-boost, .cm-live-inline-code) * {
     font-size: inherit !important;
 }
@@ -1339,7 +1358,8 @@ html[data-theme='dark'] .markdown-preview pre.indented-pre {
    One --mdc-* variable per element. The defaults come from the theme palette
    (css/tokens.css, .markdown-colored), so they follow every theme; a colour
    the user picked is inlined on <body> by index.php and applies identically
-   in light and dark mode.
+   in light and dark mode. A shared note (public_note.php) renders outside
+   .markdown-preview, hence .public-note-markdown next to it.
    The colour declarations need BOTH the !important and the unmatched #id
    inside :is(): they fight the blanket
    `.noteentry * { color: var(--pz-text) !important }` rule in
@@ -1365,29 +1385,29 @@ body.markdown-colored .markdown-codemirror-host {
     --poznote-cm-monospace: var(--mdc-code);
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h1) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, h1) {
     color: var(--mdc-h1) !important;
     border-bottom-color: color-mix(in srgb, var(--mdc-h1) 30%, transparent);
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h2) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, h2) {
     color: var(--mdc-h2) !important;
     border-bottom-color: color-mix(in srgb, var(--mdc-h2) 30%, transparent);
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h3) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, h3) {
     color: var(--mdc-h3) !important;
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h4) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, h4) {
     color: var(--mdc-h4) !important;
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h5) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, h5) {
     color: var(--mdc-h5) !important;
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, h6) {
     color: var(--mdc-h6) !important;
 }
 
@@ -1396,17 +1416,17 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, h6) {
    css/dark-mode/markdown.css). !important is needed to beat the
    `background: #F8FAFC !important` on pre.code-block in css/code-blocks.css,
    so indented and mermaid blocks must be excluded here explicitly. */
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
     background: color-mix(in srgb, var(--mdc-codeblock) 8%, var(--pz-surface-hover));
 }
 
-body.markdown-colored .markdown-preview :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :not(pre) > :is(#poznote-md-colored-boost, code:not([class*="hljs"]):not([class*="language-"])) {
     color: var(--mdc-code) !important;
     background-color: color-mix(in srgb, var(--mdc-code) 9%, transparent);
     border-radius: var(--pz-radius-sm);
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, blockquote) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, blockquote) {
     border-left-color: var(--mdc-quote);
     background-color: color-mix(in srgb, var(--mdc-quote) 6%, transparent);
     padding-top: 4px;
@@ -1414,11 +1434,11 @@ body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, blockquot
     padding-right: 8px;
 }
 
-body.markdown-colored .markdown-preview table :is(#poznote-md-colored-boost, th) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) table :is(#poznote-md-colored-boost, th) {
     background-color: color-mix(in srgb, var(--mdc-table) 9%, transparent);
 }
 
-body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, hr) {
+body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, hr) {
     border-top-color: color-mix(in srgb, var(--mdc-hr) 35%, transparent);
 }
 

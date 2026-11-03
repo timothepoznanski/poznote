@@ -317,6 +317,32 @@ document.addEventListener('noteLoaded', function () {
     applyStoredFontSize();
 });
 
+// Apply sizes saved elsewhere to a page that is already laid out
+function applyFontSizeChangedElsewhere() {
+    applyStoredFontSize();
+
+    const markdownEditors = window.PoznoteMarkdownCodeMirror;
+    if (markdownEditors) {
+        document.querySelectorAll('.markdown-codemirror-host').forEach(function (host) {
+            markdownEditors.remeasureLines(host);
+        });
+    }
+}
+
+// The sizes are saved from the Settings page, usually open in another tab...
+window.addEventListener('storage', function (event) {
+    if (event.key === null || /_font_size(::|$)/.test(event.key)) {
+        applyFontSizeChangedElsewhere();
+    }
+});
+// ...or while this page sat in the back/forward cache, which gets no storage
+// events.
+window.addEventListener('pageshow', function (event) {
+    if (event.persisted) {
+        applyFontSizeChangedElsewhere();
+    }
+});
+
 // Apply font size after note is initialized
 function reinitializeFontSize() {
     applyStoredFontSize();

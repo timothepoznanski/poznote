@@ -1000,6 +1000,7 @@ Doneu l'etiqueta `speed-dial` a una nota, o trieu **Afegeix a l'accés ràpid** 
 - **Un enllaç o cap:** la nota és una rajola que obre aquest enllaç, o la mateixa nota. La seva icona és la primera imatge de la nota, si no la icona del lloc, si no la primera lletra del títol.
 - **Diversos enllaços:** la nota és un grup de rajoles amb el nom de la nota i una rajola per enllaç. Una línia horitzontal (`----`) comença una fila nova, i un enllaç al voltant d'una imatge la fa servir com a icona: `[![GitHub](https://example.com/icon.png)](https://github.com)`.
 - **Nom del grup:** un clic obre la nota, un clic dret canvia el color de la seva etiqueta.
+- **Diversos accessos ràpids:** **Nou accés ràpid** en crea un altre, i unes píndoles permeten canviar entre ells (per exemple Feina i Casa). Cadascun és una etiqueta, com `speed-dial-Feina`, amb la seva pròpia imatge de fons. Un clic dret en una píndola el reanomena o el suprimeix: en suprimir-lo es conserven les notes. Els menús de notes i carpetes ofereixen llavors **Afegeix a un accés ràpid**, amb la llista al costat: una marca indica en quins són, i un clic afegeix o treu.
 - **Organitzar la vista:** arrossegueu rajoles i grups per moure'ls, i canvieu-ne la mida amb el botó del costat del filtre. El menú **...** a baix a la dreta defineix una imatge de fons, i el botó de l'ull amaga el que no necessiteu.
 - **Pàgina d'inici del navegador:** feu servir `speed_dial.php?workspace=Name&focus=1` després de la vostra adreça de Poznote. `focus=1` també amaga la barra d'icones.
 

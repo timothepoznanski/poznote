@@ -3,8 +3,9 @@
 // A workspace is shared with named accounts of the instance (workspaces.php >
 // Share): the modal below lists the accounts, and the ones picked find the
 // workspace under "Shared with me" in their workspace menu and edit it, as
-// the owner would. Also the workspace info panel, which shows who a
-// workspace is shared with.
+// the owner would, or only read it when the owner picks "Read only" next to
+// their name. Also the workspace info panel, which shows who a workspace is
+// shared with.
 
 function getWorkspaceShareText(attributeName, fallback) {
     if (!document.body) return fallback;
@@ -19,14 +20,14 @@ function getWorkspaceShareConfirmMessage(workspaceName) {
     return wsTr(
         'workspaces.share.confirm.message',
         { workspace: workspaceName },
-        'Pick the users who can open workspace "{{workspace}}". They will find it in their workspace menu and can edit its notes and folders.'
+        'Pick the users who can open workspace "{{workspace}}". They will find it in their workspace menu. Next to each name, choose whether they can edit its notes and folders or only read them.'
     );
 }
 
-function parseWorkspaceShareAllowedUsers(button) {
+function parseWorkspaceShareUserIds(button, attribute) {
     if (!button) return [];
     try {
-        var parsed = JSON.parse(button.getAttribute('data-allowed-users') || '[]');
+        var parsed = JSON.parse(button.getAttribute(attribute) || '[]');
         if (!Array.isArray(parsed)) return [];
         return parsed.map(function (id) { return parseInt(id, 10); }).filter(function (id) { return id > 0; });
     } catch (e) {
@@ -49,6 +50,7 @@ function updateWorkspaceShareToggleButton(button, shareState) {
 
     var isShared = !!(shareState && shareState.shared);
     var allowedUsers = (shareState && Array.isArray(shareState.allowed_users)) ? shareState.allowed_users : [];
+    var readOnlyUsers = (shareState && Array.isArray(shareState.read_only_users)) ? shareState.read_only_users : [];
     var sharedWith = (shareState && Array.isArray(shareState.shared_with)) ? shareState.shared_with : [];
     var shareLabel = isShared
         ? getWorkspaceShareText('workspace-share-edit-btn', 'Edit share')
@@ -59,6 +61,7 @@ function updateWorkspaceShareToggleButton(button, shareState) {
     Array.prototype.forEach.call(shareButtons, function (shareButton) {
         shareButton.setAttribute('data-shared', isShared ? '1' : '0');
         shareButton.setAttribute('data-allowed-users', JSON.stringify(allowedUsers));
+        shareButton.setAttribute('data-read-only-users', JSON.stringify(readOnlyUsers));
         shareButton.setAttribute('data-shared-with', JSON.stringify(sharedWith));
         shareButton.title = shareLabel;
         shareButton.setAttribute('aria-label', shareLabel);
@@ -138,7 +141,8 @@ function showWorkspaceShareToast(message, type) {
 function showWorkspaceShareOptionsModal(button) {
     var workspaceName = button.getAttribute('data-ws') || '';
     var isExistingShare = button.getAttribute('data-shared') === '1';
-    var selectedUserIds = parseWorkspaceShareAllowedUsers(button);
+    var selectedUserIds = parseWorkspaceShareUserIds(button, 'data-allowed-users');
+    var readOnlyUserIds = parseWorkspaceShareUserIds(button, 'data-read-only-users');
     var availableUsers = [];
 
     var modal = document.createElement('div');
@@ -180,12 +184,34 @@ function showWorkspaceShareOptionsModal(button) {
             checkbox.type = 'checkbox';
             checkbox.value = user.id;
             checkbox.checked = selectedUserIds.indexOf(user.id) !== -1;
+
+            // What the person may do, offered once they are picked
+            var permission = document.createElement('select');
+            permission.className = 'share-user-list-permission';
+            permission.setAttribute('aria-label', user.username);
+            [
+                ['write', wsTr('workspaces.share.options.can_edit', {}, 'Can edit')],
+                ['read', wsTr('workspaces.share.options.read_only', {}, 'Read only')]
+            ].forEach(function (option) {
+                var optionEl = document.createElement('option');
+                optionEl.value = option[0];
+                optionEl.textContent = option[1];
+                permission.appendChild(optionEl);
+            });
+            permission.value = readOnlyUserIds.indexOf(user.id) !== -1 ? 'read' : 'write';
+            permission.hidden = !checkbox.checked;
+            permission.addEventListener('change', function () {
+                readOnlyUserIds = readOnlyUserIds.filter(function (id) { return id !== user.id; });
+                if (permission.value === 'read') readOnlyUserIds.push(user.id);
+            });
+
             checkbox.addEventListener('change', function () {
                 if (checkbox.checked) {
                     if (selectedUserIds.indexOf(user.id) === -1) selectedUserIds.push(user.id);
                 } else {
                     selectedUserIds = selectedUserIds.filter(function (id) { return id !== user.id; });
                 }
+                permission.hidden = !checkbox.checked;
             });
 
             var displayName = document.createElement('span');
@@ -194,7 +220,13 @@ function showWorkspaceShareOptionsModal(button) {
 
             row.appendChild(checkbox);
             row.appendChild(displayName);
-            userListContainer.appendChild(row);
+            // Next to the row's label, not inside it: a click on the select
+            // must not toggle the checkbox.
+            var entry = document.createElement('div');
+            entry.className = 'share-user-list-entry';
+            entry.appendChild(row);
+            entry.appendChild(permission);
+            userListContainer.appendChild(entry);
         });
     }
 
@@ -280,7 +312,11 @@ function showWorkspaceShareOptionsModal(button) {
 
     shareBtn.addEventListener('click', function () {
         setBusy(true);
-        submitWorkspaceShare(button, { action: 'share_workspace', allowed_users: selectedUserIds.slice() })
+        submitWorkspaceShare(button, {
+            action: 'share_workspace',
+            allowed_users: selectedUserIds.slice(),
+            read_only_users: readOnlyUserIds.filter(function (id) { return selectedUserIds.indexOf(id) !== -1; })
+        })
             .then(function (json) {
                 showWorkspaceShareToast(json && json.message ? json.message : '', 'success');
                 closeModal();
@@ -325,6 +361,7 @@ function submitWorkspaceShare(button, options) {
     });
     if (options && Object.prototype.hasOwnProperty.call(options, 'allowed_users')) {
         params.set('allowed_users', JSON.stringify(options.allowed_users || []));
+        params.set('read_only_users', JSON.stringify(options.read_only_users || []));
     }
 
     return fetch('workspaces.php', {

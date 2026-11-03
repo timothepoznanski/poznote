@@ -418,7 +418,7 @@
       },
       "confirm": {
         "title": "Comparteix l'espai de treball",
-        "message": "Trieu els usuaris que poden obrir l'espai de treball «{{workspace}}». El trobaran al menú d'espais de treball i en podran editar les notes i les carpetes."
+        "message": "Tria els usuaris que poden obrir l'espai de treball \"{{workspace}}\". El trobaran al seu menú d'espais de treball. Al costat de cada nom, tria si poden editar-ne les notes i carpetes o només llegir-les."
       },
       "messages": {
         "disabled": "L'espai de treball ja no es comparteix",
@@ -431,7 +431,9 @@
       },
       "options": {
         "users_loading": "S'estan carregant els usuaris...",
-        "no_users_found": "No s'ha trobat cap altre usuari"
+        "no_users_found": "No s'ha trobat cap altre usuari",
+        "can_edit": "Pot editar",
+        "read_only": "Només lectura"
       },
       "status": {
         "not_shared": "No compartit"
@@ -2659,6 +2661,10 @@
     "filter_all": "Tot",
     "filter_notes": "Notes",
     "filter_folders": "Carpetes",
+    "sort_label": "Ordena els elements compartits",
+    "sort_name": "Ordena per nom",
+    "sort_updated": "Ordena per última edició",
+    "sort_shared": "Ordena per data de compartició",
     "no_shared_notes": "Encara no hi ha cap nota compartida.",
     "no_shared_folders": "Encara no hi ha cap carpeta compartida.",
     "no_shares": "Encara no hi ha cap compartició.",
@@ -2863,6 +2869,7 @@
     "search_in_notes": "Cerca a les notes",
     "search_in_tags": "Cerca a les etiquetes",
     "toggle_date_filter": "Commuta el filtre per data",
+    "help_toggle": "Com cercar",
     "created_from": "Creada des del",
     "created_to": "Creada fins al",
     "validation": {
@@ -2870,7 +2877,23 @@
       "single_letter_warning": "Cercar amb paraules d'una sola lletra pot retornar massa resultats. Proveu de fer servir paraules més llargues per fer una cerca més precisa.",
       "invalid_date_range": "La data d'inici ha de ser anterior o igual a la data de finalització."
     },
-    "placeholder_account": "Cerca a {{account}}..."
+    "placeholder_account": "Cerca a {{account}}...",
+    "help": {
+      "title": "Com cercar",
+      "words_example": "pressupost reunió",
+      "words": "Notes que contenen totes aquestes paraules, en qualsevol ordre",
+      "phrase_example": "\"reunió setmanal\"",
+      "phrase": "Aquestes paraules juntes, en aquest ordre",
+      "partial_example": "reun",
+      "partial": "N'hi ha prou amb part d'una paraula. S'ignoren les majúscules i els accents",
+      "tags_example": "feina urgent",
+      "tags": "Amb la icona d'etiquetes activa: notes que tenen totes aquestes etiquetes",
+      "both": "Amb les dues icones actives: notes el text o les etiquetes de les quals coincideixen",
+      "key_enter": "Retorn",
+      "key_shift": "Maj",
+      "navigate_next": "Premut de nou: coincidència següent i després la nota següent",
+      "navigate_previous": "Coincidència anterior a la nota"
+    }
   },
   "icon_names": {
     "briefcase": "cartera",
@@ -4233,7 +4256,8 @@
     "take_over_confirm": "{{user}} està editant aquesta nota. Si en preneu el control, el seu editor passarà a només lectura i els canvis que encara no hagi desat es quedaran al seu dispositiu. Voleu continuar?",
     "take_over_failed": "No es pot prendre el control d'aquesta nota.",
     "taken_over_notice": "Heu pres el control de l'edició d'aquesta nota.",
-    "lost_unsaved_kept": "Els canvis no desats d'aquí es conserven en aquest dispositiu i se us tornaran a oferir quan la nota quedi lliure."
+    "lost_unsaved_kept": "Els canvis no desats d'aquí es conserven en aquest dispositiu i se us tornaran a oferir quan la nota quedi lliure.",
+    "read_only_share": "Aquest espai de treball s'ha compartit amb tu en mode de només lectura."
   },
   "live_refresh": {
     "note_changed": "Aquesta nota s'ha modificat fora d'aquesta pestanya.",
@@ -4308,6 +4332,8 @@
     },
     "filters": {
       "button": "Filtres",
+      "favorites": "Preferits",
+      "favorites_only": "Només preferits",
       "color": "Color",
       "modified": "Última modificació",
       "tags": "Etiquetes",
@@ -5222,6 +5248,7 @@
     "emoji": "Insereix un emoji pel nom",
     "indent": "Augmenta o redueix el sagnat d'un element de llista",
     "checklist_toggle": "Marca o desmarca un element d'una llista de comprovació",
+    "note_reference_open": "En un [[enllaç de nota]]: obre la nota o crea-la",
     "tree_move": "Ves a la nota o la carpeta de dalt o de baix",
     "tree_open_folder": "Obre una carpeta o entra-hi",
     "tree_close_folder": "Tanca una carpeta o puja a la que conté la fila",
@@ -5616,6 +5643,18 @@
     "remove_error": "No s'ha pogut treure la nota de l'accés ràpid",
     "folder_removed_one": "S'ha tret 1 nota de l'accés ràpid",
     "folder_removed_other": "S'han tret {{count}} notes de l'accés ràpid",
+    "new_button": "Nou accés ràpid",
+    "default_name": "Predeterminat",
+    "new_modal_title": "Crea un nou accés ràpid",
+    "name_placeholder": "Nom de l'accés ràpid",
+    "rename_title": "Canvia el nom de l'accés ràpid",
+    "delete_confirm": "Voleu suprimir aquest accés ràpid? Les seves notes es conserven, només perden la seva etiqueta.",
+    "board_error": "No s'ha pogut desar l'accés ràpid.",
+    "board_exists": "Ja existeix un accés ràpid amb aquest nom.",
+    "board_invalid": "Aquest nom no es pot fer servir.",
+    "choose_item": "Afegeix a un accés ràpid",
+    "folder_added_one": "S'ha afegit 1 nota a l'accés ràpid",
+    "folder_added_other": "S'han afegit {{count}} notes a l'accés ràpid",
     "visibility": {
       "title": "Títol de la pàgina",
       "workspace": "Selector d'espai de treball",
@@ -5625,7 +5664,8 @@
       "frame": "Marcs dels mosaics",
       "group_titles": "Títols dels grups",
       "group_rules": "Separadors dels grups",
-      "size": "Botó de mida de les rajoles"
+      "size": "Botó de mida de les rajoles",
+      "boards": "Llista d'accessos ràpids"
     }
   }
 }

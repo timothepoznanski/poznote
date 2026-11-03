@@ -1,0 +1,62 @@
+/* A workspace shared for reading only (auth.php, icon_sidebar.php sets the body
+   class): the server refuses every write, so what would ask for one is not
+   offered. The note itself goes through js/note-edit-lock.js, like a note
+   someone else is editing. */
+body.shared-workspace-readonly #sidebarCreateBtn,
+body.shared-workspace-readonly .folder-actions,
+body.shared-workspace-readonly .folder-actions-toggle,
+body.shared-workspace-readonly .folder-actions-menu,
+body.shared-workspace-readonly .note-actions,
+body.shared-workspace-readonly .note-actions-toggle,
+body.shared-workspace-readonly .note-actions-menu,
+body.shared-workspace-readonly .note-edit-toolbar .note-lock-disabled,
+body.shared-workspace-readonly .mobile-toolbar-menu .note-lock-disabled,
+body.shared-workspace-readonly .tag-actions-dropdown,
+body.shared-workspace-readonly .tag-delete-button,
+body.shared-workspace-readonly .code-block-delete-btn,
+body.shared-workspace-readonly .name_tags .tag-input,
+body.shared-workspace-readonly .task-input-container,
+body.shared-workspace-readonly .image-menu,
+body.shared-workspace-readonly .image-submenu,
+body.shared-workspace-readonly .task-item .task-important-btn,
+body.shared-workspace-readonly .task-item .task-due-btn,
+body.shared-workspace-readonly .task-item .task-menu-btn,
+body.shared-workspace-readonly .task-item .task-subtask-btn,
+body.shared-workspace-readonly .task-item .task-move-btn,
+body.shared-workspace-readonly .task-item .task-delete-btn,
+body.shared-workspace-readonly .task-item .task-drag-handle,
+body.shared-workspace-readonly .kanban-inline-view .kanban-add-card-btn,
+body.shared-workspace-readonly .kanban-inline-view .kanban-add-column-btn,
+body.shared-workspace-readonly .kanban-inline-view .kanban-subfolder-add-btn,
+body.shared-workspace-readonly .kanban-inline-view .kanban-card-complete-btn,
+body.shared-workspace-readonly .settings-section:has(.attachment-upload-section),
+body.shared-workspace-readonly [data-action="delete"][data-attachment-id],
+body.shared-workspace-readonly .note-edit-toolbar .toolbar-menu-anchor {
+    display: none !important;
+}
+
+/* All that the ⋮ menu would still hold, so it goes and these sit in the row */
+body.shared-workspace-readonly .note-edit-toolbar .read-only-share-action:not(.hide-on-selection) {
+    display: inline-flex !important;
+}
+
+body.shared-workspace-readonly .css-title[readonly],
+body.shared-workspace-readonly .noteentry[contenteditable="false"],
+body.shared-workspace-readonly .task-item .task-text {
+    cursor: default;
+}
+
+body.shared-workspace-readonly .noteentry[contenteditable="false"] img,
+body.shared-workspace-readonly .noteentry[contenteditable="false"] .excalidraw-container,
+body.shared-workspace-readonly .noteentry[contenteditable="false"] .excalidraw-preview-container,
+body.shared-workspace-readonly .noteentry[contenteditable="false"] .markdown-preview img,
+body.shared-workspace-readonly .noteentry[contenteditable="false"] div[onclick*="openExcalidrawNote"] {
+    cursor: default !important;
+}
+
+body.shared-workspace-readonly .kanban-inline-view .folder-icon[data-action="open-folder-icon-picker"],
+body.shared-workspace-readonly .note-icon[data-action="open-note-icon-picker"],
+body.shared-workspace-readonly .task-item .task-checkbox {
+    cursor: default !important;
+    pointer-events: none !important;
+}

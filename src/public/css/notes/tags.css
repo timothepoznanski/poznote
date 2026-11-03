@@ -284,24 +284,17 @@
     color: var(--pz-danger-text);
 }
 
-/* Tag Highlight state */
+/* Tag Highlight state: the tag keeps its shape, only its inside turns orange */
 .clickable-tag-wrapper.tag-highlight {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 2px 6px;
-    border-radius: var(--pz-radius-lg);
-    background: var(--pz-warning-soft);
+    padding: 0;
+    border-color: var(--pz-mark);
+    border-radius: var(--pz-radius-xl);
+    background: var(--pz-mark);
 }
 
-.clickable-tag-wrapper.tag-highlight .clickable-tag {
-    color: var(--pz-text);
-}
-
+.clickable-tag-wrapper.tag-highlight .clickable-tag,
 .clickable-tag-wrapper.tag-highlight .tag-delete-button {
-    background: rgba(var(--pz-shadow-rgb), 0.06);
-    border-radius: var(--pz-radius-sm);
-    color: var(--pz-warning-strong);
+    color: var(--pz-text);
 }
 
 /* Tag Input */

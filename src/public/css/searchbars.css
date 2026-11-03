@@ -173,8 +173,7 @@
 
 /* Highlight a tag when it matches an active tag search */
 .tag-highlight {
-    background: var(--pz-warning-soft);
-    /* soft yellow */
+    background: var(--pz-mark);
     padding: 2px 6px;
     border-radius: var(--pz-radius);
     box-shadow: inset 0 -1px 0 rgba(var(--pz-shadow-rgb), 0.03);
@@ -343,6 +342,113 @@
 
 .search-date-filter[hidden] {
     display: none;
+}
+
+/* Right of the field: the info button (how to search), or the circled cross
+   that clears a running search */
+.searchbar-side-btn {
+    flex: 0 0 auto;
+    width: auto;
+    height: 30px;
+    margin-left: 4px;
+    margin-right: -5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Room on the field's side only, so the icon sits close to the edge */
+    padding: 0 0 0 7px;
+    border: none;
+    border-radius: var(--pz-radius-circle);
+    background: transparent;
+    color: var(--pz-text-subtle);
+    cursor: pointer;
+    transition: color 0.18s;
+}
+
+.searchbar-help-toggle:hover,
+.searchbar-help-toggle.active {
+    color: var(--pz-accent);
+}
+
+.searchbar-side-btn i {
+    color: inherit;
+    font-size: 16px;
+}
+
+/* Red like the cross it replaces, also under the pointer (css/icons.css
+   recolours any hovered lucide icon) */
+.searchbar-side-clear,
+.searchbar-side-clear i[class*="lucide-"],
+.searchbar-side-clear i[class*="lucide-"]:hover {
+    color: var(--pz-danger-text);
+}
+
+.search-help {
+    width: 100%;
+    margin: 0 0 8px 0;
+    padding: 8px 10px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    box-sizing: border-box;
+    color: var(--pz-text-muted);
+    font-size: 0.74em;
+    line-height: 1.35;
+    text-align: left;
+}
+
+.search-help-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+    color: var(--pz-text-secondary);
+    font-weight: var(--pz-weight-semibold);
+}
+
+.search-help-title i {
+    color: var(--pz-text-subtle);
+    font-size: 14px;
+}
+
+.search-help-list {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 10px;
+    row-gap: 6px;
+    align-items: baseline;
+    margin: 0;
+}
+
+.search-help-list dt {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    color: var(--pz-text-subtle);
+    white-space: nowrap;
+}
+
+.search-help-list dt i {
+    font-size: 13px;
+}
+
+.search-help-list dd {
+    margin: 0;
+}
+
+.search-help-sample,
+.search-help-list kbd {
+    padding: 1px 5px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-bg);
+    color: var(--pz-text);
+    font-family: inherit;
+    font-size: 1em;
+}
+
+.search-help-list kbd {
+    border-bottom-width: 2px;
 }
 
 .search-date-field {

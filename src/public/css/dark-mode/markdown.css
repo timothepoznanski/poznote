@@ -138,7 +138,7 @@ html[data-theme='dark'] body.markdown-colored .markdown-codemirror-host {
 
 /* Code block background tint over the dark surface; !important mirrors the
    light-mode rule in css/markdown.css (see the pre.code-block override) */
-html[data-theme='dark'] body.markdown-colored .markdown-preview :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
+html[data-theme='dark'] body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, pre:not(.indented-pre):not(.mermaid)) {
     background: color-mix(in srgb, var(--mdc-codeblock) 10%, var(--pz-surface)) !important;
 }
 

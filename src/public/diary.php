@@ -212,21 +212,8 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-book-open"></i> <?php echo t_h('diary.title', [], 'Diary'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($diaryWorkspace); ?></h1>
 
 		<header class="dashboard-topbar">
-			<div class="diary-actions">
-				<button type="button" id="diaryNewBtn" class="btn btn-primary" title="<?php echo t_h('diary.new_modal_title', [], 'Create a new diary'); ?>">
-					<i class="lucide lucide-plus"></i>
-					<?php echo t_h('diary.new_button', [], 'New diary'); ?>
-				</button>
-				<?php // Named after what it will do: open the day's entry, or create it. js/diary-page.js renames it when that entry is trashed. ?>
-				<button type="button" id="diaryTodayBtn" class="btn btn-primary">
-					<i class="lucide <?php echo $todayNoteId !== null ? 'lucide-calendar' : 'lucide-calendar-plus'; ?>"></i>
-					<span class="diary-today-label"><?php echo $todayNoteId !== null
-						? t_h('diary.today_button_go', [], "Go to today's entry")
-						: t_h('diary.today_button_create', [], "Create today's entry"); ?></span>
-				</button>
-			</div>
-			<?php if (!empty($diaryRoots)): ?>
-			<?php // One pill per diary, even a lone one, so its name is always shown. Right-click or a long press renames or deletes it. ?>
+			<?php if (count($diaryRoots) > 1): ?>
+			<?php // One pill per diary, once there are several. Right-click or a long press renames or deletes it. ?>
 			<nav class="diary-switcher">
 				<?php foreach ($diaryRoots as $root): ?>
 				<?php $rootNameAttr = htmlspecialchars($root['name'], ENT_QUOTES, 'UTF-8'); ?>
@@ -241,6 +228,16 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 			</nav>
 			<?php endif; ?>
 			<div class="board-filter-row">
+			<?php $todayLabel = $todayNoteId !== null ? t_h('diary.today_button_go', [], "Go to today's entry") : t_h('diary.today_button_create', [], "Create today's entry"); ?>
+			<button type="button" id="diaryTodayBtn" class="dashboard-color-filter-btn" title="<?php echo $todayLabel; ?>" aria-label="<?php echo $todayLabel; ?>">
+				<i class="lucide <?php echo $todayNoteId !== null ? 'lucide-calendar' : 'lucide-calendar-plus'; ?>"></i>
+			</button>
+	<?php // Created from the default diary only, the one the page opens on ?>
+	<?php if ($selectedDiary === null || $selectedDiary['id'] === $diaryRoots[0]['id']): ?>
+	<button type="button" id="diaryNewBtn" class="dashboard-color-filter-btn" title="<?php echo t_h('diary.new_modal_title', [], 'Create a new diary'); ?>" aria-label="<?php echo t_h('diary.new_button', [], 'New diary'); ?>">
+		<i class="lucide lucide-plus"></i>
+	</button>
+	<?php endif; ?>
 			<button type="button" id="diaryJournalToggle" class="board-view-btn diary-journal-toggle" aria-pressed="false" title="<?php echo t_h('diary.journal_view', [], 'Journal view'); ?>">
 				<i class="lucide lucide-scroll"></i>
 			</button>

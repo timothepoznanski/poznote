@@ -526,13 +526,17 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			<header class="dashboard-topbar">
 				<div class="board-filter-row">
 				<?php renderBoardViewMenu('dashboard'); ?>
-				<?php // One button for the color, last-modified and tag filters: a panel with a section each (initFilterPanel in js/dashboard-page.js) ?>
+				<?php // One button for the favorites, color, last-modified and tag filters: a panel with a section each (initFilterPanel in js/dashboard-page.js) ?>
 				<div class="dashboard-color-filter-wrap">
 					<button type="button" id="dashboardFilterBtn" class="dashboard-color-filter-btn dashboard-filter-btn" title="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-label="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-haspopup="true" aria-expanded="false">
 						<i class="lucide lucide-filter"></i>
 						<span class="dashboard-filter-badge" hidden></span>
 					</button>
 					<div id="dashboardFilterMenu" class="dashboard-color-filter-menu dashboard-filter-panel" hidden>
+						<div class="dashboard-filter-section">
+							<div class="dashboard-filter-section-title"><?php echo t_h('dashboard.filters.favorites', [], 'Favorites'); ?></div>
+							<div id="dashboardFilterFavoritesSection" class="dashboard-filter-chips"></div>
+						</div>
 						<div class="dashboard-filter-section">
 							<div class="dashboard-filter-section-title"><?php echo t_h('dashboard.filters.color', [], 'Color'); ?></div>
 							<div id="dashboardFilterColorSection" class="dashboard-filter-chips"></div>
@@ -697,6 +701,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			month: <?php echo json_encode(t('dashboard.modified.month', [], 'Last 30 days')); ?>,
 			quarter: <?php echo json_encode(t('dashboard.modified.quarter', [], 'Last 90 days')); ?>,
 			year: <?php echo json_encode(t('dashboard.modified.year', [], 'Last 12 months')); ?>
+		};
+		window.DASHBOARD_FAVORITES_TXT = {
+			all: <?php echo json_encode(t('note_color.filter_all', [], 'All notes')); ?>,
+			only: <?php echo json_encode(t('dashboard.filters.favorites_only', [], 'Favorites only')); ?>
 		};
 		window.DASHBOARD_TAG_FILTER_TXT = {
 			all: <?php echo json_encode(t('dashboard.tag_filter.all', [], 'All tags')); ?>,

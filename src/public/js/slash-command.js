@@ -2421,7 +2421,8 @@
         'link-to-attachment': true,
         'mp4-video': true,
         'audio-file': true,
-        'paste-markdown': true
+        'paste-markdown': true,
+        'insert-markdown': true
     };
 
     function isOfflinePage() {
@@ -2431,7 +2432,7 @@
     function filterSlashCommands(commands) {
         var offline = isOfflinePage();
         return commands.reduce(function (filtered, command) {
-            if (!command || !command.id || isSlashCommandHidden(command.id) || (offline && OFFLINE_UNAVAILABLE_COMMANDS[command.id])) {
+            if (!command || !command.id || isSlashCommandHidden(command.hideId || command.id) || (offline && OFFLINE_UNAVAILABLE_COMMANDS[command.id])) {
                 return filtered;
             }
 
@@ -2924,6 +2925,33 @@
                 // Once the caret has settled where the slash text was removed:
                 // the Markdown dialog reads it when it opens
                 setTimeout(function () { show(noteId); }, 10);
+            }
+        };
+    }
+
+    // The "Rich text" view of a Markdown note never shows the syntax and takes
+    // typed Markdown literally, so it also takes Markdown through the "Insert
+    // Markdown" dialog, which previews it before the source goes in
+    // (js/insert-markdown-modal.js). Not in the split view, whose editor shows
+    // the source. Hidden along with "Insert rich text": one Settings tick.
+    function getLiveInsertMarkdownSlashCommand(t, markdownApi, markdownEditor) {
+        if (!document.getElementById('insertMarkdownModal') || !markdownApi || !markdownEditor
+            || !isMarkdownCodeMirrorEditor(markdownEditor)
+            || typeof window.isMarkdownRichText !== 'function' || !window.isMarkdownRichText()
+            || typeof markdownApi.isLivePreview !== 'function' || !markdownApi.isLivePreview(markdownEditor)) {
+            return null;
+        }
+        return {
+            id: 'insert-markdown',
+            hideId: 'paste-markdown',
+            icon: 'lucide-clipboard',
+            label: t('modals.insert_markdown.menu_item', null, 'Insert Markdown'),
+            noRefocus: true,
+            action: function () {
+                if (typeof window.showInsertMarkdownModal !== 'function') return;
+                var noteEntry = markdownEditor.closest ? markdownEditor.closest('.noteentry') : null;
+                var noteId = noteEntry ? noteEntry.getAttribute('data-note-id') : null;
+                setTimeout(function () { window.showInsertMarkdownModal(noteId); }, 10);
             }
         };
     }
@@ -3572,7 +3600,8 @@
                             insertMarkdownAtCursor('\n---\n', 0);
                         }
                     },
-                    getPasteConvertedSlashCommand(t, true)
+                    getPasteConvertedSlashCommand(t, true),
+                    getLiveInsertMarkdownSlashCommand(t, markdownApi, markdownEditor)
                 ]
             },
             ...buildDiagramItems(t, common, true),

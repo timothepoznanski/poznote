@@ -802,6 +802,19 @@ if (!empty($sharedTheme) && in_array($sharedTheme, $allowedPublicThemes, true)) 
 $effectiveTheme = $theme === 'black' ? 'dark' : $theme;
 $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
 
+// The owner's display settings for markdown, as in the app (index.php): the
+// colours of the "Colored markdown" setting come from lib/markdown-colored.php.
+$publicBodyClasses = 'public-note-page';
+if (in_array(getSetting('markdown_heading_underline', '1'), ['0', 'false'], true)) {
+    $publicBodyClasses .= ' markdown-no-heading-underline';
+}
+$publicBodyStyle = '';
+$markdownColoredTheme = getSetting('markdown_colored', '0');
+if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
+    $publicBodyClasses .= ' markdown-colored';
+    $publicBodyStyle = poznoteMarkdownColoredStyle($markdownColoredTheme, getSetting('markdown_colored_custom', ''));
+}
+
 // ============================================================================
 // HTML OUTPUT
 // ============================================================================
@@ -914,7 +927,7 @@ $themeClass = $theme === 'black' ? ' class="theme-black"' : '';
     <script src="<?php echo poznoteAsset('js/highlight/powershell.min.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/syntax-highlight.js'); ?>"></script>
 </head>
-<body class="public-note-page<?php echo in_array(getSetting('markdown_heading_underline', '1'), ['0', 'false'], true) ? ' markdown-no-heading-underline' : ''; ?>" data-task-access-mode="<?php echo htmlspecialchars($taskAccessMode, ENT_QUOTES); ?>">
+<body class="<?php echo htmlspecialchars($publicBodyClasses, ENT_QUOTES); ?>"<?php echo $publicBodyStyle !== '' ? ' style="' . htmlspecialchars($publicBodyStyle, ENT_QUOTES) . '"' : ''; ?> data-task-access-mode="<?php echo htmlspecialchars($taskAccessMode, ENT_QUOTES); ?>">
     <div class="public-note-layout">
         <div class="public-note-main" id="publicNoteMain">
             <div class="public-note">

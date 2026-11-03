@@ -114,3 +114,38 @@ test('a rich text note gives the addresses written as plain text too', function 
     assertSame(['https://c.example'], array_column($rows[1], 'url'));
     assertSame([], poznoteSpeedDialParseHtml('<p>no address</p><hr><img src="https://img.example/i.png">'));
 });
+
+test('a speed dial is a tag', function () {
+    assertTrue(poznoteHasSpeedDialTag('work, speed-dial-Travail', 'speed-dial-travail'));
+    assertTrue(!poznoteHasSpeedDialTag('speed-dial-Travail'));
+    assertTrue(!poznoteHasSpeedDialTag('speed-dial', 'speed-dial-travail'));
+    assertTrue(poznoteSpeedDialIsBoardTag('speed-dial'));
+    assertTrue(poznoteSpeedDialIsBoardTag('Speed-Dial-Maison'));
+    assertTrue(!poznoteSpeedDialIsBoardTag('speed-dial-'));
+    assertTrue(!poznoteSpeedDialIsBoardTag('my-speed-dial'));
+    assertSame(['speed-dial', 'speed-dial-a_b'], poznoteSpeedDialTagsOf('x, Speed-Dial, speed-dial-A_B, my-speed-dial'));
+});
+
+test('a name gives a tag and back, or nothing', function () {
+    assertSame('speed-dial-Mes_liens', poznoteSpeedDialTagFromName('  Mes liens '));
+    assertSame('Mes liens', poznoteSpeedDialBoardName('speed-dial-Mes_liens'));
+    assertSame(null, poznoteSpeedDialBoardName('speed-dial'));
+    assertSame('speed-dial-a_b', poznoteSpeedDialTagFromName('a, b'));
+    foreach (['', '   ', 'a/b', 'a<b', 'a"b', "a'b", 'a&b', str_repeat('x', 51)] as $bad) {
+        assertSame(null, poznoteSpeedDialTagFromName($bad));
+    }
+});
+
+test('the speed dials of a workspace: default first, created ones, tags in use, no double', function () {
+    assertSame(['speed-dial'], poznoteSpeedDialMergeBoards([], []));
+    assertSame(
+        ['speed-dial', 'speed-dial-Empty', 'speed-dial-Used'],
+        poznoteSpeedDialMergeBoards(['speed-dial-Empty', 'junk', 42], ['x, speed-dial-Used', 'speed-dial-empty, my-speed-dial-notes', 'SPEED-DIAL-USED'])
+    );
+});
+
+test('only a named speed dial has a background key, the same whatever the case', function () {
+    assertSame('', poznoteSpeedDialBackgroundKey('speed-dial'));
+    assertSame(poznoteSpeedDialBackgroundKey('speed-dial-A'), poznoteSpeedDialBackgroundKey('speed-dial-a'));
+    assertTrue(preg_match('/^[0-9a-f]{10}$/', poznoteSpeedDialBackgroundKey('speed-dial-a')) === 1);
+});

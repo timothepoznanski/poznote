@@ -808,7 +808,7 @@
       },
       "confirm": {
         "title": "共享工作区",
-        "message": "选择可以打开工作区“{{workspace}}”的用户。他们会在自己的工作区菜单中看到它，并可以编辑其中的笔记和文件夹。"
+        "message": "选择可以打开工作区“{{workspace}}”的用户。他们会在自己的工作区菜单中找到它。在每个名称旁边，选择对方可以编辑其笔记和文件夹，还是只能阅读。"
       },
       "messages": {
         "disabled": "该工作区已不再共享",
@@ -821,7 +821,9 @@
       },
       "options": {
         "users_loading": "正在加载用户...",
-        "no_users_found": "未找到其他用户"
+        "no_users_found": "未找到其他用户",
+        "can_edit": "可编辑",
+        "read_only": "只读"
       },
       "status": {
         "not_shared": "未共享"
@@ -990,6 +992,7 @@
     "search_in_notes": "在笔记中搜索",
     "search_in_tags": "在标签中搜索",
     "toggle_date_filter": "显示/隐藏日期筛选",
+    "help_toggle": "如何搜索",
     "created_from": "创建日期从",
     "created_to": "创建日期到",
     "validation": {
@@ -997,7 +1000,23 @@
       "single_letter_warning": "使用单字母单词搜索可能会返回过多结果。请尝试使用更长的单词进行精确搜索。",
       "invalid_date_range": "开始日期必须早于或等于结束日期。"
     },
-    "placeholder_account": "在 {{account}} 中搜索..."
+    "placeholder_account": "在 {{account}} 中搜索...",
+    "help": {
+      "title": "如何搜索",
+      "words_example": "预算 会议",
+      "words": "包含所有这些词的笔记，顺序不限",
+      "phrase_example": "\"每周会议\"",
+      "phrase": "这些词紧挨在一起，且按此顺序",
+      "partial_example": "会",
+      "partial": "输入词的一部分即可。忽略大小写和重音",
+      "tags_example": "工作 紧急",
+      "tags": "开启标签图标时：带有所有这些标签的笔记",
+      "both": "同时开启两个图标时：文本或标签匹配的笔记",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "再次按下：下一个匹配项，之后是下一篇笔记",
+      "navigate_previous": "笔记中的上一个匹配项"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ 检测到未保存的更改\n\n您有未保存的更改，如果现在切换，这些更改将会丢失。\n\n点击“确定”保存并继续，或点击“取消”留下。\n（停止输入 2 秒后将自动保存）",
@@ -3045,6 +3064,10 @@
     "filter_all": "全部",
     "filter_notes": "笔记",
     "filter_folders": "文件夹",
+    "sort_label": "排序共享项",
+    "sort_name": "按名称排序",
+    "sort_updated": "按最后编辑时间排序",
+    "sort_shared": "按共享日期排序",
     "no_shared_notes": "目前还没有共享笔记。",
     "no_shared_folders": "目前还没有共享文件夹。",
     "no_shares": "暂无共享。",
@@ -4698,7 +4721,8 @@
     "take_over_confirm": "{{user}} 正在编辑此笔记。如果您接管，对方的编辑器将变为只读，其尚未保存的更改会保留在其设备上。是否继续？",
     "take_over_failed": "无法接管此笔记。",
     "taken_over_notice": "您已接管此笔记的编辑。",
-    "lost_unsaved_kept": "您在此处未保存的更改已保留在此设备上，笔记空闲后会再次提供。"
+    "lost_unsaved_kept": "您在此处未保存的更改已保留在此设备上，笔记空闲后会再次提供。",
+    "read_only_share": "此工作区以只读模式与您共享。"
   },
   "live_refresh": {
     "note_changed": "此笔记已在本标签页之外被修改。",
@@ -4773,6 +4797,8 @@
     },
     "filters": {
       "button": "筛选",
+      "favorites": "收藏",
+      "favorites_only": "仅收藏",
       "color": "颜色",
       "modified": "最后修改",
       "tags": "标签",
@@ -5483,6 +5509,7 @@
     "emoji": "按名称插入表情",
     "indent": "增加或减少列表项缩进",
     "checklist_toggle": "勾选或取消勾选清单项",
+    "note_reference_open": "在 [[笔记链接]] 上:打开笔记,或创建笔记",
     "tree_move": "移动到上方或下方的笔记或文件夹",
     "tree_open_folder": "展开文件夹，或进入其中",
     "tree_close_folder": "折叠文件夹，或返回上级文件夹",
@@ -5868,6 +5895,18 @@
     "remove_error": "无法从快速访问中移除笔记",
     "folder_removed_one": "已从快速访问中移除 1 条笔记",
     "folder_removed_other": "已从快速访问中移除 {{count}} 条笔记",
+    "new_button": "新建快速访问",
+    "default_name": "默认",
+    "new_modal_title": "创建新的快速访问",
+    "name_placeholder": "快速访问名称",
+    "rename_title": "重命名快速访问",
+    "delete_confirm": "删除此快速访问?其笔记会保留,只是失去它的标签。",
+    "board_error": "无法保存快速访问。",
+    "board_exists": "已存在同名的快速访问。",
+    "board_invalid": "不能使用此名称。",
+    "choose_item": "添加到一个快速访问",
+    "folder_added_one": "已将 1 条笔记添加到快速访问",
+    "folder_added_other": "已将 {{count}} 条笔记添加到快速访问",
     "visibility": {
       "title": "页面标题",
       "workspace": "工作区选择器",
@@ -5877,7 +5916,8 @@
       "frame": "磁贴边框",
       "group_titles": "分组标题",
       "group_rules": "分组分隔线",
-      "size": "磁贴大小按钮"
+      "size": "磁贴大小按钮",
+      "boards": "快速访问列表"
     }
   }
 }

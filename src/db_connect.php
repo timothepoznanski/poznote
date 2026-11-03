@@ -1117,6 +1117,12 @@ try {
         $_SESSION['language_synced_user_id'] = $activeUserId;
     }
 
+    // A workspace shared for reading only: whatever a request tries to write
+    // to the owner's database fails (auth.php, enforceSharedWorkspaceReadOnly).
+    if (function_exists('isSharedWorkspaceReadOnly') && isSharedWorkspaceReadOnly()) {
+        $con->exec('PRAGMA query_only = ON');
+    }
+
 } catch(PDOException $e) {
     error_log("Poznote: database connection failed: " . $e->getMessage());
     http_response_code(503);

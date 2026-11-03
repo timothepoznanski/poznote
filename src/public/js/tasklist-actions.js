@@ -4,6 +4,8 @@
 
 // Delete task
 function deleteTask(taskId, noteId) {
+    if (isSharedWorkspaceReadOnlyTasks()) return;
+
     const noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
@@ -31,6 +33,8 @@ function deleteTask(taskId, noteId) {
 
 // Toggle important flag for a task and move it to top when important
 function toggleImportant(taskId, noteId) {
+    if (isSharedWorkspaceReadOnlyTasks()) return;
+
     const noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
 
@@ -57,6 +61,8 @@ function openTaskDueDatePicker(taskId, noteId, event, anchorRectOverride) {
         event.preventDefault();
         event.stopPropagation();
     }
+
+    if (isSharedWorkspaceReadOnlyTasks()) return;
 
     const noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;
@@ -152,6 +158,8 @@ function openTaskActionsMenu(taskId, noteId, event) {
     }
 
     closeTaskActionsMenu();
+
+    if (isSharedWorkspaceReadOnlyTasks()) return;
 
     const noteEntry = document.getElementById('entry' + noteId);
     if (!noteEntry) return;

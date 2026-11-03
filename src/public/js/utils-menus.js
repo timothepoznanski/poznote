@@ -38,18 +38,7 @@ function populateFolderActionsMenu(menu, toggle) {
 
     // Speed dial item: "Remove" once all the notes of the folder and its
     // subfolders are in it, read from their rows as they can change one by one
-    var folderHeader = document.querySelector('.folder-header[data-folder-id="' + folderId + '"]');
-    var noteToggles = folderHeader ? Array.prototype.slice.call(folderHeader.querySelectorAll('.folder-content .note-actions-toggle')) : [];
-    var allInSpeedDial = noteToggles.length > 0 && noteToggles.every(function (noteToggle) {
-        var rendered = noteToggle.getAttribute('data-speed-dial') === '1';
-        return window.noteInSpeedDial ? window.noteInSpeedDial(noteToggle.getAttribute('data-note-id'), rendered) : rendered;
-    });
-    menu.querySelectorAll('.speed-dial-state-on').forEach(function (item) {
-        item.style.display = noteCount > 0 && allInSpeedDial ? '' : 'none';
-    });
-    menu.querySelectorAll('.speed-dial-state-off').forEach(function (item) {
-        item.style.display = noteCount > 0 && !allInSpeedDial ? '' : 'none';
-    });
+    syncSpeedDialMenuItems(menu, noteCount > 0, folderRowsSpeedDialTags(folderId).indexOf('speed-dial') !== -1);
 
     // Share item: show the variant matching the folder's shared state
     menu.querySelectorAll('.share-state-shared').forEach(function (item) {
@@ -369,31 +358,86 @@ function refreshOpenNotesTags() {
     });
 }
 
+// The variant of the speed dial entries a menu shows
+function syncSpeedDialMenuItems(menu, available, inDefault) {
+    var several = !!document.getElementById('speedDialSubmenu');
+    var show = function(selector, shown) {
+        menu.querySelectorAll(selector).forEach(function(item) {
+            item.style.display = available && shown ? '' : 'none';
+        });
+    };
+    show('.speed-dial-state-on', !several && inDefault);
+    show('.speed-dial-state-off', !several && !inDefault);
+    show('.speed-dial-state-choose', several);
+}
+window.syncSpeedDialMenuItems = syncSpeedDialMenuItems;
+
+// The speed dials all the notes of a folder and its subfolders are on, from their rows
+function folderRowsSpeedDialTags(folderId) {
+    return rowsSpeedDialTags(document.querySelector('.folder-header[data-folder-id="' + folderId + '"]'));
+}
+
+// The same for the favorite notes, the rows of the Favorites section
+function favoritesRowsSpeedDialTags() {
+    return rowsSpeedDialTags(document.querySelector('.folder-header[data-folder="Favorites"]'));
+}
+window.favoritesRowsSpeedDialTags = favoritesRowsSpeedDialTags;
+
+function rowsSpeedDialTags(header) {
+    var rows = header ? Array.prototype.slice.call(header.querySelectorAll('.folder-content .note-actions-toggle')) : [];
+    var common = null;
+    rows.forEach(function(row) {
+        var tags = window.noteSpeedDialTags(row.getAttribute('data-note-id'), row.getAttribute('data-speed-dial'));
+        common = common === null ? tags : common.filter(function(tag) { return tags.indexOf(tag) !== -1; });
+    });
+    return common || [];
+}
+
 // The state the menus read, on the rows of the notes the server changed. The
 // page of the folders has no such rows: it renders the state, so it reloads,
 // after a moment for the toast.
-function syncSpeedDialAfterFolderChange(noteIds, inSpeedDial) {
+function syncSpeedDialAfterFolderChange(noteIds, tag, inBoard) {
+    tag = tag.toLowerCase();
     (noteIds || []).forEach(function(noteId) {
         document.querySelectorAll('.note-actions-toggle[data-note-id="' + noteId + '"]').forEach(function(toggle) {
-            toggle.setAttribute('data-speed-dial', inSpeedDial ? '1' : '0');
+            var tags = (toggle.getAttribute('data-speed-dial') || '').split(' ').filter(function(current) {
+                return current && current !== tag;
+            });
+            if (inBoard) tags.push(tag);
+            toggle.setAttribute('data-speed-dial', tags.join(' '));
         });
     });
-    if (!document.querySelector('.note-actions-toggle')) {
+    if (document.querySelector('.note-actions-toggle')) return;
+    // While the list of speed dials is open, it waits for it to close
+    var list = document.getElementById('speedDialSubmenu');
+    if (list && !list.hidden) {
+        list.setAttribute('data-reload-on-close', '1');
+    } else {
         setTimeout(function() { window.location.reload(); }, 1000);
     }
 }
 
-// "Remove from speed dial" of a folder: at once, adding it back is as easy
-function removeFolderFromSpeedDial(folderId) {
+// A speed dial on or off for a whole folder, subfolders included
+function setFolderSpeedDial(folderId, tag, add) {
+    return setNotesSpeedDial('/api/v1/folders/' + encodeURIComponent(folderId) + '/tags', tag, add);
+}
+
+// The same for every favorite note of the workspace
+function setFavoritesSpeedDial(tag, add) {
+    return setNotesSpeedDial('/api/v1/notes/favorites/tags', tag, add);
+}
+window.setFavoritesSpeedDial = setFavoritesSpeedDial;
+
+function setNotesSpeedDial(url, tag, add) {
     var label = function(key, fallback) {
         return window.t ? window.t(key, null, fallback) : fallback;
     };
-    fetch('/api/v1/folders/' + encodeURIComponent(folderId) + '/tags', {
-        method: 'DELETE',
+    return fetch(url, {
+        method: add ? 'POST' : 'DELETE',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         credentials: 'same-origin',
         body: JSON.stringify({
-            tags: ['speed-dial'],
+            tags: [tag],
             workspace: document.body.getAttribute('data-workspace') || '',
             include_subfolders: true
         })
@@ -405,19 +449,154 @@ function removeFolderFromSpeedDial(folderId) {
             });
         })
         .then(function(data) {
-            var message = data.updated_count === 1
-                ? label('speed_dial.folder_removed_one', '1 note removed from the speed dial')
-                : label('speed_dial.folder_removed_other', '{{count}} notes removed from the speed dial');
-            window.poznoteShowToast(message.replace('{{count}}', String(data.updated_count)));
+            var one = add ? label('speed_dial.folder_added_one', '1 note added to the speed dial') : label('speed_dial.folder_removed_one', '1 note removed from the speed dial');
+            var other = add ? label('speed_dial.folder_added_other', '{{count}} notes added to the speed dial') : label('speed_dial.folder_removed_other', '{{count}} notes removed from the speed dial');
+            window.poznoteShowToast((data.updated_count === 1 ? one : other).replace('{{count}}', String(data.updated_count)));
             refreshOpenNotesTags();
-            syncSpeedDialAfterFolderChange(data.note_ids, false);
+            syncSpeedDialAfterFolderChange(data.note_ids, tag, add);
+            return true;
         })
         .catch(function(error) {
-            console.error('removeFolderFromSpeedDial failed', error);
+            console.error('setNotesSpeedDial failed', error);
             showNotificationPopup(label('speed_dial.remove_error', 'Could not remove the note from the speed dial'), 'error');
+            return false;
         });
 }
+
+// "Remove from speed dial" of a folder: at once, adding it back is as easy
+function removeFolderFromSpeedDial(folderId) {
+    return setFolderSpeedDial(folderId, 'speed-dial', false);
+}
 window.removeFolderFromSpeedDial = removeFolderFromSpeedDial;
+
+// "Add to a speed dial", once the workspace has several: the list opens beside
+// the entry, on hover or click, ticks the ones the note or folder is on, and each
+// box is applied as it changes, so several can be ticked in a row: the list stays
+// open until the pointer leaves it. The list is outside the menus, which clip or
+// close on what happens in them, so the entry is dealt with ahead of them, in the
+// capture phase, immediately: a listener of the same phase closes the note menu
+// on any click in it.
+(function () {
+    var currentItem = null;
+    var closeTimer = null;
+
+    function submenu() {
+        return document.getElementById('speedDialSubmenu');
+    }
+
+    function tagsOf(item) {
+        var noteId = item.getAttribute('data-note-id');
+        var folderId = item.getAttribute('data-folder-id');
+        if (item.hasAttribute('data-favorites-action')) return favoritesRowsSpeedDialTags();
+        if (item.getAttribute('data-action') === 'toggle-speed-dial' && noteId) {
+            var row = document.querySelector('.note-actions-toggle[data-note-id="' + noteId + '"]');
+            return window.noteSpeedDialTags(noteId, row ? row.getAttribute('data-speed-dial') : '');
+        }
+        // The page of the folders has no rows of notes: its button says
+        var button = document.querySelector('.folder-list-menu-btn[data-folder-id="' + folderId + '"]');
+        return button
+            ? (button.getAttribute('data-speed-dial') || '').split(' ').filter(Boolean)
+            : folderRowsSpeedDialTags(folderId);
+    }
+
+    function close() {
+        var list = submenu();
+        clearTimeout(closeTimer);
+        if (list) list.hidden = true;
+        currentItem = null;
+        if (list && list.hasAttribute('data-reload-on-close')) window.location.reload();
+    }
+
+    function open(item) {
+        var list = submenu();
+        if (!list) return;
+        clearTimeout(closeTimer);
+        if (currentItem === item && !list.hidden) return;
+        currentItem = item;
+
+        var tags = tagsOf(item);
+        list.querySelectorAll('.speed-dial-submenu-item').forEach(function (row) {
+            setBox(row, tags.indexOf(row.getAttribute('data-tag').toLowerCase()) !== -1);
+        });
+
+        list.hidden = false;
+        var margin = 8;
+        var itemRect = item.getBoundingClientRect();
+        var listRect = list.getBoundingClientRect();
+        var left = itemRect.right + 4;
+        if (left + listRect.width > window.innerWidth - margin) left = itemRect.left - listRect.width - 4;
+        list.style.left = Math.max(margin, left) + 'px';
+        list.style.top = Math.max(margin, Math.min(itemRect.top - 6, window.innerHeight - listRect.height - margin)) + 'px';
+    }
+
+    function setBox(row, on) {
+        row.classList.toggle('is-on', on);
+        row.setAttribute('aria-checked', on ? 'true' : 'false');
+    }
+
+    function apply(row) {
+        var item = currentItem;
+        var tag = row.getAttribute('data-tag');
+        var add = !row.classList.contains('is-on');
+        var noteId = item.getAttribute('data-note-id');
+        setBox(row, add);
+        row.disabled = true;
+        var saved;
+        if (item.hasAttribute('data-favorites-action')) {
+            saved = setFavoritesSpeedDial(tag, add);
+        } else if (item.getAttribute('data-action') === 'toggle-speed-dial') {
+            saved = window.setNoteSpeedDial(noteId, add, tag, true);
+        } else {
+            saved = setFolderSpeedDial(item.getAttribute('data-folder-id'), tag, add);
+        }
+        saved.then(function (done) {
+            row.disabled = false;
+            if (!done) setBox(row, !add);
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest) return;
+        var row = event.target.closest('.speed-dial-submenu-item');
+        if (row) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            if (currentItem) apply(row);
+            return;
+        }
+        var item = event.target.closest('.speed-dial-state-choose');
+        if (item) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            open(item);
+            return;
+        }
+        close();
+    }, true);
+
+    document.addEventListener('mouseover', function (event) {
+        var list = submenu();
+        if (!list || !event.target.closest) return;
+        var item = event.target.closest('.speed-dial-state-choose');
+        if (item) {
+            open(item);
+        } else if (event.target.closest('#speedDialSubmenu')) {
+            clearTimeout(closeTimer);
+        } else if (!list.hidden) {
+            clearTimeout(closeTimer);
+            closeTimer = setTimeout(close, 250);
+        }
+    }, true);
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') close();
+    }, true);
+    document.addEventListener('scroll', function (event) {
+        var list = submenu();
+        if (list && !list.contains(event.target)) close();
+    }, true);
+    window.addEventListener('resize', close);
+})();
 
 function executeTagFolderNotes() {
     var modal = document.getElementById('tagFolderNotesModal');
@@ -462,7 +641,9 @@ function executeTagFolderNotes() {
             window.poznoteShowToast((message || '').replace('{{count}}', String(data.updated_count || 0)));
             if (typeof closeModal === 'function') closeModal('tagFolderNotesModal');
             if (data.updated_count > 0) refreshOpenNotesTags();
-            if (tags.indexOf('speed-dial') !== -1) syncSpeedDialAfterFolderChange(data.note_ids, true);
+            tags.forEach(function(tag) {
+                if (/^speed-dial(-.+)?$/i.test(tag)) syncSpeedDialAfterFolderChange(data.note_ids, tag, true);
+            });
         })
         .catch(function(error) {
             if (errorMessage) errorMessage.textContent = error.message;
@@ -602,16 +783,9 @@ function populateNoteActionsMenu(menu, toggle) {
         item.style.display = isFavorite ? 'none' : '';
     });
 
-    // Speed dial item: same, a shortcut row keeps neither (.note-real-only)
-    var inSpeedDial = window.noteInSpeedDial
-        ? window.noteInSpeedDial(noteId, toggle.getAttribute('data-speed-dial') === '1')
-        : toggle.getAttribute('data-speed-dial') === '1';
-    menu.querySelectorAll('.speed-dial-state-on').forEach(function (item) {
-        item.style.display = !isLinkedNote && inSpeedDial ? '' : 'none';
-    });
-    menu.querySelectorAll('.speed-dial-state-off').forEach(function (item) {
-        item.style.display = !isLinkedNote && !inSpeedDial ? '' : 'none';
-    });
+    // Speed dial item: same, a shortcut row has none (.note-real-only)
+    syncSpeedDialMenuItems(menu, !isLinkedNote,
+        window.noteSpeedDialTags(noteId, toggle.getAttribute('data-speed-dial')).indexOf('speed-dial') !== -1);
 
     // Keep offline item: "Stop" for a note marked "Keep offline", and for
     // one this browser holds anyway (recent, favorite, in a folder kept

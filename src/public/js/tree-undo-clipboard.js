@@ -81,6 +81,10 @@
         return window.selectedWorkspace || '';
     }
 
+    function isReadOnly() {
+        return !!(document.body && document.body.classList.contains('shared-workspace-readonly'));
+    }
+
     function hasTree() {
         return !!document.getElementById('left_col');
     }
@@ -958,7 +962,7 @@
      * back. The clipboard is consumed once anything was pasted.
      */
     function paste(targetFolderId) {
-        if (running) return;
+        if (isReadOnly() || running) return;
         var clipboard = getClipboard();
         if (!clipboard) {
             toast(tr('tree_clipboard.nothing_to_paste', 'Nothing to paste'));
@@ -1050,7 +1054,7 @@
      * recorded, like a single dragged note.
      */
     function moveItems(targets, dest) {
-        if (running) return;
+        if (isReadOnly() || running) return;
         var workspace = currentWorkspace();
         var folderId = dest && dest.folderId ? String(dest.folderId) : null;
         var beside = dest && dest.targetNoteId
@@ -1156,7 +1160,7 @@
      * folders are set outright.
      */
     function favoriteItems(targets) {
-        if (running) return;
+        if (isReadOnly() || running) return;
         var workspace = currentWorkspace();
         var jobs = [];
         var noteIds = [];
@@ -1311,7 +1315,7 @@
      * so nothing is asked twice.
      */
     function deleteItems(targets, options) {
-        if (running) return;
+        if (isReadOnly() || running) return;
         targets = withoutNested(targets || []).filter(function (target) {
             return target.type === 'note' ? !!noteLink(target.id) : !!folderHeader(target.id);
         });
@@ -1526,7 +1530,7 @@
     }
 
     function handleDeleteKey(e) {
-        if (!hasTree() || !treeOwnsKeyboard()) return;
+        if (!hasTree() || isReadOnly() || !treeOwnsKeyboard()) return;
         if (isTextEditingContext(e.target) || isModalOpen()) return;
 
         var targets = selectedTargets();
@@ -1557,7 +1561,7 @@
         var isPaste = key === 'v' && !e.shiftKey;
         if (!(isUndo || isRedo || isCopy || isCut || isPaste)) return;
 
-        if (!hasTree() || !treeOwnsKeyboard()) return;
+        if (!hasTree() || isReadOnly() || !treeOwnsKeyboard()) return;
         if (isTextEditingContext(e.target) || isModalOpen()) return;
         // Copying selected text is the browser's job
         if ((isCopy || isCut) && hasTextSelection()) return;
@@ -1628,7 +1632,7 @@
      */
     function syncMenu(menu) {
         if (!menu) return;
-        var hasClipboard = !!getClipboard();
+        var hasClipboard = !!getClipboard() && !isReadOnly();
         menu.querySelectorAll('[data-action="paste-into-note-folder"], [data-action="paste-into-folder"]').forEach(function (item) {
             item.style.display = hasClipboard ? '' : 'none';
         });

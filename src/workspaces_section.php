@@ -32,6 +32,7 @@ function poznoteWorkspacesSectionData(PDO $con): array
 
     $ownerUserId = (int)($_SESSION['user_id'] ?? 0);
     $sharedUserIdsByWorkspace = getWorkspaceShareGranteesByWorkspace($ownerUserId);
+    $readOnlyUserIdsByWorkspace = getWorkspaceShareReadOnlyGranteesByWorkspace($ownerUserId);
 
     $usernamesById = [];
     try {
@@ -75,6 +76,7 @@ function poznoteWorkspacesSectionData(PDO $con): array
             'color' => (string)($row['color'] ?? ''),
             'color_hex' => ($row['color'] ?? '') !== '' ? resolveNoteColorHex((string)$row['color']) : '',
             'shared_user_ids' => array_values($sharedUserIds),
+            'read_only_user_ids' => array_values($readOnlyUserIdsByWorkspace[$name] ?? []),
             'shared_with' => $sharedWith,
             'notes' => $noteCounts[$name] ?? 0,
             'folders' => $folderCounts[$name] ?? 0,
@@ -177,6 +179,7 @@ function poznoteRenderWorkspacesList(array $data): void
                                 . ' data-ws="' . $ws . '"'
                                 . ' data-shared="' . ($shared ? '1' : '0') . '"'
                                 . ' data-allowed-users="' . poznoteWorkspacesSectionJsonAttribute($row['shared_user_ids']) . '"'
+                                . ' data-read-only-users="' . poznoteWorkspacesSectionJsonAttribute($row['read_only_user_ids']) . '"'
                                 . ' data-shared-with="' . $sharedWithAttr . '"'
                                 . ' title="' . $shareLabel . '" aria-label="' . $shareLabel . '">'
                                 . '<i class="lucide lucide-share-2"></i><span class="ws-icon-btn-text">' . $shareLabel . '</span>'

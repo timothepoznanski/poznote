@@ -39,7 +39,7 @@ class ShareController {
             $noteType = $noteRow['type'] ?? 'note';
             
             // Get share info
-            $stmt = $this->con->prepare('SELECT token, indexable, password, password_encrypted, access_mode, allowed_users FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL LIMIT 1');
+            $stmt = $this->con->prepare('SELECT token, indexable, password, password_encrypted, access_mode, allowed_users, disabled FROM shared_notes WHERE note_id = ? AND access_mode IS NOT NULL LIMIT 1');
             $stmt->execute([$noteId]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -76,7 +76,8 @@ class ShareController {
                 'noteType' => $noteType,
                 'accessMode' => $accessMode,
                 'workspace' => $noteWorkspace,
-                'allowed_users' => $allowedUsers
+                'allowed_users' => $allowedUsers,
+                'disabled' => (int)($row['disabled'] ?? 0)
             ]);
             
         } catch (Exception $e) {

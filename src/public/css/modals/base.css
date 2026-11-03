@@ -873,3 +873,91 @@ html[data-theme='dark'] .note-palette-remove:hover {
     background-color: var(--pz-icon);
     flex: none;
 }
+
+/* The speed dials beside the "Add to a speed dial" entry of a menu
+   (modals/speed_dial_submenu.php), over every menu and dialog */
+.speed-dial-submenu {
+    position: fixed;
+    z-index: 2147483002;
+    min-width: 170px;
+    max-width: 280px;
+    max-height: calc(100vh - 16px);
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 6px 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.15);
+    font-family: 'Inter', sans-serif;
+}
+
+.speed-dial-submenu[hidden] {
+    display: none;
+}
+
+.speed-dial-submenu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 14px;
+    border: 0;
+    background: none;
+    color: var(--pz-text);
+    font: inherit;
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.speed-dial-submenu-item:hover,
+.speed-dial-submenu-item:focus-visible {
+    outline: none;
+    background: var(--pz-surface);
+}
+
+.speed-dial-submenu-item:disabled {
+    cursor: progress;
+}
+
+.speed-dial-submenu-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.speed-dial-submenu-box {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    border: 1px solid var(--pz-border-strong);
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-bg);
+}
+
+.speed-dial-submenu-box i {
+    width: 12px;
+    height: 12px;
+    background-color: var(--pz-text-inverse);
+    visibility: hidden;
+}
+
+.speed-dial-submenu-item.is-on .speed-dial-submenu-box {
+    border-color: var(--pz-accent);
+    background: var(--pz-accent);
+}
+
+.speed-dial-submenu-item.is-on .speed-dial-submenu-box i {
+    visibility: visible;
+}
+
+.speed-dial-state-choose .speed-dial-submenu-arrow {
+    width: 14px;
+    height: 14px;
+    margin-left: auto;
+}

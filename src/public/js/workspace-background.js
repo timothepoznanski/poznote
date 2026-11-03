@@ -18,11 +18,15 @@
     }
 
     function buildOpacitySettingKey(workspace) {
-        return (currentScope === SPEED_DIAL_SCOPE ? 'speed_dial_background_opacity_' : 'background_opacity_') + workspace;
+        if (currentScope !== SPEED_DIAL_SCOPE) return 'background_opacity_' + workspace;
+        // Each speed dial has its own: the page says which one (public/speed_dial.php)
+        var boardKey = document.body.getAttribute('data-board-key');
+        return 'speed_dial_background_opacity_' + workspace + (boardKey ? '_' + boardKey : '');
     }
 
     function scopeParam() {
-        return currentScope ? '&scope=' + currentScope : '';
+        if (!currentScope) return '';
+        return '&scope=' + currentScope + '&board=' + encodeURIComponent(document.body.getAttribute('data-board') || '');
     }
 
     // The highest value is also the default
@@ -320,7 +324,10 @@
         const formData = new FormData();
         formData.append('background', file);
         formData.append('workspace', currentWorkspace);
-        if (currentScope) formData.append('scope', currentScope);
+        if (currentScope) {
+            formData.append('scope', currentScope);
+            formData.append('board', document.body.getAttribute('data-board') || '');
+        }
 
         fetch('api_upload_background.php', {
             method: 'POST',

@@ -2,8 +2,8 @@
 lib('markdown-colored');
 
 // The "Colored markdown" setting reaches the stylesheets as body.markdown-colored
-// plus --mdc-* declarations on <body>; index.php and diary.php both build them
-// from these two functions, so the journal view paints what the editor paints.
+// plus --mdc-* declarations on <body>; index.php, diary.php and public_note.php
+// build them from these two functions, so all of them paint the same colours.
 
 test('the setting is off for 0, empty and false, on for anything else', function () {
     foreach (['0', '', 'false', ' 0 ', null] as $off) {
@@ -46,4 +46,14 @@ test('nothing is declared when the setting is off or the stored value is not JSO
     assertSame('', poznoteMarkdownColoredStyle('custom', ''));
     assertSame('', poznoteMarkdownColoredStyle('custom', 'not json'));
     assertSame('', poznoteMarkdownColoredStyle('custom', '"a string"'));
+});
+
+// Issue #1720: a shared note showed none of it, its page never set the class.
+test('the shared note page sets the class and the colours, and the rules reach its content', function () {
+    $page = file_get_contents(__DIR__ . '/../src/public/public_note.php');
+    assertContains("poznoteMarkdownColoredEnabled(\$markdownColoredTheme)", $page);
+    assertContains("poznoteMarkdownColoredStyle(\$markdownColoredTheme", $page);
+    assertContains("' public-note-markdown'", $page);
+    $css = file_get_contents(__DIR__ . '/../src/public/css/markdown.css');
+    assertContains('body.markdown-colored :is(.markdown-preview, .public-note-markdown) :is(#poznote-md-colored-boost, h1)', $css);
 });

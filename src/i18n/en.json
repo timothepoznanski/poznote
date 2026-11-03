@@ -418,7 +418,7 @@
       },
       "confirm": {
         "title": "Share workspace",
-        "message": "Pick the users who can open workspace \"{{workspace}}\". They will find it in their workspace menu and can edit its notes and folders."
+        "message": "Pick the users who can open workspace \"{{workspace}}\". They will find it in their workspace menu. Next to each name, choose whether they can edit its notes and folders or only read them."
       },
       "messages": {
         "disabled": "Workspace is no longer shared",
@@ -431,7 +431,9 @@
       },
       "options": {
         "users_loading": "Loading users...",
-        "no_users_found": "No other users found"
+        "no_users_found": "No other users found",
+        "can_edit": "Can edit",
+        "read_only": "Read only"
       },
       "status": {
         "not_shared": "Not shared"
@@ -2659,6 +2661,10 @@
     "filter_all": "All",
     "filter_notes": "Notes",
     "filter_folders": "Folders",
+    "sort_label": "Sort shares",
+    "sort_name": "Sort by name",
+    "sort_updated": "Sort by last edit",
+    "sort_shared": "Sort by share date",
     "no_shared_notes": "No shared notes yet.",
     "no_shared_folders": "No shared folders yet.",
     "no_shares": "No shares yet.",
@@ -2863,6 +2869,7 @@
     "search_in_notes": "Search in notes",
     "search_in_tags": "Search in tags",
     "toggle_date_filter": "Toggle date filter",
+    "help_toggle": "How to search",
     "created_from": "Created from",
     "created_to": "Created to",
     "validation": {
@@ -2870,7 +2877,23 @@
       "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search.",
       "invalid_date_range": "The start date must be before or equal to the end date."
     },
-    "placeholder_account": "Search in {{account}}..."
+    "placeholder_account": "Search in {{account}}...",
+    "help": {
+      "title": "How to search",
+      "words_example": "budget meeting",
+      "words": "Notes containing all these words, in any order",
+      "phrase_example": "\"weekly meeting\"",
+      "phrase": "These words side by side, in this order",
+      "partial_example": "meet",
+      "partial": "Part of a word is enough. Capitals and accents are ignored",
+      "tags_example": "work urgent",
+      "tags": "With the tag icon on: notes that have all these tags",
+      "both": "With both icons on: notes whose text or tags match",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "Pressed again: next match, then the next note",
+      "navigate_previous": "Previous match in the note"
+    }
   },
   "icon_names": {
     "briefcase": "briefcase",
@@ -4233,7 +4256,8 @@
     "take_over_confirm": "{{user}} is currently editing this note. If you take over, their editor becomes read-only and the changes they have not saved yet stay on their device. Continue?",
     "take_over_failed": "Unable to take over this note.",
     "taken_over_notice": "You took over editing this note.",
-    "lost_unsaved_kept": "Your unsaved changes here are kept on this device and offered again once the note is free."
+    "lost_unsaved_kept": "Your unsaved changes here are kept on this device and offered again once the note is free.",
+    "read_only_share": "This workspace is shared with you in read-only mode."
   },
   "live_refresh": {
     "note_changed": "This note was modified outside this tab.",
@@ -4308,6 +4332,8 @@
     },
     "filters": {
       "button": "Filters",
+      "favorites": "Favorites",
+      "favorites_only": "Favorites only",
       "color": "Color",
       "modified": "Last modified",
       "tags": "Tags",
@@ -5222,6 +5248,7 @@
     "emoji": "Insert an emoji by its name",
     "indent": "Indent or outdent a list item",
     "checklist_toggle": "Check or uncheck a checklist item",
+    "note_reference_open": "On a [[note link]]: open the note, or create it",
     "tree_move": "Move to the note or folder above or below",
     "tree_open_folder": "Open a folder, or step into it",
     "tree_close_folder": "Close a folder, or go up to the one holding the row",
@@ -5616,6 +5643,18 @@
     "remove_error": "Could not remove the note from the speed dial",
     "folder_removed_one": "1 note removed from the speed dial",
     "folder_removed_other": "{{count}} notes removed from the speed dial",
+    "new_button": "New speed dial",
+    "default_name": "Default",
+    "new_modal_title": "Create a new speed dial",
+    "name_placeholder": "Speed dial name",
+    "rename_title": "Rename speed dial",
+    "delete_confirm": "Delete this speed dial? Its notes stay, they only lose its tag.",
+    "board_error": "Could not save the speed dial.",
+    "board_exists": "A speed dial with this name already exists.",
+    "board_invalid": "This name cannot be used.",
+    "choose_item": "Add to a speed dial",
+    "folder_added_one": "1 note added to the speed dial",
+    "folder_added_other": "{{count}} notes added to the speed dial",
     "visibility": {
       "title": "Page title",
       "workspace": "Workspace selector",
@@ -5625,7 +5664,8 @@
       "frame": "Tile frames",
       "group_titles": "Group titles",
       "group_rules": "Group separators",
-      "size": "Tile size button"
+      "size": "Tile size button",
+      "boards": "List of speed dials"
     }
   }
 }

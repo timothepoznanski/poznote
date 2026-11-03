@@ -345,8 +345,17 @@
                         echo '<button type="button" class="toolbar-btn btn-create-linked-note note-action-btn" title="' . t_h('editor.toolbar.create_linked_note') . '" data-action="create-linked-note"><i class="lucide lucide-link"></i></button>';
                     }
                     
+                    // A read-only share has nothing else in the ⋮ menu, so Download
+                    // and Print sit in the row (css/shared-workspace-readonly.css)
+                    $readOnlyShare = function_exists('isSharedWorkspaceReadOnly') && isSharedWorkspaceReadOnly();
+                    $downloadInRow = ($readOnlyShare && !poznoteIsUiElementHidden('toolbar:btn-download')) ? ' read-only-share-action' : '';
+
                     // Download button
-                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type_attr.'"><i class="lucide lucide-download"></i></button>';
+                    echo '<button type="button" class="toolbar-btn btn-download note-action-btn'.$downloadInRow.'" title="'.t_h('common.download', [], 'Download').'" data-action="show-export-modal" data-note-id="'.$row['id'].'" data-filename="'.htmlspecialchars($filename, ENT_QUOTES).'" data-title="'.htmlspecialchars($title_safe, ENT_QUOTES).'" data-note-type="'.$note_type_attr.'"><i class="lucide lucide-download"></i></button>';
+
+                    if ($readOnlyShare && !poznoteIsUiElementHidden('toolbar:btn-print')) {
+                        echo '<button type="button" class="toolbar-btn btn-print note-action-btn read-only-share-action" title="'.t_h('common.print', [], 'Print').'" data-action="print-note" data-note-id="'.$row['id'].'" data-note-type="'.$note_type_attr.'"><i class="lucide lucide-printer"></i></button>';
+                    }
 
                     if ($note_type === 'markdown') {
                         echo '<button type="button" class="toolbar-btn btn-convert note-action-btn" data-action="show-convert-modal" data-note-id="'.$row['id'].'" data-convert-to="html" title="'.t_h('index.toolbar.convert_to_html', [], 'Convert to rich text').'"><i class="lucide lucide-refresh-cw-alt"></i></button>';
@@ -414,6 +423,7 @@
                         // Two variants, shown as the menu opens (js/clickable-tags.js)
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item speed-dial-state-on" role="menuitem" data-action="toggle-speed-dial" data-note-id="'.$row['id'].'" style="display: none;"><i class="lucide lucide-zap"></i> '.t_h('speed_dial.remove', [], 'Remove from speed dial').'</button>';
                         echo '<button type="button" class="dropdown-item mobile-toolbar-item speed-dial-state-off" role="menuitem" data-action="toggle-speed-dial" data-note-id="'.$row['id'].'"><i class="lucide lucide-zap"></i> '.t_h('speed_dial.add', [], 'Add to speed dial').'</button>';
+                        echo '<button type="button" class="dropdown-item mobile-toolbar-item speed-dial-state-choose" role="menuitem" data-action="toggle-speed-dial" data-note-id="'.$row['id'].'" style="display: none;"><i class="lucide lucide-zap"></i> '.t_h('speed_dial.choose_item', [], 'Add to a speed dial').'<i class="lucide lucide-chevron-right speed-dial-submenu-arrow"></i></button>';
                     }
                     // Archive: files the note away in the archive workspace with
                     // its folder path. Hidden once that workspace is the one open,

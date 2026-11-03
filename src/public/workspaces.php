@@ -585,8 +585,8 @@ if ($_POST) {
             }
         } elseif (isset($_POST['action']) && $_POST['action'] === 'share_workspace') {
             // Share the workspace with named accounts of the instance, or
-            // change who it is shared with. They open it from their own
-            // workspace menu and edit it (auth.php, shared workspace scope).
+            // change who it is shared with and what they may do. They open it
+            // from their own workspace menu (auth.php, shared workspace scope).
             $name = trim($_POST['name'] ?? '');
 
             if ($name === '') {
@@ -609,7 +609,12 @@ if ($_POST) {
             $ownerId = (int)$_SESSION['user_id'];
             $previousUserIds = getWorkspaceShareGranteesByWorkspace($ownerId)[$name] ?? [];
             $wantedUserIds = sanitizeWorkspaceShareAllowedUsers($_POST['allowed_users'] ?? []);
-            $sharedUserIds = setWorkspaceShareGrantees($ownerId, $name, $wantedUserIds);
+            // A page loaded before read-only sharing does not post the list:
+            // it must not turn someone read-only into an editor.
+            $readOnlyUserIds = isset($_POST['read_only_users'])
+                ? sanitizeWorkspaceShareAllowedUsers($_POST['read_only_users'])
+                : (getWorkspaceShareReadOnlyGranteesByWorkspace($ownerId)[$name] ?? []);
+            $sharedUserIds = setWorkspaceShareGrantees($ownerId, $name, $wantedUserIds, $readOnlyUserIds);
 
             $usernamesById = [];
             foreach (getMasterConnection()->query('SELECT id, username FROM users')->fetchAll(PDO::FETCH_ASSOC) as $masterUser) {
@@ -638,6 +643,7 @@ if ($_POST) {
                     'success' => true,
                     'shared' => !empty($sharedUserIds),
                     'allowed_users' => $sharedUserIds,
+                    'read_only_users' => array_values(array_intersect($sharedUserIds, $readOnlyUserIds)),
                     'shared_with' => $sharedUsernames,
                     'message' => $message,
                 ]);
@@ -667,6 +673,7 @@ if ($_POST) {
                     'success' => true,
                     'shared' => false,
                     'allowed_users' => [],
+                    'read_only_users' => [],
                     'shared_with' => [],
                     'message' => $message,
                 ]);

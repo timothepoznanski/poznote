@@ -418,7 +418,7 @@
       },
       "confirm": {
         "title": "ワークスペースを共有",
-        "message": "ワークスペース「{{workspace}}」を開けるユーザーを選択してください。選択したユーザーのワークスペースメニューに表示され、そのノートとフォルダーを編集できるようになります。"
+        "message": "ワークスペース「{{workspace}}」を開けるユーザーを選択してください。ユーザーのワークスペースメニューに表示されます。各名前の横で、ノートとフォルダーを編集できるか、閲覧のみかを選択します。"
       },
       "messages": {
         "disabled": "ワークスペースの共有を解除しました",
@@ -431,7 +431,9 @@
       },
       "options": {
         "users_loading": "ユーザーを読み込み中...",
-        "no_users_found": "他のユーザーが見つかりません"
+        "no_users_found": "他のユーザーが見つかりません",
+        "can_edit": "編集可能",
+        "read_only": "閲覧のみ"
       },
       "status": {
         "not_shared": "共有されていません"
@@ -2659,6 +2661,10 @@
     "filter_all": "すべて",
     "filter_notes": "ノート",
     "filter_folders": "フォルダー",
+    "sort_label": "共有の並べ替え",
+    "sort_name": "名前で並べ替え",
+    "sort_updated": "最終編集日で並べ替え",
+    "sort_shared": "共有日で並べ替え",
     "no_shared_notes": "共有中のノートはまだありません。",
     "no_shared_folders": "共有中のフォルダーはまだありません。",
     "no_shares": "共有はまだありません。",
@@ -2863,6 +2869,7 @@
     "search_in_notes": "ノートを検索",
     "search_in_tags": "タグを検索",
     "toggle_date_filter": "日付での絞り込みを切り替え",
+    "help_toggle": "検索のしかた",
     "created_from": "作成日（開始）",
     "created_to": "作成日（終了）",
     "validation": {
@@ -2870,7 +2877,23 @@
       "single_letter_warning": "1文字の単語で検索すると、結果が多くなりすぎることがあります。より長い単語で検索すると、結果を絞り込めます。",
       "invalid_date_range": "開始日は終了日以前の日付にしてください。"
     },
-    "placeholder_account": "{{account}}内を検索..."
+    "placeholder_account": "{{account}}内を検索...",
+    "help": {
+      "title": "検索のしかた",
+      "words_example": "予算 会議",
+      "words": "これらの語をすべて含むノート（順序は問いません）",
+      "phrase_example": "\"週次 会議\"",
+      "phrase": "これらの語が隣り合い、この順序で並ぶもの",
+      "partial_example": "会",
+      "partial": "語の一部だけでも一致します。大文字・小文字とアクセントは区別しません",
+      "tags_example": "仕事 至急",
+      "tags": "タグアイコンがオンのとき：これらのタグをすべて持つノート",
+      "both": "両方のアイコンがオンのとき：本文またはタグが一致するノート",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "もう一度押す：次の一致箇所、その後は次のノート",
+      "navigate_previous": "ノート内の前の一致箇所"
+    }
   },
   "icon_names": {
     "briefcase": "ブリーフケース",
@@ -4233,7 +4256,8 @@
     "take_over_confirm": "{{user}}がこのノートを編集中です。引き継ぐと、相手のエディターは閲覧のみになり、相手がまだ保存していない変更は相手の端末に残ります。続行しますか？",
     "take_over_failed": "このノートの編集を引き継げませんでした。",
     "taken_over_notice": "このノートの編集を引き継ぎました。",
-    "lost_unsaved_kept": "未保存の変更はこの端末に保持されます。ノートが再び編集可能になると、復元するかどうかを選択できます。"
+    "lost_unsaved_kept": "未保存の変更はこの端末に保持されます。ノートが再び編集可能になると、復元するかどうかを選択できます。",
+    "read_only_share": "このワークスペースは閲覧のみのモードで共有されています。"
   },
   "live_refresh": {
     "note_changed": "このノートは、このタブ以外で変更されました。",
@@ -4308,6 +4332,8 @@
     },
     "filters": {
       "button": "フィルター",
+      "favorites": "お気に入り",
+      "favorites_only": "お気に入りのみ",
       "color": "色",
       "modified": "最終更新日",
       "tags": "タグ",
@@ -5222,6 +5248,7 @@
     "emoji": "名前で絵文字を挿入",
     "indent": "リスト項目のインデントを増減",
     "checklist_toggle": "チェックリストの項目のチェックを付け外し",
+    "note_reference_open": "[[ノートリンク]]上で:ノートを開く、または作成",
     "tree_move": "上または下のノートやフォルダーに移動",
     "tree_open_folder": "フォルダーを開く、またはその中に入る",
     "tree_close_folder": "フォルダーを閉じる、または親フォルダーに移動",
@@ -5616,6 +5643,18 @@
     "remove_error": "ノートをスピードダイヤルから削除できませんでした",
     "folder_removed_one": "1 件のノートをスピードダイヤルから削除しました",
     "folder_removed_other": "{{count}} 件のノートをスピードダイヤルから削除しました",
+    "new_button": "新しいスピードダイヤル",
+    "default_name": "デフォルト",
+    "new_modal_title": "新しいスピードダイヤルを作成",
+    "name_placeholder": "スピードダイヤルの名前",
+    "rename_title": "スピードダイヤルの名前を変更",
+    "delete_confirm": "このスピードダイヤルを削除しますか?ノートは残り、そのタグだけが外れます。",
+    "board_error": "スピードダイヤルを保存できませんでした。",
+    "board_exists": "この名前のスピードダイヤルはすでにあります。",
+    "board_invalid": "この名前は使用できません。",
+    "choose_item": "いずれかのスピードダイヤルに追加",
+    "folder_added_one": "1 件のノートをスピードダイヤルに追加しました",
+    "folder_added_other": "{{count}} 件のノートをスピードダイヤルに追加しました",
     "visibility": {
       "title": "ページタイトル",
       "workspace": "ワークスペースセレクター",
@@ -5625,7 +5664,8 @@
       "frame": "タイルの枠",
       "group_titles": "グループのタイトル",
       "group_rules": "グループの区切り線",
-      "size": "タイルサイズのボタン"
+      "size": "タイルサイズのボタン",
+      "boards": "スピードダイヤルの一覧"
     }
   }
 }

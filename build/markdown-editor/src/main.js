@@ -26,7 +26,7 @@ const filteredSearchKeymap = searchKeymap.filter(binding => binding.key !== 'Mod
 import { Annotation, CharCategory, Compartment, EditorSelection, EditorState, MapMode, RangeSet, RangeSetBuilder, RangeValue, StateEffect, StateField } from '@codemirror/state'
 import { Decoration, EditorView, ViewPlugin, WidgetType, drawSelection, highlightActiveLine, keymap, placeholder } from '@codemirror/view'
 import { tags as syntaxTags } from '@lezer/highlight'
-import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, sourceLinkClicks, getEditingTableRange, getTableCellAt, getTableCellAtSelection, getTableCellTarget, getTableBlockElement, finishTableCellEdit, focusTableCell, moveTableCell, insertTableLineBreak } from './live-preview.js'
+import { armPendingFormat, dropPendingFormat, insertTabSpacesInText, swallowShiftTabInText, clearSpanChanges, leavePendingSpace, isFormatActiveAt, findInlineFormatEnd, findInlineFormatExit, findUntypedPair, wrapSelectionChanges, leaveInlineFormat, livePreview, refreshLivePreviewEffect, sourceLinkClicks, getEditingTableRange, getTableCellAt, getTableCellAtSelection, getTableCellTarget, getTableBlockElement, finishTableCellEdit, focusTableCell, moveTableCell, insertTableLineBreak, openNoteReferenceAtCaret } from './live-preview.js'
 
 const instances = new WeakMap()
 let lastActiveHost = null
@@ -201,7 +201,9 @@ const markdownCodeLinePlugin = ViewPlugin.fromClass(class {
   }
 
   update(update) {
-    if (update.docChanged || update.viewportChanged) {
+    // The parser reaches a block far down the note after the view is built
+    // (returning to a tab, scrolled to it), with no other change to the view
+    if (update.docChanged || update.viewportChanged || syntaxTree(update.startState) !== syntaxTree(update.state)) {
       this.decorations = buildMarkdownCodeLineDecorations(update.view)
     }
   }
@@ -211,7 +213,7 @@ const markdownCodeLinePlugin = ViewPlugin.fromClass(class {
 
 // Inline `code` is kept away from the spell checker too, backticks included
 // (HTML notes do the same for their <code>, js/syntax-highlight.js)
-const markdownInlineCodeDecoration = Decoration.mark({ attributes: { spellcheck: 'false' } })
+const markdownInlineCodeDecoration = Decoration.mark({ class: 'cm-md-inline-code', attributes: { spellcheck: 'false' } })
 
 function buildMarkdownInlineCodeDecorations(view) {
   const builder = new RangeSetBuilder()
@@ -1235,6 +1237,17 @@ function getInstance(host) {
   return host ? instances.get(host) : null
 }
 
+// For a size that changed through CSS alone: clicks would still resolve against
+// the line heights CodeMirror measured before. requestMeasure() alone does not
+// read them again while .cm-content keeps its height, which its min-height
+// does as long as the text is shorter than the pane.
+function remeasureLines(host) {
+  const instance = getInstance(host)
+  if (!instance) return
+  instance.view.viewState.mustMeasureContent = true
+  instance.view.requestMeasure()
+}
+
 function getValue(host) {
   const instance = getInstance(host)
   return instance ? instance.view.state.doc.toString() : ''
@@ -2076,6 +2089,7 @@ function createEditor(host, options = {}) {
       domHandlers,
       keymap.of([
         { key: 'Shift-Enter', run: insertTableLineBreak },
+        { key: 'Mod-Enter', run: openNoteReferenceAtCaret },
         { key: 'Home', mac: 'Cmd-ArrowLeft', run: moveToTableRowEnd(false, false), shift: moveToTableRowEnd(false, true) },
         { key: 'End', mac: 'Cmd-ArrowRight', run: moveToTableRowEnd(true, false), shift: moveToTableRowEnd(true, true) },
         { key: 'Enter', run: runMarkdownTableEnter(host) },
@@ -2173,6 +2187,7 @@ window.PoznoteMarkdownCodeMirror = {
   createEditor,
   destroyEditor,
   destroyEditorsWithin,
+  remeasureLines,
   getValue,
   getLength,
   sliceText,

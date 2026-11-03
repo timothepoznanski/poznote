@@ -5,8 +5,9 @@
  * api/v1/controllers/SettingsController.php as markdown_colored and
  * markdown_colored_custom) reach the stylesheets as body.markdown-colored
  * plus --mdc-* custom properties inlined on <body>. css/markdown.css paints
- * the note preview from them and css/diary.css the journal view, so every
- * page rendering markdown builds its <body> through these two functions.
+ * the note preview and the shared note page from them and css/diary.css the
+ * journal view, so every page rendering markdown builds its <body> through
+ * these two functions.
  */
 
 /** Elements a colour can be chosen for, in the order the modal lists them. */

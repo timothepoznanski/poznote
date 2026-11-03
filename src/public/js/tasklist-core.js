@@ -17,6 +17,10 @@ function parseTaskData(element) {
     }
 }
 
+function isSharedWorkspaceReadOnlyTasks() {
+    return !!(document.body && document.body.classList.contains('shared-workspace-readonly'));
+}
+
 function isTaskEditBlurSavePaused(input) {
     return !!(input && input.dataset && input.dataset.taskEditBlurSavePaused === 'true');
 }

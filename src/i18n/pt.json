@@ -809,7 +809,7 @@
       },
       "confirm": {
         "title": "Compartilhar espaço de trabalho",
-        "message": "Escolha os usuários que podem abrir o espaço de trabalho \"{{workspace}}\". Eles o encontrarão no menu de espaços de trabalho e poderão editar suas notas e pastas."
+        "message": "Escolha os utilizadores que podem abrir o espaço de trabalho \"{{workspace}}\". Vão encontrá-lo no menu de espaços de trabalho. Ao lado de cada nome, escolha se podem editar as notas e pastas ou apenas lê-las."
       },
       "messages": {
         "disabled": "O espaço de trabalho não está mais compartilhado",
@@ -822,7 +822,9 @@
       },
       "options": {
         "users_loading": "Carregando usuários...",
-        "no_users_found": "Nenhum outro usuário encontrado"
+        "no_users_found": "Nenhum outro usuário encontrado",
+        "can_edit": "Pode editar",
+        "read_only": "Só leitura"
       },
       "status": {
         "not_shared": "Não compartilhado"
@@ -991,6 +993,7 @@
     "search_in_notes": "Buscar em notas",
     "search_in_tags": "Buscar em etiquetas",
     "toggle_date_filter": "Mostrar/ocultar filtro de data",
+    "help_toggle": "Como pesquisar",
     "created_from": "Criada a partir de",
     "created_to": "Criada até",
     "validation": {
@@ -998,7 +1001,23 @@
       "single_letter_warning": "Buscar com palavras de uma única letra pode retornar muitos resultados. Tente usar palavras mais longas para uma busca mais precisa.",
       "invalid_date_range": "A data de início deve ser anterior ou igual à data de fim."
     },
-    "placeholder_account": "Pesquisar em {{account}}..."
+    "placeholder_account": "Pesquisar em {{account}}...",
+    "help": {
+      "title": "Como pesquisar",
+      "words_example": "orçamento reunião",
+      "words": "Notas que contêm todas estas palavras, em qualquer ordem",
+      "phrase_example": "\"reunião semanal\"",
+      "phrase": "Estas palavras juntas, nesta ordem",
+      "partial_example": "reun",
+      "partial": "Basta parte de uma palavra. Maiúsculas e acentos são ignorados",
+      "tags_example": "trabalho urgente",
+      "tags": "Com o ícone de etiquetas ativo: notas que têm todas estas etiquetas",
+      "both": "Com os dois ícones ativos: notas cujo texto ou etiquetas correspondem",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "Premido de novo: resultado seguinte e depois a nota seguinte",
+      "navigate_previous": "Resultado anterior na nota"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ Alterações Não Salvas Detectadas\n\nVocê tem alterações não salvas que serão perdidas se continuar agora.\n\nClique em OK para salvar e continuar, ou Cancelar para ficar.\n(Auto-salvamento ocorre 2 segundos após você parar de digitar)",
@@ -3047,6 +3066,10 @@
     "filter_all": "Tudo",
     "filter_notes": "Notas",
     "filter_folders": "Pastas",
+    "sort_label": "Ordenar partilhas",
+    "sort_name": "Ordenar por nome",
+    "sort_updated": "Ordenar por última edição",
+    "sort_shared": "Ordenar por data de partilha",
     "no_shared_notes": "Ainda não há notas compartilhadas.",
     "no_shared_folders": "Ainda não há pastas compartilhadas.",
     "no_shares": "Nenhum compartilhamento ainda.",
@@ -4602,7 +4625,8 @@
     "take_over_confirm": "{{user}} está a editar esta nota. Se assumir a edição, o editor dessa pessoa passa a só leitura e as alterações ainda não guardadas ficam no dispositivo dela. Continuar?",
     "take_over_failed": "Não foi possível assumir a edição desta nota.",
     "taken_over_notice": "Assumiu a edição desta nota.",
-    "lost_unsaved_kept": "As suas alterações por guardar ficam neste dispositivo e serão propostas de novo assim que a nota estiver livre."
+    "lost_unsaved_kept": "As suas alterações por guardar ficam neste dispositivo e serão propostas de novo assim que a nota estiver livre.",
+    "read_only_share": "Este espaço de trabalho é partilhado consigo em modo de só leitura."
   },
   "live_refresh": {
     "note_changed": "Esta nota foi modificada fora desta aba.",
@@ -4677,6 +4701,8 @@
     },
     "filters": {
       "button": "Filtros",
+      "favorites": "Favoritos",
+      "favorites_only": "Apenas favoritos",
       "color": "Cor",
       "modified": "Última modificação",
       "tags": "Tags",
@@ -5387,6 +5413,7 @@
     "emoji": "Inserir um emoji pelo nome",
     "indent": "Aumentar ou diminuir o recuo de um item de lista",
     "checklist_toggle": "Marcar ou desmarcar um item da checklist",
+    "note_reference_open": "Num [[link de nota]]: abrir a nota ou criá-la",
     "tree_move": "Ir para a nota ou pasta acima ou abaixo",
     "tree_open_folder": "Abrir uma pasta ou entrar nela",
     "tree_close_folder": "Fechar uma pasta ou subir para a que a contém",
@@ -5772,6 +5799,18 @@
     "remove_error": "Não foi possível remover a nota do acesso rápido",
     "folder_removed_one": "1 nota removida do acesso rápido",
     "folder_removed_other": "{{count}} notas removidas do acesso rápido",
+    "new_button": "Novo acesso rápido",
+    "default_name": "Padrão",
+    "new_modal_title": "Criar um novo acesso rápido",
+    "name_placeholder": "Nome do acesso rápido",
+    "rename_title": "Renomear o acesso rápido",
+    "delete_confirm": "Excluir este acesso rápido? As notas permanecem, apenas perdem a etiqueta.",
+    "board_error": "Não foi possível salvar o acesso rápido.",
+    "board_exists": "Já existe um acesso rápido com este nome.",
+    "board_invalid": "Este nome não pode ser usado.",
+    "choose_item": "Adicionar a um acesso rápido",
+    "folder_added_one": "1 nota adicionada ao acesso rápido",
+    "folder_added_other": "{{count}} notas adicionadas ao acesso rápido",
     "visibility": {
       "title": "Título da página",
       "workspace": "Seletor de espaço de trabalho",
@@ -5781,7 +5820,8 @@
       "frame": "Molduras dos mosaicos",
       "group_titles": "Títulos dos grupos",
       "group_rules": "Separadores dos grupos",
-      "size": "Botão de tamanho dos mosaicos"
+      "size": "Botão de tamanho dos mosaicos",
+      "boards": "Lista de acessos rápidos"
     }
   }
 }

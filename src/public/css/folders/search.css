@@ -15,14 +15,13 @@
 html[data-theme='dark'] .search-highlight,
 html[data-theme='dark'] .noteentry .search-highlight {
     background-color: var(--pz-mark);
-    color: #000000; /* Force black text for readability on yellow */
+    color: var(--pz-text);
     font-weight: var(--pz-weight-normal) !important;
     font-family: inherit !important;
     font-style: normal !important;
     text-decoration: none !important;
     border-radius: var(--pz-radius-sm);
     padding: 1px 2px;
-    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
     display: inline !important;
     line-height: inherit !important;
 }
@@ -34,12 +33,12 @@ html[data-theme='dark'] .noteentry .search-highlight {
 .search-highlight-active,
 html[data-theme='dark'] .search-highlight-active,
 html[data-theme='dark'] .noteentry .search-highlight-active {
-    background-color: var(--pz-mark-active); /* Bright orange */
-    color: #000000;
-    font-weight: var(--pz-weight-bold) !important;
-    box-shadow: 0 0 10px rgba(255, 157, 0, 0.8);
+    background-color: var(--pz-mark-active);
+    color: var(--pz-mark-active-text);
+    font-weight: var(--pz-weight-normal) !important;
+    box-shadow: none;
     z-index: 1000 !important;
-    border: 1px solid var(--pz-mark-active-border);
+    border: none;
     border-radius: var(--pz-radius-sm);
 }
 
@@ -49,25 +48,43 @@ html[data-theme='dark'] .noteentry .search-highlight-active {
     color: var(--pz-text);
 }
 
+/* A tag keeps its shape: only its inside turns a soft orange, no outline */
+.clickable-tag-wrapper.tag-highlight.search-highlight-active {
+    background-color: var(--pz-color-orange-soft);
+    border: 1px solid var(--pz-color-orange-soft);
+    border-radius: var(--pz-radius-xl);
+}
+
 /* Input highlight overlay for precise word highlighting in input elements */
 .input-highlight-overlay,
 html[data-theme='dark'] .input-highlight-overlay,
 html[data-theme='dark'] .note-header .input-highlight-overlay {
     background-color: var(--pz-mark);
-    color: #000000;
-    opacity: 0.7;
+    color: var(--pz-text);
     border-radius: var(--pz-radius-sm);
-    box-shadow: 0 1px 3px rgba(255, 255, 0, 0.3);
     pointer-events: none; /* Let clicks pass through to the input */
+    /* The overlay sits over the input's text: blending tints the ground and
+       leaves the text as dark (light theme) or as light (dark) as elsewhere */
+    mix-blend-mode: multiply;
+}
+
+html[data-theme='dark'] .input-highlight-overlay {
+    mix-blend-mode: lighten;
 }
 
 .input-highlight-overlay.search-highlight-active,
 html[data-theme='dark'] .input-highlight-overlay.search-highlight-active,
 html[data-theme='dark'] .note-header .input-highlight-overlay.search-highlight-active {
     background-color: var(--pz-mark-active);
-    color: #000000;
-    opacity: 0.9;
+    color: var(--pz-text);
     z-index: 10 !important;
-    box-shadow: 0 0 5px rgba(255, 157, 0, 0.7);
+    box-shadow: none;
     border-radius: var(--pz-radius-sm);
+}
+
+/* Blended over the light text of a dark title, the bright orange would hide
+   it: the title gets a deeper mix of that orange instead */
+html[data-theme='dark'] .input-highlight-overlay.search-highlight-active,
+html[data-theme='dark'] .note-header .input-highlight-overlay.search-highlight-active {
+    background-color: color-mix(in srgb, var(--pz-mark-active) 40%, var(--pz-bg));
 }

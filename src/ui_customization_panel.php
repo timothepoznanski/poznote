@@ -94,6 +94,7 @@ $pzShortcutGroups = [
             ['keys' => [[':']], 'label' => t_h('keyboard_shortcuts.emoji', [], 'Insert an emoji by its name')],
             ['keys' => [['Tab'], ['Shift', 'Tab']], 'label' => t_h('keyboard_shortcuts.indent', [], 'Indent or outdent a list item')],
             ['keys' => [['mod', 'Enter']], 'label' => t_h('keyboard_shortcuts.checklist_toggle', [], 'Check or uncheck a checklist item')],
+            ['keys' => [['mod', 'Enter']], 'label' => t_h('keyboard_shortcuts.note_reference_open', [], 'On a [[note link]]: open the note, or create it')],
         ],
     ],
     [

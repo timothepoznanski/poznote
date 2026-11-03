@@ -28,6 +28,10 @@
         return text;
     }
 
+    function isReadOnlyWorkspace() {
+        return !!(document.body && document.body.classList.contains('shared-workspace-readonly'));
+    }
+
     // True only when the drag carries OS files, not a note/folder being moved.
     function dragCarriesFiles(e) {
         if (!e.dataTransfer) return false;
@@ -313,7 +317,7 @@
 
     function init() {
         var sidebar = getSidebar();
-        if (!sidebar) return;
+        if (!sidebar || isReadOnlyWorkspace()) return;
 
         buildOverlay();
 

@@ -309,7 +309,9 @@ function renderWorkspaceMenu(menu, state) {
             menuHtml += '<div class="workspace-menu-item workspace-menu-shared' + (row.current ? ' current-workspace' : '') + '" data-shared-index="' + index + '">'
                 + '<i class="' + (row.current ? 'lucide-check-circle' : 'lucide-layers') + '"></i>'
                 + '<span>' + escapeWorkspaceMenuText(row.workspace) + '</span>'
-                + '<span class="workspace-menu-shared-owner">' + escapeWorkspaceMenuText(row.ownerUsername) + '</span>'
+                + '<span class="workspace-menu-shared-owner">' + escapeWorkspaceMenuText(row.ownerUsername)
+                + (row.readOnly ? ' · ' + escapeWorkspaceMenuText(wsTr('workspaces.share.options.read_only', {}, 'Read only')) : '')
+                + '</span>'
                 + '</div>';
         });
     }

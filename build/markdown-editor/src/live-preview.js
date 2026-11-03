@@ -2137,10 +2137,26 @@ function findSourceLinkAt(state, at) {
     const to = from + match[0].length
     const title = match[1].trim()
     if (at < from || at >= to) continue
-    if (!title || line.text.charAt(match.index - 1) === '\\') return null
+    // (an embed of a file imported from Obsidian is no link to a note)
+    const before = line.text.charAt(match.index - 1)
+    if (!title || before === '\\' || before === '!') return null
     return { title }
   }
   return null
+}
+
+// Ctrl/Cmd + Enter with the caret in a [[note]], or right behind it: what
+// Ctrl/Cmd + click does, without the mouse (#1711). Anywhere else the key does
+// what it does in any CodeMirror editor, it opens the next line.
+export function openNoteReferenceAtCaret(view) {
+  const { state } = view
+  const { main, ranges } = state.selection
+  if (ranges.length !== 1 || !main.empty || typeof window.openBrokenNoteReference !== 'function') return false
+  const link = findSourceLinkAt(state, main.head) || (main.head > 0 ? findSourceLinkAt(state, main.head - 1) : null)
+  if (!link || !link.title) return false
+  // finds the note of that title, or offers to create it (js/note-reference.js)
+  window.openBrokenNoteReference(link.title, view.dom.closest('.noteentry[data-note-id]'))
+  return true
 }
 
 function sourceLinkAtEvent(view, event) {

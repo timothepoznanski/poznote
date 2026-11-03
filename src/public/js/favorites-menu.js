@@ -5,7 +5,9 @@
 // on its row (js/notes-list-events.js) or by its three-dot toggle. Favorites
 // has no folder behind it, so the folder actions menu does not apply: this one
 // sets the section's own order and star colour (the favorites_sort and
-// favorites_icon_color settings, read by index.php) and empties it.
+// favorites_icon_color settings, read by index.php), puts its notes on a speed
+// dial or takes them off (the helpers of the folder menu, js/utils-menus.js)
+// and empties it.
 //
 // The markup (#favorites-actions-menu) is rendered by notes_list.php inside
 // #left_col, so a sidebar refresh replaces it: it is looked up on every use,
@@ -47,11 +49,21 @@
         if (toggle) toggle.classList.remove('open');
     }
 
+    // The speed dial entries: "Remove" once every favorite note is in the
+    // default one, read from the rows of the section as they change one by one
+    function syncSpeedDial(menu) {
+        if (typeof window.syncSpeedDialMenuItems !== 'function') return;
+        var hasNotes = !!document.querySelector('.folder-header[data-folder="Favorites"] .folder-content .note-actions-toggle');
+        window.syncSpeedDialMenuItems(menu, hasNotes, window.favoritesRowsSpeedDialTags().indexOf('speed-dial') !== -1);
+        if (typeof window.syncActionsMenuSeparators === 'function') window.syncActionsMenuSeparators(menu);
+    }
+
     // Returns false when the menu is not on the page (no Favorites section)
     function openAtPoint(x, y) {
         var menu = getMenu();
         if (!menu || typeof positionMenuAtPoint !== 'function') return false;
         closeOtherMenus();
+        syncSpeedDial(menu);
         menu.classList.add('show');
         positionMenuAtPoint(menu, x, y);
         return true;
@@ -65,6 +77,7 @@
             return;
         }
         closeOtherMenus();
+        syncSpeedDial(menu);
         menu.classList.add('show');
         // Kept visible while its menu is open, like the folder toggles
         toggle.classList.add('open');
@@ -197,6 +210,9 @@
                 changeColor(menu);
             } else if (action === 'clear') {
                 clearAll(menu);
+            } else if (action === 'speed-dial') {
+                // With several speed dials, js/utils-menus.js opens their list first
+                window.setFavoritesSpeedDial('speed-dial', item.classList.contains('speed-dial-state-off'));
             }
             return;
         }

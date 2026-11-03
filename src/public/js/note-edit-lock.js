@@ -19,35 +19,42 @@
         var style = document.createElement('style');
         style.id = 'note-edit-lock-styles';
         style.textContent = [
+            // The sticky header is opaque: the line closes up by taking its bottom
+            // padding away, a negative margin would slide the text under it.
+            '.note-header:has(+ .note-edit-lock-banner) {',
+            '    padding-bottom: 0;',
+            '}',
             '.note-edit-lock-banner {',
             '    display: flex;',
             '    align-items: center;',
-            '    justify-content: space-between;',
-            '    gap: 12px;',
+            '    justify-content: center;',
+            '    gap: 10px;',
             '    flex-wrap: wrap;',
-            '    margin: 12px 0;',
-            '    padding: 10px 14px;',
-            '    border: 1px solid rgba(180, 122, 0, 0.28);',
-            '    border-radius: 10px;',
-            '    background: #fff6dd;',
-            '    color: #7a5a00;',
+            '    margin: 4px 0 8px;',
+            '    text-align: center;',
+            '    color: var(--pz-accent-text);',
             '    font-size: 14px;',
-            '    line-height: 1.45;',
+            '    line-height: 1.4;',
             '}',
             // Drawn from the banner's own text colour so it needs no colour of
             // its own, in dark mode included.
+            '.note-edit-lock-banner-icon {',
+            '    margin-right: 6px;',
+            '    color: inherit;',
+            '    vertical-align: -2px;',
+            '}',
             '.note-edit-lock-banner button {',
             '    flex-shrink: 0;',
-            '    border: 1px solid currentColor;',
-            '    border-radius: 8px;',
+            '    border: 0;',
             '    background: transparent;',
             '    color: inherit;',
             '    font: inherit;',
-            '    padding: 4px 12px;',
+            '    padding: 0;',
+            '    text-decoration: underline;',
             '    cursor: pointer;',
             '}',
             '.note-edit-lock-banner button:hover {',
-            '    background: color-mix(in srgb, currentColor 12%, transparent);',
+            '    color: var(--pz-accent-text-hover);',
             '}',
             '.note-edit-lock-banner button:disabled {',
             '    opacity: 0.6;',
@@ -110,6 +117,12 @@
             }
             return window.__poznoteFallbackEditorSessionId;
         }
+    }
+
+    // A workspace shared for reading only (auth.php): no lock to ask for, the
+    // server would refuse it. The note just stays in its read-only state.
+    function isReadOnlyShare() {
+        return !!(document.body && document.body.classList.contains('shared-workspace-readonly'));
     }
 
     function parseResponse(response) {
@@ -234,17 +247,22 @@
             return;
         }
 
+        // A read-only share keeps the way to the attachments: a note someone
+        // else is editing can wait, this one stays like this for as long as
+        // the share does.
+        var readOnlyShare = isReadOnlyShare();
         var allowToolbarClasses = [
             'btn-home',
             'btn-history-nav',
             'btn-download',
+            'btn-print',
             'btn-open-new-tab',
             'markdown-view-mode-btn',
             'markdown-edit-btn',
             'markdown-preview-btn'
         ];
         noteCard.querySelectorAll('.note-edit-toolbar .toolbar-btn').forEach(function (button) {
-            var keepEnabled = allowToolbarClasses.some(function (className) {
+            var keepEnabled = (readOnlyShare && button.classList.contains('btn-attachment')) || allowToolbarClasses.some(function (className) {
                 return button.classList.contains(className);
             });
 
@@ -254,6 +272,9 @@
         });
 
         noteCard.querySelectorAll('.note-tags-row [data-action], .note-attachments-row [data-action="show-attachment-dialog"], .search-replace-bar input, .search-replace-bar button').forEach(function (element) {
+            if (readOnlyShare && element.getAttribute('data-action') === 'show-attachment-dialog') {
+                return;
+            }
             setTemporarilyDisabled(element, locked);
         });
 
@@ -279,6 +300,10 @@
     }
 
     function getLockBannerMessage(lock) {
+        if (isReadOnlyShare()) {
+            return t('note_lock.read_only_share', {}, 'This workspace is shared with you in read-only mode.');
+        }
+
         if (lock && lock.holder_is_current_user) {
             return t('note_lock.current_user_other_tab', {}, 'Read only: this note is already being edited in another tab or on another device by the same user.');
         }
@@ -347,7 +372,7 @@
         }
 
         var noteId = normalizeNoteId(String(noteCard.id || '').replace(/^note/, ''));
-        var canTakeOver = !!(noteId && lock && isLockHeldByDifferentUser(lock));
+        var canTakeOver = !!(noteId && lock && isLockHeldByDifferentUser(lock) && !isReadOnlyShare());
         var signature = message + '|' + (canTakeOver ? 'takeover' : '');
         if (banner.dataset.lockBannerSignature === signature) {
             return;   // same banner already on screen (status check): no blink
@@ -356,7 +381,10 @@
         banner.textContent = '';
 
         var text = document.createElement('span');
-        text.textContent = message;
+        var icon = document.createElement('i');
+        icon.className = 'lucide lucide-alert-triangle note-edit-lock-banner-icon';
+        text.appendChild(icon);
+        text.appendChild(document.createTextNode(message));
         banner.appendChild(text);
 
         if (canTakeOver) {
@@ -645,7 +673,7 @@
     // must not overtake the release (js/profile.js).
     function releaseLock(noteId) {
         noteId = normalizeNoteId(noteId);
-        if (!noteId) {
+        if (!noteId || isReadOnlyShare()) {
             return Promise.resolve(null);
         }
 
@@ -694,7 +722,7 @@
 
     function checkLockStatus(noteId) {
         noteId = normalizeNoteId(noteId);
-        if (!noteId || String(activeNoteId) !== noteId) {
+        if (!noteId || String(activeNoteId) !== noteId || isReadOnlyShare()) {
             return;
         }
 
@@ -744,7 +772,7 @@
 
     function refreshLock(noteId) {
         noteId = normalizeNoteId(noteId);
-        if (!noteId || String(activeNoteId) !== noteId) {
+        if (!noteId || String(activeNoteId) !== noteId || isReadOnlyShare()) {
             return;
         }
 
@@ -789,6 +817,10 @@
         stopStatusChecks();
         activeNoteId = noteId;
         acquireRequestId += 1;
+        if (isReadOnlyShare()) {
+            setNoteLockedState(noteId, null);
+            return;
+        }
         setNoteCheckingState(noteId);
         sendAcquireRequest(noteId, acquireRequestId, 0);
     }

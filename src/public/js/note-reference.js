@@ -1159,7 +1159,7 @@
                 tr('note_reference.broken.confirm_title', {}, 'Create note'),
                 message,
                 function() { createNoteFromBrokenLink(title, workspace, deadId, sourceEntry); },
-                { confirmText: tr('note_reference.broken.confirm_button', {}, 'Create') }
+                { confirmText: tr('note_reference.broken.confirm_button', {}, 'Create'), focusConfirm: true }
             );
         } else if (window.confirm(message)) {
             createNoteFromBrokenLink(title, workspace, deadId, sourceEntry);

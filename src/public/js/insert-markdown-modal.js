@@ -8,6 +8,11 @@
  * parser used for whole-note conversion, so there is only one conversion
  * implementation to maintain. The HTML that comes back is previewed, then
  * inserted at the caret of the rich-text editor.
+ *
+ * Markdown notes open it too in the "Rich text" view, where the syntax is
+ * hidden and typed Markdown is taken literally: the preview shows what the
+ * snippet will look like, and the source itself goes in at the caret,
+ * unconverted.
  */
 
 (function () {
@@ -171,6 +176,19 @@
         if (!html) return;
 
         var note = findTargetNote();
+
+        if (note && note.getAttribute('data-note-type') === 'markdown') {
+            var source = el('insertMarkdownSource');
+            var markdown = source ? source.value : '';
+            if (typeof window.insertMarkdownSourceIntoNote === 'function' &&
+                window.insertMarkdownSourceIntoNote(note, markdown)) {
+                closeModal();
+            } else {
+                setError(translate('modals.insert_markdown.error', 'Conversion failed. Please try again.'));
+            }
+            return;
+        }
+
         if (!note || note.getAttribute('contenteditable') !== 'true') {
             setError(translate('modals.insert_markdown.no_note', 'No note is open.'));
             return;

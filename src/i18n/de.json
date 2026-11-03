@@ -809,7 +809,7 @@
       },
       "confirm": {
         "title": "Arbeitsbereich teilen",
-        "message": "Wählen Sie die Benutzer, die den Arbeitsbereich „{{workspace}}“ öffnen dürfen. Sie finden ihn in ihrem Arbeitsbereichsmenü und können seine Notizen und Ordner bearbeiten."
+        "message": "Wählen Sie die Benutzer aus, die den Arbeitsbereich \"{{workspace}}\" öffnen können. Sie finden ihn in ihrem Arbeitsbereichsmenü. Legen Sie neben jedem Namen fest, ob die Person Notizen und Ordner bearbeiten oder nur lesen kann."
       },
       "messages": {
         "disabled": "Der Arbeitsbereich wird nicht mehr geteilt",
@@ -822,7 +822,9 @@
       },
       "options": {
         "users_loading": "Benutzer werden geladen...",
-        "no_users_found": "Keine anderen Benutzer gefunden"
+        "no_users_found": "Keine anderen Benutzer gefunden",
+        "can_edit": "Kann bearbeiten",
+        "read_only": "Nur lesen"
       },
       "status": {
         "not_shared": "Nicht geteilt"
@@ -991,6 +993,7 @@
     "search_in_notes": "In Notizen suchen",
     "search_in_tags": "In Tags suchen",
     "toggle_date_filter": "Datumsfilter ein-/ausblenden",
+    "help_toggle": "So suchen Sie",
     "created_from": "Erstellt ab",
     "created_to": "Erstellt bis",
     "validation": {
@@ -998,7 +1001,23 @@
       "single_letter_warning": "Suche nach einzelnen Buchstaben kann zu viele Ergebnisse zurückgeben. Versuchen Sie längere Wörter für eine präzisere Suche.",
       "invalid_date_range": "Das Startdatum muss vor oder am Enddatum liegen."
     },
-    "placeholder_account": "In {{account}} suchen..."
+    "placeholder_account": "In {{account}} suchen...",
+    "help": {
+      "title": "So suchen Sie",
+      "words_example": "Budget Besprechung",
+      "words": "Notizen, die alle diese Wörter enthalten, in beliebiger Reihenfolge",
+      "phrase_example": "\"wöchentliche Besprechung\"",
+      "phrase": "Diese Wörter direkt hintereinander, in dieser Reihenfolge",
+      "partial_example": "Bespr",
+      "partial": "Ein Teil eines Wortes genügt. Groß-/Kleinschreibung und Akzente werden ignoriert",
+      "tags_example": "Arbeit dringend",
+      "tags": "Mit aktivem Tag-Symbol: Notizen, die alle diese Tags haben",
+      "both": "Mit beiden Symbolen aktiv: Notizen, deren Text oder Tags passen",
+      "key_enter": "Eingabe",
+      "key_shift": "Umschalt",
+      "navigate_next": "Erneut gedrückt: nächster Treffer, danach die nächste Notiz",
+      "navigate_previous": "Vorheriger Treffer in der Notiz"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ Ungespeicherte Änderungen erkannt\n\nSie haben ungespeicherte Änderungen, die verloren gehen, wenn Sie jetzt wechseln.\n\nKlicken Sie auf OK, um zu speichern und fortzufahren, oder Abbrechen, um zu bleiben.\n(Auto-Speicherung erfolgt 2 Sekunden nachdem Sie aufgehört haben zu tippen)",
@@ -3046,6 +3065,10 @@
     "filter_all": "Alle",
     "filter_notes": "Notizen",
     "filter_folders": "Ordner",
+    "sort_label": "Freigaben sortieren",
+    "sort_name": "Nach Name sortieren",
+    "sort_updated": "Nach letzter Änderung sortieren",
+    "sort_shared": "Nach Freigabedatum sortieren",
     "no_shared_notes": "Noch keine geteilten Notizen.",
     "no_shared_folders": "Noch keine geteilten Ordner.",
     "no_shares": "Noch keine Freigaben.",
@@ -4601,7 +4624,8 @@
     "take_over_confirm": "{{user}} bearbeitet diese Notiz gerade. Wenn Sie übernehmen, wird der Editor der anderen Person schreibgeschützt und ihre noch nicht gespeicherten Änderungen bleiben auf ihrem Gerät. Fortfahren?",
     "take_over_failed": "Diese Notiz konnte nicht übernommen werden.",
     "taken_over_notice": "Sie haben die Bearbeitung dieser Notiz übernommen.",
-    "lost_unsaved_kept": "Ihre hier nicht gespeicherten Änderungen bleiben auf diesem Gerät erhalten und werden erneut angeboten, sobald die Notiz frei ist."
+    "lost_unsaved_kept": "Ihre hier nicht gespeicherten Änderungen bleiben auf diesem Gerät erhalten und werden erneut angeboten, sobald die Notiz frei ist.",
+    "read_only_share": "Dieser Arbeitsbereich wird schreibgeschützt mit Ihnen geteilt."
   },
   "live_refresh": {
     "note_changed": "Diese Notiz wurde außerhalb dieses Tabs geändert.",
@@ -4676,6 +4700,8 @@
     },
     "filters": {
       "button": "Filter",
+      "favorites": "Favoriten",
+      "favorites_only": "Nur Favoriten",
       "color": "Farbe",
       "modified": "Zuletzt geändert",
       "tags": "Tags",
@@ -5386,6 +5412,7 @@
     "emoji": "Emoji über seinen Namen einfügen",
     "indent": "Listenelement ein- oder ausrücken",
     "checklist_toggle": "Checklistenelement abhaken oder zurücksetzen",
+    "note_reference_open": "Auf einem [[Notizlink]]: Notiz öffnen oder erstellen",
     "tree_move": "Zur Notiz oder zum Ordner darüber oder darunter wechseln",
     "tree_open_folder": "Einen Ordner öffnen oder hineingehen",
     "tree_close_folder": "Einen Ordner schließen oder zum übergeordneten Ordner wechseln",
@@ -5771,6 +5798,18 @@
     "remove_error": "Die Notiz konnte nicht aus der Schnellwahl entfernt werden",
     "folder_removed_one": "1 Notiz aus der Schnellwahl entfernt",
     "folder_removed_other": "{{count}} Notizen aus der Schnellwahl entfernt",
+    "new_button": "Neue Schnellwahl",
+    "default_name": "Standard",
+    "new_modal_title": "Neue Schnellwahl erstellen",
+    "name_placeholder": "Name der Schnellwahl",
+    "rename_title": "Schnellwahl umbenennen",
+    "delete_confirm": "Diese Schnellwahl löschen? Ihre Notizen bleiben erhalten, sie verlieren nur den Tag.",
+    "board_error": "Die Schnellwahl konnte nicht gespeichert werden.",
+    "board_exists": "Eine Schnellwahl mit diesem Namen existiert bereits.",
+    "board_invalid": "Dieser Name kann nicht verwendet werden.",
+    "choose_item": "Zu einer Schnellwahl hinzufügen",
+    "folder_added_one": "1 Notiz zur Schnellwahl hinzugefügt",
+    "folder_added_other": "{{count}} Notizen zur Schnellwahl hinzugefügt",
     "visibility": {
       "title": "Seitentitel",
       "workspace": "Arbeitsbereichsauswahl",
@@ -5780,7 +5819,8 @@
       "frame": "Kachelrahmen",
       "group_titles": "Gruppentitel",
       "group_rules": "Gruppentrennlinien",
-      "size": "Schaltfläche für die Kachelgröße"
+      "size": "Schaltfläche für die Kachelgröße",
+      "boards": "Liste der Schnellwahlen"
     }
   }
 }

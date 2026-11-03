@@ -54,54 +54,6 @@
     padding-left: var(--shared-divider-padding);
 }
 
-.shared-header-help {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    color: var(--text-muted, var(--pz-text-muted));
-    cursor: help;
-}
-
-.shared-header-help i {
-    font-size: 14px;
-}
-
-.shared-header-help-tooltip {
-    position: absolute;
-    top: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    min-width: 260px;
-    max-width: 320px;
-    padding: 10px 12px;
-    border-radius: var(--pz-radius-lg);
-    background: rgba(20, 20, 20, 0.94);
-    color: var(--pz-text-inverse);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.95rem;
-    font-weight: var(--pz-weight-normal);
-    letter-spacing: normal;
-    line-height: 1.45;
-    text-transform: none;
-    white-space: normal;
-    box-shadow: 0 8px 24px rgba(var(--pz-shadow-rgb), 0.18);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.16s ease, visibility 0.16s ease;
-    z-index: 20;
-}
-
-.shared-header-help:hover .shared-header-help-tooltip,
-.shared-header-help:focus .shared-header-help-tooltip,
-.shared-header-help:focus-visible .shared-header-help-tooltip {
-    opacity: 1;
-    visibility: visible;
-}
-
 .shared-notes-header-actions {
     flex: 0 0 var(--shared-actions-width);
     width: var(--shared-actions-width);
@@ -571,7 +523,8 @@ html[data-theme='dark'] .folder-name-path {
 }
 
 /* Reason filter, beside the search field and drawn like it */
-.offline-reason-select {
+.offline-reason-select,
+.shared-sort-select {
     flex: 0 0 auto;
     max-width: 100%;
     /* The search field's 38px: a select's own line box would make it 40 */
@@ -587,7 +540,8 @@ html[data-theme='dark'] .folder-name-path {
     cursor: pointer;
 }
 
-.offline-reason-select:focus {
+.offline-reason-select:focus,
+.shared-sort-select:focus {
     outline: none;
     border-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);

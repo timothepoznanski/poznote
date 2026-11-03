@@ -238,8 +238,9 @@ function initializeMasterDatabase(PDO $con): void {
 
     // Workspace shares: the owner of a workspace names the accounts that may
     // open it. A grantee finds the workspace in their own workspace menu and
-    // works in it, with the same write access as the owner, but never sees
-    // the owner's other workspaces (see auth.php, "shared workspace scope").
+    // works in it, with the same write access as the owner unless the owner
+    // made them read-only (permission), but never sees the owner's other
+    // workspaces (see auth.php, "shared workspace scope").
     //
     // An earlier, unreleased draft of the table (owner_id, shared_with_user_id,
     // permission) may survive in a development database: it is rebuilt in
@@ -257,6 +258,7 @@ function initializeMasterDatabase(PDO $con): void {
             owner_user_id INTEGER NOT NULL,
             workspace_name TEXT NOT NULL,
             grantee_user_id INTEGER NOT NULL,
+            permission TEXT NOT NULL DEFAULT 'write',
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (owner_user_id, workspace_name, grantee_user_id),
             FOREIGN KEY (owner_user_id) REFERENCES users(id) ON DELETE CASCADE,
@@ -277,6 +279,15 @@ function initializeMasterDatabase(PDO $con): void {
         }
     } catch (Exception $e) {
         error_log("Failed to carry over legacy workspace shares: " . $e->getMessage());
+    }
+    // Shares made before read-only sharing keep the write access they gave.
+    try {
+        $shareCols = array_column($con->query("PRAGMA table_info(workspace_shares)")->fetchAll(PDO::FETCH_ASSOC), 'name');
+        if (!in_array('permission', $shareCols, true)) {
+            $con->exec("ALTER TABLE workspace_shares ADD COLUMN permission TEXT NOT NULL DEFAULT 'write'");
+        }
+    } catch (Exception $e) {
+        error_log("Failed to add workspace_shares.permission: " . $e->getMessage());
     }
 
     // Transient edit locks for notes shared across users. holder_kind
@@ -573,9 +584,10 @@ function setUserAccountAccessTargets(int $accessorUserId, array $targetUserIds):
 
 /**
  * Replace the accounts a workspace is shared with. The owner cannot be named,
- * nor an inactive or unknown account. Returns the ids actually recorded.
+ * nor an inactive or unknown account. Those also in $readOnlyUserIds can read
+ * the workspace but not change it. Returns the ids actually recorded.
  */
-function setWorkspaceShareGrantees(int $ownerUserId, string $workspaceName, array $granteeUserIds): array {
+function setWorkspaceShareGrantees(int $ownerUserId, string $workspaceName, array $granteeUserIds, array $readOnlyUserIds = []): array {
     $workspaceName = trim($workspaceName);
     if ($ownerUserId <= 0 || $workspaceName === '') {
         return [];
@@ -606,9 +618,10 @@ function setWorkspaceShareGrantees(int $ownerUserId, string $workspaceName, arra
         $stmt = $con->prepare("DELETE FROM workspace_shares WHERE owner_user_id = ? AND workspace_name = ?");
         $stmt->execute([$ownerUserId, $workspaceName]);
         if (!empty($validIds)) {
-            $stmt = $con->prepare("INSERT OR IGNORE INTO workspace_shares (owner_user_id, workspace_name, grantee_user_id) VALUES (?, ?, ?)");
+            $readOnly = array_flip(array_map('intval', $readOnlyUserIds));
+            $stmt = $con->prepare("INSERT OR IGNORE INTO workspace_shares (owner_user_id, workspace_name, grantee_user_id, permission) VALUES (?, ?, ?, ?)");
             foreach ($validIds as $granteeUserId) {
-                $stmt->execute([$ownerUserId, $workspaceName, $granteeUserId]);
+                $stmt->execute([$ownerUserId, $workspaceName, $granteeUserId, isset($readOnly[$granteeUserId]) ? 'read' : 'write']);
             }
         }
         $con->commit();
@@ -654,9 +667,32 @@ function getWorkspaceShareGranteesByWorkspace(int $ownerUserId): array {
 }
 
 /**
+ * Ids of the accounts that can only read each workspace of an owner, keyed by
+ * workspace name. Workspaces without any are absent.
+ */
+function getWorkspaceShareReadOnlyGranteesByWorkspace(int $ownerUserId): array {
+    if ($ownerUserId <= 0) {
+        return [];
+    }
+    try {
+        $con = getMasterConnection();
+        $stmt = $con->prepare("SELECT workspace_name, grantee_user_id FROM workspace_shares WHERE owner_user_id = ? AND permission = 'read'");
+        $stmt->execute([$ownerUserId]);
+        $map = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $map[(string)$row['workspace_name']][] = (int)$row['grantee_user_id'];
+        }
+        return $map;
+    } catch (Exception $e) {
+        error_log("Failed to list read-only workspace grantees: " . $e->getMessage());
+        return [];
+    }
+}
+
+/**
  * Workspaces shared with an account, owners first by name then by workspace
- * name: rows of owner_user_id, owner_username, workspace_name. Owners whose
- * account is inactive are left out.
+ * name: rows of owner_user_id, owner_username, workspace_name, read_only.
+ * Owners whose account is inactive are left out.
  */
 function getWorkspacesSharedWithUser(int $granteeUserId): array {
     if ($granteeUserId <= 0) {
@@ -665,7 +701,7 @@ function getWorkspacesSharedWithUser(int $granteeUserId): array {
     try {
         $con = getMasterConnection();
         $stmt = $con->prepare("
-            SELECT s.owner_user_id, u.username AS owner_username, s.workspace_name
+            SELECT s.owner_user_id, u.username AS owner_username, s.workspace_name, s.permission
             FROM workspace_shares s
             INNER JOIN users u ON u.id = s.owner_user_id
             WHERE s.grantee_user_id = ? AND u.active = 1
@@ -678,6 +714,7 @@ function getWorkspacesSharedWithUser(int $granteeUserId): array {
                 'owner_user_id' => (int)$row['owner_user_id'],
                 'owner_username' => (string)$row['owner_username'],
                 'workspace_name' => (string)$row['workspace_name'],
+                'read_only' => (string)$row['permission'] !== 'write',
             ];
         }
         return $rows;
@@ -724,14 +761,22 @@ function listActiveWorkspaceShares(): array {
  * accounts are active.
  */
 function isWorkspaceSharedWithUser(int $ownerUserId, string $workspaceName, int $granteeUserId): bool {
+    return getWorkspaceSharePermission($ownerUserId, $workspaceName, $granteeUserId) !== null;
+}
+
+/**
+ * What the grantee may do in the named workspace of the owner: 'write', 'read',
+ * or null when it is not shared with them or either account is inactive.
+ */
+function getWorkspaceSharePermission(int $ownerUserId, string $workspaceName, int $granteeUserId): ?string {
     $workspaceName = trim($workspaceName);
     if ($ownerUserId <= 0 || $granteeUserId <= 0 || $workspaceName === '' || $ownerUserId === $granteeUserId) {
-        return false;
+        return null;
     }
     try {
         $con = getMasterConnection();
         $stmt = $con->prepare("
-            SELECT COUNT(*)
+            SELECT s.permission
             FROM workspace_shares s
             INNER JOIN users o ON o.id = s.owner_user_id
             INNER JOIN users g ON g.id = s.grantee_user_id
@@ -739,10 +784,14 @@ function isWorkspaceSharedWithUser(int $ownerUserId, string $workspaceName, int 
               AND o.active = 1 AND g.active = 1
         ");
         $stmt->execute([$ownerUserId, $workspaceName, $granteeUserId]);
-        return (int)$stmt->fetchColumn() > 0;
+        $permission = $stmt->fetchColumn();
+        if ($permission === false) {
+            return null;
+        }
+        return $permission === 'write' ? 'write' : 'read';
     } catch (Exception $e) {
         error_log("Failed to check workspace share: " . $e->getMessage());
-        return false;
+        return null;
     }
 }
 
