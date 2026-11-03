@@ -783,6 +783,12 @@ if ($favoritesMenuCanWrite) {
     echo "<div class='folder-actions-menu-item' role='menuitem' data-favorites-action='color'><i class='lucide lucide-palette'></i><span>" . t_h('modals.icon_sidebar_order.change_color', [], 'Change icon color') . "</span></div>";
     echo "<div class='folder-actions-menu-separator'></div>";
 }
+// The favorite notes on or off a speed dial, the three variants of the folder
+// menu, picked as the menu opens (js/favorites-menu.js)
+echo "<div class='folder-actions-menu-item speed-dial-state-off' role='menuitem' data-favorites-action='speed-dial'><i class='lucide lucide-zap'></i><span>" . t_h('speed_dial.add', [], 'Add to speed dial') . "</span></div>";
+echo "<div class='folder-actions-menu-item speed-dial-state-on active-state' role='menuitem' data-favorites-action='speed-dial'><i class='lucide lucide-zap'></i><span>" . t_h('speed_dial.remove', [], 'Remove from speed dial') . "</span></div>";
+echo "<div class='folder-actions-menu-item speed-dial-state-choose' role='menuitem' data-favorites-action='speed-dial'><i class='lucide lucide-zap'></i><span>" . t_h('speed_dial.choose_item', [], 'Add to a speed dial') . "</span><i class='lucide lucide-chevron-right speed-dial-submenu-arrow'></i></div>";
+echo "<div class='folder-actions-menu-separator'></div>";
 echo "<div class='folder-actions-menu-item danger' role='menuitem' data-favorites-action='clear'><i class='lucide lucide-eraser'></i><span>" . t_h('notes_list.favorites_menu.clear', [], 'Remove all from favorites') . "</span></div>";
 echo "</div>";
 // View options menu of the tree (index.php, js/tree-options-menu.js)

@@ -296,6 +296,14 @@ $router->post('/notes/favorites/clear', function($params) use ($notesController)
     $notesController->clearFavorites();
 });
 
+// Add or remove tags on every favorite note of a workspace (must come before /notes/{id})
+$router->post('/notes/favorites/tags', function($params) use ($foldersController) {
+    $foldersController->addFavoritesTags();
+});
+$router->delete('/notes/favorites/tags', function($params) use ($foldersController) {
+    $foldersController->removeFavoritesTags();
+});
+
 // Search notes (must come before /notes/{id})
 $router->get('/notes/search', function($params) use ($notesController) {
     $notesController->search();

@@ -374,7 +374,16 @@ window.syncSpeedDialMenuItems = syncSpeedDialMenuItems;
 
 // The speed dials all the notes of a folder and its subfolders are on, from their rows
 function folderRowsSpeedDialTags(folderId) {
-    var header = document.querySelector('.folder-header[data-folder-id="' + folderId + '"]');
+    return rowsSpeedDialTags(document.querySelector('.folder-header[data-folder-id="' + folderId + '"]'));
+}
+
+// The same for the favorite notes, the rows of the Favorites section
+function favoritesRowsSpeedDialTags() {
+    return rowsSpeedDialTags(document.querySelector('.folder-header[data-folder="Favorites"]'));
+}
+window.favoritesRowsSpeedDialTags = favoritesRowsSpeedDialTags;
+
+function rowsSpeedDialTags(header) {
     var rows = header ? Array.prototype.slice.call(header.querySelectorAll('.folder-content .note-actions-toggle')) : [];
     var common = null;
     rows.forEach(function(row) {
@@ -410,10 +419,20 @@ function syncSpeedDialAfterFolderChange(noteIds, tag, inBoard) {
 
 // A speed dial on or off for a whole folder, subfolders included
 function setFolderSpeedDial(folderId, tag, add) {
+    return setNotesSpeedDial('/api/v1/folders/' + encodeURIComponent(folderId) + '/tags', tag, add);
+}
+
+// The same for every favorite note of the workspace
+function setFavoritesSpeedDial(tag, add) {
+    return setNotesSpeedDial('/api/v1/notes/favorites/tags', tag, add);
+}
+window.setFavoritesSpeedDial = setFavoritesSpeedDial;
+
+function setNotesSpeedDial(url, tag, add) {
     var label = function(key, fallback) {
         return window.t ? window.t(key, null, fallback) : fallback;
     };
-    return fetch('/api/v1/folders/' + encodeURIComponent(folderId) + '/tags', {
+    return fetch(url, {
         method: add ? 'POST' : 'DELETE',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         credentials: 'same-origin',
@@ -438,7 +457,7 @@ function setFolderSpeedDial(folderId, tag, add) {
             return true;
         })
         .catch(function(error) {
-            console.error('setFolderSpeedDial failed', error);
+            console.error('setNotesSpeedDial failed', error);
             showNotificationPopup(label('speed_dial.remove_error', 'Could not remove the note from the speed dial'), 'error');
             return false;
         });
@@ -468,6 +487,7 @@ window.removeFolderFromSpeedDial = removeFolderFromSpeedDial;
     function tagsOf(item) {
         var noteId = item.getAttribute('data-note-id');
         var folderId = item.getAttribute('data-folder-id');
+        if (item.hasAttribute('data-favorites-action')) return favoritesRowsSpeedDialTags();
         if (item.getAttribute('data-action') === 'toggle-speed-dial' && noteId) {
             var row = document.querySelector('.note-actions-toggle[data-note-id="' + noteId + '"]');
             return window.noteSpeedDialTags(noteId, row ? row.getAttribute('data-speed-dial') : '');
@@ -521,9 +541,14 @@ window.removeFolderFromSpeedDial = removeFolderFromSpeedDial;
         var noteId = item.getAttribute('data-note-id');
         setBox(row, add);
         row.disabled = true;
-        var saved = item.getAttribute('data-action') === 'toggle-speed-dial'
-            ? window.setNoteSpeedDial(noteId, add, tag, true)
-            : setFolderSpeedDial(item.getAttribute('data-folder-id'), tag, add);
+        var saved;
+        if (item.hasAttribute('data-favorites-action')) {
+            saved = setFavoritesSpeedDial(tag, add);
+        } else if (item.getAttribute('data-action') === 'toggle-speed-dial') {
+            saved = window.setNoteSpeedDial(noteId, add, tag, true);
+        } else {
+            saved = setFolderSpeedDial(item.getAttribute('data-folder-id'), tag, add);
+        }
         saved.then(function (done) {
             row.disabled = false;
             if (!done) setBox(row, !add);
