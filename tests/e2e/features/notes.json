@@ -1,0 +1,1044 @@
+{
+  "title": "Notes and navigation",
+  "features": [
+    {
+      "id": "notes.create-menu",
+      "title": "The + menu lists note, Markdown, task list, diary, folder",
+      "src": [
+        "action:toggle-create-menu",
+        "action:select-create-type",
+        "action:create-folder",
+        "modal:createModal"
+      ]
+    },
+    {
+      "id": "notes.create-note",
+      "title": "Create a rich text, Markdown or task list note from the + menu",
+      "src": [
+        "card:create-note-card"
+      ]
+    },
+    {
+      "id": "notes.create-diary",
+      "title": "Diary entry of the + menu creates today's entry"
+    },
+    {
+      "id": "notes.create-page",
+      "title": "create.php: the page offering each kind of note",
+      "src": [
+        "page:create.php"
+      ]
+    },
+    {
+      "id": "notes.shortcut-new-note",
+      "title": "Alt+Shift+N creates a note of the chosen type",
+      "src": [
+        "setting:new_note_shortcut_type"
+      ]
+    },
+    {
+      "id": "notes.shortcuts-modal",
+      "title": "Keyboard shortcuts window",
+      "src": [
+        "modal:keyboardShortcutsModal",
+        "action:open-keyboard-shortcuts",
+        "action:close-help-modal"
+      ]
+    },
+    {
+      "id": "notes.create-in-folder",
+      "title": "Create here in a folder menu",
+      "src": [
+        "action:create-note-in-folder"
+      ]
+    },
+    {
+      "id": "notes.folder-create",
+      "title": "Create a folder and a subfolder inline",
+      "src": [
+        "card:create-folder-card",
+        "modal:newFolderModal"
+      ]
+    },
+    {
+      "id": "notes.rename-title",
+      "title": "Rename a note by typing its title; tree and tab follow"
+    },
+    {
+      "id": "notes.rename-tree",
+      "title": "Rename note inline from the tree menu",
+      "src": [
+        "action:rename-note",
+        "action:save-note-name",
+        "action:close-rename-modal",
+        "modal:renameNoteModal",
+        "action:rename"
+      ]
+    },
+    {
+      "id": "notes.title-style-menu",
+      "title": "Right-click on the title: colour, size, reset"
+    },
+    {
+      "id": "notes.subline",
+      "title": "Dates and character, word, line counts under the title"
+    },
+    {
+      "id": "notes.subline-menu",
+      "title": "Right-click on the subline: show or hide each item",
+      "src": [
+        "setting:hidden_ui_elements"
+      ]
+    },
+    {
+      "id": "notes.info-modal",
+      "title": "Note information window",
+      "src": [
+        "modal:noteInfoModal",
+        "action:show-note-info",
+        "action:close-note-modal"
+      ]
+    },
+    {
+      "id": "notes.autosave",
+      "title": "Typing saves by itself"
+    },
+    {
+      "id": "notes.save-button",
+      "title": "Save button of the toolbar",
+      "src": [
+        "action:save-note"
+      ]
+    },
+    {
+      "id": "notes.shortcut-save",
+      "title": "Ctrl+S saves and says so"
+    },
+    {
+      "id": "notes.delete-toolbar",
+      "title": "Delete from the toolbar",
+      "src": [
+        "action:delete-note",
+        "action:delete",
+        "modal:deleteModal"
+      ]
+    },
+    {
+      "id": "notes.delete-in-place",
+      "title": "Deleting leaves the page in place, closes the tab, updates the tree"
+    },
+    {
+      "id": "notes.delete-tree",
+      "title": "Delete note from the tree menu acts on that row"
+    },
+    {
+      "id": "notes.trash-page",
+      "title": "Trash page lists the deleted notes",
+      "src": [
+        "page:trash.php",
+        "setting:trash_sort"
+      ]
+    },
+    {
+      "id": "notes.trash-search",
+      "title": "Trash page search"
+    },
+    {
+      "id": "notes.trash-restore",
+      "title": "Restore a note from the trash",
+      "src": [
+        "modal:restoreConfirmModal"
+      ]
+    },
+    {
+      "id": "notes.trash-purge",
+      "title": "Delete a note permanently",
+      "src": [
+        "modal:deleteConfirmModal"
+      ]
+    },
+    {
+      "id": "notes.trash-empty",
+      "title": "Empty the trash, with Cancel",
+      "src": [
+        "modal:emptyTrashConfirmModal"
+      ]
+    },
+    {
+      "id": "notes.duplicate",
+      "title": "Duplicate a note",
+      "src": [
+        "action:duplicate-note"
+      ]
+    },
+    {
+      "id": "notes.convert",
+      "title": "Convert between Markdown and rich text",
+      "src": [
+        "action:show-convert-modal",
+        "modal:convertNoteModal"
+      ]
+    },
+    {
+      "id": "notes.convert-duplicate",
+      "title": "Duplicate button of the convert window"
+    },
+    {
+      "id": "notes.archive-note",
+      "title": "Archive note",
+      "src": [
+        "action:archive-note",
+        "modal:confirmModal",
+        "action:execute-confirmed-action",
+        "action:close-confirm-modal"
+      ]
+    },
+    {
+      "id": "notes.toolbar",
+      "title": "Note toolbar: exact buttons, exact ⋮ entries per note type",
+      "src": [
+        "action:toggle-note-actions-menu"
+      ]
+    },
+    {
+      "id": "notes.toolbar-overflow",
+      "title": "Buttons that do not fit move to the menu"
+    },
+    {
+      "id": "notes.toolbar-revisions",
+      "title": "Revisions button"
+    },
+    {
+      "id": "notes.toolbar-attachments",
+      "title": "Attachments button"
+    },
+    {
+      "id": "notes.toolbar-share",
+      "title": "Share button"
+    },
+    {
+      "id": "notes.toolbar-reminder",
+      "title": "Reminder button: set and remove"
+    },
+    {
+      "id": "notes.toolbar-download",
+      "title": "Download from the menu"
+    },
+    {
+      "id": "notes.toolbar-print",
+      "title": "Print from the menu"
+    },
+    {
+      "id": "notes.page-more-menu",
+      "title": "... of the floating stack",
+      "src": [
+        "action:toggle-page-more-menu"
+      ]
+    },
+    {
+      "id": "notes.note-width",
+      "title": "Note width cycle, stored on the note",
+      "src": [
+        "action:cycle-note-width"
+      ]
+    },
+    {
+      "id": "notes.scroll-buttons",
+      "title": "Buttons to the top and the bottom of a note",
+      "src": [
+        "action:scroll-note-top",
+        "action:scroll-note-bottom"
+      ]
+    },
+    {
+      "id": "notes.breadcrumb",
+      "title": "Folder under the title reveals it in the tree",
+      "src": [
+        "action:reveal-folder-in-tree"
+      ]
+    },
+    {
+      "id": "notes.tab-open",
+      "title": "Plain click replaces the tab, double-click and middle-click open a new one",
+      "src": [
+        "action:load-note"
+      ]
+    },
+    {
+      "id": "notes.tab-open-menu",
+      "title": "Open in a tab from the tree menu",
+      "src": [
+        "action:open-note-new-tab"
+      ]
+    },
+    {
+      "id": "notes.tab-close-menu",
+      "title": "Close this tab from the tree menu",
+      "src": [
+        "action:close-note-tab"
+      ]
+    },
+    {
+      "id": "notes.tab-switch",
+      "title": "Click a tab to switch note"
+    },
+    {
+      "id": "notes.tab-close",
+      "title": "× closes a tab"
+    },
+    {
+      "id": "notes.tab-close-gestures",
+      "title": "Double-click and middle-click close a tab"
+    },
+    {
+      "id": "notes.tab-context-menu",
+      "title": "Right-click menu of a tab, exact entries"
+    },
+    {
+      "id": "notes.tab-pin",
+      "title": "Pin and unpin a tab"
+    },
+    {
+      "id": "notes.tab-close-others",
+      "title": "Close all except this one"
+    },
+    {
+      "id": "notes.tab-close-all",
+      "title": "Close all, sparing pinned tabs"
+    },
+    {
+      "id": "notes.tab-reorder",
+      "title": "Reorder tabs by dragging"
+    },
+    {
+      "id": "notes.tab-persist",
+      "title": "Tabs come back after a reload and on the home page"
+    },
+    {
+      "id": "notes.tab-follows-note",
+      "title": "A tab follows the rename and the deletion of its note"
+    },
+    {
+      "id": "notes.tab-return-scroll",
+      "title": "Back on a tab, the place in the note comes back"
+    },
+    {
+      "id": "notes.tab-return-caret",
+      "title": "Back on a Markdown tab, the caret comes back"
+    },
+    {
+      "id": "notes.history",
+      "title": "Back and Forward buttons between notes"
+    },
+    {
+      "id": "notes.browser-back",
+      "title": "Browser Back returns to the previous note"
+    },
+    {
+      "id": "notes.folder-menu",
+      "title": "Folder menu: exact entries",
+      "src": [
+        "action:toggle-folder-actions-menu",
+        "action:open-folder-actions-modal",
+        "modal:folderActionsModal"
+      ]
+    },
+    {
+      "id": "notes.tree-context-menu",
+      "title": "Right-click on a folder or a note opens its menu"
+    },
+    {
+      "id": "notes.column-context-menu",
+      "title": "Right-click on the empty column: hide it",
+      "src": [
+        "action:hide-left-column"
+      ]
+    },
+    {
+      "id": "notes.folder-collapse",
+      "title": "Fold a folder, remembered",
+      "src": [
+        "action:toggle-folder",
+        "action:select-folder",
+        "action:toggle-folder-collapse"
+      ]
+    },
+    {
+      "id": "notes.folders-collapse-all",
+      "title": "Collapse and expand all folders",
+      "src": [
+        "action:toggle-all-folders"
+      ]
+    },
+    {
+      "id": "notes.folder-rename",
+      "title": "Rename a folder inline, Escape cancels",
+      "src": [
+        "action:rename-folder",
+        "action:save-folder-name",
+        "modal:editFolderModal"
+      ]
+    },
+    {
+      "id": "notes.folder-delete",
+      "title": "Delete a folder, with Cancel",
+      "src": [
+        "action:delete-folder",
+        "action:execute-delete-folder",
+        "modal:deleteFolderModal"
+      ]
+    },
+    {
+      "id": "notes.folder-duplicate",
+      "title": "Duplicate a folder",
+      "src": [
+        "action:duplicate-folder"
+      ]
+    },
+    {
+      "id": "notes.folder-move",
+      "title": "Move a folder",
+      "src": [
+        "action:move-entire-folder",
+        "action:execute-move-folder-to-subfolder",
+        "modal:moveFolderModal"
+      ]
+    },
+    {
+      "id": "notes.folder-move-files",
+      "title": "Move all files of a folder",
+      "src": [
+        "action:move-folder-files",
+        "action:execute-move-all-files",
+        "modal:moveFolderFilesModal"
+      ]
+    },
+    {
+      "id": "notes.folder-show-only",
+      "title": "Show only this folder",
+      "src": [
+        "action:show-only-folder"
+      ]
+    },
+    {
+      "id": "notes.folder-open-all",
+      "title": "Open all notes of a folder in tabs",
+      "src": [
+        "action:open-all-notes-in-tabs",
+        "action:open-all"
+      ]
+    },
+    {
+      "id": "notes.folder-archive",
+      "title": "Archive a folder",
+      "src": [
+        "action:archive-folder"
+      ]
+    },
+    {
+      "id": "notes.folder-tag-notes",
+      "title": "Tag all notes of a folder",
+      "src": [
+        "action:tag-folder-notes",
+        "action:execute-tag-folder-notes",
+        "modal:tagFolderNotesModal"
+      ]
+    },
+    {
+      "id": "notes.folder-favorite",
+      "title": "Favorite a folder",
+      "src": [
+        "action:favorite-folder"
+      ]
+    },
+    {
+      "id": "notes.folder-icon",
+      "title": "Folder icon picker: search, apply, reset",
+      "src": [
+        "action:open-folder-icon-picker",
+        "action:change-folder-icon",
+        "action:close-folder-icon-modal",
+        "modal:folderIconModal"
+      ]
+    },
+    {
+      "id": "notes.folder-color",
+      "title": "Folder icon colour"
+    },
+    {
+      "id": "notes.note-icon",
+      "title": "Note icon picker",
+      "src": [
+        "action:open-note-icon-picker",
+        "setting:show_note_icons"
+      ]
+    },
+    {
+      "id": "notes.folders-page",
+      "title": "list_folders.php lists the folders",
+      "src": [
+        "page:list_folders.php"
+      ]
+    },
+    {
+      "id": "notes.folders-page-actions",
+      "title": "Folders page: filter, favorite, rename, open a board"
+    },
+    {
+      "id": "notes.move-note",
+      "title": "Move a note to a folder",
+      "src": [
+        "action:show-move-folder-dialog",
+        "action:move-note-to-folder",
+        "action:close-move-modal",
+        "action:move",
+        "modal:moveNoteFolderModal",
+        "modal:moveNoteModal",
+        "modal:moveNotesModal"
+      ]
+    },
+    {
+      "id": "notes.move-create-folder",
+      "title": "Create the folder from the move window",
+      "src": [
+        "action:toggle-move-create-folder",
+        "action:create-move-modal-folder"
+      ]
+    },
+    {
+      "id": "notes.move-workspace",
+      "title": "Move a note to another workspace",
+      "src": [
+        "action:on-workspace-change",
+        "action:toggle-move-create-workspace",
+        "action:create-move-modal-workspace"
+      ]
+    },
+    {
+      "id": "notes.dnd-note-folder",
+      "title": "Drag a note onto a folder"
+    },
+    {
+      "id": "notes.dnd-root",
+      "title": "Drag a note out of its folder"
+    },
+    {
+      "id": "notes.dnd-folder",
+      "title": "Drag a folder into another"
+    },
+    {
+      "id": "notes.dnd-reorder",
+      "title": "Drag a note between two others in custom order"
+    },
+    {
+      "id": "notes.dnd-multiselect",
+      "title": "Drag a multi-selection"
+    },
+    {
+      "id": "notes.dnd-favorites",
+      "title": "Drag a note onto Favorites"
+    },
+    {
+      "id": "notes.clipboard-menu",
+      "title": "Copy, Cut, Paste in the row menus",
+      "src": [
+        "action:copy-note",
+        "action:cut-note",
+        "action:copy-folder",
+        "action:cut-folder",
+        "action:paste-into-folder",
+        "action:paste-into-note-folder"
+      ]
+    },
+    {
+      "id": "notes.clipboard-keys",
+      "title": "Ctrl+C, Ctrl+X, Ctrl+V in the tree"
+    },
+    {
+      "id": "notes.tree-undo",
+      "title": "Ctrl+Z and Ctrl+Shift+Z in the tree"
+    },
+    {
+      "id": "notes.tree-delete-key",
+      "title": "Del in the tree, after a confirmation"
+    },
+    {
+      "id": "notes.tree-multiselect",
+      "title": "Ctrl+Click, Shift+Click, group menu, group Del"
+    },
+    {
+      "id": "notes.tree-keyboard",
+      "title": "Arrows, Space and Enter in the tree"
+    },
+    {
+      "id": "notes.tree-options-menu",
+      "title": "View options menu: exact entries",
+      "src": [
+        "action:toggle-tree-options-menu"
+      ]
+    },
+    {
+      "id": "notes.sort-modes",
+      "title": "Sort by name, modified, created, type",
+      "src": [
+        "action:set-note-sort",
+        "setting:note_list_sort"
+      ]
+    },
+    {
+      "id": "notes.sort-manual",
+      "title": "Custom order"
+    },
+    {
+      "id": "notes.customize-sidebar",
+      "title": "Customize sidebar panel",
+      "src": [
+        "action:toggle-ui-customization-panel"
+      ]
+    },
+    {
+      "id": "notes.offline-dots",
+      "title": "Hide offline dots"
+    },
+    {
+      "id": "notes.favorite-toggle",
+      "title": "Favorite from the toolbar and the tree menu",
+      "src": [
+        "action:toggle-favorite"
+      ]
+    },
+    {
+      "id": "notes.favorites-section",
+      "title": "Favorites section of the tree"
+    },
+    {
+      "id": "notes.favorites-page",
+      "title": "Favorites page: list, filter, open, remove",
+      "src": [
+        "page:favorites.php"
+      ]
+    },
+    {
+      "id": "notes.favorites-menu",
+      "title": "Favorites menu: order, clear all",
+      "src": [
+        "action:toggle-favorites-menu",
+        "setting:favorites_sort",
+        "setting:favorites_icon_color"
+      ]
+    },
+    {
+      "id": "notes.tag-note",
+      "title": "Add tags to a note under its title",
+      "src": [
+        "action:show-tag-edit-modal",
+        "action:close-tags-modal",
+        "modal:tagsModal"
+      ]
+    },
+    {
+      "id": "notes.tag-click",
+      "title": "Click a tag of the note to list its notes"
+    },
+    {
+      "id": "notes.tag-autocomplete",
+      "title": "Tag suggestions"
+    },
+    {
+      "id": "notes.tags-page",
+      "title": "Tags page: counts, filter, open a tag",
+      "src": [
+        "page:list_tags.php",
+        "action:navigate-tags"
+      ]
+    },
+    {
+      "id": "notes.tag-rename",
+      "title": "Rename a tag everywhere"
+    },
+    {
+      "id": "notes.tag-delete",
+      "title": "Delete a tag everywhere"
+    },
+    {
+      "id": "notes.tag-color",
+      "title": "Tag colour",
+      "src": [
+        "setting:tag_colors"
+      ]
+    },
+    {
+      "id": "notes.tag-color-filter",
+      "title": "Filter tags by colour"
+    },
+    {
+      "id": "notes.search-unified",
+      "title": "Search box: titles and content, ignoring accents"
+    },
+    {
+      "id": "notes.search-help",
+      "title": "Search guide behind the info icon, replaced by a clear button while a search runs"
+    },
+    {
+      "id": "notes.search-clear",
+      "title": "Clear the search",
+      "src": [
+        "action:clear-search"
+      ]
+    },
+    {
+      "id": "notes.search-operators",
+      "title": "Search: all words required, quotes for a phrase"
+    },
+    {
+      "id": "notes.search-highlight",
+      "title": "Found words highlighted in the note"
+    },
+    {
+      "id": "notes.search-scope",
+      "title": "Search in notes, tags or both"
+    },
+    {
+      "id": "notes.search-date",
+      "title": "Date filter of the search",
+      "src": [
+        "action:toggle-date-filter"
+      ]
+    },
+    {
+      "id": "notes.shortcut-search",
+      "title": "Ctrl+K goes to the search"
+    },
+    {
+      "id": "notes.search-replace",
+      "title": "Find and replace in a rich note",
+      "src": [
+        "action:open-search-replace-modal"
+      ]
+    },
+    {
+      "id": "notes.shortcut-find",
+      "title": "Ctrl+Shift+F opens find and replace"
+    },
+    {
+      "id": "notes.search-replace-markdown",
+      "title": "Find and replace in a Markdown note, Ctrl+F there"
+    },
+    {
+      "id": "notes.linked-create",
+      "title": "Create a shortcut to a note",
+      "src": [
+        "action:create-linked-note",
+        "action:create-note-shortcut",
+        "action:close-linked-folder-selector-modal",
+        "action:close-linked-selector-modal",
+        "modal:linkedNoteFolderSelectorModal",
+        "modal:linkedNoteSelectorModal"
+      ]
+    },
+    {
+      "id": "notes.linked-open",
+      "title": "A shortcut opens its target"
+    },
+    {
+      "id": "notes.linked-delete",
+      "title": "Delete only the shortcut",
+      "src": [
+        "modal:deleteLinkedNoteModal",
+        "modal:moveLinkedNoteModal",
+        "action:move-linked-note-shortcut",
+        "action:move-linked-note-target"
+      ]
+    },
+    {
+      "id": "notes.note-reference",
+      "title": "Link to note, from the slash menu",
+      "src": [
+        "modal:noteReferenceModal",
+        "action:close-note-reference-modal"
+      ]
+    },
+    {
+      "id": "notes.note-link-open",
+      "title": "A link to a note opens it"
+    },
+    {
+      "id": "notes.wiki-link",
+      "title": "[[wiki links]] in Markdown"
+    },
+    {
+      "id": "notes.backlinks",
+      "title": "Backlinks under a note",
+      "src": [
+        "setting:backlinks_at_bottom"
+      ]
+    },
+    {
+      "id": "notes.cross-workspace-link",
+      "title": "Link to a note of another workspace"
+    },
+    {
+      "id": "notes.workspace-menu",
+      "title": "Workspace menu of the sidebar",
+      "src": [
+        "action:toggle-workspace-menu"
+      ]
+    },
+    {
+      "id": "notes.workspace-create",
+      "title": "New workspace",
+      "src": [
+        "modal:createWorkspaceModal"
+      ]
+    },
+    {
+      "id": "notes.workspace-switch",
+      "title": "Switch workspace",
+      "src": [
+        "setting:last_opened_workspace"
+      ]
+    },
+    {
+      "id": "notes.workspace-tabs",
+      "title": "Each workspace has its own tabs"
+    },
+    {
+      "id": "notes.workspaces-page",
+      "title": "Workspaces page",
+      "src": [
+        "page:workspaces.php",
+        "modal:workspaceInfoModal",
+        "action:close-workspace-info-modal"
+      ]
+    },
+    {
+      "id": "notes.workspace-rename",
+      "title": "Rename a workspace"
+    },
+    {
+      "id": "notes.workspace-delete",
+      "title": "Delete a workspace after typing its name",
+      "src": [
+        "action:close-delete-modal"
+      ]
+    },
+    {
+      "id": "notes.workspace-order",
+      "title": "Order of the workspaces"
+    },
+    {
+      "id": "notes.workspace-filter",
+      "title": "Filter the workspaces"
+    },
+    {
+      "id": "notes.workspace-color",
+      "title": "Workspace colour",
+      "src": [
+        "modal:workspaceColorModal",
+        "action:close-workspace-color-modal"
+      ]
+    },
+    {
+      "id": "notes.workspace-tags",
+      "title": "Workspace tags",
+      "src": [
+        "modal:workspaceTagsModal",
+        "action:close-workspace-tags-modal"
+      ]
+    },
+    {
+      "id": "notes.page-title-menu",
+      "title": "Workspace menu in the title of secondary pages"
+    },
+    {
+      "id": "notes.landing-note",
+      "title": "The home page opens the note last opened",
+      "src": [
+        "page:index.php"
+      ]
+    },
+    {
+      "id": "notes.live-refresh",
+      "title": "Changes made elsewhere appear by themselves"
+    },
+    {
+      "id": "notes.live-refresh-conflict",
+      "title": "Banner when the note changed under unsaved edits"
+    },
+    {
+      "id": "notes.draft-recovery",
+      "title": "Unsaved text recovered after a reload"
+    },
+    {
+      "id": "notes.edit-lock",
+      "title": "Read-only while another person edits"
+    },
+    {
+      "id": "notes.sidebar-resize",
+      "title": "Resize the left column"
+    },
+    {
+      "id": "notes.sidebar-collapse",
+      "title": "Hide and show the left column"
+    },
+    {
+      "id": "notes.focus-mode",
+      "title": "Focus mode with F11 and its button",
+      "src": [
+        "action:toggle-focus-mode"
+      ]
+    },
+    {
+      "id": "notes.focus-peek",
+      "title": "Left edge slides the column back in focus mode"
+    },
+    {
+      "id": "notes.icon-rail",
+      "title": "Icon rail: exact entries, each to its page",
+      "src": [
+        "action:scroll-to-left-column"
+      ]
+    },
+    {
+      "id": "notes.icon-rail-collapse",
+      "title": "Hide the icon rail"
+    },
+    {
+      "id": "notes.icon-rail-overflow",
+      "title": "Rail overflow button on a short window"
+    },
+    {
+      "id": "notes.shortcut-sibling",
+      "title": "Alt+Up and Alt+Down between notes of a folder"
+    },
+    {
+      "id": "notes.shortcut-scroll",
+      "title": "Ctrl+Up and Ctrl+Down scroll the note"
+    },
+    {
+      "id": "notes.shortcut-markdown-view",
+      "title": "Ctrl+E switches source and preview"
+    },
+    {
+      "id": "notes.shortcut-snapshot",
+      "title": "Ctrl+Alt+S takes a snapshot"
+    },
+    {
+      "id": "notes.manager-filter",
+      "title": "Notes manager: filter by text and type",
+      "src": [
+        "page:notes_manager.php"
+      ]
+    },
+    {
+      "id": "notes.manager-collapse",
+      "title": "Notes manager: collapse all"
+    },
+    {
+      "id": "notes.manager-bulk-move",
+      "title": "Notes manager: move in bulk",
+      "src": [
+        "modal:nmMoveModal"
+      ]
+    },
+    {
+      "id": "notes.manager-bulk-tags",
+      "title": "Notes manager: tag in bulk",
+      "src": [
+        "modal:nmTagModal"
+      ]
+    },
+    {
+      "id": "notes.manager-bulk-favorite",
+      "title": "Notes manager: favorite in bulk"
+    },
+    {
+      "id": "notes.manager-bulk-trash",
+      "title": "Notes manager: trash in bulk"
+    },
+    {
+      "id": "notes.dashboard",
+      "title": "Dashboard: folders, notes, into a folder",
+      "src": [
+        "page:dashboard.php"
+      ]
+    },
+    {
+      "id": "notes.dashboard-note-modal",
+      "title": "Dashboard: a card opens the note in a window",
+      "src": [
+        "modal:dashboardNoteModal"
+      ]
+    },
+    {
+      "id": "notes.note-pin",
+      "title": "Pin a card on the dashboard"
+    },
+    {
+      "id": "notes.note-color",
+      "title": "Note colour from a dashboard card",
+      "src": [
+        "modal:noteColorModal",
+        "action:close-note-color-modal",
+        "action:clear-card-selection"
+      ]
+    },
+    {
+      "id": "notes.dashboard-view",
+      "title": "Dashboard: layout and full height, remembered",
+      "src": [
+        "action:view"
+      ]
+    },
+    {
+      "id": "notes.dashboard-filter",
+      "title": "Dashboard: filters"
+    },
+    {
+      "id": "notes.dashboard-favorites-filter",
+      "title": "Dashboard filter panel: favorites only, counted by the badge, turned off by Reset"
+    },
+    {
+      "id": "notes.dashboard-scope",
+      "title": "Dashboard: scope window across workspaces",
+      "src": [
+        "modal:workspaceSwitcherModal",
+        "action:open-workspace-switcher-modal",
+        "action:close-workspace-switcher-modal"
+      ]
+    },
+    {
+      "id": "notes.account-tree",
+      "title": "account_tree.php: refused, then a shared workspace",
+      "src": [
+        "page:account_tree.php"
+      ]
+    }
+  ],
+  "notFeatures": [
+    {
+      "src": "action:close-modal",
+      "why": "generic closer, exercised by each dialog's Cancel"
+    },
+    {
+      "src": "action:close-info-modal",
+      "why": "generic closer of the info dialog"
+    },
+    {
+      "src": "modal:infoModal",
+      "why": "generic message dialog"
+    },
+    {
+      "src": "modal:statusModal",
+      "why": "generic message dialog"
+    },
+    {
+      "src": "modal:inputModal",
+      "why": "generic prompt dialog"
+    },
+    {
+      "src": "action:hide-custom-alert",
+      "why": "generic closer of modal-alerts"
+    }
+  ]
+}

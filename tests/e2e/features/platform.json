@@ -1,0 +1,1479 @@
+{
+  "title": "Accounts, administration, API, AI and MCP",
+  "features": [
+    {
+      "id": "plat.api.notes-crud",
+      "title": "REST: create, read and update a note, with the version check",
+      "src": [
+        "route:POST /notes",
+        "route:GET /notes/{id}",
+        "route:PATCH /notes/{id}"
+      ]
+    },
+    {
+      "id": "plat.api.notes-list",
+      "title": "REST: list notes with filters, search, search ids, resolve a reference",
+      "src": [
+        "route:GET /notes",
+        "route:GET /notes/search",
+        "route:GET /notes/search/ids",
+        "route:GET /notes/resolve"
+      ]
+    },
+    {
+      "id": "plat.api.notes-order",
+      "title": "REST: reorder notes, favorites and clearing them, last opened note",
+      "src": [
+        "route:POST /notes/reorder",
+        "route:POST /notes/{id}/favorite",
+        "route:POST /notes/favorites/clear",
+        "route:POST /notes/{id}/opened"
+      ]
+    },
+    {
+      "id": "plat.api.notes-attributes",
+      "title": "REST: note tags, icon, colour, width, title style, pin, offline, Kanban state",
+      "src": [
+        "route:PUT /notes/{id}/tags",
+        "route:PUT /notes/{id}/icon",
+        "route:PUT /notes/{id}/color",
+        "route:PUT /notes/{id}/pinned",
+        "route:PUT /notes/{id}/content-width",
+        "route:PUT /notes/{id}/title-style",
+        "route:PUT /notes/{id}/offline",
+        "route:POST /notes/{id}/kanban-completed"
+      ]
+    },
+    {
+      "id": "plat.api.notes-beacon",
+      "title": "REST: emergency save of a note by sendBeacon",
+      "src": [
+        "route:POST /notes/{id}/beacon"
+      ]
+    },
+    {
+      "id": "plat.api.notes-lock",
+      "title": "REST: note edit lock taken, read, kept alive, released",
+      "src": [
+        "route:POST /notes/{id}/lock",
+        "route:GET /notes/{id}/lock",
+        "route:POST /notes/{id}/lock/heartbeat",
+        "route:POST /notes/{id}/lock/release"
+      ]
+    },
+    {
+      "id": "plat.api.notes-convert",
+      "title": "REST: duplicate a note, convert it both ways, the HTML and Markdown converters",
+      "src": [
+        "route:POST /notes/{id}/duplicate",
+        "route:POST /notes/{id}/convert",
+        "route:POST /convert-html",
+        "route:POST /convert-markdown"
+      ]
+    },
+    {
+      "id": "plat.api.trash",
+      "title": "REST: trash a note, restore it, delete it for good, empty the trash",
+      "src": [
+        "route:DELETE /notes/{id}",
+        "route:POST /notes/{id}/restore",
+        "route:GET /trash",
+        "route:DELETE /trash/{id}",
+        "route:DELETE /trash"
+      ]
+    },
+    {
+      "id": "plat.api.graph",
+      "title": "REST: backlinks, note graph, change probe",
+      "src": [
+        "route:GET /notes/{id}/backlinks",
+        "route:GET /graph",
+        "route:GET /changes"
+      ]
+    },
+    {
+      "id": "plat.api.notes-templates",
+      "title": "REST: list templates and notes with attachments",
+      "src": [
+        "route:GET /notes/templates",
+        "route:GET /notes/with-attachments"
+      ]
+    },
+    {
+      "id": "plat.api.offline",
+      "title": "REST: offline manifest, list and note contents",
+      "src": [
+        "route:GET /offline/manifest",
+        "route:GET /offline/list",
+        "route:GET /offline/notes"
+      ]
+    },
+    {
+      "id": "plat.api.snapshots",
+      "title": "REST: note snapshots created, listed, read, restored, deleted",
+      "src": [
+        "route:POST /notes/{id}/snapshot",
+        "route:GET /notes/{id}/snapshots",
+        "route:GET /notes/{id}/snapshot",
+        "route:POST /notes/{id}/snapshot/restore",
+        "route:DELETE /notes/{id}/snapshot"
+      ]
+    },
+    {
+      "id": "plat.api.tasks",
+      "title": "REST: tasks and subtasks of a task list, tasks overview",
+      "src": [
+        "route:POST /notes/{id}/tasks",
+        "route:GET /notes/{id}/tasks",
+        "route:PATCH /notes/{id}/tasks/{taskId}",
+        "route:DELETE /notes/{id}/tasks/{taskId}",
+        "route:POST /notes/{id}/tasks/{taskId}/subtasks",
+        "route:PATCH /notes/{id}/tasks/{taskId}/subtasks/{subtaskId}",
+        "route:DELETE /notes/{id}/tasks/{taskId}/subtasks/{subtaskId}",
+        "route:GET /tasks"
+      ]
+    },
+    {
+      "id": "plat.api.reminders",
+      "title": "REST: note and task reminders, notifications read and dismissed",
+      "src": [
+        "route:GET /notes/{id}/reminder",
+        "route:POST /notes/{id}/reminder",
+        "route:DELETE /notes/{id}/reminder",
+        "route:POST /notes/{id}/task-reminder",
+        "route:DELETE /notes/{id}/task-reminder",
+        "route:GET /reminders",
+        "route:GET /reminders/count",
+        "route:POST /reminders/dismiss-all",
+        "route:POST /reminders/{id}/read",
+        "route:POST /reminders/{id}/dismiss"
+      ]
+    },
+    {
+      "id": "plat.api.note-share",
+      "title": "REST: public link of a note, listing what is shared",
+      "src": [
+        "route:GET /notes/{id}/share",
+        "route:POST /notes/{id}/share",
+        "route:PATCH /notes/{id}/share",
+        "route:DELETE /notes/{id}/share",
+        "route:GET /shared"
+      ]
+    },
+    {
+      "id": "plat.api.public",
+      "title": "REST: tasks and text edited through a public token, with the lock",
+      "src": [
+        "route:POST /public/tasks",
+        "route:PATCH /public/tasks/{id}",
+        "route:DELETE /public/tasks/{id}",
+        "route:PATCH /public/notes/content",
+        "route:POST /public/notes/lock",
+        "route:POST /public/notes/lock/heartbeat",
+        "route:POST /public/notes/lock/release"
+      ]
+    },
+    {
+      "id": "plat.api.folders-crud",
+      "title": "REST: folders created, listed, read, renamed, path, counts, suggestions",
+      "src": [
+        "route:POST /folders",
+        "route:GET /folders",
+        "route:GET /folders/{id}",
+        "route:PATCH /folders/{id}",
+        "route:GET /folders/{id}/path",
+        "route:GET /folders/{id}/notes",
+        "route:GET /folders/counts",
+        "route:GET /folders/suggested"
+      ]
+    },
+    {
+      "id": "plat.api.folders-move",
+      "title": "REST: move notes and folders, reorder, duplicate, empty, tag a folder",
+      "src": [
+        "route:POST /notes/{id}/folder",
+        "route:POST /notes/{id}/remove-folder",
+        "route:POST /folders/move-files",
+        "route:POST /folders/reorder",
+        "route:POST /folders/{id}/move",
+        "route:POST /folders/{id}/duplicate",
+        "route:POST /folders/{id}/empty",
+        "route:POST /folders/{id}/tags"
+      ]
+    },
+    {
+      "id": "plat.api.folders-attributes",
+      "title": "REST: folder icon, colour, pin, offline, favorite",
+      "src": [
+        "route:PUT /folders/{id}/icon",
+        "route:PUT /folders/{id}/color",
+        "route:PUT /folders/{id}/pinned",
+        "route:PUT /folders/{id}/offline",
+        "route:PUT /folders/{id}/favorite"
+      ]
+    },
+    {
+      "id": "plat.api.folders-delete",
+      "title": "REST: delete a folder, restore it from its snapshot, archive notes and folders",
+      "src": [
+        "route:DELETE /folders/{id}",
+        "route:POST /folders/restore",
+        "route:POST /folders/{id}/archive",
+        "route:POST /notes/{id}/archive"
+      ]
+    },
+    {
+      "id": "plat.api.folder-share",
+      "title": "REST: public link of a folder",
+      "src": [
+        "route:GET /folders/{id}/share",
+        "route:POST /folders/{id}/share",
+        "route:PATCH /folders/{id}/share",
+        "route:DELETE /folders/{id}/share"
+      ]
+    },
+    {
+      "id": "plat.api.workspaces",
+      "title": "REST: workspaces created, listed, renamed, deleted",
+      "src": [
+        "route:GET /workspaces",
+        "route:POST /workspaces",
+        "route:PATCH /workspaces/{name}",
+        "route:DELETE /workspaces/{name}"
+      ]
+    },
+    {
+      "id": "plat.api.tags",
+      "title": "REST: tags listed, renamed, deleted",
+      "src": [
+        "route:GET /tags",
+        "route:PATCH /tags/{tag}",
+        "route:DELETE /tags/{tag}"
+      ]
+    },
+    {
+      "id": "plat.api.attachments",
+      "title": "REST: attachments uploaded, listed, downloaded, moved, deleted",
+      "src": [
+        "route:POST /notes/{noteId}/attachments",
+        "route:GET /notes/{noteId}/attachments",
+        "route:GET /notes/{noteId}/attachments/{attachmentId}",
+        "route:POST /notes/{noteId}/attachments/{attachmentId}/move",
+        "route:DELETE /notes/{noteId}/attachments/{attachmentId}"
+      ]
+    },
+    {
+      "id": "plat.api.settings",
+      "title": "REST: settings read and written",
+      "src": [
+        "route:GET /settings",
+        "route:GET /settings/{key}",
+        "route:PUT /settings/{key}"
+      ]
+    },
+    {
+      "id": "plat.api.backups",
+      "title": "REST: backups created, listed, downloaded, uploaded, restored, deleted",
+      "src": [
+        "route:GET /backups",
+        "route:POST /backups",
+        "route:POST /backups/upload",
+        "route:GET /backups/{filename}",
+        "route:POST /backups/{filename}/restore",
+        "route:DELETE /backups/{filename}"
+      ]
+    },
+    {
+      "id": "plat.api.system",
+      "title": "REST: version, updates, what is new, translations",
+      "src": [
+        "route:GET /system/version",
+        "route:GET /system/updates",
+        "route:GET /system/whats-new",
+        "route:POST /system/whats-new/seen",
+        "route:GET /system/i18n"
+      ]
+    },
+    {
+      "id": "plat.api.git-sync",
+      "title": "REST: Git sync, its /github-sync aliases and the progress report",
+      "src": [
+        "route:GET /git-sync/status",
+        "route:GET /github-sync/status",
+        "route:POST /git-sync/test",
+        "route:POST /github-sync/test",
+        "route:POST /git-sync/push",
+        "route:POST /github-sync/push",
+        "route:POST /git-sync/pull",
+        "route:POST /github-sync/pull",
+        "route:GET /git-sync/progress",
+        "route:PUT /git-sync/config"
+      ]
+    },
+    {
+      "id": "plat.api.me",
+      "title": "REST: my profile and password status, list of profiles",
+      "src": [
+        "route:GET /users/me",
+        "route:PATCH /users/me",
+        "route:GET /users/me/password-status",
+        "route:GET /users/profiles"
+      ]
+    },
+    {
+      "id": "plat.api.push",
+      "title": "REST: web push status and subscriptions",
+      "src": [
+        "route:GET /users/me/push",
+        "route:POST /users/me/push/subscriptions",
+        "route:DELETE /users/me/push/subscriptions"
+      ]
+    },
+    {
+      "id": "plat.api.two-factor",
+      "title": "REST: two-factor status, setup, enable, new codes, disable, admin reset",
+      "src": [
+        "route:GET /users/me/two-factor",
+        "route:POST /users/me/two-factor/setup",
+        "route:POST /users/me/two-factor/enable",
+        "route:POST /users/me/two-factor/recovery-codes",
+        "route:POST /users/me/two-factor/disable",
+        "route:POST /admin/users/{id}/two-factor/reset"
+      ]
+    },
+    {
+      "id": "plat.api.app-passwords",
+      "title": "REST: app passwords created, listed, used, revoked",
+      "src": [
+        "route:GET /users/me/app-passwords",
+        "route:POST /users/me/app-passwords",
+        "route:DELETE /users/me/app-passwords/{id}"
+      ]
+    },
+    {
+      "id": "plat.api.admin-users",
+      "title": "REST: admin user management and its refusal to normal accounts",
+      "src": [
+        "route:GET /admin/users",
+        "route:GET /admin/users/{id}",
+        "route:POST /admin/users",
+        "route:PATCH /admin/users/{id}",
+        "route:DELETE /admin/users/{id}",
+        "route:POST /admin/users/{id}/reset-password",
+        "route:GET /admin/users/{id}/password-status",
+        "route:GET /users/lookup/{username}"
+      ]
+    },
+    {
+      "id": "plat.api.admin-tools",
+      "title": "REST: instance statistics, token, public switch, repair",
+      "src": [
+        "route:GET /admin/stats",
+        "route:GET /admin/statistics",
+        "route:GET /admin/statistics/token",
+        "route:POST /admin/statistics/token",
+        "route:DELETE /admin/statistics/token",
+        "route:PUT /admin/statistics/public",
+        "route:POST /admin/repair"
+      ]
+    },
+    {
+      "id": "plat.api.admin-orphans",
+      "title": "REST: orphan attachments found and deleted",
+      "src": [
+        "route:GET /admin/orphan-attachments",
+        "route:DELETE /admin/orphan-attachments"
+      ]
+    },
+    {
+      "id": "plat.api.mentions",
+      "title": "REST: mentions of a shared workspace, handled and asked again; shared with me",
+      "src": [
+        "route:GET /mentions",
+        "route:GET /mentions/members",
+        "route:POST /mentions/{ownerId}/{noteId}/handled",
+        "route:DELETE /mentions/{ownerId}/{noteId}/handled",
+        "route:GET /shared/with-me"
+      ]
+    },
+    {
+      "id": "plat.api.auth",
+      "title": "The API refuses bad credentials, a missing profile, unknown routes",
+      "src": []
+    },
+    {
+      "id": "plat.api.docs",
+      "title": "API documentation page (Swagger) and the API card of the settings",
+      "src": [
+        "card:api-rest-card",
+        "modal:apiRestModal"
+      ]
+    },
+    {
+      "id": "plat.mcp.protocol",
+      "title": "MCP server: answers initialize over streamable HTTP",
+      "src": []
+    },
+    {
+      "id": "plat.mcp.list",
+      "title": "MCP server: tools/list is the expected list",
+      "src": []
+    },
+    {
+      "id": "plat.mcp.errors",
+      "title": "MCP server: an unknown tool or a bad argument is an error, not a crash",
+      "src": []
+    },
+    {
+      "id": "plat.mcp.profiles",
+      "title": "MCP server: a tool can act for another profile",
+      "src": []
+    },
+    {
+      "id": "plat.mcp.get_note",
+      "title": "MCP tool get_note",
+      "src": [
+        "mcp:get_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_notes",
+      "title": "MCP tool list_notes",
+      "src": [
+        "mcp:list_notes"
+      ]
+    },
+    {
+      "id": "plat.mcp.search_notes",
+      "title": "MCP tool search_notes",
+      "src": [
+        "mcp:search_notes"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_templates",
+      "title": "MCP tool list_templates",
+      "src": [
+        "mcp:list_templates"
+      ]
+    },
+    {
+      "id": "plat.mcp.create_note",
+      "title": "MCP tool create_note",
+      "src": [
+        "mcp:create_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.update_note",
+      "title": "MCP tool update_note",
+      "src": [
+        "mcp:update_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.delete_note",
+      "title": "MCP tool delete_note",
+      "src": [
+        "mcp:delete_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_reminders",
+      "title": "MCP tool list_reminders",
+      "src": [
+        "mcp:list_reminders"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_reminder",
+      "title": "MCP tool get_reminder",
+      "src": [
+        "mcp:get_reminder"
+      ]
+    },
+    {
+      "id": "plat.mcp.set_reminder",
+      "title": "MCP tool set_reminder",
+      "src": [
+        "mcp:set_reminder"
+      ]
+    },
+    {
+      "id": "plat.mcp.remove_reminder",
+      "title": "MCP tool remove_reminder",
+      "src": [
+        "mcp:remove_reminder"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_tasks",
+      "title": "MCP tool list_tasks",
+      "src": [
+        "mcp:list_tasks"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_all_tasks",
+      "title": "MCP tool list_all_tasks",
+      "src": [
+        "mcp:list_all_tasks"
+      ]
+    },
+    {
+      "id": "plat.mcp.add_task",
+      "title": "MCP tool add_task",
+      "src": [
+        "mcp:add_task"
+      ]
+    },
+    {
+      "id": "plat.mcp.update_task",
+      "title": "MCP tool update_task",
+      "src": [
+        "mcp:update_task"
+      ]
+    },
+    {
+      "id": "plat.mcp.complete_task",
+      "title": "MCP tool complete_task",
+      "src": [
+        "mcp:complete_task"
+      ]
+    },
+    {
+      "id": "plat.mcp.delete_task",
+      "title": "MCP tool delete_task",
+      "src": [
+        "mcp:delete_task"
+      ]
+    },
+    {
+      "id": "plat.mcp.add_subtask",
+      "title": "MCP tool add_subtask",
+      "src": [
+        "mcp:add_subtask"
+      ]
+    },
+    {
+      "id": "plat.mcp.update_subtask",
+      "title": "MCP tool update_subtask",
+      "src": [
+        "mcp:update_subtask"
+      ]
+    },
+    {
+      "id": "plat.mcp.delete_subtask",
+      "title": "MCP tool delete_subtask",
+      "src": [
+        "mcp:delete_subtask"
+      ]
+    },
+    {
+      "id": "plat.mcp.create_folder",
+      "title": "MCP tool create_folder",
+      "src": [
+        "mcp:create_folder"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_folders",
+      "title": "MCP tool list_folders",
+      "src": [
+        "mcp:list_folders"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_workspaces",
+      "title": "MCP tool list_workspaces",
+      "src": [
+        "mcp:list_workspaces"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_tags",
+      "title": "MCP tool list_tags",
+      "src": [
+        "mcp:list_tags"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_trash",
+      "title": "MCP tool get_trash",
+      "src": [
+        "mcp:get_trash"
+      ]
+    },
+    {
+      "id": "plat.mcp.empty_trash",
+      "title": "MCP tool empty_trash",
+      "src": [
+        "mcp:empty_trash"
+      ]
+    },
+    {
+      "id": "plat.mcp.delete_trash_note",
+      "title": "MCP tool delete_trash_note",
+      "src": [
+        "mcp:delete_trash_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.restore_note",
+      "title": "MCP tool restore_note",
+      "src": [
+        "mcp:restore_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.duplicate_note",
+      "title": "MCP tool duplicate_note",
+      "src": [
+        "mcp:duplicate_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.toggle_favorite",
+      "title": "MCP tool toggle_favorite",
+      "src": [
+        "mcp:toggle_favorite"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_attachments",
+      "title": "MCP tool list_attachments",
+      "src": [
+        "mcp:list_attachments"
+      ]
+    },
+    {
+      "id": "plat.mcp.add_attachment",
+      "title": "MCP tool add_attachment",
+      "src": [
+        "mcp:add_attachment"
+      ]
+    },
+    {
+      "id": "plat.mcp.move_note_to_folder",
+      "title": "MCP tool move_note_to_folder",
+      "src": [
+        "mcp:move_note_to_folder"
+      ]
+    },
+    {
+      "id": "plat.mcp.remove_note_from_folder",
+      "title": "MCP tool remove_note_from_folder",
+      "src": [
+        "mcp:remove_note_from_folder"
+      ]
+    },
+    {
+      "id": "plat.mcp.move_note",
+      "title": "MCP tool move_note",
+      "src": [
+        "mcp:move_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.move_folder",
+      "title": "MCP tool move_folder",
+      "src": [
+        "mcp:move_folder"
+      ]
+    },
+    {
+      "id": "plat.mcp.share_note",
+      "title": "MCP tool share_note",
+      "src": [
+        "mcp:share_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.unshare_note",
+      "title": "MCP tool unshare_note",
+      "src": [
+        "mcp:unshare_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_note_share_status",
+      "title": "MCP tool get_note_share_status",
+      "src": [
+        "mcp:get_note_share_status"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_folder_share_status",
+      "title": "MCP tool get_folder_share_status",
+      "src": [
+        "mcp:get_folder_share_status"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_shared",
+      "title": "MCP tool list_shared",
+      "src": [
+        "mcp:list_shared"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_shared_with_me",
+      "title": "MCP tool list_shared_with_me",
+      "src": [
+        "mcp:list_shared_with_me"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_snapshots",
+      "title": "MCP tool list_snapshots",
+      "src": [
+        "mcp:list_snapshots"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_snapshot",
+      "title": "MCP tool get_snapshot",
+      "src": [
+        "mcp:get_snapshot"
+      ]
+    },
+    {
+      "id": "plat.mcp.restore_snapshot",
+      "title": "MCP tool restore_snapshot",
+      "src": [
+        "mcp:restore_snapshot"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_git_sync_status",
+      "title": "MCP tool get_git_sync_status",
+      "src": [
+        "mcp:get_git_sync_status"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_system_info",
+      "title": "MCP tool get_system_info",
+      "src": [
+        "mcp:get_system_info"
+      ]
+    },
+    {
+      "id": "plat.mcp.list_backups",
+      "title": "MCP tool list_backups",
+      "src": [
+        "mcp:list_backups"
+      ]
+    },
+    {
+      "id": "plat.mcp.create_backup",
+      "title": "MCP tool create_backup",
+      "src": [
+        "mcp:create_backup"
+      ]
+    },
+    {
+      "id": "plat.mcp.delete_backup",
+      "title": "MCP tool delete_backup",
+      "src": [
+        "mcp:delete_backup"
+      ]
+    },
+    {
+      "id": "plat.mcp.restore_backup",
+      "title": "MCP tool restore_backup",
+      "src": [
+        "mcp:restore_backup"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_app_setting",
+      "title": "MCP tool get_app_setting",
+      "src": [
+        "mcp:get_app_setting"
+      ]
+    },
+    {
+      "id": "plat.mcp.update_app_setting",
+      "title": "MCP tool update_app_setting",
+      "src": [
+        "mcp:update_app_setting"
+      ]
+    },
+    {
+      "id": "plat.mcp.get_backlinks",
+      "title": "MCP tool get_backlinks",
+      "src": [
+        "mcp:get_backlinks"
+      ]
+    },
+    {
+      "id": "plat.mcp.convert_note",
+      "title": "MCP tool convert_note",
+      "src": [
+        "mcp:convert_note"
+      ]
+    },
+    {
+      "id": "plat.mcp.rename_folder",
+      "title": "MCP tool rename_folder",
+      "src": [
+        "mcp:rename_folder"
+      ]
+    },
+    {
+      "id": "plat.mcp.delete_folder",
+      "title": "MCP tool delete_folder",
+      "src": [
+        "mcp:delete_folder"
+      ]
+    },
+    {
+      "id": "plat.mcp.create_workspace",
+      "title": "MCP tool create_workspace",
+      "src": [
+        "mcp:create_workspace"
+      ]
+    },
+    {
+      "id": "plat.mcp.rename_workspace",
+      "title": "MCP tool rename_workspace",
+      "src": [
+        "mcp:rename_workspace"
+      ]
+    },
+    {
+      "id": "plat.mcp.delete_workspace",
+      "title": "MCP tool delete_workspace",
+      "src": [
+        "mcp:delete_workspace"
+      ]
+    },
+    {
+      "id": "plat.mcp.git_push",
+      "title": "MCP tool git_push",
+      "src": [
+        "mcp:git_push"
+      ]
+    },
+    {
+      "id": "plat.mcp.git_pull",
+      "title": "MCP tool git_pull",
+      "src": [
+        "mcp:git_pull"
+      ]
+    },
+    {
+      "id": "plat.login.form",
+      "title": "Sign in with the form, wrong password refused",
+      "src": [
+        "page:login.php"
+      ]
+    },
+    {
+      "id": "plat.login.eye",
+      "title": "Show or hide the password on the login page",
+      "src": []
+    },
+    {
+      "id": "plat.login.remember",
+      "title": "Remember me keeps the session",
+      "src": []
+    },
+    {
+      "id": "plat.login.redirect",
+      "title": "Redirect after sign-in, other sites refused",
+      "src": []
+    },
+    {
+      "id": "plat.login.return",
+      "title": "An anonymous visit goes to the form and returns to the page",
+      "src": []
+    },
+    {
+      "id": "plat.login.logout",
+      "title": "Log out asks first, then ends the session",
+      "src": [
+        "page:logout.php"
+      ]
+    },
+    {
+      "id": "plat.login.default-credentials",
+      "title": "Warning about default credentials",
+      "src": []
+    },
+    {
+      "id": "plat.login.display-name",
+      "title": "Display name on the login page",
+      "src": [
+        "card:login-display-card",
+        "setting:login_display_name"
+      ]
+    },
+    {
+      "id": "plat.login.disabled",
+      "title": "Open without login",
+      "src": [
+        "card:login-disabled-card",
+        "setting:login_disabled",
+        "setting:login_disabled_user_id"
+      ]
+    },
+    {
+      "id": "plat.login.switch",
+      "title": "Switch account without signing out",
+      "src": [
+        "page:switch_account.php",
+        "page:account_tree.php"
+      ]
+    },
+    {
+      "id": "plat.login.stale-tab",
+      "title": "A tab left on another account reloads instead of acting on the wrong one",
+      "src": []
+    },
+    {
+      "id": "plat.login.select-account",
+      "title": "Choose the account at sign-in when several are granted",
+      "src": []
+    },
+    {
+      "id": "plat.login.expired",
+      "title": "Session expired notice on the login page",
+      "src": []
+    },
+    {
+      "id": "plat.login.totp-cancel",
+      "title": "Cancel the two-factor step of the sign-in",
+      "src": []
+    },
+    {
+      "id": "plat.account.profile",
+      "title": "My profile dialog",
+      "src": [
+        "card:my-profile-card"
+      ]
+    },
+    {
+      "id": "plat.account.password",
+      "title": "Change my password",
+      "src": [
+        "card:change-password-card",
+        "action:open-password-settings",
+        "route:POST /users/me/password"
+      ]
+    },
+    {
+      "id": "plat.account.two-factor",
+      "title": "Two-factor from the settings, code asked at sign-in",
+      "src": [
+        "card:two-factor-card"
+      ]
+    },
+    {
+      "id": "plat.account.two-factor-recovery",
+      "title": "Recovery codes: download, use at sign-in, renew",
+      "src": []
+    },
+    {
+      "id": "plat.account.two-factor-required",
+      "title": "Two-factor required by the admin, enrolment at sign-in",
+      "src": [
+        "card:two-factor-required-card",
+        "setting:two_factor_required"
+      ]
+    },
+    {
+      "id": "plat.account.app-passwords",
+      "title": "App passwords from the settings",
+      "src": [
+        "card:app-passwords-card"
+      ]
+    },
+    {
+      "id": "plat.account.delete",
+      "title": "Delete my account",
+      "src": [
+        "card:delete-account-card",
+        "route:DELETE /users/me"
+      ]
+    },
+    {
+      "id": "plat.account.delete-admin",
+      "title": "The permanent admin cannot be deleted",
+      "src": []
+    },
+    {
+      "id": "plat.account.storage",
+      "title": "My storage summary",
+      "src": [
+        "card:storage-stats-user-card",
+        "page:storage-stats-user.php"
+      ]
+    },
+    {
+      "id": "plat.account.cards",
+      "title": "The cards of the account section",
+      "src": []
+    },
+    {
+      "id": "plat.oauth.register",
+      "title": "OAuth: register a client",
+      "src": [
+        "page:oauth/register.php"
+      ]
+    },
+    {
+      "id": "plat.oauth.authorize-errors",
+      "title": "OAuth: bad authorization requests refused",
+      "src": []
+    },
+    {
+      "id": "plat.oauth.flow",
+      "title": "OAuth: sign-in, consent, code, token, introspection, refresh, revoke",
+      "src": [
+        "page:oauth/authorize.php",
+        "page:oauth/token.php",
+        "page:oauth/introspect.php",
+        "page:oauth/revoke.php"
+      ]
+    },
+    {
+      "id": "plat.oauth.deny",
+      "title": "OAuth: refuse on the consent page",
+      "src": []
+    },
+    {
+      "id": "plat.oauth.connected-apps",
+      "title": "Connected apps listed and disconnected",
+      "src": [
+        "card:connected-apps-card",
+        "route:GET /users/me/connected-apps",
+        "route:DELETE /users/me/connected-apps/{id}"
+      ]
+    },
+    {
+      "id": "plat.oidc.admin",
+      "title": "OIDC settings page",
+      "src": [
+        "page:admin/oidc.php",
+        "card:oidc-config-card"
+      ]
+    },
+    {
+      "id": "plat.oidc.login",
+      "title": "Sign in with OIDC, unknown identity refused",
+      "src": [
+        "page:oidc_login.php",
+        "page:oidc_callback.php",
+        "page:oidc.php"
+      ]
+    },
+    {
+      "id": "plat.oidc.provision",
+      "title": "OIDC: account created at first sign-in, group filter",
+      "src": []
+    },
+    {
+      "id": "plat.oidc.verify",
+      "title": "OIDC: a wrong audience or a forged state is refused",
+      "src": []
+    },
+    {
+      "id": "plat.admin.access",
+      "title": "Admin pages refused to normal accounts",
+      "src": []
+    },
+    {
+      "id": "plat.admin.cards",
+      "title": "The cards of the admin section, and where they lead",
+      "src": []
+    },
+    {
+      "id": "plat.admin.users-create",
+      "title": "Users: create a profile",
+      "src": [
+        "page:admin/users.php",
+        "card:users-admin-card",
+        "modal:createModal"
+      ]
+    },
+    {
+      "id": "plat.admin.users-edit",
+      "title": "Users: edit a profile",
+      "src": [
+        "modal:renameModal"
+      ]
+    },
+    {
+      "id": "plat.admin.users-disable",
+      "title": "Users: disable and enable",
+      "src": [
+        "modal:statusConfirmModal"
+      ]
+    },
+    {
+      "id": "plat.admin.users-promote",
+      "title": "Users: promote to admin",
+      "src": [
+        "modal:adminConfirmModal"
+      ]
+    },
+    {
+      "id": "plat.admin.users-password",
+      "title": "Users: set or reset a password",
+      "src": [
+        "modal:passwordModal"
+      ]
+    },
+    {
+      "id": "plat.admin.users-access",
+      "title": "Users: note access for another person",
+      "src": [
+        "modal:accessModal"
+      ]
+    },
+    {
+      "id": "plat.admin.users-delete",
+      "title": "Users: delete, not ID 1 nor oneself",
+      "src": [
+        "modal:deleteModal"
+      ]
+    },
+    {
+      "id": "plat.admin.users-list",
+      "title": "Users: filter, status, sort, page size, CSV",
+      "src": [
+        "setting:admin_users_hide_inactive",
+        "setting:admin_users_per_page",
+        "setting:admin_users_sort",
+        "setting:admin_users_status_filter"
+      ]
+    },
+    {
+      "id": "plat.admin.storage",
+      "title": "Storage statistics: quotas in place, filter, sort, CSV",
+      "src": [
+        "page:admin/storage-stats.php",
+        "card:storage-stats-card",
+        "modal:quotaModal",
+        "modal:quotaAdminModal",
+        "setting:admin_storage_stats_hide_inactive",
+        "setting:admin_storage_stats_per_page",
+        "setting:admin_storage_stats_sort"
+      ]
+    },
+    {
+      "id": "plat.admin.activity",
+      "title": "Activity log: list, search, filter, retention, CSV, clear",
+      "src": [
+        "page:admin/activity-log.php",
+        "card:activity-log-card",
+        "modal:clearLogModal",
+        "setting:admin_activity_log_per_page"
+      ]
+    },
+    {
+      "id": "plat.admin.disaster-recovery",
+      "title": "Rebuild the master database",
+      "src": [
+        "page:admin/disaster-recovery.php",
+        "card:disaster-recovery-card",
+        "modal:disasterRecoveryModal"
+      ]
+    },
+    {
+      "id": "plat.admin.orphans",
+      "title": "Orphan scanner",
+      "src": [
+        "page:admin/orphan-scanner.php",
+        "card:orphan-scanner-card",
+        "modal:orphanScannerModal"
+      ]
+    },
+    {
+      "id": "plat.admin.smtp",
+      "title": "SMTP settings and test email",
+      "src": [
+        "page:admin/smtp.php",
+        "card:smtp-config-card",
+        "setting:smtp_*"
+      ]
+    },
+    {
+      "id": "plat.admin.webhooks",
+      "title": "Webhooks of the instance",
+      "src": [
+        "page:admin/webhooks.php",
+        "card:webhooks-card"
+      ]
+    },
+    {
+      "id": "plat.admin.statistics",
+      "title": "Instance statistics card",
+      "src": [
+        "card:statistics-token-card"
+      ]
+    },
+    {
+      "id": "plat.admin.outbound",
+      "title": "Local network access list",
+      "src": [
+        "card:outbound-hosts-card",
+        "modal:outboundHostsModal",
+        "setting:outbound_allowed_hosts"
+      ]
+    },
+    {
+      "id": "plat.admin.tenant",
+      "title": "Tenant isolation",
+      "src": [
+        "card:tenant-isolation-card",
+        "modal:tenantIsolationModal",
+        "setting:tenant_isolation_features"
+      ]
+    },
+    {
+      "id": "plat.quota.notes",
+      "title": "Max notes enforced",
+      "src": []
+    },
+    {
+      "id": "plat.quota.storage",
+      "title": "Max storage enforced",
+      "src": []
+    },
+    {
+      "id": "plat.quota.global",
+      "title": "Global quotas dialog",
+      "src": [
+        "card:user-quotas-card",
+        "modal:userQuotasModal",
+        "setting:user_max_*"
+      ]
+    },
+    {
+      "id": "plat.isolation.accounts",
+      "title": "Accounts cannot see each other",
+      "src": []
+    },
+    {
+      "id": "plat.isolation.public",
+      "title": "A public link shows that note only, password protection",
+      "src": []
+    },
+    {
+      "id": "plat.security.headers",
+      "title": "Security headers",
+      "src": []
+    },
+    {
+      "id": "plat.security.cookie",
+      "title": "Session cookie flags",
+      "src": []
+    },
+    {
+      "id": "plat.security.csrf",
+      "title": "CSRF refused on admin forms",
+      "src": []
+    },
+    {
+      "id": "plat.security.login-csrf",
+      "title": "CSRF refused on the login form",
+      "src": []
+    },
+    {
+      "id": "plat.security.api-csrf",
+      "title": "The session cookie is not sent cross-site",
+      "src": []
+    },
+    {
+      "id": "plat.security.xss",
+      "title": "Stored XSS attempts do not run",
+      "src": []
+    },
+    {
+      "id": "plat.security.reflected",
+      "title": "Reflected XSS attempts are escaped",
+      "src": []
+    },
+    {
+      "id": "plat.security.files",
+      "title": "Databases, backups, secrets and sources are not served",
+      "src": []
+    },
+    {
+      "id": "plat.security.traversal",
+      "title": "Path traversal refused on attachments and backups",
+      "src": []
+    },
+    {
+      "id": "plat.security.pages",
+      "title": "Every page sends an anonymous visitor to the login",
+      "src": []
+    },
+    {
+      "id": "plat.ai.panel",
+      "title": "AI panel: open, send, streamed answer, close",
+      "src": [
+        "action:toggle-ai-chat",
+        "page:api_ai_chat.php"
+      ]
+    },
+    {
+      "id": "plat.ai.input",
+      "title": "AI panel: Shift+Enter, empty message, workspace dialog",
+      "src": [
+        "action:ai-chat-workspace-info",
+        "action:ai-chat-workspace-info-close",
+        "action:ai-chat-open-dashboard",
+        "modal:aiChatWorkspaceInfoModal"
+      ]
+    },
+    {
+      "id": "plat.ai.stop",
+      "title": "AI panel: stop the answer",
+      "src": []
+    },
+    {
+      "id": "plat.ai.conversations",
+      "title": "AI panel: conversations kept, listed, reopened, deleted",
+      "src": [
+        "action:ai-chat-new",
+        "action:ai-chat-history",
+        "action:ai-chat-clear"
+      ]
+    },
+    {
+      "id": "plat.ai.copy",
+      "title": "AI panel: copy an answer",
+      "src": []
+    },
+    {
+      "id": "plat.ai.note-context",
+      "title": "AI panel: the open note is the context",
+      "src": []
+    },
+    {
+      "id": "plat.ai.apply",
+      "title": "AI panel: a change applied to the open note, with a snapshot",
+      "src": []
+    },
+    {
+      "id": "plat.ai.error",
+      "title": "AI panel: error and retry",
+      "src": []
+    },
+    {
+      "id": "plat.ai.tools",
+      "title": "Every built-in tool of the assistant",
+      "src": []
+    },
+    {
+      "id": "plat.ai.diagrams",
+      "title": "AI: note diagrams kept by a rewrite",
+      "src": []
+    },
+    {
+      "id": "plat.ai.multi-workspace",
+      "title": "AI: several workspaces read, nothing written",
+      "src": []
+    },
+    {
+      "id": "plat.ai.saved-prompts",
+      "title": "AI: saved prompts and the lightning menu",
+      "src": [
+        "action:ai-chat-prompts",
+        "action:ai-chat-prompt",
+        "action:remove-prompt"
+      ]
+    },
+    {
+      "id": "plat.ai.user-settings",
+      "title": "AI: custom instructions, tools off per person",
+      "src": [
+        "page:ai_settings_user.php",
+        "card:ai-assistant-user-card"
+      ]
+    },
+    {
+      "id": "plat.ai.external-tools",
+      "title": "AI: external MCP tools",
+      "src": [
+        "action:ai-chat-external",
+        "setting:ai_chat_mcp_*"
+      ]
+    },
+    {
+      "id": "plat.ai.ssrf",
+      "title": "AI: a normal account cannot reach local addresses",
+      "src": []
+    },
+    {
+      "id": "plat.ai.admin-settings",
+      "title": "AI settings page and test button",
+      "src": [
+        "page:ai_settings.php",
+        "card:ai-assistant-card",
+        "setting:ai_chat_api_key",
+        "setting:ai_chat_enabled",
+        "setting:ai_chat_headers",
+        "setting:ai_chat_model",
+        "setting:ai_chat_provider",
+        "setting:ai_chat_reasoning_effort",
+        "setting:ai_chat_url"
+      ]
+    },
+    {
+      "id": "plat.ai.not-allowed",
+      "title": "An account without the assistant",
+      "src": []
+    },
+    {
+      "id": "plat.ai.user-keys",
+      "title": "Personal AI keys",
+      "src": [
+        "setting:ai_chat_user_keys_enabled"
+      ]
+    },
+    {
+      "id": "plat.stt.admin",
+      "title": "Transcription settings page and test button",
+      "src": [
+        "page:stt_settings.php",
+        "card:stt-card",
+        "setting:stt_api_key",
+        "setting:stt_enabled",
+        "setting:stt_language",
+        "setting:stt_max_recording_minutes",
+        "setting:stt_model",
+        "setting:stt_provider",
+        "setting:stt_url"
+      ]
+    },
+    {
+      "id": "plat.stt.api",
+      "title": "api_transcribe.php",
+      "src": [
+        "page:api_transcribe.php"
+      ]
+    },
+    {
+      "id": "plat.stt.user",
+      "title": "Personal transcription server",
+      "src": [
+        "page:stt_settings_user.php",
+        "card:stt-user-card",
+        "setting:stt_user_keys_enabled"
+      ]
+    },
+    {
+      "id": "plat.stt.dictate",
+      "title": "Dictation from a microphone",
+      "src": [
+        "modal:dictateModal"
+      ],
+      "manual": "needs a real microphone: the dialog is only checked to be on the page"
+    }
+  ]
+}

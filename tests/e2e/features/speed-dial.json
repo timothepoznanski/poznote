@@ -1,0 +1,19 @@
+{
+  "title": "Speed dial",
+  "features": [
+    { "id": "dial.page", "title": "Speed dial view, from the rail, with its empty state", "src": ["page:speed_dial.php"] },
+    { "id": "dial.tiles", "title": "Notes tagged speed-dial become tiles: the link opens the site, no link opens the note, favicon or letter", "src": [] },
+    { "id": "dial.groups", "title": "A note with several links is a group, its rules start new rows", "src": [] },
+    { "id": "dial.filter", "title": "Filter the tiles by name or link, clear it, no match message", "src": [] },
+    { "id": "dial.size", "title": "Tile size slider, kept by the account", "src": ["setting:speed_dial_tile_size"] },
+    { "id": "dial.label-colors", "title": "Right click the name of a group to colour it, Default takes the colour off", "src": ["setting:speed_dial_label_colors"] },
+    { "id": "dial.reorder", "title": "Drag the tiles into a new order, which stays", "src": [] },
+    { "id": "dial.focus-param", "title": "?focus=1 and ?focus=0 in the address of the view", "src": [] },
+    { "id": "dial.background", "title": "Background image and opacity of the view, from the ... menu", "src": ["action:open-speed-dial-background", "setting:speed_dial_background_opacity_"] },
+    { "id": "dial.add-note", "title": "Add a note to the speed dial and remove it, from the note toolbar and from the tree", "src": ["action:toggle-speed-dial"] },
+    { "id": "dial.add-folder", "title": "Add the notes of a folder to the speed dial through the tag dialog, then remove them", "src": ["action:toggle-folder-speed-dial", "route:POST /folders/{id}/tags", "route:DELETE /folders/{id}/tags"] },
+    { "id": "dial.add-favorites", "title": "Put the favorite notes on the speed dial from the Favorites menu, and take them off", "src": ["route:POST /notes/favorites/tags", "route:DELETE /notes/favorites/tags"] },
+    { "id": "dial.boards", "title": "Several speed dials: create, choose one from the note menu, rename, delete", "src": [] },
+    { "id": "dial.visibility", "title": "Element visibility of the view: title, workspace, filter, group names and rules, frames, icons, names, switcher, new, size, pencil", "src": [] }
+  ]
+}

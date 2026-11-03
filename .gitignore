@@ -80,3 +80,7 @@ src/poznote_mcp/__pycache__/
 
 # PHPStan binary, downloaded on demand (CI and local runs)
 phpstan.phar
+
+# On-demand checks (tests/e2e): results, and the reference screenshots of this machine
+tests/e2e/.results/
+tests/e2e/.visual-reference/

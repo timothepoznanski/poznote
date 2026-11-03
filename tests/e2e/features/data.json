@@ -1,0 +1,1151 @@
+{
+  "title": "Data in and out, sharing, external sync",
+  "features": [
+    {
+      "id": "data.export-modal",
+      "title": "Download dialog of a note, with the formats of its type",
+      "src": [
+        "action:show-export-modal",
+        "action:select-export-type",
+        "modal:exportModal",
+        "page:api_export_note.php"
+      ]
+    },
+    {
+      "id": "data.export-html",
+      "title": "Download a rich text note as HTML",
+      "src": []
+    },
+    {
+      "id": "data.export-html-embedded",
+      "title": "Download a note as a single HTML file with embedded images",
+      "src": []
+    },
+    {
+      "id": "data.export-attachments-in-zip",
+      "title": "A note with files downloads as a ZIP with its files",
+      "src": []
+    },
+    {
+      "id": "data.export-markdown",
+      "title": "Download a Markdown note as Markdown with front matter",
+      "src": []
+    },
+    {
+      "id": "data.export-markdown-html",
+      "title": "Download a Markdown note as rendered HTML",
+      "src": []
+    },
+    {
+      "id": "data.export-tasklist-markdown",
+      "title": "Download a task list as Markdown checkboxes",
+      "src": []
+    },
+    {
+      "id": "data.export-tasklist-json",
+      "title": "Download a task list as JSON",
+      "src": []
+    },
+    {
+      "id": "data.export-tasklist-html",
+      "title": "Download a task list as HTML",
+      "src": []
+    },
+    {
+      "id": "data.export-print",
+      "title": "Print a note from its menu",
+      "src": [
+        "action:print-note"
+      ]
+    },
+    {
+      "id": "data.export-folder",
+      "title": "Download a folder as a ZIP from its menu",
+      "src": [
+        "action:download-folder",
+        "page:api_export_folder.php"
+      ]
+    },
+    {
+      "id": "data.export-structured",
+      "title": "Structured export of a workspace with its folders",
+      "src": [
+        "page:api_export_structured.php"
+      ]
+    },
+    {
+      "id": "data.export-attachments",
+      "title": "Export every attachment as a ZIP",
+      "src": [
+        "page:api_export_attachments.php"
+      ]
+    },
+    {
+      "id": "data.export-entries",
+      "title": "Export every note file as a ZIP with an index",
+      "src": [
+        "page:api_export_entries.php"
+      ]
+    },
+    {
+      "id": "data.download-note-route",
+      "title": "Download one note file through api_download_note",
+      "src": [
+        "page:api_download_note.php"
+      ]
+    },
+    {
+      "id": "data.export-errors",
+      "title": "Exports refuse trashed notes and unknown formats",
+      "src": []
+    },
+    {
+      "id": "data.card-structured-export",
+      "title": "Settings card: Structured export",
+      "src": [
+        "card:structured-export-card"
+      ]
+    },
+    {
+      "id": "data.card-attachments-export",
+      "title": "Settings card: Attachments export",
+      "src": [
+        "card:attachments-export-card"
+      ]
+    },
+    {
+      "id": "data.card-backup",
+      "title": "Settings card: Complete backup",
+      "src": [
+        "card:backup-export-card"
+      ]
+    },
+    {
+      "id": "data.backup-complete",
+      "title": "Complete backup from the backup page, downloaded from a link",
+      "src": [
+        "page:backup_export.php"
+      ]
+    },
+    {
+      "id": "data.backup-job",
+      "title": "Backup in the background: progress, resumes after a reload, discard",
+      "src": [
+        "page:api_backup_job.php"
+      ]
+    },
+    {
+      "id": "data.backup-per-user",
+      "title": "An administrator backs up any account, a user only their own",
+      "src": []
+    },
+    {
+      "id": "data.backup-api",
+      "title": "Backup API: create, list, download, delete, upload, refuse foreign files",
+      "src": [
+        "route:GET /backups",
+        "route:POST /backups",
+        "route:GET /backups/{filename}",
+        "route:DELETE /backups/{filename}",
+        "route:POST /backups/upload"
+      ]
+    },
+    {
+      "id": "data.backup-restore-api",
+      "title": "Restore a backup through the API",
+      "src": [
+        "route:POST /backups/{filename}/restore"
+      ]
+    },
+    {
+      "id": "data.backup-post",
+      "title": "The plain POST of a complete backup still answers an archive",
+      "src": []
+    },
+    {
+      "id": "data.card-restore",
+      "title": "Settings card: Restore a backup",
+      "src": [
+        "card:restore-import-card"
+      ]
+    },
+    {
+      "id": "data.card-restore-direct",
+      "title": "Settings card: Restore by direct copy",
+      "src": [
+        "card:restore-direct-copy-card"
+      ]
+    },
+    {
+      "id": "data.restore-page",
+      "title": "Restore and import page: cards fold and unfold",
+      "src": [
+        "action:toggle-card",
+        "action:toggle-sub-card",
+        "page:restore_import.php"
+      ]
+    },
+    {
+      "id": "data.restore-complete",
+      "title": "Complete restore: choose, confirm or cancel, summary",
+      "src": [
+        "action:show-complete-restore-confirmation",
+        "action:hide-complete-restore-confirmation",
+        "action:proceed-complete-restore",
+        "modal:completeRestoreConfirmModal"
+      ]
+    },
+    {
+      "id": "data.restore-chunked",
+      "title": "Restore uploaded in slices and run by a background worker",
+      "src": [
+        "page:api_restore_upload.php"
+      ]
+    },
+    {
+      "id": "data.restore-workspaces-modal",
+      "title": "After a restore, choose which workspace to open",
+      "src": [
+        "action:hide-restore-workspaces-modal",
+        "modal:restoreWorkspacesModal"
+      ]
+    },
+    {
+      "id": "data.restore-errors",
+      "title": "A broken archive or no file is refused, and nothing changes",
+      "src": []
+    },
+    {
+      "id": "data.restore-cancel-upload",
+      "title": "Cancel a restore upload left behind by another tab",
+      "src": [
+        "action:cancel-pending-restore-upload"
+      ]
+    },
+    {
+      "id": "data.restore-direct-copy",
+      "title": "Restore from a file copied onto the server",
+      "src": [
+        "action:show-direct-copy-restore-confirmation",
+        "action:hide-direct-copy-restore-confirmation",
+        "action:proceed-direct-copy-restore",
+        "modal:directCopyRestoreConfirmModal"
+      ]
+    },
+    {
+      "id": "data.restore-post",
+      "title": "The plain POST of a complete restore still works, and checks its CSRF token",
+      "src": [
+        "modal:restoreConfirmModal"
+      ]
+    },
+    {
+      "id": "data.disaster-recovery",
+      "title": "Disaster recovery: rebuild the master database, public links survive",
+      "src": [
+        "page:admin/disaster-recovery.php",
+        "modal:disasterRecoveryModal"
+      ]
+    },
+    {
+      "id": "data.card-import",
+      "title": "Settings card: Import notes",
+      "src": [
+        "card:import-notes-card"
+      ]
+    },
+    {
+      "id": "data.import-selection",
+      "title": "The chosen files show with a button to remove them",
+      "src": [
+        "action:clear-individual-notes-files"
+      ]
+    },
+    {
+      "id": "data.import-dropzone",
+      "title": "Drop files on the import zone",
+      "src": []
+    },
+    {
+      "id": "data.import-individual",
+      "title": "Import notes: summary, confirm or cancel",
+      "src": [
+        "action:show-individual-notes-import-confirmation",
+        "action:hide-individual-notes-import-confirmation",
+        "action:proceed-individual-notes-import",
+        "modal:individualNotesImportConfirmModal"
+      ]
+    },
+    {
+      "id": "data.import-md",
+      "title": "Import a Markdown file",
+      "src": []
+    },
+    {
+      "id": "data.import-html",
+      "title": "Import an HTML file, without its scripts",
+      "src": []
+    },
+    {
+      "id": "data.import-txt",
+      "title": "Import a text file",
+      "src": []
+    },
+    {
+      "id": "data.import-destination",
+      "title": "Choose the destination workspace and folder of an import",
+      "src": []
+    },
+    {
+      "id": "data.import-front-matter",
+      "title": "Front matter: title, tags, favorite, dates, folder",
+      "src": []
+    },
+    {
+      "id": "data.import-obsidian-tags",
+      "title": "Obsidian hashtags become tags",
+      "src": []
+    },
+    {
+      "id": "data.import-tasklist",
+      "title": "Task lists recognised on import, brackets are not",
+      "src": []
+    },
+    {
+      "id": "data.import-zip",
+      "title": "Import a ZIP in the background with progress",
+      "src": []
+    },
+    {
+      "id": "data.import-zip-folders",
+      "title": "A ZIP keeps its folders",
+      "src": []
+    },
+    {
+      "id": "data.import-zip-images",
+      "title": "Images of a ZIP are attached and their links rewritten",
+      "src": []
+    },
+    {
+      "id": "data.import-zip-pdf",
+      "title": "PDFs of a ZIP: linked ones attached, lone ones become notes",
+      "src": []
+    },
+    {
+      "id": "data.import-errors",
+      "title": "Too many files are refused with a message",
+      "src": []
+    },
+    {
+      "id": "data.import-cancel-upload",
+      "title": "Cancel a ZIP import upload left behind by another tab",
+      "src": [
+        "action:cancel-pending-notes-import-upload"
+      ]
+    },
+    {
+      "id": "data.import-limits",
+      "title": "Import limits: shown, changed by an administrator, enforced",
+      "src": [
+        "card:import-limits-card",
+        "modal:importLimitsModal"
+      ]
+    },
+    {
+      "id": "data.import-notes-archive",
+      "title": "Import a notes archive through its form action",
+      "src": []
+    },
+    {
+      "id": "data.import-attachments-archive",
+      "title": "Import an attachments archive through its form action",
+      "src": []
+    },
+    {
+      "id": "data.drop-sidebar",
+      "title": "Drop note files on the sidebar",
+      "src": [
+        "page:api_import_dropped_notes.php"
+      ]
+    },
+    {
+      "id": "data.drop-sidebar-folder",
+      "title": "Drop note files on a folder of the sidebar",
+      "src": []
+    },
+    {
+      "id": "data.roundtrip-structured",
+      "title": "Structured export reimported elsewhere gives the same notes",
+      "src": []
+    },
+    {
+      "id": "data.roundtrip-note",
+      "title": "A downloaded note or task list reimported comes back",
+      "src": []
+    },
+    {
+      "id": "data.roundtrip-folder",
+      "title": "A downloaded folder reimported rebuilds its tree",
+      "src": []
+    },
+    {
+      "id": "data.card-local-backup",
+      "title": "Settings card: Local backups",
+      "src": [
+        "card:local-backup-card"
+      ]
+    },
+    {
+      "id": "data.local-backup-page",
+      "title": "Local backups page, for administrators only",
+      "src": [
+        "page:local_backup_settings.php",
+        "page:api_local_backup.php"
+      ]
+    },
+    {
+      "id": "data.local-backup-config",
+      "title": "Local backups: folder, retention, frequency, schedule, users",
+      "src": [
+        "setting:local_backup_directory",
+        "setting:local_backup_frequency",
+        "setting:local_backup_retention",
+        "setting:local_backup_user_ids",
+        "setting:local_backup_auto_enabled"
+      ]
+    },
+    {
+      "id": "data.local-backup-run",
+      "title": "Local backups: back up now",
+      "src": [
+        "setting:local_backup_last_run_summary"
+      ]
+    },
+    {
+      "id": "data.local-backup-list",
+      "title": "Local backups: list and filter",
+      "src": []
+    },
+    {
+      "id": "data.local-backup-download",
+      "title": "Local backups: download an archive",
+      "src": []
+    },
+    {
+      "id": "data.local-backup-delete",
+      "title": "Local backups: delete an archive",
+      "src": []
+    },
+    {
+      "id": "data.local-backup-retention",
+      "title": "Local backups: retention prunes old archives",
+      "src": []
+    },
+    {
+      "id": "data.local-backup-scheduled",
+      "title": "Local backups: schedule, run by the worker when due",
+      "src": [
+        "setting:local_backup_last_auto_run"
+      ]
+    },
+    {
+      "id": "data.card-s3-backup-admin",
+      "title": "Settings card: S3 backups (administrator)",
+      "src": [
+        "card:s3-backup-card"
+      ]
+    },
+    {
+      "id": "data.s3-backup-page",
+      "title": "S3 backups page and its master switch",
+      "src": [
+        "page:s3_backup_settings.php",
+        "page:api_s3_backup.php",
+        "setting:s3_backup_enabled"
+      ]
+    },
+    {
+      "id": "data.s3-backup-config",
+      "title": "S3 backups: bucket, keys, retention, frequency, users",
+      "src": [
+        "setting:s3_backup_endpoint",
+        "setting:s3_backup_region",
+        "setting:s3_backup_bucket",
+        "setting:s3_backup_access_key",
+        "setting:s3_backup_secret_key",
+        "setting:s3_backup_path_style",
+        "setting:s3_backup_retention",
+        "setting:s3_backup_frequency",
+        "setting:s3_backup_user_ids",
+        "setting:s3_backup_auto_enabled",
+        "setting:s3_backup_skip_s3_attachments"
+      ]
+    },
+    {
+      "id": "data.s3-backup-test",
+      "title": "S3 backups: test the connection",
+      "src": []
+    },
+    {
+      "id": "data.s3-backup-run",
+      "title": "S3 backups: back up now",
+      "src": [
+        "setting:s3_backup_last_run_summary"
+      ]
+    },
+    {
+      "id": "data.s3-backup-list",
+      "title": "S3 backups: list the bucket",
+      "src": []
+    },
+    {
+      "id": "data.s3-backup-download",
+      "title": "S3 backups: download an archive",
+      "src": []
+    },
+    {
+      "id": "data.s3-backup-delete",
+      "title": "S3 backups: delete an archive",
+      "src": []
+    },
+    {
+      "id": "data.s3-backup-retention",
+      "title": "S3 backups: retention prunes the bucket",
+      "src": []
+    },
+    {
+      "id": "data.s3-backup-scheduled",
+      "title": "S3 backups: schedule, run by the worker when due",
+      "src": [
+        "setting:s3_backup_last_auto_run"
+      ]
+    },
+    {
+      "id": "data.s3-backup-quota",
+      "title": "S3 backups quota refuses an archive over the limit",
+      "src": [
+        "setting:user_max_backups_s3_mb"
+      ]
+    },
+    {
+      "id": "data.s3-self-backup",
+      "title": "A user backs up their own account to S3, lists, downloads, deletes",
+      "src": []
+    },
+    {
+      "id": "data.card-s3-self",
+      "title": "Settings card: S3 backup of my account",
+      "src": []
+    },
+    {
+      "id": "data.card-restore-s3",
+      "title": "Settings card: Restore from S3",
+      "src": [
+        "card:restore-s3-card"
+      ]
+    },
+    {
+      "id": "data.s3-restore",
+      "title": "Restore from an S3 archive",
+      "src": []
+    },
+    {
+      "id": "data.card-s3-storage",
+      "title": "Settings card: S3 attachment storage",
+      "src": [
+        "card:s3-storage-card"
+      ]
+    },
+    {
+      "id": "data.s3-storage-config",
+      "title": "S3 storage: bucket and keys, for administrators only",
+      "src": [
+        "page:s3_settings.php",
+        "page:api_s3_storage.php",
+        "setting:s3_storage_enabled",
+        "setting:s3_storage_endpoint",
+        "setting:s3_storage_region",
+        "setting:s3_storage_bucket",
+        "setting:s3_storage_access_key",
+        "setting:s3_storage_secret_key",
+        "setting:s3_storage_path_style"
+      ]
+    },
+    {
+      "id": "data.s3-storage-test",
+      "title": "S3 storage: test the connection",
+      "src": []
+    },
+    {
+      "id": "data.s3-storage-attachments",
+      "title": "S3 storage on: attachments go to the bucket and are served back",
+      "src": [
+        "setting:user_max_storage_s3_mb"
+      ]
+    },
+    {
+      "id": "data.s3-storage-migrate",
+      "title": "S3 storage: migrate attachments to the bucket and back",
+      "src": []
+    },
+    {
+      "id": "data.git-enable",
+      "title": "Administrator switch for Git sync",
+      "src": []
+    },
+    {
+      "id": "data.card-git-enabled",
+      "title": "Settings card: Git sync on or off",
+      "src": [
+        "card:git-sync-enabled-card",
+        "card:git-sync-card"
+      ]
+    },
+    {
+      "id": "data.git-config",
+      "title": "Git sync: provider, address, token, repository, branch, author",
+      "src": [
+        "page:git_sync.php",
+        "route:GET /git-sync/status",
+        "route:PUT /git-sync/config"
+      ]
+    },
+    {
+      "id": "data.git-test",
+      "title": "Git sync: test the connection",
+      "src": [
+        "route:POST /git-sync/test"
+      ]
+    },
+    {
+      "id": "data.git-test-error",
+      "title": "Git sync: the error of the forge is shown",
+      "src": []
+    },
+    {
+      "id": "data.git-push",
+      "title": "Git sync: push from the rail, with updates and deletions",
+      "src": [
+        "route:POST /git-sync/push"
+      ]
+    },
+    {
+      "id": "data.git-pull",
+      "title": "Git sync: pull a change from the rail",
+      "src": [
+        "route:POST /git-sync/pull"
+      ]
+    },
+    {
+      "id": "data.git-pull-delete",
+      "title": "Git sync: pull creates new notes and trashes lost ones",
+      "src": []
+    },
+    {
+      "id": "data.git-forgejo",
+      "title": "Git sync with Forgejo or Gitea",
+      "src": []
+    },
+    {
+      "id": "data.git-gitlab",
+      "title": "Git sync with GitLab",
+      "src": []
+    },
+    {
+      "id": "data.git-github",
+      "title": "Git sync with GitHub",
+      "src": []
+    },
+    {
+      "id": "data.git-api",
+      "title": "Git sync through the API, and its old route names",
+      "src": [
+        "route:GET /github-sync/status",
+        "route:POST /github-sync/test",
+        "route:POST /github-sync/push",
+        "route:POST /github-sync/pull"
+      ]
+    },
+    {
+      "id": "data.git-progress",
+      "title": "Git sync in the background reports its progress",
+      "src": [
+        "route:GET /git-sync/progress"
+      ]
+    },
+    {
+      "id": "data.git-auto-push",
+      "title": "Git auto push when a note changes",
+      "src": []
+    },
+    {
+      "id": "data.git-auto-pull",
+      "title": "Git auto pull asked at the start of a session",
+      "src": []
+    },
+    {
+      "id": "data.git-workspaces",
+      "title": "Git sync limited to chosen workspaces",
+      "src": []
+    },
+    {
+      "id": "data.git-debug",
+      "title": "Git sync: result and debug log, filter and copy",
+      "src": []
+    },
+    {
+      "id": "data.webhooks-user",
+      "title": "User webhooks page: add, list, refuse bad input",
+      "src": [
+        "page:user-webhooks.php"
+      ]
+    },
+    {
+      "id": "data.webhooks-admin",
+      "title": "Instance webhooks page: add, list, refuse bad input",
+      "src": [
+        "page:admin/webhooks.php"
+      ]
+    },
+    {
+      "id": "data.card-user-webhooks",
+      "title": "Settings card: My webhooks, with its count",
+      "src": [
+        "card:user-webhooks-card"
+      ]
+    },
+    {
+      "id": "data.card-admin-webhooks",
+      "title": "Settings card: Instance webhooks",
+      "src": [
+        "card:webhooks-card"
+      ]
+    },
+    {
+      "id": "data.webhook-test",
+      "title": "Send a test delivery to a webhook",
+      "src": []
+    },
+    {
+      "id": "data.webhook-signature",
+      "title": "Webhook signature with the secret",
+      "src": []
+    },
+    {
+      "id": "data.webhook-edit",
+      "title": "Edit a webhook, cancel an edit",
+      "src": []
+    },
+    {
+      "id": "data.webhook-toggle",
+      "title": "Disable and enable a webhook",
+      "src": []
+    },
+    {
+      "id": "data.webhook-delete",
+      "title": "Delete a webhook, with confirmation",
+      "src": []
+    },
+    {
+      "id": "data.webhook-note-created",
+      "title": "Event note.created, only for the owner",
+      "src": []
+    },
+    {
+      "id": "data.webhook-note-shared",
+      "title": "Event note.shared",
+      "src": []
+    },
+    {
+      "id": "data.webhook-reminder",
+      "title": "Events reminder.due, due_title and due_minimal",
+      "src": [
+        "setting:webhook_reminder_cutoff_at"
+      ]
+    },
+    {
+      "id": "data.webhook-user-events",
+      "title": "Events user.created, updated, activated, deactivated, deleted",
+      "src": []
+    },
+    {
+      "id": "data.webhook-language",
+      "title": "Event settings.language_changed",
+      "src": []
+    },
+    {
+      "id": "data.webhook-quota",
+      "title": "Events quota.notes_reached and quota.storage_reached",
+      "src": [
+        "setting:user_max_notes",
+        "setting:user_max_storage_mb"
+      ]
+    },
+    {
+      "id": "data.webhook-backup",
+      "title": "Events backup.completed and backup.failed",
+      "src": []
+    },
+    {
+      "id": "data.webhook-instance-url",
+      "title": "Instance URL of the webhooks",
+      "src": []
+    },
+    {
+      "id": "data.webhook-ssrf",
+      "title": "A user webhook cannot reach a private address",
+      "src": []
+    },
+    {
+      "id": "data.webhook-signup-cap",
+      "title": "Event signup.cap_reached",
+      "src": [],
+      "manual": "only fired by a sign-up through a real OIDC provider"
+    },
+    {
+      "id": "data.share-note",
+      "title": "Share a note from its button, cancel, shared state of the button",
+      "src": [
+        "action:open-share-modal",
+        "route:POST /notes/{id}/share",
+        "route:GET /notes/{id}/share"
+      ]
+    },
+    {
+      "id": "data.shared-page",
+      "title": "Shares page lists what is shared",
+      "src": [
+        "page:shared.php",
+        "route:GET /shared"
+      ]
+    },
+    {
+      "id": "data.share-settings-dialog",
+      "title": "The share button of a shared note opens its settings over the note, also right after the creation",
+      "src": []
+    },
+    {
+      "id": "data.shared-page-sort",
+      "title": "Shares page: sort by name, last edit or share date, remembered by the browser",
+      "src": []
+    },
+    {
+      "id": "data.shared-copy",
+      "title": "Shares page: copy the link and open the public page",
+      "src": []
+    },
+    {
+      "id": "data.shared-filter",
+      "title": "Shares page: filter by text and by type",
+      "src": []
+    },
+    {
+      "id": "data.shared-tree",
+      "title": "Shares page: fold a folder, expand all",
+      "src": []
+    },
+    {
+      "id": "data.shared-with-me",
+      "title": "Shares page: what others shared with me",
+      "src": [
+        "route:GET /shared/with-me"
+      ]
+    },
+    {
+      "id": "data.share-custom-slug",
+      "title": "Custom and renewed address of a share, taken ones refused",
+      "src": [
+        "route:PATCH /notes/{id}/share"
+      ]
+    },
+    {
+      "id": "data.share-protocol",
+      "title": "Choose http or https for the public links",
+      "src": []
+    },
+    {
+      "id": "data.share-password",
+      "title": "Password on a share",
+      "src": []
+    },
+    {
+      "id": "data.share-indexing",
+      "title": "Let search engines index a share",
+      "src": []
+    },
+    {
+      "id": "data.share-restrict-users",
+      "title": "Restrict a share to chosen accounts",
+      "src": []
+    },
+    {
+      "id": "data.share-permissions",
+      "title": "Share permissions: read only, editable, check only, full",
+      "src": []
+    },
+    {
+      "id": "data.share-disable",
+      "title": "Disable and enable a share",
+      "src": []
+    },
+    {
+      "id": "data.share-revoke",
+      "title": "Delete a share",
+      "src": [
+        "route:DELETE /notes/{id}/share"
+      ]
+    },
+    {
+      "id": "data.share-folder",
+      "title": "Share a folder from its menu",
+      "src": [
+        "action:share-folder",
+        "route:POST /folders/{id}/share",
+        "route:GET /folders/{id}/share",
+        "route:DELETE /folders/{id}/share"
+      ]
+    },
+    {
+      "id": "data.share-folder-password",
+      "title": "Password on a shared folder",
+      "src": []
+    },
+    {
+      "id": "data.share-folder-edit",
+      "title": "An editable shared folder lets visitors edit its notes",
+      "src": [
+        "route:PATCH /folders/{id}/share"
+      ]
+    },
+    {
+      "id": "data.share-via-folder",
+      "title": "A note in a shared folder says so and can be excluded",
+      "src": []
+    },
+    {
+      "id": "data.modal-shared-via-folder",
+      "title": "Dialog: shared through its folder",
+      "src": []
+    },
+    {
+      "id": "data.public-note",
+      "title": "Public note page, read only",
+      "src": [
+        "page:public_note.php"
+      ]
+    },
+    {
+      "id": "data.public-slug",
+      "title": "Pretty public address",
+      "src": [
+        "page:public_slug.php"
+      ]
+    },
+    {
+      "id": "data.public-password",
+      "title": "Password page of a public note",
+      "src": []
+    },
+    {
+      "id": "data.public-folder",
+      "title": "Public folder page with notes and subfolders",
+      "src": [
+        "page:public_folder.php"
+      ]
+    },
+    {
+      "id": "data.public-folder-filter",
+      "title": "Public folder: filter and fold groups",
+      "src": []
+    },
+    {
+      "id": "data.public-folder-kanban",
+      "title": "Public folder: board view",
+      "src": []
+    },
+    {
+      "id": "data.public-theme",
+      "title": "Theme of public pages: from the share, the URL or the toggle",
+      "src": []
+    },
+    {
+      "id": "data.public-render-markdown",
+      "title": "Public page draws Markdown, tables, code, diagrams",
+      "src": []
+    },
+    {
+      "id": "data.public-render-rich",
+      "title": "Public page shows rich text",
+      "src": []
+    },
+    {
+      "id": "data.public-render-tasklist",
+      "title": "Public page shows a task list with its states",
+      "src": []
+    },
+    {
+      "id": "data.public-attachments",
+      "title": "Images of a public note load for visitors",
+      "src": []
+    },
+    {
+      "id": "data.public-sanitize",
+      "title": "Scripts never run on a public page",
+      "src": []
+    },
+    {
+      "id": "data.public-not-found",
+      "title": "Unknown link and trashed note say not found",
+      "src": []
+    },
+    {
+      "id": "data.public-section-link",
+      "title": "Copy the link of a section on a public page",
+      "src": []
+    },
+    {
+      "id": "data.public-edit",
+      "title": "Edit a note from its public page, save and cancel",
+      "src": [
+        "route:PATCH /public/notes/content"
+      ]
+    },
+    {
+      "id": "data.public-edit-lock",
+      "title": "Only one visitor edits a public note at a time",
+      "src": [
+        "route:POST /public/notes/lock",
+        "route:POST /public/notes/lock/heartbeat",
+        "route:POST /public/notes/lock/release"
+      ]
+    },
+    {
+      "id": "data.public-tasklist",
+      "title": "Tick, add and delete tasks from a public page",
+      "src": [
+        "route:POST /public/tasks",
+        "route:PATCH /public/tasks/{id}",
+        "route:DELETE /public/tasks/{id}"
+      ]
+    },
+    {
+      "id": "data.health",
+      "title": "Health check without an account",
+      "src": [
+        "page:api_health.php"
+      ]
+    },
+    {
+      "id": "data.note-info",
+      "title": "Note information dialog",
+      "src": [
+        "action:show-note-info",
+        "modal:noteInfoModal",
+        "page:api_note_info.php"
+      ]
+    },
+    {
+      "id": "data.attachments-route",
+      "title": "api_attachments: upload, list, download, delete",
+      "src": [
+        "page:api_attachments.php"
+      ]
+    },
+    {
+      "id": "data.share-target",
+      "title": "System share menu creates a note",
+      "src": [
+        "page:share-target.php"
+      ]
+    },
+    {
+      "id": "data.open-shared",
+      "title": "Link of a shared workspace email, checked by signature",
+      "src": [
+        "page:open_shared.php"
+      ]
+    },
+    {
+      "id": "data.extension-connect",
+      "title": "Chrome extension: profiles, workspaces, folders",
+      "src": [
+        "route:GET /users/profiles"
+      ]
+    },
+    {
+      "id": "data.extension-save",
+      "title": "Chrome extension: save a page as a note",
+      "src": []
+    },
+    {
+      "id": "data.extension-search",
+      "title": "Chrome extension: search a note to append to",
+      "src": []
+    },
+    {
+      "id": "data.extension-append",
+      "title": "Chrome extension: append to a note, surviving a conflict",
+      "src": []
+    },
+    {
+      "id": "data.extension-append-markdown",
+      "title": "Chrome extension: append to a Markdown note",
+      "src": []
+    },
+    {
+      "id": "data.extension-screenshot",
+      "title": "Chrome extension: upload a screenshot",
+      "src": []
+    },
+    {
+      "id": "data.extension-app-password",
+      "title": "Chrome extension: connect with an app password",
+      "src": []
+    },
+    {
+      "id": "data.card-extension",
+      "title": "Settings card: link to the extension",
+      "src": [
+        "card:extension-card"
+      ]
+    }
+  ],
+  "notFeatures": [
+    {
+      "src": "action:hide-import-confirmation",
+      "why": "dead markup: the database-only import form is gone from the page"
+    },
+    {
+      "src": "action:proceed-import",
+      "why": "dead markup: the database-only import form is gone from the page"
+    },
+    {
+      "src": "modal:importConfirmModal",
+      "why": "dead markup, never opened"
+    },
+    {
+      "src": "action:hide-notes-import-confirmation",
+      "why": "dead markup, its form is gone from the page"
+    },
+    {
+      "src": "action:proceed-notes-import",
+      "why": "dead markup, its form is gone from the page"
+    },
+    {
+      "src": "modal:notesImportConfirmModal",
+      "why": "dead markup, never opened"
+    },
+    {
+      "src": "action:hide-attachments-import-confirmation",
+      "why": "dead markup, its form is gone from the page"
+    },
+    {
+      "src": "action:proceed-attachments-import",
+      "why": "dead markup, its form is gone from the page"
+    },
+    {
+      "src": "modal:attachmentsImportConfirmModal",
+      "why": "dead markup, never opened"
+    }
+  ]
+}

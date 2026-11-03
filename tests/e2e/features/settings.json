@@ -1,0 +1,1009 @@
+{
+ "title": "Settings and appearance",
+ "features": [
+  {
+   "id": "set.page",
+   "title": "Open the settings page",
+   "src": [
+    "page:settings.php"
+   ]
+  },
+  {
+   "id": "set.cards-user",
+   "title": "A non-admin sees exactly the expected cards, per section",
+   "src": []
+  },
+  {
+   "id": "set.cards-admin",
+   "title": "An admin sees the instance cards, group by group",
+   "src": []
+  },
+  {
+   "id": "set.scope-switch",
+   "title": "Switch between the Personal and Admin sides of Settings",
+   "src": []
+  },
+  {
+   "id": "set.nav-desktop",
+   "title": "List of sections on the left, one section at a time, remembered",
+   "src": []
+  },
+  {
+   "id": "set.filter",
+   "title": "Filter cards from the search box, clear it, focus it with /",
+   "src": []
+  },
+  {
+   "id": "set.pin",
+   "title": "Pin a card to the Pinned section and unpin it",
+   "src": [
+    "setting:settings_pinned_cards"
+   ]
+  },
+  {
+   "id": "set.mobile",
+   "title": "Stacked collapsible sections with Expand all on a phone",
+   "src": []
+  },
+  {
+   "id": "set.code-wrap",
+   "title": "Code block word wrap",
+   "src": [
+    "card:code-wrap-card",
+    "setting:code_block_word_wrap"
+   ]
+  },
+  {
+   "id": "set.code-line-numbers",
+   "title": "Code block line numbers",
+   "src": [
+    "card:code-line-numbers-card",
+    "setting:code_block_line_numbers"
+   ]
+  },
+  {
+   "id": "set.note-virtual-space",
+   "title": "Space below the note",
+   "src": [
+    "card:note-virtual-space-card",
+    "setting:note_virtual_space"
+   ]
+  },
+  {
+   "id": "set.backlinks-at-bottom",
+   "title": "Backlinks at the bottom of the note",
+   "src": [
+    "card:backlinks-at-bottom-card",
+    "setting:backlinks_at_bottom"
+   ]
+  },
+  {
+   "id": "set.attachments-at-bottom",
+   "title": "Attachments at the bottom of the note",
+   "src": [
+    "card:attachments-at-bottom-card",
+    "setting:attachments_at_bottom"
+   ]
+  },
+  {
+   "id": "set.attachment-previews",
+   "title": "Attachment previews in the note",
+   "src": [
+    "card:attachment-previews-card",
+    "setting:attachment_previews_in_note"
+   ]
+  },
+  {
+   "id": "set.default-image-border",
+   "title": "Default image border",
+   "src": [
+    "card:default-image-border-card",
+    "setting:default_image_border_no_padding"
+   ]
+  },
+  {
+   "id": "set.spellcheck",
+   "title": "Browser spell check in notes",
+   "src": [
+    "card:spellcheck-html-notes-card",
+    "setting:spellcheck_html_notes"
+   ]
+  },
+  {
+   "id": "set.folder-count-parentheses",
+   "title": "Folder counts in parentheses",
+   "src": [
+    "card:folder-count-parentheses-card",
+    "setting:folder_count_parentheses"
+   ]
+  },
+  {
+   "id": "set.markdown-split-card-view",
+   "title": "Framed markdown split view",
+   "src": [
+    "card:markdown-split-card-view-card",
+    "setting:markdown_split_card_view"
+   ]
+  },
+  {
+   "id": "set.markdown-split-preview-left",
+   "title": "Preview on the left in split view",
+   "src": [
+    "card:markdown-split-preview-left-card",
+    "setting:markdown_split_preview_left"
+   ]
+  },
+  {
+   "id": "set.markdown-heading-underline",
+   "title": "Underline under markdown headings",
+   "src": [
+    "card:markdown-heading-underline-card",
+    "setting:markdown_heading_underline"
+   ]
+  },
+  {
+   "id": "set.markdown-editor-wrap",
+   "title": "Markdown editor word wrap",
+   "src": [
+    "card:markdown-editor-wrap-card",
+    "setting:markdown_editor_word_wrap"
+   ]
+  },
+  {
+   "id": "set.notes-after-folders",
+   "title": "Show notes without folder after folders",
+   "src": [
+    "card:notes-without-folders-card",
+    "setting:notes_without_folders_after_folders"
+   ]
+  },
+  {
+   "id": "set.folder-icon-kanban",
+   "title": "Folder icon opens the Kanban view",
+   "src": [
+    "card:folder-icon-kanban-card",
+    "setting:folder_icon_opens_kanban"
+   ]
+  },
+  {
+   "id": "set.sidebar-offline-marks",
+   "title": "Show offline dot in the tree",
+   "src": [
+    "card:sidebar-offline-marks-card",
+    "setting:sidebar_offline_marks"
+   ]
+  },
+  {
+   "id": "set.whats-new-card",
+   "title": "What's new after updates switch",
+   "src": [
+    "card:whats-new-card",
+    "setting:whats_new_popup"
+   ]
+  },
+  {
+   "id": "set.timezone",
+   "title": "Timezone",
+   "src": [
+    "card:timezone-card",
+    "setting:timezone"
+   ]
+  },
+  {
+   "id": "set.date-time-format",
+   "title": "Date and time format, each option",
+   "src": [
+    "card:date-time-format-card",
+    "setting:date_time_format",
+    "modal:dateTimeFormatModal"
+   ]
+  },
+  {
+   "id": "set.date-time-format-custom",
+   "title": "Custom date and time format, invalid ones refused",
+   "src": []
+  },
+  {
+   "id": "set.note-width",
+   "title": "Note content width slider",
+   "src": [
+    "card:note-width-card",
+    "setting:center_note_content"
+   ]
+  },
+  {
+   "id": "set.slash-trigger",
+   "title": "Command menu shortcut on a computer",
+   "src": [
+    "card:slash-menu-trigger-card",
+    "setting:slash_menu_trigger"
+   ]
+  },
+  {
+   "id": "set.slash-trigger-mobile",
+   "title": "Command menu shortcut on a phone",
+   "src": [
+    "card:slash-menu-trigger-mobile-card",
+    "setting:slash_menu_trigger_mobile"
+   ]
+  },
+  {
+   "id": "set.format-toolbar-mode",
+   "title": "Floating formatting toolbar",
+   "src": [
+    "card:format-toolbar-mode-card",
+    "setting:format_toolbar_mode"
+   ]
+  },
+  {
+   "id": "set.tasklist-order",
+   "title": "Task list insert order",
+   "src": [
+    "card:tasklist-insert-order-card",
+    "setting:tasklist_insert_order"
+   ]
+  },
+  {
+   "id": "set.default-workspace",
+   "title": "Default workspace",
+   "src": [
+    "card:default-workspace-card",
+    "setting:default_workspace"
+   ]
+  },
+  {
+   "id": "set.markdown-view-modes",
+   "title": "Markdown default and new note view modes",
+   "src": [
+    "card:markdown-default-view-mode-card",
+    "card:markdown-new-note-view-mode-card",
+    "setting:markdown_default_view_mode",
+    "setting:markdown_new_note_view_mode"
+   ]
+  },
+  {
+   "id": "set.markdown-view-cycle",
+   "title": "Views offered by the view menu of a markdown note",
+   "src": [
+    "card:markdown-view-cycle-card",
+    "setting:markdown_view_cycle"
+   ]
+  },
+  {
+   "id": "set.markdown-view-button-cycle",
+   "title": "View button: menu or stepping through views",
+   "src": [
+    "setting:markdown_view_button_cycle"
+   ]
+  },
+  {
+   "id": "set.markdown-colored",
+   "title": "Colored markdown, custom colours",
+   "src": [
+    "card:markdown-colored-card",
+    "setting:markdown_colored",
+    "setting:markdown_colored_custom"
+   ]
+  },
+  {
+   "id": "set.note-colors",
+   "title": "Note colours palette",
+   "src": [
+    "card:note-color-palette-card",
+    "modal:noteColorPaletteModal"
+   ]
+  },
+  {
+   "id": "set.folder-tree-highlight",
+   "title": "Highlight the current folder tree and its dimming",
+   "src": [
+    "card:folder-tree-highlight-card",
+    "modal:folderTreeHighlightModal"
+   ]
+  },
+  {
+   "id": "set.note-age-filter",
+   "title": "Note age filter",
+   "src": [
+    "card:note-age-filter-card",
+    "setting:note_age_filter_days",
+    "modal:noteAgeFilterModal"
+   ]
+  },
+  {
+   "id": "set.snapshots-card",
+   "title": "Revisions kept: days and safety count",
+   "src": [
+    "card:snapshots-card",
+    "setting:snapshots_keep_count",
+    "setting:snapshots_safety_keep_count",
+    "modal:snapshotsSettingsModal"
+   ]
+  },
+  {
+   "id": "set.offline-card",
+   "title": "Offline notes card: days and turning it off",
+   "src": [
+    "card:offline-notes-card",
+    "setting:offline_mode_enabled",
+    "setting:offline_notes_days"
+   ]
+  },
+  {
+   "id": "set.theme-menu",
+   "title": "Theme menu of the rail, keyboard included",
+   "src": [
+    "theme:*"
+   ]
+  },
+  {
+   "id": "set.theme-list-user",
+   "title": "A user cannot edit the theme list",
+   "src": []
+  },
+  {
+   "id": "set.themes",
+   "title": "Each of the six themes, with its colours, on every page, after a reload",
+   "src": [
+    "theme:*"
+   ]
+  },
+  {
+   "id": "set.dark-bundle",
+   "title": "Dark themes keep text readable on notes and settings",
+   "src": [
+    "page:dark_mode_css.php"
+   ]
+  },
+  {
+   "id": "set.theme-init",
+   "title": "Theme painted before the page scripts, no flash",
+   "src": []
+  },
+  {
+   "id": "set.theme-prelogin",
+   "title": "Login page follows the device theme",
+   "src": []
+  },
+  {
+   "id": "set.theme-cycle",
+   "title": "Theme button steps through the themes, set from its right-click menu",
+   "src": [
+    "setting:theme_button_cycle"
+   ]
+  },
+  {
+   "id": "set.css-endpoints",
+   "title": "Stylesheet and script bundles are served",
+   "src": [
+    "page:dark_mode_css.php",
+    "page:index_css.php",
+    "page:index_js.php"
+   ]
+  },
+  {
+   "id": "set.language-list",
+   "title": "Language list matches the shipped dictionaries",
+   "src": [
+    "card:language-card",
+    "setting:language",
+    "lang:*"
+   ]
+  },
+  {
+   "id": "set.language-runtime",
+   "title": "JS strings follow the language",
+   "src": [
+    "route:GET /system/i18n"
+   ]
+  },
+  {
+   "id": "set.lang-ca",
+   "title": "Interface, dates and no raw key in language ca",
+   "src": [
+    "lang:ca"
+   ]
+  },
+  {
+   "id": "set.lang-zh-cn",
+   "title": "Interface, dates and no raw key in language zh-cn",
+   "src": [
+    "lang:zh-cn"
+   ]
+  },
+  {
+   "id": "set.lang-en",
+   "title": "Interface, dates and no raw key in language en",
+   "src": [
+    "lang:en"
+   ]
+  },
+  {
+   "id": "set.lang-fr",
+   "title": "Interface, dates and no raw key in language fr",
+   "src": [
+    "lang:fr"
+   ]
+  },
+  {
+   "id": "set.lang-ja",
+   "title": "Interface, dates and no raw key in language ja",
+   "src": [
+    "lang:ja"
+   ]
+  },
+  {
+   "id": "set.lang-ko",
+   "title": "Interface, dates and no raw key in language ko",
+   "src": [
+    "lang:ko"
+   ]
+  },
+  {
+   "id": "set.lang-de",
+   "title": "Interface, dates and no raw key in language de",
+   "src": [
+    "lang:de"
+   ]
+  },
+  {
+   "id": "set.lang-pt",
+   "title": "Interface, dates and no raw key in language pt",
+   "src": [
+    "lang:pt"
+   ]
+  },
+  {
+   "id": "set.lang-ru",
+   "title": "Interface, dates and no raw key in language ru",
+   "src": [
+    "lang:ru"
+   ]
+  },
+  {
+   "id": "set.lang-es",
+   "title": "Interface, dates and no raw key in language es",
+   "src": [
+    "lang:es"
+   ]
+  },
+  {
+   "id": "set.settings-api",
+   "title": "Settings and system version through the API",
+   "src": [
+    "route:GET /settings",
+    "route:GET /settings/{key}",
+    "route:PUT /settings/{key}",
+    "route:GET /system/version"
+   ]
+  },
+  {
+   "id": "set.settings-without-card",
+   "title": "Settings without a card still apply",
+   "src": [
+    "setting:emoji_icons_enabled",
+    "setting:hide_folder_actions"
+   ]
+  },
+  {
+   "id": "set.main-font",
+   "title": "App font, each one",
+   "src": [
+    "card:main-font-card"
+   ]
+  },
+  {
+   "id": "set.markdown-font",
+   "title": "Markdown editor font",
+   "src": [
+    "card:markdown-font-card"
+   ]
+  },
+  {
+   "id": "set.font-size",
+   "title": "Font sizes: note, tree, code, settings",
+   "src": [
+    "card:font-size-card",
+    "setting:note_font_size",
+    "modal:fontSizeModal"
+   ]
+  },
+  {
+   "id": "set.icon-scales",
+   "title": "Icon scale of the notes page and the rail",
+   "src": [
+    "card:index-icon-scale-card",
+    "card:icon-rail-scale-card"
+   ]
+  },
+  {
+   "id": "set.admin-link-cards",
+   "title": "Admin link cards open their pages",
+   "src": [
+    "card:users-admin-card",
+    "card:oidc-config-card",
+    "card:smtp-config-card",
+    "card:webhooks-card",
+    "card:ai-assistant-card",
+    "card:stt-card",
+    "card:s3-storage-card",
+    "card:s3-backup-card",
+    "card:local-backup-card",
+    "card:activity-log-card",
+    "card:storage-stats-card"
+   ]
+  },
+  {
+   "id": "set.login-display",
+   "title": "Login page title",
+   "src": [
+    "card:login-display-card",
+    "setting:login_display_name"
+   ]
+  },
+  {
+   "id": "set.logo",
+   "title": "Custom logo with its notice, upload and reset",
+   "src": [
+    "card:custom-logo-card",
+    "page:api_branding.php",
+    "modal:customLogoModal",
+    "modal:customLogoNoticeModal"
+   ]
+  },
+  {
+   "id": "set.logo-donate",
+   "title": "Buy me a coffee way of the logo notice",
+   "src": []
+  },
+  {
+   "id": "set.custom-css",
+   "title": "Custom CSS: upload, apply, download, delete",
+   "src": [
+    "card:custom-css-card",
+    "setting:custom_css_path",
+    "page:api_upload_css.php",
+    "modal:customCssModal"
+   ]
+  },
+  {
+   "id": "set.theme-list",
+   "title": "Theme list: untick and reorder, for every user",
+   "src": [
+    "card:theme-list-card",
+    "setting:theme_list",
+    "modal:themeListModal"
+   ]
+  },
+  {
+   "id": "set.theme-custom-css",
+   "title": "A CSS file as a theme of the menu",
+   "src": []
+  },
+  {
+   "id": "set.theme-list-menu",
+   "title": "Customize this menu in the theme menu, old link too",
+   "src": []
+  },
+  {
+   "id": "set.custom-fonts",
+   "title": "Custom fonts: upload, offered, applied, deleted",
+   "src": [
+    "card:custom-fonts-card",
+    "setting:custom_fonts",
+    "page:api_upload_font.php",
+    "modal:customFontsModal"
+   ]
+  },
+  {
+   "id": "set.background",
+   "title": "Workspace background image and opacity",
+   "src": [
+    "page:api_upload_background.php",
+    "modal:backgroundImageModal"
+   ]
+  },
+  {
+   "id": "set.icon-sidebar-order",
+   "title": "Icon rail layout dialog: drag, separator, reset, cancel",
+   "src": [
+    "card:icon-sidebar-order-card",
+    "setting:icon_sidebar_order",
+    "modal:iconSidebarOrderModal"
+   ]
+  },
+  {
+   "id": "set.icon-rail-colors",
+   "title": "Colour a rail button from its right-click menu",
+   "src": [
+    "setting:icon_sidebar_colors",
+    "modal:iconSidebarColorModal"
+   ]
+  },
+  {
+   "id": "set.icon-rail-hide",
+   "title": "Hide a rail button from its right-click menu",
+   "src": []
+  },
+  {
+   "id": "set.toolbar-colors",
+   "title": "Colour and hide a note toolbar button by right-click",
+   "src": [
+    "setting:toolbar_icon_colors"
+   ]
+  },
+  {
+   "id": "set.ui-checklist",
+   "title": "Element visibility checklist lists the expected elements",
+   "src": [
+    "setting:hidden_ui_elements"
+   ]
+  },
+  {
+   "id": "set.ui-save",
+   "title": "Saving a change in the checklist",
+   "src": []
+  },
+  {
+   "id": "set.ui-settings-cards",
+   "title": "One settings card hidden and back",
+   "src": []
+  },
+  {
+   "id": "set.ui-settings-cards-all",
+   "title": "Every settings card hidden with its section",
+   "src": [
+    "card:restore-direct-copy-card"
+   ]
+  },
+  {
+   "id": "set.ui-create-cards",
+   "title": "Hide note types of the + menu",
+   "src": [
+    "card:create-note-card",
+    "card:create-markdown-note-card",
+    "card:create-task-list-card",
+    "card:create-diary-entry-card",
+    "card:create-folder-card"
+   ]
+  },
+  {
+   "id": "set.ui-sidebar",
+   "title": "Hide the elements of Sidebar",
+   "src": []
+  },
+  {
+   "id": "set.ui-icon-rail",
+   "title": "Hide the elements of Icon rail",
+   "src": []
+  },
+  {
+   "id": "set.ui-toolbar",
+   "title": "Hide the elements of Toolbar",
+   "src": []
+  },
+  {
+   "id": "set.ui-mobile-editor-bar",
+   "title": "Hide the elements of Mobile editor bar",
+   "src": []
+  },
+  {
+   "id": "set.ui-other",
+   "title": "Hide the elements of Other",
+   "src": []
+  },
+  {
+   "id": "set.ui-dashboard",
+   "title": "Hide the elements of Dashboard",
+   "src": []
+  },
+  {
+   "id": "set.ui-folder-actions",
+   "title": "Hide the elements of Folder Actions",
+   "src": []
+  },
+  {
+   "id": "set.ui-note-actions",
+   "title": "Hide the elements of Note Actions",
+   "src": []
+  },
+  {
+   "id": "set.ui-slash-menu",
+   "title": "Hide commands of the slash menu",
+   "src": []
+  },
+  {
+   "id": "set.ui-workspace-menu",
+   "title": "Hide entries of the workspace menu",
+   "src": []
+  },
+  {
+   "id": "set.ui-default-hidden",
+   "title": "Details hidden by default come back when ticked",
+   "src": []
+  },
+  {
+   "id": "set.ui-filter",
+   "title": "Checklist filter, unticked only, Collapse all, Uncheck all",
+   "src": []
+  },
+  {
+   "id": "set.ui-panel",
+   "title": "Contextual Element visibility panel",
+   "src": [
+    "action:toggle-ui-customization-panel"
+   ]
+  },
+  {
+   "id": "set.ui-self-hide",
+   "title": "Hide Element visibility itself, way back through Settings",
+   "src": []
+  },
+  {
+   "id": "set.ui-global",
+   "title": "Users column: hide for everyone but admins",
+   "src": [
+    "setting:hidden_ui_elements_global"
+   ]
+  },
+  {
+   "id": "set.link-cards",
+   "title": "Link cards open their pages",
+   "src": [
+    "card:backup-export-card",
+    "card:restore-import-card",
+    "card:restore-direct-copy-card",
+    "card:structured-export-card",
+    "card:attachments-export-card",
+    "card:import-notes-card",
+    "card:git-sync-card",
+    "card:user-webhooks-card",
+    "card:ai-assistant-user-card",
+    "card:stt-user-card"
+   ]
+  },
+  {
+   "id": "set.external-cards",
+   "title": "External link cards",
+   "src": [
+    "card:github-card",
+    "card:discussions-card",
+    "card:website-card",
+    "card:tips-card",
+    "card:discord-card",
+    "card:support-card",
+    "card:extension-card"
+   ]
+  },
+  {
+   "id": "set.install-app",
+   "title": "Install application card",
+   "src": [
+    "card:install-app-card"
+   ]
+  },
+  {
+   "id": "set.storage-summary",
+   "title": "Storage summary of the account",
+   "src": [
+    "card:storage-stats-user-card"
+   ]
+  },
+  {
+   "id": "set.profile-card",
+   "title": "Profile card edits the name",
+   "src": [
+    "card:my-profile-card"
+   ]
+  },
+  {
+   "id": "set.password-card",
+   "title": "Password and two-factor cards open their dialogs",
+   "src": [
+    "card:change-password-card",
+    "card:two-factor-card"
+   ]
+  },
+  {
+   "id": "set.app-passwords-card",
+   "title": "App passwords card and deep link",
+   "src": [
+    "card:app-passwords-card"
+   ]
+  },
+  {
+   "id": "set.diary-type",
+   "title": "Diary entry format",
+   "src": [
+    "card:diary-note-type-card",
+    "setting:diary_default_note_type"
+   ]
+  },
+  {
+   "id": "set.diary-date-format",
+   "title": "Diary entry date format",
+   "src": [
+    "card:diary-date-format-card",
+    "setting:diary_date_format",
+    "modal:diaryDateFormatModal"
+   ]
+  },
+  {
+   "id": "set.diary-template",
+   "title": "Diary entry template",
+   "src": [
+    "card:diary-template-card",
+    "setting:diary_templates"
+   ]
+  },
+  {
+   "id": "set.new-note-shortcut-type",
+   "title": "Type of the note created by the shortcut",
+   "src": [
+    "setting:new_note_shortcut_type"
+   ]
+  },
+  {
+   "id": "set.delete-account",
+   "title": "Delete my account",
+   "src": [
+    "card:delete-account-card"
+   ]
+  },
+  {
+   "id": "set.whats-new-popup",
+   "title": "What's new popup after an update, save as note, recorded as seen",
+   "src": [
+    "modal:whatsNewModal",
+    "setting:whats_new_seen_version",
+    "route:GET /system/whats-new",
+    "route:POST /system/whats-new/seen"
+   ]
+  },
+  {
+   "id": "set.whats-new-never",
+   "title": "Do not show the popup again, not on a phone",
+   "src": []
+  },
+  {
+   "id": "set.check-updates",
+   "title": "Version card checks for updates",
+   "src": [
+    "card:check-updates-card",
+    "route:GET /system/updates",
+    "modal:updateModal",
+    "modal:updateCheckModal",
+    "action:close-update-modal",
+    "action:close-update-check-modal"
+   ]
+  },
+  {
+   "id": "set.welcome",
+   "title": "Start guide for a new account, every choice stored",
+   "src": [
+    "page:welcome.php",
+    "setting:welcome_setup"
+   ]
+  },
+  {
+   "id": "set.welcome-errors",
+   "title": "Start guide refuses passwords that differ",
+   "src": []
+  },
+  {
+   "id": "set.api-rest",
+   "title": "API REST card and Swagger page",
+   "src": [
+    "card:api-rest-card"
+   ]
+  },
+  {
+   "id": "set.tenant-isolation",
+   "title": "Tenant isolation",
+   "src": [
+    "card:tenant-isolation-card",
+    "setting:tenant_isolation_features"
+   ]
+  },
+  {
+   "id": "set.git-sync-enabled",
+   "title": "Instance switch of Git Sync",
+   "src": [
+    "card:git-sync-enabled-card"
+   ]
+  },
+  {
+   "id": "set.executable-attachments",
+   "title": "Script and executable attachments",
+   "src": [
+    "card:executable-attachments-card",
+    "setting:allow_executable_attachments"
+   ]
+  },
+  {
+   "id": "set.login-disabled",
+   "title": "Open without login",
+   "src": [
+    "card:login-disabled-card",
+    "setting:login_disabled"
+   ]
+  },
+  {
+   "id": "set.two-factor-required",
+   "title": "Require two-factor refused without own factor",
+   "src": [
+    "card:two-factor-required-card",
+    "setting:two_factor_required"
+   ]
+  },
+  {
+   "id": "set.import-limits",
+   "title": "Import limits",
+   "src": [
+    "card:import-limits-card"
+   ]
+  },
+  {
+   "id": "set.user-quotas",
+   "title": "User quotas, one enforced",
+   "src": [
+    "card:user-quotas-card",
+    "setting:user_max_notes",
+    "setting:user_max_storage_mb",
+    "setting:user_max_storage_s3_mb",
+    "setting:user_max_backups_s3_mb"
+   ]
+  },
+  {
+   "id": "set.outbound-hosts",
+   "title": "Local network access hosts",
+   "src": [
+    "card:outbound-hosts-card",
+    "setting:outbound_allowed_hosts"
+   ]
+  },
+  {
+   "id": "set.statistics-token",
+   "title": "Statistics API: token and public mode",
+   "src": [
+    "card:statistics-token-card",
+    "route:GET /admin/statistics/token",
+    "route:POST /admin/statistics/token",
+    "route:DELETE /admin/statistics/token",
+    "route:PUT /admin/statistics/public"
+   ]
+  },
+  {
+   "id": "set.maintenance",
+   "title": "Rebuild master database, orphan attachments scan",
+   "src": [
+    "card:disaster-recovery-card",
+    "card:orphan-scanner-card",
+    "route:POST /admin/repair",
+    "route:GET /admin/orphan-attachments"
+   ]
+  },
+  {
+   "id": "set.workspace-emails",
+   "title": "Shared workspace emails row needs SMTP and an address",
+   "src": [
+    "card:workspace-activity-emails-card",
+    "setting:workspace_activity_emails"
+   ]
+  }
+ ],
+ "notFeatures": [
+  {
+   "src": "modal:userSettingsInfoModal",
+   "why": "dead markup: nothing in js/ or the PHP opens it, only its close button is wired"
+  },
+  {
+   "src": "action:close-user-settings-info-modal",
+   "why": "close button of the dead userSettingsInfoModal"
+  },
+  {
+   "src": "action:open-password-settings",
+   "why": "button of the dead userSettingsInfoModal"
+  }
+ ]
+}
