@@ -5227,7 +5227,11 @@
   "page_menu": {
     "button": "추가 옵션",
     "split_view": "분할 보기",
-    "markdown_view": "Markdown 보기 (기본, 실시간 미리보기, 서식 있는 텍스트, 분할)"
+    "markdown_view": "Markdown 보기 (기본, 실시간 미리보기, 서식 있는 텍스트, 분할)",
+    "page_width": "페이지 너비",
+    "width_default": "기본값",
+    "width_reset": "기본값으로 재설정",
+    "width_error": "너비를 저장할 수 없습니다."
   },
   "keyboard_shortcuts": {
     "menu_item": "키보드 단축키",

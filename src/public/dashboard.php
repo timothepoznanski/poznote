@@ -3,6 +3,7 @@
  * Notes board - visual dashboard of notes grouped by folder.
  */
 require_once __DIR__ . '/../page_bootstrap.php';
+require_once __DIR__ . '/../lib/page-width.php';
 
 $pageWorkspace = trim(getWorkspaceFilter());
 $currentLang = getUserLanguage();
@@ -448,6 +449,8 @@ if ($dashboardScope['mode'] === 'tag' && empty($dashboardScope['workspaces'])) {
 // stayed one level up, so this fell back to time() and changed the asset
 // URL on every single page load.
 $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
+// Width of the board, from the slider of its toolbar (js/page-width.js)
+$pageWidthStyle = poznotePageWidthStyle('dashboard');
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -501,7 +504,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 <?php if ($aiPanelWorkspaces !== []): ?>
       data-ai-workspaces="<?php echo htmlspecialchars(json_encode($aiPanelWorkspaces, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>"
 <?php endif; ?>
-      data-scope="<?php echo htmlspecialchars($dashboardScope['key'], ENT_QUOTES, 'UTF-8'); ?>">
+      data-scope="<?php echo htmlspecialchars($dashboardScope['key'], ENT_QUOTES, 'UTF-8'); ?>"<?php if ($pageWidthStyle !== ''): ?> style="<?php echo $pageWidthStyle; ?>"<?php endif; ?>>
     <?php
     // The AI assistant toggle lives in the floating stack at the bottom-right
     // of the page (ui_customization_panel.php), like on index.php.
@@ -526,6 +529,17 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			<header class="dashboard-topbar">
 				<div class="board-filter-row">
 				<?php renderBoardViewMenu('dashboard'); ?>
+				<?php // Width of the board: a slider in a popover (js/page-width.js). The setting belongs to the account. ?>
+				<?php if (isActiveAccountOwnedByAuthenticatedUser()): ?>
+				<div id="dashboardWidth" class="dashboard-width-wrap">
+					<button type="button" id="dashboardWidthBtn" class="board-view-btn" data-page-width-toggle aria-haspopup="true" aria-expanded="false" aria-controls="dashboardWidthPopover" title="<?php echo t_h('page_menu.page_width', [], 'Page width'); ?>" aria-label="<?php echo t_h('page_menu.page_width', [], 'Page width'); ?>">
+						<i class="lucide lucide-move-horizontal"></i>
+					</button>
+					<div id="dashboardWidthPopover" class="dashboard-width-popover" hidden>
+						<?php poznoteRenderPageWidthSlider('dashboard', 'dashboardWidthSlider'); ?>
+					</div>
+				</div>
+				<?php endif; ?>
 				<?php // One button for the favorites, color, last-modified and tag filters: a panel with a section each (initFilterPanel in js/dashboard-page.js) ?>
 				<div class="dashboard-color-filter-wrap">
 					<button type="button" id="dashboardFilterBtn" class="dashboard-color-filter-btn dashboard-filter-btn" title="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-label="<?php echo t_h('dashboard.filters.button', [], 'Filters'); ?>" aria-haspopup="true" aria-expanded="false">
@@ -754,6 +768,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
     <!-- Contextual UI Customization panel (see ui_customization_panel.php) -->
     <script src="<?php echo poznoteAsset('js/ui-customization.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/ui-customization-panel.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/page-width.js'); ?>"></script>
     <?php // Target of the rel="expect" link in <head>: keep it last ?>
     <span id="dashboardPageEnd" hidden></span>
 </body>

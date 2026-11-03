@@ -5227,7 +5227,11 @@
   "page_menu": {
     "button": "More options",
     "split_view": "Split view",
-    "markdown_view": "Markdown view (classic, live preview, rich text, split)"
+    "markdown_view": "Markdown view (classic, live preview, rich text, split)",
+    "page_width": "Page width",
+    "width_default": "Default",
+    "width_reset": "Reset to default",
+    "width_error": "Could not save the width."
   },
   "keyboard_shortcuts": {
     "menu_item": "Keyboard shortcuts",

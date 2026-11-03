@@ -5392,7 +5392,11 @@
   "page_menu": {
     "button": "Mais opções",
     "split_view": "Vista dividida",
-    "markdown_view": "Vista Markdown (clássica, pré-visualização em tempo real, texto formatado, dividida)"
+    "markdown_view": "Vista Markdown (clássica, pré-visualização em tempo real, texto formatado, dividida)",
+    "page_width": "Largura da página",
+    "width_default": "Predefinido",
+    "width_reset": "Repor o valor predefinido",
+    "width_error": "Não foi possível guardar a largura."
   },
   "keyboard_shortcuts": {
     "menu_item": "Atalhos de teclado",

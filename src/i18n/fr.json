@@ -5496,7 +5496,11 @@
   "page_menu": {
     "button": "Plus d'options",
     "split_view": "Vue divisée",
-    "markdown_view": "Vue Markdown (classique, aperçu en direct, texte enrichi, divisée)"
+    "markdown_view": "Vue Markdown (classique, aperçu en direct, texte enrichi, divisée)",
+    "page_width": "Largeur de la page",
+    "width_default": "Par défaut",
+    "width_reset": "Revenir à la valeur par défaut",
+    "width_error": "Impossible d'enregistrer la largeur."
   },
   "keyboard_shortcuts": {
     "menu_item": "Raccourcis clavier",

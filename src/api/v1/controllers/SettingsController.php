@@ -659,6 +659,17 @@ class SettingsController {
             return (string) poznoteSpeedDialTileSize($value);
         }
 
+        // Width of the speed dial and of the dashboard (js/page-width.js):
+        // a percentage, empty for the page's own layout
+        if ($key === 'speed_dial_width' || $key === 'dashboard_width') {
+            require_once __DIR__ . '/../../../lib/page-width.php';
+            $width = poznotePageWidth($value);
+            if ($width === null && trim((string) $value) !== '') {
+                throw new InvalidArgumentException($key . ' must be a percentage or empty', 400);
+            }
+            return $width === null ? '' : (string) $width;
+        }
+
         // Button => #rrggbb maps painted on the icon rail
         // (poznoteNormalizeIconSidebarColors()) and the note toolbar
         // (poznoteNormalizeToolbarIconColors()).

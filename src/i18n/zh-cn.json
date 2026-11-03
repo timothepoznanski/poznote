@@ -5488,7 +5488,11 @@
   "page_menu": {
     "button": "更多选项",
     "split_view": "分屏视图",
-    "markdown_view": "Markdown 视图（经典、实时预览、富文本、分屏）"
+    "markdown_view": "Markdown 视图（经典、实时预览、富文本、分屏）",
+    "page_width": "页面宽度",
+    "width_default": "默认",
+    "width_reset": "恢复默认",
+    "width_error": "无法保存宽度。"
   },
   "keyboard_shortcuts": {
     "menu_item": "键盘快捷键",

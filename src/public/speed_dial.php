@@ -13,6 +13,7 @@
 require_once __DIR__ . '/../page_bootstrap.php';
 require_once __DIR__ . '/../lib/note-sort.php';
 require_once __DIR__ . '/../lib/speed-dial.php';
+require_once __DIR__ . '/../lib/page-width.php';
 
 function speedDialLetter(string $text): string {
     return mb_strtoupper(mb_substr($text, 0, 1, 'UTF-8'), 'UTF-8');
@@ -113,6 +114,8 @@ $rows = array_filter($stmt->fetchAll(PDO::FETCH_ASSOC), static fn($note) => pozn
 usort($rows, static fn($a, $b) => poznoteComparePlacedOrder($a, $b, 'speed_dial_order'));
 $items = array_map(static fn($note) => speedDialBuildItem($note, $workspace), $rows);
 $tileSize = poznoteSpeedDialTileSize(getSetting('speed_dial_tile_size', POZNOTE_SPEED_DIAL_TILE_DEFAULT));
+// Width of the column, from the slider of its toolbar (js/page-width.js)
+$pageWidthStyle = poznotePageWidthStyle('speed-dial');
 $labelColors = poznoteSpeedDialNormalizeLabelColors((array)json_decode((string)getSetting('speed_dial_label_colors', '{}'), true));
 
 // The view's own image, api_upload_background.php?scope=speed_dial. In the page
@@ -145,7 +148,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<?php poznoteRenderBrandIcons(); ?>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
-<body class="speed-dial-page has-icon-sidebar<?php echo $backgroundUrl !== null ? ' has-speed-dial-background' : ''; ?>" data-board="<?php echo htmlspecialchars($board, ENT_QUOTES, 'UTF-8'); ?>" data-board-key="<?php echo $boardKey; ?>" style="--speed-dial-tile-width: <?php echo $tileSize; ?>px" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
+<body class="speed-dial-page has-icon-sidebar<?php echo $backgroundUrl !== null ? ' has-speed-dial-background' : ''; ?>" data-board="<?php echo htmlspecialchars($board, ENT_QUOTES, 'UTF-8'); ?>" data-board-key="<?php echo $boardKey; ?>" style="--speed-dial-tile-width: <?php echo $tileSize; ?>px<?php echo $pageWidthStyle !== '' ? '; ' . $pageWidthStyle : ''; ?>" data-workspace="<?php echo htmlspecialchars($workspace, ENT_QUOTES, 'UTF-8'); ?>">
 	<?php if ($backgroundUrl !== null): ?>
 	<div class="speed-dial-background" style="background-image: url('<?php echo htmlspecialchars($backgroundUrl, ENT_QUOTES, 'UTF-8'); ?>'); opacity: <?php echo $backgroundOpacity / 100; ?>;"></div>
 	<?php endif; ?>
@@ -185,19 +188,9 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		<?php ob_start(); ?>
 		<?php // Created from the default speed dial only ?>
 		<?php if ($canEditBoards && $boardKey === ''): ?><button type="button" id="speedDialNewBtn" class="speed-dial-board-new" title="<?php echo t_h('speed_dial.new_button', [], 'New speed dial'); ?>" aria-label="<?php echo t_h('speed_dial.new_button', [], 'New speed dial'); ?>"><i class="lucide lucide-plus"></i></button><?php endif; ?>
-		<?php $newBoardButton = trim((string)ob_get_clean()); ?>
-
-		<?php if (empty($items)): ?>
-		<?php if ($newBoardButton !== ''): ?>
-		<div class="speed-dial-toolbar is-empty"><?php echo $newBoardButton; ?></div>
-		<?php endif; ?>
-		<p class="speed-dial-empty"><?php echo t_h('speed_dial.empty', ['tag' => $board], 'Your speed dial is empty.'); ?></p>
-		<?php else: ?>
-		<div class="speed-dial-toolbar">
-		<div class="speed-dial-toolbar-actions">
-		<?php echo $newBoardButton; ?>
-		<?php // The setting belongs to the account: not for someone only looking at it ?>
+		<?php // The settings belong to the account: not for someone only looking at it ?>
 		<?php if (isActiveAccountOwnedByAuthenticatedUser()): ?>
+		<?php if (!empty($items)): ?>
 		<div id="speedDialSize" class="speed-dial-size">
 			<button type="button" id="speedDialSizeBtn" class="speed-dial-size-btn" aria-expanded="false" aria-controls="speedDialSizePopover" title="<?php echo t_h('speed_dial.tile_size', [], 'Tile size'); ?>" aria-label="<?php echo t_h('speed_dial.tile_size', [], 'Tile size'); ?>">
 				<i class="lucide lucide-zoom-in"></i>
@@ -208,6 +201,27 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			</div>
 		</div>
 		<?php endif; ?>
+		<?php // Width of the column: a slider in a popover (js/page-width.js) ?>
+		<div id="speedDialWidth" class="speed-dial-size speed-dial-width">
+			<button type="button" id="speedDialWidthBtn" class="speed-dial-size-btn" data-page-width-toggle aria-haspopup="true" aria-expanded="false" aria-controls="speedDialWidthPopover" title="<?php echo t_h('page_menu.page_width', [], 'Page width'); ?>" aria-label="<?php echo t_h('page_menu.page_width', [], 'Page width'); ?>">
+				<i class="lucide lucide-move-horizontal"></i>
+			</button>
+			<div id="speedDialWidthPopover" class="speed-dial-size-popover" hidden>
+				<?php poznoteRenderPageWidthSlider('speed-dial', 'speedDialWidthSlider'); ?>
+			</div>
+		</div>
+		<?php endif; ?>
+		<?php $toolbarButtons = trim((string)ob_get_clean()); ?>
+
+		<?php if (empty($items)): ?>
+		<?php if ($toolbarButtons !== ''): ?>
+		<div class="speed-dial-toolbar is-empty"><div class="speed-dial-toolbar-actions"><?php echo $toolbarButtons; ?></div></div>
+		<?php endif; ?>
+		<p class="speed-dial-empty"><?php echo t_h('speed_dial.empty', ['tag' => $board], 'Your speed dial is empty.'); ?></p>
+		<?php else: ?>
+		<div class="speed-dial-toolbar">
+		<div class="speed-dial-toolbar-actions">
+		<?php echo $toolbarButtons; ?>
 		</div>
 		<div id="speedDialFilter" class="home-search-container">
 			<div class="home-search-wrapper">
@@ -284,5 +298,6 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="<?php echo poznoteAsset('js/workspace-background.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/ui-customization.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/ui-customization-panel.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/page-width.js'); ?>"></script>
 </body>
 </html>

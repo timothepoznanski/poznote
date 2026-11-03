@@ -5227,7 +5227,11 @@
   "page_menu": {
     "button": "その他のオプション",
     "split_view": "分割表示",
-    "markdown_view": "Markdown表示（クラシック、ライブプレビュー、リッチテキスト、分割）"
+    "markdown_view": "Markdown表示（クラシック、ライブプレビュー、リッチテキスト、分割）",
+    "page_width": "ページの幅",
+    "width_default": "既定",
+    "width_reset": "既定値に戻す",
+    "width_error": "幅を保存できませんでした。"
   },
   "keyboard_shortcuts": {
     "menu_item": "キーボードショートカット",

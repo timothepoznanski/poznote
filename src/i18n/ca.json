@@ -5227,7 +5227,11 @@
   "page_menu": {
     "button": "Més opcions",
     "split_view": "Visualització dividida",
-    "markdown_view": "Visualització Markdown (clàssica, previsualització, text enriquit, dividida)"
+    "markdown_view": "Visualització Markdown (clàssica, previsualització, text enriquit, dividida)",
+    "page_width": "Amplada de la pàgina",
+    "width_default": "Per defecte",
+    "width_reset": "Restableix el valor per defecte",
+    "width_error": "No s'ha pogut desar l'amplada."
   },
   "keyboard_shortcuts": {
     "menu_item": "Dreceres de teclat",

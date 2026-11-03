@@ -196,18 +196,11 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     /* Each column docked on the right of the note (outline, AI chat, UI
        customization panel) declares its width in one of these on <html> or
        <body>; the fixed controls add them up instead of listing every
-       combination. css/ui-customization-panel.css reads them too. */
+       combination. css/ui-customization-panel.css reads them too, and
+       declares the AI chat's and its own panel's: those two dock on the
+       dashboard and the speed dial as well, which do not load this sheet. */
     html:not(.outline-collapsed):not(.outline-no-note) {
         --pz-docked-outline: var(--outline-width, 280px);
-    }
-
-    html.ai-chat-open,
-    body:has(#ai-chat-panel.ai-chat-open) {
-        --pz-docked-ai-chat: var(--ai-chat-width, 380px);
-    }
-
-    body.ui-custom-panel-open {
-        --pz-docked-ui-custom: var(--ui-custom-panel-width, 360px);
     }
 
     /* --pz-docked-note-scrollbar, the room left for the note's scrollbar

@@ -31,9 +31,12 @@ body.dashboard-page {
 
 .dashboard-container {
     flex: 1;
-    /* Full available width: the card grid fits as many columns as the screen
-       allows (capped by the column-count setting) and centers itself. */
-    max-width: 100%;
+    /* Full available width by default: the card grid fits as many columns as
+       the screen allows and centers itself. The slider of the toolbar narrows
+       it (js/page-width.js, lib/page-width.php), the columns that fit follow
+       (board-view-menu.js). */
+    max-width: var(--dashboard-width, 100%);
+    margin-inline: auto;
     padding-top: 0;
     padding-bottom: 0;
     min-width: 0;
@@ -621,6 +624,46 @@ html[data-theme='dark'] .dash-section-title {
 /* Tag chips sit on the tinted background, so lift them slightly */
 .dash-card.has-note-color .board-card-tag {
     background: color-mix(in srgb, var(--note-color) 16%, var(--pz-bg));
+}
+
+/* ---------- Board width (topbar) ----------
+   A .board-view-btn opening the width slider (js/page-width.js, the row is
+   styled in css/ui-customization-panel.css). Fixed like the filter panel:
+   the topbar is an overflow-x:auto scroller that would clip it. JS places it
+   under its button. */
+
+.dashboard-width-wrap {
+    display: inline-flex;
+    flex-shrink: 0;
+}
+
+.board-view-btn[aria-expanded="true"] {
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+}
+
+.dashboard-width-popover {
+    position: fixed;
+    z-index: 1200;
+    box-sizing: border-box;
+    width: 260px;
+    padding: 10px 12px 12px;
+    background: var(--pz-bg);
+    border: 1.5px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.12);
+    color: var(--pz-text);
+    font-size: 13px;
+}
+
+.dashboard-width-popover[hidden] {
+    display: none;
+}
+
+html[data-theme='dark'] .dashboard-width-popover {
+    background: var(--pz-surface);
+    border-color: var(--pz-border);
+    box-shadow: 0 6px 20px rgba(var(--pz-shadow-rgb), 0.5);
 }
 
 /* ---------- Note color filter (topbar) ---------- */

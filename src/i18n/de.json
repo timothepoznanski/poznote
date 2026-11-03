@@ -5391,7 +5391,11 @@
   "page_menu": {
     "button": "Weitere Optionen",
     "split_view": "Geteilte Ansicht",
-    "markdown_view": "Markdown-Ansicht (klassisch, Live-Vorschau, Rich Text, geteilt)"
+    "markdown_view": "Markdown-Ansicht (klassisch, Live-Vorschau, Rich Text, geteilt)",
+    "page_width": "Seitenbreite",
+    "width_default": "Standard",
+    "width_reset": "Auf Standard zurücksetzen",
+    "width_error": "Die Breite konnte nicht gespeichert werden."
   },
   "keyboard_shortcuts": {
     "menu_item": "Tastenkürzel",
