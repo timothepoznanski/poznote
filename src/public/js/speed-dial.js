@@ -38,10 +38,11 @@ document.addEventListener('mouseover', function (event) {
     if (tile) tile.classList.toggle('is-url-above', tile.getBoundingClientRect().bottom + 100 > window.innerHeight);
 });
 
-// Background image, from the "..." menu of the floating stack: the modal of the
-// workspaces' background (js/workspace-background.js), for the view's own image.
+// Background image, from its button in the floating stack at the bottom-right
+// (ui_customization_panel.php): the modal of the workspaces' background
+// (js/workspace-background.js), for the view's own image.
 document.addEventListener('DOMContentLoaded', function () {
-    var button = document.getElementById('edgeMenuSpeedDialBackground');
+    var button = document.getElementById('edgeSpeedDialBackgroundBtn');
     if (!button) return;
 
     button.addEventListener('click', function () {

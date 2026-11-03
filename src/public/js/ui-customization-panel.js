@@ -498,10 +498,13 @@
         return !!moreMenu && !moreMenu.hidden;
     }
 
-    // Entries the UI Customization runtime has not hidden
+    // Entries the UI Customization runtime has not hidden, as the elements
+    // that take the focus: a width slider row is reached through its slider
     function visibleMoreMenuItems() {
         return Array.prototype.filter.call(moreMenu.querySelectorAll('.page-more-menu-item'), function (item) {
             return item.offsetParent !== null;
+        }).map(function (item) {
+            return item.querySelector('.page-more-menu-slider-input') || item;
         });
     }
 
@@ -585,24 +588,16 @@
             infoItem.setAttribute('data-note-id', noteId);
         }
 
-        // Outside the split view the entry is the note's own width, stored on
-        // the note, so it waits for the lock. Inside it, the same entry cycles
-        // the ratio of the two panes (discussion 1483): that is a layout
+        // Outside the split view the slider is the note's own width, stored
+        // on the note, so it waits for the lock. Inside it, the same slider
+        // moves the seam of the two panes (discussion 1483): that is a layout
         // preference of this browser, nothing is written to the note, so the
         // lock does not reach it.
         var widthItem = document.getElementById('edgeMenuNoteWidth');
         if (widthItem) {
             widthItem.hidden = !entry || (isLocked && !isSplit);
-            widthItem.setAttribute('data-note-id', noteId);
-            var label = widthItem.querySelector('.page-more-menu-label');
-            if (label) {
-                label.textContent = widthItem.getAttribute(isSplit ? 'data-label-split' : 'data-label') || label.textContent;
-            }
-            var state = widthItem.querySelector('.page-more-menu-state');
-            if (state) {
-                state.textContent = (noteId && typeof window.describeNoteWidth === 'function')
-                    ? window.describeNoteWidth(noteId)
-                    : '';
+            if (typeof window.syncNoteWidthSlider === 'function') {
+                window.syncNoteWidthSlider(noteId);
             }
         }
 
@@ -852,14 +847,6 @@
                 if (modal && (name === 'close-help-modal' || e.target === modal)) {
                     setHelpModalOpen(modal, false);
                 }
-                return;
-            }
-
-            // The width cycles through its steps: the menu stays open so each
-            // click is one step, and its entry says where the note landed
-            // (js/note-width-toggle.js ran on this same click)
-            if (name === 'cycle-note-width') {
-                setTimeout(syncNoteControls, 0);
                 return;
             }
 

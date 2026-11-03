@@ -356,6 +356,9 @@
     },
     "messages": {
       "upload_success": "¡Archivo subido exitosamente!",
+      "upload_success_many": "¡{{count}} archivos subidos exitosamente!",
+      "attached_one": "Adjuntado: {{filename}}",
+      "attached_many": "{{count}} archivos adjuntados",
       "deleted_success": "Adjunto eliminado exitosamente",
       "link_copied": "¡Enlace copiado!",
       "moved_success": "Adjunto movido a «{{heading}}»"
@@ -364,7 +367,7 @@
       "title": "Administrar adjuntos",
       "subtitle": "Administrar adjuntos para la nota:",
       "upload_section_title": "Subir nuevo adjunto",
-      "drag_drop_info": "Puedes arrastrar y soltar tu archivo a continuación:",
+      "drag_drop_info": "Puedes arrastrar y soltar tus archivos a continuación:",
       "all_types_accepted": "Todos los tipos de archivo aceptados (máx 200MB)",
       "upload_button": "Adjuntar",
       "current_attachments": "Adjuntos actuales",
@@ -423,6 +426,13 @@
       "empty": "No se encontró ninguna otra nota",
       "moving": "Moviendo...",
       "kept_notice": "Queda una copia en esta nota, cuyo contenido usa el archivo."
+    },
+    "image_drop": {
+      "title": "Soltar una imagen",
+      "message_one": "¿Insertar la imagen en la nota o añadirla a los adjuntos?",
+      "message_many": "¿Insertar las {{count}} imágenes en la nota o añadirlas a los adjuntos?",
+      "attach": "Añadir como adjunto",
+      "insert": "Insertar en la nota"
     }
   },
   "auth": {
@@ -5382,7 +5392,11 @@
   "page_menu": {
     "button": "Más opciones",
     "split_view": "Vista dividida",
-    "markdown_view": "Vista Markdown (clásica, vista previa en vivo, texto enriquecido, dividida)"
+    "markdown_view": "Vista Markdown (clásica, vista previa en vivo, texto enriquecido, dividida)",
+    "page_width": "Ancho de la página",
+    "width_default": "Predeterminado",
+    "width_reset": "Restablecer valor predeterminado",
+    "width_error": "No se pudo guardar el ancho."
   },
   "keyboard_shortcuts": {
     "menu_item": "Atajos de teclado",

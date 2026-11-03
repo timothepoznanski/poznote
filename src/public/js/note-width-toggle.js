@@ -1,20 +1,20 @@
 /**
- * Note content width toggle ("..." menu of the floating stack,
+ * Note content width slider ("..." menu of the floating stack,
  * ui_customization_panel.php).
  *
- * Cycles the opened note through a few width presets, as percentages of the
- * note column, and stores the choice on that note only
- * (entries.content_width). This overrides the global center_note_content
- * setting from settings.php for this note. One step of the ring is
- * "default": the override is cleared and the note follows the global
- * setting again.
+ * Sets the width of the opened note, as a percentage of the note column, and
+ * stores it on that note only (entries.content_width). This overrides the
+ * global center_note_content setting from settings.php for this note; the
+ * reset button clears the override and the note follows the global setting
+ * again. While the dual pane view is open the same slider moves the seam
+ * between the two panes instead (js/markdown-split-resize.js).
  */
 (function () {
     'use strict';
 
-    // Ring of states: null = follow the global setting, 100 = full width.
-    var WIDTH_RING = [null, 50, 60, 70, 85, 100];
+    var MIN_WIDTH = 10;
     var FULL_WIDTH = 100;
+    var WIDTH_STEP = 5;
     var TOAST_DURATION = 1200;
     var SAVE_DEBOUNCE = 400;
 
@@ -26,7 +26,7 @@
     }
 
     // Width the global setting renders (settings.php). `percent` is null for
-    // a legacy pixel value, which no step of the ring can equal.
+    // a legacy pixel value, which no position of the slider can equal.
     function readGlobalWidth() {
         if (!document.body || !document.body.classList.contains('center-note-content')) {
             return { percent: FULL_WIDTH, label: pxOrPercentLabel(FULL_WIDTH, '%') };
@@ -53,31 +53,7 @@
 
         var parsed = parseInt(card.getAttribute('data-content-width'), 10);
 
-        return isNaN(parsed) ? null : Math.min(FULL_WIDTH, Math.max(10, parsed));
-    }
-
-    // Next state on the ring. A step that renders exactly like the global
-    // setting is skipped: "default" already covers that look. A custom value
-    // set through the API resumes at the first wider step.
-    function nextOverride(current, globalPercent) {
-        var index = WIDTH_RING.indexOf(current);
-
-        if (index === -1) {
-            index = WIDTH_RING.length - 1;
-            for (var i = 1; i < WIDTH_RING.length; i++) {
-                if (WIDTH_RING[i] > current) {
-                    index = i - 1;
-                    break;
-                }
-            }
-        }
-
-        var next = WIDTH_RING[(index + 1) % WIDTH_RING.length];
-        if (next !== null && next === globalPercent) {
-            next = WIDTH_RING[(index + 2) % WIDTH_RING.length];
-        }
-
-        return next;
+        return isNaN(parsed) ? null : Math.min(FULL_WIDTH, Math.max(MIN_WIDTH, parsed));
     }
 
     function pxOrPercentLabel(value, unit) {
@@ -100,21 +76,42 @@
             : 'Default (' + globalWidth.label + ')';
     }
 
-    // The step the note is on, as the menu entry shows it: "70%", or
-    // "Default (80%)" while the note follows the global setting. While the
-    // dual pane view is open the entry says where its seam is instead
-    // (js/markdown-split-resize.js): the note keeps the full column there, and
-    // it is the two panes that share a width.
-    function describeNoteWidth(noteId) {
-        if (typeof window.describeMarkdownSplitRatio === 'function') {
-            var splitLabel = window.describeMarkdownSplitRatio(noteId);
-            if (splitLabel) return splitLabel;
+    // What the slider shows for the note: its own width, or "Default (80 %)"
+    // with the thumb on the global width while the note follows it. While the
+    // dual pane view is open, where the seam is instead: the note keeps the
+    // full column there, and it is the two panes that share a width.
+    function sliderState(noteId) {
+        var split = (typeof window.getMarkdownSplitRatioState === 'function')
+            ? window.getMarkdownSplitRatioState(noteId)
+            : null;
+        if (split) {
+            return {
+                split: true,
+                min: split.min,
+                max: split.max,
+                step: 1,
+                value: Math.round(split.value),
+                label: split.label,
+                canReset: Math.round(split.value) !== split.defaultValue
+            };
         }
 
         var card = getNoteCard(noteId);
-        if (!card) return '';
+        if (!card) return null;
 
-        return stateLabel(readNoteOverride(card), readGlobalWidth());
+        var globalWidth = readGlobalWidth();
+        var override = readNoteOverride(card);
+        var fallback = globalWidth.percent !== null ? globalWidth.percent : FULL_WIDTH;
+
+        return {
+            split: false,
+            min: MIN_WIDTH,
+            max: FULL_WIDTH,
+            step: WIDTH_STEP,
+            value: override !== null ? override : fallback,
+            label: stateLabel(override, globalWidth),
+            canReset: override !== null
+        };
     }
 
     // Mirrors what note_display.php renders.
@@ -129,7 +126,8 @@
         card.style.setProperty('--note-content-width', override + '%');
     }
 
-    // Short-lived label: the reflow alone does not say which step you landed on.
+    // Short-lived label for js/markdown-split-resize.js, whose handle is
+    // dragged on the note itself, away from any value shown.
     function showWidthToast(text) {
         var toast = document.getElementById('note-width-toast');
         if (!toast) {
@@ -149,7 +147,7 @@
         }, TOAST_DURATION);
     }
 
-    // Debounced: cycling through several steps must not fire one PUT per click.
+    // Debounced: dragging the slider must not fire one PUT per step.
     function persistOverride(noteId, override) {
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(function () {
@@ -164,28 +162,98 @@
         }, SAVE_DEBOUNCE);
     }
 
-    function cycleNoteWidth(noteId) {
-        // Dual pane view open: the same entry cycles the ratio of the two panes
-        // (discussion 1483, js/markdown-split-resize.js).
-        if (typeof window.cycleMarkdownSplitRatio === 'function'
-            && window.cycleMarkdownSplitRatio(noteId)) {
+    function getRow() {
+        return document.getElementById('edgeMenuNoteWidth');
+    }
+
+    /**
+     * Point the slider at `noteId` and show where it is. Called by
+     * syncNoteControls() (js/ui-customization-panel.js) when a note loads,
+     * when the menu opens and when the view of the note changes.
+     */
+    function syncNoteWidthSlider(noteId) {
+        var row = getRow();
+        if (!row) return;
+
+        row.setAttribute('data-note-id', noteId || '');
+        var state = noteId ? sliderState(noteId) : null;
+        if (!state) return;
+
+        var label = row.querySelector('.page-more-menu-label');
+        var input = row.querySelector('.page-more-menu-slider-input');
+        var output = row.querySelector('.page-more-menu-slider-value');
+        var reset = row.querySelector('.page-more-menu-slider-reset');
+
+        if (label) {
+            label.textContent = row.getAttribute(state.split ? 'data-label-split' : 'data-label') || label.textContent;
+        }
+        // The bounds before the value, which the browser clamps to them
+        input.min = String(state.min);
+        input.max = String(state.max);
+        input.step = String(state.step);
+        input.value = String(state.value);
+        input.setAttribute('aria-valuetext', state.label);
+        output.textContent = state.label;
+        reset.hidden = !state.canReset;
+    }
+
+    function setNoteWidth(noteId, value) {
+        if (typeof window.setMarkdownSplitRatio === 'function'
+            && window.setMarkdownSplitRatio(noteId, value)) {
             return;
         }
 
         var card = getNoteCard(noteId);
         if (!card) return;
 
-        var globalWidth = readGlobalWidth();
-        var override = nextOverride(readNoteOverride(card), globalWidth.percent);
-
-        applyOverride(card, override);
-        showWidthToast(stateLabel(override, globalWidth));
-        persistOverride(noteId, override);
+        applyOverride(card, value);
+        persistOverride(noteId, value);
     }
 
-    window.cycleNoteWidth = cycleNoteWidth;
-    window.describeNoteWidth = describeNoteWidth;
-    // Shared with js/markdown-split-resize.js, which says the same kind of
-    // thing about the pane it just moved.
+    function resetNoteWidth(noteId) {
+        var split = (typeof window.getMarkdownSplitRatioState === 'function')
+            ? window.getMarkdownSplitRatioState(noteId)
+            : null;
+        if (split) {
+            window.setMarkdownSplitRatio(noteId, split.defaultValue);
+            return;
+        }
+
+        var card = getNoteCard(noteId);
+        if (!card) return;
+
+        applyOverride(card, null);
+        persistOverride(noteId, null);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var row = getRow();
+        if (!row) return;
+
+        var input = row.querySelector('.page-more-menu-slider-input');
+        var reset = row.querySelector('.page-more-menu-slider-reset');
+
+        // The note follows the thumb as it moves
+        input.addEventListener('input', function () {
+            var noteId = row.getAttribute('data-note-id');
+            if (!noteId) return;
+
+            setNoteWidth(noteId, parseInt(input.value, 10));
+            syncNoteWidthSlider(noteId);
+        });
+
+        reset.addEventListener('click', function () {
+            var noteId = row.getAttribute('data-note-id');
+            if (!noteId) return;
+
+            resetNoteWidth(noteId);
+            syncNoteWidthSlider(noteId);
+            // The button hides with nothing left to reset
+            input.focus();
+        });
+    });
+
+    window.syncNoteWidthSlider = syncNoteWidthSlider;
+    // Shared with js/markdown-split-resize.js
     window.showNoteWidthToast = showWidthToast;
 })();

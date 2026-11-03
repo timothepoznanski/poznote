@@ -178,13 +178,16 @@ html[data-theme='dark'] .note-creation-loading-dialog {
     background: var(--pz-danger-hover);
 }
 
-/* "Open all notes" on a folder with subfolders (js/utils-kanban.js): three
-   buttons, too wide for the default 400px, wrap rather than overflow. */
-.alert-modal.open-all-notes-confirm {
+/* "Open all notes" on a folder with subfolders (js/utils-kanban.js) and the
+   image drop choice (js/attachments.js): three buttons, too wide for the
+   default 400px, wrap rather than overflow. */
+.alert-modal.open-all-notes-confirm,
+.alert-modal.image-drop-choice {
     max-width: 500px;
 }
 
-.alert-modal.open-all-notes-confirm .alert-modal-footer {
+.alert-modal.open-all-notes-confirm .alert-modal-footer,
+.alert-modal.image-drop-choice .alert-modal-footer {
     flex-wrap: wrap;
 }
 

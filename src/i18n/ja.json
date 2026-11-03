@@ -746,6 +746,9 @@
     },
     "messages": {
       "upload_success": "ファイルをアップロードしました！",
+      "upload_success_many": "{{count}} 個のファイルをアップロードしました！",
+      "attached_one": "添付しました：{{filename}}",
+      "attached_many": "{{count}} 個のファイルを添付しました",
       "deleted_success": "添付ファイルを削除しました",
       "link_copied": "リンクをコピーしました！",
       "moved_success": "添付ファイルを「{{heading}}」に移動しました"
@@ -754,7 +757,7 @@
       "title": "添付ファイルの管理",
       "subtitle": "次のノートの添付ファイルを管理：",
       "upload_section_title": "新しい添付ファイルを選択",
-      "drag_drop_info": "下にファイルをドラッグ＆ドロップできます：",
+      "drag_drop_info": "下にファイルをドラッグ＆ドロップできます（複数可）：",
       "all_types_accepted": "すべての種類のファイルをアップロードできます（最大200MB）",
       "upload_button": "添付",
       "current_attachments": "現在の添付ファイル",
@@ -812,6 +815,13 @@
       "empty": "他のノートが見つかりません",
       "moving": "移動中...",
       "kept_notice": "このノートの本文がファイルを使っているため、このノートにもコピーが残ります。"
+    },
+    "image_drop": {
+      "title": "画像のドロップ",
+      "message_one": "画像をノートに挿入しますか？それとも添付ファイルに追加しますか？",
+      "message_many": "{{count}} 枚の画像をノートに挿入しますか？それとも添付ファイルに追加しますか？",
+      "attach": "添付ファイルとして追加",
+      "insert": "ノートに挿入"
     }
   },
   "modals": {
@@ -5217,7 +5227,11 @@
   "page_menu": {
     "button": "その他のオプション",
     "split_view": "分割表示",
-    "markdown_view": "Markdown表示（クラシック、ライブプレビュー、リッチテキスト、分割）"
+    "markdown_view": "Markdown表示（クラシック、ライブプレビュー、リッチテキスト、分割）",
+    "page_width": "ページの幅",
+    "width_default": "既定",
+    "width_reset": "既定値に戻す",
+    "width_error": "幅を保存できませんでした。"
   },
   "keyboard_shortcuts": {
     "menu_item": "キーボードショートカット",

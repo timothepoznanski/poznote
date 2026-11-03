@@ -746,6 +746,9 @@
     },
     "messages": {
       "upload_success": "File uploaded successfully!",
+      "upload_success_many": "{{count}} files uploaded successfully!",
+      "attached_one": "Attached: {{filename}}",
+      "attached_many": "{{count}} files attached",
       "deleted_success": "Attachment deleted successfully",
       "link_copied": "Link copied!",
       "moved_success": "Attachment moved to \"{{heading}}\""
@@ -754,7 +757,7 @@
       "title": "Manage attachments",
       "subtitle": "Manage attachments for note:",
       "upload_section_title": "Choose a new attachment",
-      "drag_drop_info": "You can drag and drop your file below:",
+      "drag_drop_info": "You can drag and drop your files below:",
       "all_types_accepted": "All file types accepted (max 200 MB)",
       "upload_button": "Attach",
       "current_attachments": "Current attachments",
@@ -812,6 +815,13 @@
       "empty": "No other note found",
       "moving": "Moving...",
       "kept_notice": "A copy stays in this note, whose content uses the file."
+    },
+    "image_drop": {
+      "title": "Drop an image",
+      "message_one": "Insert the image into the note, or add it to the attachments?",
+      "message_many": "Insert the {{count}} images into the note, or add them to the attachments?",
+      "attach": "Add as attachment",
+      "insert": "Insert into the note"
     }
   },
   "modals": {
@@ -5217,7 +5227,11 @@
   "page_menu": {
     "button": "More options",
     "split_view": "Split view",
-    "markdown_view": "Markdown view (classic, live preview, rich text, split)"
+    "markdown_view": "Markdown view (classic, live preview, rich text, split)",
+    "page_width": "Page width",
+    "width_default": "Default",
+    "width_reset": "Reset to default",
+    "width_error": "Could not save the width."
   },
   "keyboard_shortcuts": {
     "menu_item": "Keyboard shortcuts",

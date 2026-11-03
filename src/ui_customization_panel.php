@@ -150,9 +150,12 @@ $pzFocusModeLabel = t_h('focus_mode.button', [], 'Focus mode') . ' (F11)';
 require_once __DIR__ . '/markdown_syntax_content.php';
 ?>
     <!-- Floating stack at the bottom-right of the page: split view, customize
-         this page, AI assistant, focus mode, then the "..." menu (on the notes
-         page the note width; keyboard shortcuts, Markdown syntax, then the
-         open note's information). On the notes page the note's scroll-to-edge arrows
+         this page, AI assistant, focus mode (not on the dashboard and the
+         speed dial), then the "..." menu (the width of the open note,
+         keyboard shortcuts, Markdown syntax, then the open note's
+         information; none of them on the dashboard and the speed dial, whose
+         width is a button of their toolbar; the speed dial's background is
+         a button of this stack). On the notes page the note's scroll-to-edge arrows
          (note_display.php) sit under it, see css/ui-customization-panel.css. -->
     <div class="pz-edge-stack">
         <?php if ($uiCustomizationPanelPage === 'notes'): ?>
@@ -226,6 +229,13 @@ require_once __DIR__ . '/markdown_syntax_content.php';
             </div>
         </div>
         <?php endif; ?>
+        <?php if ($uiCustomizationPanelPage === 'speed-dial'): ?>
+        <!-- The speed dial's own background image (js/speed-dial.js) -->
+        <button type="button" id="edgeSpeedDialBackgroundBtn" class="pz-edge-btn"
+            title="<?php echo t_h('modals.background_image.title', [], 'Background Image Settings'); ?>" aria-label="<?php echo t_h('modals.background_image.title', [], 'Background Image Settings'); ?>">
+            <i class="lucide lucide-image"></i>
+        </button>
+        <?php endif; ?>
         <button type="button" id="edgeCustomizeBtn" class="pz-edge-btn" data-action="toggle-ui-customization-panel" aria-controls="uiCustomizationPanel"
             title="<?php echo $uiCustomizationPanelTitle; ?>" aria-label="<?php echo $uiCustomizationPanelTitle; ?>">
             <i class="lucide lucide-eye-off"></i>
@@ -236,7 +246,8 @@ require_once __DIR__ . '/markdown_syntax_content.php';
             <i class="lucide lucide-bot"></i>
         </button>
         <?php endif; ?>
-        <?php if ($uiCustomizationPanelPage !== 'speed-dial'): ?>
+        <?php // Not on the boards: F11 and ?focus= still work there ?>
+        <?php if ($uiCustomizationPanelPage !== 'speed-dial' && $uiCustomizationPanelPage !== 'dashboard'): ?>
         <button type="button" id="edgeFocusModeBtn" class="pz-edge-btn pz-edge-focus-btn" data-action="toggle-focus-mode" aria-pressed="false"
             title="<?php echo $pzFocusModeLabel; ?>" aria-label="<?php echo $pzFocusModeLabel; ?>">
             <i class="lucide lucide-maximize-2 pz-edge-focus-icon-on"></i>
@@ -257,29 +268,34 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     <i class="lucide lucide-eye-off"></i>
                     <span><?php echo $uiCustomizationPanelTitle; ?></span>
                 </button>
-                <?php if ($uiCustomizationPanelPage === 'speed-dial'): ?>
-                <!-- The view's background image (js/speed-dial.js) -->
-                <button type="button" id="edgeMenuSpeedDialBackground" class="page-more-menu-item" role="menuitem" data-action="open-speed-dial-background">
-                    <i class="lucide lucide-image"></i>
-                    <span><?php echo t_h('modals.background_image.title', [], 'Background Image Settings'); ?></span>
-                </button>
-                <?php endif; ?>
                 <?php if ($uiCustomizationPanelPage === 'notes'): ?>
                 <!-- The open note (discussion 1482). Width and Information
                      (at the end of the menu) used to be toolbar buttons;
                      js/ui-customization-panel.js shows them for the note that
-                     is open and keeps the menu open while the width
-                     cycles. The width is desktop only, like the layout it
-                     changes. Inside the dual pane view the same entry cycles
-                     the ratio of the two panes instead (discussion 1483), which
-                     is what its second label is for. -->
-                <button type="button" id="edgeMenuNoteWidth" class="page-more-menu-item page-more-menu-item-desktop" role="menuitem" data-action="cycle-note-width" hidden
+                     is open. The width is a slider (js/note-width-toggle.js),
+                     desktop only like the layout it changes; its reset button
+                     takes the note back to the width of the settings. Inside
+                     the dual pane view the same slider moves the seam of the
+                     two panes instead (discussion 1483), which is what its
+                     second label is for. No data-action: a click in the row
+                     leaves the menu open. -->
+                <div id="edgeMenuNoteWidth" class="page-more-menu-item page-more-menu-slider page-more-menu-item-desktop" role="group" aria-labelledby="edgeMenuNoteWidthLabel" hidden
                     data-label="<?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?>"
                     data-label-split="<?php echo t_h('index.toolbar.split_width', [], 'Dual pane width'); ?>">
-                    <i class="lucide lucide-move-horizontal"></i>
-                    <span><span class="page-more-menu-label"><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span><span class="page-more-menu-state"></span></span>
-                </button>
+                    <div class="page-more-menu-slider-head">
+                        <i class="lucide lucide-move-horizontal"></i>
+                        <span id="edgeMenuNoteWidthLabel" class="page-more-menu-label"><?php echo t_h('index.toolbar.note_width', [], 'Note width'); ?></span>
+                        <output class="page-more-menu-slider-value" for="edgeMenuNoteWidthInput"></output>
+                        <button type="button" class="page-more-menu-slider-reset" hidden
+                            title="<?php echo t_h('page_menu.width_reset', [], 'Reset to default'); ?>" aria-label="<?php echo t_h('page_menu.width_reset', [], 'Reset to default'); ?>">
+                            <i class="lucide lucide-rotate-ccw"></i>
+                        </button>
+                    </div>
+                    <input type="range" id="edgeMenuNoteWidthInput" class="page-more-menu-slider-input" min="10" max="100" step="5" value="100" aria-labelledby="edgeMenuNoteWidthLabel">
+                </div>
                 <?php endif; ?>
+                <?php // Help for the editor: the dashboard and the speed dial open no note, their "..." menu goes ?>
+                <?php if ($uiCustomizationPanelPage !== 'dashboard' && $uiCustomizationPanelPage !== 'speed-dial'): ?>
                 <button type="button" id="edgeMenuShortcuts" class="page-more-menu-item" role="menuitem" data-action="open-keyboard-shortcuts" aria-controls="keyboardShortcutsModal">
                     <i class="lucide lucide-keyboard"></i>
                     <span><?php echo t_h('keyboard_shortcuts.menu_item', [], 'Keyboard shortcuts'); ?></span>
@@ -288,6 +304,7 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                     <i class="lucide lucide-book-open"></i>
                     <span><?php echo t_h('markdown_syntax.menu_item', [], 'Markdown syntax'); ?></span>
                 </button>
+                <?php endif; ?>
                 <?php if ($uiCustomizationPanelPage === 'notes'): ?>
                 <!-- Information on the open note, last in the menu -->
                 <button type="button" id="edgeMenuNoteInfo" class="page-more-menu-item" role="menuitem" data-action="show-note-info" hidden>

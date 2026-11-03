@@ -1121,6 +1121,151 @@ function handleImageFilesAndInsert(files, dropTarget, dropPoint) {
     }
 }
 
+// Files dropped on a note that go to its attachments (discussion 1725), one
+// upload after the other: the server rewrites the note's whole list of
+// attachments on each one. Nothing is written into the note itself.
+function handleDroppedFilesAsAttachments(files, noteEntry) {
+    var noteId = noteEntry && noteEntry.id ? noteEntry.id.replace('entry', '') : '';
+    if (!noteId || !files) return;
+
+    var queue = Array.prototype.slice.call(files);
+    if (queue.length === 0) return;
+
+    var maxSize = 200 * 1024 * 1024; // 200MB, as the server
+    var attachedNames = [];
+    var failures = [];
+
+    function uploadNext() {
+        if (queue.length === 0) {
+            finish();
+            return;
+        }
+
+        var file = queue.shift();
+        if (file.size > maxSize) {
+            failures.push(file.name + ': ' + tr('attachments.errors.file_too_large', { maxSize: '200 MB' }, 'The file is too large (max: {{maxSize}}).'));
+            uploadNext();
+            return;
+        }
+
+        var formData = new FormData();
+        formData.append('note_id', noteId);
+        formData.append('file', file);
+        if (typeof selectedWorkspace !== 'undefined' && selectedWorkspace) {
+            formData.append('workspace', selectedWorkspace);
+        }
+
+        fetch('/api/v1/notes/' + noteId + '/attachments', {
+            method: 'POST',
+            body: formData
+        })
+            .then(function (response) {
+                return window.readApiJson(response);
+            })
+            .then(function (data) {
+                if (data && data.success) {
+                    attachedNames.push(file.name);
+                } else {
+                    failures.push(file.name + ': ' + window.apiErrorMessage(data));
+                }
+            })
+            .catch(function (error) {
+                failures.push(file.name + ': ' + window.apiErrorMessage(error));
+            })
+            .then(uploadNext);
+    }
+
+    function finish() {
+        if (attachedNames.length > 0) {
+            updateAttachmentCountInMenu(noteId);
+
+            if (typeof currentNoteIdForAttachments !== 'undefined' && currentNoteIdForAttachments == noteId) {
+                loadAttachments(noteId);
+            }
+
+            if (window.POZNOTE_CONFIG && window.POZNOTE_CONFIG.gitSyncAutoPush && typeof window.setNeedsAutoPush === 'function') {
+                window.setNeedsAutoPush(true);
+            }
+
+            if (typeof window.poznoteShowToast === 'function') {
+                window.poznoteShowToast(attachedNames.length === 1
+                    ? tr('attachments.messages.attached_one', { filename: attachedNames[0] }, 'Attached: {{filename}}')
+                    : tr('attachments.messages.attached_many', { count: attachedNames.length }, '{{count}} files attached'));
+            }
+        }
+
+        if (failures.length > 0 && typeof showNotificationPopup === 'function') {
+            var failureText = failures.length === 1 ? failures[0] : '\n' + failures.join('\n');
+            showNotificationPopup(tr('attachments.errors.upload_failed', { error: failureText }, 'Upload failed: {{error}}'), 'error');
+        }
+    }
+
+    uploadNext();
+}
+
+// Images dropped on a note: the user picks between the note's content and its
+// attachments. The insertion point is pinned before the dialog covers it.
+function handleDroppedImages(images, noteEntry, dropPoint) {
+    if (!images || images.length === 0) return;
+
+    var pinnedPoint = pinDropPoint(noteEntry, dropPoint);
+    askImageDropDestination(images.length).then(function (choice) {
+        if (choice === 'insert') {
+            if (!noteEntry.querySelector('.markdown-editor')) {
+                // The dialog took the focus away from the note
+                noteEntry.focus({ preventScroll: true });
+            }
+            handleImageFilesAndInsert(images, noteEntry, pinnedPoint);
+        } else if (choice === 'attach') {
+            handleDroppedFilesAsAttachments(images, noteEntry);
+        }
+    });
+}
+
+// Resolves with 'insert', 'attach', or null when the dialog is dismissed.
+// Cancel stays the first button: Escape and a backdrop click run it.
+function askImageDropDestination(count) {
+    return new Promise(function (resolve) {
+        if (!window.modalAlert || typeof window.modalAlert.showModal !== 'function') {
+            resolve('insert');
+            return;
+        }
+
+        window.modalAlert.showModal({
+            type: 'confirm',
+            message: count === 1
+                ? tr('attachments.image_drop.message_one', {}, 'Insert the image into the note, or add it to the attachments?')
+                : tr('attachments.image_drop.message_many', { count: count }, 'Insert the {{count}} images into the note, or add them to the attachments?'),
+            alertType: 'info',
+            title: tr('attachments.image_drop.title', {}, 'Drop an image'),
+            modalClass: 'image-drop-choice',
+            buttons: [
+                { text: tr('common.cancel', {}, 'Cancel'), type: 'secondary', action: function () { resolve(null); } },
+                { text: tr('attachments.image_drop.attach', {}, 'Add as attachment'), type: 'primary', action: function () { resolve('attach'); } },
+                { text: tr('attachments.image_drop.insert', {}, 'Insert into the note'), type: 'primary', action: function () { resolve('insert'); } }
+            ]
+        });
+    });
+}
+
+// The drop position as an editor position (CodeMirror) or a DOM range,
+// worked out while the point still lies over the note
+function pinDropPoint(noteEntry, dropPoint) {
+    if (!dropPoint) return dropPoint;
+
+    var pinned = { x: dropPoint.x, y: dropPoint.y };
+    var editor = noteEntry ? noteEntry.querySelector('.markdown-editor') : null;
+    var cmApi = _getCmApi();
+    if (editor && _isCmEditor(editor) && cmApi && typeof cmApi.getPosAtCoords === 'function') {
+        var pos = cmApi.getPosAtCoords(editor, dropPoint.x, dropPoint.y);
+        if (pos !== null && pos !== undefined) pinned.cmPos = pos;
+    } else {
+        var range = caretRangeAtPoint(dropPoint.x, dropPoint.y);
+        if (range && noteEntry && noteEntry.contains(range.startContainer)) pinned.range = range;
+    }
+    return pinned;
+}
+
 function handleSingleImageFile(file, dropTarget, dropPoint) {
     if (!file.type || !file.type.startsWith('image/')) return;
 
@@ -1178,7 +1323,9 @@ function handleMarkdownImageUpload(file, dropTarget, noteEntry, dropPoint) {
         // Insert at the drop location when we have one; the cursor may be
         // anywhere else (or the editor unfocused) during a drag-and-drop.
         var insertPos = null;
-        if (dropPoint && typeof cmApi.getPosAtCoords === 'function') {
+        if (dropPoint && dropPoint.cmPos !== undefined && typeof cmApi.getValue === 'function') {
+            insertPos = Math.min(dropPoint.cmPos, cmApi.getValue(editor).length);
+        } else if (dropPoint && typeof cmApi.getPosAtCoords === 'function') {
             insertPos = cmApi.getPosAtCoords(editor, dropPoint.x, dropPoint.y);
         }
         if (insertPos === null || insertPos === undefined) {
@@ -1396,7 +1543,7 @@ function insertMarkdownAtCursor(text, dropTarget, dropPoint) {
     if (editor) {
         // A drop lands at the pointed position, not at the previous cursor
         if (dropPoint) {
-            var pointRange = caretRangeAtPoint(dropPoint.x, dropPoint.y);
+            var pointRange = dropPoint.range || caretRangeAtPoint(dropPoint.x, dropPoint.y);
             if (pointRange && editor.contains(pointRange.startContainer)) {
                 var pointSel = window.getSelection();
                 pointSel.removeAllRanges();
@@ -1535,7 +1682,7 @@ function handleHTMLImageInsert(file, dropTarget, dropPoint) {
 
     // A drop lands at the pointed position, not at the previous cursor
     if (dropPoint) {
-        var pointRange = caretRangeAtPoint(dropPoint.x, dropPoint.y);
+        var pointRange = dropPoint.range || caretRangeAtPoint(dropPoint.x, dropPoint.y);
         if (pointRange && dropTarget.contains(pointRange.startContainer)) {
             var pointSel = window.getSelection();
             pointSel.removeAllRanges();

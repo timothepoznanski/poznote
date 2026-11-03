@@ -7,13 +7,65 @@
    and style the whole page, so the list could not bring them along.
    ========================================================================== */
 
-/* Filter above the list (js/workspaces-page.js): the Settings filter field,
-   across the section instead of centred */
+/* Above the list: the filter (once there are several workspaces) and the
+   "New workspace" button, which stays at the right end of the row */
+.ws-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: flex-end;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+/* Filter (js/workspaces-page.js): the Settings filter field, across the
+   section instead of centred */
 .workspace-list .ws-filter {
     /* css/home/responsive.css narrows the settings filter on a phone */
-    width: 100%;
+    flex: 1 1 240px;
+    width: auto;
     max-width: none;
-    margin: 0 0 12px;
+    margin: 0;
+}
+
+/* Same frame as the filter field beside it, the label in the accent colour */
+.ws-create-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--pz-bg);
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    color: var(--pz-accent-text);
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.ws-create-btn:hover,
+.ws-create-btn:focus-visible {
+    border-color: var(--pz-accent-text);
+}
+
+/* The plus takes the label's colour: without it the dark default of
+   dark-mode/icons.css paints it grey */
+.ws-create-btn .lucide {
+    width: 16px;
+    height: 16px;
+    color: inherit;
+}
+
+html[data-theme='dark'] .ws-create-btn {
+    background: var(--pz-surface, var(--pz-bg));
+}
+
+/* Nor does it grow under the pointer, the border answers it */
+html[data-theme='dark'] .ws-create-btn [class*="lucide-"]:hover {
+    transform: none;
+    color: inherit;
 }
 
 .workspace-list ul li.ws-row[hidden] {

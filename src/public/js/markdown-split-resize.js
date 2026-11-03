@@ -4,8 +4,8 @@
  * The split lays the editor and the preview out as flex items of the note
  * entry; the seam between them is --markdown-split-left, a percentage of the
  * note column (css/markdown.css). This module owns that value: a handle
- * between the panes drags it, the arrow keys nudge it, the "..." menu cycles
- * it through three presets while the split is open (js/note-width-toggle.js
+ * between the panes drags it, the arrow keys nudge it, the width slider of
+ * the "..." menu moves it while the split is open (js/note-width-toggle.js
  * delegates here), and the choice is remembered in this browser for every
  * note, like the width of the left column.
  *
@@ -21,10 +21,6 @@
     var MIN_RATIO = 20;
     var MAX_RATIO = 80;
     var KEYBOARD_STEP = 2;
-
-    // The ring the menu entry cycles, as discussion 1483 asked: halves first,
-    // so one more click from either lopsided step lands back on balance.
-    var PRESETS = [50, 40, 60];
 
     function clampRatio(value) {
         if (typeof value !== 'number' || isNaN(value)) {
@@ -301,33 +297,38 @@
     }
 
     /**
-     * Next preset, for the "Note width" entry of the "..." menu while the
-     * split is open (js/note-width-toggle.js). Returns false when this note is
-     * not split, so the caller cycles the note width as usual.
+     * Where the seam is, for the width slider of the "..." menu while the
+     * split is open (js/note-width-toggle.js). Null when this note is not
+     * split, so the slider is the note width as usual.
      */
-    function cycleMarkdownSplitRatio(noteId) {
+    function getMarkdownSplitRatioState(noteId) {
+        var noteEntry = getSplitNoteEntry(noteId);
+        if (!noteEntry) {
+            return null;
+        }
+
+        var ratio = currentRatio(noteEntry);
+        return {
+            value: ratio,
+            min: MIN_RATIO,
+            max: MAX_RATIO,
+            defaultValue: DEFAULT_RATIO,
+            label: ratioLabel(ratio)
+        };
+    }
+
+    /**
+     * Move the seam from the slider. Returns false when this note is not
+     * split, so the caller sets the note width instead.
+     */
+    function setMarkdownSplitRatio(noteId, ratio) {
         var noteEntry = getSplitNoteEntry(noteId);
         if (!noteEntry) {
             return false;
         }
 
-        // A dragged ratio is on no step of the ring: indexOf() gives -1 and the
-        // ring starts again at halves.
-        var index = PRESETS.indexOf(Math.round(currentRatio(noteEntry)));
-        var next = PRESETS[(index + 1) % PRESETS.length];
-
-        commitRatio(noteEntry, next);
-        showRatioToast(next);
-
+        commitRatio(noteEntry, clampRatio(ratio));
         return true;
-    }
-
-    /**
-     * The step the menu entry shows while the split is open, empty otherwise.
-     */
-    function describeMarkdownSplitRatio(noteId) {
-        var noteEntry = getSplitNoteEntry(noteId);
-        return noteEntry ? ratioLabel(currentRatio(noteEntry)) : '';
     }
 
     // Translations load after the handle may have been created.
@@ -340,6 +341,6 @@
     });
 
     window.setupMarkdownSplitResizer = setupMarkdownSplitResizer;
-    window.cycleMarkdownSplitRatio = cycleMarkdownSplitRatio;
-    window.describeMarkdownSplitRatio = describeMarkdownSplitRatio;
+    window.getMarkdownSplitRatioState = getMarkdownSplitRatioState;
+    window.setMarkdownSplitRatio = setMarkdownSplitRatio;
 })();

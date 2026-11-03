@@ -5,9 +5,10 @@
 
 // ========== CREATE WORKSPACE MODAL ==========
 // A workspace is a name and, optionally, tags: it is created in place, from
-// the workspace menu and the create (+) menu. A page that does not include
-// modals.php falls back to Settings > Workspaces, which opens the dialog on
-// arrival (workspaces.php?new=1 redirects there).
+// the workspace menu, the create (+) menu and the "New workspace" button of
+// Settings > Workspaces. A page that does not include modals.php falls back
+// to Settings > Workspaces, which opens the dialog on arrival
+// (workspaces.php?new=1 redirects there).
 
 function showCreateWorkspaceError(message) {
     var box = document.getElementById('createWorkspaceError');
@@ -101,8 +102,8 @@ function submitCreateWorkspaceModal() {
                 // create menu also lives on pages without it.
                 var created = result.data.name || name;
                 if (document.getElementById('settings-workspaces-list')) {
-                    // Created on Settings > Workspaces (the fallback
-                    // above): stay there, the new row is the confirmation
+                    // Created on Settings > Workspaces: stay there, the
+                    // new row is the confirmation
                     window.location.reload();
                 } else if (document.getElementById('left_col')) {
                     switchToWorkspace(created);

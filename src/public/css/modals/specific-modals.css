@@ -1265,7 +1265,13 @@
 /* Creation dialog of a workspace (modals.php): the tags field and its hint
    under the name. The hint belongs to the field: it sits close under it
    (the 15px that .modal-content input leaves under a field would set it
-   apart) and keeps its distance from the buttons instead. */
+   apart) and keeps its distance from the buttons instead. Both fields span
+   the dialog: nothing else gives them a width on a page without
+   css/workspaces.css (Settings, whose dialog is the same). */
+#createWorkspaceModal .form-group input[type="text"] {
+    width: 100%;
+}
+
 .modal-content .create-workspace-tags input {
     margin-bottom: 0;
 }

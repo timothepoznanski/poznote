@@ -7,7 +7,11 @@
 // This file also holds the window.* exports for the whole markdown module set, so
 // it must load last.
 
-function persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, noteId, newContent) {
+// patchPreview, when given, brings the rendered preview up to date in place and
+// returns true if it could: a border toggle then leaves every other block,
+// pictures included, where it is (a full render reloads the pictures, the note
+// moved while those above the one bordered took their height back).
+function persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, noteId, newContent, patchPreview) {
     renderMarkdownEditorContent(editorDiv, newContent);
     noteEntry.setAttribute('data-markdown-content', newContent);
 
@@ -24,7 +28,7 @@ function persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, note
         window.writeNoteDraft(noteId, newContent, titleInput ? titleInput.value : null, tagsElem ? tagsElem.value : null);
     }
 
-    if (previewDiv) {
+    if (previewDiv && !(patchPreview && patchPreview(previewDiv))) {
         renderMarkdownPreview(previewDiv, newContent, noteId, { delay: 50 });
     }
 
@@ -37,6 +41,21 @@ function persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, note
     } else if (typeof window.saveNoteImmediately === 'function') {
         window.saveNoteImmediately();
     }
+}
+
+// The border classes of the preview's pictures matching selector, as the
+// source now has them; false when the preview holds none of them
+function _mdPatchPreviewImageBorder(selector, borderClass) {
+    return function (previewDiv) {
+        var images = previewDiv.querySelectorAll(selector);
+        Array.prototype.forEach.call(images, function (image) {
+            image.classList.remove('img-with-border', 'img-with-border-no-padding');
+            if (borderClass) {
+                image.classList.add(borderClass);
+            }
+        });
+        return images.length > 0;
+    };
 }
 
 function toggleMarkdownImageBorder(img, borderClass) {
@@ -66,7 +85,8 @@ function toggleMarkdownImageBorder(img, borderClass) {
         return false;
     }
 
-    persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, noteId, newContent);
+    persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, noteId, newContent,
+        _mdPatchPreviewImageBorder('img[data-markdown-image-index="' + imageIndex + '"]', nextBorderClass));
 
     return true;
 }
@@ -166,7 +186,8 @@ function toggleMarkdownExcalidrawImageBorder(img, borderClass) {
         return false;
     }
 
-    persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, noteId, newContent);
+    persistMarkdownImageSourceChange(noteEntry, editorDiv, previewDiv, noteId, newContent,
+        _mdPatchPreviewImageBorder('.excalidraw-container[data-markdown-excalidraw-index="' + blockIndex + '"] img', nextBorderClass));
 
     return true;
 }

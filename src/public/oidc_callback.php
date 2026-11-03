@@ -40,8 +40,12 @@ try {
 
     // CSP-compliant redirect using external script with JSON config
     if (isAccountSelectionRequired()) {
+        // Read back by login.php while the account choice is pending; unset
+        // when there is none, so an abandoned earlier choice leaves nothing.
         if ($sanitizedRedirectAfter !== null) {
             $_SESSION['post_login_redirect'] = $sanitizedRedirectAfter;
+        } else {
+            unset($_SESSION['post_login_redirect']);
         }
         $redirectConfig = ['redirectAfter' => 'login.php?select_account=1'];
     } else {

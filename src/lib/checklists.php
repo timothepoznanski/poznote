@@ -100,7 +100,14 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true, $withLinks = f
     }
 
     if ($type === 'markdown') {
-        $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', str_replace("\x01", '', $raw));
+        // Backslash escapes ("\-" at the start of a line, "\*"...) show their
+        // character alone, as the rendered note does. The character is held
+        // as \x04<hex> until the markup is stripped, so an escaped "#" or "["
+        // is not read as markup; code keeps its backslashes.
+        $text = preg_replace_callback('/(```[\s\S]*?```|`[^`\n]*`)|\\\\([!-\/:-@\[-`{-~])/', function ($m) {
+            return ($m[1] ?? '') !== '' ? $m[0] : "\x04" . bin2hex($m[2]);
+        }, str_replace(["\x01", "\x04"], '', $raw));
+        $text = preg_replace('/```[^\n]*\n([\s\S]*?)```/', ' $1 ', $text);
         // A heading line keeps its level as \x01<level> until the excerpt is
         // cut, see 'headings' below.
         $text = preg_replace_callback('/^ {0,3}(#{1,6})[^\S\n]+(?=\S)/m', function ($m) {
@@ -146,6 +153,11 @@ function buildNoteCardPreview($noteId, $type, $withSearch = true, $withLinks = f
     $text = strip_tags($text);
     $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $text = str_replace("\r", '', $text);
+    if ($type === 'markdown') {
+        $text = preg_replace_callback('/\x04([0-9a-f]{2})/', function ($m) {
+            return hex2bin($m[1]);
+        }, $text);
+    }
     if ($withSearch) {
         $text = collapseNoteCardWhitespace($text);
     } else {

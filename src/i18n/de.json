@@ -356,6 +356,9 @@
     },
     "messages": {
       "upload_success": "Datei erfolgreich hochgeladen!",
+      "upload_success_many": "{{count}} Dateien erfolgreich hochgeladen!",
+      "attached_one": "Angehängt: {{filename}}",
+      "attached_many": "{{count}} Dateien angehängt",
       "deleted_success": "Anhang erfolgreich gelöscht",
       "link_copied": "Link kopiert!",
       "moved_success": "Anhang nach „{{heading}}“ verschoben"
@@ -364,7 +367,7 @@
       "title": "Anhänge verwalten",
       "subtitle": "Anhänge für Notiz verwalten:",
       "upload_section_title": "Neuen Anhang hochladen",
-      "drag_drop_info": "Sie können Ihre Datei unten ablegen:",
+      "drag_drop_info": "Sie können Ihre Dateien unten ablegen:",
       "all_types_accepted": "Alle Dateitypen akzeptiert (max 200MB)",
       "upload_button": "Anhängen",
       "current_attachments": "Aktuelle Anhänge",
@@ -423,6 +426,13 @@
       "empty": "Keine andere Notiz gefunden",
       "moving": "Wird verschoben...",
       "kept_notice": "Eine Kopie bleibt in dieser Notiz, deren Inhalt die Datei verwendet."
+    },
+    "image_drop": {
+      "title": "Bild ablegen",
+      "message_one": "Das Bild in die Notiz einfügen oder zu den Anhängen hinzufügen?",
+      "message_many": "Die {{count}} Bilder in die Notiz einfügen oder zu den Anhängen hinzufügen?",
+      "attach": "Als Anhang hinzufügen",
+      "insert": "In die Notiz einfügen"
     }
   },
   "auth": {
@@ -5381,7 +5391,11 @@
   "page_menu": {
     "button": "Weitere Optionen",
     "split_view": "Geteilte Ansicht",
-    "markdown_view": "Markdown-Ansicht (klassisch, Live-Vorschau, Rich Text, geteilt)"
+    "markdown_view": "Markdown-Ansicht (klassisch, Live-Vorschau, Rich Text, geteilt)",
+    "page_width": "Seitenbreite",
+    "width_default": "Standard",
+    "width_reset": "Auf Standard zurücksetzen",
+    "width_error": "Die Breite konnte nicht gespeichert werden."
   },
   "keyboard_shortcuts": {
     "menu_item": "Tastenkürzel",

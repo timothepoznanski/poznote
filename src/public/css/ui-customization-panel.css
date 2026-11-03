@@ -19,6 +19,21 @@
     }
 }
 
+/* The columns docked on the right on every page with the stack: the AI chat
+   and this panel. Declared here rather than in css/notes/noteentry.css (which
+   keeps the notes page's outline) so the stack moves aside on the dashboard
+   and the speed dial too. */
+@media (min-width: 801px) {
+    html.ai-chat-open,
+    body:has(#ai-chat-panel.ai-chat-open) {
+        --pz-docked-ai-chat: var(--ai-chat-width, 380px);
+    }
+
+    body.ui-custom-panel-open {
+        --pz-docked-ui-custom: var(--ui-custom-panel-width, 360px);
+    }
+}
+
 /* Floating stack at the bottom-right of the page (ui_customization_panel.php):
    the AI assistant toggle above this panel's toggle. Shifted left of the
    columns docked there (--pz-docked-*, css/notes/noteentry.css) and, on the
@@ -326,6 +341,94 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
 
 .page-more-menu-state:not(:empty)::before {
     content: ': ';
+}
+
+/* A width slider (#edgeMenuNoteWidth, js/note-width-toggle.js;
+   the toolbar popovers of the speed dial and the dashboard, js/page-width.js):
+   the name, the value and a reset button on one line, the slider of the
+   settings page (.settings-inline-range, css/settings.css) under them. In the
+   menu it is a row, not an entry: no hover ground. */
+.page-more-menu-slider {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    min-width: 240px;
+    padding-bottom: 9px;
+    cursor: default;
+}
+
+.page-more-menu-slider:hover {
+    background-color: transparent;
+}
+
+.page-more-menu-slider:hover [class*="lucide-"] {
+    color: var(--pz-text-muted);
+}
+
+.page-more-menu-slider-reset:hover [class*="lucide-"],
+.page-more-menu-slider-reset:focus-visible [class*="lucide-"] {
+    color: var(--pz-text);
+}
+
+.page-more-menu-slider-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 22px;
+}
+
+.page-more-menu-slider-value {
+    margin-left: auto;
+    font-size: 0.85em;
+    font-weight: var(--pz-weight-semibold);
+    font-variant-numeric: tabular-nums;
+    color: var(--pz-text-secondary);
+}
+
+.page-more-menu-slider-reset {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border: none;
+    border-radius: var(--pz-radius);
+    background: transparent;
+    cursor: pointer;
+}
+
+.page-more-menu-slider-reset[hidden] {
+    display: none;
+}
+
+.page-more-menu-slider-reset [class*="lucide-"] {
+    width: 14px;
+    color: var(--pz-text-muted);
+}
+
+.page-more-menu-slider-reset:hover,
+.page-more-menu-slider-reset:focus-visible {
+    background-color: var(--pz-surface-hover);
+    outline: none;
+}
+
+.page-more-menu-slider-input {
+    width: 100%;
+    margin: 0;
+    accent-color: var(--pz-accent);
+    cursor: pointer;
+}
+
+/* Outside the menu (the toolbar popovers) the box gives the room */
+.page-more-menu-slider:not(.page-more-menu-item) {
+    min-width: 0;
+    padding: 0;
+}
+
+html[data-theme='dark'] .page-more-menu-slider:hover {
+    background-color: transparent;
 }
 
 html[data-theme='dark'] .page-more-menu {

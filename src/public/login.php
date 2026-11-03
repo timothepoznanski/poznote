@@ -50,9 +50,16 @@ try {
     $currentLang = 'en';
 }
 
-$redirectAfter = oidc_sanitize_redirect($_POST['redirect'] ?? $_GET['redirect'] ?? ($_SESSION['post_login_redirect'] ?? null));
-if ($redirectAfter !== null) {
-    $_SESSION['post_login_redirect'] = $redirectAfter;
+// Where to go once signed in: named by this request (js/session-guard.js sends
+// a tab whose session ended here with its own URL, and every step of the form
+// carries it in a hidden field), or handed over in the session by
+// oidc_callback.php to the account choice that follows an SSO sign-in. Only
+// that hand-off goes through the session: when this page wrote every redirect
+// there, a tab left open on a note and bounced here after a logout sent the
+// next plain sign-in, from any tab, to that tab's note (issue #1726).
+$redirectAfter = oidc_sanitize_redirect($_POST['redirect'] ?? $_GET['redirect'] ?? null);
+if ($redirectAfter === null && isAccountSelectionRequired()) {
+    $redirectAfter = oidc_sanitize_redirect($_SESSION['post_login_redirect'] ?? null);
 }
 
 // The login page is pre-auth, so there is no user preference to read yet: pick
@@ -179,6 +186,9 @@ if ($_POST && ($_POST['action'] ?? '') !== 'select_account' && isset($_POST['use
         $error = t('login.errors.invalid_credentials', [], 'Incorrect username or password.', $currentLang ?? 'en');
         goto render_page;
     }
+    // This sign-in carries its own redirect: what an abandoned SSO sign-in
+    // left for its account choice must not reach the one that may follow
+    unset($_SESSION['post_login_redirect']);
     $username = $_POST['username'];
     $password = $_POST['password'];
     $rememberMe = isset($_POST['remember_me']) && $_POST['remember_me'] === '1';

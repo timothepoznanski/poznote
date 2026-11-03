@@ -7,9 +7,10 @@
  * It was a page of its own, workspaces.php, reached from a card of the
  * Actions section. That file still answers the actions of the list (its POST
  * handler is what js/workspaces-*.js call); what it displayed is drawn here,
- * so the list sits in Settings next to the settings that concern it. A
- * workspace is not created here: that is the "Create a new workspace" dialog
- * of modals.php, opened from the workspace menu and the create (+) menu.
+ * so the list sits in Settings next to the settings that concern it. The
+ * "New workspace" button above the list opens the "Create a new workspace"
+ * dialog of modals.php, the same one as the workspace menu and the create (+)
+ * menu.
  *
  * settings.php calls, in this order: poznoteWorkspacesSectionData() before
  * the page starts, poznoteWorkspacesSectionBodyAttributes() on <body> (the
@@ -128,9 +129,10 @@ function poznoteWorkspacesSectionBodyAttributes(array $data): string
 }
 
 /**
- * The list: a filter once there are several rows, then one row per
- * workspace. Share stays on the row and opens the "..." menu too; the other
- * actions sit behind that button only (js/workspaces-page.js).
+ * The list: a filter once there are several rows and the "New workspace"
+ * button, then one row per workspace. Share stays on the row and opens the
+ * "..." menu too; the other actions sit behind that button only
+ * (js/workspaces-page.js).
  */
 function poznoteRenderWorkspacesList(array $data): void
 {
@@ -146,21 +148,29 @@ function poznoteRenderWorkspacesList(array $data): void
     $deleteLabel = t_h('common.delete', [], 'Delete');
     $infoLabel = t_h('common.information', [], 'Information');
     $actionsMenuLabel = t_h('workspaces.actions.menu', [], 'Workspace actions');
+    $createLabel = t_h('workspaces.menu.new_workspace', [], 'New workspace');
     ?>
                 <div class="settings-workspaces-list workspace-list" id="settings-workspaces-list">
                     <!-- Messages of the list's actions (showTopAlert() in js/workspaces-create.js) -->
                     <div id="topAlert" class="initially-hidden alert-with-margin"></div>
 
-                    <?php if ($several): ?>
-                    <!-- Filters the rows below by name and tag (js/workspaces-page.js) -->
-                    <div class="home-search-wrapper ws-filter">
-                        <i class="lucide lucide-search home-search-icon"></i>
-                        <input type="text" id="workspace-filter-input" class="home-search-input" autocomplete="off" placeholder="<?php echo $filterLabel; ?>" aria-label="<?php echo $filterLabel; ?>">
-                        <button type="button" id="workspace-filter-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
-                            <i class="lucide lucide-x"></i>
+                    <div class="ws-toolbar">
+                        <?php if ($several): ?>
+                        <!-- Filters the rows below by name and tag (js/workspaces-page.js) -->
+                        <div class="home-search-wrapper ws-filter">
+                            <i class="lucide lucide-search home-search-icon"></i>
+                            <input type="text" id="workspace-filter-input" class="home-search-input" autocomplete="off" placeholder="<?php echo $filterLabel; ?>" aria-label="<?php echo $filterLabel; ?>">
+                            <button type="button" id="workspace-filter-clear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+                                <i class="lucide lucide-x"></i>
+                            </button>
+                        </div>
+                        <?php endif; ?>
+                        <!-- Opens the "Create a new workspace" dialog of modals.php
+                             (openCreateWorkspaceModal(), js/workspaces-create.js) -->
+                        <button type="button" class="ws-create-btn" id="settings-create-workspace-btn" title="<?php echo $createLabel; ?>">
+                            <i class="lucide lucide-plus"></i><span><?php echo $createLabel; ?></span>
                         </button>
                     </div>
-                    <?php endif; ?>
 
                     <?php if (empty($rows)): ?>
                     <div class="ws-list-empty"><?php echo t_h('workspaces.sections.existing.empty', [], 'No workspaces defined.'); ?></div>

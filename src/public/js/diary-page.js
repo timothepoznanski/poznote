@@ -475,7 +475,8 @@
     function updateJournalNoteExcerpt(note, content, type) {
         var text;
         if (type === 'markdown') {
-            text = String(content || '');
+            // "\-" shows "-", as on the server (lib/checklists.php)
+            text = String(content || '').replace(/\\([!-\/:-@\[-`{-~])/g, '$1');
         } else {
             var holder = document.createElement('div');
             holder.innerHTML = String(content || '');

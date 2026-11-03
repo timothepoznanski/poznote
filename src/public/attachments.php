@@ -124,6 +124,7 @@ if (!$note) {
       data-txt-select-file="<?php echo t_h('attachments.errors.select_file', [], 'Please select a file to upload.'); ?>"
       data-txt-file-too-large="<?php echo t_h('attachments.errors.file_too_large', ['maxSize' => '200MB'], 'The file is too large (max: {{maxSize}}).'); ?>"
       data-txt-upload-success="<?php echo t_h('attachments.messages.upload_success', [], 'File uploaded successfully!'); ?>"
+      data-txt-upload-success-many="<?php echo t_h('attachments.messages.upload_success_many', ['count' => '{{count}}'], '{{count}} files uploaded successfully!'); ?>"
       data-txt-upload-failed-prefix="<?php echo t_h('attachments.errors.upload_failed', ['error' => '{{error}}'], 'Upload failed: {{error}}'); ?>"
       data-txt-upload-failed-generic="<?php echo t_h('attachments.errors.upload_failed_generic', [], 'Upload failed. Please try again.'); ?>"
       data-txt-upload-failed-connection="<?php echo t_h('attachments.errors.upload_failed_connection', [], 'Upload failed. Please check your connection.'); ?>"
@@ -212,7 +213,7 @@ if (!$note) {
             <div class="attachment-upload-section">
                 <div class="drag-drop-info"><?php echo t_h('attachments.page.drag_drop_info'); ?></div><br>
                 <div class="form-group">
-                    <input type="file" id="attachmentFile" class="file-input">
+                    <input type="file" id="attachmentFile" class="file-input" multiple>
                     <div class="accepted-types">
                         <?php echo t_h('attachments.page.all_types_accepted'); ?>
                     </div>

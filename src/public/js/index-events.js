@@ -971,12 +971,6 @@
                     deleteNote(noteId);
                 }
                 break;
-            case 'cycle-note-width':
-                if (noteId && typeof window.cycleNoteWidth === 'function') {
-                    window.cycleNoteWidth(noteId);
-                }
-                blurAfterPointerActivation(target, e);
-                break;
             case 'cycle-markdown-view':
                 if (noteId && typeof window.cycleMarkdownView === 'function') {
                     window.cycleMarkdownView(noteId);

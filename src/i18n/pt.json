@@ -356,6 +356,9 @@
     },
     "messages": {
       "upload_success": "Arquivo enviado com sucesso!",
+      "upload_success_many": "{{count}} arquivos enviados com sucesso!",
+      "attached_one": "Anexado: {{filename}}",
+      "attached_many": "{{count}} arquivos anexados",
       "deleted_success": "Anexo excluído com sucesso",
       "link_copied": "Link copiado!",
       "moved_success": "Anexo movido para \"{{heading}}\""
@@ -364,7 +367,7 @@
       "title": "Gerenciar Anexos",
       "subtitle": "Gerenciar anexos para nota:",
       "upload_section_title": "Enviar Novo Anexo",
-      "drag_drop_info": "Você pode arrastar e soltar seu arquivo abaixo:",
+      "drag_drop_info": "Você pode arrastar e soltar seus arquivos abaixo:",
       "all_types_accepted": "Todos os tipos de arquivo aceitos (máx 200MB)",
       "upload_button": "Anexar",
       "current_attachments": "Anexos Atuais",
@@ -423,6 +426,13 @@
       "empty": "Nenhuma outra nota encontrada",
       "moving": "Movendo...",
       "kept_notice": "Uma cópia fica nesta nota, cujo conteúdo usa o arquivo."
+    },
+    "image_drop": {
+      "title": "Soltar uma imagem",
+      "message_one": "Inserir a imagem na nota ou adicioná-la aos anexos?",
+      "message_many": "Inserir as {{count}} imagens na nota ou adicioná-las aos anexos?",
+      "attach": "Adicionar como anexo",
+      "insert": "Inserir na nota"
     }
   },
   "auth": {
@@ -5382,7 +5392,11 @@
   "page_menu": {
     "button": "Mais opções",
     "split_view": "Vista dividida",
-    "markdown_view": "Vista Markdown (clássica, pré-visualização em tempo real, texto formatado, dividida)"
+    "markdown_view": "Vista Markdown (clássica, pré-visualização em tempo real, texto formatado, dividida)",
+    "page_width": "Largura da página",
+    "width_default": "Predefinido",
+    "width_reset": "Repor o valor predefinido",
+    "width_error": "Não foi possível guardar a largura."
   },
   "keyboard_shortcuts": {
     "menu_item": "Atalhos de teclado",
