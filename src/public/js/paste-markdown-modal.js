@@ -118,6 +118,20 @@
             return;
         }
 
+        if (insertMarkdownSource(note, markdown)) {
+            closeModal();
+            return;
+        }
+
+        setError(translate('modals.paste_markdown.error', 'Conversion failed. Please try again.'));
+    }
+
+    /**
+     * Insert Markdown source at the cursor of a Markdown note's editor.
+     * Also used by the "Insert Markdown" modal in the live rendering view
+     * (js/insert-markdown-modal.js).
+     */
+    function insertMarkdownSource(note, markdown) {
         var editorDiv = note.querySelector('.markdown-editor') || note;
         var api = (typeof window.PoznoteMarkdownCodeMirror !== 'undefined')
             ? window.PoznoteMarkdownCodeMirror
@@ -145,8 +159,7 @@
             }
             // replaceRange dispatches with userEvent 'input', so autosave fires.
             api.replaceRange(editorDiv, from, to, markdown);
-            closeModal();
-            return;
+            return true;
         }
 
         // Legacy contenteditable editor: insert as text so the Markdown source
@@ -154,11 +167,9 @@
         editorDiv.focus();
         if (document.execCommand('insertText', false, markdown)) {
             if (typeof window.markNoteAsModified === 'function') window.markNoteAsModified();
-            closeModal();
-            return;
+            return true;
         }
-
-        setError(translate('modals.paste_markdown.error', 'Conversion failed. Please try again.'));
+        return false;
     }
 
     function closeModal() {
@@ -243,4 +254,5 @@
     }
 
     window.showPasteMarkdownModal = showPasteMarkdownModal;
+    window.insertMarkdownSourceIntoNote = insertMarkdownSource;
 })();
