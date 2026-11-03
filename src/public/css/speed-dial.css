@@ -470,12 +470,14 @@ body.speed-dial-page {
     font-size: clamp(11px, calc(var(--speed-dial-tile-width) * 0.1), 18px);
 }
 
+/* 16px down to the default tile size, then smaller with the tile */
 .speed-dial-edit {
     position: absolute;
-    top: 6px;
-    right: 6px;
+    top: clamp(3px, calc(var(--speed-dial-tile-width) * 0.043), 6px);
+    right: clamp(3px, calc(var(--speed-dial-tile-width) * 0.043), 6px);
     display: flex;
-    padding: 4px;
+    padding: clamp(2px, calc(var(--speed-dial-tile-width) * 0.029), 4px);
+    font-size: clamp(11px, calc(var(--speed-dial-tile-width) * 0.115), 16px);
     color: var(--pz-text-muted);
     text-decoration: none;
     opacity: 0;
