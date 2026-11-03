@@ -993,6 +993,7 @@
     "search_in_notes": "Rechercher dans les notes",
     "search_in_tags": "Rechercher dans les tags",
     "toggle_date_filter": "Afficher/masquer le filtre de date",
+    "help_toggle": "Comment chercher",
     "created_from": "Créée à partir du",
     "created_to": "Créée jusqu'au",
     "validation": {
@@ -1000,7 +1001,23 @@
       "single_letter_warning": "La recherche avec des mots d’une seule lettre peut retourner trop de résultats. Essayez d’utiliser des mots plus longs pour une recherche plus précise.",
       "invalid_date_range": "La date de début doit être antérieure ou égale à la date de fin."
     },
-    "placeholder_account": "Rechercher dans {{account}}..."
+    "placeholder_account": "Rechercher dans {{account}}...",
+    "help": {
+      "title": "Comment chercher",
+      "words_example": "budget réunion",
+      "words": "Les notes qui contiennent tous ces mots, dans n'importe quel ordre",
+      "phrase_example": "\"réunion hebdo\"",
+      "phrase": "Ces mots collés, dans cet ordre",
+      "partial_example": "réun",
+      "partial": "Un bout de mot suffit. Majuscules et accents sont ignorés",
+      "tags_example": "travail urgent",
+      "tags": "Avec l'icône des tags : les notes qui ont tous ces tags",
+      "both": "Avec les deux icônes : les notes dont le texte ou les tags correspondent",
+      "key_enter": "Entrée",
+      "key_shift": "Maj",
+      "navigate_next": "Appuyé à nouveau : résultat suivant, puis la note suivante",
+      "navigate_previous": "Résultat précédent dans la note"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ Modifications non enregistrées\n\nVous avez des modifications non enregistrées qui seront perdues si vous changez maintenant.\n\nCliquez sur OK pour enregistrer et continuer, ou Annuler pour rester.\n(L’enregistrement automatique se déclenche 2 secondes après avoir arrêté de saisir)",

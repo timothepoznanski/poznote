@@ -993,6 +993,7 @@
     "search_in_notes": "Buscar em notas",
     "search_in_tags": "Buscar em etiquetas",
     "toggle_date_filter": "Mostrar/ocultar filtro de data",
+    "help_toggle": "Como pesquisar",
     "created_from": "Criada a partir de",
     "created_to": "Criada até",
     "validation": {
@@ -1000,7 +1001,23 @@
       "single_letter_warning": "Buscar com palavras de uma única letra pode retornar muitos resultados. Tente usar palavras mais longas para uma busca mais precisa.",
       "invalid_date_range": "A data de início deve ser anterior ou igual à data de fim."
     },
-    "placeholder_account": "Pesquisar em {{account}}..."
+    "placeholder_account": "Pesquisar em {{account}}...",
+    "help": {
+      "title": "Como pesquisar",
+      "words_example": "orçamento reunião",
+      "words": "Notas que contêm todas estas palavras, em qualquer ordem",
+      "phrase_example": "\"reunião semanal\"",
+      "phrase": "Estas palavras juntas, nesta ordem",
+      "partial_example": "reun",
+      "partial": "Basta parte de uma palavra. Maiúsculas e acentos são ignorados",
+      "tags_example": "trabalho urgente",
+      "tags": "Com o ícone de etiquetas ativo: notas que têm todas estas etiquetas",
+      "both": "Com os dois ícones ativos: notas cujo texto ou etiquetas correspondem",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "Premido de novo: resultado seguinte e depois a nota seguinte",
+      "navigate_previous": "Resultado anterior na nota"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ Alterações Não Salvas Detectadas\n\nVocê tem alterações não salvas que serão perdidas se continuar agora.\n\nClique em OK para salvar e continuar, ou Cancelar para ficar.\n(Auto-salvamento ocorre 2 segundos após você parar de digitar)",

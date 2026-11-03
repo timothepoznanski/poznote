@@ -31,7 +31,7 @@ html[data-theme='dark'] .tags-info {
 }
 
 /* Editable tags */
-html[data-theme='dark'] .clickable-tag-wrapper {
+html[data-theme='dark'] .clickable-tag-wrapper:not(.tag-highlight) {
     border-color: var(--pz-border);
 }
 
@@ -45,14 +45,6 @@ html[data-theme='dark'] .clickable-tag:visited {
 
 html[data-theme='dark'] .clickable-tag:hover:visited {
     color: var(--pz-accent-text-hover);
-}
-
-html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight {
-    background: var(--pz-warning-soft);
-}
-
-html[data-theme='dark'] .clickable-tag-wrapper.tag-highlight .clickable-tag {
-    color: var(--pz-warning-text);
 }
 
 html[data-theme='dark'] .tag-input {

@@ -993,6 +993,7 @@
     "search_in_notes": "Buscar en notas",
     "search_in_tags": "Buscar en etiquetas",
     "toggle_date_filter": "Mostrar/ocultar filtro de fecha",
+    "help_toggle": "Cómo buscar",
     "created_from": "Creada desde",
     "created_to": "Creada hasta",
     "validation": {
@@ -1000,7 +1001,23 @@
       "single_letter_warning": "Buscar con palabras de una sola letra puede devolver demasiados resultados. Intenta usar palabras más largas para una búsqueda más precisa.",
       "invalid_date_range": "La fecha de inicio debe ser anterior o igual a la fecha de fin."
     },
-    "placeholder_account": "Buscar en {{account}}..."
+    "placeholder_account": "Buscar en {{account}}...",
+    "help": {
+      "title": "Cómo buscar",
+      "words_example": "presupuesto reunión",
+      "words": "Notas que contienen todas estas palabras, en cualquier orden",
+      "phrase_example": "\"reunión semanal\"",
+      "phrase": "Estas palabras juntas, en este orden",
+      "partial_example": "reun",
+      "partial": "Basta con parte de una palabra. Se ignoran mayúsculas y acentos",
+      "tags_example": "trabajo urgente",
+      "tags": "Con el icono de etiquetas activo: notas que tienen todas estas etiquetas",
+      "both": "Con ambos iconos activos: notas cuyo texto o etiquetas coinciden",
+      "key_enter": "Intro",
+      "key_shift": "Mayús",
+      "navigate_next": "Pulsado de nuevo: coincidencia siguiente y luego la nota siguiente",
+      "navigate_previous": "Coincidencia anterior en la nota"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ Cambios no guardados detectados\n\nTienes cambios no guardados que se perderán si cambias ahora.\n\nHaz clic en Aceptar para guardar y continuar, o Cancelar para quedarte.\n(El autoguardado ocurre 2 segundos después de que dejes de escribir)",

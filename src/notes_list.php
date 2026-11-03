@@ -113,7 +113,8 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
                         <i class="lucide lucide-tag"></i>
                     </button>
                 </div>
-                <div class="searchbar-input-wrapper searchbar-has-date-toggle<?php echo (!empty($search) || !empty($tags_search) || $has_created_date_filter) ? ' searchbar-has-clear' : ''; ?>">
+                <?php $has_active_search = !empty($search) || !empty($tags_search) || $has_created_date_filter; ?>
+                <div class="searchbar-input-wrapper searchbar-has-date-toggle">
                     <input autocomplete="off" autocapitalize="off" spellcheck="false" id="unified-search" type="text" name="unified_search" class="search form-control searchbar-input" placeholder="<?php echo t_h('search.placeholder_notes'); ?>"<?php
                         // Several accounts in the list below: the search only covers the
                         // active one, and its placeholder says which (js/unified-search.js).
@@ -124,10 +125,17 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
                     <button type="button" id="search-date-toggle" class="searchbar-date-toggle<?php echo $has_created_date_filter ? ' active' : ''; ?>" data-action="toggle-date-filter" title="<?php echo t_h('search.toggle_date_filter', [], 'Toggle date filter'); ?>" aria-label="<?php echo t_h('search.toggle_date_filter', [], 'Toggle date filter'); ?>" aria-controls="search-date-filter" aria-expanded="<?php echo $has_created_date_filter ? 'true' : 'false'; ?>">
                         <i class="lucide lucide-calendar"></i>
                     </button>
-                    <?php if (!empty($search) || !empty($tags_search) || $has_created_date_filter): ?>
-                        <button type="button" class="searchbar-clear" title="<?php echo t_h('search.clear'); ?>" data-action="clear-search"><span class="clear-icon">×</span></button>
-                    <?php endif; ?>
                 </div>
+                <?php // Right of the field: the help, or clearing the search while one runs ?>
+                <?php if ($has_active_search): ?>
+                    <button type="button" class="searchbar-side-btn searchbar-side-clear" title="<?php echo t_h('search.clear'); ?>" aria-label="<?php echo t_h('search.clear'); ?>" data-action="clear-search">
+                        <i class="lucide lucide-x-circle"></i>
+                    </button>
+                <?php else: ?>
+                    <button type="button" id="search-help-toggle" class="searchbar-side-btn searchbar-help-toggle" title="<?php echo t_h('search.help_toggle', [], 'How to search'); ?>" aria-label="<?php echo t_h('search.help_toggle', [], 'How to search'); ?>" aria-controls="search-help" aria-expanded="false">
+                        <i class="lucide lucide-info"></i>
+                    </button>
+                <?php endif; ?>
             </div>
             <div class="search-date-filter<?php echo $has_created_date_filter ? ' active' : ''; ?>" id="search-date-filter"<?php echo $has_created_date_filter ? '' : ' hidden'; ?>>
                 <div class="search-date-field">
@@ -144,6 +152,28 @@ $search_combined_value = ($search_in_notes_value === '1' && $search_in_tags_valu
                     </label>
                     <input id="created-to" class="search-date-input" type="date" name="created_to" value="<?php echo htmlspecialchars($created_to ?? '', ENT_QUOTES); ?>">
                 </div>
+            </div>
+            <div class="search-help" id="search-help" hidden>
+                <div class="search-help-title">
+                    <i class="lucide lucide-info"></i>
+                    <span><?php echo t_h('search.help.title', [], 'How to search'); ?></span>
+                </div>
+                <dl class="search-help-list">
+                    <dt><kbd><?php echo t_h('search.help.key_enter', [], 'Enter'); ?></kbd></dt>
+                    <dd><?php echo t_h('search.help.navigate_next', [], 'Pressed again: next match, then the next note'); ?></dd>
+                    <dt><kbd><?php echo t_h('search.help.key_shift', [], 'Shift'); ?></kbd>+<kbd><?php echo t_h('search.help.key_enter', [], 'Enter'); ?></kbd></dt>
+                    <dd><?php echo t_h('search.help.navigate_previous', [], 'Previous match in the note'); ?></dd>
+                    <dt><span class="search-help-sample"><?php echo t_h('search.help.words_example', [], 'budget meeting'); ?></span></dt>
+                    <dd><?php echo t_h('search.help.words', [], 'Notes containing all these words, in any order'); ?></dd>
+                    <dt><span class="search-help-sample"><?php echo t_h('search.help.phrase_example', [], '"weekly meeting"'); ?></span></dt>
+                    <dd><?php echo t_h('search.help.phrase', [], 'These words side by side, in this order'); ?></dd>
+                    <dt><span class="search-help-sample"><?php echo t_h('search.help.partial_example', [], 'meet'); ?></span></dt>
+                    <dd><?php echo t_h('search.help.partial', [], 'Part of a word is enough. Capitals and accents are ignored'); ?></dd>
+                    <dt><i class="lucide lucide-tag" aria-hidden="true"></i> <span class="search-help-sample"><?php echo t_h('search.help.tags_example', [], 'work urgent'); ?></span></dt>
+                    <dd><?php echo t_h('search.help.tags', [], 'With the tag icon on: notes that have all these tags'); ?></dd>
+                    <dt><i class="lucide lucide-file-alt" aria-hidden="true"></i><i class="lucide lucide-tag" aria-hidden="true"></i></dt>
+                    <dd><?php echo t_h('search.help.both', [], 'With both icons on: notes whose text or tags match'); ?></dd>
+                </dl>
             </div>
             <input type="hidden" id="search-notes-hidden" name="search" value="<?php echo htmlspecialchars($search ?? '', ENT_QUOTES); ?>">
             <input type="hidden" id="search-tags-hidden" name="tags_search" value="<?php echo htmlspecialchars($tags_search ?? '', ENT_QUOTES); ?>">

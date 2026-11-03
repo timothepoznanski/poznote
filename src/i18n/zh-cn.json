@@ -992,6 +992,7 @@
     "search_in_notes": "在笔记中搜索",
     "search_in_tags": "在标签中搜索",
     "toggle_date_filter": "显示/隐藏日期筛选",
+    "help_toggle": "如何搜索",
     "created_from": "创建日期从",
     "created_to": "创建日期到",
     "validation": {
@@ -999,7 +1000,23 @@
       "single_letter_warning": "使用单字母单词搜索可能会返回过多结果。请尝试使用更长的单词进行精确搜索。",
       "invalid_date_range": "开始日期必须早于或等于结束日期。"
     },
-    "placeholder_account": "在 {{account}} 中搜索..."
+    "placeholder_account": "在 {{account}} 中搜索...",
+    "help": {
+      "title": "如何搜索",
+      "words_example": "预算 会议",
+      "words": "包含所有这些词的笔记，顺序不限",
+      "phrase_example": "\"每周会议\"",
+      "phrase": "这些词紧挨在一起，且按此顺序",
+      "partial_example": "会",
+      "partial": "输入词的一部分即可。忽略大小写和重音",
+      "tags_example": "工作 紧急",
+      "tags": "开启标签图标时：带有所有这些标签的笔记",
+      "both": "同时开启两个图标时：文本或标签匹配的笔记",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "再次按下：下一个匹配项，之后是下一篇笔记",
+      "navigate_previous": "笔记中的上一个匹配项"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ 检测到未保存的更改\n\n您有未保存的更改，如果现在切换，这些更改将会丢失。\n\n点击“确定”保存并继续，或点击“取消”留下。\n（停止输入 2 秒后将自动保存）",

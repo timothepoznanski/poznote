@@ -2869,6 +2869,7 @@
     "search_in_notes": "ノートを検索",
     "search_in_tags": "タグを検索",
     "toggle_date_filter": "日付での絞り込みを切り替え",
+    "help_toggle": "検索のしかた",
     "created_from": "作成日（開始）",
     "created_to": "作成日（終了）",
     "validation": {
@@ -2876,7 +2877,23 @@
       "single_letter_warning": "1文字の単語で検索すると、結果が多くなりすぎることがあります。より長い単語で検索すると、結果を絞り込めます。",
       "invalid_date_range": "開始日は終了日以前の日付にしてください。"
     },
-    "placeholder_account": "{{account}}内を検索..."
+    "placeholder_account": "{{account}}内を検索...",
+    "help": {
+      "title": "検索のしかた",
+      "words_example": "予算 会議",
+      "words": "これらの語をすべて含むノート（順序は問いません）",
+      "phrase_example": "\"週次 会議\"",
+      "phrase": "これらの語が隣り合い、この順序で並ぶもの",
+      "partial_example": "会",
+      "partial": "語の一部だけでも一致します。大文字・小文字とアクセントは区別しません",
+      "tags_example": "仕事 至急",
+      "tags": "タグアイコンがオンのとき：これらのタグをすべて持つノート",
+      "both": "両方のアイコンがオンのとき：本文またはタグが一致するノート",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "もう一度押す：次の一致箇所、その後は次のノート",
+      "navigate_previous": "ノート内の前の一致箇所"
+    }
   },
   "icon_names": {
     "briefcase": "ブリーフケース",

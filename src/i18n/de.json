@@ -993,6 +993,7 @@
     "search_in_notes": "In Notizen suchen",
     "search_in_tags": "In Tags suchen",
     "toggle_date_filter": "Datumsfilter ein-/ausblenden",
+    "help_toggle": "So suchen Sie",
     "created_from": "Erstellt ab",
     "created_to": "Erstellt bis",
     "validation": {
@@ -1000,7 +1001,23 @@
       "single_letter_warning": "Suche nach einzelnen Buchstaben kann zu viele Ergebnisse zurückgeben. Versuchen Sie längere Wörter für eine präzisere Suche.",
       "invalid_date_range": "Das Startdatum muss vor oder am Enddatum liegen."
     },
-    "placeholder_account": "In {{account}} suchen..."
+    "placeholder_account": "In {{account}} suchen...",
+    "help": {
+      "title": "So suchen Sie",
+      "words_example": "Budget Besprechung",
+      "words": "Notizen, die alle diese Wörter enthalten, in beliebiger Reihenfolge",
+      "phrase_example": "\"wöchentliche Besprechung\"",
+      "phrase": "Diese Wörter direkt hintereinander, in dieser Reihenfolge",
+      "partial_example": "Bespr",
+      "partial": "Ein Teil eines Wortes genügt. Groß-/Kleinschreibung und Akzente werden ignoriert",
+      "tags_example": "Arbeit dringend",
+      "tags": "Mit aktivem Tag-Symbol: Notizen, die alle diese Tags haben",
+      "both": "Mit beiden Symbolen aktiv: Notizen, deren Text oder Tags passen",
+      "key_enter": "Eingabe",
+      "key_shift": "Umschalt",
+      "navigate_next": "Erneut gedrückt: nächster Treffer, danach die nächste Notiz",
+      "navigate_previous": "Vorheriger Treffer in der Notiz"
+    }
   },
   "autosave": {
     "confirm_switch": "⚠️ Ungespeicherte Änderungen erkannt\n\nSie haben ungespeicherte Änderungen, die verloren gehen, wenn Sie jetzt wechseln.\n\nKlicken Sie auf OK, um zu speichern und fortzufahren, oder Abbrechen, um zu bleiben.\n(Auto-Speicherung erfolgt 2 Sekunden nachdem Sie aufgehört haben zu tippen)",

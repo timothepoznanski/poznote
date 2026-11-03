@@ -2869,6 +2869,7 @@
     "search_in_notes": "Cerca a les notes",
     "search_in_tags": "Cerca a les etiquetes",
     "toggle_date_filter": "Commuta el filtre per data",
+    "help_toggle": "Com cercar",
     "created_from": "Creada des del",
     "created_to": "Creada fins al",
     "validation": {
@@ -2876,7 +2877,23 @@
       "single_letter_warning": "Cercar amb paraules d'una sola lletra pot retornar massa resultats. Proveu de fer servir paraules més llargues per fer una cerca més precisa.",
       "invalid_date_range": "La data d'inici ha de ser anterior o igual a la data de finalització."
     },
-    "placeholder_account": "Cerca a {{account}}..."
+    "placeholder_account": "Cerca a {{account}}...",
+    "help": {
+      "title": "Com cercar",
+      "words_example": "pressupost reunió",
+      "words": "Notes que contenen totes aquestes paraules, en qualsevol ordre",
+      "phrase_example": "\"reunió setmanal\"",
+      "phrase": "Aquestes paraules juntes, en aquest ordre",
+      "partial_example": "reun",
+      "partial": "N'hi ha prou amb part d'una paraula. S'ignoren les majúscules i els accents",
+      "tags_example": "feina urgent",
+      "tags": "Amb la icona d'etiquetes activa: notes que tenen totes aquestes etiquetes",
+      "both": "Amb les dues icones actives: notes el text o les etiquetes de les quals coincideixen",
+      "key_enter": "Retorn",
+      "key_shift": "Maj",
+      "navigate_next": "Premut de nou: coincidència següent i després la nota següent",
+      "navigate_previous": "Coincidència anterior a la nota"
+    }
   },
   "icon_names": {
     "briefcase": "cartera",

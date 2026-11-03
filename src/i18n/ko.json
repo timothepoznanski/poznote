@@ -2869,6 +2869,7 @@
     "search_in_notes": "노트에서 검색",
     "search_in_tags": "태그에서 검색",
     "toggle_date_filter": "날짜 필터 전환",
+    "help_toggle": "검색 방법",
     "created_from": "작성일 시작",
     "created_to": "작성일 종료",
     "validation": {
@@ -2876,7 +2877,23 @@
       "single_letter_warning": "단일 문자 단어로 검색하면 너무 많은 결과가 반환될 수 있습니다. 더 정확한 검색을 위해 더 긴 단어를 사용해 보세요.",
       "invalid_date_range": "시작 날짜는 종료 날짜 이전이거나 같아야 합니다."
     },
-    "placeholder_account": "{{account}}에서 검색..."
+    "placeholder_account": "{{account}}에서 검색...",
+    "help": {
+      "title": "검색 방법",
+      "words_example": "예산 회의",
+      "words": "이 단어를 모두 포함하는 노트(순서 무관)",
+      "phrase_example": "\"주간 회의\"",
+      "phrase": "이 단어들이 붙어서 이 순서대로 나오는 경우",
+      "partial_example": "회",
+      "partial": "단어의 일부만으로도 충분합니다. 대소문자와 악센트는 무시됩니다",
+      "tags_example": "업무 긴급",
+      "tags": "태그 아이콘이 켜져 있으면: 이 태그를 모두 가진 노트",
+      "both": "두 아이콘이 모두 켜져 있으면: 본문이나 태그가 일치하는 노트",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "다시 누르면: 다음 일치 항목, 그다음 다음 노트",
+      "navigate_previous": "노트의 이전 일치 항목"
+    }
   },
   "icon_names": {
     "briefcase": "서류가방",

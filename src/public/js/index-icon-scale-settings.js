@@ -105,6 +105,7 @@ function applyIndexIconScale(scale) {
            tall, 64px / 48px / 88px of padding at the default size). */
         .searchbar-type-btn,
         .searchbar-date-toggle i,
+        .searchbar-side-btn i,
         .searchbar-clear .clear-icon {
             font-size: ${16 * s}px !important;
         }

@@ -51,7 +51,24 @@ html[data-theme='dark'] .searchbar-date-toggle.active {
     color: var(--pz-accent-text-hover);
 }
 
-html[data-theme='dark'] .search-date-filter {
+html[data-theme='dark'] .search-date-filter,
+html[data-theme='dark'] .search-help {
+    border-color: var(--pz-border);
+}
+
+html[data-theme='dark'] .searchbar-help-toggle:hover,
+html[data-theme='dark'] .searchbar-help-toggle.active {
+    color: var(--pz-accent-text-hover);
+}
+
+html[data-theme='dark'] .searchbar-side-clear i[class*="lucide-"],
+html[data-theme='dark'] .searchbar-side-clear i[class*="lucide-"]:hover {
+    color: var(--pz-danger-text);
+}
+
+html[data-theme='dark'] .search-help-sample,
+html[data-theme='dark'] .search-help-list kbd {
+    background: var(--pz-chrome-bg);
     border-color: var(--pz-border);
 }
 

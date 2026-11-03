@@ -441,6 +441,10 @@ function highlightMatchingTags(searchTerm, _attempt = 0) {
         return;
     }
 
+    // A search on tags alone has nothing else to point at: the matching tags
+    // stay orange in every note it opens, not just the first one.
+    const tagsOnly = typeof isNotesSearchActive === 'function' && !isNotesSearchActive();
+
     let matched = 0;
     tagEls.forEach(el => {
         const text = (el.textContent || '').trim().toLowerCase();
@@ -450,6 +454,7 @@ function highlightMatchingTags(searchTerm, _attempt = 0) {
 
         if (isMatch) {
             target.classList.add('tag-highlight');
+            if (tagsOnly) target.classList.add('search-highlight-active');
             matched++;
         } else {
             target.classList.remove('tag-highlight');

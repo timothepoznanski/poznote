@@ -2869,6 +2869,7 @@
     "search_in_notes": "Search in notes",
     "search_in_tags": "Search in tags",
     "toggle_date_filter": "Toggle date filter",
+    "help_toggle": "How to search",
     "created_from": "Created from",
     "created_to": "Created to",
     "validation": {
@@ -2876,7 +2877,23 @@
       "single_letter_warning": "Searching with single-letter words can return too many results. Try using longer words for a more precise search.",
       "invalid_date_range": "The start date must be before or equal to the end date."
     },
-    "placeholder_account": "Search in {{account}}..."
+    "placeholder_account": "Search in {{account}}...",
+    "help": {
+      "title": "How to search",
+      "words_example": "budget meeting",
+      "words": "Notes containing all these words, in any order",
+      "phrase_example": "\"weekly meeting\"",
+      "phrase": "These words side by side, in this order",
+      "partial_example": "meet",
+      "partial": "Part of a word is enough. Capitals and accents are ignored",
+      "tags_example": "work urgent",
+      "tags": "With the tag icon on: notes that have all these tags",
+      "both": "With both icons on: notes whose text or tags match",
+      "key_enter": "Enter",
+      "key_shift": "Shift",
+      "navigate_next": "Pressed again: next match, then the next note",
+      "navigate_previous": "Previous match in the note"
+    }
   },
   "icon_names": {
     "briefcase": "briefcase",

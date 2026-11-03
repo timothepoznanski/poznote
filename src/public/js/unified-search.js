@@ -1521,11 +1521,27 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Info button right of the search field: shows or hides how to search.
+    // Delegated, because an AJAX search re-renders the search bar.
+    document.addEventListener('click', function (event) {
+        const toggle = event.target.closest('#search-help-toggle');
+        if (!toggle) return;
+        event.preventDefault();
+        const panel = document.getElementById('search-help');
+        if (!panel) return;
+        panel.hidden = !panel.hidden;
+        toggle.classList.toggle('active', !panel.hidden);
+        toggle.setAttribute('aria-expanded', panel.hidden ? 'false' : 'true');
+    });
+
     // Highlight search terms on page load
     setTimeout(function () {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('search') && typeof highlightSearchTerms === 'function') {
             highlightSearchTerms();
+        } else if (urlParams.get('tags_search') && typeof applyHighlightsWithRetries === 'function') {
+            // Clicking a tag in a note reloads the page on its tag search
+            applyHighlightsWithRetries();
         }
     }, 500);
 });
