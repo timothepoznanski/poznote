@@ -35,12 +35,27 @@ body.speed-dial-page {
 .speed-dial-container {
     flex: 1 1 0;
     min-width: 0;
-    /* A percentage from the slider of the toolbar (js/page-width.js,
-       lib/page-width.php), else a column of its own */
-    max-width: var(--speed-dial-width, 1200px);
     margin: 0 auto;
     padding: 20px;
     box-sizing: border-box;
+}
+
+/* The slider of the toolbar (js/page-width.js, lib/page-width.php) sizes the
+   grid alone, as a percentage of the room beside the rail; without a setting
+   it is the 1200px column it always was (1160px inside the padding). The
+   title, the speed dials and the toolbar keep that column when the grid gets
+   narrower, and follow it when it gets wider. */
+.speed-dial-container > .poznote-page-title,
+.speed-dial-container > .speed-dial-boards,
+.speed-dial-container > .speed-dial-toolbar,
+.speed-dial-container > .speed-dial-empty {
+    max-width: max(1160px, var(--speed-dial-width, 0%));
+    margin-inline: auto;
+}
+
+.speed-dial-container > .speed-dial-grid {
+    max-width: var(--speed-dial-width, 1160px);
+    margin-inline: auto;
 }
 
 .speed-dial-container > .poznote-page-title {

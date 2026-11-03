@@ -5492,7 +5492,8 @@
     "page_width": "页面宽度",
     "width_default": "默认",
     "width_reset": "恢复默认",
-    "width_error": "无法保存宽度。"
+    "width_error": "无法保存宽度。",
+    "note_width_settings_hint": "在设置中为所有笔记设置默认值"
   },
   "keyboard_shortcuts": {
     "menu_item": "键盘快捷键",

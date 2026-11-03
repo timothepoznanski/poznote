@@ -31,15 +31,20 @@ body.dashboard-page {
 
 .dashboard-container {
     flex: 1;
-    /* Full available width by default: the card grid fits as many columns as
-       the screen allows and centers itself. The slider of the toolbar narrows
-       it (js/page-width.js, lib/page-width.php), the columns that fit follow
-       (board-view-menu.js). */
-    max-width: var(--dashboard-width, 100%);
-    margin-inline: auto;
+    /* Full available width: the card grid fits as many columns as the screen
+       allows and centers itself. */
+    max-width: 100%;
     padding-top: 0;
     padding-bottom: 0;
     min-width: 0;
+}
+
+/* The cards and what goes with them, not the title nor the toolbar: the
+   slider of the toolbar narrows this alone (js/page-width.js,
+   lib/page-width.php), the columns that fit follow (board-view-menu.js). */
+.dashboard-content {
+    max-width: var(--dashboard-width, 100%);
+    margin-inline: auto;
 }
 
 /* ---------- Top bar ---------- */

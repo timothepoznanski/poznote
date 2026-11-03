@@ -5231,7 +5231,8 @@
     "page_width": "ページの幅",
     "width_default": "既定",
     "width_reset": "既定値に戻す",
-    "width_error": "幅を保存できませんでした。"
+    "width_error": "幅を保存できませんでした。",
+    "note_width_settings_hint": "すべてのノートの既定値は設定で変更できます"
   },
   "keyboard_shortcuts": {
     "menu_item": "キーボードショートカット",

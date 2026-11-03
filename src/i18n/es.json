@@ -5396,7 +5396,8 @@
     "page_width": "Ancho de la página",
     "width_default": "Predeterminado",
     "width_reset": "Restablecer valor predeterminado",
-    "width_error": "No se pudo guardar el ancho."
+    "width_error": "No se pudo guardar el ancho.",
+    "note_width_settings_hint": "Definir el valor predeterminado de todas las notas en Ajustes"
   },
   "keyboard_shortcuts": {
     "menu_item": "Atajos de teclado",

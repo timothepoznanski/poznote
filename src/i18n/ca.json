@@ -5231,7 +5231,8 @@
     "page_width": "Amplada de la pàgina",
     "width_default": "Per defecte",
     "width_reset": "Restableix el valor per defecte",
-    "width_error": "No s'ha pogut desar l'amplada."
+    "width_error": "No s'ha pogut desar l'amplada.",
+    "note_width_settings_hint": "Defineix el valor per defecte de totes les notes a Configuració"
   },
   "keyboard_shortcuts": {
     "menu_item": "Dreceres de teclat",
