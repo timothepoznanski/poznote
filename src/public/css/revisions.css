@@ -555,11 +555,19 @@ html:has(> body.revisions-page)::-webkit-scrollbar-thumb:hover,
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    min-width: 0;
+    max-width: 100%;
     color: var(--pz-text-muted);
     font-size: 13px;
 }
 
+.revisions-compare span {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
 .revisions-compare select {
+    min-width: 0;
     max-width: 280px;
     height: 32px;
     padding: 0 8px;
@@ -1025,6 +1033,17 @@ html:has(> body.revisions-page)::-webkit-scrollbar-thumb:hover,
     .revisions-toolbar {
         padding-left: 12px;
         padding-right: 12px;
+    }
+
+    /* The select's natural width is its longest option: it takes the row */
+    .revisions-toolbar-group,
+    .revisions-compare {
+        width: 100%;
+    }
+
+    .revisions-compare select {
+        flex: 1 1 auto;
+        max-width: none;
     }
 
     /* Side by side needs width: the layout switch goes, unified is used */
