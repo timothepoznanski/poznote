@@ -4315,6 +4315,8 @@
     },
     "filters": {
       "button": "Filters",
+      "favorites": "Favorites",
+      "favorites_only": "Favorites only",
       "color": "Color",
       "modified": "Last modified",
       "tags": "Tags",

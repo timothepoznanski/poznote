@@ -4315,6 +4315,8 @@
     },
     "filters": {
       "button": "フィルター",
+      "favorites": "お気に入り",
+      "favorites_only": "お気に入りのみ",
       "color": "色",
       "modified": "最終更新日",
       "tags": "タグ",

@@ -4315,6 +4315,8 @@
     },
     "filters": {
       "button": "Filtres",
+      "favorites": "Preferits",
+      "favorites_only": "Només preferits",
       "color": "Color",
       "modified": "Última modificació",
       "tags": "Etiquetes",

@@ -4315,6 +4315,8 @@
     },
     "filters": {
       "button": "필터",
+      "favorites": "즐겨찾기",
+      "favorites_only": "즐겨찾기만",
       "color": "색상",
       "modified": "최종 수정됨",
       "tags": "태그",

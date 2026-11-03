@@ -4317,6 +4317,8 @@
     },
     "filters": {
       "button": "Фильтры",
+      "favorites": "Избранное",
+      "favorites_only": "Только избранное",
       "color": "Цвет",
       "modified": "Последнее изменение",
       "tags": "Теги",

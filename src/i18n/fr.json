@@ -4788,6 +4788,8 @@
     },
     "filters": {
       "button": "Filtres",
+      "favorites": "Favoris",
+      "favorites_only": "Favoris uniquement",
       "color": "Couleur",
       "modified": "Dernière modification",
       "tags": "Tags",

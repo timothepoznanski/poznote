@@ -4684,6 +4684,8 @@
     },
     "filters": {
       "button": "Filtros",
+      "favorites": "Favoritos",
+      "favorites_only": "Solo favoritos",
       "color": "Color",
       "modified": "Última modificación",
       "tags": "Etiquetas",

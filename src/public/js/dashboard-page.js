@@ -9,15 +9,22 @@
     var TAG_FILTER_KEY = 'dashboard_tag_filter';
 
     // The favorites preference used to be persisted for a toggle button in the
-    // dashboard topbar, and was replayed onto the URL on every load. That button
-    // is gone (the icon rail links straight to ?favorites=1), so replaying a
-    // stale '0' would strip the parameter and silently show the full board.
-    // The URL is now the only source of truth; drop the leftover key.
+    // dashboard topbar, and was replayed onto the URL on every load. Replaying
+    // a stale '0' would strip the parameter and silently show the full board,
+    // so the URL is now the only source of truth (?favorites=1, toggled from
+    // the filter panel); drop the leftover key.
     try {
         localStorage.removeItem(FAVORITES_KEY);
     } catch (e) { /* localStorage unavailable */ }
 
     var rootData  = window.DASHBOARD_DATA || { folders: [], notes: [] };
+
+    // Favorites mode is built on the server (dashboard.php keeps favorite
+    // notes and favorite folders), so its filter chip reloads the page
+    var favoritesOnly = false;
+    try {
+        favoritesOnly = new URL(window.location.href).searchParams.get('favorites') === '1';
+    } catch (e) { /* ignore */ }
 
     // Navigation stack: array of folder objects navigated into.
     // Empty = at root level.
@@ -83,19 +90,20 @@
     }
 
     // Preferences are kept per scope: a multi-workspace scope has its own key
-    // (data-scope), a single workspace keeps its historical key
-    function dashboardStorageKey(baseKey) {
+    // (data-scope), a single workspace keeps its historical key. Only the
+    // navigation path is also kept per favorites mode, whose folder tree is
+    // not the full board's; the filters carry over when favorites is toggled.
+    function dashboardStorageKey(baseKey, perFavoritesMode) {
         var workspace = '';
         var scope = '';
-        var favoritesMode = 'all';
 
         try {
             workspace = document.body && document.body.dataset ? (document.body.dataset.workspace || '') : '';
             scope = document.body && document.body.dataset ? (document.body.dataset.scope || '') : '';
-            favoritesMode = new URL(window.location.href).searchParams.get('favorites') === '1' ? 'favorites' : 'all';
         } catch (err) { /* ignore */ }
 
-        return baseKey + ':' + encodeURIComponent(scope || workspace) + ':' + favoritesMode;
+        var key = baseKey + ':' + encodeURIComponent(scope || workspace);
+        return perFavoritesMode ? key + ':' + (favoritesOnly ? 'favorites' : 'all') : key;
     }
 
     function normalizeSearchText(value) {
@@ -586,14 +594,14 @@
     function saveNavigationPath() {
         try {
             var path = navStack.map(function (folder) { return folder.id; });
-            localStorage.setItem(dashboardStorageKey(NAV_PATH_KEY), JSON.stringify(path));
+            localStorage.setItem(dashboardStorageKey(NAV_PATH_KEY, true), JSON.stringify(path));
         } catch (err) { /* ignore */ }
     }
 
     function restoreNavigationPath() {
         var storedPath;
         try {
-            storedPath = JSON.parse(localStorage.getItem(dashboardStorageKey(NAV_PATH_KEY)) || '[]');
+            storedPath = JSON.parse(localStorage.getItem(dashboardStorageKey(NAV_PATH_KEY, true)) || '[]');
         } catch (err) {
             storedPath = [];
         }
@@ -1694,7 +1702,7 @@
     // criteria. State, storage and matching are the per-filter code above.
 
     function activeFilterCount() {
-        return (activeColorFilter ? 1 : 0) + (activeModifiedFilter ? 1 : 0) + activeTagFilter.length;
+        return (favoritesOnly ? 1 : 0) + (activeColorFilter ? 1 : 0) + (activeModifiedFilter ? 1 : 0) + activeTagFilter.length;
     }
 
     function updateFilterButtonState() {
@@ -1793,6 +1801,34 @@
                 updateFilterButtonState();
                 renderAll();
             }, swatch));
+        });
+    }
+
+    // Reload the board in or out of favorites mode, keeping the scope and
+    // the other URL parameters
+    function setFavoritesOnly(on) {
+        var url = new URL(window.location.href);
+        if (on) {
+            url.searchParams.set('favorites', '1');
+        } else {
+            url.searchParams.delete('favorites');
+        }
+        window.location.replace(url.toString());
+    }
+
+    function buildFavoritesFilterSection() {
+        var section = document.getElementById('dashboardFilterFavoritesSection');
+        if (!section) return;
+        section.innerHTML = '';
+
+        var txt = window.DASHBOARD_FAVORITES_TXT || {};
+        [
+            { value: false, label: txt.all || 'All notes', leading: '' },
+            { value: true, label: txt.only || 'Favorites only', leading: '<i class="lucide lucide-star"></i>' }
+        ].forEach(function (entry) {
+            section.appendChild(buildFilterChip(entry.label, favoritesOnly === entry.value, function () {
+                if (favoritesOnly !== entry.value) setFavoritesOnly(entry.value);
+            }, entry.leading));
         });
     }
 
@@ -1937,6 +1973,7 @@
     }
 
     function buildFilterPanel() {
+        buildFavoritesFilterSection();
         buildColorFilterSection();
         buildModifiedFilterSection();
         buildTagFilterSection();
@@ -1996,6 +2033,10 @@
                 saveColorFilter();
                 saveModifiedFilter();
                 saveTagFilter();
+                if (favoritesOnly) {
+                    setFavoritesOnly(false);
+                    return;
+                }
                 buildFilterPanel();
                 renderAll();
             });

@@ -84,7 +84,8 @@ $iconSidebarIsAboutView = $iconSidebarCurrentPage === 'settings.php' && (($_GET[
 // Diary), the collections derived from that content (Tags, Shares,
 // Attachments), and the Trash on its own. A separator is drawn between two
 // consecutive entries of different groups. Favorites has no entry: it is a
-// dashboard filter, reached from the notes list's system folder. Home has no
+// dashboard filter, reached from the notes list's system folder and the
+// dashboard's filter panel. Home has no
 // entry either: the Poznote mark at the top of the rail is the Home link.
 $iconSidebarItems = [
     ['id' => 'iconSidebarDashboardBtn', 'group' => 'home', 'url' => $iconSidebarUrl('dashboard.php'), 'page' => 'dashboard.php', 'icon' => 'lucide-layout-dashboard', 'label' => t('common.back_to_home', [], 'Dashboard')],

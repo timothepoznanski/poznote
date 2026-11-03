@@ -4780,6 +4780,8 @@
     },
     "filters": {
       "button": "筛选",
+      "favorites": "收藏",
+      "favorites_only": "仅收藏",
       "color": "颜色",
       "modified": "最后修改",
       "tags": "标签",
