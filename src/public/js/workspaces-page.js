@@ -241,9 +241,17 @@ function initializeWorkspacesPage() {
     document.addEventListener('click', handleWorkspaceInfoButtonClick);
     document.addEventListener('click', handleWorkspaceInfoCloseButtonClick);
 
+    // "New workspace" above the list: the creation dialog of modals.php
+    var createBtn = document.getElementById('settings-create-workspace-btn');
+    if (createBtn) {
+        createBtn.addEventListener('click', function () {
+            openCreateWorkspaceModal();
+        });
+    }
+
     // settings.php?open=new-workspace (what workspaces.php?new=1 redirects
     // to, the fallback of a page without the creation dialog): the dialog
-    // opens here, once. The section has no button of its own for it.
+    // opens here, once.
     var pageUrl = new URL(window.location.href);
     if (pageUrl.searchParams.get('open') === 'new-workspace') {
         openCreateWorkspaceModal();
