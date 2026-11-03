@@ -1287,17 +1287,30 @@ function setValue(host, value, options = {}) {
   const currentValue = instance.view.state.doc.toString()
   if (currentValue === nextValue) return true
 
-  const previousHead = instance.view.state.selection.main.head
-  const nextHead = Math.min(previousHead, nextValue.length)
-  const transaction = {
-    changes: { from: 0, to: currentValue.length, insert: nextValue }
-  }
-
+  // Content written back from outside (the image menu's border and size, a
+  // ticked task) replaces only what differs: replacing the whole document
+  // threw away every line height the editor had measured, pictures and
+  // rendered blocks then came back at an estimated height and the note jumped.
+  // The caret follows the text it was in.
   if (options.preserveSelection !== false) {
-    transaction.selection = { anchor: nextHead }
+    let from = 0
+    const maxFrom = Math.min(currentValue.length, nextValue.length)
+    while (from < maxFrom && currentValue.charCodeAt(from) === nextValue.charCodeAt(from)) from++
+    let currentTo = currentValue.length
+    let nextTo = nextValue.length
+    while (currentTo > from && nextTo > from && currentValue.charCodeAt(currentTo - 1) === nextValue.charCodeAt(nextTo - 1)) {
+      currentTo--
+      nextTo--
+    }
+    instance.view.dispatch({
+      changes: { from, to: currentTo, insert: nextValue.slice(from, nextTo) }
+    })
+    return true
   }
 
-  instance.view.dispatch(transaction)
+  instance.view.dispatch({
+    changes: { from: 0, to: currentValue.length, insert: nextValue }
+  })
 
   return true
 }

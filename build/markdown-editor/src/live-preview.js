@@ -636,6 +636,29 @@ class ImageWidget extends WidgetType {
     return wrapper
   }
 
+  // A new border or width keeps the picture already loaded: a fresh <img>
+  // has no height until it loads, the lines below jumped meanwhile
+  updateDOM(dom) {
+    const image = dom.querySelector('img.cm-live-image')
+    if (!image || image.getAttribute('src') !== this.src) return false
+
+    image.alt = this.alt
+    image.title = (this.source && this.source.title) || this.alt
+    image.classList.remove('img-with-border', 'img-with-border-no-padding')
+    image.removeAttribute('data-markdown-image-index')
+    image.removeAttribute('width')
+    image.style.width = ''
+    if (this.source) {
+      image.setAttribute('data-markdown-image-index', String(this.source.index))
+      if (this.source.borderClass) image.classList.add(this.source.borderClass)
+      if (this.source.width) {
+        image.setAttribute('width', String(this.source.width))
+        image.style.width = this.source.width + 'px'
+      }
+    }
+    return true
+  }
+
   ignoreEvent() {
     return false
   }
