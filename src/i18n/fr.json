@@ -355,6 +355,9 @@
     },
     "messages": {
       "upload_success": "Fichier téléchargé avec succès !",
+      "upload_success_many": "{{count}} fichiers téléchargés avec succès !",
+      "attached_one": "Pièce jointe ajoutée : {{filename}}",
+      "attached_many": "{{count}} pièces jointes ajoutées",
       "deleted_success": "Pièce jointe supprimée avec succès",
       "link_copied": "Lien copié !",
       "moved_success": "Pièce jointe déplacée vers « {{heading}} »"
@@ -363,7 +366,7 @@
       "title": "Gérer les pièces jointes",
       "subtitle": "Gérer les pièces jointes de la note :",
       "upload_section_title": "Choisissez une nouvelle pièce jointe",
-      "drag_drop_info": "Vous pouvez glisser-déposer votre fichier ci-dessous :",
+      "drag_drop_info": "Vous pouvez glisser-déposer vos fichiers ci-dessous :",
       "all_types_accepted": "Tous types de fichiers acceptés (max 200 Mo)",
       "upload_button": "Joindre",
       "current_attachments": "Pièces jointes actuelles",
@@ -422,6 +425,13 @@
       "empty": "Aucune autre note trouvée",
       "moving": "Déplacement...",
       "kept_notice": "Une copie reste dans cette note, dont le contenu utilise le fichier."
+    },
+    "image_drop": {
+      "title": "Déposer une image",
+      "message_one": "Insérer l'image dans la note, ou l'ajouter aux pièces jointes ?",
+      "message_many": "Insérer les {{count}} images dans la note, ou les ajouter aux pièces jointes ?",
+      "attach": "Ajouter en pièce jointe",
+      "insert": "Insérer dans la note"
     }
   },
   "auth": {

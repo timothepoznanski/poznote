@@ -29,6 +29,7 @@
         TXT.selectFile = body.getAttribute('data-txt-select-file') || 'Please select a file to upload.';
         TXT.fileTooLarge = body.getAttribute('data-txt-file-too-large') || 'The file is too large (max: 200MB).';
         TXT.uploadSuccess = body.getAttribute('data-txt-upload-success') || 'File uploaded successfully!';
+        TXT.uploadSuccessMany = body.getAttribute('data-txt-upload-success-many') || '{{count}} files uploaded successfully!';
         TXT.uploadFailedPrefix = body.getAttribute('data-txt-upload-failed-prefix') || 'Upload failed: {{error}}';
         TXT.uploadFailedGeneric = body.getAttribute('data-txt-upload-failed-generic') || 'Upload failed. Please try again.';
         TXT.uploadFailedConnection = body.getAttribute('data-txt-upload-failed-connection') || 'Upload failed. Please check your connection.';
@@ -142,13 +143,22 @@
         }, 6000);
     }
 
-    // Show file name when file is selected
+    // Show the selected files: name and size of each, plus a preview when
+    // there is only one
     function showFileName() {
         var fileInput = document.getElementById('attachmentFile');
         var fileNameDiv = document.getElementById('selectedFileName');
         var uploadBtn = document.getElementById('uploadBtn');
 
-        if (fileInput.files.length > 0) {
+        if (fileInput.files.length > 1) {
+            var listHtml = '';
+            for (var i = 0; i < fileInput.files.length; i++) {
+                listHtml += '<div class="selected-file-info"><span>' + escapeHtml(fileInput.files[i].name) + ' (' + escapeHtml(formatFileSize(fileInput.files[i].size)) + ')</span></div>';
+            }
+            fileNameDiv.innerHTML = listHtml;
+            fileNameDiv.style.display = 'block';
+            uploadBtn.disabled = false;
+        } else if (fileInput.files.length > 0) {
             var file = fileInput.files[0];
             var fileName = file.name;
             var fileSize = formatFileSize(file.size);
@@ -162,14 +172,16 @@
             if (isImage) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    htmlContent += '<div class="image-preview"><img src="' + e.target.result + '" alt="' + TXT.previewAlt + '" style="max-width: 200px; max-height: 150px; border-radius: 4px; margin-top: 10px;"></div>';
+                    if (fileInput.files[0] !== file || fileInput.files.length !== 1) return;
+                    htmlContent += '<div class="image-preview"><img src="' + escapeHtml(e.target.result) + '" alt="' + escapeHtml(TXT.previewAlt) + '" style="max-width: 200px; max-height: 150px; border-radius: 4px; margin-top: 10px;"></div>';
                     fileNameDiv.innerHTML = htmlContent;
                 };
                 reader.readAsDataURL(file);
             } else if (isPDF) {
                 var reader = new FileReader();
                 reader.onload = function (e) {
-                    htmlContent += '<div class="pdf-preview"><embed src="' + e.target.result + '" type="application/pdf" width="200" height="150" style="border-radius: 4px; margin-top: 10px;"></div>';
+                    if (fileInput.files[0] !== file || fileInput.files.length !== 1) return;
+                    htmlContent += '<div class="pdf-preview"><embed src="' + escapeHtml(e.target.result) + '" type="application/pdf" width="200" height="150" style="border-radius: 4px; margin-top: 10px;"></div>';
                     fileNameDiv.innerHTML = htmlContent;
                 };
                 reader.readAsDataURL(file);
@@ -195,7 +207,8 @@
         }
     }
 
-    // Upload attachment with progress
+    // Upload the selected files with progress, one after the other: the
+    // server rewrites the note's whole list of attachments on each upload
     function uploadAttachment(event) {
         if (uploadInProgress) return;
 
@@ -214,76 +227,127 @@
             return;
         }
 
-        var file = fileInput.files[0];
+        var files = Array.prototype.slice.call(fileInput.files);
         var maxSize = 200 * 1024 * 1024; // 200MB
 
-        if (file.size > maxSize) {
+        if (files.length === 1 && files[0].size > maxSize) {
             showNotification(TXT.fileTooLarge, 'error');
             return;
         }
 
+        var totalBytes = 0;
+        files.forEach(function (file) { totalBytes += file.size; });
+        var doneBytes = 0;
+        var uploadedCount = 0;
+        var failures = [];
+
         uploadInProgress = true;
+        progressFill.style.width = '0%';
+        progressText.textContent = TXT.uploading;
         progressDiv.style.display = 'block';
         document.getElementById('uploadBtn').disabled = true;
 
-        var formData = new FormData();
-        formData.append('note_id', noteId);
-        if (noteWorkspace) {
-            formData.append('workspace', noteWorkspace);
+        function showProgress(index, loaded) {
+            var percent = totalBytes > 0 ? Math.round(((doneBytes + loaded) / totalBytes) * 100) : 100;
+            progressFill.style.width = percent + '%';
+            progressText.textContent = TXT.uploading + ' '
+                + (files.length > 1 ? (index + 1) + '/' + files.length + ' - ' : '') + percent + '%';
         }
-        formData.append('file', file);
 
-        var xhr = new XMLHttpRequest();
-
-        xhr.upload.addEventListener('progress', function (e) {
-            if (e.lengthComputable) {
-                var percent = Math.round((e.loaded / e.total) * 100);
-                progressFill.style.width = percent + '%';
-                progressText.textContent = TXT.uploading + ' ' + percent + '%';
+        function uploadNext(index) {
+            if (index >= files.length) {
+                finish();
+                return;
             }
-        });
 
-        xhr.addEventListener('load', function () {
-            uploadInProgress = false;
-            progressDiv.style.display = 'none';
+            var file = files[index];
+            var fail = function (message) {
+                failures.push(files.length > 1 ? file.name + ': ' + message : message);
+                doneBytes += file.size;
+                uploadNext(index + 1);
+            };
 
-            try {
-                var response = JSON.parse(xhr.responseText);
-                if (response.success) {
-                    showNotification(TXT.uploadSuccess, 'success');
-                    fileInput.value = '';
-                    document.getElementById('selectedFileName').style.display = 'none';
-                    document.getElementById('uploadBtn').disabled = true;
-                    
-                    // Mark that this note needs an auto-push (if auto-push enabled)
-                    if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
-                        try {
-                            localStorage.setItem('poznote_needs_auto_push_' + noteStorageId(noteId), 'true');
-                        } catch (e) {
-                            console.debug('attachments-page: uploadAttachment() failed:', e);
-                        }
-                    }
-                    
-                    loadAttachments();
-                } else {
-                    showNotification(TXT.uploadFailedPrefix.replace('{{error}}', response.message || ''), 'error');
-                    document.getElementById('uploadBtn').disabled = false;
+            if (file.size > maxSize) {
+                fail(TXT.fileTooLarge);
+                return;
+            }
+
+            var formData = new FormData();
+            formData.append('note_id', noteId);
+            if (noteWorkspace) {
+                formData.append('workspace', noteWorkspace);
+            }
+            formData.append('file', file);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.upload.addEventListener('progress', function (e) {
+                if (e.lengthComputable) {
+                    showProgress(index, Math.min(file.size, file.size * (e.loaded / e.total)));
                 }
-            } catch (e) {
-                showNotification(TXT.uploadFailedGeneric, 'error');
-                document.getElementById('uploadBtn').disabled = false;
-            }
-        });
+            });
 
-        xhr.addEventListener('error', function () {
+            xhr.addEventListener('load', function () {
+                var response = null;
+                try {
+                    response = JSON.parse(xhr.responseText);
+                } catch (e) {
+                    fail(TXT.uploadFailedGeneric);
+                    return;
+                }
+                if (response && response.success) {
+                    uploadedCount++;
+                    doneBytes += file.size;
+                    uploadNext(index + 1);
+                } else {
+                    fail(TXT.uploadFailedPrefix.replace('{{error}}', (response && (response.message || response.error)) || ''));
+                }
+            });
+
+            xhr.addEventListener('error', function () {
+                fail(TXT.uploadFailedConnection);
+            });
+
+            xhr.open('POST', '/api/v1/notes/' + noteId + '/attachments');
+            xhr.send(formData);
+            showProgress(index, 0);
+        }
+
+        function finish() {
             uploadInProgress = false;
             progressDiv.style.display = 'none';
-            showNotification(TXT.uploadFailedConnection, 'error');
-            document.getElementById('uploadBtn').disabled = false;
-        });
 
-        xhr.open('POST', '/api/v1/notes/' + noteId + '/attachments');
-        xhr.send(formData);
+            // Shown first so that the success message ends up on top
+            failures.forEach(function (message) {
+                showNotification(message, 'error');
+            });
+
+            if (uploadedCount === 0) {
+                // Nothing went through: the selection stays for a retry
+                document.getElementById('uploadBtn').disabled = false;
+                return;
+            }
+
+            showNotification(uploadedCount === 1 ? TXT.uploadSuccess : TXT.uploadSuccessMany.replace('{{count}}', uploadedCount), 'success');
+            // Cleared even after a partial failure, so that a second click
+            // does not attach the uploaded files twice
+            fileInput.value = '';
+            document.getElementById('selectedFileName').style.display = 'none';
+            document.getElementById('uploadBtn').disabled = true;
+
+            // Mark that this note needs an auto-push (if auto-push enabled)
+            if (window.POZNOTE_CONFIG?.gitSyncAutoPush) {
+                try {
+                    localStorage.setItem('poznote_needs_auto_push_' + noteStorageId(noteId), 'true');
+                } catch (e) {
+                    console.debug('attachments-page: uploadAttachment() failed:', e);
+                }
+            }
+
+            loadAttachments();
+        }
+
+        uploadNext(0);
     }
 
     // Load attachments list

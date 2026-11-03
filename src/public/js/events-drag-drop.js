@@ -18,7 +18,14 @@ function setupDragDropEvents() {
     document.addEventListener('dragend', function () {
         window.internalDragActive = false;
     }, true);
-    document.addEventListener('drop', function () {
+    document.addEventListener('drop', function (e) {
+        // CodeMirror reads files dropped on a Markdown note and types the
+        // text ones into it (an SVG included); the note handler below
+        // attaches them instead. CodeMirror skips a drop already prevented.
+        if (!window.internalDragActive && e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0
+            && e.target && e.target.closest && e.target.closest('.noteentry')) {
+            e.preventDefault();
+        }
         // Bubble handlers of this same drop still see the flag; clear after.
         setTimeout(function () {
             window.internalDragActive = false;
@@ -93,12 +100,44 @@ function setupDragDropEvents() {
             if (!dt) return;
 
             if (dt.files && dt.files.length > 0) {
-                handleImageFilesAndInsert(dt.files, note, { x: e.clientX, y: e.clientY });
+                if (!canDropFilesOnNote(note)) return;
+                // Images go into the note or to its attachments, the user
+                // picks; the other files go straight to the attachments
+                var files = droppedFilesWithoutFolders(dt);
+                var images = files.filter(function (file) { return file.type && file.type.startsWith('image/'); });
+                var others = files.filter(function (file) { return images.indexOf(file) === -1; });
+                if (others.length > 0) handleDroppedFilesAsAttachments(others, note);
+                if (images.length > 0) handleDroppedImages(images, note, { x: e.clientX, y: e.clientY });
             }
         } catch (err) {
             console.debug('events-drag-drop: setupDragDropEvents() failed:', err);
         }
     });
+}
+
+// A note the viewer cannot edit (workspace shared for reading, or a note
+// open in someone else's editor) takes no dropped file
+function canDropFilesOnNote(note) {
+    if (isSharedWorkspaceReadOnly()) return false;
+    var noteId = note.getAttribute('data-note-id') || note.id.replace('entry', '');
+    return !(typeof window.isNoteEditingLocked === 'function' && window.isNoteEditingLocked(noteId));
+}
+
+// The dropped files without the folders, which dataTransfer.files lists as
+// empty files that cannot be uploaded
+function droppedFilesWithoutFolders(dt) {
+    if (!dt.items || !dt.items.length) return Array.prototype.slice.call(dt.files);
+
+    var files = [];
+    for (var i = 0; i < dt.items.length; i++) {
+        var item = dt.items[i];
+        if (item.kind !== 'file') continue;
+        var entry = typeof item.webkitGetAsEntry === 'function' ? item.webkitGetAsEntry() : null;
+        if (entry && entry.isDirectory) continue;
+        var file = item.getAsFile();
+        if (file) files.push(file);
+    }
+    return files;
 }
 
 // True when the drag comes from outside the browser (OS files) rather than

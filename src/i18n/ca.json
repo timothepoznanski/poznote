@@ -746,6 +746,9 @@
     },
     "messages": {
       "upload_success": "S'ha pujat el fitxer correctament.",
+      "upload_success_many": "S'han pujat {{count}} fitxers correctament.",
+      "attached_one": "Adjuntat: {{filename}}",
+      "attached_many": "{{count}} fitxers adjuntats",
       "deleted_success": "S'ha suprimit el fitxer adjunt",
       "link_copied": "S'ha copiat l'enllaç.",
       "moved_success": "S'ha mogut el fitxer adjunt a «{{heading}}»"
@@ -754,7 +757,7 @@
       "title": "Gestió dels fitxers adjunts",
       "subtitle": "Gestió dels fitxers adjunts de la nota:",
       "upload_section_title": "Trieu un fitxer adjunt nou",
-      "drag_drop_info": "Podeu arrossegar i deixar anar el fitxer a sota:",
+      "drag_drop_info": "Podeu arrossegar i deixar anar els fitxers a sota:",
       "all_types_accepted": "S'accepten tots els tipus de fitxer (màx. 200 MB)",
       "upload_button": "Adjunta",
       "current_attachments": "Fitxers adjunts actuals",
@@ -812,6 +815,13 @@
       "empty": "No s'ha trobat cap altra nota",
       "moving": "S'està movent...",
       "kept_notice": "En queda una còpia en aquesta nota, perquè el contingut fa servir el fitxer."
+    },
+    "image_drop": {
+      "title": "Deixar anar una imatge",
+      "message_one": "Voleu inserir la imatge a la nota o afegir-la als adjunts?",
+      "message_many": "Voleu inserir les {{count}} imatges a la nota o afegir-les als adjunts?",
+      "attach": "Afegeix com a adjunt",
+      "insert": "Insereix a la nota"
     }
   },
   "modals": {

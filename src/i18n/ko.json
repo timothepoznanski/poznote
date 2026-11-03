@@ -746,6 +746,9 @@
     },
     "messages": {
       "upload_success": "파일이 업로드되었습니다!",
+      "upload_success_many": "파일 {{count}}개가 업로드되었습니다!",
+      "attached_one": "첨부됨: {{filename}}",
+      "attached_many": "파일 {{count}}개 첨부됨",
       "deleted_success": "첨부 파일이 삭제되었습니다.",
       "link_copied": "링크가 복사되었습니다!",
       "moved_success": "첨부 파일이 \"{{heading}}\"로 이동되었습니다."
@@ -754,7 +757,7 @@
       "title": "첨부 파일 관리",
       "subtitle": "노트에 대한 첨부 파일 관리:",
       "upload_section_title": "새 첨부 파일 선택",
-      "drag_drop_info": "아래에 파일을 끌어서 놓을 수 있습니다.",
+      "drag_drop_info": "아래에 파일을 끌어서 놓을 수 있습니다(여러 개 가능).",
       "all_types_accepted": "모든 파일 형식 허용(최대 200MB)",
       "upload_button": "첨부",
       "current_attachments": "현재 첨부 파일",
@@ -812,6 +815,13 @@
       "empty": "다른 노트를 찾을 수 없습니다",
       "moving": "이동 중...",
       "kept_notice": "이 노트 본문에서 파일을 사용하고 있으므로 복사본이 남습니다."
+    },
+    "image_drop": {
+      "title": "이미지 놓기",
+      "message_one": "이미지를 노트에 삽입할까요, 아니면 첨부 파일에 추가할까요?",
+      "message_many": "이미지 {{count}}개를 노트에 삽입할까요, 아니면 첨부 파일에 추가할까요?",
+      "attach": "첨부 파일로 추가",
+      "insert": "노트에 삽입"
     }
   },
   "modals": {
