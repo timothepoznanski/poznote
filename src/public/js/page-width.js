@@ -3,7 +3,8 @@
  * dashboard (speed_dial.php, dashboard.php), rendered by
  * poznoteRenderPageWidthSlider().
  *
- * The width of the page's column, as a percentage of the room beside the icon
+ * The width of the page's content (the grid, the cards: not the title nor
+ * the toolbar), as a percentage of the room beside the icon
  * rail, saved in an account setting (speed_dial_width, dashboard_width) once
  * the slider stops. The page renders the stored width on <body> as a CSS
  * variable (lib/page-width.php), which its stylesheet reads; without one the

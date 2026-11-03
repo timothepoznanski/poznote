@@ -5231,7 +5231,8 @@
     "page_width": "페이지 너비",
     "width_default": "기본값",
     "width_reset": "기본값으로 재설정",
-    "width_error": "너비를 저장할 수 없습니다."
+    "width_error": "너비를 저장할 수 없습니다.",
+    "note_width_settings_hint": "모든 노트의 기본값은 설정에서 지정하세요"
   },
   "keyboard_shortcuts": {
     "menu_item": "키보드 단축키",

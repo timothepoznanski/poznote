@@ -98,6 +98,9 @@
         var container = document.querySelector('.dashboard-container');
         if (!viewBtn || !container) return;
         var cardHeights = watchCardHeights(container);
+        // What the cards can spread over: the dashboard's content, which its
+        // page width slider narrows (js/page-width.js), else the container
+        var room = container.querySelector('.dashboard-content') || container;
 
         function readSetting(key, allowed, fallback) {
             var value = null;
@@ -116,8 +119,9 @@
             var style = getComputedStyle(container);
             var card = parseFloat(style.getPropertyValue('--dash-col-min')) || 190;
             var gap = parseFloat(style.getPropertyValue('--dash-col-gap')) || 14;
-            var width = container.clientWidth -
-                (parseFloat(style.paddingLeft) || 0) - (parseFloat(style.paddingRight) || 0);
+            var roomStyle = room === container ? style : getComputedStyle(room);
+            var width = room.clientWidth -
+                (parseFloat(roomStyle.paddingLeft) || 0) - (parseFloat(roomStyle.paddingRight) || 0);
             var fit = String(Math.max(1, Math.floor((width + gap) / (card + gap))));
             if (container.style.getPropertyValue('--dash-col-max') !== fit) {
                 container.style.setProperty('--dash-col-max', fit);
@@ -166,7 +170,9 @@
         fitColumns();
 
         if (typeof ResizeObserver === 'function') {
-            new ResizeObserver(fitColumns).observe(container);
+            var resized = new ResizeObserver(fitColumns);
+            resized.observe(container);
+            if (room !== container) resized.observe(room);
         } else {
             window.addEventListener('resize', fitColumns);
         }

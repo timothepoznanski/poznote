@@ -421,6 +421,25 @@ body:has(#ai-chat-panel.ai-chat-open) #edgeAiChatBtn {
     cursor: pointer;
 }
 
+/* Under the note's slider: where the width of all notes is set */
+.page-more-menu-slider-hint {
+    align-self: flex-start;
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--pz-text-muted);
+    text-decoration: none;
+}
+
+.page-more-menu-slider-hint[hidden] {
+    display: none;
+}
+
+.page-more-menu-slider-hint:hover,
+.page-more-menu-slider-hint:focus-visible {
+    color: var(--pz-text);
+    text-decoration: underline;
+}
+
 /* Outside the menu (the toolbar popovers) the box gives the room */
 .page-more-menu-slider:not(.page-more-menu-item) {
     min-width: 0;

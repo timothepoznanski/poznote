@@ -14,7 +14,7 @@
 
     var MIN_WIDTH = 10;
     var FULL_WIDTH = 100;
-    var WIDTH_STEP = 5;
+    var WIDTH_STEP = 1;
     var TOAST_DURATION = 1200;
     var SAVE_DEBOUNCE = 400;
 
@@ -195,6 +195,9 @@
         input.setAttribute('aria-valuetext', state.label);
         output.textContent = state.label;
         reset.hidden = !state.canReset;
+        // The link to the setting of all notes: the dual pane seam has none
+        var hint = row.querySelector('.page-more-menu-slider-hint');
+        if (hint) hint.hidden = state.split;
     }
 
     function setNoteWidth(noteId, value) {

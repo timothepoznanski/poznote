@@ -1220,7 +1220,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                     <div class="home-card-content">
                         <label class="home-card-title" for="note-width-range"><?php echo t_h('display.cards.note_content_width', [], 'Note Content Width'); ?></label>
                         <span class="settings-inline-range">
-                            <input type="range" id="note-width-range" class="settings-inline-control" data-control="note-width-range" min="10" max="100" step="5" value="100">
+                            <input type="range" id="note-width-range" class="settings-inline-control" data-control="note-width-range" min="10" max="100" step="1" value="100">
                             <output class="settings-inline-value" for="note-width-range"><?php echo t_h('modals.note_width.full_width', [], 'Full Width'); ?></output>
                         </span>
                     </div>

@@ -1,8 +1,8 @@
 <?php
 /**
- * Width of the column of the speed dial and of the dashboard, set from the
- * slider of their "..." menu (ui_customization_panel.php, js/page-width.js):
- * a percentage of the room beside the icon rail, in the account settings
+ * Width of the content of the speed dial and of the dashboard (the grid, the
+ * cards: not the title nor the toolbar), set from the slider of their toolbar
+ * (js/page-width.js): a percentage of the room beside the icon rail, in the account settings
  * speed_dial_width and dashboard_width. Empty, the page keeps its own layout:
  * the speed dial's 1200px column, the dashboard's full width (until the
  * slider is first moved, the dashboard's 100 being stored as empty again).
@@ -12,11 +12,11 @@ const POZNOTE_PAGE_WIDTH_MIN = 10;
 const POZNOTE_PAGE_WIDTH_MAX = 100;
 
 // Per page: the setting, the CSS variable the page reads on <body>, the
-// column it sizes, and the width it has without a setting (null: a layout of
+// content it sizes, and the width it has without a setting (null: a layout of
 // its own, which no percentage matches).
 const POZNOTE_PAGE_WIDTH_PAGES = [
-    'speed-dial' => ['setting' => 'speed_dial_width', 'var' => '--speed-dial-width', 'column' => '.speed-dial-container', 'default' => null],
-    'dashboard' => ['setting' => 'dashboard_width', 'var' => '--dashboard-width', 'column' => '.dashboard-container', 'default' => 100],
+    'speed-dial' => ['setting' => 'speed_dial_width', 'var' => '--speed-dial-width', 'column' => '.speed-dial-grid', 'default' => null],
+    'dashboard' => ['setting' => 'dashboard_width', 'var' => '--dashboard-width', 'column' => '.dashboard-content', 'default' => 100],
 ];
 
 /** A stored width as a whole percentage, null for the page's own layout. */
@@ -64,7 +64,7 @@ function poznoteRenderPageWidthSlider(string $page, string $id, string $class = 
             <span id="<?php echo $id; ?>Label" class="page-more-menu-label"><?php echo t_h('page_menu.page_width', [], 'Page width'); ?></span>
             <output class="page-more-menu-slider-value" for="<?php echo $id; ?>Input"></output>
         </div>
-        <input type="range" id="<?php echo $id; ?>Input" class="page-more-menu-slider-input" min="<?php echo POZNOTE_PAGE_WIDTH_MIN; ?>" max="<?php echo POZNOTE_PAGE_WIDTH_MAX; ?>" step="5" value="100" aria-labelledby="<?php echo $id; ?>Label">
+        <input type="range" id="<?php echo $id; ?>Input" class="page-more-menu-slider-input" min="<?php echo POZNOTE_PAGE_WIDTH_MIN; ?>" max="<?php echo POZNOTE_PAGE_WIDTH_MAX; ?>" step="1" value="100" aria-labelledby="<?php echo $id; ?>Label">
     </div>
     <?php
 }

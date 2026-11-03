@@ -5500,7 +5500,8 @@
     "page_width": "Largeur de la page",
     "width_default": "Par défaut",
     "width_reset": "Revenir à la valeur par défaut",
-    "width_error": "Impossible d'enregistrer la largeur."
+    "width_error": "Impossible d'enregistrer la largeur.",
+    "note_width_settings_hint": "Définir la largeur par défaut de toutes les notes dans les paramètres"
   },
   "keyboard_shortcuts": {
     "menu_item": "Raccourcis clavier",

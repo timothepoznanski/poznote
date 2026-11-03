@@ -291,7 +291,9 @@ require_once __DIR__ . '/markdown_syntax_content.php';
                             <i class="lucide lucide-rotate-ccw"></i>
                         </button>
                     </div>
-                    <input type="range" id="edgeMenuNoteWidthInput" class="page-more-menu-slider-input" min="10" max="100" step="5" value="100" aria-labelledby="edgeMenuNoteWidthLabel">
+                    <input type="range" id="edgeMenuNoteWidthInput" class="page-more-menu-slider-input" min="10" max="100" step="1" value="100" aria-labelledby="edgeMenuNoteWidthLabel">
+                    <?php // Where the width of all notes is set. Not for the dual pane seam, which has no setting. ?>
+                    <a class="page-more-menu-slider-hint" href="settings.php#section=settings-note-content-section-grid"><?php echo t_h('page_menu.note_width_settings_hint', [], 'Set the default for all notes in Settings'); ?></a>
                 </div>
                 <?php endif; ?>
                 <?php // Help for the editor: the dashboard and the speed dial open no note, their "..." menu goes ?>

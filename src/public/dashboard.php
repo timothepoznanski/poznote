@@ -595,6 +595,8 @@ $pageWidthStyle = poznotePageWidthStyle('dashboard');
 			</header>
 
 
+		<?php // The content only: the slider of the toolbar narrows it, not the title nor the toolbar (js/page-width.js) ?>
+		<div class="dashboard-content">
 		<?php if ($isEmpty): ?>
 			<div class="dashboard-empty">
 				<i class="lucide <?php echo $dashboardScopeIsMulti && !$favoritesOnly ? 'lucide-layers' : 'lucide-star'; ?>"></i>
@@ -607,6 +609,7 @@ $pageWidthStyle = poznotePageWidthStyle('dashboard');
 			<nav id="dashboardBreadcrumb" class="dashboard-breadcrumb" hidden aria-label="breadcrumb"></nav>
 			<div id="dashboardGrid" class="dashboard-grid-container"></div>
 		<?php endif; ?>
+		</div>
 	</div>
 
 	<?php if ($aiChatEnabled): ?>
