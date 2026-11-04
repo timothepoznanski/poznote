@@ -7,6 +7,13 @@
  * manually from this page or automatically on a schedule by the backup
  * worker, and how many of them are kept. The configuration lives in master.db
  * (global_settings) and applies to the whole instance.
+ *
+ * One box per job, each with its own form, so saving one never touches the
+ * others: Configuration (folder, retention), Automatic backups (switch,
+ * frequency, the users they cover), Manual backup (its own user selection,
+ * never stored), Access for users (whether users may back up their own
+ * account into the folder from the Backup page, and restore it from the
+ * Restore page), then the archives.
  */
 
 require_once __DIR__ . '/../auth.php';
@@ -29,15 +36,31 @@ $pageWorkspace = trim(getWorkspaceFilter());
 $message = '';
 $error = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_config') {
+$postAction = $_SERVER['REQUEST_METHOD'] === 'POST' ? (string)($_POST['action'] ?? '') : '';
+
+if ($postAction === 'save_config') {
+    $retention = max(0, (int)($_POST['local_backup_retention'] ?? 7));
+    $directory = LocalBackupService::normalizeDirectory((string)($_POST['local_backup_directory'] ?? ''));
+    $effectiveDirectory = $directory['path'] !== '' ? $directory['path'] : LocalBackupService::defaultDirectory();
+
+    if ($directory['error'] === 'not_absolute') {
+        $error = t('local_backup.messages.not_absolute', [], 'The backup folder must be an absolute path, for example /backups.');
+    } elseif ($directory['error'] === 'inside_app') {
+        $error = t('local_backup.messages.inside_app', [], 'The backup folder cannot be inside the application, apart from data/backups.');
+    } elseif (LocalBackupService::ensureDirectory($effectiveDirectory) !== null) {
+        $error = t('local_backup.messages.not_writable', ['path' => $effectiveDirectory], 'The backup folder cannot be created or is not writable by the web server: ' . $effectiveDirectory);
+    } elseif (setGlobalSetting('local_backup_directory', $directory['path'])
+        && setGlobalSetting('local_backup_retention', (string)$retention)) {
+        $message = t('s3_backup.messages.saved', [], 'Configuration saved successfully.');
+    } else {
+        $error = t('s3_backup.messages.save_error', [], 'Failed to save configuration.');
+    }
+} elseif ($postAction === 'save_auto') {
     $autoEnabled = isset($_POST['local_backup_auto_enabled']) ? '1' : '0';
     $frequency = (string)($_POST['local_backup_frequency'] ?? 'daily');
     if (!isset(LocalBackupService::FREQUENCIES[$frequency])) {
         $frequency = 'daily';
     }
-    $retention = max(0, (int)($_POST['local_backup_retention'] ?? 7));
-    $directory = LocalBackupService::normalizeDirectory((string)($_POST['local_backup_directory'] ?? ''));
-    $effectiveDirectory = $directory['path'] !== '' ? $directory['path'] : LocalBackupService::defaultDirectory();
 
     // Checked users; when every existing user is checked, store an empty
     // selection so future accounts are covered automatically
@@ -47,25 +70,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save_
     $selectedIds = array_values(array_intersect($selectedIds, $allUserIds));
     $userIdsSetting = count($selectedIds) === count($allUserIds) ? '' : implode(',', $selectedIds);
 
-    if ($directory['error'] === 'not_absolute') {
-        $error = t('local_backup.messages.not_absolute', [], 'The backup folder must be an absolute path, for example /backups.');
-    } elseif ($directory['error'] === 'inside_app') {
-        $error = t('local_backup.messages.inside_app', [], 'The backup folder cannot be inside the application, apart from data/backups.');
-    } elseif (LocalBackupService::ensureDirectory($effectiveDirectory) !== null) {
-        $error = t('local_backup.messages.not_writable', ['path' => $effectiveDirectory], 'The backup folder cannot be created or is not writable by the web server: ' . $effectiveDirectory);
-    } elseif (empty($selectedIds)) {
+    if (empty($selectedIds) && $autoEnabled === '1') {
         $error = t('s3_backup.messages.no_user_selected', [], 'Select at least one user to back up.');
     } else {
         $saved = setGlobalSetting('local_backup_auto_enabled', $autoEnabled)
-            && setGlobalSetting('local_backup_directory', $directory['path'])
             && setGlobalSetting('local_backup_frequency', $frequency)
-            && setGlobalSetting('local_backup_retention', (string)$retention)
-            && setGlobalSetting('local_backup_user_ids', $userIdsSetting);
+            // Nothing checked with the schedule off: the stored selection
+            // stays (an empty setting would mean "every user")
+            && (empty($selectedIds) || setGlobalSetting('local_backup_user_ids', $userIdsSetting));
         if ($saved) {
             $message = t('s3_backup.messages.saved', [], 'Configuration saved successfully.');
         } else {
             $error = t('s3_backup.messages.save_error', [], 'Failed to save configuration.');
         }
+    }
+} elseif ($postAction === 'save_user_access') {
+    if (setGlobalSetting('local_backup_user_backup', isset($_POST['local_backup_user_backup']) ? '1' : '0')
+        && setGlobalSetting('local_backup_user_delete', isset($_POST['local_backup_user_delete']) ? '1' : '0')
+        && setGlobalSetting('local_backup_user_restore', isset($_POST['local_backup_user_restore']) ? '1' : '0')) {
+        $message = t('s3_backup.messages.saved', [], 'Configuration saved successfully.');
+    } else {
+        $error = t('s3_backup.messages.save_error', [], 'Failed to save configuration.');
     }
 }
 
@@ -76,6 +101,68 @@ $directoryValue = $error !== '' && isset($_POST['local_backup_directory'])
     ? trim((string)$_POST['local_backup_directory'])
     : $backupConfig['custom_directory'];
 $allBackupUsers = listAllUserProfiles();
+// After a refused save of the automatic backups, show what was checked
+$autoUserIds = $postAction === 'save_auto' && $error !== ''
+    ? array_map('intval', (array)($_POST['local_backup_users'] ?? []))
+    : $backupConfig['user_ids'];
+
+/**
+ * A filterable list of user checkboxes with Select all / Deselect all. Used
+ * twice: the users of the automatic backups (posted with its form) and the
+ * users of a manual run (read by the page script, never stored).
+ *
+ * @param string        $prefix    id prefix of the picker's elements
+ * @param string        $inputName checkbox name ('' = not part of a form)
+ * @param callable      $isChecked fn(int $userId): bool
+ */
+function localBackupRenderUsersPicker(array $users, string $prefix, string $inputName, callable $isChecked): void {
+    $h = function ($value) { return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8'); };
+    ?>
+                        <div class="local-backup-users-picker" id="<?php echo $h($prefix); ?>">
+                            <div class="local-backup-users-toolbar">
+                                <div class="local-backup-users-search">
+                                    <i class="lucide lucide-search"></i>
+                                    <input type="search" id="<?php echo $h($prefix); ?>-filter" class="git-field-input local-backup-filter-input" data-picker-filter
+                                           placeholder="<?php echo t_h('s3_backup.users_filter_placeholder', [], 'Filter by name, username or email...'); ?>"
+                                           autocomplete="off">
+                                    <button type="button" class="local-backup-users-clear" data-picker-clear hidden
+                                            aria-label="<?php echo t_h('s3_backup.users_filter_clear', [], 'Clear filter'); ?>">
+                                        <i class="lucide lucide-x"></i>
+                                    </button>
+                                </div>
+                                <button type="button" class="btn btn-secondary" data-picker-all><?php echo t_h('s3_backup.users_select_all', [], 'Select all'); ?></button>
+                                <button type="button" class="btn btn-secondary" data-picker-none><?php echo t_h('s3_backup.users_select_none', [], 'Deselect all'); ?></button>
+                            </div>
+
+                            <div class="local-backup-users-list" data-picker-list>
+                                <?php foreach ($users as $backupUser):
+                                    $backupUserId = (int)$backupUser['id'];
+                                    $fullName = trim(((string)($backupUser['first_name'] ?? '')) . ' ' . ((string)($backupUser['last_name'] ?? '')));
+                                    $email = trim((string)($backupUser['email'] ?? ''));
+                                    $metaParts = array_values(array_filter([$fullName, $email], function ($part) { return $part !== ''; }));
+                                    $searchText = strtolower(trim($backupUser['username'] . ' ' . $fullName . ' ' . $email));
+                                ?>
+                                <label class="local-backup-user-check" data-search="<?php echo $h($searchText); ?>">
+                                    <input type="checkbox"<?php echo $inputName !== '' ? ' name="' . $h($inputName) . '"' : ''; ?> value="<?php echo $backupUserId; ?>" data-username="<?php echo $h($backupUser['username']); ?>" <?php echo $isChecked($backupUserId) ? 'checked' : ''; ?>>
+                                    <span class="local-backup-user-name"><?php echo $h($backupUser['username']); ?></span>
+                                    <?php if (!empty($metaParts)): ?>
+                                    <span class="local-backup-user-meta"><?php echo $h(implode(' · ', $metaParts)); ?></span>
+                                    <?php endif; ?>
+                                    <?php if (!empty($backupUser['is_admin'])): ?>
+                                    <span class="local-backup-user-badge"><?php echo t_h('s3_backup.users_badge_admin', [], 'Admin'); ?></span>
+                                    <?php endif; ?>
+                                    <?php if (empty($backupUser['active'])): ?>
+                                    <span class="local-backup-user-badge is-inactive"><?php echo t_h('s3_backup.users_badge_inactive', [], 'Inactive'); ?></span>
+                                    <?php endif; ?>
+                                </label>
+                                <?php endforeach; ?>
+                                <div class="local-backup-users-empty" data-picker-empty hidden><?php echo t_h('s3_backup.users_no_match', [], 'No user matches this filter.'); ?></div>
+                            </div>
+
+                            <div class="local-backup-users-count" data-picker-count></div>
+                        </div>
+    <?php
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?php echo htmlspecialchars($currentLang, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>">
@@ -114,7 +201,7 @@ $allBackupUsers = listAllUserProfiles();
     .local-backup-table th, .local-backup-table td { white-space: nowrap; }
     /* The actions column absorbs the leftover width so the text columns stay
        snug together instead of being spread across the whole table. It stays
-       pinned to the right edge so Download/Delete remain reachable when long
+       pinned to the right edge so the actions button stays reachable when long
        archive names push the table into horizontal scrolling. */
     .local-backup-table th:last-child, .local-backup-table td.local-backup-actions-cell { text-align: right; position: sticky; right: 0; background: var(--pz-bg); }
     body.dark-mode .local-backup-table th:last-child,
@@ -129,10 +216,8 @@ $allBackupUsers = listAllUserProfiles();
     .local-backup-sort-btn.local-backup-sort-active .local-backup-sort-icon { opacity: 1; }
     .local-backup-sort-btn.local-backup-sort-active { font-weight: 700; }
     .local-backup-table .btn { display: inline-flex; align-items: center; vertical-align: middle; padding: 3px 10px; font-size: 0.85rem; line-height: 1.4; border: none; margin: 0; box-sizing: border-box; }
-    .local-backup-table a.btn-primary { background-color: var(--pz-accent); color: var(--pz-text-inverse); text-decoration: none; }
-    .local-backup-table a.btn-primary:hover { background-color: var(--pz-accent-hover); }
-    .local-backup-table .btn-danger { background-color: var(--pz-danger); color: var(--pz-text-inverse); }
-    .local-backup-table .btn-danger:hover { background-color: var(--pz-danger-hover); }
+    #local-backup-restore-status { white-space: pre-line; }
+    .local-backup-table .btn.row-actions-toggle { padding: 3px 8px; }
     /* The folder can hold a lot of archives: keep the list inside a scroller
        instead of letting it push the rest of the page down */
     .local-backup-table-wrap { overflow: auto; max-height: 420px; overscroll-behavior: contain; }
@@ -140,12 +225,12 @@ $allBackupUsers = listAllUserProfiles();
     .local-backup-users-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
     .local-backup-users-search { position: relative; flex: 1 1 220px; min-width: 180px; }
     .local-backup-users-search .lucide-search { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); opacity: 0.55; pointer-events: none; font-size: 0.95rem; }
-    #local-backup-user-filter, #local-backup-list-filter { width: 100%; padding-left: 32px; padding-right: 30px; margin: 0; }
+    .local-backup-filter-input, #local-backup-list-filter { width: 100%; padding-left: 32px; padding-right: 30px; margin: 0; }
     .local-backup-users-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; padding: 2px 4px; opacity: 0.6; color: inherit; line-height: 1; }
     .local-backup-users-clear:hover { opacity: 1; }
     .local-backup-users-toolbar .btn { padding: 5px 12px; font-size: 0.85rem; margin: 0; }
     .local-backup-users-list { max-height: 260px; overflow-y: auto; border: 1px solid var(--pz-border-strong); border-radius: 6px; }
-    #local-backup-user-filter::-webkit-search-cancel-button,
+    .local-backup-filter-input::-webkit-search-cancel-button,
     #local-backup-list-filter::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
     /* Backup list filter reuses the users-toolbar look; [hidden] must beat its
        display:flex (same trap as the user rows above) */
@@ -167,6 +252,7 @@ $allBackupUsers = listAllUserProfiles();
     .local-backup-users-count { font-size: 0.85rem; opacity: 0.75; margin-top: 6px; }
     /* Beat .git-sync-description's centering max-width/auto margins (ID wins) */
     #local-backup-manual-desc { margin: 0 0 10px; max-width: none; text-align: left; }
+    .local-backup-section-desc { margin: 0 0 14px; font-size: 0.9rem; opacity: 0.8; text-align: left; }
     .local-backup-retention-warning { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 18px; text-align: left; font-size: 0.9rem; color: var(--pz-warning-strong); }
     .local-backup-retention-warning .lucide-alert-triangle { flex: none; margin-top: 2px; color: var(--pz-warning); background-color: var(--pz-warning); }
     body.dark-mode .local-backup-retention-warning { color: var(--pz-warning); }
@@ -198,11 +284,45 @@ $allBackupUsers = listAllUserProfiles();
         </div>
         <?php endif; ?>
 
-        <div class="git-sync-section">
+        <div class="git-sync-section" id="local-backup-config">
             <h2><i class="lucide lucide-hard-drive"></i> <?php echo t_h('s3_backup.config_title', [], 'Configuration'); ?></h2>
+            <p class="local-backup-section-desc"><?php echo t_h('local_backup.config_description', [], 'Where the archives are saved and how many are kept, for the automatic and the manual backups alike.'); ?></p>
 
-            <form method="post">
+            <form method="post" action="#local-backup-config">
                 <input type="hidden" name="action" value="save_config">
+
+                <div class="git-config-fields">
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="local_backup_directory"><?php echo t_h('local_backup.directory_label', [], 'Backup folder'); ?></label>
+                        <input type="text" name="local_backup_directory" id="local_backup_directory" class="git-field-input"
+                               value="<?php echo htmlspecialchars($directoryValue, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
+                               placeholder="<?php echo htmlspecialchars(LocalBackupService::defaultDirectory(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
+                               autocomplete="off" spellcheck="false">
+                        <span class="label-desc"><?php echo t_h('local_backup.directory_description', ['default' => LocalBackupService::defaultDirectory()], 'Absolute path on the server (inside the container with Docker). Leave empty to use ' . LocalBackupService::defaultDirectory() . '. To store the backups somewhere else, mount a volume and enter its path here.'); ?></span>
+                    </div>
+
+                    <div class="git-field-group">
+                        <label class="git-field-label" for="local_backup_retention"><?php echo t_h('s3_backup.retention_label', [], 'Backups to keep per user'); ?></label>
+                        <input type="number" name="local_backup_retention" id="local_backup_retention" class="git-field-input" min="0" step="1"
+                               value="<?php echo (int)$backupConfig['retention']; ?>">
+                        <span class="label-desc"><?php echo t_h('local_backup.retention_description', [], 'Older archives are deleted from the folder after each backup. 0 keeps everything.'); ?></span>
+                    </div>
+
+                    <div class="git-field-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('s3_settings.save', [], 'Save Configuration'); ?>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="git-sync-section" id="local-backup-auto">
+            <h2><i class="lucide lucide-clock"></i> <?php echo t_h('s3_backup.enable_label', [], 'Automatic backups'); ?></h2>
+
+            <form method="post" action="#local-backup-auto">
+                <input type="hidden" name="action" value="save_auto">
 
                 <div class="git-config-fields">
                     <div class="form-check">
@@ -211,8 +331,8 @@ $allBackupUsers = listAllUserProfiles();
                             <span class="slider round"></span>
                         </label>
                         <div class="check-label">
-                            <span class="label-title"><?php echo t_h('s3_backup.enable_label', [], 'Automatic backups'); ?></span>
-                            <span class="label-desc"><?php echo t_h('local_backup.enable_description', [], 'Back up the selected users into the folder on the schedule below. Manual backups from this page work even with this switch off.'); ?></span>
+                            <span class="label-title"><?php echo t_h('local_backup.auto_enable_label', [], 'Enable automatic backups'); ?></span>
+                            <span class="label-desc"><?php echo t_h('local_backup.enable_description', [], 'Back up the users checked below into the folder on the chosen schedule.'); ?></span>
                         </div>
                     </div>
 
@@ -227,66 +347,82 @@ $allBackupUsers = listAllUserProfiles();
                     </div>
 
                     <div class="git-field-group">
-                        <label class="git-field-label" for="local_backup_retention"><?php echo t_h('s3_backup.retention_label', [], 'Backups to keep per user'); ?></label>
-                        <input type="number" name="local_backup_retention" id="local_backup_retention" class="git-field-input" min="0" step="1"
-                               value="<?php echo (int)$backupConfig['retention']; ?>">
-                        <span class="label-desc"><?php echo t_h('local_backup.retention_description', [], 'Older archives are deleted from the folder after each backup. 0 keeps everything.'); ?></span>
+                        <label class="git-field-label" for="local-backup-auto-users-filter"><?php echo t_h('local_backup.auto_users_label', [], 'Users backed up automatically'); ?></label>
+                        <?php localBackupRenderUsersPicker($allBackupUsers, 'local-backup-auto-users', 'local_backup_users[]', function (int $id) use ($autoUserIds) {
+                            return $autoUserIds === null || in_array($id, $autoUserIds, true);
+                        }); ?>
+                        <span class="label-desc"><?php echo t_h('local_backup.auto_users_description', [], 'While every user is checked, new accounts are included automatically.'); ?></span>
                     </div>
 
-                    <div class="git-field-group">
-                        <label class="git-field-label" for="local_backup_directory"><?php echo t_h('local_backup.directory_label', [], 'Backup folder'); ?></label>
-                        <input type="text" name="local_backup_directory" id="local_backup_directory" class="git-field-input"
-                               value="<?php echo htmlspecialchars($directoryValue, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
-                               placeholder="<?php echo htmlspecialchars(LocalBackupService::defaultDirectory(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
-                               autocomplete="off" spellcheck="false">
-                        <span class="label-desc"><?php echo t_h('local_backup.directory_description', ['default' => LocalBackupService::defaultDirectory()], 'Absolute path on the server (inside the container with Docker). Leave empty to use ' . LocalBackupService::defaultDirectory() . '. To store the backups somewhere else, mount a volume and enter its path here.'); ?></span>
+                    <div class="git-field-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="lucide lucide-save"></i>
+                            <?php echo t_h('s3_settings.save', [], 'Save Configuration'); ?>
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <div class="config-hint" id="local-backup-auto-status" hidden></div>
+        </div>
+
+        <div class="git-sync-section" id="local-backup-manual">
+            <h2><i class="lucide lucide-save"></i> <?php echo t_h('s3_backup.manual_title', [], 'Manual backup'); ?></h2>
+            <p class="git-sync-description git-sync-description-left" id="local-backup-manual-desc"><?php echo t_h('local_backup.manual_description', [], 'Back up the users checked below into the folder right now, one user at a time. This selection is not saved and does not change the automatic backups.'); ?></p>
+            <p class="local-backup-retention-warning"><i class="lucide lucide-alert-triangle"></i><span><?php echo t_h('s3_backup.manual_retention_warning', [], 'Every backup counts toward the retention limit, so a scheduled run can delete a manual archive just as a manual run can delete a scheduled one. To keep an archive for good, download it.'); ?></span></p>
+
+            <div class="git-field-group">
+                <label class="git-field-label" for="local-backup-manual-users-filter"><?php echo t_h('local_backup.manual_users_label', [], 'Users to back up now'); ?></label>
+                <?php localBackupRenderUsersPicker($allBackupUsers, 'local-backup-manual-users', '', function (int $id) { return false; }); ?>
+            </div>
+
+            <div class="git-field-actions">
+                <button type="button" id="local-backup-run-btn" class="btn btn-primary" disabled>
+                    <i class="lucide lucide-save"></i>
+                    <?php echo t_h('s3_backup.run_now', [], 'Back up now'); ?>
+                </button>
+            </div>
+            <div class="config-hint" id="local-backup-run-status" hidden></div>
+            <div id="local-backup-run-log" class="label-desc"></div>
+            <div class="config-hint" id="local-backup-last-run" hidden></div>
+        </div>
+
+        <div class="git-sync-section" id="local-backup-user-access">
+            <h2><i class="lucide lucide-users"></i> <?php echo t_h('local_backup.user_access_title', [], 'Access for users'); ?></h2>
+
+            <form method="post" action="#local-backup-user-access">
+                <input type="hidden" name="action" value="save_user_access">
+
+                <div class="git-config-fields">
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="local_backup_user_backup" id="local_backup_user_backup" <?php echo LocalBackupService::isUserBackupEnabled() ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo t_h('local_backup.user_backup_label', [], 'Allow users to back up their account'); ?></span>
+                            <span class="label-desc"><?php echo t_h('local_backup.user_backup_description', [], 'When enabled, each user can save a backup of their own account into the folder and download their archives, from the Backup / Export page. These archives count toward the retention limit like the others.'); ?></span>
+                        </div>
                     </div>
 
-                    <div class="git-field-group">
-                        <label class="git-field-label" for="local-backup-user-filter"><?php echo t_h('s3_backup.users_label', [], 'Users to back up'); ?></label>
-                        <div class="local-backup-users-picker">
-                            <div class="local-backup-users-toolbar">
-                                <div class="local-backup-users-search">
-                                    <i class="lucide lucide-search"></i>
-                                    <input type="search" id="local-backup-user-filter" class="git-field-input"
-                                           placeholder="<?php echo t_h('s3_backup.users_filter_placeholder', [], 'Filter by name, username or email...'); ?>"
-                                           autocomplete="off">
-                                    <button type="button" class="local-backup-users-clear" id="local-backup-user-filter-clear" hidden
-                                            aria-label="<?php echo t_h('s3_backup.users_filter_clear', [], 'Clear filter'); ?>">
-                                        <i class="lucide lucide-x"></i>
-                                    </button>
-                                </div>
-                                <button type="button" class="btn btn-secondary" id="local-backup-users-select-all"><?php echo t_h('s3_backup.users_select_all', [], 'Select all'); ?></button>
-                                <button type="button" class="btn btn-secondary" id="local-backup-users-select-none"><?php echo t_h('s3_backup.users_select_none', [], 'Deselect all'); ?></button>
-                            </div>
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="local_backup_user_delete" id="local_backup_user_delete" <?php echo getGlobalSetting('local_backup_user_delete', '0') === '1' ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo t_h('local_backup.user_delete_label', [], 'Allow users to delete their archives'); ?></span>
+                            <span class="label-desc"><?php echo t_h('local_backup.user_delete_description', [], 'When disabled, the Delete entry of the users\' actions menu is greyed out, so they cannot remove the archives of their account, including those of the automatic backups. Older archives are still pruned by the retention limit.'); ?></span>
+                        </div>
+                    </div>
 
-                            <div class="local-backup-users-list" id="local-backup-users-list">
-                                <?php foreach ($allBackupUsers as $backupUser):
-                                    $backupUserId = (int)$backupUser['id'];
-                                    $isSelected = $backupConfig['user_ids'] === null || in_array($backupUserId, $backupConfig['user_ids'], true);
-                                    $fullName = trim(((string)($backupUser['first_name'] ?? '')) . ' ' . ((string)($backupUser['last_name'] ?? '')));
-                                    $email = trim((string)($backupUser['email'] ?? ''));
-                                    $metaParts = array_values(array_filter([$fullName, $email], function ($part) { return $part !== ''; }));
-                                    $searchText = strtolower(trim($backupUser['username'] . ' ' . $fullName . ' ' . $email));
-                                ?>
-                                <label class="local-backup-user-check" data-search="<?php echo htmlspecialchars($searchText, ENT_QUOTES, 'UTF-8'); ?>">
-                                    <input type="checkbox" name="local_backup_users[]" value="<?php echo $backupUserId; ?>" <?php echo $isSelected ? 'checked' : ''; ?>>
-                                    <span class="local-backup-user-name"><?php echo htmlspecialchars($backupUser['username']); ?></span>
-                                    <?php if (!empty($metaParts)): ?>
-                                    <span class="local-backup-user-meta"><?php echo htmlspecialchars(implode(' · ', $metaParts)); ?></span>
-                                    <?php endif; ?>
-                                    <?php if (!empty($backupUser['is_admin'])): ?>
-                                    <span class="local-backup-user-badge"><?php echo t_h('s3_backup.users_badge_admin', [], 'Admin'); ?></span>
-                                    <?php endif; ?>
-                                    <?php if (empty($backupUser['active'])): ?>
-                                    <span class="local-backup-user-badge is-inactive"><?php echo t_h('s3_backup.users_badge_inactive', [], 'Inactive'); ?></span>
-                                    <?php endif; ?>
-                                </label>
-                                <?php endforeach; ?>
-                                <div class="local-backup-users-empty" id="local-backup-users-empty" hidden><?php echo t_h('s3_backup.users_no_match', [], 'No user matches this filter.'); ?></div>
-                            </div>
-
-                            <div class="local-backup-users-count" id="local-backup-users-count"></div>
+                    <div class="form-check">
+                        <label class="switch">
+                            <input type="checkbox" name="local_backup_user_restore" id="local_backup_user_restore" <?php echo LocalBackupService::isUserRestoreEnabled() ? 'checked' : ''; ?>>
+                            <span class="slider round"></span>
+                        </label>
+                        <div class="check-label">
+                            <span class="label-title"><?php echo t_h('local_backup.user_restore_label', [], 'Allow users to restore their account'); ?></span>
+                            <span class="label-desc"><?php echo t_h('local_backup.user_restore_description', [], 'When enabled, each user can restore their own account from their archives in the folder, on the Restore / Import page. When disabled, users with archives see a message asking them to contact an administrator. Administrators can always restore any archive from the list below.'); ?></span>
                         </div>
                     </div>
 
@@ -301,23 +437,8 @@ $allBackupUsers = listAllUserProfiles();
         </div>
 
         <div class="git-sync-section">
-            <h2><i class="lucide lucide-save"></i> <?php echo t_h('s3_backup.manual_title', [], 'Manual backup'); ?></h2>
-            <p class="git-sync-description git-sync-description-left" id="local-backup-manual-desc"><?php echo t_h('local_backup.manual_description', [], 'Back up the selected users into the folder right now, one user at a time.'); ?></p>
-            <p class="local-backup-retention-warning"><i class="lucide lucide-alert-triangle"></i><span><?php echo t_h('s3_backup.manual_retention_warning', [], 'Every backup counts toward the retention limit, so a scheduled run can delete a manual archive just as a manual run can delete a scheduled one. To keep an archive for good, download it.'); ?></span></p>
-
-            <div class="git-field-actions">
-                <button type="button" id="local-backup-run-btn" class="btn btn-primary">
-                    <i class="lucide lucide-save"></i>
-                    <?php echo t_h('s3_backup.run_now', [], 'Back up now'); ?>
-                </button>
-            </div>
-            <div class="config-hint" id="local-backup-run-status" hidden></div>
-            <div id="local-backup-run-log" class="label-desc"></div>
-            <div class="config-hint" id="local-backup-last-run" hidden></div>
-        </div>
-
-        <div class="git-sync-section">
             <h2><i class="lucide lucide-archive"></i> <?php echo t_h('local_backup.list_title', [], 'Backups in the folder'); ?></h2>
+            <div class="config-hint" id="local-backup-restore-status" role="status" hidden></div>
             <div class="config-hint" id="local-backup-list-status" hidden></div>
             <div class="local-backup-users-toolbar local-backup-list-toolbar" id="local-backup-list-toolbar" hidden>
                 <div class="local-backup-users-search">
@@ -366,6 +487,7 @@ $allBackupUsers = listAllUserProfiles();
 
     <script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
     <script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+    <script src="<?php echo poznoteAsset('js/row-actions-menu.js'); ?>"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         var i18n = {
@@ -387,27 +509,53 @@ $allBackupUsers = listAllUserProfiles();
             download: <?php echo json_encode(t('s3_backup.download', [], 'Download')); ?>,
             deleteLabel: <?php echo json_encode(t('s3_backup.delete', [], 'Delete')); ?>,
             confirmDelete: <?php echo json_encode(t('local_backup.confirm_delete', [], 'Delete the backup {{filename}} from the folder?')); ?>,
+            restoreLabel: <?php echo json_encode(t('local_backup.restore', [], 'Restore')); ?>,
+            actionsLabel: <?php echo json_encode(t('webhooks_admin.actions_menu', [], 'Actions')); ?>,
+            restoreTitle: <?php echo json_encode(t('local_backup.restore_title', [], 'Restore a backup')); ?>,
+            confirmRestore: <?php echo json_encode(t('local_backup.confirm_restore', [], 'Restore the account {{username}} from {{filename}}? The current notes, attachments and settings of this account will be replaced by the archive content.')); ?>,
+            restoring: <?php echo json_encode(t('local_backup.restoring', [], 'Restoring {{username}} from {{filename}}...')); ?>,
+            restoreDone: <?php echo json_encode(t('local_backup.restore_done', [], '{{username}} restored from {{filename}}.')); ?>,
+            restoreError: <?php echo json_encode(t('local_backup.restore_error', [], 'The restore of {{username}} failed: {{error}}')); ?>,
+            restoreStages: <?php echo json_encode([
+                'queued' => t('restore_import.chunked.queued', [], 'Restore starting...'),
+                'extracting' => t('restore_import.chunked.stage_extracting', [], 'Extracting the archive...'),
+                'preparing' => t('restore_import.chunked.stage_preparing', [], 'Preparing the data...'),
+                'database' => t('restore_import.chunked.stage_database', [], 'Restoring the database...'),
+                'notes' => t('restore_import.chunked.stage_notes', [], 'Restoring the notes... ({{done}}/{{total}})'),
+                'notes_simple' => t('restore_import.chunked.stage_notes_simple', [], 'Restoring the notes...'),
+                'attachments' => t('restore_import.chunked.stage_attachments', [], 'Restoring the attachments... ({{done}}/{{total}})'),
+                'attachments_simple' => t('restore_import.chunked.stage_attachments_simple', [], 'Restoring the attachments...'),
+                'worker_lost' => t('restore_import.chunked.worker_lost', [], 'The restore stopped before it finished. Check the server logs, then start it again.'),
+            ]); ?>,
             manualTitle: <?php echo json_encode(t('s3_backup.manual_title', [], 'Manual backup')); ?>,
             usersCount: <?php echo json_encode(t('s3_backup.users_count', [], '{{selected}} of {{total}} user(s) selected')); ?>,
             usersCountFiltered: <?php echo json_encode(t('s3_backup.users_count_filtered', [], '{{selected}} of {{total}} user(s) selected, {{shown}} shown')); ?>
         };
 
-        // ---- Users picker (filter + bulk selection) -------------------------
-        (function() {
-            var listEl = document.getElementById('local-backup-users-list');
-            if (!listEl) return;
-            var filterEl = document.getElementById('local-backup-user-filter');
-            var clearEl = document.getElementById('local-backup-user-filter-clear');
-            var emptyEl = document.getElementById('local-backup-users-empty');
-            var countEl = document.getElementById('local-backup-users-count');
-            var rows = Array.prototype.slice.call(listEl.querySelectorAll('.local-backup-user-check'));
+        // ---- Users pickers (filter + bulk selection) ------------------------
+        // Two of them: the users of the automatic backups (part of its form)
+        // and the users of a manual run. Returns the checked users.
+        function initUsersPicker(rootId, onChange) {
+            var root = document.getElementById(rootId);
+            if (!root) return function() { return []; };
+            var filterEl = root.querySelector('[data-picker-filter]');
+            var clearEl = root.querySelector('[data-picker-clear]');
+            var emptyEl = root.querySelector('[data-picker-empty]');
+            var countEl = root.querySelector('[data-picker-count]');
+            var rows = Array.prototype.slice.call(root.querySelectorAll('.local-backup-user-check'));
+
+            function checkedUsers() {
+                return rows.map(function(row) { return row.querySelector('input'); })
+                    .filter(function(input) { return input.checked; })
+                    .map(function(input) { return { id: parseInt(input.value, 10), username: input.getAttribute('data-username') || '' }; });
+            }
 
             function visibleRows() {
                 return rows.filter(function(row) { return !row.hidden; });
             }
 
             function updateCount() {
-                var selected = rows.filter(function(row) { return row.querySelector('input').checked; }).length;
+                var selected = checkedUsers().length;
                 var shown = visibleRows().length;
                 var text = shown === rows.length
                     ? i18n.usersCount
@@ -415,6 +563,7 @@ $allBackupUsers = listAllUserProfiles();
                 countEl.textContent = text
                     .replace('{{selected}}', selected)
                     .replace('{{total}}', rows.length);
+                if (onChange) onChange(selected);
             }
 
             function applyFilter() {
@@ -443,20 +592,30 @@ $allBackupUsers = listAllUserProfiles();
                     filterEl.value = '';
                     applyFilter();
                 }
+                // Enter in the filter must not submit the automatic backups form
+                if (e.key === 'Enter') e.preventDefault();
             });
             clearEl.addEventListener('click', function() {
                 filterEl.value = '';
                 applyFilter();
                 filterEl.focus();
             });
-            document.getElementById('local-backup-users-select-all').addEventListener('click', function() { setVisible(true); });
-            document.getElementById('local-backup-users-select-none').addEventListener('click', function() { setVisible(false); });
-            listEl.addEventListener('change', function(e) {
+            root.querySelector('[data-picker-all]').addEventListener('click', function() { setVisible(true); });
+            root.querySelector('[data-picker-none]').addEventListener('click', function() { setVisible(false); });
+            root.addEventListener('change', function(e) {
                 if (e.target && e.target.type === 'checkbox') updateCount();
             });
 
             applyFilter();
-        })();
+            return checkedUsers;
+        }
+
+        var runBtn = document.getElementById('local-backup-run-btn');
+        var runInProgress = false;
+        initUsersPicker('local-backup-auto-users');
+        var manualUsers = initUsersPicker('local-backup-manual-users', function(selected) {
+            runBtn.disabled = runInProgress || selected === 0;
+        });
 
         function formatBytes(bytes) {
             if (bytes === null || bytes === undefined) return '';
@@ -484,28 +643,33 @@ $allBackupUsers = listAllUserProfiles();
         // ---- Status / last run ---------------------------------------------
         var statusData = null;
 
+        // The last run is shown in the box of what triggered it, the next
+        // scheduled one in the automatic backups box
         function renderLastRun() {
-            var el = document.getElementById('local-backup-last-run');
-            if (!statusData || !statusData.last_run) {
-                el.textContent = '';
-                el.hidden = true;
-                return;
+            var autoEl = document.getElementById('local-backup-auto-status');
+            var manualEl = document.getElementById('local-backup-last-run');
+            var autoText = '', manualText = '';
+            var run = statusData && statusData.last_run;
+            if (run) {
+                var date = run.finished_at ? new Date(run.finished_at * 1000).toLocaleString() : '?';
+                var text = i18n.lastRun
+                    .replace('{{trigger}}', run.trigger === 'auto' ? i18n.triggerAuto : i18n.triggerManual)
+                    .replace('{{date}}', date)
+                    .replace('{{saved}}', run.saved)
+                    .replace('{{total}}', run.users);
+                if (run.errors && run.errors.length) {
+                    text += ' ' + run.errors.join(' | ');
+                }
+                if (run.trigger === 'auto') autoText = text; else manualText = text;
             }
-            el.hidden = false;
-            var run = statusData.last_run;
-            var date = run.finished_at ? new Date(run.finished_at * 1000).toLocaleString() : '?';
-            el.textContent = i18n.lastRun
-                .replace('{{trigger}}', run.trigger === 'auto' ? i18n.triggerAuto : i18n.triggerManual)
-                .replace('{{date}}', date)
-                .replace('{{saved}}', run.saved)
-                .replace('{{total}}', run.users);
-            if (run.errors && run.errors.length) {
-                el.textContent += ' ' + run.errors.join(' | ');
-            }
-            if (statusData.next_auto_run) {
-                el.textContent += ' ' + i18n.nextRun
+            if (statusData && statusData.next_auto_run) {
+                autoText += (autoText ? ' ' : '') + i18n.nextRun
                     .replace('{{date}}', new Date(statusData.next_auto_run * 1000).toLocaleString());
             }
+            autoEl.textContent = autoText;
+            autoEl.hidden = autoText === '';
+            manualEl.textContent = manualText;
+            manualEl.hidden = manualText === '';
         }
 
         function refreshStatus() {
@@ -521,18 +685,23 @@ $allBackupUsers = listAllUserProfiles();
         }
 
         // ---- Manual run -----------------------------------------------------
-        var runInProgress = false;
+        function setRunInProgress(busy) {
+            runInProgress = busy;
+            runBtn.disabled = busy || manualUsers().length === 0;
+        }
 
-        document.getElementById('local-backup-run-btn').addEventListener('click', function() {
+        runBtn.addEventListener('click', function() {
             if (runInProgress) return;
-            window.modalAlert.confirm(i18n.confirmRun, i18n.manualTitle).then(function(confirmed) {
+            var users = manualUsers();
+            if (!users.length) return;
+            window.modalAlert.confirm(i18n.confirmRun.replace('{{count}}', users.length), i18n.manualTitle).then(function(confirmed) {
                 if (!confirmed || runInProgress) return;
-                startRun();
+                startRun(users);
             });
         });
 
-        function startRun() {
-            runInProgress = true;
+        function startRun(users) {
+            setRunInProgress(true);
             var statusEl = document.getElementById('local-backup-run-status');
             var logEl = document.getElementById('local-backup-run-log');
             statusEl.hidden = false;
@@ -541,10 +710,9 @@ $allBackupUsers = listAllUserProfiles();
             refreshStatus().then(function(data) {
                 if (!data || !data.success || data.directory_error) {
                     statusEl.textContent = i18n.runError.replace('{{error}}', (data && data.directory_error) || 'unknown');
-                    runInProgress = false;
+                    setRunInProgress(false);
                     return;
                 }
-                var users = (data.users || []).filter(function(u) { return u.selected; });
                 var saved = 0, errors = [], index = 0;
 
                 function finish() {
@@ -563,7 +731,7 @@ $allBackupUsers = listAllUserProfiles();
                     }).catch(function (e) {
                         console.debug('local_backup_settings: finish() failed:', e);
                     }).then(function() {
-                        runInProgress = false;
+                        setRunInProgress(false);
                         refreshStatus();
                         refreshList();
                     });
@@ -634,7 +802,7 @@ $allBackupUsers = listAllUserProfiles();
                     .catch(function(e) {
                         statusEl.textContent = i18n.runError.replace('{{error}}', e.message);
                         errors.push(user.username + ': ' + e.message);
-                        runInProgress = false;
+                        setRunInProgress(false);
                     });
                 }
                 step();
@@ -763,6 +931,7 @@ $allBackupUsers = listAllUserProfiles();
         }
 
         function renderBackupRows() {
+            window.poznoteRowActionsMenu.close();
             var table = document.getElementById('local-backup-table');
             var tbody = table.querySelector('tbody');
             tbody.innerHTML = '';
@@ -797,45 +966,146 @@ $allBackupUsers = listAllUserProfiles();
                 var tdActions = document.createElement('td');
                 tdActions.className = 'local-backup-actions-cell';
 
-                var dlLink = document.createElement('a');
-                dlLink.className = 'btn btn-primary';
-                dlLink.href = 'api_local_backup.php?action=download&user_id=' + encodeURIComponent(backup.user_id)
-                    + '&filename=' + encodeURIComponent(backup.filename);
-                dlLink.textContent = i18n.download;
-                tdActions.appendChild(dlLink);
-                tdActions.appendChild(document.createTextNode(' '));
-
-                var delBtn = document.createElement('button');
-                delBtn.className = 'btn btn-danger';
-                delBtn.type = 'button';
-                delBtn.textContent = i18n.deleteLabel;
-                delBtn.addEventListener('click', function() {
-                    window.modalAlert.confirm(
-                        i18n.confirmDelete.replace('{{filename}}', backup.filename),
-                        i18n.deleteLabel
-                    ).then(function(confirmed) {
-                        if (!confirmed) return;
-                        var body = new URLSearchParams();
-                        body.append('user_id', String(backup.user_id));
-                        body.append('filename', backup.filename);
-                        fetch('api_local_backup.php?action=delete', {
-                            method: 'POST',
-                            credentials: 'same-origin',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                            body: body.toString()
-                        })
-                        .then(function(r) { return r.json(); })
-                        .then(function() { refreshList(); })
-                        .catch(function() { refreshList(); });
-                    });
-                });
-                tdActions.appendChild(delBtn);
+                // Built when the menu opens, so Restore reflects a restore
+                // started meanwhile
+                tdActions.appendChild(window.poznoteRowActionsMenu.createToggle(i18n.actionsLabel, function() {
+                    return [
+                        { icon: 'lucide-download', label: i18n.download,
+                          href: 'api_local_backup.php?action=download&user_id=' + encodeURIComponent(backup.user_id)
+                              + '&filename=' + encodeURIComponent(backup.filename) },
+                        { icon: 'lucide-rotate-ccw', label: i18n.restoreLabel, disabled: restoreInProgress,
+                          onSelect: function() { confirmRestore(backup); } },
+                        { icon: 'lucide-trash-2', label: i18n.deleteLabel, danger: true,
+                          onSelect: function() { confirmDelete(backup); } }
+                    ];
+                }));
                 tr.appendChild(tdActions);
 
                 tbody.appendChild(tr);
             });
 
             fitContainerToTable();
+        }
+
+        function confirmDelete(backup) {
+            window.modalAlert.confirm(
+                i18n.confirmDelete.replace('{{filename}}', backup.filename),
+                i18n.deleteLabel
+            ).then(function(confirmed) {
+                if (!confirmed) return;
+                var body = new URLSearchParams();
+                body.append('user_id', String(backup.user_id));
+                body.append('filename', backup.filename);
+                fetch('api_local_backup.php?action=delete', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: body.toString()
+                })
+                .then(function(r) { return r.json(); })
+                .then(function() { refreshList(); })
+                .catch(function() { refreshList(); });
+            });
+        }
+
+        function confirmRestore(backup) {
+            if (restoreInProgress) return;
+            window.modalAlert.confirm(
+                i18n.confirmRestore
+                    .replace('{{username}}', backup.username)
+                    .replace('{{filename}}', backup.filename),
+                i18n.restoreTitle
+            ).then(function(confirmed) {
+                if (!confirmed || restoreInProgress) return;
+                startRestore(backup);
+            });
+        }
+
+        // ---- Restore ----------------------------------------------------------
+        // Same background job as "Restore from S3" on the Restore page (a
+        // large archive takes longer to restore than a proxied request may
+        // live), owned by the account being restored: queue it, then poll
+        // its state until it ends. One restore at a time from this page.
+        var restoreInProgress = false;
+
+        // The menu's Restore entry is built disabled while a restore runs
+        function setRestoreBusy(busy) {
+            restoreInProgress = busy;
+        }
+
+        function restoreStageText(job) {
+            var stages = i18n.restoreStages;
+            var stage = job.stage || '';
+            var hasCounts = job.stage_done !== null && job.stage_done !== undefined
+                && job.stage_total !== null && job.stage_total !== undefined && job.stage_total > 0;
+            if (stage === 'notes' || stage === 'attachments') {
+                return hasCounts
+                    ? stages[stage].replace('{{done}}', job.stage_done).replace('{{total}}', job.stage_total)
+                    : stages[stage + '_simple'];
+            }
+            return stages[stage] || stages.queued;
+        }
+
+        function startRestore(backup) {
+            var statusEl = document.getElementById('local-backup-restore-status');
+            var heading = i18n.restoring
+                .replace('{{username}}', backup.username)
+                .replace('{{filename}}', backup.filename);
+            setRestoreBusy(true);
+            statusEl.hidden = false;
+            statusEl.textContent = heading + '\n' + i18n.restoreStages.queued;
+
+            function fail(error) {
+                statusEl.textContent = i18n.restoreError
+                    .replace('{{username}}', backup.username)
+                    .replace('{{error}}', error || 'unknown');
+                setRestoreBusy(false);
+            }
+
+            var body = new URLSearchParams();
+            body.append('user_id', String(backup.user_id));
+            body.append('filename', backup.filename);
+            fetch('api_local_backup.php?action=restore', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body.toString()
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(result) {
+                if (!result.success) {
+                    fail(result.error);
+                    return;
+                }
+                var timer = setInterval(function() {
+                    fetch('api_local_backup.php?action=restore_status&user_id=' + encodeURIComponent(backup.user_id)
+                        + '&job_id=' + encodeURIComponent(result.job_id), { credentials: 'same-origin' })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            var job = data.success ? data.job : null;
+                            if (job && job.stale) {
+                                clearInterval(timer);
+                                fail(i18n.restoreStages.worker_lost);
+                                return;
+                            }
+                            if (job && (job.status === 'queued' || job.status === 'running')) {
+                                statusEl.textContent = heading + '\n' + restoreStageText(job);
+                                return;
+                            }
+                            clearInterval(timer);
+                            if (job && job.status === 'done') {
+                                statusEl.textContent = i18n.restoreDone
+                                    .replace('{{username}}', backup.username)
+                                    .replace('{{filename}}', backup.filename);
+                                setRestoreBusy(false);
+                            } else {
+                                fail(job && job.error);
+                            }
+                        })
+                        .catch(function() { /* transient network error: keep polling */ });
+                }, 2000);
+            })
+            .catch(function(e) { fail(e.message); });
         }
 
         /**

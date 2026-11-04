@@ -14,8 +14,8 @@
 // Mermaid diagrams are whole blocks: the preview's own parser renders them
 // (renderedBlocksField below), nothing of js/markdown-parser.js is redone here.
 import { syntaxTree } from '@codemirror/language'
-import { EditorSelection, EditorState, Prec, findClusterBreak, RangeSet, RangeValue, StateEffect, StateField } from '@codemirror/state'
-import { BlockType, Decoration, EditorView, ViewPlugin, WidgetType, keymap } from '@codemirror/view'
+import { EditorSelection, EditorState, Prec, countColumn, findClusterBreak, findColumn, RangeSet, RangeValue, StateEffect, StateField } from '@codemirror/state'
+import { BlockType, BlockWrapper, Decoration, EditorView, ViewPlugin, WidgetType, keymap } from '@codemirror/view'
 
 export const refreshLivePreviewEffect = StateEffect.define()
 
@@ -463,6 +463,179 @@ class CalloutTitleWidget extends WidgetType {
 
 const calloutTitleDecoration = Decoration.mark({ class: 'cm-live-callout-title' })
 
+// The lines of a fenced code block sit in one element, so that with the
+// account's "Code block word wrap" off (<body class="code-block-no-wrap">)
+// the block scrolls sideways on its own, as the preview's <pre> does
+// (css/markdown.css), instead of its lines wrapping.
+const codeBlockWrapper = BlockWrapper.create({ tagName: 'div', attributes: { class: 'cm-live-code-block' } })
+
+// The block's own sideways scroll is not one CodeMirror knows about.
+// - Bringing the caret into view: CodeMirror only scrolls the editor and the
+//   page, so a caret moved past the visible part of a long line of code (End,
+//   the arrow keys) stayed out of sight. The block scrolls to it first, then
+//   CodeMirror goes on with the vertical scroll. Layout is read from the DOM:
+//   the view is mid-update here (see scrollPastHiddenSyntax in main.js).
+// - Drawing the caret and the selection: they sit in a layer measured against
+//   the editor, which a scroll inside the block does not refresh, so they
+//   stayed where the text had been. The scroll redraws them.
+const CODE_BLOCK_CARET_MARGIN = 30
+
+// The line element at pos, or null
+function codeLineElementAt(view, pos) {
+  let at
+  try {
+    at = view.domAtPos(pos)
+  } catch (_error) {
+    return null
+  }
+  const element = at.node.nodeType === 1 ? at.node : at.node.parentElement
+  return element && element.closest ? element.closest('.cm-line') : null
+}
+
+// The block that scrolls sideways (lines not wrapped) the caret is in, or null
+function scrollingCodeBlockAt(view, pos) {
+  if (!document.body || !document.body.classList.contains('code-block-no-wrap')) return null
+  const line = codeLineElementAt(view, pos)
+  return line ? line.closest('.cm-live-code-block') : null
+}
+
+function isInScrollingCodeBlock(view, pos) {
+  return !!scrollingCodeBlockAt(view, pos)
+}
+
+// The arrow keys up and down. CodeMirror aims at the same distance from the
+// left of the editor, which the block's own sideways scroll throws off: going
+// through a short line scrolls the block back, and the caret came back on the
+// long line far from where it had left it. Between two lines of code of the
+// same block, the caret keeps its column in characters instead, as code
+// editors do. Anything else (a fence, the line out of the block) is left to
+// the editor.
+const codeBlockGoalColumns = new WeakMap()
+
+function moveCodeLineVertically(forward, extend) {
+  return view => {
+    const { state } = view
+    const selection = state.selection
+    const main = selection.main
+    const block = scrollingCodeBlockAt(view, main.head)
+    if (!block) return false
+
+    const line = state.doc.lineAt(main.head)
+    const number = line.number + (forward ? 1 : -1)
+    if (number < 1 || number > state.doc.lines) return false
+    const target = state.doc.line(number)
+    const targetElement = codeLineElementAt(view, target.from)
+    if (!targetElement || targetElement.closest('.cm-live-code-block') !== block) return false
+    if (targetElement.classList.contains('cm-live-code-open') || targetElement.classList.contains('cm-live-code-close')) return false
+    if (!extend && !main.empty) return false
+    if (selection.ranges.length > 1) return false
+
+    const remembered = codeBlockGoalColumns.get(view)
+    const goal = remembered && remembered.pos === main.head
+      ? remembered.column
+      : countColumn(line.text.slice(0, main.head - line.from), state.tabSize)
+    const pos = target.from + findColumn(target.text, goal, state.tabSize)
+    codeBlockGoalColumns.set(view, { pos, column: goal })
+
+    view.dispatch({
+      selection: extend ? EditorSelection.range(main.anchor, pos) : EditorSelection.cursor(pos),
+      scrollIntoView: true,
+      userEvent: 'select'
+    })
+    return true
+  }
+}
+
+// Home and End. CodeMirror's own, in an editor that wraps its lines, go to the
+// edge of the "visual line", found at the left or right edge of the editor:
+// on a line of code that does not wrap, that is wherever the visible part
+// ends, not the line's start or end. Here they go to the line's end, and to
+// the end of its indentation, then its start (CodeMirror's smart Home).
+function moveToCodeLineBoundary(forward, extend) {
+  return view => {
+    const { state } = view
+    if (!isInScrollingCodeBlock(view, state.selection.main.head)) return false
+    const selection = state.selection
+    const ranges = selection.ranges.map(range => {
+      const line = state.doc.lineAt(range.head)
+      let pos = line.to
+      if (!forward) {
+        const indent = /^\s*/.exec(line.text)[0].length
+        pos = indent > 0 && indent < line.length && range.head - line.from !== indent ? line.from + indent : line.from
+      }
+      return extend ? EditorSelection.range(range.anchor, pos) : EditorSelection.cursor(pos)
+    })
+    view.dispatch({
+      selection: EditorSelection.create(ranges, selection.mainIndex),
+      scrollIntoView: true,
+      userEvent: 'select'
+    })
+    return true
+  }
+}
+
+const codeBlockScroll = [
+  Prec.high(keymap.of([
+    { key: 'Home', mac: 'Cmd-ArrowLeft', run: moveToCodeLineBoundary(false, false), shift: moveToCodeLineBoundary(false, true) },
+    { key: 'End', mac: 'Cmd-ArrowRight', run: moveToCodeLineBoundary(true, false), shift: moveToCodeLineBoundary(true, true) },
+    { key: 'ArrowUp', run: moveCodeLineVertically(false, false), shift: moveCodeLineVertically(false, true) },
+    { key: 'ArrowDown', run: moveCodeLineVertically(true, false), shift: moveCodeLineVertically(true, true) }
+  ])),
+  EditorView.scrollHandler.of((view, range) => {
+    let at
+    try {
+      at = view.domAtPos(range.head)
+    } catch (_error) {
+      return false
+    }
+    const element = at.node.nodeType === 1 ? at.node : at.node.parentElement
+    const block = element && element.closest ? element.closest('.cm-live-code-block') : null
+    if (!block || block.scrollWidth <= block.clientWidth) return false
+
+    const caret = document.createRange()
+    try {
+      caret.setStart(at.node, at.offset)
+      caret.setEnd(at.node, at.offset)
+    } catch (_error) {
+      return false
+    }
+    const rect = caret.getClientRects()[0]
+    if (!rect) return false
+
+    const box = block.getBoundingClientRect()
+    if (rect.left < box.left + CODE_BLOCK_CARET_MARGIN) {
+      block.scrollLeft -= box.left + CODE_BLOCK_CARET_MARGIN - rect.left
+    } else if (rect.right > box.right - CODE_BLOCK_CARET_MARGIN) {
+      block.scrollLeft += rect.right - (box.right - CODE_BLOCK_CARET_MARGIN)
+    }
+    return false
+  }),
+  ViewPlugin.fromClass(class {
+    constructor(view) {
+      this.view = view
+      this.frame = 0
+      this.onScroll = event => {
+        const target = event.target
+        if (!target || !target.classList || !target.classList.contains('cm-live-code-block')) return
+        if (this.frame) return
+        this.frame = requestAnimationFrame(() => {
+          this.frame = 0
+          // (the same selection again: the layers are redrawn on any
+          // selection change, and nothing else is)
+          if (!this.view.destroyed) this.view.dispatch({ selection: this.view.state.selection })
+        })
+      }
+      // (scroll does not bubble: listened to on the way down)
+      view.contentDOM.addEventListener('scroll', this.onScroll, true)
+    }
+
+    destroy() {
+      cancelAnimationFrame(this.frame)
+      this.view.contentDOM.removeEventListener('scroll', this.onScroll, true)
+    }
+  })
+]
+
 // A fenced code block keeps its source and takes the frame of the preview's:
 // the opening fence gives way to the language badge, the closing one to an
 // empty line, both back as text once the caret is in the block.
@@ -476,10 +649,13 @@ class CodeLanguageWidget extends WidgetType {
     return other.language === this.language
   }
 
+  // A bare ``` fence is a plain block: no badge, as in the preview, where
+  // the untagged <pre> has none either (js/markdown-parser.js). The fence
+  // still gives way to the widget, which then draws nothing.
   toDOM() {
     const badge = document.createElement('span')
-    badge.className = 'cm-live-code-lang'
-    badge.textContent = this.language || 'code'
+    badge.className = this.language ? 'cm-live-code-lang' : 'cm-live-code-lang cm-live-code-lang-none'
+    badge.textContent = this.language
     return badge
   }
 
@@ -670,6 +846,9 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
   const selection = state.selection.ranges
   const tree = syntaxTree(state)
   const decorations = []
+  // The lines of each fenced code block, wrapped in one element
+  // (codeBlockWrapper)
+  const codeBlocks = []
   const indentedListLines = new Set()
 
   // Nothing is revealed while the editor is not the one being typed in
@@ -889,6 +1068,9 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
     }
     decorations.push(codeOpenLineDecoration.range(firstLine.from))
     decorations.push(codeCloseLineDecoration.range(lastLine.from))
+    // (a wrapper takes the lines that start in its range, both ends included:
+    // up to the end of the last line, or the line after it is taken too)
+    codeBlocks.push(codeBlockWrapper.range(firstLine.from, lastLine.to))
     decorations.push(Decoration.widget({ widget: new CodeActionsWidget(numbered), side: 1 }).range(firstLine.to))
 
     if (touchesLines(node.from, node.to)) return
@@ -1342,7 +1524,8 @@ function buildLivePreviewDecorations(view, armedPair, pendingFormat) {
 
   return {
     decorations: Decoration.set(decorations, true),
-    atomic: Decoration.set(hidden, true)
+    atomic: Decoration.set(hidden, true),
+    codeBlocks: BlockWrapper.set(codeBlocks, true)
   }
 }
 
@@ -4460,6 +4643,7 @@ const livePreviewPlugin = ViewPlugin.fromClass(class {
     const built = buildLivePreviewDecorations(view, this.emptyPair, this.pendingFormat)
     this.decorations = built.decorations
     this.atomic = built.atomic
+    this.codeBlocks = built.codeBlocks
   }
 
   destroy() {
@@ -4670,5 +4854,10 @@ export const livePreview = [
     const plugin = view.plugin(livePreviewPlugin)
     return plugin ? plugin.atomic : Decoration.none
   }),
+  EditorView.blockWrappers.of(view => {
+    const plugin = view.plugin(livePreviewPlugin)
+    return plugin && plugin.codeBlocks ? plugin.codeBlocks : RangeSet.empty
+  }),
+  codeBlockScroll,
   EditorView.editorAttributes.of({ class: 'cm-live-preview' })
 ]

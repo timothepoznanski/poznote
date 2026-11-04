@@ -612,6 +612,14 @@ body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-
     letter-spacing: 0;
 }
 
+/* Same in the lines of a code block, whose own size rule (top of this file,
+   span:not(.cm-live-code-lang)) outweighs the one above: without this, the
+   closing ``` of every block stayed in sight in rich text. */
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line) :is(.cm-live-empty-pair, .cm-live-squeezed-tail),
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line) :is(.cm-live-empty-pair, .cm-live-squeezed-tail) * {
+    font-size: 0 !important;
+}
+
 /* In the middle of that empty pair: something of the line's height for the
    caret to be drawn against, of no width for bold, italic or strikethrough,
    and for inline code the start of its grey ground, so that the place where
@@ -803,6 +811,11 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :
     background: rgba(var(--pz-shadow-rgb), 0.1);
 }
 
+/* Plain block (bare ``` fence): no badge, as in the preview */
+.markdown-codemirror-host .cm-live-preview .cm-live-code-lang.cm-live-code-lang-none {
+    display: none;
+}
+
 .markdown-codemirror-host .cm-live-preview .cm-live-code-actions {
     position: absolute;
     top: 2px;
@@ -827,6 +840,41 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :
     color: var(--pz-text-subtle);
     user-select: none;
     -webkit-user-select: none;
+}
+
+/* "Code block word wrap" off (<body class="code-block-no-wrap">): the lines of
+   a block no longer wrap and the block scrolls sideways on its own, as the
+   preview's <pre> does (css/code-blocks.css). The lines sit in one element,
+   .cm-live-code-block (live-preview.js), which then scrolls and draws the
+   frame: the lines' own side borders would scroll away with them. Every line
+   is as wide as the longest one, and at least as wide as the block (the
+   min-width counts in the column's max-content width), so that the ground
+   goes all the way. The opening and closing lines stay in place, at the
+   visible width, with the badge and the buttons. */
+body.code-block-no-wrap .markdown-codemirror-host .cm-live-preview .cm-live-code-block {
+    display: grid;
+    grid-template-columns: max-content;
+    overflow-x: auto;
+    container-type: inline-size;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-sm);
+}
+
+body.code-block-no-wrap .markdown-codemirror-host .cm-live-preview .cm-live-code-block > .cm-line.cm-live-code {
+    box-sizing: border-box;
+    min-width: 100cqw;
+    white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
+    border-width: 0;
+    border-radius: 0;
+}
+
+body.code-block-no-wrap .markdown-codemirror-host .cm-live-preview .cm-live-code-block > .cm-line:is(.cm-live-code-open, .cm-live-code-close) {
+    position: sticky;
+    left: 0;
+    width: 100cqw;
+    box-sizing: border-box;
 }
 
 .markdown-codemirror-host .cm-live-preview :is(.cm-live-code-copy, .cm-live-code-lines, .cm-live-code-delete) {

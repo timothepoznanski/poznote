@@ -466,7 +466,7 @@
       "main_font": "Wählen Sie die Schriftart für die gesamte Anwendung.",
       "markdown_font": "Wählen Sie die Schriftart für den Markdown-Editor.",
       "markdown_default_view_mode": "Festlegen, ob Markdown-Notizen in der Vorschau, im Bearbeitungsmodus oder geteilt geöffnet werden.",
-      "markdown_new_note_view_mode": "Festlegen, ob eine neue Markdown-Notiz geteilt, im Bearbeitungsmodus oder in der Live-Darstellung geöffnet wird. Die Live-Darstellung wird dann auch für die anderen Notizen eingeschaltet. Auf dem Smartphone öffnet sich eine neue Notiz nie geteilt.",
+      "markdown_new_note_view_mode": "Festlegen, ob eine neue Markdown-Notiz geteilt, im Bearbeitungsmodus, in der Live-Vorschau oder als Rich Text geöffnet wird. Bei Live-Vorschau oder Rich Text wechseln auch die anderen Notizen in diese Ansicht. Auf dem Smartphone öffnet sich eine neue Notiz nie geteilt.",
       "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste, Codeblöcken und der Einstellungsseite an.",
       "index_icon_scale": "Passen Sie die Größe der Symbole in der Notizenliste an.",
       "icon_rail_scale": "Passen Sie die Größe der Symbole in der Icon-Seitenleiste an.",
@@ -1478,8 +1478,10 @@
       "badge_hidden_count_admin_columns": "{{me}} für Sie ausgeblendet, {{users}} für Benutzer",
       "badge_hidden_count": "{{count}} ausgeblendet",
       "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellen, wenn die Standard-Wiederherstellung nicht funktioniert“",
+      "local_backups_section": "Sicherungsseite: Abschnitt „Lokale Sicherungen“",
       "s3_backups_section": "Sicherungsseite: Abschnitt „S3-Sicherungen“",
       "s3_restore_section": "Wiederherstellungsseite: Abschnitt „Aus S3 wiederherstellen“",
+      "local_restore_section": "Wiederherstellungsseite: Abschnitt „Aus einer lokalen Sicherung wiederherstellen“",
       "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?",
       "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
       "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
@@ -2592,6 +2594,16 @@
         "description": "Laden Sie alle Anhänge Ihres Kontos in einem einzigen ZIP-Archiv herunter.",
         "description_s3": "Bei aktiviertem S3-Speicher werden die Dateien aus dem Bucket geholt; verwenden Sie dieses Archiv, um einem ohne S3-Anhänge erstellten Backup vor der Wiederherstellung die fehlenden Dateien hinzuzufügen."
       },
+      "local_backup": {
+        "title": "Lokale Sicherungen",
+        "description": "Speichern Sie ein Sicherungsarchiv Ihres Kontos im Sicherungsordner dieses Servers und laden Sie die dort bereits gespeicherten Archive herunter.",
+        "backup_now": "Mein Konto in den Ordner sichern",
+        "running": "Sicherung wird im Ordner gespeichert...",
+        "done": "Sicherung gespeichert ({{size}}).",
+        "list_empty": "Noch keine Sicherung Ihres Kontos im Ordner.",
+        "confirm_run": "Ihr Konto jetzt in den Sicherungsordner sichern? Das Erstellen des Archivs kann eine Weile dauern.",
+        "delete_disabled": "Das Löschen von Sicherungen wurde von Ihrem Administrator deaktiviert."
+      },
       "s3_backup": {
         "title": "S3-Sicherungen",
         "description": "Lädt ein Sicherungsarchiv Ihres Kontos in den auf dieser Instanz konfigurierten S3-Bucket hoch und lädt die dort bereits gespeicherten Archive herunter.",
@@ -2852,6 +2864,12 @@
         "loading": "Wird geladen...",
         "empty": "Noch keine Sicherung Ihres Kontos im Bucket.",
         "confirm": "Ihr Konto aus {{filename}} wiederherstellen? Ihre aktuellen Notizen, Anhänge und Einstellungen werden durch den Archivinhalt ersetzt."
+      },
+      "local_restore": {
+        "title": "Aus einer lokalen Sicherung wiederherstellen",
+        "description": "Stellen Sie Ihr Konto direkt aus einem der Sicherungsarchive wieder her, die im Sicherungsordner dieses Servers gespeichert sind.",
+        "confirm": "Ihr Konto aus {{filename}} wiederherstellen? Ihre aktuellen Notizen, Anhänge und Einstellungen werden durch den Inhalt des Archivs ersetzt.",
+        "disabled": "Ihr Konto hat {{count}} Sicherung(en) im Sicherungsordner dieses Servers, aber die Wiederherstellung durch Sie selbst ist nicht aktiviert. Bitten Sie Ihren Administrator, eine für Sie wiederherzustellen oder die Wiederherstellung auf dieser Seite zu aktivieren."
       }
     },
     "buttons": {
@@ -5307,12 +5325,12 @@
     "title": "Lokale Sicherungen",
     "description": "Speichern Sie vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit dem Download der vollständigen Sicherung) in einem Ordner des Servers, manuell oder automatisch nach Zeitplan.",
     "description_scope": "Die Einstellung gilt für alle Benutzer dieser Instanz.",
-    "enable_description": "Sichert die ausgewählten Benutzer nach dem untenstehenden Zeitplan in den Ordner. Manuelle Sicherungen von dieser Seite funktionieren auch, wenn dieser Schalter aus ist.",
+    "enable_description": "Sichert die unten ausgewählten Benutzer im gewählten Intervall in den Ordner.",
     "directory_label": "Sicherungsordner",
     "directory_description": "Absoluter Pfad auf dem Server (mit Docker: im Container). Leer lassen, um {{default}} zu verwenden. Um die Sicherungen woanders abzulegen, binden Sie ein Volume ein und geben Sie dessen Pfad hier ein.",
     "retention_description": "Ältere Archive werden nach jeder Sicherung aus dem Ordner gelöscht. 0 behält alles.",
-    "manual_description": "Sichert die ausgewählten Benutzer sofort in den Ordner, einen Benutzer nach dem anderen.",
-    "confirm_run": "Die ausgewählten Benutzer jetzt in den Sicherungsordner sichern?",
+    "manual_description": "Sichert die unten ausgewählten Benutzer sofort in den Ordner, einen nach dem anderen. Diese Auswahl wird nicht gespeichert und ändert die automatischen Sicherungen nicht.",
+    "confirm_run": "Die {{count}} ausgewählten Benutzer jetzt in den Sicherungsordner sichern?",
     "run_done": "Sicherung abgeschlossen: {{saved}}/{{total}} Benutzer gesichert.",
     "user_ok": "{{username}}: gespeichert ({{size}})",
     "last_run": "Letzter Lauf ({{trigger}}): {{date}}, {{saved}}/{{total}} Benutzer gesichert.",
@@ -5321,12 +5339,30 @@
     "list_empty": "Noch keine Sicherung im Ordner.",
     "list_error": "Die Sicherungen können nicht aufgelistet werden: {{error}}",
     "confirm_delete": "Die Sicherung {{filename}} aus dem Ordner löschen?",
+    "restore": "Wiederherstellen",
+    "restore_title": "Sicherung wiederherstellen",
+    "confirm_restore": "Das Konto {{username}} aus {{filename}} wiederherstellen? Die aktuellen Notizen, Anhänge und Einstellungen dieses Kontos werden durch den Inhalt des Archivs ersetzt.",
+    "restoring": "{{username}} wird aus {{filename}} wiederhergestellt...",
+    "restore_done": "{{username}} wurde aus {{filename}} wiederhergestellt.",
+    "restore_error": "Die Wiederherstellung von {{username}} ist fehlgeschlagen: {{error}}",
     "footer_note": "Archive werden im Sicherungsordner unter {Benutzer-ID}/ gespeichert und können mit der Standardseite „Wiederherstellen / Importieren“ wiederhergestellt werden.",
     "messages": {
       "not_absolute": "Der Sicherungsordner muss ein absoluter Pfad sein, zum Beispiel /backups.",
       "inside_app": "Der Sicherungsordner darf nicht innerhalb der Anwendung liegen, außer in data/backups.",
       "not_writable": "Der Sicherungsordner kann nicht erstellt werden oder ist für den Webserver nicht beschreibbar: {{path}}"
-    }
+    },
+    "config_description": "Wo die Archive gespeichert werden und wie viele aufbewahrt werden, für automatische wie manuelle Sicherungen.",
+    "auto_enable_label": "Automatische Sicherungen aktivieren",
+    "auto_users_label": "Automatisch gesicherte Benutzer",
+    "auto_users_description": "Solange alle Benutzer ausgewählt sind, werden neue Konten automatisch einbezogen.",
+    "manual_users_label": "Jetzt zu sichernde Benutzer",
+    "user_access_title": "Zugriff für Benutzer",
+    "user_backup_label": "Benutzern erlauben, ihr Konto zu sichern",
+    "user_backup_description": "Wenn aktiviert, kann jeder Benutzer auf der Seite Sichern / Exportieren eine Sicherung seines eigenen Kontos im Ordner speichern und seine Archive herunterladen. Diese Archive zählen wie die anderen zum Aufbewahrungslimit.",
+    "user_delete_label": "Benutzern erlauben, ihre Archive zu löschen",
+    "user_delete_description": "Wenn deaktiviert, ist der Eintrag Löschen im Aktionsmenü der Benutzer ausgegraut, sodass sie die Archive ihres Kontos nicht entfernen können, auch nicht die der automatischen Sicherungen. Ältere Archive werden weiterhin durch das Aufbewahrungslimit entfernt.",
+    "user_restore_label": "Benutzern erlauben, ihr Konto wiederherzustellen",
+    "user_restore_description": "Wenn aktiviert, kann jeder Benutzer sein eigenes Konto aus seinen Archiven im Ordner auf der Seite Wiederherstellen / Importieren wiederherstellen. Wenn deaktiviert, sehen Benutzer mit Archiven eine Meldung, sich an einen Administrator zu wenden. Administratoren können jedes Archiv jederzeit aus der Liste unten wiederherstellen."
   },
   "tasklist_embed": {
     "unavailable": "Diese Aufgabenliste ist nicht mehr verfügbar.",

@@ -134,7 +134,7 @@
       "main_font": "Trieu el tipus de lletra que es fa servir a tota l'aplicació.",
       "markdown_font": "Trieu el tipus de lletra de l'editor Markdown.",
       "markdown_default_view_mode": "Trieu si les notes Markdown s'obren en mode de previsualització, d'edició o dividit.",
-      "markdown_new_note_view_mode": "Trieu si una nota Markdown nova s'obre en mode dividit, d'edició o de renderització en directe. Aleshores, la renderització en directe també s'activa per a les altres notes. En un telèfon, una nota nova no s'obre mai en mode dividit.",
+      "markdown_new_note_view_mode": "Trieu si una nota Markdown nova s'obre en mode dividit, d'edició, de previsualització en directe o de text enriquit. Amb la previsualització en directe o el text enriquit, les altres notes també passen a aquesta vista. En un telèfon, una nota nova no s'obre mai en mode dividit.",
       "font_size": "Ajusteu la mida de la lletra de les notes, la barra lateral, els blocs de codi i la pàgina de paràmetres.",
       "index_icon_scale": "Ajusteu la mida de les icones de la llista de notes.",
       "icon_rail_scale": "Ajusteu la mida de les icones de la barra lateral d'icones.",
@@ -962,8 +962,10 @@
       "collapse_all": "Redueix-ho tot",
       "expand_all": "Amplia-ho tot",
       "direct_copy_restore_section": "Pàgina de restauració: secció «Restaura quan la restauració estàndard no funciona»",
+      "local_backups_section": "Pàgina de còpia: secció «Còpies locals»",
       "s3_backups_section": "Pàgina de còpia de seguretat: secció «Còpies de seguretat a S3»",
       "s3_restore_section": "Pàgina de restauració: secció «Restaura des d'S3»",
+      "local_restore_section": "Pàgina de restauració: secció «Restaura des d'una còpia local»",
       "toggle_all_warning": "Es perdran totes les personalitzacions existents. Voleu continuar?",
       "folder_actions_toggle": "Botó de menú (⋮) a les carpetes",
       "note_actions_toggle": "Botó de menú (⋮) a les notes",
@@ -2188,6 +2190,16 @@
         "description": "Baixeu tots els fitxers adjunts del compte en un sol arxiu ZIP.",
         "description_s3": "Amb l'emmagatzematge S3 activat, els fitxers s'obtenen del cubell. Feu servir aquest arxiu per afegir els fitxers que falten a una còpia de seguretat feta sense els fitxers adjunts d'S3 abans de restaurar-la."
       },
+      "local_backup": {
+        "title": "Còpies locals",
+        "description": "Desa un arxiu de còpia de seguretat del teu compte a la carpeta de còpies d'aquest servidor i baixa els arxius que ja hi ha.",
+        "backup_now": "Copia el meu compte a la carpeta",
+        "running": "S'està desant la còpia a la carpeta...",
+        "done": "Còpia desada ({{size}}).",
+        "list_empty": "Encara no hi ha cap còpia del teu compte a la carpeta.",
+        "confirm_run": "Vols copiar ara el teu compte a la carpeta de còpies? Crear l'arxiu pot trigar una estona.",
+        "delete_disabled": "El teu administrador ha desactivat la supressió de còpies."
+      },
       "s3_backup": {
         "title": "Còpies de seguretat a S3",
         "description": "Pugeu un arxiu de còpia de seguretat del compte al cubell S3 configurat en aquesta instància i baixeu els arxius que ja hi ha emmagatzemats.",
@@ -2448,6 +2460,12 @@
         "loading": "S'està carregant...",
         "empty": "Encara no hi ha cap còpia de seguretat del compte al cubell.",
         "confirm": "Voleu restaurar el compte a partir de {{filename}}? Les notes, els fitxers adjunts i els paràmetres actuals se substituiran pel contingut de l'arxiu."
+      },
+      "local_restore": {
+        "title": "Restaura des d'una còpia local",
+        "description": "Restaura el teu compte directament des d'un dels arxius de còpia de seguretat desats a la carpeta de còpies d'aquest servidor.",
+        "confirm": "Vols restaurar el teu compte des de {{filename}}? Les teves notes, adjunts i configuració actuals se substituiran pel contingut de l'arxiu.",
+        "disabled": "El teu compte té {{count}} còpia(es) a la carpeta de còpies d'aquest servidor, però la restauració per tu mateix no està activada. Demana al teu administrador que en restauri una per tu, o que activi la restauració des d'aquesta pàgina."
       }
     },
     "buttons": {
@@ -4980,12 +4998,12 @@
     "title": "Còpies de seguretat locals",
     "description": "Deseu arxius de còpia de seguretat completa (un ZIP per usuari, idèntic a la baixada de la còpia de seguretat completa) en una carpeta del servidor, manualment o automàticament de manera planificada.",
     "description_scope": "Aquest paràmetre s'aplica a tots els usuaris d'aquesta instància.",
-    "enable_description": "Fa una còpia de seguretat dels usuaris seleccionats a la carpeta segons la programació de sota. Les còpies de seguretat manuals d'aquesta pàgina funcionen fins i tot amb aquest commutador desactivat.",
+    "enable_description": "Copia els usuaris marcats a sota a la carpeta segons la freqüència triada.",
     "directory_label": "Carpeta de còpies de seguretat",
     "directory_description": "Camí absolut al servidor (dins del contenidor, amb Docker). Deixeu-ho buit per fer servir {{default}}. Per emmagatzemar les còpies de seguretat en un altre lloc, munteu un volum i introduïu-ne el camí aquí.",
     "retention_description": "Els arxius més antics se suprimeixen de la carpeta després de cada còpia de seguretat. 0 ho conserva tot.",
-    "manual_description": "Fa ara mateix una còpia de seguretat dels usuaris seleccionats a la carpeta, un usuari cada vegada.",
-    "confirm_run": "Voleu fer ara una còpia de seguretat dels usuaris seleccionats a la carpeta de còpies de seguretat?",
+    "manual_description": "Copia ara els usuaris marcats a sota a la carpeta, d'un en un. Aquesta selecció no es desa i no canvia les còpies automàtiques.",
+    "confirm_run": "Vols copiar ara els {{count}} usuari(s) marcat(s) a la carpeta de còpies?",
     "run_done": "Ha finalitzat la còpia de seguretat: {{saved}}/{{total}} usuaris desats.",
     "user_ok": "{{username}}: desat ({{size}})",
     "last_run": "Última execució ({{trigger}}): {{date}}, {{saved}}/{{total}} usuaris desats.",
@@ -4994,12 +5012,30 @@
     "list_empty": "Encara no hi ha cap còpia de seguretat a la carpeta.",
     "list_error": "No es poden llistar les còpies de seguretat: {{error}}",
     "confirm_delete": "Voleu suprimir la còpia de seguretat {{filename}} de la carpeta?",
+    "restore": "Restaura",
+    "restore_title": "Restaura una còpia de seguretat",
+    "confirm_restore": "Vols restaurar el compte {{username}} des de {{filename}}? Les notes, els adjunts i la configuració actuals d'aquest compte se substituiran pel contingut de l'arxiu.",
+    "restoring": "S'està restaurant {{username}} des de {{filename}}...",
+    "restore_done": "{{username}} restaurat des de {{filename}}.",
+    "restore_error": "La restauració de {{username}} ha fallat: {{error}}",
     "footer_note": "Els arxius s'emmagatzemen a {user id}/ a la carpeta de còpies de seguretat i es poden restaurar amb la pàgina estàndard «Restauració / Importació».",
     "messages": {
       "not_absolute": "La carpeta de còpies de seguretat ha de ser un camí absolut, per exemple /backups.",
       "inside_app": "La carpeta de còpies de seguretat no pot ser dins de l'aplicació, tret de data/backups.",
       "not_writable": "La carpeta de còpies de seguretat no es pot crear o el servidor web no hi pot escriure: {{path}}"
-    }
+    },
+    "config_description": "On es desen els arxius i quants se'n conserven, tant per a les còpies automàtiques com per a les manuals.",
+    "auto_enable_label": "Activa les còpies automàtiques",
+    "auto_users_label": "Usuaris copiats automàticament",
+    "auto_users_description": "Mentre tots els usuaris estiguin marcats, els comptes nous s'inclouen automàticament.",
+    "manual_users_label": "Usuaris per copiar ara",
+    "user_access_title": "Accés dels usuaris",
+    "user_backup_label": "Permet als usuaris copiar el seu compte",
+    "user_backup_description": "Si està activat, cada usuari pot desar una còpia del seu propi compte a la carpeta i baixar els seus arxius, des de la pàgina Còpia / Exportació. Aquests arxius compten per al límit de retenció com els altres.",
+    "user_delete_label": "Permet als usuaris suprimir els seus arxius",
+    "user_delete_description": "Si està desactivat, l'entrada Suprimeix del menú d'accions dels usuaris apareix en gris, de manera que no poden eliminar els arxius del seu compte, ni tan sols els de les còpies automàtiques. Els arxius més antics es continuen eliminant segons el límit de retenció.",
+    "user_restore_label": "Permet als usuaris restaurar el seu compte",
+    "user_restore_description": "Si està activat, cada usuari pot restaurar el seu propi compte des dels seus arxius de la carpeta, a la pàgina Restauració / Importació. Si està desactivat, els usuaris amb arxius veuen un missatge que els demana que contactin amb un administrador. Els administradors sempre poden restaurar qualsevol arxiu des de la llista de sota."
   },
   "tasklist_embed": {
     "unavailable": "Aquesta llista de tasques ja no està disponible.",

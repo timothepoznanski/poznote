@@ -716,6 +716,9 @@ $s3BackupCardVisible = S3BackupService::isEnabled()
 $s3RestoreCardVisible = S3BackupService::isEnabled()
     && (isCurrentUserAdmin() || !in_array('user_s3_restore', TENANT_ISOLATION_FEATURES, true))
     && !poznoteIsUiElementHidden('card:s3RestoreSection');
+require_once __DIR__ . '/../LocalBackupService.php';
+$localBackupCardVisible = LocalBackupService::canCurrentUserBackup();
+$localRestoreCardVisible = !empty(LocalBackupService::restorePageBackups());
 ?>
 
         <!-- BACKUP & RESTORE CATEGORY: the whole account, out and back in -->
@@ -735,6 +738,19 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                         <span class="home-card-title"><?php echo t_h('backup_export.sections.complete_backup.title', [], 'Complete Backup'); ?></span>
                     </div>
                 </a>
+
+                <?php if ($localBackupCardVisible): ?>
+                <!-- Local backups of the own account: same rule as the part of the page it opens -->
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=local" class="home-card" id="local-backup-user-card" title="<?php echo t_h('backup_export.sections.local_backup.title', [], 'Local Backups'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('backup_export.sections.local_backup.description', [], 'Save a backup archive of your account into the backup folder of this server, and download the archives already stored there.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-hard-drive"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('backup_export.sections.local_backup.title', [], 'Local Backups'); ?></span>
+                    </div>
+                </a>
+                <?php endif; ?>
 
                 <?php if ($s3BackupCardVisible): ?>
                 <!-- S3 backups of the own account: same rule as the part of the page it opens -->
@@ -765,6 +781,19 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
                         <span class="home-card-title"><?php echo t_h('restore_import.sections.standard_restore.title', [], 'Standard Restore'); ?></span>
                     </div>
                 </a>
+
+                <?php if ($localRestoreCardVisible): ?>
+                <!-- Restore from the own archives in the local backup folder: same rule as the part it opens -->
+                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=restore-local" class="home-card" id="restore-local-card" title="<?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a local backup'); ?>">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('restore_import.sections.local_restore.description', [], 'Restore your account directly from one of the backup archives saved in the backup folder of this server.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-hard-drive"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a local backup'); ?></span>
+                    </div>
+                </a>
+                <?php endif; ?>
 
                 <?php if (!poznoteIsUiElementHidden('card:directCopyRestoreCard')): ?>
                 <!-- Restore from an archive copied onto the server -->
@@ -1409,7 +1438,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
 
             <!-- View mode of a new, empty note (split / edit / live preview / rich text) -->
             <div class="home-card settings-inline-card settings-card-stacks" id="markdown-new-note-view-mode-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_new_note_view_mode', [], 'Choose whether a new markdown note opens in split, edit or live rendering mode. Live rendering is then turned on for the other notes too. On a phone a new note never opens in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_new_note_view_mode', [], 'Choose whether a new markdown note opens in split, edit, live preview or rich text mode. With live preview or rich text, the other notes switch to that view too. On a phone a new note never opens in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-file-plus"></i></div>
                 <div class="home-card-content">
                     <label class="home-card-title" for="markdown-new-note-view-mode-select"><?php echo t_h('display.cards.markdown_new_note_view_mode', [], 'New note view mode'); ?></label>

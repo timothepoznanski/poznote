@@ -1,0 +1,34 @@
+/*
+ * Per-row actions menu of the backup archive tables (Local Backups admin
+ * page, Local Backups section of the Backup / Export page): one "..." button
+ * per row opening a small menu, same look as the webhooks page. Driven by
+ * js/row-actions-menu.js. The menu is a single element on <body> with
+ * position:fixed, placed under the clicked button: inside the table it would
+ * be clipped by the scrolling wrapper.
+ */
+.btn.row-actions-toggle { display: inline-flex; align-items: center; justify-content: center; padding: 3px 8px; }
+.row-actions-toggle .lucide { width: 16px; height: 16px; }
+
+.row-actions-menu { position: fixed; z-index: 1000; min-width: 180px; background: var(--pz-bg); border: 1px solid var(--pz-border); border-radius: var(--pz-radius-lg); box-shadow: 0 6px 18px rgba(var(--pz-shadow-rgb), 0.15); padding: 6px 0; overflow: hidden; }
+.row-actions-menu[hidden] { display: none; }
+
+.row-actions-item { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 14px; margin: 0; background: none; border: none; border-radius: 0; text-align: left; font-family: inherit; font-size: 0.88rem; color: var(--pz-text); text-decoration: none; cursor: pointer; box-sizing: border-box; }
+.row-actions-item:hover, .row-actions-item:focus-visible { background: var(--pz-surface-hover); color: var(--pz-accent-text); outline: none; }
+.row-actions-item .lucide { width: 16px; height: 16px; flex: 0 0 auto; background-color: var(--pz-accent-text); }
+
+/* Greyed out: shown so the user knows the action exists, not clickable */
+.row-actions-item.is-disabled { opacity: 0.45; cursor: not-allowed; }
+.row-actions-item.is-disabled:hover, .row-actions-item.is-disabled:focus-visible { background: none; color: var(--pz-text); }
+
+.row-actions-item.is-danger { color: var(--pz-danger-hover); }
+.row-actions-item.is-danger:hover, .row-actions-item.is-danger:focus-visible { background: color-mix(in srgb, var(--pz-danger) 8%, transparent); color: var(--pz-danger-text-hover); }
+.row-actions-item.is-danger .lucide { background-color: var(--pz-danger-hover); }
+.row-actions-item.is-danger.is-disabled:hover, .row-actions-item.is-danger.is-disabled:focus-visible { background: none; color: var(--pz-danger-hover); }
+
+html[data-theme='dark'] .row-actions-menu { background: var(--pz-surface, var(--pz-bg)); border-color: rgba(var(--pz-highlight-rgb), 0.14); box-shadow: 0 6px 18px rgba(var(--pz-shadow-rgb), 0.5); }
+html[data-theme='dark'] .row-actions-item { color: var(--pz-text, var(--pz-text-strong)); }
+html[data-theme='dark'] .row-actions-item:hover, html[data-theme='dark'] .row-actions-item:focus-visible { background: rgba(var(--pz-highlight-rgb), 0.08); }
+html[data-theme='dark'] .row-actions-item.is-disabled:hover, html[data-theme='dark'] .row-actions-item.is-disabled:focus-visible { background: none; color: var(--pz-text, var(--pz-text-strong)); }
+html[data-theme='dark'] .row-actions-item.is-danger { color: var(--pz-danger-text); }
+html[data-theme='dark'] .row-actions-item.is-danger .lucide { background-color: var(--pz-danger-text); }
+html[data-theme='dark'] .row-actions-item.is-danger.is-disabled:hover, html[data-theme='dark'] .row-actions-item.is-danger.is-disabled:focus-visible { color: var(--pz-danger-text); }

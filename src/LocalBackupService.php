@@ -316,6 +316,77 @@ class LocalBackupService {
     }
 
     /**
+     * Whether the admin lets users back up their own account into the backup
+     * folder ("Access for users" on the Local Backups page). Off by default.
+     */
+    public static function isUserBackupEnabled(): bool {
+        return getGlobalSetting('local_backup_user_backup', '0') === '1';
+    }
+
+    /**
+     * Whether the current user may back up their own account into the
+     * folder, and see and download its archives there ("Local Backups" on
+     * the Backup / Export page): administrators always, other users once the
+     * admin enabled it, unless the section is hidden with Elements
+     * visibility. Needs the user database (the hidden-elements rule reads
+     * its settings).
+     */
+    public static function canCurrentUserBackup(): bool {
+        return (isCurrentUserAdmin() || self::isUserBackupEnabled())
+            && !poznoteIsUiElementHidden('card:local-user-backup-section');
+    }
+
+    /**
+     * Whether users may delete their own archives from the Local Backups
+     * section of the Backup / Export page ("Access for users" on the Local
+     * Backups page). Off by default: the Delete entry of their actions menu
+     * is then greyed out, and the endpoint refuses. Administrators always may.
+     */
+    public static function canCurrentUserDeleteBackups(): bool {
+        return isCurrentUserAdmin() || getGlobalSetting('local_backup_user_delete', '0') === '1';
+    }
+
+    /**
+     * Whether the admin lets users restore their own account from its
+     * archives in the backup folder ("Access for users" on the Local Backups
+     * page). Off by default.
+     */
+    public static function isUserRestoreEnabled(): bool {
+        return getGlobalSetting('local_backup_user_restore', '0') === '1';
+    }
+
+    /**
+     * Whether the current user may start a restore from their own archives
+     * ("Restore from a local backup" on the Restore page): administrators
+     * always (they can restore any archive from the Local Backups page
+     * anyway), other users once the admin enabled it. The section must not
+     * be hidden with Elements visibility either. Needs the user database
+     * (the hidden-elements rule reads its settings).
+     */
+    public static function canCurrentUserRestore(): bool {
+        return (isCurrentUserAdmin() || self::isUserRestoreEnabled())
+            && !poznoteIsUiElementHidden('card:localRestoreSection');
+    }
+
+    /**
+     * The current user's archives in the backup folder, newest first, for
+     * the Restore page and its Settings card. There is no master switch for
+     * local backups, so the section only shows when there is something to
+     * restore; it shows even when the user may not restore, with a message
+     * sending them to the admin. Empty when the section is hidden with
+     * Elements visibility.
+     *
+     * @return array List of ['filename', 'size', 'mtime', 'user_id']
+     */
+    public static function restorePageBackups(): array {
+        $userId = (int)getCurrentUserId();
+        if ($userId <= 0 || poznoteIsUiElementHidden('card:localRestoreSection')) {
+            return [];
+        }
+        return self::listUserBackups($userId);
+    }
+
+    /**
      * Full path of one archive, or null when the name is not one of ours or
      * the file does not exist. The only way a request-supplied name reaches
      * the filesystem.

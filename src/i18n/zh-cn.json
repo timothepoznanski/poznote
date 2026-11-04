@@ -465,7 +465,7 @@
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
       "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。",
-      "markdown_new_note_view_mode": "选择新建的 Markdown 笔记以分栏、编辑还是实时渲染模式打开。选择实时渲染后，其他笔记也会启用实时渲染。在手机上新笔记不会以分栏模式打开。",
+      "markdown_new_note_view_mode": "选择新建的 Markdown 笔记以分栏、编辑、实时预览还是富文本模式打开。选择实时预览或富文本后，其他笔记也会切换到该视图。在手机上新笔记不会以分栏模式打开。",
       "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "icon_rail_scale": "调整图标侧边栏中图标的大小。",
@@ -1476,8 +1476,10 @@
       "badge_hidden_count_admin_columns": "为您隐藏 {{me}} 个，为用户隐藏 {{users}} 个",
       "badge_hidden_count": "{{count}} 个已隐藏",
       "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分",
+      "local_backups_section": "备份页面：\"本地备份\"部分",
       "s3_backups_section": "备份页面:“S3 备份”部分",
       "s3_restore_section": "恢复页面:“从 S3 恢复”部分",
+      "local_restore_section": "恢复页面：\"从本地备份恢复\"部分",
       "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?",
       "folder_actions_toggle": "文件夹上的菜单按钮（⋮）",
       "note_actions_toggle": "笔记上的菜单按钮（⋮）",
@@ -2590,6 +2592,16 @@
         "description": "将您账户的所有附件下载为一个 ZIP 压缩包。",
         "description_s3": "启用 S3 存储时,文件会从存储桶中获取;恢复前,可用此压缩包为不含 S3 附件的备份补全缺失的文件。"
       },
+      "local_backup": {
+        "title": "本地备份",
+        "description": "将您账户的备份归档保存到本服务器的备份文件夹，并下载其中已有的归档。",
+        "backup_now": "将我的账户备份到文件夹",
+        "running": "正在将备份保存到文件夹...",
+        "done": "备份已保存（{{size}}）。",
+        "list_empty": "文件夹中还没有您账户的备份。",
+        "confirm_run": "现在将您的账户备份到备份文件夹吗？创建归档可能需要一些时间。",
+        "delete_disabled": "管理员已禁用删除备份。"
+      },
       "s3_backup": {
         "title": "S3 备份",
         "description": "将您账户的备份归档上传到此实例配置的 S3 存储桶,并下载已存储在那里的归档。",
@@ -2850,6 +2862,12 @@
         "loading": "加载中...",
         "empty": "存储桶中还没有您账户的备份。",
         "confirm": "从 {{filename}} 恢复您的账户?您当前的笔记、附件和设置将被归档内容替换。"
+      },
+      "local_restore": {
+        "title": "从本地备份恢复",
+        "description": "直接从本服务器备份文件夹中保存的某个备份归档恢复您的账户。",
+        "confirm": "要从 {{filename}} 恢复您的账户吗？您当前的笔记、附件和设置将被归档内容替换。",
+        "disabled": "您的账户在本服务器的备份文件夹中有 {{count}} 个备份，但未启用自行恢复。请让管理员为您恢复其中一个，或为您启用从此页面恢复。"
       }
     },
     "buttons": {
@@ -5404,12 +5422,12 @@
     "title": "本地备份",
     "description": "将完整备份归档（每位用户一个 ZIP，与“完整备份”下载的内容相同）保存到服务器上的文件夹，可手动执行或按计划自动执行。",
     "description_scope": "此设置适用于本实例的所有用户。",
-    "enable_description": "按下方计划将所选用户备份到该文件夹。即使此开关关闭，也可以在本页面手动备份。",
+    "enable_description": "按所选频率将下方勾选的用户备份到文件夹。",
     "directory_label": "备份文件夹",
     "directory_description": "服务器上的绝对路径（使用 Docker 时为容器内的路径）。留空则使用 {{default}}。如需将备份存放到其他位置，请挂载一个卷并在此填写其路径。",
     "retention_description": "每次备份后，较旧的归档会从文件夹中删除。0 表示全部保留。",
-    "manual_description": "立即将所选用户备份到该文件夹，每次一位用户。",
-    "confirm_run": "现在将所选用户备份到备份文件夹吗？",
+    "manual_description": "立即将下方勾选的用户逐个备份到文件夹。此选择不会保存，也不会更改自动备份。",
+    "confirm_run": "立即将勾选的 {{count}} 个用户备份到备份文件夹吗？",
     "run_done": "备份完成：已备份 {{saved}}/{{total}} 位用户。",
     "user_ok": "{{username}}：已保存（{{size}}）",
     "last_run": "上次运行（{{trigger}}）：{{date}}，已备份 {{saved}}/{{total}} 位用户。",
@@ -5418,12 +5436,30 @@
     "list_empty": "文件夹中还没有备份。",
     "list_error": "无法列出备份：{{error}}",
     "confirm_delete": "从文件夹中删除备份 {{filename}} 吗？",
+    "restore": "恢复",
+    "restore_title": "恢复备份",
+    "confirm_restore": "要从 {{filename}} 恢复账户 {{username}} 吗？该账户当前的笔记、附件和设置将被归档内容替换。",
+    "restoring": "正在从 {{filename}} 恢复 {{username}}...",
+    "restore_done": "已从 {{filename}} 恢复 {{username}}。",
+    "restore_error": "恢复 {{username}} 失败：{{error}}",
     "footer_note": "归档存放在备份文件夹的 {用户 ID}/ 下，可通过标准的“恢复 / 导入”页面恢复。",
     "messages": {
       "not_absolute": "备份文件夹必须是绝对路径，例如 /backups。",
       "inside_app": "备份文件夹不能位于应用程序目录内，data/backups 除外。",
       "not_writable": "无法创建备份文件夹，或 Web 服务器对其没有写入权限：{{path}}"
-    }
+    },
+    "config_description": "归档的保存位置和保留数量，同时适用于自动备份和手动备份。",
+    "auto_enable_label": "启用自动备份",
+    "auto_users_label": "自动备份的用户",
+    "auto_users_description": "只要勾选了所有用户，新账户也会自动包含在内。",
+    "manual_users_label": "立即备份的用户",
+    "user_access_title": "用户访问",
+    "user_backup_label": "允许用户备份自己的账户",
+    "user_backup_description": "启用后，每个用户都可以在备份 / 导出页面将自己账户的备份保存到文件夹，并下载自己的归档。这些归档与其他归档一样计入保留数量上限。",
+    "user_delete_label": "允许用户删除自己的归档",
+    "user_delete_description": "禁用后，用户操作菜单中的“删除”项会显示为灰色，用户无法删除自己账户的归档，包括自动备份生成的归档。较旧的归档仍会按保留数量上限删除。",
+    "user_restore_label": "允许用户恢复自己的账户",
+    "user_restore_description": "启用后，每个用户都可以在恢复 / 导入页面中，从文件夹里自己的归档恢复自己的账户。禁用后，有归档的用户会看到一条请其联系管理员的消息。管理员始终可以从下方列表恢复任何归档。"
   },
   "tasklist_embed": {
     "unavailable": "此任务列表已不可用。",

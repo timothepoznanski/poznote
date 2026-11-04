@@ -16,8 +16,9 @@ declare(strict_types=1);
  *                  job owner, or another user when an admin asked) and
  *                  leaves it in the job directory for the download endpoint.
  *
- * chunked_restore  Concatenates the uploaded chunks into the backup zip,
- *                  then runs the same restoreCompleteBackup() pipeline as
+ * chunked_restore  Concatenates the uploaded chunks into the backup zip (or
+ *                  fetches it from the bucket, or reads it from the local
+ *                  backup folder), then runs the same restoreCompleteBackup() pipeline as
  *                  the synchronous flows, with the job owner as the session
  *                  user so every path helper resolves to their data.
  *
@@ -188,9 +189,28 @@ function runChunkedRestoreJob(int $userId, string $jobId, array $payload): void 
     $totalSize = (int)($payload['total_size'] ?? 0);
     $originalName = (string)($payload['original_name'] ?? 'backup.zip');
     $s3Key = (string)($payload['s3_key'] ?? '');
+    $localBackupFile = (string)($payload['local_backup_filename'] ?? '');
 
-    // Two ways the archive gets here: uploaded in slices by the browser, or
-    // already sitting in the bucket. Both then follow the same restore path.
+    // Three ways the archive gets here: uploaded in slices by the browser,
+    // already sitting in the bucket, or in the local backup folder (an admin
+    // restoring it from the Local Backups page). All then follow the same
+    // restore path.
+    if ($localBackupFile !== '') {
+        require_once __DIR__ . '/../functions.php';
+        require_once __DIR__ . '/../users/db_master.php';
+        require_once __DIR__ . '/../LocalBackupService.php';
+        // Resolved again here: the archive may have been pruned or deleted
+        // between the click and the worker start.
+        $path = LocalBackupService::backupPath((int)($payload['local_backup_user_id'] ?? 0), $localBackupFile);
+        if ($path === null || !is_readable($path)) {
+            throw new RuntimeException('Backup not found in the backup folder');
+        }
+        // restoreCompleteBackup() works on its own copy, so the archive is
+        // read in place and stays in the folder afterwards.
+        runRestoreOfArchive($userId, $jobId, $path, $originalName, false);
+        return;
+    }
+
     if ($s3Key !== '') {
         poznoteJobUpdate($userId, $jobId, [
             'phase' => 'downloading',
@@ -398,10 +418,10 @@ function runS3BackupJob(int $userId, string $jobId, array $payload): void {
 
 /**
  * Restore an archive already sitting on disk, whatever brought it there
- * (assembled chunks or a bucket download), reporting the pipeline's
+ * (assembled chunks, a bucket download, the local backup folder), reporting the pipeline's
  * milestones into the polled job state.
  */
-function runRestoreOfArchive(int $userId, string $jobId, string $zipPath, string $originalName): void {
+function runRestoreOfArchive(int $userId, string $jobId, string $zipPath, string $originalName, bool $deleteArchive = true): void {
     poznoteJobUpdate($userId, $jobId, [
         'phase' => 'restoring',
         'stage' => 'extracting',
@@ -426,7 +446,9 @@ function runRestoreOfArchive(int $userId, string $jobId, string $zipPath, string
 
     $result = restoreCompleteBackup(['tmp_name' => $zipPath, 'name' => $originalName], true);
     unset($GLOBALS['poznote_restore_progress_hook']);
-    @unlink($zipPath);
+    if ($deleteArchive) {
+        @unlink($zipPath);
+    }
 
     if (empty($result['success'])) {
         $details = trim((string)($result['message'] ?? ''));
@@ -441,7 +463,9 @@ function runRestoreOfArchive(int $userId, string $jobId, string $zipPath, string
     require_once __DIR__ . '/../ActivityLog.php';
     logActivity(ACTIVITY_BACKUP_RESTORED, [
         'filename' => $originalName,
-        'source' => !empty($jobPayload['s3_key']) ? 's3' : 'chunked_upload',
+        'source' => !empty($jobPayload['local_backup_filename'])
+            ? 'local_backup'
+            : (!empty($jobPayload['s3_key']) ? 's3' : 'chunked_upload'),
     ], 'web', $userId);
 
     poznoteJobUpdate($userId, $jobId, [
