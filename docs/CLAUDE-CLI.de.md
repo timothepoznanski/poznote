@@ -382,7 +382,7 @@ Der Poznote MCP-Server stellt die folgenden Tools bereit:
 ### Aufgaben
 - `list_tasks`: Die Aufgaben einer Aufgabenlisten-Notiz mit ihren IDs und Fälligkeitsdaten auflisten
 - `add_task`: Eine einzelne Aufgabe hinzufügen, optional mit Fälligkeitsdatum und Erinnerung
-- `update_task`: Eine Aufgabe aktualisieren (Text, Fälligkeitsdatum, Erinnerung, Markierung als wichtig)
+- `update_task`: Eine Aufgabe aktualisieren (Text, Fälligkeitsdatum, Erinnerung, Priorität)
 - `complete_task`: Eine Aufgabe als erledigt markieren oder wieder öffnen
 - `delete_task`: Eine Aufgabe aus einer Aufgabenlisten-Notiz löschen
 - `add_subtask`: Eine Unteraufgabe zu einer Aufgabe einer Aufgabenlisten-Notiz hinzufügen

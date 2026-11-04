@@ -186,30 +186,41 @@
         return Array.isArray(tasks) ? tasks.filter(function (task) { return task && typeof task === 'object'; }) : [];
     }
 
+    // Priority of a task (#1730, js/task-priority.js): 'high', 'medium', 'low' or null
+    function priorityOf(task) {
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.get(task) : (task && task.important ? 'high' : null);
+    }
+
+    function sortByPriority(tasks) {
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.sort(tasks) : tasks;
+    }
+
+    // `important` holds the open tasks with a priority, in high, medium, low order
     function groupTasks(tasks) {
         var groups = { important: [], normal: [], completed: [] };
         tasks.forEach(function (task) {
             if (task.completed) groups.completed.push(task);
-            else if (task.important) groups.important.push(task);
+            else if (priorityOf(task)) groups.important.push(task);
             else groups.normal.push(task);
         });
+        groups.important = sortByPriority(groups.important);
         return groups;
     }
 
-    // Same order rules as tasklist-crud.js: important open tasks first, then
-    // the other open tasks, completed last. A newly completed task lands at
+    // Same order rules as tasklist-crud.js: open tasks by priority (high,
+    // medium, low, none), completed last. A newly completed task lands at
     // the top of the completed group (bottom insert order) or at its end.
     function reorderAfterToggle(tasks, toggled) {
         var groups = groupTasks(tasks.filter(function (task) { return task !== toggled; }));
         if (toggled.completed) {
             if (insertOrder === 'bottom') groups.completed.unshift(toggled);
             else groups.completed.push(toggled);
-        } else if (toggled.important) {
+        } else if (priorityOf(toggled)) {
             groups.important.push(toggled);
         } else {
             groups.normal.push(toggled);
         }
-        return [].concat(groups.important, groups.normal, groups.completed);
+        return sortByPriority([].concat(groups.important, groups.normal, groups.completed));
     }
 
     function autosizeTaskText(field) {
@@ -298,7 +309,9 @@
         var row = document.createElement('li');
         row.className = 'dashboard-note-task' +
             (task.completed ? ' is-done' : '') +
-            (task.important && !task.completed ? ' is-important' : '');
+            (priorityOf(task) && !task.completed
+                ? ' is-important' + (window.poznoteTaskPriority ? window.poznoteTaskPriority.classNames(task) : '')
+                : '');
 
         var box = document.createElement('input');
         box.type = 'checkbox';

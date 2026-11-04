@@ -1077,7 +1077,12 @@
     "move_error": "无法移动任务",
     "add_subtask": "添加子任务",
     "subtask_placeholder": "添加子任务...",
-    "delete_subtask": "删除子任务"
+    "delete_subtask": "删除子任务",
+    "priority": "优先级",
+    "priority_high": "高优先级",
+    "priority_medium": "中优先级",
+    "priority_low": "低优先级",
+    "priority_none": "无优先级"
   },
   "tags": {
     "add_single": "添加标签...",
@@ -1459,7 +1464,8 @@
         "workspace_menu": "工作区菜单",
         "note_actions": "笔记操作",
         "mobile_editor_bar": "移动端编辑栏",
-        "sidebar": "侧边栏"
+        "sidebar": "侧边栏",
+        "task_lists": "任务列表"
       },
       "check_all": "全选",
       "uncheck_all": "取消全选",
@@ -1494,7 +1500,12 @@
       "note_stats_lines": "显示行数",
       "note_info_icon": "在笔记标题下显示信息图标",
       "note_scrollbar": "笔记滚动条",
-      "note_scroll_arrows": "跳到笔记顶部和底部的箭头"
+      "note_scroll_arrows": "跳到笔记顶部和底部的箭头",
+      "tasklist_add_field": "添加任务的输入框",
+      "tasklist_frame": "每个任务的边框",
+      "tasklist_delete": "删除已完成的任务",
+      "tasklist_menu": "任务选项菜单（移动端）",
+      "tasklist_frame_color": "任务边框的优先级颜色"
     },
     "icon_sidebar_order": {
       "title": "图标侧边栏布局",
@@ -5253,7 +5264,12 @@
     "hide_list": "在此页面隐藏",
     "unhide_list": "在此页面重新显示",
     "show_hidden": "显示已隐藏的列表",
-    "empty_hidden": "所有列表均已隐藏。"
+    "empty_hidden": "所有列表均已隐藏。",
+    "show_note_checklists_help": "在任务列表的任务旁边，也列出普通笔记中写的复选框。它们的分组带有“笔记”标记。",
+    "show_hidden_help": "用标题上的眼睛图标隐藏的列表会从本页、日历和计数中移除。勾选此项可重新显示隐藏的列表（变暗显示），并可用眼睛图标逐个恢复。没有隐藏列表时显示为灰色。",
+    "filter_priority_high": "高",
+    "filter_priority_medium": "中",
+    "filter_priority_low": "低"
   },
   "mentions": {
     "title": "提及",

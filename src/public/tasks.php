@@ -67,12 +67,13 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			<div class="tasks-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="tasksProgressBar">
 				<div class="tasks-progress-fill" id="tasksProgressFill"></div>
 			</div>
-			<label class="tasks-progress-option" for="tasksShowNoteChecklists" title="<?php echo t_h('tasks_page.note_badge_title', [], 'Checklist items of a note'); ?>">
+			<?php // What each option does, in a bubble on hover like the help icons of the settings cards ?>
+			<label class="tasks-progress-option" for="tasksShowNoteChecklists" data-tooltip="<?php echo t_h('tasks_page.show_note_checklists_help', [], 'Also list the checkboxes written inside ordinary notes, next to the tasks of your task lists. Their group carries a Note badge.'); ?>">
 				<input type="checkbox" id="tasksShowNoteChecklists" checked>
 				<span><?php echo t_h('tasks_page.show_note_checklists', [], 'Display tasks in notes'); ?></span>
 			</label>
 			<?php // Greyed out until a group is hidden; the label then gets their count (js/tasks-page.js) ?>
-			<label class="tasks-progress-option disabled" id="tasksShowHiddenOption" for="tasksShowHidden">
+			<label class="tasks-progress-option disabled" id="tasksShowHiddenOption" for="tasksShowHidden" data-tooltip="<?php echo t_h('tasks_page.show_hidden_help', [], 'A list hidden with the eye of its header leaves this page, the calendar and the counts. Tick this to show hidden lists again, dimmed, with an eye to bring each one back. Greyed out while no list is hidden.'); ?>">
 				<input type="checkbox" id="tasksShowHidden" disabled>
 				<span id="tasksShowHiddenLabel"><?php echo t_h('tasks_page.show_hidden', [], 'Show hidden lists'); ?></span>
 			</label>
@@ -97,7 +98,10 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					<div class="tasks-filter-chips" id="tasksFilterChips">
 						<button type="button" class="tasks-filter-chip active" data-filter="all"><?php echo t_h('tasks_page.filter_all', [], 'All'); ?></button>
 						<button type="button" class="tasks-filter-chip" data-filter="open"><?php echo t_h('tasks_page.filter_open', [], 'To do'); ?></button>
-						<button type="button" class="tasks-filter-chip" data-filter="important"><?php echo t_h('tasks_page.filter_important', [], 'Important'); ?></button>
+						<?php // One chip per priority level (#1730, js/task-priority.js) ?>
+						<button type="button" class="tasks-filter-chip tasks-filter-chip-priority priority-high" data-filter="priority-high" title="<?php echo t_h('tasklist.priority_high', [], 'High priority'); ?>"><i class="lucide lucide-flag"></i><?php echo t_h('tasks_page.filter_priority_high', [], 'High'); ?></button>
+						<button type="button" class="tasks-filter-chip tasks-filter-chip-priority priority-medium" data-filter="priority-medium" title="<?php echo t_h('tasklist.priority_medium', [], 'Medium priority'); ?>"><i class="lucide lucide-flag"></i><?php echo t_h('tasks_page.filter_priority_medium', [], 'Medium'); ?></button>
+						<button type="button" class="tasks-filter-chip tasks-filter-chip-priority priority-low" data-filter="priority-low" title="<?php echo t_h('tasklist.priority_low', [], 'Low priority'); ?>"><i class="lucide lucide-flag"></i><?php echo t_h('tasks_page.filter_priority_low', [], 'Low'); ?></button>
 						<button type="button" class="tasks-filter-chip" data-filter="overdue"><?php echo t_h('tasks_page.filter_overdue', [], 'Overdue'); ?></button>
 						<button type="button" class="tasks-filter-chip" data-filter="dated"><?php echo t_h('tasks_page.filter_dated', [], 'With due date'); ?></button>
 						<button type="button" class="tasks-filter-chip" data-filter="completed"><?php echo t_h('tasks_page.filter_completed', [], 'Completed'); ?></button>
@@ -173,6 +177,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/date-picker-popup.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/task-due-modal.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="<?php echo poznoteAsset('js/reminder-notifications.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/task-priority.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/tasks-page.js'); ?>"></script>
 </body>
 </html>

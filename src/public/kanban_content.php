@@ -362,12 +362,13 @@ try {
             }
 
             $completed = !empty($task['completed']) || !empty($task['checked']) || !empty($task['done']);
-            $important = !empty($task['important']);
-            $className = 'kanban-task-preview-item' . ($completed ? ' completed' : '') . ($important ? ' important' : '');
+            // Open tasks take the colour of their priority (#1730, css/kanban.css)
+            $priority = getTasklistTaskPriority($task);
+            $className = 'kanban-task-preview-item' . ($completed ? ' completed' : '') . ($completed ? '' : tasklistPriorityClasses($task));
             $taskId = $task['id'] ?? '';
             $taskIdAttr = is_scalar($taskId) ? htmlspecialchars((string) $taskId, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') : '';
 
-            echo '<label class="' . $className . '">';
+            echo '<label class="' . $className . '"' . ($priority !== null ? ' data-priority="' . $priority . '"' : '') . '>';
             echo '<input type="checkbox" class="kanban-task-checkbox" data-task-index="' . (int) $taskIndex . '" data-task-id="' . $taskIdAttr . '"' . ($completed ? ' checked' : '') . '>';
             echo '<span class="kanban-task-preview-text">' . htmlspecialchars((string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
             echo '</label>';

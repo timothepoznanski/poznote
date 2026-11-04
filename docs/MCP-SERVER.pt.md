@@ -72,9 +72,9 @@ Uma aba do Poznote aberta no navegador recebe as alterações feitas via MCP em 
 - `remove_reminder`: remove o lembrete de uma nota
 - `list_reminders`: lista as notificações de lembrete que já dispararam e continuam pendentes (o fluxo do sino da interface); lembretes futuros não podem ser listados
 - `list_tasks`: lista as tarefas de uma nota do tipo lista de tarefas, com seus IDs, prazos e marcadores
-- `list_all_tasks`: lista as tarefas pendentes de todas as notas de um espaço de trabalho, as mais urgentes primeiro, com filtros (prazo, importância, tarefas concluídas, caixas de seleção dentro das notas)
+- `list_all_tasks`: lista as tarefas pendentes de todas as notas de um espaço de trabalho, as mais urgentes primeiro, com filtros (prazo, prioridade alta, tarefas concluídas, caixas de seleção dentro das notas)
 - `add_task`: adiciona uma única tarefa a uma nota do tipo lista de tarefas, com prazo e lembrete opcionais
-- `update_task`: atualiza uma tarefa (texto, prazo, lembrete, marcador de importante)
+- `update_task`: atualiza uma tarefa (texto, prazo, lembrete, prioridade)
 - `complete_task`: marca uma tarefa como concluída ou a reabre
 - `delete_task`: exclui uma tarefa de uma nota do tipo lista de tarefas
 - `add_subtask`: adiciona uma subtarefa a uma tarefa de uma nota do tipo lista de tarefas

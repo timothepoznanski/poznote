@@ -72,9 +72,9 @@ Un onglet Poznote ouvert dans le navigateur prend en compte les modifications fa
 - `remove_reminder` : supprimer le rappel d'une note
 - `list_reminders` : lister les notifications de rappel déjà déclenchées et encore en attente (le fil de la cloche de l'interface) ; les rappels à venir ne sont pas listables
 - `list_tasks` : lister les tâches d'une liste de tâches, avec leurs ID, leurs dates d'échéance et leurs indicateurs
-- `list_all_tasks` : lister les tâches à faire de toutes les notes d'un espace de travail, les plus urgentes d'abord, avec des filtres (échéance, importance, tâches terminées, cases à cocher dans les notes)
+- `list_all_tasks` : lister les tâches à faire de toutes les notes d'un espace de travail, les plus urgentes d'abord, avec des filtres (échéance, priorité haute, tâches terminées, cases à cocher dans les notes)
 - `add_task` : ajouter une tâche à une liste de tâches, avec une date d'échéance et un rappel facultatifs
-- `update_task` : mettre à jour une tâche (texte, date d'échéance, rappel, indicateur important)
+- `update_task` : mettre à jour une tâche (texte, date d'échéance, rappel, priorité)
 - `complete_task` : marquer une tâche comme terminée, ou la rouvrir
 - `delete_task` : supprimer une tâche d'une liste de tâches
 - `add_subtask` : ajouter une sous-tâche à une tâche d'une liste de tâches

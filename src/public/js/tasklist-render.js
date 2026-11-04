@@ -86,11 +86,15 @@ function renderTasks(tasks, noteId) {
     const t = window.t || ((key, params, fallback) => fallback);
 
     return tasks.map(task => {
-        const starClass = 'lucide lucide-star';
-        const favBtnClass = task.important ? 'task-important-btn btn-favorite is-favorite' : 'task-important-btn btn-favorite';
-        const title = task.important
-            ? t('tasklist.unmark_important', null, 'Remove important')
-            : t('tasklist.mark_important', null, 'Mark as important');
+        // Priority flag (#1730, js/task-priority.js)
+        const priority = getTaskPriority(task);
+        const priorityApi = window.poznoteTaskPriority;
+        const priorityBtnClass = 'task-priority-btn' + (priority ? ' has-priority priority-' + priority : '');
+        const priorityTitle = priorityApi ? priorityApi.buttonTitle(task) : t('tasklist.priority', null, 'Priority');
+        // Only open tasks are coloured, like everywhere else
+        const priorityRowClass = (!task.completed && priority)
+            ? (priorityApi ? priorityApi.classNames(task) : ' important')
+            : '';
         const moveTitle = t('tasklist.move_to_list', null, 'Move to another list');
         const dueTitle = t('tasklist.due_date', null, 'Due date');
         const menuTitle = t('tasklist.task_options', null, 'Task options');
@@ -132,8 +136,8 @@ function renderTasks(tasks, noteId) {
                 <i class="lucide lucide-corner-down-right"></i>
             </button>
             ${dueBtnHtml}
-            <button class="${favBtnClass}" title="${title}" onclick="toggleImportant(${task.id}, ${task.noteId || 'null'})">
-                <i class="${starClass}"></i>
+            <button class="${priorityBtnClass}" title="${priorityTitle}" aria-haspopup="menu" onclick="openTaskPriorityMenu(${task.id}, ${task.noteId || 'null'}, event)">
+                <i class="lucide lucide-flag"></i>
             </button>
             <button class="task-move-btn" title="${moveTitle}" onclick="openMoveTaskModal(${task.id}, ${task.noteId || 'null'})">
                 <i class="lucide-arrow-right"></i>
@@ -150,7 +154,7 @@ function renderTasks(tasks, noteId) {
         const subtasksHtml = renderSubtasks(task, task.noteId || noteId);
 
         return `
-        <div class="task-item ${task.completed ? 'completed' : ''} ${task.important ? 'important' : ''} ${dueAt ? 'has-due' : ''} ${subtasksHtml ? 'has-subtasks' : ''}" data-task-id="${task.id}" draggable="false">
+        <div class="task-item ${task.completed ? 'completed' : ''}${priorityRowClass} ${dueAt ? 'has-due' : ''} ${subtasksHtml ? 'has-subtasks' : ''}" data-task-id="${task.id}"${priority ? ` data-priority="${priority}"` : ''} draggable="false">
             <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id}, ${task.noteId || 'null'})">
             <span class="task-text" onclick="editTask(${task.id}, ${task.noteId || 'null'})">${linkifyHtml(task.text)}</span>
             ${dueChipHtml}

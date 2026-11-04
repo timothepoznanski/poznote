@@ -442,6 +442,26 @@ function poznoteGetToolbarMenuActions() {
     ];
 }
 
+/**
+ * What each tasklist:* key of the "Task lists" section of Element visibility
+ * hides: the parts of a task row in a task list note, the matching entry of
+ * its mobile menu (openTaskActionsMenu in js/tasklist-actions.js) and, where
+ * there is one, the control of the embedded task list (js/tasklist-embed.js).
+ * Mirrored by TASKLIST_UI_SELECTORS in js/ui-customization.js.
+ */
+function poznoteTasklistUiSelectors(): array {
+    return [
+        'add-field'   => ['.task-list-container .task-input-container', '.tasklist-embed-add'],
+        'subtask'     => ['.task-item .task-subtask-btn', '.task-actions-menu-item[data-action="subtask"]'],
+        'due-date'    => ['.task-item .task-due-btn', '.task-actions-menu-item[data-action="due-date"]', '.tasklist-embed-action-due'],
+        'priority'    => ['.task-item .task-priority-btn', '.task-actions-menu-item[data-action="priority"]', '.tasklist-embed-action-priority'],
+        'move'        => ['.task-item .task-move-btn', '.task-actions-menu-item[data-action="move"]'],
+        'delete'      => ['.task-item .task-delete-btn', '.tasklist-embed-action-delete'],
+        'drag-handle' => ['.task-item .task-drag-handle'],
+        'menu'        => ['.task-item .task-menu-btn'],
+    ];
+}
+
 function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
     $createMenuOptionSelectors = [
         'card:create-note-card' => '.create-note-option[data-type="html"]',
@@ -481,6 +501,19 @@ function poznoteBuildUiCustomizationRules(array $hiddenKeys) {
             }
             if ($id === 'btn-tasklist-actions') {
                 $rules[] = '.tasklist-actions-dropdown { display: none !important; }';
+            }
+        } elseif ($type === 'tasklist') {
+            if ($id === 'frame') {
+                // The border and ground of each task row, hover included
+                // (the ID boost outweighs the frame-color rule below)
+                $rules[] = '.task-list-container .task-item:is(#pz-specificity-boost, *), .task-list-container .task-item:is(#pz-specificity-boost, *):hover { border-color: transparent !important; background: transparent !important; }';
+            } elseif ($id === 'frame-color') {
+                // The frame of a task with a priority keeps the plain border;
+                // the text keeps its colour
+                $rules[] = '.task-list-container .task-item:is(.priority-high, .priority-medium, .priority-low) { border-color: var(--pz-border) !important; }';
+                $rules[] = '.task-list-container .task-item:is(.priority-high, .priority-medium, .priority-low):hover { border-color: var(--pz-border-strong) !important; }';
+            } elseif (isset(poznoteTasklistUiSelectors()[$id])) {
+                $rules[] = implode(', ', poznoteTasklistUiSelectors()[$id]) . ' { display: none !important; }';
             }
         } elseif ($type === 'wsmenu') {
             $rules[] = '.workspace-menu-item[data-action="' . $id . '"] { display: none !important; }';

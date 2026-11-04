@@ -355,7 +355,7 @@ VS Code Copilot은 Poznote MCP 서버의 다음 도구를 사용할 수 있습�
 ### 할 일
 - `list_tasks` - 할 일 목록 노트의 할 일과 ID·마감일 조회
 - `add_task` - 할 일 하나 추가. 마감일·알림 지정 가능
-- `update_task` - 할 일 하나 수정(내용, 마감일, 알림, 중요 표시)
+- `update_task` - 할 일 하나 수정(내용, 마감일, 알림, 우선순위)
 - `complete_task` - 할 일 완료 또는 완료 취소
 - `delete_task` - 할 일 목록 노트에서 할 일 하나 삭제
 - `add_subtask` - 할 일 아래에 하위 할 일 추가

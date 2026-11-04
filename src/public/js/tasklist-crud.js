@@ -101,7 +101,7 @@ function toggleTask(taskId, noteId) {
     }
     
     // Reorder tasks to maintain grouping:
-    // - important incomplete tasks first
+    // - incomplete tasks with a priority first (high, medium, low)
     // - other incomplete tasks next
     // - completed tasks last
     // Additionally:
@@ -136,12 +136,13 @@ function toggleTask(taskId, noteId) {
         ii = normalIncomplete.findIndex(t => String(t.id) === String(toggledTask.id));
         if (ii !== -1) normalIncomplete.splice(ii, 1);
 
-        if (toggledTask.important) importantIncomplete.push(toggledTask);
+        if (getTaskPriority(toggledTask)) importantIncomplete.push(toggledTask);
         else normalIncomplete.push(toggledTask);
     }
 
     // Reassemble tasks preserving the chosen grouping
-    tasks = [].concat(importantIncomplete, normalIncomplete, completedArr);
+    // (a reopened task goes back to the end of its priority level)
+    tasks = sortTasksByPriority([].concat(importantIncomplete, normalIncomplete, completedArr));
     
     saveAndRenderTasks(noteId, tasks);
 

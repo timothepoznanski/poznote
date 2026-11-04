@@ -1499,6 +1499,7 @@ def _flatten_all_tasks(payload: dict, include_checklists: bool) -> list[dict]:
                 "text": task.get("text", ""),
                 "completed": bool(task.get("completed")),
                 "important": bool(task.get("important")),
+                "priority": task.get("priority") or ("high" if task.get("important") else None),
                 "dueAt": task.get("dueAt") or "",
                 "dueReminder": bool(task.get("dueReminder")),
             })
@@ -1516,8 +1517,9 @@ def _flatten_all_tasks(payload: dict, include_checklists: bool) -> list[dict]:
                     "id": task.get("id"),
                     "text": task.get("text", ""),
                     "completed": bool(task.get("completed")),
-                    # Checklist items carry neither flag nor due date.
+                    # Checklist items carry neither priority nor due date.
                     "important": False,
+                    "priority": None,
                     "dueAt": "",
                     "dueReminder": False,
                 })
@@ -1525,10 +1527,14 @@ def _flatten_all_tasks(payload: dict, include_checklists: bool) -> list[dict]:
     return rows
 
 
+_PRIORITY_RANK = {"high": 0, "medium": 1, "low": 2}
+
+
 def _task_sort_key(task: dict):
-    """Dated tasks first by due date ascending, then undated; important first."""
+    """Dated tasks first by due date ascending, then undated; higher priority first."""
     due = task.get("dueAt") or ""
-    return (due == "", due, not task.get("important"), str(task.get("text") or ""))
+    rank = _PRIORITY_RANK.get(task.get("priority") or "", len(_PRIORITY_RANK))
+    return (due == "", due, rank, str(task.get("text") or ""))
 
 
 @_tool()
@@ -1552,10 +1558,11 @@ def list_all_tasks(
       * "checklist" - a checkbox written inside a regular HTML or markdown
         note. Its "id" is the item's position in the note source, NOT an
         identifier: these CANNOT be changed with update_task/complete_task.
-        Edit the note content instead. They never carry a due date or flag.
+        Edit the note content instead. They never carry a due date or priority.
 
     Results are sorted with dated tasks first by due date ascending, then
-    undated ones, important ones first within the same date. "total" is the
+    undated ones, higher priority first within the same date (high, medium,
+    low, none). "total" is the
     number of tasks matching the filters and "count" the size of this page, so
     a truncated list is always visible as has_more.
 
@@ -1565,7 +1572,7 @@ def list_all_tasks(
             what is left to do)
         due_before: Keep only tasks due on or before this 'YYYY-MM-DD' date,
             inclusive. Undated tasks are dropped by this filter.
-        only_important: Keep only tasks flagged important (default: False)
+        only_important: Keep only high priority tasks (default: False)
         include_checklists: Include in-note checkbox items (default: True)
         limit: Maximum number of tasks to return, 1-1000 (default: 100)
         user_id: User profile ID to access (optional, overrides default)
@@ -1630,6 +1637,7 @@ def add_task(
     important: Optional[bool] = None,
     reminder_email: Optional[bool] = None,
     user_id: Optional[int] = None,
+    priority: Optional[str] = None,
 ) -> str:
     """Add a single task to a tasklist note
 
@@ -1647,9 +1655,11 @@ def add_task(
         reminder: Whether the due date raises a notification. Requires due_at.
         recurrence: Repeat interval of the reminder as '<count><unit>' with unit
             i/h/d/w/m/y (minute/hour/day/week/month/year), e.g. '1d', '2w', '1y'.
-        important: Mark the task as important (sorts it to the top)
+        important: Older spelling of priority 'high' (prefer priority)
         reminder_email: Whether the reminder also sends an email (optional)
         user_id: User profile ID to access (optional, overrides default)
+        priority: 'high', 'medium' or 'low' (default: none). Open tasks are
+            kept in high, medium, low, none order.
     """
     if not text or not str(text).strip():
         return json.dumps({"error": "text is required"}, ensure_ascii=False)
@@ -1666,6 +1676,7 @@ def add_task(
             reminder_email=reminder_email,
             recurrence=recurrence,
             important=important,
+            priority=priority,
             user_id=user_id,
         )
     except Exception as exc:
@@ -1694,6 +1705,7 @@ def update_task(
     recurrence: Optional[str] = None,
     reminder_email: Optional[bool] = None,
     user_id: Optional[int] = None,
+    priority: Optional[str] = None,
 ) -> str:
     """Update one task of a tasklist note. Only provided fields change.
 
@@ -1702,7 +1714,8 @@ def update_task(
         task_id: ID of the task (from list_tasks)
         text: New task text
         completed: Whether the task is done. Completing it clears its reminder.
-        important: Important flag
+        important: Older spelling of priority 'high' (prefer priority); false
+            only clears a high priority
         due_at: Due date as 'YYYY-MM-DD', or 'YYYY-MM-DDTHH:MM' to set a time.
             This is local wall-clock time in the user's configured timezone,
             with no offset. A date without a time reminds at 09:00. Pass 'none'
@@ -1712,12 +1725,14 @@ def update_task(
             i/h/d/w/m/y (minute/hour/day/week/month/year), e.g. '1d', '2w', '1y'.
         reminder_email: Whether the reminder also sends an email (optional)
         user_id: User profile ID to access (optional, overrides default)
+        priority: 'high', 'medium', 'low', or 'none' to clear it
     """
     fields: dict = {}
     for key, value in (
         ("text", text),
         ("completed", completed),
         ("important", important),
+        ("priority", priority),
         ("reminder", reminder),
         ("recurrence", recurrence),
         ("reminder_email", reminder_email),

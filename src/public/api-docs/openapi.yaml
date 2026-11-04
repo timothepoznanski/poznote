@@ -442,7 +442,12 @@ components:
           type: boolean
         important:
           type: boolean
-          description: Sorts the task to the top of its list.
+          description: True when the priority is "high". Older spelling of the priority, kept for existing clients.
+        priority:
+          type: string
+          nullable: true
+          enum: [high, medium, low]
+          description: Task priority, null for none. Open tasks are kept in high, medium, low, none order.
         dueAt:
           type: string
           nullable: true
@@ -2357,8 +2362,13 @@ paths:
                   nullable: true
                   description: Repeat interval, "<count><unit>" with unit i/h/d/w/m/y.
                   example: "1w"
+                priority:
+                  type: string
+                  enum: [high, medium, low, none]
+                  description: Task priority (default none).
                 important:
                   type: boolean
+                  description: Older spelling of priority "high"; ignored when priority is given.
                 completed:
                   type: boolean
       responses:
@@ -2428,8 +2438,14 @@ paths:
                   type: string
                 completed:
                   type: boolean
+                priority:
+                  type: string
+                  nullable: true
+                  enum: [high, medium, low, none]
+                  description: Task priority; "none" or null clears it.
                 important:
                   type: boolean
+                  description: Older spelling of priority "high"; false only clears a high priority. Ignored when priority is given.
                 due_at:
                   type: string
                   nullable: true

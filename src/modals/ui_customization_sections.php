@@ -306,6 +306,25 @@
 </div>
 </div>
 
+<!-- Task Lists Section: the parts of a task list note's rows
+     (tasklist:* keys, see poznoteTasklistUiSelectors() in lib/ui-customization.php) -->
+<div class="ui-custom-section" data-ui-pages="notes">
+<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.task_lists', [], 'Task lists'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<div class="ui-custom-items">
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:add-field" checked><span><?php echo t_h('modals.ui_customization.tasklist_add_field', [], 'Field to add a task'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:frame" checked><span><?php echo t_h('modals.ui_customization.tasklist_frame', [], 'Frame around each task'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:frame-color" checked><span><?php echo t_h('modals.ui_customization.tasklist_frame_color', [], 'Priority colour of the task frame'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:subtask" checked><span><?php echo t_h('tasklist.add_subtask', [], 'Add a subtask'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:due-date" checked><span><?php echo t_h('tasklist.due_date', [], 'Due date'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:priority" checked><span><?php echo t_h('tasklist.priority', [], 'Priority'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:move" checked><span><?php echo t_h('tasklist.move_to_list', [], 'Move to another list'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:delete" checked><span><?php echo t_h('modals.ui_customization.tasklist_delete', [], 'Delete a completed task'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:drag-handle" checked><span><?php echo t_h('tasklist.drag_to_reorder', [], 'Drag to reorder'); ?></span></label>
+    <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:menu" checked><span><?php echo t_h('modals.ui_customization.tasklist_menu', [], 'Task options menu (mobile)'); ?></span></label>
+</div>
+</div>
+
 <!-- Other Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
 <h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
@@ -313,7 +332,6 @@
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-scrollbar" checked><span><?php echo t_h('modals.ui_customization.note_scrollbar', [], 'Note scrollbar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-scroll-arrows" checked><span><?php echo t_h('modals.ui_customization.note_scroll_arrows', [], 'Scroll to top and bottom arrows'); ?></span></label>
-    <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:preview-code-block-delete" checked><span><?php echo t_h('modals.ui_customization.preview_code_block_delete', [], 'Delete button on code blocks, in markdown preview'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-created-date" checked><span><?php echo t_h('display.cards.show_note_created', [], 'Show creation date'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-updated-date" checked><span><?php echo t_h('modals.ui_customization.note_updated_date', [], 'Show modification date'); ?></span></label>

@@ -618,16 +618,16 @@ body.public-note-page {
     background: var(--pz-neutral-hover);
 }
 
-/* Important task styling for public view */
-.public-note .content .task-item.important {
-    border-color: var(--pz-danger-soft);
-    background: var(--pz-surface);
+/* Priority (#1730): the colour of the task's level, from
+   css/components/task-priority.css */
+.public-note .content .task-item:is(.priority-high, .priority-medium, .priority-low) {
+    border-color: color-mix(in srgb, var(--pz-task-priority) 45%, var(--pz-bg));
 }
 
-.public-note .content .task-item.important .task-text {
-    color: var(--pz-danger-hover);
-    font-weight: var(--pz-weight-semibold);
+.public-note .content .task-item:is(.priority-high, .priority-medium, .priority-low) .task-text {
+    color: var(--pz-task-priority);
 }
+
 
 /* Horizontal rule */
 .public-note .content hr {
@@ -907,16 +907,6 @@ html[data-theme='dark'] .public-note .content code[class*="language-"] {
     color: var(--pz-syntax-text);
 }
 
-/* Dark mode styles for important tasks */
-html[data-theme='dark'] .public-note .content .task-item.important {
-    border-color: var(--pz-danger-soft);
-    background: var(--pz-bg);
-}
-
-html[data-theme='dark'] .public-note .content .task-item.important .task-text {
-    color: var(--pz-danger-text);
-    font-weight: var(--pz-weight-semibold);
-}
 
 html[data-theme='dark'] .public-task-edit-title {
     color: var(--pz-text);

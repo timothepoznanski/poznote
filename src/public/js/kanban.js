@@ -1189,6 +1189,16 @@
         return Number.isInteger(taskIndex) && taskIndex >= 0 && taskIndex < tasks.length ? taskIndex : -1;
     }
 
+    // Priority of a task (#1730, js/task-priority.js): 'high', 'medium', 'low' or null
+    function kanbanTaskPriority(task) {
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.get(task) : (task && task.important ? 'high' : null);
+    }
+
+    function sortKanbanTasksByPriority(tasks) {
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.sort(tasks) : tasks;
+    }
+
+    // `important` holds the open tasks with a priority, in high, medium, low order
     function groupKanbanTasksByStatus(tasks) {
         const important = [];
         const normal = [];
@@ -1196,11 +1206,11 @@
 
         tasks.forEach((task) => {
             if (task && task.completed) completed.push(task);
-            else if (task && task.important) important.push(task);
+            else if (task && kanbanTaskPriority(task)) important.push(task);
             else if (task) normal.push(task);
         });
 
-        return { important, normal, completed };
+        return { important: sortKanbanTasksByPriority(important), normal, completed };
     }
 
     function reorderKanbanTasksAfterToggle(tasks, toggledTask) {
@@ -1209,13 +1219,13 @@
 
         if (toggledTask.completed) {
             groups.completed.unshift(toggledTask);
-        } else if (toggledTask.important) {
+        } else if (kanbanTaskPriority(toggledTask)) {
             groups.important.push(toggledTask);
         } else {
             groups.normal.push(toggledTask);
         }
 
-        return [].concat(groups.important, groups.normal, groups.completed);
+        return sortKanbanTasksByPriority([].concat(groups.important, groups.normal, groups.completed));
     }
 
     function escapeKanbanHtml(value) {
@@ -1245,11 +1255,13 @@
             const taskObject = task && typeof task === 'object' ? task : {};
             const text = taskObject.text ?? taskObject.content ?? '';
             const completed = !!(taskObject.completed || taskObject.checked || taskObject.done);
-            const important = !!taskObject.important;
+            const priority = kanbanTaskPriority(taskObject);
             const taskId = taskObject.id ?? '';
-            const className = 'kanban-task-preview-item' + (completed ? ' completed' : '') + (important ? ' important' : '');
+            // Open tasks take the colour of their priority (css/kanban.css)
+            const className = 'kanban-task-preview-item' + (completed ? ' completed' : '')
+                + (priority && !completed ? (window.poznoteTaskPriority ? window.poznoteTaskPriority.classNames(taskObject) : ' important') : '');
 
-            const taskHtml = '<label class="' + className + '">'
+            const taskHtml = '<label class="' + className + '"' + (priority ? ' data-priority="' + priority + '"' : '') + '>'
                 + '<input type="checkbox" class="kanban-task-checkbox" data-task-index="' + index + '" data-task-id="' + escapeKanbanHtml(taskId) + '"' + (completed ? ' checked' : '') + '>'
                 + '<span class="kanban-task-preview-text">' + escapeKanbanHtml(text) + '</span>'
                 + '</label>';
@@ -1638,13 +1650,16 @@
                 return;
             }
 
-            tasks.push({
+            const priority = item.dataset.priority || (item.classList.contains('important') ? 'high' : '');
+            const task = {
                 id: box ? (box.dataset.taskId || '') : '',
                 text: text ? text.textContent : '',
                 completed: item.classList.contains('completed'),
-                important: item.classList.contains('important'),
+                important: priority === 'high',
                 subtasks: []
-            });
+            };
+            if (priority) task.priority = priority;
+            tasks.push(task);
         });
         return tasks;
     }

@@ -38,6 +38,7 @@ function poznoteCssGroups(): array
             'css/components/logo.css',
             'css/components/selection.css',
             'css/components/folder-title.css',
+            'css/components/task-priority.css',
         ],
 
         // The dialog stack, in cascade order.

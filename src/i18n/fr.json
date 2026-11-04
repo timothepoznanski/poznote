@@ -1079,7 +1079,12 @@
     "remind_me_hint": "Une notification se déclenche à la date et l'heure d'échéance.",
     "add_subtask": "Ajouter une sous-tâche",
     "subtask_placeholder": "Ajouter une sous-tâche...",
-    "delete_subtask": "Supprimer la sous-tâche"
+    "delete_subtask": "Supprimer la sous-tâche",
+    "priority": "Priorité",
+    "priority_high": "Priorité haute",
+    "priority_medium": "Priorité moyenne",
+    "priority_low": "Priorité basse",
+    "priority_none": "Aucune priorité"
   },
   "tags": {
     "add_single": "Ajouter un tag...",
@@ -1461,7 +1466,8 @@
         "workspace_menu": "Menu du workspace",
         "note_actions": "Actions des notes",
         "mobile_editor_bar": "Barre d’édition mobile",
-        "sidebar": "Barre latérale"
+        "sidebar": "Barre latérale",
+        "task_lists": "Listes de tâches"
       },
       "badge_all_visible": "Tout visible",
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
@@ -1496,7 +1502,12 @@
       "note_stats_lines": "Afficher le nombre de lignes",
       "note_info_icon": "Afficher l'icône d'information sous le titre de la note",
       "note_scrollbar": "Barre de défilement des notes",
-      "note_scroll_arrows": "Flèches pour remonter et descendre dans la note"
+      "note_scroll_arrows": "Flèches pour remonter et descendre dans la note",
+      "tasklist_add_field": "Champ d'ajout de tâche",
+      "tasklist_frame": "Cadre autour de chaque tâche",
+      "tasklist_delete": "Supprimer une tâche terminée",
+      "tasklist_menu": "Menu des options de tâche (mobile)",
+      "tasklist_frame_color": "Couleur de priorité du cadre des tâches"
     },
     "icon_sidebar_order": {
       "title": "Disposition de la barre d'icônes",
@@ -5261,7 +5272,12 @@
     "hide_list": "Masquer sur cette page",
     "unhide_list": "Réafficher sur cette page",
     "show_hidden": "Afficher les listes masquées",
-    "empty_hidden": "Toutes les listes sont masquées."
+    "empty_hidden": "Toutes les listes sont masquées.",
+    "show_note_checklists_help": "Affiche aussi les cases à cocher écrites dans les notes ordinaires, à côté des tâches de vos listes de tâches. Leur groupe porte un badge Note.",
+    "show_hidden_help": "Une liste masquée avec l'œil de son en-tête disparaît de cette page, du calendrier et des compteurs. Cochez cette case pour réafficher les listes masquées, atténuées, avec un œil pour rétablir chacune. Grisée tant qu'aucune liste n'est masquée.",
+    "filter_priority_high": "Haute",
+    "filter_priority_medium": "Moyenne",
+    "filter_priority_low": "Basse"
   },
   "mentions": {
     "title": "Mentions",

@@ -1079,7 +1079,12 @@
     "remind_me_hint": "Uma notificação é disparada na data e hora de vencimento.",
     "add_subtask": "Adicionar uma subtarefa",
     "subtask_placeholder": "Adicionar uma subtarefa...",
-    "delete_subtask": "Excluir subtarefa"
+    "delete_subtask": "Excluir subtarefa",
+    "priority": "Prioridade",
+    "priority_high": "Prioridade alta",
+    "priority_medium": "Prioridade média",
+    "priority_low": "Prioridade baixa",
+    "priority_none": "Sem prioridade"
   },
   "tags": {
     "add_single": "Adicionar etiqueta...",
@@ -1461,7 +1466,8 @@
         "workspace_menu": "Menu do espaço de trabalho",
         "note_actions": "Ações das notas",
         "mobile_editor_bar": "Barra de edição móvel",
-        "sidebar": "Barra lateral"
+        "sidebar": "Barra lateral",
+        "task_lists": "Listas de tarefas"
       },
       "check_all": "Marcar todos",
       "uncheck_all": "Desmarcar todos",
@@ -1496,7 +1502,12 @@
       "note_stats_lines": "Mostrar número de linhas",
       "note_info_icon": "Mostrar ícone de informação sob o título da nota",
       "note_scrollbar": "Barra de rolagem das notas",
-      "note_scroll_arrows": "Setas para ir ao início e ao fim da nota"
+      "note_scroll_arrows": "Setas para ir ao início e ao fim da nota",
+      "tasklist_add_field": "Campo para adicionar uma tarefa",
+      "tasklist_frame": "Moldura em volta de cada tarefa",
+      "tasklist_delete": "Excluir uma tarefa concluída",
+      "tasklist_menu": "Menu de opções da tarefa (celular)",
+      "tasklist_frame_color": "Cor de prioridade da moldura das tarefas"
     },
     "icon_sidebar_order": {
       "title": "Layout da barra de ícones",
@@ -5157,7 +5168,12 @@
     "hide_list": "Ocultar nesta página",
     "unhide_list": "Mostrar novamente nesta página",
     "show_hidden": "Mostrar as listas ocultas",
-    "empty_hidden": "Todas as listas estão ocultas."
+    "empty_hidden": "Todas as listas estão ocultas.",
+    "show_note_checklists_help": "Mostra também as caixas de seleção escritas dentro de notas comuns, ao lado das tarefas das suas listas de tarefas. O grupo delas leva um selo Nota.",
+    "show_hidden_help": "Uma lista ocultada com o olho do seu cabeçalho sai desta página, do calendário e das contagens. Marque esta opção para mostrar de novo as listas ocultas, esmaecidas, com um olho para trazer cada uma de volta. Fica cinza enquanto nenhuma lista estiver oculta.",
+    "filter_priority_high": "Alta",
+    "filter_priority_medium": "Média",
+    "filter_priority_low": "Baixa"
   },
   "mentions": {
     "title": "Menções",

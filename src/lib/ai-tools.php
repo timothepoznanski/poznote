@@ -468,17 +468,9 @@ function aiFindTaskIndex(array $tasks, $ref): ?int {
     return $found;
 }
 
-/** Important incomplete, then incomplete, then completed: the order the UI keeps (js/tasklist-core.js). */
+/** Open tasks by priority (high, medium, low, none), then completed: the order the UI keeps (js/tasklist-core.js). */
 function aiRegroupTasks(array $tasks): array {
-    $important = [];
-    $normal = [];
-    $completed = [];
-    foreach ($tasks as $task) {
-        if (!empty($task['completed'])) $completed[] = $task;
-        elseif (!empty($task['important'])) $important[] = $task;
-        else $normal[] = $task;
-    }
-    return array_merge($important, $normal, $completed);
+    return regroupTasklistTasks($tasks);
 }
 
 /** A task id in the frontend's format (float timestamp), unique in the list. */
@@ -499,8 +491,10 @@ function aiTaskView(array $task): array {
         'id' => isset($task['id']) ? aiTaskIdToString($task['id']) : '',
         'text' => (string)($task['text'] ?? ''),
         'completed' => !empty($task['completed']),
-        'important' => !empty($task['important']),
+        'important' => getTasklistTaskPriority($task) === 'high',
     ];
+    $priority = getTasklistTaskPriority($task);
+    if ($priority !== null) $view['priority'] = $priority;
     $dueAt = $task['dueAt'] ?? null;
     if (is_string($dueAt) && preg_match('/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?/', $dueAt, $m)) {
         $view['due_at'] = substr($dueAt, 0, empty($m[1]) ? 10 : 16);
@@ -1443,14 +1437,23 @@ function aiToolAddTask($con, array $args, $chatWorkspace, $actorUserId): string
     }
     $note = aiLoadTasklist($con, $noteId, $chatWorkspace);
     if (is_string($note)) return $note;
-    $task = [
+    $priority = null;
+    if (array_key_exists('priority', $args)) {
+        $priority = normalizeTasklistPriority($args['priority']);
+        if ($priority === false) {
+            return json_encode(['error' => 'Invalid priority: expected "high", "medium", "low" or "none"']);
+        }
+    } elseif (!empty($args['important'])) {
+        $priority = 'high';
+    }
+    $task = setTasklistTaskPriority([
         'id' => aiGenerateTaskId($note['tasks']),
         'text' => $text,
         'noteId' => $noteId,
         'completed' => false,
-        'important' => !empty($args['important']),
+        'important' => false,
         'dueAt' => null,
-    ];
+    ], $priority);
     if (isset($args['due_at']) && trim((string)$args['due_at']) !== '') {
         $dueAt = aiNormalizeLocalDateTime($args['due_at']);
         if ($dueAt === null) {
@@ -1492,9 +1495,18 @@ function aiToolUpdateTask($con, array $args, $chatWorkspace, $actorUserId): stri
         $task['completed'] = filter_var($args['completed'], FILTER_VALIDATE_BOOLEAN);
         $changed[] = 'completed';
     }
-    if (array_key_exists('important', $args)) {
-        $task['important'] = filter_var($args['important'], FILTER_VALIDATE_BOOLEAN);
-        $changed[] = 'important';
+    if (array_key_exists('priority', $args)) {
+        $priority = normalizeTasklistPriority($args['priority']);
+        if ($priority === false) {
+            return json_encode(['error' => 'Invalid priority: expected "high", "medium", "low" or "none"']);
+        }
+        $task = setTasklistTaskPriority($task, $priority);
+        $changed[] = 'priority';
+    } elseif (array_key_exists('important', $args)) {
+        // Older spelling of priority "high"; false only clears a high priority
+        $current = getTasklistTaskPriority($task);
+        $task = setTasklistTaskPriority($task, filter_var($args['important'], FILTER_VALIDATE_BOOLEAN) ? 'high' : ($current === 'high' ? null : $current));
+        $changed[] = 'priority';
     }
     if (array_key_exists('text', $args)) {
         $text = trim((string)$args['text']);
@@ -1522,7 +1534,7 @@ function aiToolUpdateTask($con, array $args, $chatWorkspace, $actorUserId): stri
         $changed[] = 'reminder';
     }
     if (empty($changed)) {
-        return json_encode(['error' => 'Nothing to change: pass completed, important, text, due_at or reminder']);
+        return json_encode(['error' => 'Nothing to change: pass completed, priority, text, due_at or reminder']);
     }
     // Completing a repeating task opens its next occurrence, which carries the repeat
     $nextTask = null;

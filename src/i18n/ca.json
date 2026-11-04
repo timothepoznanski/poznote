@@ -617,7 +617,12 @@
     "uncheck_all": "Desmarca totes les tasques",
     "add_subtask": "Afegeix una subtasca",
     "subtask_placeholder": "Afegiu una subtasca...",
-    "delete_subtask": "Suprimeix la subtasca"
+    "delete_subtask": "Suprimeix la subtasca",
+    "priority": "Prioritat",
+    "priority_high": "Prioritat alta",
+    "priority_medium": "Prioritat mitjana",
+    "priority_low": "Prioritat baixa",
+    "priority_none": "Sense prioritat"
   },
   "tags": {
     "add_single": "Afegiu una etiqueta...",
@@ -945,7 +950,8 @@
         "workspace_menu": "Menú dels espais de treball",
         "note_actions": "Accions de les notes",
         "mobile_editor_bar": "Barra de l'editor per a mòbils",
-        "sidebar": "Barra lateral"
+        "sidebar": "Barra lateral",
+        "task_lists": "Llistes de tasques"
       },
       "badge_all_visible": "Tot visible",
       "badge_hidden_count_admin": "{{count}} amagats ({{admin}} per l'administrador)",
@@ -980,7 +986,12 @@
       "note_stats_lines": "Mostra el nombre de línies",
       "note_info_icon": "Mostra la icona d'informació sota el títol de la nota",
       "note_scrollbar": "Barra de desplaçament de la nota",
-      "note_scroll_arrows": "Fletxes per desplaçar-se a dalt i a baix"
+      "note_scroll_arrows": "Fletxes per desplaçar-se a dalt i a baix",
+      "tasklist_add_field": "Camp per afegir una tasca",
+      "tasklist_frame": "Marc al voltant de cada tasca",
+      "tasklist_delete": "Suprimeix una tasca completada",
+      "tasklist_menu": "Menú d'opcions de la tasca (mòbil)",
+      "tasklist_frame_color": "Color de prioritat del marc de les tasques"
     },
     "icon_sidebar_order": {
       "title": "Disposició de la barra lateral d'icones",
@@ -4829,7 +4840,12 @@
     "hide_list": "Amaga d'aquesta pàgina",
     "unhide_list": "Torna a mostrar en aquesta pàgina",
     "show_hidden": "Mostra les llistes amagades",
-    "empty_hidden": "Totes les llistes estan amagades."
+    "empty_hidden": "Totes les llistes estan amagades.",
+    "show_note_checklists_help": "Mostra també les caselles escrites dins de les notes normals, al costat de les tasques de les vostres llistes de tasques. El seu grup porta una insígnia Nota.",
+    "show_hidden_help": "Una llista amagada amb l'ull de la seva capçalera surt d'aquesta pàgina, del calendari i dels comptadors. Marqueu aquesta opció per tornar a mostrar les llistes amagades, atenuades, amb un ull per recuperar-ne cadascuna. En gris mentre no hi hagi cap llista amagada.",
+    "filter_priority_high": "Alta",
+    "filter_priority_medium": "Mitjana",
+    "filter_priority_low": "Baixa"
   },
   "mentions": {
     "title": "Mencions",

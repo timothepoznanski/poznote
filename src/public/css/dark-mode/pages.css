@@ -438,15 +438,14 @@ html[data-theme='dark'] .public-note .content pre code {
     background-color: transparent !important;
 }
 
-/* Important task styling for public view in dark mode */
-html[data-theme='dark'] .public-note .content .task-item.important {
-    border-color: var(--pz-danger-text-hover);
-    background: var(--pz-bg);
+/* Priority colours of the public view (#1730): the palette tokens switch
+   with the theme, these only outweigh the dark task rules */
+html[data-theme='dark'] .public-note .content .task-item:is(.priority-high, .priority-medium, .priority-low) {
+    border-color: color-mix(in srgb, var(--pz-task-priority) 45%, var(--pz-bg));
 }
 
-html[data-theme='dark'] .public-note .content .task-item.important .task-text {
-    color: var(--pz-danger-text);
-    font-weight: var(--pz-weight-semibold);
+html[data-theme='dark'] .public-note .content .task-item:is(.priority-high, .priority-medium, .priority-low) .task-text {
+    color: var(--pz-task-priority);
 }
 
 /* ============================================

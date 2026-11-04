@@ -1,6 +1,6 @@
 // Task lists: per-task actions.
 // 
-// Deleting, marking important, setting a due date, and the per-task actions menu.
+// Deleting, setting the priority or a due date, and the per-task actions menu.
 
 // Delete task
 function deleteTask(taskId, noteId) {
@@ -31,8 +31,9 @@ function deleteTask(taskId, noteId) {
     markTaskListAsModified(noteId);
 }
 
-// Toggle important flag for a task and move it to top when important
-function toggleImportant(taskId, noteId) {
+// Set a task's priority (#1730): 'high', 'medium', 'low' or null, then move
+// it among the open tasks (high, medium, low, none)
+function setTaskPriority(taskId, noteId, priority) {
     if (isSharedWorkspaceReadOnlyTasks()) return;
 
     const noteEntry = document.getElementById('entry' + noteId);
@@ -40,19 +41,46 @@ function toggleImportant(taskId, noteId) {
 
     let tasks = parseTaskData(noteEntry);
 
-    const taskIndex = tasks.findIndex(task => task.id === taskId);
-    if (taskIndex === -1) return;
+    const task = tasks.find(t => String(t.id) === String(taskId));
+    if (!task || !window.poznoteTaskPriority) return;
+    if (getTaskPriority(task) === window.poznoteTaskPriority.normalize(priority)) return;
 
-    // Toggle flag
-    tasks[taskIndex].important = !tasks[taskIndex].important;
-
-    // Reorder: important incomplete → normal incomplete → completed
-    const { important, normal, completed } = groupTasksByStatus(tasks);
-    tasks = [].concat(important, normal, completed);
+    window.poznoteTaskPriority.set(task, priority);
+    tasks = sortTasksByPriority(tasks);
 
     saveAndRenderTasks(noteId, tasks);
 
     markTaskListAsModified(noteId);
+}
+
+// The flag button of a task row: High, Medium, Low, No priority
+function openTaskPriorityMenu(taskId, noteId, event, anchorRectOverride) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    if (isSharedWorkspaceReadOnlyTasks() || !window.poznoteTaskPriority) return;
+
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+
+    const task = parseTaskData(noteEntry).find(t => String(t.id) === String(taskId));
+    if (!task) return;
+
+    const trigger = event && event.target ? event.target.closest('button') : null;
+    window.poznoteTaskPriority.openMenu(trigger || anchorRectOverride || null, getTaskPriority(task), function (priority) {
+        setTaskPriority(taskId, noteId, priority);
+    });
+}
+
+// Older name, kept for anything still calling it: flips high priority
+function toggleImportant(taskId, noteId) {
+    const noteEntry = document.getElementById('entry' + noteId);
+    if (!noteEntry) return;
+    const task = parseTaskData(noteEntry).find(t => String(t.id) === String(taskId));
+    if (!task) return;
+    setTaskPriority(taskId, noteId, getTaskPriority(task) === 'high' ? null : 'high');
 }
 
 // Open the calendar popup to set or clear a task's due date
@@ -174,6 +202,7 @@ function openTaskActionsMenu(taskId, noteId, event) {
 
     const items = [
         {
+            action: 'subtask',
             icon: 'lucide lucide-corner-down-right',
             label: t('tasklist.add_subtask', null, 'Add a subtask'),
             run: function () {
@@ -181,6 +210,7 @@ function openTaskActionsMenu(taskId, noteId, event) {
             }
         },
         {
+            action: 'due-date',
             icon: 'lucide lucide-calendar-alt',
             label: t('tasklist.due_date', null, 'Due date'),
             run: function () {
@@ -188,15 +218,17 @@ function openTaskActionsMenu(taskId, noteId, event) {
             }
         },
         {
-            icon: 'lucide lucide-star',
-            label: task.important
-                ? t('tasklist.unmark_important', null, 'Remove important')
-                : t('tasklist.mark_important', null, 'Mark as important'),
+            action: 'priority',
+            icon: 'lucide lucide-flag',
+            label: window.poznoteTaskPriority
+                ? window.poznoteTaskPriority.buttonTitle(task)
+                : t('tasklist.priority', null, 'Priority'),
             run: function () {
-                toggleImportant(taskId, noteId);
+                openTaskPriorityMenu(taskId, noteId, null, anchorRect);
             }
         },
         {
+            action: 'move',
             icon: 'lucide lucide-arrow-right',
             label: t('tasklist.move_to_list', null, 'Move to another list'),
             run: function () {
@@ -212,6 +244,8 @@ function openTaskActionsMenu(taskId, noteId, event) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'task-actions-menu-item';
+        // Element visibility hides an entry by it (tasklist:* keys)
+        if (item.action) btn.setAttribute('data-action', item.action);
         const icon = document.createElement('i');
         icon.className = item.icon;
         btn.appendChild(icon);

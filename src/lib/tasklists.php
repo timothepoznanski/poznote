@@ -150,6 +150,101 @@ function normalizeTasklistSubtasks($subtasks): array {
 }
 
 /**
+ * Task priority levels (#1730), most urgent first. A task stores one of them
+ * as `priority`; none means no priority. `important` mirrors "high" so what
+ * only knows the old star keeps working. Mirrored by js/task-priority.js.
+ */
+const POZNOTE_TASK_PRIORITIES = ['high', 'medium', 'low'];
+
+/**
+ * A priority as given by a caller: 'high', 'medium' or 'low' (any case), null
+ * for none ('none', '' and null clear it), false when the value is invalid.
+ *
+ * @param mixed $value
+ * @return string|null|false
+ */
+function normalizeTasklistPriority($value) {
+    if ($value === null) {
+        return null;
+    }
+    if (!is_string($value)) {
+        return false;
+    }
+    $value = strtolower(trim($value));
+    if ($value === '' || $value === 'none') {
+        return null;
+    }
+    return in_array($value, POZNOTE_TASK_PRIORITIES, true) ? $value : false;
+}
+
+/**
+ * The priority of a stored task: its `priority` when valid, else "high" for a
+ * task starred important before priorities existed, else null.
+ *
+ * @param mixed $task Decoded task.
+ */
+function getTasklistTaskPriority($task): ?string {
+    if (!is_array($task)) {
+        return null;
+    }
+    $priority = normalizeTasklistPriority($task['priority'] ?? null);
+    if (is_string($priority)) {
+        return $priority;
+    }
+    return !empty($task['important']) ? 'high' : null;
+}
+
+/**
+ * Set a task's priority (null clears it) and keep `important` in step.
+ */
+function setTasklistTaskPriority(array $task, ?string $priority): array {
+    $priority = normalizeTasklistPriority($priority);
+    if (is_string($priority)) {
+        $task['priority'] = $priority;
+    } else {
+        unset($task['priority']);
+    }
+    $task['important'] = $priority === 'high';
+    return $task;
+}
+
+/**
+ * Open tasks by priority (high, medium, low, none), completed ones last. The
+ * order inside each level is kept, so a manual arrangement survives. Mirrors
+ * poznoteTaskPriority.sort() in js/task-priority.js.
+ */
+function regroupTasklistTasks(array $tasks): array {
+    $buckets = array_fill(0, count(POZNOTE_TASK_PRIORITIES) + 2, []);
+    foreach ($tasks as $task) {
+        if (is_array($task) && !empty($task['completed'])) {
+            $rank = count(POZNOTE_TASK_PRIORITIES) + 1;
+        } else {
+            $priority = getTasklistTaskPriority($task);
+            $rank = $priority === null ? count(POZNOTE_TASK_PRIORITIES) : (int) array_search($priority, POZNOTE_TASK_PRIORITIES, true);
+        }
+        $buckets[$rank][] = $task;
+    }
+    return array_merge(...$buckets);
+}
+
+/**
+ * Classes of a task row in the static renderers: ' important priority-high',
+ * ' priority-medium', ' priority-low' or '' (completed tasks are not coloured).
+ *
+ * @param mixed $task Decoded task.
+ */
+function tasklistPriorityClasses($task): string {
+    if (!is_array($task) || !empty($task['completed'])) {
+        return '';
+    }
+    $priority = getTasklistTaskPriority($task);
+    if ($priority === null) {
+        return '';
+    }
+    return ($priority === 'high' ? ' important' : '') . ' priority-' . $priority;
+}
+
+/**
  * Subtasks of a decoded task, reduced to what a reader displays: entries
  * without text are left out.
  *

@@ -231,7 +231,7 @@ function convertTasklistToMarkdown($jsonContent) {
     foreach ($tasks as $task) {
         $text = isset($task['text']) ? trim($task['text']) : '';
         $completed = !empty($task['completed']);
-        $important = !empty($task['important']);
+        $priority = getTasklistTaskPriority($task);
 
         if (empty($text)) {
             continue;
@@ -239,8 +239,15 @@ function convertTasklistToMarkdown($jsonContent) {
 
         $checkbox = $completed ? '[x]' : '[ ]';
 
-        if ($important) {
+        // Priority (#1730): high keeps the bold text and ⭐ of the important
+        // star, medium and low take the Obsidian Tasks markers; the import
+        // (convertMarkdownCheckboxListToTasklistJson) reads all three back
+        if ($priority === 'high') {
             $markdown .= '- ' . $checkbox . ' **' . $text . '** ⭐' . "\n";
+        } elseif ($priority === 'medium') {
+            $markdown .= '- ' . $checkbox . ' ' . $text . ' 🔼' . "\n";
+        } elseif ($priority === 'low') {
+            $markdown .= '- ' . $checkbox . ' ' . $text . ' 🔽' . "\n";
         } else {
             $markdown .= '- ' . $checkbox . ' ' . $text . "\n";
         }

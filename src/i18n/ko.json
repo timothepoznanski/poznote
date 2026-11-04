@@ -617,7 +617,12 @@
     "uncheck_all": "모든 할 일의 완료 표시 해제",
     "add_subtask": "하위 할 일 추가",
     "subtask_placeholder": "하위 할 일 추가...",
-    "delete_subtask": "하위 할 일 삭제"
+    "delete_subtask": "하위 할 일 삭제",
+    "priority": "우선순위",
+    "priority_high": "높은 우선순위",
+    "priority_medium": "보통 우선순위",
+    "priority_low": "낮은 우선순위",
+    "priority_none": "우선순위 없음"
   },
   "tags": {
     "add_single": "태그 추가...",
@@ -945,7 +950,8 @@
         "workspace_menu": "작업 공간 메뉴",
         "note_actions": "노트 작업",
         "mobile_editor_bar": "모바일 편집기 표시줄",
-        "sidebar": "사이드바"
+        "sidebar": "사이드바",
+        "task_lists": "할 일 목록"
       },
       "badge_all_visible": "모두 표시됨",
       "badge_hidden_count_admin": "{{count}}개 숨김(관리자가 숨긴 항목 {{admin}}개)",
@@ -980,7 +986,12 @@
       "note_stats_lines": "줄 수 표시",
       "note_info_icon": "노트 제목 아래에 정보 아이콘 표시",
       "note_scrollbar": "노트 스크롤바",
-      "note_scroll_arrows": "노트 맨 위·맨 아래로 이동 화살표"
+      "note_scroll_arrows": "노트 맨 위·맨 아래로 이동 화살표",
+      "tasklist_add_field": "할 일 추가 입력란",
+      "tasklist_frame": "각 할 일의 테두리",
+      "tasklist_delete": "완료한 할 일 삭제",
+      "tasklist_menu": "할 일 옵션 메뉴(모바일)",
+      "tasklist_frame_color": "할 일 테두리의 우선순위 색상"
     },
     "icon_sidebar_order": {
       "title": "아이콘 사이드바 레이아웃",
@@ -4829,7 +4840,12 @@
     "hide_list": "이 페이지에서 숨기기",
     "unhide_list": "이 페이지에 다시 표시",
     "show_hidden": "숨겨진 목록 표시",
-    "empty_hidden": "모든 목록이 숨겨져 있습니다."
+    "empty_hidden": "모든 목록이 숨겨져 있습니다.",
+    "show_note_checklists_help": "할 일 목록의 할 일 옆에 일반 노트 안에 작성한 체크박스도 표시합니다. 해당 그룹에는 노트 배지가 붙습니다.",
+    "show_hidden_help": "머리글의 눈 아이콘으로 숨긴 목록은 이 페이지, 달력, 개수에서 빠집니다. 선택하면 숨긴 목록이 흐리게 다시 표시되며, 눈 아이콘으로 하나씩 되돌릴 수 있습니다. 숨긴 목록이 없으면 회색으로 표시됩니다.",
+    "filter_priority_high": "높음",
+    "filter_priority_medium": "보통",
+    "filter_priority_low": "낮음"
   },
   "mentions": {
     "title": "멘션",

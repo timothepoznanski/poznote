@@ -678,9 +678,12 @@
     text-decoration: line-through;
 }
 
-.kanban-task-preview-item.important .kanban-task-preview-text {
-    font-weight: var(--pz-weight-semibold);
+/* Priority (#1730): the colour of the task's level, from
+   css/components/task-priority.css */
+.kanban-task-preview-item:is(.priority-high, .priority-medium, .priority-low) .kanban-task-preview-text {
+    color: var(--pz-task-priority);
 }
+
 
 /* Own row, directly above the card title. */
 .kanban-card-tags {

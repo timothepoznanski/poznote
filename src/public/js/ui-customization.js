@@ -406,6 +406,19 @@
         });
     }
 
+    // tasklist:* keys, the "Task lists" section: same selectors as
+    // poznoteTasklistUiSelectors() in lib/ui-customization.php
+    var TASKLIST_UI_SELECTORS = {
+        'add-field': ['.task-list-container .task-input-container', '.tasklist-embed-add'],
+        'subtask': ['.task-item .task-subtask-btn', '.task-actions-menu-item[data-action="subtask"]'],
+        'due-date': ['.task-item .task-due-btn', '.task-actions-menu-item[data-action="due-date"]', '.tasklist-embed-action-due'],
+        'priority': ['.task-item .task-priority-btn', '.task-actions-menu-item[data-action="priority"]', '.tasklist-embed-action-priority'],
+        'move': ['.task-item .task-move-btn', '.task-actions-menu-item[data-action="move"]'],
+        'delete': ['.task-item .task-delete-btn', '.tasklist-embed-action-delete'],
+        'drag-handle': ['.task-item .task-drag-handle'],
+        'menu': ['.task-item .task-menu-btn']
+    };
+
     function applyHiddenKeys(hidden) {
         hidden = sanitizeHiddenKeys(hidden);
         publishHiddenKeys(hidden);
@@ -440,6 +453,16 @@
                     rules.push('.note-edit-toolbar .btn-search-replace-format, .note-edit-toolbar .btn-search-replace-format.show-on-selection { display: none !important; }');
                 } else if (id === 'btn-tasklist-actions') {
                     rules.push('.tasklist-actions-dropdown { display: none !important; }');
+                }
+            } else if (type === 'tasklist') {
+                if (id === 'frame') {
+                    // (the ID boost outweighs the frame-color rule below)
+                    rules.push('.task-list-container .task-item:is(#pz-specificity-boost, *), .task-list-container .task-item:is(#pz-specificity-boost, *):hover { border-color: transparent !important; background: transparent !important; }');
+                } else if (id === 'frame-color') {
+                    rules.push('.task-list-container .task-item:is(.priority-high, .priority-medium, .priority-low) { border-color: var(--pz-border) !important; }');
+                    rules.push('.task-list-container .task-item:is(.priority-high, .priority-medium, .priority-low):hover { border-color: var(--pz-border-strong) !important; }');
+                } else if (Object.prototype.hasOwnProperty.call(TASKLIST_UI_SELECTORS, id)) {
+                    rules.push(TASKLIST_UI_SELECTORS[id].join(', ') + ' { display: none !important; }');
                 }
             } else if (type === 'wsmenu') {
                 rules.push('.workspace-menu-item[data-action="' + id + '"] { display: none !important; }');

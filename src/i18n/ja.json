@@ -617,7 +617,12 @@
     "uncheck_all": "すべてのタスクのチェックを外す",
     "add_subtask": "サブタスクを追加",
     "subtask_placeholder": "サブタスクを追加...",
-    "delete_subtask": "サブタスクを削除"
+    "delete_subtask": "サブタスクを削除",
+    "priority": "優先度",
+    "priority_high": "優先度: 高",
+    "priority_medium": "優先度: 中",
+    "priority_low": "優先度: 低",
+    "priority_none": "優先度なし"
   },
   "tags": {
     "add_single": "タグを追加...",
@@ -945,7 +950,8 @@
         "workspace_menu": "ワークスペースメニュー",
         "note_actions": "ノートの操作",
         "mobile_editor_bar": "モバイルのエディターバー",
-        "sidebar": "サイドバー"
+        "sidebar": "サイドバー",
+        "task_lists": "タスクリスト"
       },
       "badge_all_visible": "すべて表示",
       "badge_hidden_count_admin": "{{count}}件を非表示（うち管理者による非表示{{admin}}件）",
@@ -980,7 +986,12 @@
       "note_stats_lines": "行数を表示",
       "note_info_icon": "ノートのタイトルの下に情報アイコンを表示",
       "note_scrollbar": "ノートのスクロールバー",
-      "note_scroll_arrows": "先頭・末尾へスクロールする矢印"
+      "note_scroll_arrows": "先頭・末尾へスクロールする矢印",
+      "tasklist_add_field": "タスクを追加する入力欄",
+      "tasklist_frame": "各タスクの枠",
+      "tasklist_delete": "完了したタスクの削除",
+      "tasklist_menu": "タスクのオプションメニュー（モバイル）",
+      "tasklist_frame_color": "タスクの枠の優先度の色"
     },
     "icon_sidebar_order": {
       "title": "アイコンサイドバーのレイアウト",
@@ -4829,7 +4840,12 @@
     "hide_list": "このページで非表示にする",
     "unhide_list": "このページで再び表示する",
     "show_hidden": "非表示のリストを表示",
-    "empty_hidden": "すべてのリストが非表示になっています。"
+    "empty_hidden": "すべてのリストが非表示になっています。",
+    "show_note_checklists_help": "タスクリストのタスクに加えて、通常のノート内に書かれたチェックボックスも表示します。そのグループには「ノート」バッジが付きます。",
+    "show_hidden_help": "見出しの目のアイコンで非表示にしたリストは、このページ、カレンダー、件数から外れます。オンにすると、非表示のリストが薄く表示され、目のアイコンで1つずつ元に戻せます。非表示のリストがない間はグレー表示です。",
+    "filter_priority_high": "高",
+    "filter_priority_medium": "中",
+    "filter_priority_low": "低"
   },
   "mentions": {
     "title": "メンション",

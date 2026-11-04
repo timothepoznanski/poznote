@@ -382,7 +382,7 @@ The Poznote MCP server provides the following tools:
 ### Tasks
 - `list_tasks` - List the tasks of a tasklist note, with their IDs and due dates
 - `add_task` - Add a single task, with an optional due date and reminder
-- `update_task` - Update one task (text, due date, reminder, important flag)
+- `update_task` - Update one task (text, due date, reminder, priority)
 - `complete_task` - Mark a task as done, or reopen it
 - `delete_task` - Delete one task from a tasklist note
 - `add_subtask` - Add a subtask under a task of a tasklist note

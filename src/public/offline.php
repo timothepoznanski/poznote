@@ -76,6 +76,7 @@ $scripts = [
     'js/highlight/powershell.min.js?v=' . $v,
     'js/syntax-highlight.js?v=' . $v,
     poznoteAsset('js/events-text-selection.js'),
+    poznoteAsset('js/task-priority.js'),
     poznoteAsset('js/tasklist-core.js'),
     poznoteAsset('js/tasklist-render.js'),
     poznoteAsset('js/tasklist-crud.js'),

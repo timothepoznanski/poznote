@@ -382,7 +382,7 @@ El servidor MCP de Poznote ofrece las siguientes herramientas:
 ### Tareas
 - `list_tasks`: lista las tareas de una nota de lista de tareas, con sus ID y fechas de vencimiento
 - `add_task`: añade una única tarea, con fecha de vencimiento y recordatorio opcionales
-- `update_task`: actualiza una tarea (texto, fecha de vencimiento, recordatorio, indicador de importante)
+- `update_task`: actualiza una tarea (texto, fecha de vencimiento, recordatorio, prioridad)
 - `complete_task`: marca una tarea como hecha, o la vuelve a abrir
 - `delete_task`: elimina una tarea de una nota de lista de tareas
 - `add_subtask`: añade una subtarea a una tarea de una nota de lista de tareas

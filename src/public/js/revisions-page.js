@@ -543,7 +543,10 @@
         tasks.forEach(function (task) {
             if (!task || typeof task !== 'object') return;
             var text = String(task.text || task.content || '');
-            lines.push((task.completed ? '☑ ' : '☐ ') + text + (task.important ? ' ★' : ''));
+            // Priority (#1730): the markers of the markdown export
+            var priority = ['high', 'medium', 'low'].indexOf(task.priority) !== -1 ? task.priority : (task.important ? 'high' : '');
+            var marker = { high: ' ★', medium: ' 🔼', low: ' 🔽' }[priority] || '';
+            lines.push((task.completed ? '☑ ' : '☐ ') + text + marker);
             (Array.isArray(task.subtasks) ? task.subtasks : []).forEach(function (subtask) {
                 if (!subtask || typeof subtask !== 'object') return;
                 lines.push('    ' + (subtask.completed ? '☑ ' : '☐ ') + String(subtask.text || ''));

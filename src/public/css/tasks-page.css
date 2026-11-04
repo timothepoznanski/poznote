@@ -90,9 +90,58 @@ body.tasks-page {
     user-select: none;
 }
 
+/* Dimmed through its content, so the help bubble below stays readable */
 .tasks-progress-option.disabled {
-    opacity: 0.5;
     cursor: default;
+}
+
+.tasks-progress-option.disabled > input,
+.tasks-progress-option.disabled > span {
+    opacity: 0.5;
+}
+
+/* What the option does, on hover: the bubble of the help icons of the
+   settings cards (.setting-help in home/cards.css, not loaded here) */
+.tasks-progress-option[data-tooltip] {
+    position: relative;
+}
+
+.tasks-progress-option[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: max-content;
+    max-width: 260px;
+    background: var(--pz-tooltip-bg);
+    color: var(--pz-tooltip-text);
+    border: 1px solid rgba(var(--pz-highlight-rgb), 0.15);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95rem;
+    font-weight: var(--pz-weight-normal);
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+    padding: 8px 10px;
+    border-radius: var(--pz-radius-lg);
+    box-shadow: 0 4px 12px rgba(var(--pz-shadow-rgb), 0.25);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    z-index: 50;
+}
+
+.tasks-progress-option[data-tooltip]:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* No hover on touch screens */
+@media (hover: none) {
+    .tasks-progress-option[data-tooltip]::after {
+        display: none;
+    }
 }
 
 .tasks-progress-option input {
@@ -222,6 +271,25 @@ body.tasks-page {
 .tasks-filter-chip.active {
     background-color: var(--pz-accent);
     border-color: var(--pz-accent);
+    color: var(--pz-text-inverse);
+}
+
+/* The three priority chips (#1730): a flag in the colour of the level
+   (css/components/task-priority.css), white on the active chip */
+.tasks-filter-chip-priority {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.tasks-filter-chip-priority i[class*="lucide-"],
+.tasks-filter-chip-priority i[class*="lucide-"]:hover {
+    font-size: 13px;
+    color: var(--pz-task-priority);
+    transform: none;
+}
+
+.tasks-filter-chip-priority.active i[class*="lucide-"] {
     color: var(--pz-text-inverse);
 }
 
@@ -588,23 +656,31 @@ html[data-theme='dark'] .tasks-note-source-badge {
     text-decoration: line-through;
 }
 
-.tasks-task-item.important .tasks-task-text {
-    color: var(--pz-danger-text-hover);
-    font-weight: var(--pz-weight-semibold);
+/* Priority (#1730): the colour of the task's level, from
+   css/components/task-priority.css */
+.tasks-task-item:is(.priority-high, .priority-medium, .priority-low) .tasks-task-text {
+    color: var(--pz-task-priority);
 }
+
 
 /* A line box of the task's font (same size, line-height normal), so it lines
    up with the first line of the text; the icon is centred on the lowercase
    letters there. A plain 1em box at the top of the row sat 1.5px high, and
    about 2px more with Segoe UI (Windows), whose ascent is taller. */
 .tasks-task-star {
-    color: var(--pz-danger-text);
+    color: var(--pz-task-priority);
     font-size: 14px;
     flex-shrink: 0;
 }
 
 .tasks-task-star .lucide {
     vertical-align: middle;
+}
+
+.tasks-task-star i[class*="lucide-"],
+.tasks-task-star i[class*="lucide-"]:hover {
+    color: var(--pz-task-priority);
+    transform: none;
 }
 
 /* Calendar button to add a due date to an undated open task */
@@ -866,15 +942,15 @@ html[data-theme='dark'] .tasks-note-source-badge {
     text-overflow: ellipsis;
 }
 
-.tasks-cal-chip.important {
-    border-left-color: var(--pz-danger-hover);
-    background: color-mix(in srgb, var(--pz-danger-hover) 8%, transparent);
+.tasks-cal-chip:is(.priority-high, .priority-medium, .priority-low) {
+    border-left-color: var(--pz-task-priority);
+    background: color-mix(in srgb, var(--pz-task-priority) 8%, transparent);
 }
 
-.tasks-cal-chip.important .tasks-cal-chip-text {
-    color: var(--pz-danger-hover);
-    font-weight: var(--pz-weight-semibold);
+.tasks-cal-chip:is(.priority-high, .priority-medium, .priority-low) .tasks-cal-chip-text {
+    color: var(--pz-task-priority);
 }
+
 
 .tasks-cal-chip.overdue {
     border-left-color: var(--pz-danger-hover);
@@ -963,7 +1039,10 @@ html[data-theme='dark'] .tasks-note-source-badge {
         display: none;
     }
 
-    .tasks-cal-chip.important,
+    .tasks-cal-chip:is(.priority-high, .priority-medium, .priority-low) {
+        background: var(--pz-task-priority);
+    }
+
     .tasks-cal-chip.overdue {
         background: var(--pz-danger-text-hover);
     }
@@ -1310,13 +1389,13 @@ html[data-theme='dark'] .tasks-cal-chip-time {
     color: var(--pz-accent-text);
 }
 
-html[data-theme='dark'] .tasks-cal-chip.important {
-    border-left-color: var(--pz-danger-soft);
-    background: color-mix(in srgb, var(--pz-danger-text-hover) 18%, transparent);
+html[data-theme='dark'] .tasks-cal-chip:is(.priority-high, .priority-medium, .priority-low) {
+    border-left-color: var(--pz-task-priority);
+    background: color-mix(in srgb, var(--pz-task-priority) 18%, transparent);
 }
 
-html[data-theme='dark'] .tasks-cal-chip.important .tasks-cal-chip-text {
-    color: var(--pz-danger-text);
+html[data-theme='dark'] .tasks-cal-chip:is(.priority-high, .priority-medium, .priority-low) .tasks-cal-chip-text {
+    color: var(--pz-task-priority);
 }
 
 html[data-theme='dark'] .tasks-cal-chip.overdue {
@@ -1339,7 +1418,10 @@ html[data-theme='dark'] .tasks-task-note-badge {
         background: var(--pz-accent-text);
     }
 
-    html[data-theme='dark'] .tasks-cal-chip.important,
+    html[data-theme='dark'] .tasks-cal-chip:is(.priority-high, .priority-medium, .priority-low) {
+        background: var(--pz-task-priority);
+    }
+
     html[data-theme='dark'] .tasks-cal-chip.overdue {
         background: var(--pz-danger-text-hover);
     }

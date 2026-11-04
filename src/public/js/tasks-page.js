@@ -87,28 +87,39 @@
         });
     }
 
-    // Same grouping/order rules as toggleTask in tasklist-crud.js: important
-    // incomplete first, normal incomplete, then completed (a newly completed
+    // Priority of a task (#1730, js/task-priority.js): 'high', 'medium', 'low' or null
+    function priorityOf(task) {
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.get(task) : (task && task.important ? 'high' : null);
+    }
+
+    function priorityClasses(task) {
+        if (task.completed || !priorityOf(task)) return '';
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.classNames(task) : ' important';
+    }
+
+    // Same grouping/order rules as toggleTask in tasklist-crud.js: open tasks
+    // by priority (high, medium, low, none), then completed (a newly completed
     // task goes to the start of the completed group in bottom-insert mode)
     function reorderTasksAfterToggle(tasks, toggledTask) {
         var important = [], normal = [], completed = [];
         tasks.forEach(function (t) {
             if (String(t.id) === String(toggledTask.id)) return;
             if (t.completed) completed.push(t);
-            else if (t.important) important.push(t);
+            else if (priorityOf(t)) important.push(t);
             else normal.push(t);
         });
 
         if (toggledTask.completed) {
             if (tasklistInsertOrder === 'bottom') completed.unshift(toggledTask);
             else completed.push(toggledTask);
-        } else if (toggledTask.important) {
+        } else if (priorityOf(toggledTask)) {
             important.push(toggledTask);
         } else {
             normal.push(toggledTask);
         }
 
-        return [].concat(important, normal, completed);
+        var ordered = [].concat(important, normal, completed);
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.sort(ordered) : ordered;
     }
 
     // Per-note collapsed state, persisted per user across visits
@@ -514,7 +525,10 @@
     function taskMatchesMode(task) {
         switch (filterMode) {
             case 'open': return !task.completed;
-            case 'important': return !!task.important && !task.completed;
+            // One chip per priority level (#1730)
+            case 'priority-high': return priorityOf(task) === 'high' && !task.completed;
+            case 'priority-medium': return priorityOf(task) === 'medium' && !task.completed;
+            case 'priority-low': return priorityOf(task) === 'low' && !task.completed;
             case 'overdue': return isOverdue(task);
             case 'dated': return !!task.dueAt;
             case 'completed': return !!task.completed;
@@ -768,7 +782,7 @@
         var row = document.createElement('div');
         row.className = 'tasks-task-item'
             + (task.completed ? ' completed' : '')
-            + (task.important && !task.completed ? ' important' : '')
+            + priorityClasses(task)
             + (task.dueAt ? ' has-due' : '');
 
         var checkbox = document.createElement('input');
@@ -801,13 +815,15 @@
             row.appendChild(noteBadge);
         }
 
-        if (task.important && !task.completed) {
-            // The icon sits in a line box of the task's font, where
-            // vertical-align: middle centres it on the lowercase letters
-            // whatever the system font (css/tasks-page.css)
+        if (priorityOf(task) && !task.completed) {
+            // The priority flag, in the colour of its level. The icon sits in
+            // a line box of the task's font, where vertical-align: middle
+            // centres it on the lowercase letters whatever the system font
+            // (css/tasks-page.css)
             var star = document.createElement('span');
             star.className = 'tasks-task-star';
-            star.innerHTML = '<i class="lucide lucide-star"></i>';
+            star.innerHTML = '<i class="lucide lucide-flag"></i>';
+            if (window.poznoteTaskPriority) star.title = window.poznoteTaskPriority.label(priorityOf(task));
             row.appendChild(star);
         }
 
@@ -1007,7 +1023,7 @@
         chip.type = 'button';
         chip.className = 'tasks-cal-chip'
             + (task.completed ? ' completed' : '')
-            + (task.important && !task.completed ? ' important' : '')
+            + priorityClasses(task)
             + (isOverdue(task) ? ' overdue' : '');
         chip.title = (task.text || '') + ' · ' + (note.heading || config.txtUntitled);
 

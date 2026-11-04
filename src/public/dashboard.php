@@ -754,6 +754,7 @@ $pageWidthStyle = poznotePageWidthStyle('dashboard');
 		<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 		<script src="js/request-errors.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+		<script src="<?php echo poznoteAsset('js/task-priority.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/dashboard-note-modal.js'); ?>"></script>
 		<?php // Before dashboard-page.js: the card size and column count are set before the cards are drawn ?>
 		<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>

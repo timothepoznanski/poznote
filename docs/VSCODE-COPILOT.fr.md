@@ -355,7 +355,7 @@ Le serveur MCP de Poznote fournit les outils suivants, que VS Code Copilot peut 
 ### Tâches
 - `list_tasks` : lister les tâches d'une liste de tâches, avec leurs ID et leurs dates d'échéance
 - `add_task` : ajouter une tâche, avec une date d'échéance et un rappel facultatifs
-- `update_task` : mettre à jour une tâche (texte, date d'échéance, rappel, indicateur important)
+- `update_task` : mettre à jour une tâche (texte, date d'échéance, rappel, priorité)
 - `complete_task` : marquer une tâche comme terminée, ou la rouvrir
 - `delete_task` : supprimer une tâche d'une liste de tâches
 - `add_subtask` : ajouter une sous-tâche à une tâche d'une liste de tâches

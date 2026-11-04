@@ -8,10 +8,10 @@
    ========================================================================== */
 
 /* Above the list: the filter (once there are several workspaces) and the
-   "New workspace" button, which stays at the right end of the row */
+   "New workspace" button on one line, the button at the right end */
 .ws-toolbar {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: stretch;
     justify-content: flex-end;
     gap: 8px;
@@ -22,7 +22,8 @@
    section instead of centred */
 .workspace-list .ws-filter {
     /* css/home/responsive.css narrows the settings filter on a phone */
-    flex: 1 1 240px;
+    flex: 1 1 auto;
+    min-width: 0;
     width: auto;
     max-width: none;
     margin: 0;
@@ -703,6 +704,15 @@ html[data-theme='dark'] .shared-edit-token-modal .share-user-list-message.is-err
     
     /* The row stays on one line: the name (and its tags) on the left, Share
        and the "..." menu on the right. */
+    /* "New workspace" keeps its plus only, the name stays in its title */
+    .ws-create-btn {
+        padding: 8px 12px;
+    }
+
+    .ws-create-btn > span {
+        display: none;
+    }
+
     .workspace-list ul li {
         flex-direction: row !important;
         gap: 8px !important;
