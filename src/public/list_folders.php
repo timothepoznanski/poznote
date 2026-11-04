@@ -15,7 +15,7 @@ require_once __DIR__ . '/../version_helper.php';
 $workspace = trim(getWorkspaceFilter());
 
 // Build query to get all folders
-$select_query = "SELECT f.id, f.name, f.icon, f.icon_color, f.display_order, f.parent_id,
+$select_query = "SELECT f.id, f.name, f.icon, f.icon_color, f.title_color, f.display_order, f.parent_id,
                  f.created, f.favorite, f.offline,
                  (SELECT COUNT(*) FROM entries e WHERE e.folder_id = f.id AND e.trash = 0) as note_count
                  FROM folders f";
@@ -311,7 +311,9 @@ function renderFolderListRow($folderId, $folder, $depth, $workspace, $sharedFold
 	echo '<div class="shared-folder-icon" style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: transparent !important; border-radius: 8px; flex: 0 0 auto;">';
 	echo '<i class="' . $folder_icon . '" ' . $icon_style . '></i>';
 	echo '</div>';
-	echo '<span class="folder-name-text" style="font-weight: 500; font-size: 16px; color: var(--pz-text);">' . $folder_name . ' <span style="font-size: 14px; color: var(--pz-text-muted); font-weight: 400;">(' . $note_count . ')</span></span>';
+	// Name in the folder's title colour (discussion #1729, css/components/folder-title.css)
+	$nameAttrs = poznoteFolderTitleAttrs((int)$folder['id'], $folder['title_color'] ?? '');
+	echo '<span class="folder-name-text' . $nameAttrs['class'] . '"' . $nameAttrs['data'] . ' style="font-weight: 500; font-size: 16px; color: var(--pz-text); ' . $nameAttrs['style'] . '">' . $folder_name . ' <span style="font-size: 14px; color: var(--pz-text-muted); font-weight: 400;">(' . $note_count . ')</span></span>';
 	echo '</div>';
 
 	// Folder identity, carried by every action button of the row

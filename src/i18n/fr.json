@@ -1645,7 +1645,9 @@
       "reset": "Reset",
       "search_placeholder": "Rechercher des icônes...",
       "default": "Par défaut",
-      "default_color": "Par défaut"
+      "default_color": "Par défaut",
+      "apply_to_folder_title": "Appliquer la couleur au titre du dossier",
+      "apply_to_note_title": "Appliquer la couleur au titre de la note"
     },
     "linked_selector": {
       "title": "Créer un raccourci d'une note",

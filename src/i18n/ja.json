@@ -1134,7 +1134,9 @@
       "default_icon": "既定のアイコンに設定",
       "reset": "既定の動作に戻す",
       "search_placeholder": "アイコンを検索...",
-      "default_color": "既定"
+      "default_color": "既定",
+      "apply_to_folder_title": "フォルダー名にも色を適用",
+      "apply_to_note_title": "ノートのタイトルにも色を適用"
     },
     "linked_selector": {
       "title": "ノートからショートカットを作成",

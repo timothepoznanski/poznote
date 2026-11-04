@@ -45,7 +45,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
     
     // PRE-LOAD all folders in one query to avoid N+1 problem
     $folders_cache = [];
-    $folders_query = "SELECT id, name, icon, icon_color, kanban_enabled, created, display_order, favorite, offline FROM folders";
+    $folders_query = "SELECT id, name, icon, icon_color, title_color, kanban_enabled, created, display_order, favorite, offline FROM folders";
     if ($workspace_filter) {
         $folders_query .= " WHERE workspace = ?";
         $folders_stmt = $con->prepare($folders_query);
@@ -58,6 +58,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
             'name' => $folder_row['name'],
             'icon' => $folder_row['icon'] ?? null,
             'icon_color' => $folder_row['icon_color'] ?? null,
+            'title_color' => $folder_row['title_color'] ?? null,
             'kanban_enabled' => (int)($folder_row['kanban_enabled'] ?? 0),
             'created' => $folder_row['created'] ?? '',
             'display_order' => (int)($folder_row['display_order'] ?? 0),
@@ -79,6 +80,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
         $folderName = null;
         $folderIcon = null;
         $folderIconColor = null;
+        $folderTitleColor = null;
         $kanbanEnabled = 0;
         $folderCreated = '';
         $displayOrder = 0;
@@ -89,6 +91,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
             $folderName = $folders_cache[$folderId]['name'];
             $folderIcon = $folders_cache[$folderId]['icon'];
             $folderIconColor = $folders_cache[$folderId]['icon_color'];
+            $folderTitleColor = $folders_cache[$folderId]['title_color'];
             $kanbanEnabled = $folders_cache[$folderId]['kanban_enabled'];
             $folderCreated = $folders_cache[$folderId]['created'];
             $displayOrder = $folders_cache[$folderId]['display_order'];
@@ -102,6 +105,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
                 'name' => $folderName,
                 'icon' => $folderIcon,
                 'icon_color' => $folderIconColor,
+                'title_color' => $folderTitleColor,
                 'kanban_enabled' => $kanbanEnabled,
                 'created' => $folderCreated,
                 'display_order' => $displayOrder,
@@ -139,7 +143,7 @@ function organizeNotesByFolder($stmt_left, $con, $workspace_filter, $sort_mode =
  * @return array Updated folders array including empty folders
  */
 function addEmptyFolders($con, $folders, $workspace_filter) {
-    $folders_sql = "SELECT id, name, icon, icon_color, kanban_enabled, created, display_order, favorite, offline FROM folders";
+    $folders_sql = "SELECT id, name, icon, icon_color, title_color, kanban_enabled, created, display_order, favorite, offline FROM folders";
     $params = [];
     if (!empty($workspace_filter)) {
         $folders_sql .= " WHERE workspace = ?";
@@ -154,6 +158,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
         $folderName = $folder_row['name'];
         $folderIcon = $folder_row['icon'] ?? null;
         $folderIconColor = $folder_row['icon_color'] ?? null;
+        $folderTitleColor = $folder_row['title_color'] ?? null;
         $kanbanEnabled = (int)($folder_row['kanban_enabled'] ?? 0);
         $folderCreated = $folder_row['created'] ?? '';
         $displayOrder = (int)($folder_row['display_order'] ?? 0);
@@ -166,6 +171,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
                 'name' => $folderName,
                 'icon' => $folderIcon,
                 'icon_color' => $folderIconColor,
+                'title_color' => $folderTitleColor,
                 'kanban_enabled' => $kanbanEnabled,
                 'created' => $folderCreated,
                 'display_order' => $displayOrder,
@@ -177,6 +183,7 @@ function addEmptyFolders($con, $folders, $workspace_filter) {
             // Update icon, color, kanban_enabled and dates if folder already exists
             $folders[$folderId]['icon'] = $folderIcon;
             $folders[$folderId]['icon_color'] = $folderIconColor;
+            $folders[$folderId]['title_color'] = $folderTitleColor;
             $folders[$folderId]['kanban_enabled'] = $kanbanEnabled;
             $folders[$folderId]['created'] = $folderCreated;
             $folders[$folderId]['display_order'] = $displayOrder;

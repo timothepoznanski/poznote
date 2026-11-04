@@ -1639,7 +1639,9 @@
       "default_icon": "Establecer icono predeterminado",
       "reset": "Restaurar el comportamiento predeterminado",
       "search_placeholder": "Buscar iconos...",
-      "default_color": "Predeterminado"
+      "default_color": "Predeterminado",
+      "apply_to_folder_title": "Aplicar el color al título de la carpeta",
+      "apply_to_note_title": "Aplicar el color al título de la nota"
     },
     "linked_selector": {
       "title": "Crear un atajo de una nota",

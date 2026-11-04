@@ -1134,7 +1134,9 @@
       "default_icon": "Defineix la icona per defecte",
       "reset": "Restaura el comportament per defecte",
       "search_placeholder": "Cerqueu icones...",
-      "default_color": "Per defecte"
+      "default_color": "Per defecte",
+      "apply_to_folder_title": "Aplica el color al títol de la carpeta",
+      "apply_to_note_title": "Aplica el color al títol de la nota"
     },
     "linked_selector": {
       "title": "Creació d'una drecera a partir d'una nota",

@@ -1,0 +1,16 @@
+/**
+ * Folder Title Colour
+ *
+ * A folder whose icon picker had "Apply the color to the folder title"
+ * ticked (folders.title_color, discussion #1729) shows its name in that
+ * colour wherever it is named: the notes tree and its Favorites shortcut,
+ * the Kanban board, the Dashboard cards and the Folders page. The Graph
+ * paints its SVG labels itself (js/graph.js).
+ *
+ * lib/color-palette.php poznoteFolderTitleAttrs() and js/folder-icon.js put
+ * the colour on the name as --folder-title-color. !important: the names of
+ * those views carry their own colour, some of it inline (list_folders.php).
+ */
+[data-folder-title-for].has-title-color {
+    color: var(--folder-title-color) !important;
+}

@@ -1639,7 +1639,9 @@
       "default_icon": "Definir ícone padrão",
       "reset": "Restaurar comportamento padrão",
       "search_placeholder": "Pesquisar ícones...",
-      "default_color": "Padrão"
+      "default_color": "Padrão",
+      "apply_to_folder_title": "Aplicar a cor ao título da pasta",
+      "apply_to_note_title": "Aplicar a cor ao título da nota"
     },
     "linked_selector": {
       "title": "Criar um atalho a partir de uma nota",

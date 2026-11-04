@@ -39,7 +39,7 @@ try {
 
     // 5. Data Fetching
     // Get parent folder info
-    $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color FROM folders WHERE id = ?");
+    $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color, title_color FROM folders WHERE id = ?");
     $stmt->execute([$folder_id]);
     $parentFolder = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -162,7 +162,7 @@ try {
             return [];
         }
 
-        $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color FROM folders WHERE parent_id = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE");
+        $stmt = $con->prepare("SELECT id, name, parent_id, icon, icon_color, title_color FROM folders WHERE parent_id = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE");
         $stmt->execute([$parentId]);
         $folders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -609,7 +609,9 @@ try {
                        data-folder-id="<?php echo $folderId; ?>"
                        data-icon-color="<?php echo htmlspecialchars($iconColor, ENT_QUOTES); ?>"
                        <?php $iconColorCss = poznoteIconColorCss($iconColor); echo $iconColorCss !== '' ? 'style="color: ' . htmlspecialchars($iconColorCss, ENT_QUOTES) . ' !important;"' : ''; ?>></i>
-                    <span class="kanban-subfolder-name"><?php echo htmlspecialchars($folderName, ENT_QUOTES); ?></span>
+                    <?php // Name in the folder's title colour (discussion #1729, css/components/folder-title.css)
+                    $nameAttrs = poznoteFolderTitleAttrs($folderId, $folder['title_color'] ?? ''); ?>
+                    <span class="kanban-subfolder-name<?php echo $nameAttrs['class']; ?>"<?php echo $nameAttrs['data']; ?><?php echo $nameAttrs['style'] !== '' ? ' style="' . $nameAttrs['style'] . '"' : ''; ?>><?php echo htmlspecialchars($folderName, ENT_QUOTES); ?></span>
                     <span class="kanban-subfolder-count"><?php echo $activeCount; ?></span>
                 </button>
                 <button type="button"
@@ -674,10 +676,12 @@ try {
                    data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
                    data-icon-color="<?php echo htmlspecialchars($pIconColor, ENT_QUOTES); ?>"
                    style="cursor: pointer; <?php echo $pIconColorCss !== '' ? "color: {$pIconColorCss} !important;" : ''; ?>"></i>
+                <?php $pNameAttrs = poznoteFolderTitleAttrs($folder_id, $parentFolder['title_color'] ?? ''); ?>
                 <span data-action="rename-folder" 
                       data-folder-id="<?php echo $folder_id; ?>" 
-                      data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"
-                      style="cursor: pointer;"><?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?></span>
+                      data-folder-name="<?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?>"<?php echo $pNameAttrs['data']; ?>
+                      class="kanban-folder-name<?php echo $pNameAttrs['class']; ?>"
+                      style="cursor: pointer; <?php echo $pNameAttrs['style']; ?>"><?php echo htmlspecialchars($parentFolder['name'], ENT_QUOTES); ?></span>
             </h1>
             <div class="kanban-header-actions">
                 <button class="kanban-scroll-btn-header right" id="kanbanScrollRight" title="<?php echo t_h('common.scroll_right', [], 'Scroll Right'); ?>">
@@ -757,10 +761,12 @@ try {
                            data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
                            data-icon-color="<?php echo htmlspecialchars($iconColor, ENT_QUOTES); ?>"
                            style="cursor: pointer; <?php echo $iconColorCss !== '' ? "color: {$iconColorCss} !important;" : ''; ?>"></i>
+                        <?php $colNameAttrs = poznoteFolderTitleAttrs($subfolder['id'], $subfolder['title_color'] ?? ''); ?>
                         <span data-action="rename-folder" 
                               data-folder-id="<?php echo $subfolder['id']; ?>" 
-                              data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"
-                              style="cursor: pointer;"><?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?></span>
+                              data-folder-name="<?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?>"<?php echo $colNameAttrs['data']; ?>
+                              class="kanban-folder-name<?php echo $colNameAttrs['class']; ?>"
+                              style="cursor: pointer; <?php echo $colNameAttrs['style']; ?>"><?php echo htmlspecialchars($subfolder['name'], ENT_QUOTES); ?></span>
                     </div>
                     <div class="kanban-column-header-actions">
                         <button class="kanban-add-card-btn" 

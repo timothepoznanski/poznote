@@ -1639,7 +1639,9 @@
       "default_icon": "Standardsymbol festlegen",
       "reset": "Standardverhalten wiederherstellen",
       "search_placeholder": "Symbole suchen...",
-      "default_color": "Standard"
+      "default_color": "Standard",
+      "apply_to_folder_title": "Farbe auf den Ordnertitel anwenden",
+      "apply_to_note_title": "Farbe auf den Notiztitel anwenden"
     },
     "linked_selector": {
       "title": "Verknüpfung aus einer Notiz erstellen",

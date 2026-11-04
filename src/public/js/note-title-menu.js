@@ -73,12 +73,15 @@
         var selector = '#left_col a.links_arbo_left[data-note-id="' + noteId + '"] .note-title, '
             + '#left_col a.links_arbo_left[data-linked-note-id="' + noteId + '"] .note-title';
         document.querySelectorAll(selector).forEach(function (title) {
+            // data-title-color: read by the icon picker (js/folder-icon.js)
             if (css) {
                 title.classList.add('has-title-color');
                 title.style.setProperty('--note-title-color', css);
+                title.setAttribute('data-title-color', color.toLowerCase());
             } else {
                 title.classList.remove('has-title-color');
                 title.style.removeProperty('--note-title-color');
+                title.removeAttribute('data-title-color');
                 if (!title.getAttribute('style')) title.removeAttribute('style');
             }
         });
@@ -396,4 +399,19 @@
     }, true);
     window.addEventListener('resize', function () { closeMenu(false); });
     window.addEventListener('blur', function () { closeMenu(false); });
+
+    // Title colour set from elsewhere (the icon picker's "Apply the color to
+    // the note title" box, js/folder-icon.js, discussion #1729): the opened
+    // note's title keeps its size, the tree rows follow.
+    window.poznoteSetNoteTitleColor = function (noteId, color) {
+        var hex = HEX_PATTERN.test(color || '') ? color.toLowerCase() : '';
+        var heading = headingOf(noteId);
+        if (heading) {
+            var style = readStyle(heading);
+            style.color = hex;
+            applyStyle(heading, style);
+        } else {
+            paintTree(noteId, hex);
+        }
+    };
 })();

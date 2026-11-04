@@ -1134,7 +1134,9 @@
       "default_icon": "기본 아이콘 설정",
       "reset": "기본 동작 복원",
       "search_placeholder": "아이콘 검색...",
-      "default_color": "기본값"
+      "default_color": "기본값",
+      "apply_to_folder_title": "폴더 제목에 색상 적용",
+      "apply_to_note_title": "노트 제목에 색상 적용"
     },
     "linked_selector": {
       "title": "노트에서 바로가기 만들기",

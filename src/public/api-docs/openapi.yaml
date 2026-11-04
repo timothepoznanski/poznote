@@ -1435,9 +1435,17 @@ paths:
                   type: string
                   example: "#ff9800"
                   description: Icon color (empty string resets)
+                apply_to_title:
+                  type: boolean
+                  description: >
+                    Optional. true gives the note title the icon color too
+                    (title_color, a #rrggbb icon color only). false takes it
+                    back to the default when it had the previous icon color,
+                    and keeps any other title color. Omitted, the title color
+                    is left as it is.
       responses:
         '200':
-          description: Icon updated
+          description: Icon updated, with the resulting title_color
 
   /notes/{id}/offline:
     put:
@@ -4024,9 +4032,20 @@ paths:
                 icon:
                   type: string
                   example: "lucide-folder-open"
+                icon_color:
+                  type: string
+                  example: "#2563eb"
+                  description: Icon color (empty string resets)
+                apply_to_title:
+                  type: boolean
+                  description: >
+                    Optional. true shows the folder name in the icon color too
+                    (title_color, a #rrggbb icon color only). false takes it
+                    back to the default when it had the previous icon color.
+                    Omitted, the name color is left as it is.
       responses:
         '200':
-          description: Icon updated
+          description: Icon updated, with the resulting title_color
         '404':
           description: Folder not found
 

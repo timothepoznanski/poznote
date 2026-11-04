@@ -1134,7 +1134,9 @@
       "default_icon": "Set default icon",
       "reset": "Restore default behavior",
       "search_placeholder": "Search icons...",
-      "default_color": "Default"
+      "default_color": "Default",
+      "apply_to_folder_title": "Apply the color to the folder title",
+      "apply_to_note_title": "Apply the color to the note title"
     },
     "linked_selector": {
       "title": "Create a Shortcut from a Note",

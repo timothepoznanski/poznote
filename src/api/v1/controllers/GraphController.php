@@ -232,11 +232,11 @@ class GraphController
     /**
      * Folders of the workspace, keyed by id.
      *
-     * @return array<int, array{id: int, name: string, parent_id: ?int, icon: ?string, icon_color: ?string}>
+     * @return array<int, array{id: int, name: string, parent_id: ?int, title_color: ?string, icon: ?string, icon_color: ?string}>
      */
     private function loadFolders(string $workspace): array
     {
-        $sql = 'SELECT id, name, parent_id, icon, icon_color FROM folders';
+        $sql = 'SELECT id, name, parent_id, icon, icon_color, title_color FROM folders';
         $params = [];
         if ($workspace !== '') {
             $sql .= ' WHERE workspace = ?';
@@ -248,10 +248,13 @@ class GraphController
         $folders = [];
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $id = (int) $row['id'];
+            // Colour of the name (folders.title_color, discussion #1729)
+            $titleColor = strtolower(trim((string) ($row['title_color'] ?? '')));
             $folders[$id] = [
                 'id'        => $id,
                 'name'      => (string) ($row['name'] ?? ''),
                 'parent_id' => $row['parent_id'] !== null ? (int) $row['parent_id'] : null,
+                'title_color' => preg_match('/^#[0-9a-f]{6}$/', $titleColor) ? $titleColor : null,
             ] + $this->customIcon($row, 'lucide-folder');
         }
         return $folders;
@@ -297,9 +300,9 @@ class GraphController
      * Keeps the folders that hold at least one graph node, directly or
      * through a subfolder: an empty folder would only add a stray dot.
      *
-     * @param array<int, array{id: int, name: string, parent_id: ?int, icon: ?string, icon_color: ?string}> $folders
+     * @param array<int, array{id: int, name: string, parent_id: ?int, title_color: ?string, icon: ?string, icon_color: ?string}> $folders
      * @param array<int, array<string, mixed>> $nodes
-     * @return array<int, array{id: int, name: string, parent_id: ?int, icon: ?string, icon_color: ?string}>
+     * @return array<int, array{id: int, name: string, parent_id: ?int, title_color: ?string, icon: ?string, icon_color: ?string}>
      */
     private function foldersHoldingNotes(array $folders, array $nodes): array
     {

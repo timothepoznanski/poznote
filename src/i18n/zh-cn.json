@@ -1648,7 +1648,9 @@
       "default_icon": "设置默认图标",
       "reset": "恢复默认行为",
       "search_placeholder": "搜索图标...",
-      "default_color": "默认"
+      "default_color": "默认",
+      "apply_to_folder_title": "将颜色应用到文件夹标题",
+      "apply_to_note_title": "将颜色应用到笔记标题"
     },
     "linked_selector": {
       "title": "从笔记创建快捷方式",
