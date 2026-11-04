@@ -4444,6 +4444,19 @@
                 return !section.title.hidden && section.title.style.display !== 'none';
             };
 
+            // The section to open on the person's own side: the one last
+            // open there, or the first one listed
+            var pickUserSectionKey = function () {
+                var candidates = [lastUserSectionKey];
+                try { candidates.push(navStore.getItem(USER_SECTION_STATE_KEY)); } catch (err) { /* storage unavailable */ }
+                navSections.forEach(function (section) { candidates.push(section.key); });
+                for (var i = 0; i < candidates.length; i++) {
+                    var candidate = candidates[i] ? findSection(candidates[i]) : null;
+                    if (candidate && candidate.key !== ADMIN_SECTION_KEY && isSectionAvailable(candidate)) return candidate.key;
+                }
+                return null;
+            };
+
             // The pages opened from here draw the same list without this
             // page's cards to count: they read which sections to leave out.
             var publishHiddenSections = function () {
@@ -4629,13 +4642,7 @@
                         } else {
                             // Back to the section last open on that side,
                             // or to the first one listed.
-                            var candidates = [lastUserSectionKey];
-                            try { candidates.push(navStore.getItem(USER_SECTION_STATE_KEY)); } catch (err) { /* storage unavailable */ }
-                            navSections.forEach(function (section) { candidates.push(section.key); });
-                            for (var i = 0; i < candidates.length && !target; i++) {
-                                var candidate = candidates[i] ? findSection(candidates[i]) : null;
-                                if (candidate && candidate.key !== ADMIN_SECTION_KEY && isSectionAvailable(candidate)) target = candidate.key;
-                            }
+                            target = pickUserSectionKey();
                         }
                         if (target && activateSection(target, true)) syncSectionUrl(target);
                     });
@@ -4651,6 +4658,11 @@
             var initialKey = deepLinkSectionGridId();
             var hashKey = null;
             var hashGroupKey = null;
+            // #scope=user: the Personal side of the switch on the pages
+            // opened from here (settings_shell.php). Without it the saved
+            // choice below would reopen Admin Tools when coming back from an
+            // admin page.
+            var userScopeAsked = false;
             // The former "Actions" section, split into Backup & restore, Export &
             // import, Sync & history, Integrations and Apps: a link or a saved choice naming it opens
             // the first of the three.
@@ -4661,6 +4673,7 @@
             if (!initialKey && window.location.hash) {
                 // #section=admin-tools-grid&group=<key> also names the group
                 var hashParts = decodeURIComponent(window.location.hash.slice(1)).split('&');
+                userScopeAsked = hashParts[0] === 'scope=user';
                 var hashId = hashParts[0].replace(/^section=/, '');
                 hashParts.slice(1).forEach(function (part) {
                     if (part.indexOf('group=') === 0) activeAdminGroupKey = hashGroupKey = part.slice(6);
@@ -4675,6 +4688,10 @@
             }
             if (!activeAdminGroupKey) {
                 try { activeAdminGroupKey = navStore.getItem(ADMIN_GROUP_STATE_KEY); } catch (e) { /* storage unavailable */ }
+            }
+            if (!initialKey && userScopeAsked) {
+                initialKey = pickUserSectionKey();
+                if (initialKey && activateSection(initialKey, true)) syncSectionUrl(initialKey);
             }
             var pinnedSection = findSection('settings-pinned-section-grid');
             if (!initialKey && pinnedSection && isSectionAvailable(pinnedSection)) {

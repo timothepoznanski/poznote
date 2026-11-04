@@ -26,6 +26,13 @@ $s3BackupSectionVisible = S3BackupService::isEnabled()
     && (isCurrentUserAdmin() || !in_array('user_s3_backups', TENANT_ISOLATION_FEATURES, true))
     && !poznoteIsUiElementHidden('card:s3-user-backup-section');
 
+// Local backup self-service section: the user backs up their own account
+// into the local backup folder (Admin Tools > Local Backups). Needs the
+// admin's "Allow users to back up their account" switch (off by default,
+// admins always may); api_local_backup.php enforces the same rule.
+require_once __DIR__ . '/../LocalBackupService.php';
+$localBackupSectionVisible = LocalBackupService::canCurrentUserBackup();
+
 // ?part= shows one part of the page alone, under its own title: the cards of
 // Settings > Backup & restore and Export & import each open one. Without it the page shows them all.
 $backupExportParts = [
@@ -33,6 +40,9 @@ $backupExportParts = [
     'structured-export' => ['id' => 'structured-export-section', 'title' => t('backup_export.sections.structured_export.title', [], 'Structured Export')],
     'attachments-export' => ['id' => 'attachments-export-section', 'title' => t('backup_export.sections.attachments_export.title', [], 'Attachments Export')],
 ];
+if ($localBackupSectionVisible) {
+    $backupExportParts['local'] = ['id' => 'local-user-backup-section', 'title' => t('backup_export.sections.local_backup.title', [], 'Local Backups')];
+}
 if ($s3BackupSectionVisible) {
     $backupExportParts['s3'] = ['id' => 's3-user-backup-section', 'title' => t('backup_export.sections.s3_backup.title', [], 'S3 Backups')];
 }
@@ -292,6 +302,382 @@ function createBackup() {
             </button>
         </div>
 
+        <?php if ($localBackupSectionVisible || $s3BackupSectionVisible): ?>
+        <!-- Confirmation dialogs of the local and S3 backup sections (loaded
+             once: a second copy would redeclare its class and throw) -->
+        <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
+        <!-- Shared by the local and S3 backup sections -->
+        <style>
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-status { margin-top: 12px; font-size: 0.9rem; }
+        /* Backup policy configured by the admin, shown under the description */
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-policy { font-size: 0.9rem; opacity: 0.85; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-policy[hidden] { display: none; }
+        /* Highlight the values that depend on the admin's configuration
+           (same red as .text-warning-bold used elsewhere on this page) */
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-policy-value { color: #dc3545; font-weight: 600; }
+        body.dark-mode :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-policy-value { color: #f87171; }
+        /* Red sentence in the run confirmation modal (appended to body,
+           so the rule cannot be scoped to the section) */
+        .s3-self-overwrite-warning { color: #dc3545; font-weight: 600; }
+        body.dark-mode .s3-self-overwrite-warning { color: #f87171; }
+        /* Successful upload gets a blue info box (same palette as .config-hint
+           on the settings pages, which this page does not load) */
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-status.is-success { padding: 12px; border-radius: 8px; background: #f0f7ff; color: #1a56db; }
+        body.dark-mode :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-status.is-success { background: rgba(99, 102, 241, 0.1); color: #a5b4fc; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table-wrap { overflow-x: auto; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.9rem; }
+        /* Borderless, one line per row: long archive names scroll sideways in
+           the wrapper rather than wrapping onto a second line */
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table th, :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table td { text-align: left; padding: 6px 10px; white-space: nowrap; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table td:last-child { text-align: right; }
+        /* Sortable column headers */
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-sort-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: none; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-sort-btn .s3-self-sort-icon { width: 12px; height: 12px; opacity: 0.35; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-sort-btn:hover .s3-self-sort-icon,
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-sort-btn.s3-self-sort-active .s3-self-sort-icon { opacity: 1; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-sort-btn.s3-self-sort-active { font-weight: 700; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table .btn { display: inline-flex; align-items: center; vertical-align: middle; padding: 3px 10px; font-size: 0.85rem; line-height: 1.4; border: none; margin: 0; box-sizing: border-box; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table a.btn-primary { background-color: #007cba; color: #fff; text-decoration: none; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table a.btn-primary:hover { background-color: #005a8a; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table .btn-danger { background-color: #dc3545; color: #fff; border: none; }
+        :is(#s3-user-backup-section, #local-user-backup-section) .s3-self-table .btn-danger:hover { background-color: #b02a37; }
+        #local-user-backup-section .s3-self-table .btn.row-actions-toggle { padding: 3px 8px; }
+        </style>
+        <?php endif; ?>
+
+        <?php if ($localBackupSectionVisible): ?>
+        <script src="<?php echo poznoteAsset('js/row-actions-menu.js'); ?>"></script>
+        <!-- Local Backups Section (own account), same shape as S3 Backups below -->
+        <div class="backup-section" id="local-user-backup-section"<?php echo $backupPartHidden('local-user-backup-section'); ?>>
+            <h3><?php echo t_h('backup_export.sections.local_backup.title', [], 'Local Backups'); ?></h3>
+            <p><?php echo t_h('backup_export.sections.local_backup.description', [], 'Save a backup archive of your account into the backup folder of this server, and download the archives already stored there.'); ?></p>
+            <p id="localSelfBackupPolicy" class="s3-self-policy" hidden></p>
+            <button id="localSelfBackupBtn" type="button" class="btn btn-primary">
+                <span><?php echo t_h('backup_export.sections.local_backup.backup_now', [], 'Back up my account to the folder'); ?></span>
+            </button>
+            <div id="localSelfBackupStatus" class="s3-self-status" hidden></div>
+            <div class="s3-self-table-wrap">
+                <table class="s3-self-table" id="localSelfBackupTable" hidden>
+                    <thead>
+                        <tr>
+                            <th data-sort-key="filename">
+                                <button type="button" class="s3-self-sort-btn"><?php echo t_h('s3_backup.col_archive', [], 'Archive'); ?><i class="lucide lucide-chevron-down s3-self-sort-icon"></i></button>
+                            </th>
+                            <th data-sort-key="mtime">
+                                <button type="button" class="s3-self-sort-btn"><?php echo t_h('s3_backup.col_date', [], 'Date'); ?><i class="lucide lucide-chevron-down s3-self-sort-icon"></i></button>
+                            </th>
+                            <th data-sort-key="size">
+                                <button type="button" class="s3-self-sort-btn"><?php echo t_h('s3_backup.col_size', [], 'Size'); ?><i class="lucide lucide-chevron-down s3-self-sort-icon"></i></button>
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="localSelfBackupListStatus" class="s3-self-status" hidden></div>
+        </div>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var i18n = {
+                running: <?php echo json_encode(t('backup_export.sections.local_backup.running', [], 'Saving the backup into the folder...')); ?>,
+                done: <?php echo json_encode(t('backup_export.sections.local_backup.done', [], 'Backup saved ({{size}}).')); ?>,
+                error: <?php echo json_encode(t('backup_export.sections.s3_backup.error', [], 'Backup failed: {{error}}')); ?>,
+                listEmpty: <?php echo json_encode(t('backup_export.sections.local_backup.list_empty', [], 'No backup of your account in the folder yet.')); ?>,
+                listError: <?php echo json_encode(t('local_backup.list_error', [], 'Cannot list the backups: {{error}}')); ?>,
+                download: <?php echo json_encode(t('s3_backup.download', [], 'Download')); ?>,
+                deleteLabel: <?php echo json_encode(t('s3_backup.delete', [], 'Delete')); ?>,
+                confirmDelete: <?php echo json_encode(t('local_backup.confirm_delete', [], 'Delete the backup {{filename}} from the folder?')); ?>,
+                deleteDisabled: <?php echo json_encode(t('backup_export.sections.local_backup.delete_disabled', [], 'Deleting backups is disabled by your administrator.')); ?>,
+                actionsLabel: <?php echo json_encode(t('webhooks_admin.actions_menu', [], 'Actions')); ?>,
+                confirmRun: <?php echo json_encode(t('backup_export.sections.local_backup.confirm_run', [], 'Back up your account into the backup folder now? The archive can take a while to build.')); ?>,
+                confirmRunOverwrite: <?php echo json_encode(t('backup_export.sections.s3_backup.confirm_run_overwrite', [], 'Warning: the maximum number of backups is reached, so this backup will delete the oldest archive, {{filename}}.')); ?>,
+                confirmRunTitle: <?php echo json_encode(t('backup_export.sections.local_backup.backup_now', [], 'Back up my account to the folder')); ?>,
+                policyAuto: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_auto', [], 'The administrator has set up an automatic backup {{frequency}}, keeping the last {{retention}} archive(s) per user. Once that number is reached, each new backup deletes the oldest archive.')); ?>,
+                policyAutoKeepAll: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_auto_keep_all', [], 'The administrator has set up an automatic backup {{frequency}}; every archive is kept.')); ?>,
+                policyManual: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_manual', [], 'Automatic backups are disabled; the last {{retention}} archive(s) per user are kept. Once that number is reached, each new backup deletes the oldest archive.')); ?>,
+                policyManualKeepAll: <?php echo json_encode(t('backup_export.sections.s3_backup.policy_manual_keep_all', [], 'Automatic backups are disabled; every archive is kept.')); ?>,
+                freqDaily: <?php echo json_encode(t('s3_backup.frequency_daily_inline', [], 'every day')); ?>,
+                freqWeekly: <?php echo json_encode(t('s3_backup.frequency_weekly_inline', [], 'every week')); ?>,
+                freqMonthly: <?php echo json_encode(t('s3_backup.frequency_monthly_inline', [], 'every 30 days')); ?>
+            };
+            var api = 'api_local_backup.php';
+
+            function formatBytes(bytes) {
+                if (bytes === null || bytes === undefined) return '';
+                var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+                var i = 0, v = bytes;
+                while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+                return (i === 0 ? v : v.toFixed(1)) + ' ' + units[i];
+            }
+
+            function formatTimestamp(epoch) {
+                if (!epoch) return '';
+                var d = new Date(epoch * 1000);
+                try {
+                    return d.toLocaleString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                } catch (e) {
+                    return d.toLocaleString();
+                }
+            }
+
+            var runBtn = document.getElementById('localSelfBackupBtn');
+            var statusEl = document.getElementById('localSelfBackupStatus');
+            var listStatusEl = document.getElementById('localSelfBackupListStatus');
+            var policyEl = document.getElementById('localSelfBackupPolicy');
+            var table = document.getElementById('localSelfBackupTable');
+            var backupList = [];
+            var sortKey = null;
+            var sortDir = 'asc';
+            var currentRetention = 0;
+            var canDelete = false;
+
+            // Same sentences as the S3 section: an automatic backup only
+            // counts when it covers this account
+            function renderPolicy(data) {
+                var freq = { daily: i18n.freqDaily, weekly: i18n.freqWeekly, monthly: i18n.freqMonthly }[data.frequency] || i18n.freqDaily;
+                var retention = Number(data.retention || 0);
+                var keepAll = retention <= 0;
+                var template = data.auto_enabled && data.included
+                    ? (keepAll ? i18n.policyAutoKeepAll : i18n.policyAuto)
+                    : (keepAll ? i18n.policyManualKeepAll : i18n.policyManual);
+                var values = { '{{frequency}}': freq, '{{retention}}': String(retention) };
+                policyEl.textContent = '';
+                template.split(/(\{\{frequency\}\}|\{\{retention\}\})/).forEach(function(part) {
+                    if (part === '') return;
+                    if (Object.prototype.hasOwnProperty.call(values, part)) {
+                        var span = document.createElement('span');
+                        span.className = 's3-self-policy-value';
+                        span.textContent = values[part];
+                        policyEl.appendChild(span);
+                    } else {
+                        policyEl.appendChild(document.createTextNode(part));
+                    }
+                });
+                policyEl.hidden = false;
+            }
+
+            function sortedBackups() {
+                if (!sortKey) return backupList.slice();
+                var numeric = sortKey === 'mtime' || sortKey === 'size';
+                return backupList.slice().sort(function(a, b) {
+                    var cmp = numeric
+                        ? (Number(a[sortKey] || 0) - Number(b[sortKey] || 0))
+                        : String(a[sortKey] || '').localeCompare(String(b[sortKey] || ''), undefined, { sensitivity: 'base', numeric: true });
+                    return sortDir === 'asc' ? cmp : -cmp;
+                });
+            }
+
+            table.querySelectorAll('thead th[data-sort-key]').forEach(function(th) {
+                th.querySelector('.s3-self-sort-btn').addEventListener('click', function() {
+                    var key = th.getAttribute('data-sort-key');
+                    sortDir = (key === sortKey && sortDir === 'asc') ? 'desc' : 'asc';
+                    sortKey = key;
+                    table.querySelectorAll('thead th[data-sort-key]').forEach(function(other) {
+                        var isActive = other.getAttribute('data-sort-key') === sortKey;
+                        var icon = other.querySelector('.s3-self-sort-icon');
+                        other.querySelector('.s3-self-sort-btn').classList.toggle('s3-self-sort-active', isActive);
+                        icon.classList.toggle('lucide-chevron-up', isActive && sortDir === 'asc');
+                        icon.classList.toggle('lucide-chevron-down', !isActive || sortDir === 'desc');
+                        other.setAttribute('aria-sort', isActive ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none');
+                    });
+                    renderBackupRows();
+                });
+            });
+
+            function refreshList() {
+                fetch(api + '?action=self_status', { credentials: 'same-origin' })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        backupList = [];
+                        if (!data.success) {
+                            table.hidden = true;
+                            policyEl.hidden = true;
+                            listStatusEl.hidden = false;
+                            listStatusEl.textContent = i18n.listError.replace('{{error}}', data.error || 'unknown');
+                            return;
+                        }
+                        renderPolicy(data);
+                        currentRetention = Number(data.retention || 0);
+                        canDelete = !!data.can_delete;
+                        if (!data.backups.length) {
+                            table.hidden = true;
+                            listStatusEl.hidden = false;
+                            listStatusEl.textContent = i18n.listEmpty;
+                            return;
+                        }
+                        listStatusEl.hidden = true;
+                        table.hidden = false;
+                        backupList = data.backups;
+                        renderBackupRows();
+                    })
+                    .catch(function(e) {
+                        table.hidden = true;
+                        listStatusEl.hidden = false;
+                        listStatusEl.textContent = i18n.listError.replace('{{error}}', e.message);
+                    });
+            }
+
+            function deleteBackup(backup) {
+                var message = i18n.confirmDelete.replace('{{filename}}', backup.filename);
+                var confirmed = window.modalAlert
+                    ? window.modalAlert.confirm(message, i18n.deleteLabel)
+                    : Promise.resolve(window.confirm(message));
+                confirmed.then(function(ok) {
+                    if (!ok) return;
+                    var body = new URLSearchParams();
+                    body.append('filename', backup.filename);
+                    fetch(api + '?action=self_delete', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: body.toString()
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!data.success) {
+                            statusEl.hidden = false;
+                            statusEl.classList.remove('is-success');
+                            statusEl.textContent = data.error || 'unknown';
+                        }
+                        refreshList();
+                    })
+                    .catch(function() { refreshList(); });
+                });
+            }
+
+            function renderBackupRows() {
+                window.poznoteRowActionsMenu.close();
+                var tbody = table.querySelector('tbody');
+                tbody.innerHTML = '';
+                sortedBackups().forEach(function(backup) {
+                    var tr = document.createElement('tr');
+                    [backup.filename, formatTimestamp(backup.mtime), formatBytes(backup.size)].forEach(function(text) {
+                        var td = document.createElement('td');
+                        td.textContent = text;
+                        tr.appendChild(td);
+                    });
+
+                    var tdActions = document.createElement('td');
+                    tdActions.appendChild(window.poznoteRowActionsMenu.createToggle(i18n.actionsLabel, function() {
+                        return [
+                            { icon: 'lucide-download', label: i18n.download,
+                              href: api + '?action=self_download&filename=' + encodeURIComponent(backup.filename) },
+                            // Greyed out rather than hidden when the admin
+                            // keeps the archives: the title says why
+                            { icon: 'lucide-trash-2', label: i18n.deleteLabel, danger: true,
+                              disabled: !canDelete, title: canDelete ? '' : i18n.deleteDisabled,
+                              onSelect: function() { deleteBackup(backup); } }
+                        ];
+                    }));
+                    tr.appendChild(tdActions);
+                    tbody.appendChild(tr);
+                });
+            }
+
+            function showRunning() {
+                runBtn.disabled = true;
+                statusEl.hidden = false;
+                statusEl.classList.remove('is-success');
+                statusEl.textContent = i18n.running;
+            }
+
+            function showRunOutcome(success, sizeOrError) {
+                statusEl.hidden = false;
+                statusEl.textContent = success
+                    ? i18n.done.replace('{{size}}', formatBytes(sizeOrError))
+                    : i18n.error.replace('{{error}}', sizeOrError || 'unknown');
+                statusEl.classList.toggle('is-success', success);
+                runBtn.disabled = false;
+                refreshList();
+            }
+
+            function pollRunJob(jobId) {
+                var url = api + '?action=run_status' + (jobId ? '&job_id=' + encodeURIComponent(jobId) : '');
+                var timer = setInterval(function() {
+                    fetch(url, { credentials: 'same-origin' })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            var job = data.success ? data.job : null;
+                            if (!job) {
+                                clearInterval(timer);
+                                showRunOutcome(false, 'unknown');
+                                return;
+                            }
+                            if (job.status === 'queued' || job.status === 'running') return;
+                            clearInterval(timer);
+                            if (job.status === 'done') {
+                                showRunOutcome(true, job.size || 0);
+                            } else {
+                                showRunOutcome(false, job.error);
+                            }
+                        })
+                        .catch(function() { /* transient network error: keep polling */ });
+                }, 2000);
+            }
+
+            runBtn.addEventListener('click', function() {
+                if (runBtn.disabled) return;
+                // At the retention limit, this backup prunes the oldest
+                // archive: name it in the confirmation
+                var overwriteText = '';
+                if (currentRetention > 0 && backupList.length >= currentRetention) {
+                    var oldest = backupList.reduce(function(a, b) {
+                        return Number(b.mtime || 0) < Number(a.mtime || 0) ? b : a;
+                    });
+                    overwriteText = i18n.confirmRunOverwrite.replace('{{filename}}', oldest.filename);
+                }
+                var confirmed;
+                if (window.modalAlert) {
+                    var options = null;
+                    if (overwriteText) {
+                        var messageNode = document.createDocumentFragment();
+                        messageNode.appendChild(document.createTextNode(i18n.confirmRun + '\n\n'));
+                        var warnSpan = document.createElement('span');
+                        warnSpan.className = 's3-self-overwrite-warning';
+                        warnSpan.textContent = overwriteText;
+                        messageNode.appendChild(warnSpan);
+                        options = { messageNode: messageNode };
+                    }
+                    confirmed = window.modalAlert.confirm(i18n.confirmRun, i18n.confirmRunTitle, options);
+                } else {
+                    confirmed = Promise.resolve(window.confirm(overwriteText ? i18n.confirmRun + '\n\n' + overwriteText : i18n.confirmRun));
+                }
+                confirmed.then(function(ok) {
+                    if (!ok) return;
+                    showRunning();
+                    // Background job, like the S3 backup: building a large
+                    // account outlives a proxied request
+                    fetch(api + '?action=self_run', { method: 'POST', credentials: 'same-origin' })
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (!data.success) {
+                                showRunOutcome(false, data.error);
+                                return;
+                            }
+                            pollRunJob(data.job_id);
+                        })
+                        .catch(function(e) { showRunOutcome(false, e.message); });
+                });
+            });
+
+            // A backup started earlier (or in another tab) may still run
+            fetch(api + '?action=run_status', { credentials: 'same-origin' })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var job = data.success ? data.job : null;
+                    if (job && (job.status === 'queued' || job.status === 'running')) {
+                        showRunning();
+                        pollRunJob(job.id);
+                    }
+                })
+                .catch(function() { /* nothing to resume */ });
+
+            refreshList();
+        });
+        </script>
+        <?php endif; ?>
+
         <?php if ($s3BackupSectionVisible): ?>
         <!-- S3 Backups Section (own account) -->
         <div class="backup-section" id="s3-user-backup-section"<?php echo $backupPartHidden('s3-user-backup-section'); ?>>
@@ -323,42 +709,6 @@ function createBackup() {
             </div>
             <div id="s3SelfBackupListStatus" class="s3-self-status" hidden></div>
         </div>
-        <style>
-        #s3-user-backup-section .s3-self-status { margin-top: 12px; font-size: 0.9rem; }
-        /* Backup policy configured by the admin, shown under the description */
-        #s3-user-backup-section .s3-self-policy { font-size: 0.9rem; opacity: 0.85; }
-        #s3-user-backup-section .s3-self-policy[hidden] { display: none; }
-        /* Highlight the values that depend on the admin's configuration
-           (same red as .text-warning-bold used elsewhere on this page) */
-        #s3-user-backup-section .s3-self-policy-value { color: #dc3545; font-weight: 600; }
-        body.dark-mode #s3-user-backup-section .s3-self-policy-value { color: #f87171; }
-        /* Red sentence in the run confirmation modal (appended to body,
-           so the rule cannot be scoped to the section) */
-        .s3-self-overwrite-warning { color: #dc3545; font-weight: 600; }
-        body.dark-mode .s3-self-overwrite-warning { color: #f87171; }
-        /* Successful upload gets a blue info box (same palette as .config-hint
-           on the settings pages, which this page does not load) */
-        #s3-user-backup-section .s3-self-status.is-success { padding: 12px; border-radius: 8px; background: #f0f7ff; color: #1a56db; }
-        body.dark-mode #s3-user-backup-section .s3-self-status.is-success { background: rgba(99, 102, 241, 0.1); color: #a5b4fc; }
-        #s3-user-backup-section .s3-self-table-wrap { overflow-x: auto; }
-        #s3-user-backup-section .s3-self-table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.9rem; }
-        /* Borderless, one line per row: long archive names scroll sideways in
-           the wrapper rather than wrapping onto a second line */
-        #s3-user-backup-section .s3-self-table th, #s3-user-backup-section .s3-self-table td { text-align: left; padding: 6px 10px; white-space: nowrap; }
-        #s3-user-backup-section .s3-self-table td:last-child { text-align: right; }
-        /* Sortable column headers */
-        #s3-user-backup-section .s3-self-sort-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: none; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; }
-        #s3-user-backup-section .s3-self-sort-btn .s3-self-sort-icon { width: 12px; height: 12px; opacity: 0.35; }
-        #s3-user-backup-section .s3-self-sort-btn:hover .s3-self-sort-icon,
-        #s3-user-backup-section .s3-self-sort-btn.s3-self-sort-active .s3-self-sort-icon { opacity: 1; }
-        #s3-user-backup-section .s3-self-sort-btn.s3-self-sort-active { font-weight: 700; }
-        #s3-user-backup-section .s3-self-table .btn { display: inline-flex; align-items: center; vertical-align: middle; padding: 3px 10px; font-size: 0.85rem; line-height: 1.4; border: none; margin: 0; box-sizing: border-box; }
-        #s3-user-backup-section .s3-self-table a.btn-primary { background-color: #007cba; color: #fff; text-decoration: none; }
-        #s3-user-backup-section .s3-self-table a.btn-primary:hover { background-color: #005a8a; }
-        #s3-user-backup-section .s3-self-table .btn-danger { background-color: #dc3545; color: #fff; border: none; }
-        #s3-user-backup-section .s3-self-table .btn-danger:hover { background-color: #b02a37; }
-        </style>
-        <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             var i18n = {

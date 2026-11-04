@@ -221,6 +221,38 @@ function poznoteJobIsWorkerStale(int $userId, array $job): bool {
 }
 
 /**
+ * The user's active restore-family job (complete restore OR notes import),
+ * whatever type the caller wants to start: both flows rewrite the account's
+ * data, so they must never run concurrently, even across types, nor across
+ * entry points (the Restore page, or an admin restoring from the local
+ * backup folder). Stale jobs (abandoned upload, dead worker) are removed on
+ * the way, so the caller may take over.
+ */
+function poznoteJobFindActiveRestoreFamily(int $userId): ?array {
+    foreach ([POZNOTE_JOB_TYPE_RESTORE, POZNOTE_JOB_TYPE_NOTES_IMPORT] as $type) {
+        $active = poznoteJobFindActive($userId, $type);
+        if ($active === null) {
+            continue;
+        }
+        $stale = ($active['status'] ?? '') === 'uploading'
+            // Only take over an upload that has gone quiet: an active one
+            // (another tab or device mid-upload) must not have its chunks
+            // deleted out from under it.
+            ? poznoteJobIsUploadStale($userId, $active)
+            // A queued/running job whose worker died (no state update for a
+            // long time): removable rather than blocking until the 24 h
+            // cleanup.
+            : poznoteJobIsWorkerStale($userId, $active);
+        if ($stale) {
+            poznoteJobDelete($userId, (string)$active['id']);
+            continue;
+        }
+        return $active;
+    }
+    return null;
+}
+
+/**
  * Prune this user's expired jobs. A running job past the age limit is
  * considered abandoned (worker killed, container restarted) and removed too.
  */

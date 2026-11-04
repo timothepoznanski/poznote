@@ -1142,13 +1142,17 @@ Administrators can have complete backup archives (one ZIP per user, identical to
 
 Configure it in **Settings > Local Backups** (administrators only).
 
-- **Backup folder**: An absolute path on the server (inside the container with Docker). Left empty, the archives go to `data/backups`, which is already part of the data volume. The folder is created if needed and must be writable by the web server user.
-- **User selection**: Checkboxes choose which users are covered by the backups. Everyone is checked by default, and while everyone is checked, new accounts are included automatically.
-- **Manual backups**: A "Back up now" button saves a fresh archive for each selected user, one user at a time, with per-user progress. It works even when automatic backups are off.
-- **Automatic backups**: When enabled, a background worker backs up the selected users on the chosen frequency (daily, weekly, or monthly). The first run happens within a few minutes of enabling, the next ones after the chosen interval. The page shows the result of the last run and the date of the next one.
-- **Retention**: Only the most recent N archives are kept per user, older ones are deleted from the folder after each backup (0 keeps everything).
-- **Browsing**: The page lists the archives currently in the folder, with download and delete actions.
-- **Restore**: Archives are stored under `{user id}/` in the backup folder and can be restored with the standard [Restore / Import](#restore--import) page.
+- **Configuration**: The backup folder and the retention, shared by the automatic and the manual backups.
+  - **Backup folder**: An absolute path on the server (inside the container with Docker). Left empty, the archives go to `data/backups`, which is already part of the data volume. The folder is created if needed and must be writable by the web server user.
+  - **Retention**: Only the most recent N archives are kept per user, older ones are deleted from the folder after each backup (0 keeps everything).
+- **Automatic backups**: When enabled, a background worker backs up the users checked in this box on the chosen frequency (daily, weekly, or monthly). Everyone is checked by default, and while everyone is checked, new accounts are included automatically. The first run happens within a few minutes of enabling, the next ones after the chosen interval. The box shows the result of the last automatic run and the date of the next one.
+- **Manual backups**: The manual backup box has its own user checkboxes, nothing checked by default, and a "Back up now" button that saves a fresh archive for each checked user, one user at a time, with per-user progress. This selection is not saved and does not change the automatic backups, which may even be off.
+- **Browsing**: The page lists the archives currently in the folder. The actions menu of each archive downloads it, restores it into the account it belongs to, or deletes it.
+- **Access for users**: Archives are stored under `{user id}/` in the backup folder. Three switches, all off by default, open the folder to the users:
+  - **Allow users to back up their account** adds a "Local Backups" section to the Backup / Export page of every user, placed before the S3 one. Each user can save a backup of their own account into the folder, then download their archives from the actions menu of each one. These archives count toward the retention limit like the others.
+  - **Allow users to delete their archives**: while it is off, the Delete entry of that menu is greyed out, so users cannot remove the archives of their account, including those of the automatic backups. The retention limit still prunes the oldest ones.
+  - **Allow users to restore their account** adds a "Restore from a local backup" section to the [Restore / Import](#restore--import) page of every user who has archives in the folder. While it is off, those users see a message asking their administrator to restore an archive for them or to enable restoring.
+  - Administrators can always do both, and restore any archive from the list. A downloaded archive can still be restored with the standard restore.
 - **Account deletion**: Deleting an account also deletes its archives from the backup folder.
 
 To keep the backups on another disk or on a network share, mount it in the container and enter the container path (`/backups` in this example) as the backup folder:

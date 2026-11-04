@@ -10,6 +10,7 @@ require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../version_helper.php';
 require_once __DIR__ . '/../import_helpers.php';
 require_once __DIR__ . '/../S3BackupService.php';
+require_once __DIR__ . '/../LocalBackupService.php';
 
 $currentLang = getUserLanguage();
 $pageWorkspace = trim(getWorkspaceFilter());
@@ -22,6 +23,16 @@ $pageWorkspace = trim(getWorkspaceFilter());
 $s3RestoreSectionVisible = S3BackupService::isEnabled()
     && (isCurrentUserAdmin() || !in_array('user_s3_restore', TENANT_ISOLATION_FEATURES, true))
     && !poznoteIsUiElementHidden('card:s3RestoreSection');
+
+// Restore from a local backup section: the account's own archives in the
+// local backup folder (Admin Tools > Local Backups). No master switch, so it
+// only shows when there is something to restore. Restoring itself needs the
+// admin's "Restore by users" switch (off by default, admins always may);
+// without it the section only tells the user to contact an administrator.
+// api_restore_upload.php?action=start_local enforces the same rule.
+$localRestoreBackups = LocalBackupService::restorePageBackups();
+$localRestoreSectionVisible = !empty($localRestoreBackups);
+$localRestoreAllowed = $localRestoreSectionVisible && LocalBackupService::canCurrentUserRestore();
 
 // Variables for specific section messages
 $restore_message = '';
@@ -187,6 +198,9 @@ $restoreImportParts = [
     'restore-standard' => t('restore_import.sections.standard_restore.title', [], 'Standard Restore'),
     'import' => t('settings.cards.import_notes', [], 'Import notes'),
 ];
+if ($localRestoreSectionVisible) {
+    $restoreImportParts['restore-local'] = t('restore_import.sections.local_restore.title', [], 'Restore from a local backup');
+}
 if (!poznoteIsUiElementHidden('card:directCopyRestoreCard')) {
     $restoreImportParts['restore-direct-copy'] = t('settings.cards.restore_direct_copy', [], 'Restore by direct copy');
 }
@@ -209,6 +223,7 @@ $restoreBackupContentOpen = $restoreImportIsRestorePart
 $standardRestoreContentOpen = $restoreImportPart === 'restore-standard' || ($restoreImportPostAllowed && $restoreImportAction === 'complete_restore');
 $directCopyRestoreContentOpen = $restoreImportPart === 'restore-direct-copy' || $directCopyRestoreSubmitted || ($restoreImportPostAllowed && $restoreImportAction === 'check_cli_upload');
 $s3RestoreContentOpen = $restoreImportPart === 'restore-s3' || $restoreImportPostAllowed && $restoreImportAction === 'restore_s3_backup';
+$localRestoreContentOpen = $restoreImportPart === 'restore-local';
 ?>
 
 <!DOCTYPE html>
@@ -322,6 +337,84 @@ $s3RestoreContentOpen = $restoreImportPart === 'restore-s3' || $restoreImportPos
             </div>
         </div>
 
+        <?php if ($s3RestoreSectionVisible || $localRestoreSectionVisible): ?>
+        <!-- Confirmation dialogs of the S3 and local backup restores (loaded
+             once: a second copy would redeclare its class and throw) -->
+        <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
+        <?php endif; ?>
+
+        <?php if ($localRestoreSectionVisible): ?>
+        <!-- Restore From a Local Backup Section -->
+        <div class="sub-card" id="localRestoreSection"<?php echo $restoreSubCardHidden('restore-local'); ?>>
+            <div class="sub-card-header" data-action="toggle-sub-card" data-target="localRestoreContent">
+                <h4>
+                    <?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a local backup'); ?>
+                </h4>
+            </div>
+            <div class="sub-card-content<?php echo $localRestoreContentOpen ? ' open' : ''; ?>" id="localRestoreContent">
+                <p><?php echo t_h('restore_import.sections.local_restore.description', [], 'Restore your account directly from one of the backup archives saved in the backup folder of this server.'); ?></p>
+
+                <?php if ($localRestoreAllowed): ?>
+                <div class="form-group">
+                    <select id="localRestoreSelect" class="form-control form-select-styled">
+                        <?php foreach ($localRestoreBackups as $localBackup):
+                            $localBackupSize = (int)$localBackup['size'];
+                            $localBackupUnits = ['B', 'KB', 'MB', 'GB', 'TB'];
+                            $localBackupUnit = 0;
+                            $localBackupValue = (float)$localBackupSize;
+                            while ($localBackupValue >= 1024 && $localBackupUnit < count($localBackupUnits) - 1) {
+                                $localBackupValue /= 1024;
+                                $localBackupUnit++;
+                            }
+                            $localBackupSizeLabel = ($localBackupUnit === 0 ? (string)$localBackupSize : number_format($localBackupValue, 1, '.', '')) . ' ' . $localBackupUnits[$localBackupUnit];
+                        ?>
+                        <option value="<?php echo htmlspecialchars($localBackup['filename'], ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($localBackup['filename'] . ' (' . $localBackupSizeLabel . ')', ENT_QUOTES, 'UTF-8'); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <button type="button" id="localRestoreBtn" class="btn btn-primary">
+                    <?php echo t_h('restore_import.buttons.start_restore'); ?>
+                </button>
+                <!-- Progress is shown by the shared restore bar below. -->
+                <?php else: ?>
+                <div class="alert alert-warning local-restore-disabled" role="note">
+                    <i class="lucide lucide-info"></i>
+                    <span><?php echo t_h('restore_import.sections.local_restore.disabled', ['count' => count($localRestoreBackups)], 'Your account has {{count}} backup(s) in the backup folder of this server, but restoring them yourself is not enabled. Ask your administrator to restore one for you, or to enable restoring from this page.'); ?></span>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php if ($localRestoreAllowed): ?>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var i18n = {
+                confirm: <?php echo json_encode(t('restore_import.sections.local_restore.confirm', [], 'Restore your account from {{filename}}? Your current notes, attachments and settings will be replaced by the archive content.')); ?>,
+                confirmTitle: <?php echo json_encode(t('restore_import.sections.local_restore.title', [], 'Restore from a local backup')); ?>
+            };
+            var select = document.getElementById('localRestoreSelect');
+            var btn = document.getElementById('localRestoreBtn');
+
+            btn.addEventListener('click', function() {
+                if (!select.value) return;
+                var message = i18n.confirm.replace('{{filename}}', select.value);
+                var confirmed = window.modalAlert
+                    ? window.modalAlert.confirm(message, i18n.confirmTitle)
+                    : Promise.resolve(window.confirm(message));
+                confirmed.then(function(ok) {
+                    if (!ok) return;
+                    btn.disabled = true;
+                    // Background job, like the S3 restore: progress is shown
+                    // by the shared bar below.
+                    startLocalRestore(select.value).then(function() {
+                        btn.disabled = false;
+                    });
+                });
+            });
+        });
+        </script>
+        <?php endif; ?>
+        <?php endif; ?>
+
         <!-- Direct Copy Restore Section (hideable via UI customization, per
              user or enforced instance-wide by the admin) -->
         <?php if (!poznoteIsUiElementHidden('card:directCopyRestoreCard')): ?>
@@ -418,7 +511,6 @@ $s3RestoreContentOpen = $restoreImportPart === 'restore-s3' || $restoreImportPos
                 </form>
             </div>
         </div>
-        <script src="<?php echo poznoteAsset('js/modal-alerts.js'); ?>"></script>
         <script>
         document.addEventListener('DOMContentLoaded', function() {
             var i18n = {
@@ -496,8 +588,10 @@ $s3RestoreContentOpen = $restoreImportPart === 'restore-s3' || $restoreImportPos
         </script>
         <?php endif; ?>
 
-            <!-- Shared restore feedback for both background restore flows
-                 (uploaded archive and archive fetched from the bucket): one
+
+            <!-- Shared restore feedback for every background restore flow
+                 (uploaded archive, archive fetched from the bucket or read
+                 from the local backup folder): one
                  bar covering the whole pipeline, from transfer to the last
                  restored attachment. Placed at card level so it is visible
                  whichever sub-card started the restore. -->
@@ -837,6 +931,9 @@ $s3RestoreContentOpen = $restoreImportPart === 'restore-s3' || $restoreImportPos
        the hidden state or the cancel control stays on screen for the whole
        transfer and after the job has finished. */
     .chunked-restore-cancel.initially-hidden { display: none; }
+        /* Restore from a local backup, when the admin has not enabled it */
+        .local-restore-disabled { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0; }
+        .local-restore-disabled .lucide { flex: none; margin-top: 2px; background-color: currentColor; }
     </style>
     <!-- Configuration for JavaScript -->
     <script type="application/json" id="restore-import-config"><?php

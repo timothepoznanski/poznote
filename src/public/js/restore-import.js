@@ -1009,20 +1009,21 @@ function chunkedRestoreOpenCards(extraIds) {
 }
 
 /**
- * Restore from an archive already in the S3 bucket. Same background job and
- * same progress UI as an uploaded archive: fetching a large archive from the
+ * Restore from an archive already stored on the server side: in the S3
+ * bucket, or in the local backup folder. Same background job and same
+ * progress UI as an uploaded archive: fetching a large archive from the
  * bucket and restoring it is exactly as slow, so it cannot live inside an
  * HTTP request either.
  */
-function startS3Restore(s3Key, retried) {
-    chunkedRestoreOpenCards(['s3RestoreContent']);
+function startStoredRestore(contentId, action, field, value, retried) {
+    chunkedRestoreOpenCards([contentId]);
     chunkedRestoreSetBusy(true);
     chunkedRestoreShowProgress(2, chunkedRestoreText('queued', 'Restore starting...'));
 
     const body = new FormData();
-    body.append('action', 'start_s3');
+    body.append('action', action);
     body.append('csrf_token', chunkedRestoreConfig().csrfToken || '');
-    body.append('s3_backup_key', s3Key);
+    body.append(field, value);
 
     return chunkedRestoreFetch(body)
         .then(function (data) {
@@ -1034,7 +1035,7 @@ function startS3Restore(s3Key, retried) {
             if (busy) {
                 if (!retried && restoreFamilyUploadIsAbandoned(busy)) {
                     return restoreFamilyAbortJob(busy).then(function () {
-                        return startS3Restore(s3Key, true);
+                        return startStoredRestore(contentId, action, field, value, true);
                     });
                 }
                 restoreFamilyRenderJob(busy);
@@ -1043,6 +1044,14 @@ function startS3Restore(s3Key, retried) {
             }
             chunkedRestoreShowResult(false, chunkedRestoreText('error', 'The restore failed: {{error}}', { error: e.message }));
         });
+}
+
+function startS3Restore(s3Key) {
+    return startStoredRestore('s3RestoreContent', 'start_s3', 's3_backup_key', s3Key);
+}
+
+function startLocalRestore(filename) {
+    return startStoredRestore('localRestoreContent', 'start_local', 'local_backup_filename', filename);
 }
 
 function chunkedRestoreResume() {

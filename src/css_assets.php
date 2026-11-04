@@ -224,6 +224,7 @@ function poznoteCssManifest(): array
         'backup_export' => [
             'css/lucide.css',
             '@components',
+            'css/components/row-actions-menu.css',
             'css/backup_export.css',
             '@modals',
             'css/modal-alerts.css',
@@ -468,6 +469,7 @@ function poznoteCssManifest(): array
         'local_backup_settings' => [
             'css/lucide.css',
             '@components',
+            'css/components/row-actions-menu.css',
             '@home',
             'css/settings.css',
             'css/git-sync.css',

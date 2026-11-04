@@ -23,6 +23,9 @@
  *   POST ?action=finalize  All chunks sent: queue the assemble+process job
  *   POST ?action=start_s3  Queue a restore from an archive already in the
  *                          bucket (s3_backup_key), no upload involved
+ *   POST ?action=start_local  Queue a restore from one of the user's own
+ *                          archives in the local backup folder
+ *                          (local_backup_filename), no upload involved
  *   GET  ?action=status    State of the job (upload_id)
  *   POST ?action=abort     Drop an unfinished upload and its chunks
  */
@@ -89,7 +92,7 @@ function restoreUploadJob(int $userId): ?array {
     return $job;
 }
 
-function restoreUploadFail(int $code, string $error): void {
+function restoreUploadFail(int $code, string $error): never {
     http_response_code($code);
     echo json_encode(['success' => false, 'error' => $error]);
     exit;
@@ -113,37 +116,6 @@ function restoreUploadState(int $userId, array $job): array {
         $state['stale'] = false;
     }
     return $state;
-}
-
-/**
- * The user's active restore-family job (complete restore OR notes import),
- * whatever type the caller wants to start: both flows rewrite the account's
- * data, so they must never run concurrently, even across types. Stale jobs
- * (abandoned upload, dead worker) are removed on the way, so the caller may
- * take over.
- */
-function restoreFamilyActiveJob(int $userId): ?array {
-    foreach ([POZNOTE_JOB_TYPE_RESTORE, POZNOTE_JOB_TYPE_NOTES_IMPORT] as $type) {
-        $active = poznoteJobFindActive($userId, $type);
-        if ($active === null) {
-            continue;
-        }
-        $stale = ($active['status'] ?? '') === 'uploading'
-            // Only take over an upload that has gone quiet: an active one
-            // (another tab or device mid-upload) must not have its chunks
-            // deleted out from under it.
-            ? poznoteJobIsUploadStale($userId, $active)
-            // A queued/running job whose worker died (no state update for a
-            // long time): removable rather than blocking until the 24 h
-            // cleanup.
-            : poznoteJobIsWorkerStale($userId, $active);
-        if ($stale) {
-            poznoteJobDelete($userId, (string)$active['id']);
-            continue;
-        }
-        return $active;
-    }
-    return null;
 }
 
 /**
@@ -173,7 +145,7 @@ switch ($action) {
     case 'init': {
         poznoteJobCleanup($currentUserId);
 
-        $active = restoreFamilyActiveJob($currentUserId);
+        $active = poznoteJobFindActiveRestoreFamily($currentUserId);
         if ($active !== null) {
             restoreFamilyRefuseBusy($currentUserId, $active);
         }
@@ -329,7 +301,7 @@ switch ($action) {
         }
 
         poznoteJobCleanup($currentUserId);
-        $active = restoreFamilyActiveJob($currentUserId);
+        $active = poznoteJobFindActiveRestoreFamily($currentUserId);
         if ($active !== null) {
             restoreFamilyRefuseBusy($currentUserId, $active);
         }
@@ -338,6 +310,46 @@ switch ($action) {
             $job = poznoteJobCreate($currentUserId, POZNOTE_JOB_TYPE_RESTORE, [
                 's3_key' => $key,
                 'original_name' => basename($key),
+            ], 'queued');
+            poznoteJobSpawnRunner($currentUserId, (string)$job['id']);
+        } catch (Throwable $e) {
+            restoreUploadFail(500, $e->getMessage());
+        }
+
+        echo json_encode(['success' => true, 'job' => restoreUploadState($currentUserId, $job)]);
+        exit;
+    }
+
+    case 'start_local': {
+        // Same flow as start_s3, the archive being read in place from the
+        // local backup folder by the worker.
+        require_once __DIR__ . '/../LocalBackupService.php';
+        // The hidden-elements rule reads the user's settings table
+        require_once __DIR__ . '/../db_connect.php';
+
+        if (!LocalBackupService::canCurrentUserRestore()) {
+            restoreUploadFail(403, 'Restoring from a local backup is not enabled for your account. Contact your administrator.');
+        }
+
+        // Only the user's own folder: backupPath() takes the session user
+        // id, never one from the request.
+        $filename = (string)($_POST['local_backup_filename'] ?? '');
+        $path = LocalBackupService::backupPath($currentUserId, $filename);
+        if ($path === null || !is_readable($path)) {
+            restoreUploadFail(400, 'Invalid backup archive.');
+        }
+
+        poznoteJobCleanup($currentUserId);
+        $active = poznoteJobFindActiveRestoreFamily($currentUserId);
+        if ($active !== null) {
+            restoreFamilyRefuseBusy($currentUserId, $active);
+        }
+
+        try {
+            $job = poznoteJobCreate($currentUserId, POZNOTE_JOB_TYPE_RESTORE, [
+                'local_backup_user_id' => $currentUserId,
+                'local_backup_filename' => basename($path),
+                'original_name' => basename($path),
             ], 'queued');
             poznoteJobSpawnRunner($currentUserId, (string)$job['id']);
         } catch (Throwable $e) {

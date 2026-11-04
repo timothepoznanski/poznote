@@ -962,8 +962,10 @@
       "collapse_all": "Collapse all",
       "expand_all": "Expand all",
       "direct_copy_restore_section": "Restore page: \"Restore when standard restore doesn't work\" section",
+      "local_backups_section": "Backup page: \"Local Backups\" section",
       "s3_backups_section": "Backup page: \"S3 Backups\" section",
       "s3_restore_section": "Restore page: \"Restore from S3\" section",
+      "local_restore_section": "Restore page: \"Restore from a local backup\" section",
       "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?",
       "folder_actions_toggle": "Menu button (⋮) on folders",
       "note_actions_toggle": "Menu button (⋮) on notes",
@@ -2188,6 +2190,16 @@
         "description": "Download all the attachments of your account in a single ZIP archive.",
         "description_s3": "With S3 storage enabled, the files are fetched from the bucket; use this archive to add the missing files to a backup made without S3 attachments before restoring it."
       },
+      "local_backup": {
+        "title": "Local Backups",
+        "description": "Save a backup archive of your account into the backup folder of this server, and download the archives already stored there.",
+        "backup_now": "Back up my account to the folder",
+        "running": "Saving the backup into the folder...",
+        "done": "Backup saved ({{size}}).",
+        "list_empty": "No backup of your account in the folder yet.",
+        "confirm_run": "Back up your account into the backup folder now? The archive can take a while to build.",
+        "delete_disabled": "Deleting backups is disabled by your administrator."
+      },
       "s3_backup": {
         "title": "S3 Backups",
         "description": "Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.",
@@ -2448,6 +2460,12 @@
         "loading": "Loading...",
         "empty": "No backup of your account in the bucket yet.",
         "confirm": "Restore your account from {{filename}}? Your current notes, attachments and settings will be replaced by the archive content."
+      },
+      "local_restore": {
+        "title": "Restore from a local backup",
+        "description": "Restore your account directly from one of the backup archives saved in the backup folder of this server.",
+        "confirm": "Restore your account from {{filename}}? Your current notes, attachments and settings will be replaced by the archive content.",
+        "disabled": "Your account has {{count}} backup(s) in the backup folder of this server, but restoring them yourself is not enabled. Ask your administrator to restore one for you, or to enable restoring from this page."
       }
     },
     "buttons": {
@@ -4980,12 +4998,12 @@
     "title": "Local Backups",
     "description": "Save complete backup archives (one ZIP per user, identical to the Complete Backup download) into a folder of the server, manually or automatically on a schedule.",
     "description_scope": "The setting applies to all users of this instance.",
-    "enable_description": "Back up the selected users into the folder on the schedule below. Manual backups from this page work even with this switch off.",
+    "enable_description": "Back up the users checked below into the folder on the chosen schedule.",
     "directory_label": "Backup folder",
     "directory_description": "Absolute path on the server (inside the container with Docker). Leave empty to use {{default}}. To store the backups somewhere else, mount a volume and enter its path here.",
     "retention_description": "Older archives are deleted from the folder after each backup. 0 keeps everything.",
-    "manual_description": "Back up the selected users into the folder right now, one user at a time.",
-    "confirm_run": "Back up the selected users into the backup folder now?",
+    "manual_description": "Back up the users checked below into the folder right now, one user at a time. This selection is not saved and does not change the automatic backups.",
+    "confirm_run": "Back up the {{count}} checked user(s) into the backup folder now?",
     "run_done": "Backup finished: {{saved}}/{{total}} user(s) backed up.",
     "user_ok": "{{username}}: saved ({{size}})",
     "last_run": "Last run ({{trigger}}): {{date}}, {{saved}}/{{total}} user(s) backed up.",
@@ -4994,12 +5012,30 @@
     "list_empty": "No backup in the folder yet.",
     "list_error": "Cannot list the backups: {{error}}",
     "confirm_delete": "Delete the backup {{filename}} from the folder?",
+    "restore": "Restore",
+    "restore_title": "Restore a backup",
+    "confirm_restore": "Restore the account {{username}} from {{filename}}? The current notes, attachments and settings of this account will be replaced by the archive content.",
+    "restoring": "Restoring {{username}} from {{filename}}...",
+    "restore_done": "{{username}} restored from {{filename}}.",
+    "restore_error": "The restore of {{username}} failed: {{error}}",
     "footer_note": "Archives are stored under {user id}/ in the backup folder and can be restored with the standard \"Restore / Import\" page.",
     "messages": {
       "not_absolute": "The backup folder must be an absolute path, for example /backups.",
       "inside_app": "The backup folder cannot be inside the application, apart from data/backups.",
       "not_writable": "The backup folder cannot be created or is not writable by the web server: {{path}}"
-    }
+    },
+    "config_description": "Where the archives are saved and how many are kept, for the automatic and the manual backups alike.",
+    "auto_enable_label": "Enable automatic backups",
+    "auto_users_label": "Users backed up automatically",
+    "auto_users_description": "While every user is checked, new accounts are included automatically.",
+    "manual_users_label": "Users to back up now",
+    "user_access_title": "Access for users",
+    "user_backup_label": "Allow users to back up their account",
+    "user_backup_description": "When enabled, each user can save a backup of their own account into the folder and download their archives, from the Backup / Export page. These archives count toward the retention limit like the others.",
+    "user_delete_label": "Allow users to delete their archives",
+    "user_delete_description": "When disabled, the Delete entry of the users' actions menu is greyed out, so they cannot remove the archives of their account, including those of the automatic backups. Older archives are still pruned by the retention limit.",
+    "user_restore_label": "Allow users to restore their account",
+    "user_restore_description": "When enabled, each user can restore their own account from their archives in the folder, on the Restore / Import page. When disabled, users with archives see a message asking them to contact an administrator. Administrators can always restore any archive from the list below."
   },
   "tasklist_embed": {
     "unavailable": "This task list is no longer available.",

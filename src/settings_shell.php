@@ -174,8 +174,10 @@ function poznoteRenderSettingsSidebar(array $opts = []): void
                  chosen (js/settings-page.js on settings.php, plain links on
                  the pages it opens); the filter above searches both. -->
             <div class="settings-scope-switch" role="group" aria-label="<?php echo t_h('settings.title', [], 'Settings'); ?>">
+                <!-- #scope=user: settings.php would otherwise reopen the
+                     saved section, Admin Tools when coming from an admin page -->
                 <a class="settings-scope-option<?php echo $adminScope ? '' : ' is-active'; ?>" data-scope="user" aria-current="<?php echo $adminScope ? 'false' : 'true'; ?>"
-                   href="<?php echo htmlspecialchars(poznoteSettingsHref($basePath, $workspace), ENT_QUOTES, 'UTF-8'); ?>">
+                   href="<?php echo htmlspecialchars(poznoteSettingsHref($basePath, $workspace) . '#scope=user', ENT_QUOTES, 'UTF-8'); ?>">
                     <i class="lucide lucide-user"></i>
                     <span><?php echo t_h('settings.scope.user', [], 'Personal'); ?></span>
                 </a>

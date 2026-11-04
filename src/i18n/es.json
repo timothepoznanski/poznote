@@ -1478,8 +1478,10 @@
       "badge_hidden_count_admin_columns": "{{me}} oculto(s) para ti, {{users}} para los usuarios",
       "badge_hidden_count": "{{count}} oculto(s)",
       "direct_copy_restore_section": "Página de restauración: sección «Restaurar cuando la restauración estándar no funciona»",
+      "local_backups_section": "Página de copia: sección \"Copias locales\"",
       "s3_backups_section": "Página de copia de seguridad: sección «Copias de seguridad S3»",
       "s3_restore_section": "Página de restauración: sección «Restaurar desde S3»",
+      "local_restore_section": "Página de restauración: sección \"Restaurar desde una copia local\"",
       "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?",
       "folder_actions_toggle": "Botón de menú (⋮) en las carpetas",
       "note_actions_toggle": "Botón de menú (⋮) en las notas",
@@ -2592,6 +2594,16 @@
         "description": "Descargue todos los adjuntos de su cuenta en un único archivo ZIP.",
         "description_s3": "Con el almacenamiento S3 activado, los archivos se obtienen del bucket; use este archivo para añadir los archivos que faltan a una copia de seguridad creada sin los adjuntos S3 antes de restaurarla."
       },
+      "local_backup": {
+        "title": "Copias locales",
+        "description": "Guarde un archivo de copia de seguridad de su cuenta en la carpeta de copias de este servidor y descargue los archivos que ya están allí.",
+        "backup_now": "Copiar mi cuenta en la carpeta",
+        "running": "Guardando la copia en la carpeta...",
+        "done": "Copia guardada ({{size}}).",
+        "list_empty": "Todavía no hay ninguna copia de su cuenta en la carpeta.",
+        "confirm_run": "¿Copiar ahora su cuenta en la carpeta de copias? Crear el archivo puede tardar un poco.",
+        "delete_disabled": "Su administrador ha desactivado la eliminación de copias."
+      },
       "s3_backup": {
         "title": "Copias de seguridad S3",
         "description": "Sube un archivo de copia de seguridad de su cuenta al bucket S3 configurado en esta instancia y descarga los archivos ya almacenados allí.",
@@ -2852,6 +2864,12 @@
         "loading": "Cargando...",
         "empty": "Aún no hay copias de su cuenta en el bucket.",
         "confirm": "¿Restaurar su cuenta desde {{filename}}? Sus notas, adjuntos y ajustes actuales serán reemplazados por el contenido del archivo."
+      },
+      "local_restore": {
+        "title": "Restaurar desde una copia local",
+        "description": "Restaure su cuenta directamente desde uno de los archivos de copia de seguridad guardados en la carpeta de copias de este servidor.",
+        "confirm": "¿Restaurar su cuenta desde {{filename}}? Sus notas, adjuntos y ajustes actuales se sustituirán por el contenido del archivo.",
+        "disabled": "Su cuenta tiene {{count}} copia(s) en la carpeta de copias de este servidor, pero la restauración por usted mismo no está activada. Pida a su administrador que restaure una por usted, o que active la restauración desde esta página."
       }
     },
     "buttons": {
@@ -5308,12 +5326,12 @@
     "title": "Copias de seguridad locales",
     "description": "Guarda archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga de la copia de seguridad completa) en una carpeta del servidor, manualmente o automáticamente según una programación.",
     "description_scope": "El ajuste se aplica a todos los usuarios de esta instancia.",
-    "enable_description": "Copia los usuarios seleccionados en la carpeta según la programación indicada abajo. Las copias manuales desde esta página funcionan aunque este interruptor esté desactivado.",
+    "enable_description": "Copia los usuarios marcados abajo en la carpeta según la frecuencia elegida.",
     "directory_label": "Carpeta de copias de seguridad",
     "directory_description": "Ruta absoluta en el servidor (dentro del contenedor con Docker). Déjala vacía para usar {{default}}. Para guardar las copias en otro lugar, monta un volumen e introduce su ruta aquí.",
     "retention_description": "Los archivos más antiguos se eliminan de la carpeta después de cada copia. 0 lo conserva todo.",
-    "manual_description": "Copia los usuarios seleccionados en la carpeta ahora mismo, un usuario cada vez.",
-    "confirm_run": "¿Copiar ahora los usuarios seleccionados en la carpeta de copias de seguridad?",
+    "manual_description": "Copia ahora los usuarios marcados abajo en la carpeta, de uno en uno. Esta selección no se guarda y no cambia las copias automáticas.",
+    "confirm_run": "¿Copiar ahora los {{count}} usuario(s) marcado(s) en la carpeta de copias?",
     "run_done": "Copia finalizada: {{saved}}/{{total}} usuario(s) copiado(s).",
     "user_ok": "{{username}}: guardado ({{size}})",
     "last_run": "Última ejecución ({{trigger}}): {{date}}, {{saved}}/{{total}} usuario(s) copiado(s).",
@@ -5322,12 +5340,30 @@
     "list_empty": "Todavía no hay ninguna copia en la carpeta.",
     "list_error": "No se pueden listar las copias: {{error}}",
     "confirm_delete": "¿Eliminar la copia {{filename}} de la carpeta?",
+    "restore": "Restaurar",
+    "restore_title": "Restaurar una copia de seguridad",
+    "confirm_restore": "¿Restaurar la cuenta {{username}} desde {{filename}}? Las notas, adjuntos y ajustes actuales de esta cuenta se sustituirán por el contenido del archivo.",
+    "restoring": "Restaurando {{username}} desde {{filename}}...",
+    "restore_done": "{{username}} restaurado desde {{filename}}.",
+    "restore_error": "La restauración de {{username}} ha fallado: {{error}}",
     "footer_note": "Los archivos se guardan en {id de usuario}/ dentro de la carpeta de copias de seguridad y se pueden restaurar con la página estándar «Restaurar / Importar».",
     "messages": {
       "not_absolute": "La carpeta de copias de seguridad debe ser una ruta absoluta, por ejemplo /backups.",
       "inside_app": "La carpeta de copias de seguridad no puede estar dentro de la aplicación, salvo en data/backups.",
       "not_writable": "La carpeta de copias de seguridad no se puede crear o el servidor web no puede escribir en ella: {{path}}"
-    }
+    },
+    "config_description": "Dónde se guardan los archivos y cuántos se conservan, tanto para las copias automáticas como para las manuales.",
+    "auto_enable_label": "Activar las copias automáticas",
+    "auto_users_label": "Usuarios copiados automáticamente",
+    "auto_users_description": "Mientras todos los usuarios estén marcados, las cuentas nuevas se incluyen automáticamente.",
+    "manual_users_label": "Usuarios que copiar ahora",
+    "user_access_title": "Acceso de los usuarios",
+    "user_backup_label": "Permitir a los usuarios copiar su cuenta",
+    "user_backup_description": "Si está activado, cada usuario puede guardar una copia de su propia cuenta en la carpeta y descargar sus archivos, desde la página Copia / Exportación. Estos archivos cuentan para el límite de retención como los demás.",
+    "user_delete_label": "Permitir a los usuarios eliminar sus archivos",
+    "user_delete_description": "Si está desactivado, la entrada Eliminar del menú de acciones de los usuarios aparece atenuada, así que no pueden borrar los archivos de su cuenta, ni siquiera los de las copias automáticas. Los archivos más antiguos se siguen borrando según el límite de retención.",
+    "user_restore_label": "Permitir a los usuarios restaurar su cuenta",
+    "user_restore_description": "Si está activado, cada usuario puede restaurar su propia cuenta desde sus archivos de la carpeta, en la página Restaurar / Importar. Si está desactivado, los usuarios con archivos ven un mensaje que les pide contactar con un administrador. Los administradores siempre pueden restaurar cualquier archivo desde la lista de abajo."
   },
   "tasklist_embed": {
     "unavailable": "Esta lista de tareas ya no está disponible.",

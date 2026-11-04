@@ -1478,8 +1478,10 @@
       "collapse_all": "Tout replier",
       "expand_all": "Tout déplier",
       "direct_copy_restore_section": "Page Restauration : section « Restauration quand la restauration standard ne fonctionne pas »",
+      "local_backups_section": "Page Sauvegarde : section « Sauvegardes locales »",
       "s3_backups_section": "Page Sauvegarde : section « Sauvegardes S3 »",
       "s3_restore_section": "Page Restauration : section « Restauration depuis S3 »",
+      "local_restore_section": "Page Restauration : section « Restauration depuis une sauvegarde locale »",
       "toggle_all_warning": "Cette action va perdre toutes vos personnalisations existantes. Voulez-vous continuer ?",
       "folder_actions_toggle": "Bouton de menu (⋮) sur les dossiers",
       "note_actions_toggle": "Bouton de menu (⋮) sur les notes",
@@ -2597,6 +2599,16 @@
         "description": "Téléchargez toutes les pièces jointes de votre compte dans une seule archive ZIP.",
         "description_s3": "Avec le stockage S3 activé, les fichiers sont récupérés depuis le bucket ; utilisez cette archive pour ajouter les fichiers manquants à un backup créé sans les pièces jointes S3 avant de le restaurer."
       },
+      "local_backup": {
+        "title": "Sauvegardes locales",
+        "description": "Enregistrez une archive de sauvegarde de votre compte dans le dossier de sauvegarde de ce serveur, et téléchargez les archives qui s'y trouvent déjà.",
+        "backup_now": "Sauvegarder mon compte dans le dossier",
+        "running": "Enregistrement de la sauvegarde dans le dossier...",
+        "done": "Sauvegarde enregistrée ({{size}}).",
+        "list_empty": "Aucune sauvegarde de votre compte dans le dossier pour le moment.",
+        "confirm_run": "Sauvegarder maintenant votre compte dans le dossier de sauvegarde ? La création de l'archive peut prendre un moment.",
+        "delete_disabled": "La suppression des sauvegardes est désactivée par votre administrateur."
+      },
       "s3_backup": {
         "title": "Sauvegardes S3",
         "description": "Envoie une archive de sauvegarde de votre compte vers le bucket S3 configuré sur cette instance, et télécharge les archives qui y sont déjà stockées.",
@@ -2857,6 +2869,12 @@
         "loading": "Chargement...",
         "empty": "Aucune sauvegarde de votre compte dans le bucket pour le moment.",
         "confirm": "Restaurer votre compte depuis {{filename}} ? Vos notes, pièces jointes et réglages actuels seront remplacés par le contenu de l'archive."
+      },
+      "local_restore": {
+        "title": "Restauration depuis une sauvegarde locale",
+        "description": "Restaure votre compte directement depuis l'une des archives de sauvegarde enregistrées dans le dossier de sauvegarde de ce serveur.",
+        "confirm": "Restaurer votre compte depuis {{filename}} ? Vos notes, pièces jointes et réglages actuels seront remplacés par le contenu de l'archive.",
+        "disabled": "Votre compte a {{count}} sauvegarde(s) dans le dossier de sauvegarde de ce serveur, mais la restauration par vous-même n'est pas activée. Demandez à votre administrateur d'en restaurer une pour vous, ou d'activer la restauration depuis cette page."
       }
     },
     "buttons": {
@@ -5412,12 +5430,12 @@
     "title": "Sauvegardes locales",
     "description": "Enregistrez des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement de la sauvegarde complète) dans un dossier du serveur, manuellement ou automatiquement selon une planification.",
     "description_scope": "Ce réglage s'applique à tous les utilisateurs de cette instance.",
-    "enable_description": "Sauvegarde les utilisateurs sélectionnés dans le dossier selon la planification ci-dessous. Les sauvegardes manuelles depuis cette page fonctionnent même si cet interrupteur est désactivé.",
+    "enable_description": "Sauvegarde les utilisateurs cochés ci-dessous dans le dossier selon la fréquence choisie.",
     "directory_label": "Dossier de sauvegarde",
     "directory_description": "Chemin absolu sur le serveur (dans le conteneur avec Docker). Laissez vide pour utiliser {{default}}. Pour stocker les sauvegardes ailleurs, montez un volume et saisissez son chemin ici.",
     "retention_description": "Les archives plus anciennes sont supprimées du dossier après chaque sauvegarde. 0 conserve tout.",
-    "manual_description": "Sauvegarde les utilisateurs sélectionnés dans le dossier immédiatement, un utilisateur à la fois.",
-    "confirm_run": "Sauvegarder maintenant les utilisateurs sélectionnés dans le dossier de sauvegarde ?",
+    "manual_description": "Sauvegarde les utilisateurs cochés ci-dessous dans le dossier immédiatement, un utilisateur à la fois. Cette sélection n'est pas enregistrée et ne modifie pas les sauvegardes automatiques.",
+    "confirm_run": "Sauvegarder maintenant les {{count}} utilisateur(s) coché(s) dans le dossier de sauvegarde ?",
     "run_done": "Sauvegarde terminée : {{saved}}/{{total}} utilisateur(s) sauvegardé(s).",
     "user_ok": "{{username}} : enregistré ({{size}})",
     "last_run": "Dernière exécution ({{trigger}}) : {{date}}, {{saved}}/{{total}} utilisateur(s) sauvegardé(s).",
@@ -5426,12 +5444,30 @@
     "list_empty": "Aucune sauvegarde dans le dossier pour le moment.",
     "list_error": "Impossible de lister les sauvegardes : {{error}}",
     "confirm_delete": "Supprimer la sauvegarde {{filename}} du dossier ?",
+    "restore": "Restaurer",
+    "restore_title": "Restaurer une sauvegarde",
+    "confirm_restore": "Restaurer le compte {{username}} depuis {{filename}} ? Les notes, pièces jointes et réglages actuels de ce compte seront remplacés par le contenu de l'archive.",
+    "restoring": "Restauration de {{username}} depuis {{filename}}...",
+    "restore_done": "{{username}} restauré depuis {{filename}}.",
+    "restore_error": "La restauration de {{username}} a échoué : {{error}}",
     "footer_note": "Les archives sont stockées sous {id utilisateur}/ dans le dossier de sauvegarde et peuvent être restaurées avec la page « Restauration / Import » standard.",
     "messages": {
       "not_absolute": "Le dossier de sauvegarde doit être un chemin absolu, par exemple /backups.",
       "inside_app": "Le dossier de sauvegarde ne peut pas se trouver dans l'application, hormis dans data/backups.",
       "not_writable": "Le dossier de sauvegarde ne peut pas être créé ou n'est pas accessible en écriture par le serveur web : {{path}}"
-    }
+    },
+    "config_description": "Où les archives sont enregistrées et combien sont conservées, pour les sauvegardes automatiques comme manuelles.",
+    "auto_enable_label": "Activer les sauvegardes automatiques",
+    "auto_users_label": "Utilisateurs sauvegardés automatiquement",
+    "auto_users_description": "Tant que tous les utilisateurs sont cochés, les nouveaux comptes sont inclus automatiquement.",
+    "manual_users_label": "Utilisateurs à sauvegarder maintenant",
+    "user_access_title": "Accès des utilisateurs",
+    "user_backup_label": "Permettre aux utilisateurs de sauvegarder leur compte",
+    "user_backup_description": "Activé, chaque utilisateur peut enregistrer une sauvegarde de son propre compte dans le dossier et télécharger ses archives, depuis la page Sauvegarde / Export. Ces archives comptent dans la limite de rétention comme les autres.",
+    "user_delete_label": "Permettre aux utilisateurs de supprimer leurs archives",
+    "user_delete_description": "Désactivé, l'entrée Supprimer du menu d'actions des utilisateurs est grisée : ils ne peuvent pas supprimer les archives de leur compte, y compris celles des sauvegardes automatiques. Les archives les plus anciennes restent supprimées par la limite de rétention.",
+    "user_restore_label": "Permettre aux utilisateurs de restaurer leur compte",
+    "user_restore_description": "Activé, chaque utilisateur peut restaurer son propre compte depuis ses archives du dossier, sur la page Restauration / Import. Désactivé, les utilisateurs qui ont des archives voient un message leur demandant de contacter un administrateur. Les administrateurs peuvent toujours restaurer n'importe quelle archive depuis la liste ci-dessous."
   },
   "tasklist_embed": {
     "unavailable": "Cette liste de tâches n'est plus disponible.",
