@@ -2010,8 +2010,18 @@ function importIndividualNotesZip($uploadedFile, $workspace = null, $folder = nu
             
             // Process Obsidian-style image references ![[image.png]] and convert to standard markdown
             // Also build the attachments array for this note
-            $content = poznoteResolveImportedImageReferences($con, $content, $noteId, $noteType, $importedImages, $attachmentIdMap, $importedDocuments, $usedAttachmentFiles);
-            
+            $resolvedContent = poznoteResolveImportedImageReferences($con, $content, $noteId, $noteType, $importedImages, $attachmentIdMap, $importedDocuments, $usedAttachmentFiles);
+
+            // The entries.entry column was filled before the rewrite: keep it
+            // in step with the file, or the attachments row (which reads the
+            // column to leave out the images embedded in the note) lists the
+            // embedded images until the note is first saved.
+            if ($resolvedContent !== $content) {
+                $entryStmt = $con->prepare("UPDATE entries SET entry = ? WHERE id = ?");
+                $entryStmt->execute([$resolvedContent, $noteId]);
+            }
+            $content = $resolvedContent;
+
             // Save content to file
             if (writeNoteToFile($entriesPath, $noteId, $noteType, $title, $content)) {
                 $importedCount++;
