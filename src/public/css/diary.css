@@ -638,7 +638,15 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 
 .diary-journal-body .diary-journal-tasks li.important span {
     color: var(--pz-danger-text-hover);
-    font-weight: var(--pz-weight-semibold);
+}
+
+/* Priority (#1730); this page does not load css/components/task-priority.css */
+.diary-journal-body .diary-journal-tasks li.priority-medium span {
+    color: var(--pz-color-orange);
+}
+
+.diary-journal-body .diary-journal-tasks li.priority-low span {
+    color: var(--pz-color-green);
 }
 
 /* Subtasks of a task: indented under it, and styled on their own state rather

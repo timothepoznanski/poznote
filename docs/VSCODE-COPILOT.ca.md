@@ -355,7 +355,7 @@ El servidor MCP del Poznote ofereix les eines següents, que VS Code Copilot pot
 ### Tasques
 - `list_tasks` - Llista les tasques d'una llista de tasques, amb els seus ID i dates de venciment
 - `add_task` - Afegeix una tasca, amb una data de venciment i un recordatori opcionals
-- `update_task` - Actualitza una tasca (text, data de venciment, recordatori, marca d'important)
+- `update_task` - Actualitza una tasca (text, data de venciment, recordatori, prioritat)
 - `complete_task` - Marca una tasca com a feta o la torna a obrir
 - `delete_task` - Suprimeix una tasca d'una llista de tasques
 - `add_subtask` - Afegeix una subtasca a una tasca d'una llista de tasques

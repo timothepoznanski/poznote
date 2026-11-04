@@ -147,6 +147,7 @@ function poznoteGetIndexJsGroups(): array {
         'js/note-sort-cycle.js',
         'js/index-icon-scale-settings.js',
         'js/background-settings.js',
+        'js/task-priority.js',
         'js/tasklist-core.js',
         'js/tasklist-render.js',
         'js/tasklist-crud.js',

@@ -1079,7 +1079,12 @@
     "remind_me_hint": "Eine Benachrichtigung wird zum Fälligkeitstermin ausgelöst.",
     "add_subtask": "Unteraufgabe hinzufügen",
     "subtask_placeholder": "Unteraufgabe hinzufügen...",
-    "delete_subtask": "Unteraufgabe löschen"
+    "delete_subtask": "Unteraufgabe löschen",
+    "priority": "Priorität",
+    "priority_high": "Hohe Priorität",
+    "priority_medium": "Mittlere Priorität",
+    "priority_low": "Niedrige Priorität",
+    "priority_none": "Keine Priorität"
   },
   "tags": {
     "add_single": "Tag hinzufügen...",
@@ -1461,7 +1466,8 @@
         "workspace_menu": "Workspace-Menü",
         "note_actions": "Notizaktionen",
         "mobile_editor_bar": "Mobile Editorleiste",
-        "sidebar": "Seitenleiste"
+        "sidebar": "Seitenleiste",
+        "task_lists": "Aufgabenlisten"
       },
       "check_all": "Alle auswählen",
       "uncheck_all": "Alle abwählen",
@@ -1496,7 +1502,12 @@
       "note_stats_lines": "Zeilenanzahl anzeigen",
       "note_info_icon": "Informationssymbol unter dem Notiztitel anzeigen",
       "note_scrollbar": "Bildlaufleiste der Notizen",
-      "note_scroll_arrows": "Pfeile zum Anfang und Ende der Notiz"
+      "note_scroll_arrows": "Pfeile zum Anfang und Ende der Notiz",
+      "tasklist_add_field": "Feld zum Hinzufügen einer Aufgabe",
+      "tasklist_frame": "Rahmen um jede Aufgabe",
+      "tasklist_delete": "Erledigte Aufgabe löschen",
+      "tasklist_menu": "Menü der Aufgabenoptionen (Mobil)",
+      "tasklist_frame_color": "Prioritätsfarbe des Aufgabenrahmens"
     },
     "icon_sidebar_order": {
       "title": "Layout der Icon-Seitenleiste",
@@ -1639,7 +1650,9 @@
       "default_icon": "Standardsymbol festlegen",
       "reset": "Standardverhalten wiederherstellen",
       "search_placeholder": "Symbole suchen...",
-      "default_color": "Standard"
+      "default_color": "Standard",
+      "apply_to_folder_title": "Farbe auf den Ordnertitel anwenden",
+      "apply_to_note_title": "Farbe auf den Notiztitel anwenden"
     },
     "linked_selector": {
       "title": "Verknüpfung aus einer Notiz erstellen",
@@ -5154,7 +5167,12 @@
     "hide_list": "Auf dieser Seite ausblenden",
     "unhide_list": "Auf dieser Seite wieder anzeigen",
     "show_hidden": "Ausgeblendete Listen anzeigen",
-    "empty_hidden": "Alle Listen sind ausgeblendet."
+    "empty_hidden": "Alle Listen sind ausgeblendet.",
+    "show_note_checklists_help": "Zeigt auch die Kontrollkästchen in gewöhnlichen Notizen an, neben den Aufgaben Ihrer Aufgabenlisten. Ihre Gruppe trägt ein Notiz-Abzeichen.",
+    "show_hidden_help": "Eine mit dem Auge ihrer Kopfzeile ausgeblendete Liste verschwindet von dieser Seite, aus dem Kalender und den Zählern. Aktivieren Sie dies, um ausgeblendete Listen abgeblendet wieder anzuzeigen, mit einem Auge, um jede zurückzuholen. Ausgegraut, solange keine Liste ausgeblendet ist.",
+    "filter_priority_high": "Hoch",
+    "filter_priority_medium": "Mittel",
+    "filter_priority_low": "Niedrig"
   },
   "mentions": {
     "title": "Erwähnungen",

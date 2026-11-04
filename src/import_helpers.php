@@ -26,18 +26,22 @@ function extractTaskListFromHTML($htmlContent) {
         
         $classes = $taskItem->getAttribute('class');
         $completed = strpos($classes, 'completed') !== false;
-        $important = strpos($classes, 'important') !== false;
+        // Priority (#1730): data-priority, or the older important class
+        $priority = normalizeTasklistPriority($taskItem->getAttribute('data-priority'));
+        if (!is_string($priority)) {
+            $priority = preg_match('/\bimportant\b/', $classes) ? 'high' : null;
+        }
         
         // Find task text
         $textSpan = $xpath->query('.//span[contains(@class, "task-text")]', $taskItem)->item(0);
         $text = $textSpan ? trim($textSpan->textContent) : '';
         
-        $task = [
+        $task = setTasklistTaskPriority([
             'id' => floatval($taskId),
             'text' => $text,
             'completed' => $completed,
-            'important' => $important
-        ];
+            'important' => false
+        ], $priority);
 
         // Subtask rows sit inside their task (renderTasks in js/tasklist-render.js)
         $subtasks = [];
@@ -216,12 +220,16 @@ function convertMarkdownCheckboxListToTasklistJson($markdownContent) {
             continue;
         }
 
-        $important = false;
-
-        if (preg_match('/\s+⭐\s*$/u', $text)) {
-            $important = true;
-            $text = preg_replace('/\s+⭐\s*$/u', '', $text);
-            $text = preg_replace('/^\*\*(.*)\*\*$/us', '$1', trim($text));
+        // Priority (#1730): a trailing ⭐ is high, as Poznote exports it
+        // (bold text); the Obsidian Tasks markers are read too: ⏫ or 🔺
+        // high, 🔼 medium, 🔽 or ⏬ low
+        $priority = null;
+        if (preg_match('/\s+(⭐|⏫|🔺|🔼|🔽|⏬)\s*$/u', $text, $priorityMatch)) {
+            $priority = ['⭐' => 'high', '⏫' => 'high', '🔺' => 'high', '🔼' => 'medium', '🔽' => 'low', '⏬' => 'low'][$priorityMatch[1]];
+            $text = preg_replace('/\s+(⭐|⏫|🔺|🔼|🔽|⏬)\s*$/u', '', $text);
+            if ($priorityMatch[1] === '⭐') {
+                $text = preg_replace('/^\*\*(.*)\*\*$/us', '$1', trim($text));
+            }
         }
 
         $text = trim($text);
@@ -230,13 +238,13 @@ function convertMarkdownCheckboxListToTasklistJson($markdownContent) {
         }
 
         $parentIndent = $indent;
-        $tasks[] = [
+        $tasks[] = setTasklistTaskPriority([
             'id' => generateImportedTaskId(),
             'text' => $text,
             'completed' => $completed,
             'noteId' => '',
-            'important' => $important,
-        ];
+            'important' => false,
+        ], $priority);
     }
 
     if (empty($tasks)) {
@@ -491,7 +499,7 @@ function normalizeImportedTasklistJson($content) {
             return null;
         }
 
-        if (array_key_exists('completed', $task) || array_key_exists('important', $task) || array_key_exists('noteId', $task) || array_key_exists('id', $task)) {
+        if (array_key_exists('completed', $task) || array_key_exists('important', $task) || array_key_exists('priority', $task) || array_key_exists('noteId', $task) || array_key_exists('id', $task)) {
             $hasTaskMetadata = true;
         }
     }

@@ -196,7 +196,9 @@ class TasksController
      *
      * Body (JSON):
      *   - text: task label (required)
-     *   - completed / important: booleans (optional, default false)
+     *   - completed: boolean (optional, default false)
+     *   - priority: 'high', 'medium', 'low' or 'none' (optional, default none)
+     *   - important: boolean, older spelling of priority 'high' (optional)
      *   - due_at: 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM' local time (optional)
      *   - reminder: whether the due date raises a notification (optional)
      *   - reminder_email: email opt-in for that notification (optional)
@@ -226,7 +228,7 @@ class TasksController
         }
 
         $tasks = $this->decodeRawTasks($note);
-        $task = array_merge([
+        $task = $this->mergeTaskFields([
             'id'        => $this->generateTaskId($tasks),
             'text'      => $text,
             'noteId'    => $note['id'],
@@ -289,7 +291,7 @@ class TasksController
         }
 
         $previous = $tasks[$index];
-        $task = array_merge($previous, $fields);
+        $task = $this->mergeTaskFields($previous, $fields);
 
         // Completing a repeating task opens its next occurrence, which takes
         // the place the task had among the open ones and carries the repeat.
@@ -597,13 +599,25 @@ class TasksController
 
         foreach ([
             'completed'      => 'completed',
-            'important'      => 'important',
             'reminder'       => 'dueReminder',
             'reminder_email' => 'dueReminderEmail',
         ] as $key => $storedKey) {
             if (array_key_exists($key, $input)) {
                 $fields[$storedKey] = (bool) filter_var($input[$key], FILTER_VALIDATE_BOOLEAN);
             }
+        }
+
+        // Priority (#1730). `important` is the older spelling of "high", kept
+        // for existing clients; mergeTaskFields() applies either.
+        if (array_key_exists('priority', $input)) {
+            $priority = normalizeTasklistPriority($input['priority']);
+            if ($priority === false) {
+                $this->sendError(400, 'Invalid priority (expected "high", "medium", "low" or "none")');
+                return null;
+            }
+            $fields['priority'] = $priority;
+        } elseif (array_key_exists('important', $input)) {
+            $fields['important'] = (bool) filter_var($input['important'], FILTER_VALIDATE_BOOLEAN);
         }
 
         if (array_key_exists('due_at', $input)) {
@@ -649,6 +663,30 @@ class TasksController
     }
 
     /**
+     * Apply the fields read by readTaskFields() to a task. The priority keeps
+     * `important` in step: important true means high, important false only
+     * clears a high priority (a medium or low one stays).
+     */
+    private function mergeTaskFields(array $task, array $fields): array
+    {
+        $hasPriority = array_key_exists('priority', $fields);
+        $hasImportant = array_key_exists('important', $fields);
+        $priority = $fields['priority'] ?? null;
+        $important = !empty($fields['important']);
+        unset($fields['priority'], $fields['important']);
+
+        $task = array_merge($task, $fields);
+        if ($hasPriority) {
+            return setTasklistTaskPriority($task, $priority);
+        }
+        if ($hasImportant) {
+            $current = getTasklistTaskPriority($task);
+            return setTasklistTaskPriority($task, $important ? 'high' : ($current === 'high' ? null : $current));
+        }
+        return $task;
+    }
+
+    /**
      * Reject a task whose reminder would never fire. Applied to the merged task
      * so an update can enable the reminder on an existing due date.
      */
@@ -684,28 +722,14 @@ class TasksController
     }
 
     /**
-     * Restore the order the UI maintains: important-incomplete, then normal
-     * incomplete, then completed. Order inside each group is preserved, so a
-     * manual drag-and-drop arrangement survives untouched groups.
-     * Mirrors groupTasksByStatus() in js/tasklist-core.js.
+     * Restore the order the UI maintains: open tasks by priority (high,
+     * medium, low, none), then completed. Order inside each group is
+     * preserved, so a manual drag-and-drop arrangement survives untouched
+     * groups. Mirrors groupTasksByStatus() in js/tasklist-core.js.
      */
     private function regroupTasks(array $tasks): array
     {
-        $important = [];
-        $normal = [];
-        $completed = [];
-
-        foreach ($tasks as $task) {
-            if (!empty($task['completed'])) {
-                $completed[] = $task;
-            } elseif (!empty($task['important'])) {
-                $important[] = $task;
-            } else {
-                $normal[] = $task;
-            }
-        }
-
-        return array_merge($important, $normal, $completed);
+        return regroupTasklistTasks($tasks);
     }
 
     /**
@@ -959,7 +983,8 @@ class TasksController
                 'id'          => is_scalar($task['id'] ?? null) ? $task['id'] : null,
                 'text'        => is_scalar($text) ? (string) $text : '',
                 'completed'   => !empty($task['completed']),
-                'important'   => !empty($task['important']),
+                'important'   => getTasklistTaskPriority($task) === 'high',
+                'priority'    => getTasklistTaskPriority($task),
                 'dueAt'       => $dueAt,
                 'dueReminder' => !empty($task['dueReminder']),
             ];

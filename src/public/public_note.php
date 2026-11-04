@@ -630,7 +630,7 @@ if ($noteType === 'tasklist') {
             $completed = !empty($task['completed']) ? ' completed' : '';
             $checked = !empty($task['completed']) ? ' checked' : '';
             $disabled = $taskAccessMode === 'read_only' ? ' disabled' : '';
-            $important = !empty($task['important']) ? ' important' : '';
+            $important = tasklistPriorityClasses($task);
             // Subtasks can be ticked wherever tasks can (js/public-note.js)
             $subtasksHtml = renderTasklistSubtasksHtml($task, null, static function ($subtaskIndex) use ($disabled) {
                 return ' data-subtask-index="' . (int) $subtaskIndex . '"' . $disabled;

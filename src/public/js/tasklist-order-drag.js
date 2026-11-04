@@ -10,7 +10,7 @@ function insertTaskWithOrder(tasks, task, insertOrder) {
     if (task.completed) {
         if (insertOrder === 'bottom') completed.unshift(task);
         else completed.push(task);
-    } else if (task.important) {
+    } else if (getTaskPriority(task)) {
         if (insertOrder === 'top') important.unshift(task);
         else important.push(task);
     } else {
@@ -18,7 +18,8 @@ function insertTaskWithOrder(tasks, task, insertOrder) {
         else normal.push(task);
     }
 
-    return [].concat(important, normal, completed);
+    // Back in high, medium, low order, the inserted task first or last of its level
+    return sortTasksByPriority([].concat(important, normal, completed));
 }
 
 async function getTasklistInsertOrder() {
@@ -196,6 +197,8 @@ window.editTask = editTask;
 window.deleteTask = deleteTask;
 window.getTaskListData = getTaskListData;
 window.toggleImportant = toggleImportant;
+window.setTaskPriority = setTaskPriority;
+window.openTaskPriorityMenu = openTaskPriorityMenu;
 window.toggleTaskInsertOrder = toggleTaskInsertOrder;
 window.clearCompletedTasks = clearCompletedTasks;
 window.openMoveTaskModal = openMoveTaskModal;

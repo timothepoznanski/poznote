@@ -617,7 +617,12 @@
     "uncheck_all": "Uncheck all tasks",
     "add_subtask": "Add a subtask",
     "subtask_placeholder": "Add a subtask...",
-    "delete_subtask": "Delete subtask"
+    "delete_subtask": "Delete subtask",
+    "priority": "Priority",
+    "priority_high": "High priority",
+    "priority_medium": "Medium priority",
+    "priority_low": "Low priority",
+    "priority_none": "No priority"
   },
   "tags": {
     "add_single": "Add tag...",
@@ -945,7 +950,8 @@
         "workspace_menu": "Workspace Menu",
         "note_actions": "Note Actions",
         "mobile_editor_bar": "Mobile editor bar",
-        "sidebar": "Sidebar"
+        "sidebar": "Sidebar",
+        "task_lists": "Task lists"
       },
       "badge_all_visible": "All visible",
       "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
@@ -980,7 +986,12 @@
       "note_stats_lines": "Show line count",
       "note_info_icon": "Show information icon under the note title",
       "note_scrollbar": "Note scrollbar",
-      "note_scroll_arrows": "Scroll to top and bottom arrows"
+      "note_scroll_arrows": "Scroll to top and bottom arrows",
+      "tasklist_add_field": "Field to add a task",
+      "tasklist_frame": "Frame around each task",
+      "tasklist_delete": "Delete a completed task",
+      "tasklist_menu": "Task options menu (mobile)",
+      "tasklist_frame_color": "Priority colour of the task frame"
     },
     "icon_sidebar_order": {
       "title": "Icon sidebar layout",
@@ -1134,7 +1145,9 @@
       "default_icon": "Set default icon",
       "reset": "Restore default behavior",
       "search_placeholder": "Search icons...",
-      "default_color": "Default"
+      "default_color": "Default",
+      "apply_to_folder_title": "Apply the color to the folder title",
+      "apply_to_note_title": "Apply the color to the note title"
     },
     "linked_selector": {
       "title": "Create a Shortcut from a Note",
@@ -4827,7 +4840,12 @@
     "hide_list": "Hide from this page",
     "unhide_list": "Show on this page again",
     "show_hidden": "Show hidden lists",
-    "empty_hidden": "Every list is hidden."
+    "empty_hidden": "Every list is hidden.",
+    "show_note_checklists_help": "Also list the checkboxes written inside ordinary notes, next to the tasks of your task lists. Their group carries a Note badge.",
+    "show_hidden_help": "A list hidden with the eye of its header leaves this page, the calendar and the counts. Tick this to show hidden lists again, dimmed, with an eye to bring each one back. Greyed out while no list is hidden.",
+    "filter_priority_high": "High",
+    "filter_priority_medium": "Medium",
+    "filter_priority_low": "Low"
   },
   "mentions": {
     "title": "Mentions",

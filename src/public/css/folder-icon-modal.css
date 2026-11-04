@@ -279,3 +279,26 @@
         gap: 6px;
     }
 }
+
+/* "Apply the color to the folder/note title" box under the swatches
+   (discussion #1729, js/folder-icon.js) */
+.folder-icon-apply-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding-left: 4px;
+    font-size: 13px;
+    color: var(--pz-text-secondary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.folder-icon-apply-title input {
+    margin: 0;
+    cursor: pointer;
+}
+
+.folder-icon-apply-title [hidden] {
+    display: none;
+}

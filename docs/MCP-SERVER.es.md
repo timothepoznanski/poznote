@@ -72,9 +72,9 @@ Una pestaña de Poznote abierta en el navegador recoge en pocos segundos los cam
 - `remove_reminder`: quita el recordatorio de una nota
 - `list_reminders`: lista las notificaciones de recordatorio que ya se activaron y siguen pendientes (el hilo de la campana de la interfaz); los recordatorios futuros no se pueden listar
 - `list_tasks`: lista las tareas de una nota de lista de tareas, con sus ID, fechas de vencimiento e indicadores
-- `list_all_tasks`: lista las tareas pendientes de todas las notas de un espacio de trabajo, las más urgentes primero, con filtros (vencimiento, importancia, tareas completadas, casillas dentro de las notas)
+- `list_all_tasks`: lista las tareas pendientes de todas las notas de un espacio de trabajo, las más urgentes primero, con filtros (vencimiento, prioridad alta, tareas completadas, casillas dentro de las notas)
 - `add_task`: añade una única tarea a una nota de lista de tareas, con fecha de vencimiento y recordatorio opcionales
-- `update_task`: actualiza una tarea (texto, fecha de vencimiento, recordatorio, indicador de importante)
+- `update_task`: actualiza una tarea (texto, fecha de vencimiento, recordatorio, prioridad)
 - `complete_task`: marca una tarea como hecha, o la vuelve a abrir
 - `delete_task`: elimina una tarea de una nota de lista de tareas
 - `add_subtask`: añade una subtarea a una tarea de una nota de lista de tareas

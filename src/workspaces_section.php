@@ -167,7 +167,7 @@ function poznoteRenderWorkspacesList(array $data): void
                         <?php endif; ?>
                         <!-- Opens the "Create a new workspace" dialog of modals.php
                              (openCreateWorkspaceModal(), js/workspaces-create.js) -->
-                        <button type="button" class="ws-create-btn" id="settings-create-workspace-btn" title="<?php echo $createLabel; ?>">
+                        <button type="button" class="ws-create-btn" id="settings-create-workspace-btn" title="<?php echo $createLabel; ?>" aria-label="<?php echo $createLabel; ?>">
                             <i class="lucide lucide-plus"></i><span><?php echo $createLabel; ?></span>
                         </button>
                     </div>

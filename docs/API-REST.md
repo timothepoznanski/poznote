@@ -1250,7 +1250,7 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
 
 Task list notes (`type: tasklist`) store their content as a JSON array of task objects. The array is the note's `content`: reading a tasklist note through `GET /notes/{id}` returns it as a JSON string, and rewriting the whole list means sending the full modified array back through `PATCH /notes/{id}`.
 
-To manage a single task without rewriting the array, use the per-task endpoints below (`GET`/`POST /notes/{id}/tasks`, `PATCH`/`DELETE /notes/{id}/tasks/{taskId}`). They take due dates, reminders and flags as typed parameters, keep the notification scheduled for a task in sync automatically, and preserve the ordering the interface uses (important first, then normal, completed last).
+To manage a single task without rewriting the array, use the per-task endpoints below (`GET`/`POST /notes/{id}/tasks`, `PATCH`/`DELETE /notes/{id}/tasks/{taskId}`). They take due dates, reminders and flags as typed parameters, keep the notification scheduled for a task in sync automatically, and preserve the ordering the interface uses (open tasks by priority: high, medium, low, none; completed last).
 
 **Task object schema:**
 
@@ -1259,12 +1259,13 @@ To manage a single task without rewriting the array, use the per-task endpoints 
 | `id` | number | Unique task identifier inside the note |
 | `text` | string | Task text |
 | `completed` | boolean | Whether the task is done |
-| `important` | boolean | Important flag, sorts the task to the top of its list |
+| `priority` | string or null | `"high"`, `"medium"` or `"low"`, null for none. Open tasks are kept in that order, tasks without a priority after them |
+| `important` | boolean | `true` when the priority is `"high"`: the older spelling of the priority, kept for existing clients |
 | `dueAt` | string or null | Due date as `YYYY-MM-DD`, or `YYYY-MM-DDTHH:MM` when a time is set (local time, no timezone) |
 | `dueReminder` | boolean | Whether a reminder is scheduled for the due date |
 | `dueReminderEmail` | boolean | Whether that reminder also sends an email. Only present once configured; defaults to enabled otherwise |
 | `dueRecurrence` | string | Repeat interval of the reminder as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` (e.g. `1w` weekly). Only present when set. Completing the task adds its next occurrence to the list: an open copy, due on the next date of the schedule, that carries the repeat (the completed task loses it). Dismissing the notification without completing the task schedules the next one and advances `dueAt` by the same interval |
-| `subtasks` | array | Subtasks of the task, one level deep, each `{ "id": number, "text": string, "completed": boolean }`. Only present when the task has some. A subtask has no due date, reminder or important flag, and ticking it does not complete its task. The per-task endpoints return subtasks and keep them on every write; the subtask endpoints below add, rename, tick or remove one at a time |
+| `subtasks` | array | Subtasks of the task, one level deep, each `{ "id": number, "text": string, "completed": boolean }`. Only present when the task has some. A subtask has no due date, reminder or priority, and ticking it does not complete its task. The per-task endpoints return subtasks and keep them on every write; the subtask endpoints below add, rename, tick or remove one at a time |
 
 ### List All Tasks
 
@@ -1351,7 +1352,8 @@ Append a task to a tasklist note. When `reminder` is enabled, the matching notif
 | `reminder` | boolean | No | Whether the due date raises a notification. Requires `due_at`. A date without a time reminds at 09:00 |
 | `reminder_email` | boolean | No | Whether that reminder also sends an email. Ignored when SMTP is not configured |
 | `recurrence` | string | No | Repeat interval as `<count><unit>` with unit `i`/`h`/`d`/`w`/`m`/`y` (e.g. `1w`) |
-| `important` | boolean | No | Important flag, sorts the task to the top |
+| `priority` | string | No | `"high"`, `"medium"`, `"low"` or `"none"` (default) |
+| `important` | boolean | No | Older spelling of `priority: "high"`, ignored when `priority` is given |
 | `completed` | boolean | No | Whether the task starts out done |
 
 **Response:**
@@ -1399,7 +1401,8 @@ Update one task. Only the provided fields change. Completing a task clears its p
 |-------|------|----------|-------------|
 | `text` | string | No | New task text |
 | `completed` | boolean | No | Whether the task is done |
-| `important` | boolean | No | Important flag |
+| `priority` | string | No | `"high"`, `"medium"`, `"low"`, or `"none"` to clear it |
+| `important` | boolean | No | Older spelling of `priority: "high"`; `false` only clears a high priority. Ignored when `priority` is given |
 | `due_at` | string or null | No | New due date, or `null` to clear it |
 | `reminder` | boolean | No | Whether the due date raises a notification |
 | `reminder_email` | boolean | No | Whether that reminder also sends an email |

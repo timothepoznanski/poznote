@@ -58,7 +58,7 @@ try {
 $favorite_folders = [];
 try {
     if (isset($con)) {
-        $query = "SELECT id, name, icon, icon_color FROM folders WHERE favorite = 1";
+        $query = "SELECT id, name, icon, icon_color, title_color FROM folders WHERE favorite = 1";
         $params = [];
         if (!empty($workspace_filter)) {
             $query .= " AND workspace = ?";
@@ -416,11 +416,10 @@ function renderNoteListItem($row1, $noteClass, $isSelected, $link, $folderId, $f
     echo "<a class='$noteClass $isSelected' href='$link' data-note-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-db-id='" . htmlspecialchars((string)$noteDbId, ENT_QUOTES) . "' data-note-type='" . $htmlNoteType . "'" . $linkedNoteIdAttr . " data-folder-id='$htmlFolderId' data-folder='$htmlFolderName' data-created='" . $htmlCreated . "' data-updated='" . $htmlUpdated . "' draggable='true' data-action='load-note' data-dblaction='open-note-new-tab'>";
     // Colour picked in the title's right-click menu (js/note-title-menu.js,
     // which repaints these rows the same way), css/sidebar.css paints it.
-    $titleColorCss = poznoteIconColorCss($row1['title_color'] ?? '');
-    $titleColorAttrs = $titleColorCss !== ''
-        ? " has-title-color' style='--note-title-color: " . htmlspecialchars($titleColorCss, ENT_QUOTES) . "'"
-        : "'";
-    echo "<span class='note-title" . $titleColorAttrs . ">" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . $mentionMarker . "</span>";
+    // data-title-color: the stored hex, read by the icon picker's "Apply the
+    // color to the title" box (js/folder-icon.js, discussion #1729).
+    $noteTitleAttrs = poznoteTitleColorAttrs($row1['title_color'] ?? '', '--note-title-color');
+    echo "<span class='note-title" . $noteTitleAttrs['class'] . "'" . $noteTitleAttrs['attrs'] . ">" . $noteIcon . $noteTypeIcon . htmlspecialchars($noteTitle, ENT_QUOTES) . $mentionMarker . "</span>";
     echo "</a>";
     // Kept offline: marked itself, or in a kept folder and not left out
     $offlineMark = (int)($row1['offline'] ?? 0);
@@ -444,10 +443,14 @@ function renderFavoriteFolderItems($favorite_folders, $workspace_filter) {
         $customIcon = !empty($favFolder['icon']) ? convertFontAwesomeToLucide($favFolder['icon']) : 'lucide lucide-folder';
         $favIconColorCss = poznoteIconColorCss($favFolder['icon_color'] ?? '');
         $iconStyle = $favIconColorCss !== '' ? " style='color: " . htmlspecialchars($favIconColorCss, ENT_QUOTES) . " !important;'" : "";
+        // The folder's name colour (folders.title_color, discussion #1729)
+        $favNameAttrs = poznoteFolderTitleAttrs($favFolder['id'], $favFolder['title_color'] ?? '');
+        $nameAttrs = " class='favorite-folder-name" . $favNameAttrs['class'] . "'" . $favNameAttrs['data']
+            . ($favNameAttrs['style'] !== '' ? ' style="' . $favNameAttrs['style'] . '"' : '');
 
         echo "<div class='note-list-item favorite-folder-item'>";
         echo "<a class='links_arbo_left note-in-folder favorite-folder-link' href='" . htmlspecialchars($link, ENT_QUOTES) . "' data-folder-id='" . (int)$favFolder['id'] . "' data-folder='" . htmlspecialchars($favName, ENT_QUOTES) . "'>";
-        echo "<span class='note-title'><i class='" . htmlspecialchars((string)$customIcon, ENT_QUOTES, 'UTF-8') . " favorite-folder-icon'$iconStyle></i>" . htmlspecialchars($favName, ENT_QUOTES) . "</span>";
+        echo "<span class='note-title'><i class='" . htmlspecialchars((string)$customIcon, ENT_QUOTES, 'UTF-8') . " favorite-folder-icon'$iconStyle></i><span$nameAttrs>" . htmlspecialchars($favName, ENT_QUOTES) . "</span></span>";
         echo "</a>";
         echo "</div>";
         echo "<div class='pxbetweennotes'></div>";
@@ -576,8 +579,18 @@ function displayFolderRecursive($folderId, $folderData, $depth, $con, $is_search
             $folderDisplayName = t('notes_list.system_folders.favorites', [], 'Favorites');
         }
         $dblActionAttr = $isSystemFolder ? '' : " data-dblaction='edit-folder-name' data-folder-id='$folderId' data-folder-name='" . htmlspecialchars($folderName, ENT_QUOTES) . "'";
+        // Colour of the name (folders.title_color), set from the icon
+        // picker's "Apply the color to the title" box (discussion #1729,
+        // js/folder-icon.js repaints it the same way)
+        $folderNameStyle = '';
+        $folderNameClass = 'folder-name';
+        if (!$isSystemFolder) {
+            $folderNameAttrs = poznoteFolderTitleAttrs($folderId, $folderData['title_color'] ?? '');
+            $folderNameClass .= $folderNameAttrs['class'];
+            $folderNameStyle = $folderNameAttrs['data'] . ($folderNameAttrs['style'] !== '' ? ' style="' . $folderNameAttrs['style'] . '"' : '');
+        }
         // Add toggle-folder action on the folder name span
-        echo "<span class='folder-name' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderDomId'$dblActionAttr>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
+        echo "<span class='$folderNameClass' data-action='toggle-folder' data-folder-dom-id='$folderDomId' data-folder-id='$folderDomId'$dblActionAttr$folderNameStyle>" . htmlspecialchars($folderDisplayName, ENT_QUOTES) . "</span>";
         // Count notes recursively (includes all subfolder notes)
         $noteCount = countNotesRecursively($folderData);
         // Favorites shows no count: its rows repeat notes and folders counted

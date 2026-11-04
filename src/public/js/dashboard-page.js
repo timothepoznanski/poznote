@@ -213,6 +213,18 @@
 
     // --- Card builders ---
 
+    // Attributes of a folder name: its colour when "Apply the color to the
+    // folder title" was ticked in the icon picker (folders.title_color,
+    // discussion #1729, css/components/folder-title.css)
+    function folderTitleAttrs(folder, className) {
+        var attrs = ' data-folder-title-for="' + esc(String(folder.id)) + '"';
+        if (!folder.titleColor) {
+            return ' class="' + className + '"' + attrs;
+        }
+        return ' class="' + className + ' has-title-color"' + attrs +
+            ' style="--folder-title-color:' + esc(folder.titleColor) + '"';
+    }
+
     function buildFolderCard(folder, index) {
         var count = countNotes(folder);
         var iconStyle = folder.color ? ' style="color:' + esc(folder.color) + ' !important"' : '';
@@ -241,7 +253,7 @@
             ' data-folder-id="' + esc(String(folder.id)) + '"' + colorAttrs + '>' +
             pinBtn +
             '<div class="dash-card-icon"><i class="' + esc(folder.icon) + '"' + iconStyle + '></i></div>' +
-            '<span class="dash-card-name">' + esc(folder.name) + '</span>' +
+            '<span' + folderTitleAttrs(folder, 'dash-card-name') + '>' + esc(folder.name) + '</span>' +
             // Count and, on multi-workspace boards, the workspace side by side:
             // the card has no room for another line under a two-line name
             '<span class="dash-card-meta">' +
@@ -545,9 +557,9 @@
         navStack.forEach(function (folder, i) {
             html += '<i class="lucide lucide-chevron-right bc-sep"></i>';
             if (i === navStack.length - 1) {
-                html += '<span class="bc-current">' + esc(folder.name) + '</span>';
+                html += '<span' + folderTitleAttrs(folder, 'bc-current') + '>' + esc(folder.name) + '</span>';
             } else {
-                html += '<button class="bc-item" data-depth="' + (i + 1) + '">' + esc(folder.name) + '</button>';
+                html += '<button' + folderTitleAttrs(folder, 'bc-item') + ' data-depth="' + (i + 1) + '">' + esc(folder.name) + '</button>';
             }
         });
         bc.innerHTML = html;

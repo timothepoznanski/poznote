@@ -1079,7 +1079,12 @@
     "remind_me_hint": "Se activa una notificación en la fecha y hora límite.",
     "add_subtask": "Añadir una subtarea",
     "subtask_placeholder": "Añadir una subtarea...",
-    "delete_subtask": "Eliminar subtarea"
+    "delete_subtask": "Eliminar subtarea",
+    "priority": "Prioridad",
+    "priority_high": "Prioridad alta",
+    "priority_medium": "Prioridad media",
+    "priority_low": "Prioridad baja",
+    "priority_none": "Sin prioridad"
   },
   "tags": {
     "add_single": "Agregar etiqueta...",
@@ -1461,7 +1466,8 @@
         "workspace_menu": "Menú del espacio de trabajo",
         "note_actions": "Acciones de las notas",
         "mobile_editor_bar": "Barra de edición móvil",
-        "sidebar": "Barra lateral"
+        "sidebar": "Barra lateral",
+        "task_lists": "Listas de tareas"
       },
       "check_all": "Marcar todo",
       "uncheck_all": "Desmarcar todo",
@@ -1496,7 +1502,12 @@
       "note_stats_lines": "Mostrar número de líneas",
       "note_info_icon": "Mostrar icono de información bajo el título de la nota",
       "note_scrollbar": "Barra de desplazamiento de las notas",
-      "note_scroll_arrows": "Flechas para ir al principio y al final de la nota"
+      "note_scroll_arrows": "Flechas para ir al principio y al final de la nota",
+      "tasklist_add_field": "Campo para añadir una tarea",
+      "tasklist_frame": "Marco alrededor de cada tarea",
+      "tasklist_delete": "Eliminar una tarea completada",
+      "tasklist_menu": "Menú de opciones de la tarea (móvil)",
+      "tasklist_frame_color": "Color de prioridad del marco de las tareas"
     },
     "icon_sidebar_order": {
       "title": "Diseño de la barra de iconos",
@@ -1639,7 +1650,9 @@
       "default_icon": "Establecer icono predeterminado",
       "reset": "Restaurar el comportamiento predeterminado",
       "search_placeholder": "Buscar iconos...",
-      "default_color": "Predeterminado"
+      "default_color": "Predeterminado",
+      "apply_to_folder_title": "Aplicar el color al título de la carpeta",
+      "apply_to_note_title": "Aplicar el color al título de la nota"
     },
     "linked_selector": {
       "title": "Crear un atajo de una nota",
@@ -5155,7 +5168,12 @@
     "hide_list": "Ocultar en esta página",
     "unhide_list": "Volver a mostrar en esta página",
     "show_hidden": "Mostrar las listas ocultas",
-    "empty_hidden": "Todas las listas están ocultas."
+    "empty_hidden": "Todas las listas están ocultas.",
+    "show_note_checklists_help": "Muestra también las casillas escritas dentro de las notas normales, junto a las tareas de tus listas de tareas. Su grupo lleva una insignia Nota.",
+    "show_hidden_help": "Una lista oculta con el ojo de su encabezado sale de esta página, del calendario y de los contadores. Marca esta opción para volver a mostrar las listas ocultas, atenuadas, con un ojo para recuperar cada una. En gris mientras no haya ninguna lista oculta.",
+    "filter_priority_high": "Alta",
+    "filter_priority_medium": "Media",
+    "filter_priority_low": "Baja"
   },
   "mentions": {
     "title": "Menciones",

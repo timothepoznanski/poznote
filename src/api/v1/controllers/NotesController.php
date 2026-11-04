@@ -1643,16 +1643,30 @@ class NotesController {
         $iconValue = $this->normalizeNoteIcon($icon);
         $iconColorValue = $iconColor === '' ? null : $iconColor;
 
+        // Optional "apply_to_title" (the icon picker's box, discussion
+        // #1729): the title colour follows the icon colour, or drops it.
+        // Absent, the title colour is left alone.
+        $hasApplyToTitle = array_key_exists('apply_to_title', $input);
+        $applyToTitle = $hasApplyToTitle ? filter_var($input['apply_to_title'], FILTER_VALIDATE_BOOLEAN) : false;
+
         try {
-            $existsStmt = $this->con->prepare('SELECT id FROM entries WHERE id = ? AND trash = 0');
+            $existsStmt = $this->con->prepare('SELECT icon_color, title_color FROM entries WHERE id = ? AND trash = 0');
             $existsStmt->execute([$noteId]);
-            if (!$existsStmt->fetchColumn()) {
+            $before = $existsStmt->fetch(PDO::FETCH_ASSOC);
+            if (!$before) {
                 $this->sendError(404, 'Note not found');
                 return;
             }
 
-            $stmt = $this->con->prepare('UPDATE entries SET icon = ?, icon_color = ? WHERE id = ?');
-            $success = $stmt->execute([$iconValue, $iconColorValue, $noteId]);
+            $titleColorValue = $before['title_color'] ?? null;
+            if ($hasApplyToTitle) {
+                $titleColorValue = poznoteTitleColorAfterIconChange($applyToTitle, $before['icon_color'] ?? '', $iconColorValue ?? '', $before['title_color'] ?? '');
+                $stmt = $this->con->prepare('UPDATE entries SET icon = ?, icon_color = ?, title_color = ? WHERE id = ?');
+                $success = $stmt->execute([$iconValue, $iconColorValue, $titleColorValue, $noteId]);
+            } else {
+                $stmt = $this->con->prepare('UPDATE entries SET icon = ?, icon_color = ? WHERE id = ?');
+                $success = $stmt->execute([$iconValue, $iconColorValue, $noteId]);
+            }
 
             if (!$success) {
                 $this->sendError(500, 'Database error while updating note icon');
@@ -1662,7 +1676,8 @@ class NotesController {
             $this->sendSuccess([
                 'message' => 'Note icon updated successfully',
                 'icon' => $iconValue ?? self::DEFAULT_NOTE_ICON,
-                'icon_color' => $iconColorValue
+                'icon_color' => $iconColorValue,
+                'title_color' => ($titleColorValue === null || $titleColorValue === '') ? null : $titleColorValue
             ]);
 
             $this->triggerGitSync($noteId, 'push');

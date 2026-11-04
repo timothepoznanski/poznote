@@ -72,9 +72,9 @@ Una pestanya del Poznote oberta al navegador recull en pocs segons els canvis fe
 - `remove_reminder`: elimina el recordatori d'una nota
 - `list_reminders`: llista les notificacions de recordatori que ja s'han activat i encara estan pendents (les de la campana de la interfície); els recordatoris futurs no es poden llistar
 - `list_tasks`: llista les tasques d'una llista de tasques, amb els seus ID, dates de venciment i marques
-- `list_all_tasks`: llista les tasques obertes de totes les notes d'un espai de treball, primer les més urgents, amb filtres (data de venciment, importants, completades, llistes de comprovació dins de notes)
+- `list_all_tasks`: llista les tasques obertes de totes les notes d'un espai de treball, primer les més urgents, amb filtres (data de venciment, prioritat alta, completades, llistes de comprovació dins de notes)
 - `add_task`: afegeix una tasca a una llista de tasques, amb una data de venciment i un recordatori opcionals
-- `update_task`: actualitza una tasca (text, data de venciment, recordatori, marca d'important)
+- `update_task`: actualitza una tasca (text, data de venciment, recordatori, prioritat)
 - `complete_task`: marca una tasca com a feta o la torna a obrir
 - `delete_task`: suprimeix una tasca d'una llista de tasques
 - `add_subtask`: afegeix una subtasca a una tasca d'una llista de tasques

@@ -794,8 +794,9 @@ html[data-theme='light'] {
     opacity: 0.6;
 }
 
-.note-item .task-item.important {
-    font-weight: var(--pz-weight-bold);
+/* Priority (#1730, css/components/task-priority.css) */
+.note-item .task-item:is(.priority-high, .priority-medium, .priority-low) .task-text {
+    color: var(--pz-task-priority);
 }
 
 .note-item .task-text {

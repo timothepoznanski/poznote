@@ -151,6 +151,7 @@ function dashboardBuildTree(int $folderId, array &$folders, array $insertOrder, 
         'name'    => $f['name'],
         'icon'    => $f['icon'],
         'color'   => $f['color'],
+        'titleColor' => $f['titleColor'] ?? null,
         'cardColor'    => $f['cardColor'] ?? '',
         'cardColorHex' => $f['cardColorHex'] ?? '',
         'pinned'  => !empty($f['pinned']),
@@ -274,7 +275,7 @@ function dashboardBuildWorkspaceBoard(PDO $con, string $pageWorkspace, bool $fav
 
     $folderWhere = !empty($pageWorkspace) ? " WHERE workspace = ?" : "";
     $stmtF = $con->prepare(
-        "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned, favorite FROM folders" . $folderWhere .
+        "SELECT id, name, parent_id, icon, icon_color, title_color, color, display_order, pinned, favorite FROM folders" . $folderWhere .
         " ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE"
     );
     $stmtF->execute(!empty($pageWorkspace) ? [$pageWorkspace] : []);
@@ -292,6 +293,8 @@ function dashboardBuildWorkspaceBoard(PDO $con, string $pageWorkspace, bool $fav
             // 'color' is the icon color (legacy name); 'cardColor'/'cardColorHex'
             // carry the card background color, like notes.
             'color'    => poznoteIconColorCss($f['icon_color'] ?? '') ?: null,
+            // Colour of the name (folders.title_color, discussion #1729)
+            'titleColor' => poznoteIconColorCss($f['title_color'] ?? '') ?: null,
             'cardColor'    => !empty($f['color']) ? (string)$f['color'] : '',
             'cardColorHex' => !empty($f['color']) ? resolveNoteColorHex((string)$f['color']) : '',
             'pinned'   => !empty($f['pinned']),
@@ -751,6 +754,7 @@ $pageWidthStyle = poznotePageWidthStyle('dashboard');
 		<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 		<script src="js/request-errors.js?v=<?php echo $cache_v; ?>"></script>
 		<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
+		<script src="<?php echo poznoteAsset('js/task-priority.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/dashboard-note-modal.js'); ?>"></script>
 		<?php // Before dashboard-page.js: the card size and column count are set before the cards are drawn ?>
 		<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>

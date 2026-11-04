@@ -460,6 +460,8 @@
                 folderSlot: folderSlots[raw.name] !== undefined ? folderSlots[raw.name] : -1,
                 icon: raw.icon || '',
                 iconColor: iconColorCss(raw.icon_color),
+                // Name colour (folders.title_color, discussion #1729)
+                titleColor: iconColorCss(raw.title_color),
                 isFolder: true,
                 parentId: raw.parent_id,
                 noteCount: notes.length,
@@ -1246,6 +1248,8 @@
             var label = document.createElementNS(SVG_NS, 'text');
             label.setAttribute('class', 'graph-label');
             label.textContent = node.title.length > 24 ? node.title.slice(0, 23) + '…' : node.title;
+            // A folder name in its title colour: inline, over css/graph.css
+            if (node.titleColor) { label.style.fill = node.titleColor; }
 
             g.appendChild(circle);
             if (node.shape) {

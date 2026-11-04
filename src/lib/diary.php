@@ -598,7 +598,7 @@ function renderDiaryJournalContent(string $content, string $type): string {
             $text = trim((string)($item['text'] ?? ''));
             if ($text === '') continue;
             $done = !empty($item['completed']);
-            $classes = trim(($done ? 'completed' : '') . (!empty($item['important']) ? ' important' : ''));
+            $classes = trim(($done ? 'completed' : '') . tasklistPriorityClasses($item));
             $html .= '<li' . ($classes !== '' ? ' class="' . $classes . '"' : '') . '>'
                 . '<input type="checkbox" disabled' . ($done ? ' checked' : '') . '> '
                 . '<span>' . htmlspecialchars($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';

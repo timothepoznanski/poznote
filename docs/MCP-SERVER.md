@@ -72,9 +72,9 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 - `remove_reminder` — Remove the reminder from a note
 - `list_reminders` — List reminder notifications that have already fired and are still pending (the bell feed of the UI); upcoming reminders are not listable
 - `list_tasks` — List the tasks of a tasklist note, with their IDs, due dates and flags
-- `list_all_tasks` — List the open tasks across every note of a workspace, most urgent first, with filters (due date, important, completed, in-note checklists)
+- `list_all_tasks` — List the open tasks across every note of a workspace, most urgent first, with filters (due date, high priority, completed, in-note checklists)
 - `add_task` — Add a single task to a tasklist note, with an optional due date and reminder
-- `update_task` — Update one task (text, due date, reminder, important flag)
+- `update_task` — Update one task (text, due date, reminder, priority)
 - `complete_task` — Mark a task as done, or reopen it
 - `delete_task` — Delete one task from a tasklist note
 - `add_subtask` — Add a subtask under a task of a tasklist note

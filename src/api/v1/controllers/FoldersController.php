@@ -371,7 +371,7 @@ class FoldersController {
             return;
         }
         
-        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color, display_order, is_diary, created FROM folders WHERE workspace = ?');
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, title_color, color, display_order, is_diary, created FROM folders WHERE workspace = ?');
         $stmt->execute([$workspace]);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -394,6 +394,7 @@ class FoldersController {
                 'parent_id' => $r['parent_id'] !== null ? (int)$r['parent_id'] : null,
                 'icon' => $this->normalizeFolderIcon($r['icon'] ?? null),
                 'icon_color' => $r['icon_color'] ?? null,
+                'title_color' => $r['title_color'] ?? null,
                 'color' => $r['color'] ?? null,
                 'color_hex' => !empty($r['color']) ? (resolveNoteColorHex($r['color']) ?: null) : null,
                 'display_order' => (int)($r['display_order'] ?? 0),
@@ -412,6 +413,7 @@ class FoldersController {
                     'parent_id' => $f['parent_id'],
                     'icon' => $f['icon'],
                     'icon_color' => $f['icon_color'],
+                    'title_color' => $f['title_color'],
                     'color' => $f['color'],
                     'color_hex' => $f['color_hex'],
                     'display_order' => $f['display_order'],
@@ -439,6 +441,7 @@ class FoldersController {
                     'parent_id' => $f['parent_id'],
                     'icon' => $f['icon'],
                     'icon_color' => $f['icon_color'],
+                    'title_color' => $f['title_color'],
                     'color' => $f['color'],
                     'color_hex' => $f['color_hex'],
                     'display_order' => $f['display_order'],
@@ -466,7 +469,7 @@ class FoldersController {
         $workspace = isset($_GET['workspace']) ? trim((string)$_GET['workspace']) : null;
         
         [$wsCond, $wsParams] = $this->buildWorkspaceCondition($workspace);
-        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color, display_order, created, workspace FROM folders WHERE id = ?' . $wsCond);
+        $stmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, title_color, color, display_order, created, workspace FROM folders WHERE id = ?' . $wsCond);
         $stmt->execute(array_merge([$folderId], $wsParams));
 
         $folder = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -500,6 +503,7 @@ class FoldersController {
                 'parent_id' => $folder['parent_id'] !== null ? (int)$folder['parent_id'] : null,
                 'icon' => $this->normalizeFolderIcon($folder['icon'] ?? null),
                 'icon_color' => $folder['icon_color'],
+                'title_color' => $folder['title_color'] ?? null,
                 'color' => $folder['color'] ?? null,
                 'color_hex' => !empty($folder['color']) ? (resolveNoteColorHex($folder['color']) ?: null) : null,
                 'display_order' => (int)($folder['display_order'] ?? 0),
@@ -976,7 +980,7 @@ class FoldersController {
         $placeholders = implode(',', array_fill(0, count($folderIds), '?'));
 
         $folderStmt = $this->db->prepare(
-            "SELECT id, name, parent_id, icon, icon_color, color, display_order, pinned, favorite, kanban_enabled, sort_setting"
+            "SELECT id, name, parent_id, icon, icon_color, title_color, color, display_order, pinned, favorite, kanban_enabled, sort_setting"
             . " FROM folders WHERE id IN ($placeholders) AND workspace = ?"
         );
         $folderStmt->execute(array_merge($folderIds, [$workspace]));
@@ -988,6 +992,7 @@ class FoldersController {
                 'parent_id' => $row['parent_id'] !== null ? (int)$row['parent_id'] : null,
                 'icon' => $row['icon'],
                 'icon_color' => $row['icon_color'],
+                'title_color' => $row['title_color'],
                 'color' => $row['color'],
                 'display_order' => (int)($row['display_order'] ?? 0),
                 'pinned' => (int)($row['pinned'] ?? 0),
@@ -1078,6 +1083,7 @@ class FoldersController {
                 'parent_id' => (isset($row['parent_id']) && $row['parent_id'] !== null && $row['parent_id'] !== '') ? (int)$row['parent_id'] : null,
                 'icon' => isset($row['icon']) && $row['icon'] !== '' ? (string)$row['icon'] : null,
                 'icon_color' => isset($row['icon_color']) && $row['icon_color'] !== '' ? (string)$row['icon_color'] : null,
+                'title_color' => isset($row['title_color']) && preg_match('/^#[0-9a-fA-F]{6}$/', (string)$row['title_color']) ? strtolower((string)$row['title_color']) : null,
                 'color' => isset($row['color']) && $row['color'] !== '' ? (string)$row['color'] : null,
                 'display_order' => (int)($row['display_order'] ?? 0),
                 'pinned' => !empty($row['pinned']) ? 1 : 0,
@@ -1124,8 +1130,8 @@ class FoldersController {
             $findStmt = $this->db->prepare('SELECT id FROM folders WHERE workspace = ? AND name = ? AND parent_id IS ?');
             $parentExistsStmt = $this->db->prepare('SELECT id FROM folders WHERE id = ? AND workspace = ?');
             $insertStmt = $this->db->prepare(
-                "INSERT INTO folders (name, workspace, parent_id, icon, icon_color, color, display_order, pinned, favorite, kanban_enabled, sort_setting, created)"
-                . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))"
+                "INSERT INTO folders (name, workspace, parent_id, icon, icon_color, title_color, color, display_order, pinned, favorite, kanban_enabled, sort_setting, created)"
+                . " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))"
             );
 
             foreach ($ordered as $row) {
@@ -1149,7 +1155,7 @@ class FoldersController {
 
                 $insertStmt->execute([
                     $row['name'], $workspace, $newParent,
-                    $row['icon'], $row['icon_color'], $row['color'],
+                    $row['icon'], $row['icon_color'], $row['title_color'], $row['color'],
                     $row['display_order'], $row['pinned'], $row['favorite'],
                     $row['kanban_enabled'], $row['sort_setting'],
                 ]);
@@ -1330,13 +1336,14 @@ class FoldersController {
             throw new Exception('Folder hierarchy too deep');
         }
 
-        $insert = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, icon, icon_color, color, kanban_enabled, sort_setting, display_order, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
+        $insert = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, icon, icon_color, title_color, color, kanban_enabled, sort_setting, display_order, created) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))");
         $insert->execute([
             $name,
             $workspace,
             $parentId,
             $source['icon'] ?? null,
             $source['icon_color'] ?? null,
+            $source['title_color'] ?? null,
             $source['color'] ?? null,
             (int)($source['kanban_enabled'] ?? 0),
             $source['sort_setting'] ?? null,
@@ -1766,15 +1773,28 @@ class FoldersController {
         $iconValue = $this->normalizeFolderIcon($icon);
         $iconColorValue = $iconColor === '' ? null : $iconColor;
 
-        $stmt = $this->db->prepare("UPDATE folders SET icon = ?, icon_color = ? WHERE id = ?");
-        $success = $stmt->execute([$iconValue, $iconColorValue, $folderId]);
+        // Optional "apply_to_title" (the icon picker's box, discussion
+        // #1729): the name colour follows the icon colour, or drops it.
+        // Absent, the name colour is left alone.
+        $beforeStmt = $this->db->prepare('SELECT icon_color, title_color FROM folders WHERE id = ?');
+        $beforeStmt->execute([$folderId]);
+        $before = $beforeStmt->fetch(PDO::FETCH_ASSOC) ?: [];
+        $titleColorValue = $before['title_color'] ?? null;
+        if (array_key_exists('apply_to_title', $data)) {
+            $applyToTitle = filter_var($data['apply_to_title'], FILTER_VALIDATE_BOOLEAN);
+            $titleColorValue = poznoteTitleColorAfterIconChange($applyToTitle, $before['icon_color'] ?? '', $iconColorValue ?? '', $before['title_color'] ?? '');
+        }
+
+        $stmt = $this->db->prepare("UPDATE folders SET icon = ?, icon_color = ?, title_color = ? WHERE id = ?");
+        $success = $stmt->execute([$iconValue, $iconColorValue, $titleColorValue, $folderId]);
 
         if ($success) {
             $this->sendJson([
                 'success' => true,
                 'message' => 'Folder icon updated successfully',
                 'icon' => $iconValue,
-                'icon_color' => $iconColorValue
+                'icon_color' => $iconColorValue,
+                'title_color' => ($titleColorValue === null || $titleColorValue === '') ? null : $titleColorValue
             ]);
         } else {
             $this->sendError('Database error', 500);
@@ -3070,7 +3090,7 @@ class FoldersController {
         $cursor = $folderId;
         $depth = 0;
         while ($cursor !== null && $depth < 50) {
-            $folderStmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, color FROM folders WHERE id = ?');
+            $folderStmt = $this->db->prepare('SELECT id, name, parent_id, icon, icon_color, title_color, color FROM folders WHERE id = ?');
             $folderStmt->execute([$cursor]);
             $folderRow = $folderStmt->fetch(PDO::FETCH_ASSOC);
             if (!$folderRow) break;
@@ -3121,13 +3141,14 @@ class FoldersController {
             if ($existing) {
                 $parentId = (int)$existing['id'];
             } else {
-                $insertStmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, icon, icon_color, color, created) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))");
+                $insertStmt = $this->db->prepare("INSERT INTO folders (name, workspace, parent_id, icon, icon_color, title_color, color, created) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))");
                 $insertStmt->execute([
                     $segment['name'],
                     $archiveWorkspace,
                     $parentId,
                     $segment['icon'],
                     $segment['icon_color'],
+                    $segment['title_color'] ?? null,
                     $segment['color']
                 ]);
                 $parentId = (int)$this->db->lastInsertId();

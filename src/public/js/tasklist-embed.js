@@ -9,7 +9,7 @@
 // on load. The fallback link keeps public and exported notes usable.
 //
 // The widget is a live editor of the source tasklist note: tasks can be
-// added, renamed (shared "Edit task" modal), completed, starred, dated and
+// added, renamed (shared "Edit task" modal), completed, prioritized, dated and
 // deleted without leaving the host note. Every change is a read-modify-write of the source note through
 // the notes API (same flow as the global tasks page), so the host note never
 // carries task data itself.
@@ -140,17 +140,27 @@
         return insertOrder === 'top' ? 'top' : 'bottom';
     }
 
+    // Priority of a task (#1730, js/task-priority.js): 'high', 'medium', 'low' or null
+    function priorityOf(task) {
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.get(task) : (task && task.important ? 'high' : null);
+    }
+
+    function sortByPriority(tasks) {
+        return window.poznoteTaskPriority ? window.poznoteTaskPriority.sort(tasks) : tasks;
+    }
+
+    // `important` holds the open tasks with a priority, in high, medium, low order
     function groupTasks(tasks) {
         var important = [], normal = [], completed = [];
         tasks.forEach(function (task) {
             if (task.completed) completed.push(task);
-            else if (task.important) important.push(task);
+            else if (priorityOf(task)) important.push(task);
             else normal.push(task);
         });
-        return { important: important, normal: normal, completed: completed };
+        return { important: sortByPriority(important), normal: normal, completed: completed };
     }
 
-    // Important open tasks first, then the other open tasks, completed last
+    // Open tasks by priority (high, medium, low, none), completed last
     function regroupTasks(tasks) {
         var groups = groupTasks(tasks);
         return [].concat(groups.important, groups.normal, groups.completed);
@@ -166,12 +176,13 @@
         if (toggled.completed) {
             if (getInsertOrder() === 'bottom') groups.completed.unshift(toggled);
             else groups.completed.push(toggled);
-        } else if (toggled.important) {
+        } else if (priorityOf(toggled)) {
             groups.important.push(toggled);
         } else {
             groups.normal.push(toggled);
         }
-        return [].concat(groups.important, groups.normal, groups.completed);
+        // (a reopened task goes back to the end of its priority level)
+        return sortByPriority([].concat(groups.important, groups.normal, groups.completed));
     }
 
     // ===== Source note access =====
@@ -537,9 +548,12 @@
 
     function renderTaskRow(embed, noteId, task) {
         var row = document.createElement('div');
+        var priority = priorityOf(task);
         row.className = 'tasklist-embed-task'
             + (task.completed ? ' completed' : '')
-            + (task.important && !task.completed ? ' important' : '');
+            + (priority && !task.completed
+                ? (window.poznoteTaskPriority ? window.poznoteTaskPriority.classNames(task) : ' important')
+                : '');
         row.setAttribute('data-task-id', String(task.id));
 
         var checkbox = document.createElement('input');
@@ -586,7 +600,7 @@
         }
 
         // Same per-row controls as the tasklist note: open tasks get the due
-        // date and important toggles, completed tasks can be deleted
+        // date and the priority flag, completed tasks can be deleted
         var actions = document.createElement('div');
         actions.className = 'tasklist-embed-actions';
         if (task.completed) {
@@ -601,13 +615,16 @@
                         openEmbedDueModal(embed, noteId, task);
                     }));
             }
-            var starLabel = task.important
-                ? t('tasklist.unmark_important', null, 'Remove important')
-                : t('tasklist.mark_important', null, 'Mark as important');
-            actions.appendChild(actionButton('lucide-star', starLabel,
-                'tasklist-embed-action-important' + (task.important ? ' is-active' : ''), function () {
-                    toggleEmbedImportant(embed, noteId, task);
-                }));
+            if (window.poznoteTaskPriority) {
+                var priorityButton = actionButton('lucide-flag', window.poznoteTaskPriority.buttonTitle(task),
+                    'tasklist-embed-action-priority' + (priority ? ' is-active priority-' + priority : ''), function () {
+                        window.poznoteTaskPriority.openMenu(priorityButton, priority, function (picked) {
+                            setEmbedPriority(embed, noteId, task, picked);
+                        });
+                    });
+                priorityButton.setAttribute('aria-haspopup', 'menu');
+                actions.appendChild(priorityButton);
+            }
         }
         row.appendChild(actions);
 
@@ -824,11 +841,11 @@
         }
     }
 
-    async function toggleEmbedImportant(embed, noteId, task) {
+    async function setEmbedPriority(embed, noteId, task, priority) {
         try {
             await mutateTaskList(noteId, function (tasks) {
                 var target = requireTask(tasks, task.id);
-                target.important = !target.important;
+                window.poznoteTaskPriority.set(target, priority);
                 return regroupTasks(tasks);
             });
         } catch (e) {

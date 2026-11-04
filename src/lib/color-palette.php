@@ -95,6 +95,72 @@ function poznoteIsSafeCssColor($color) {
 }
 
 /**
+ * Class and attributes of a coloured title in the notes tree (a note title,
+ * a folder name): ' has-title-color' to append to the class, and the
+ * custom property that paints it plus the stored hex as data-title-color,
+ * or two empty strings for the default look.
+ *
+ * @return array{class: string, attrs: string}
+ */
+function poznoteTitleColorAttrs($titleColor, $property) {
+    $css = poznoteIconColorCss($titleColor);
+    if ($css === '') {
+        return ['class' => '', 'attrs' => ''];
+    }
+    return [
+        'class' => ' has-title-color',
+        'attrs' => " style='" . $property . ': ' . htmlspecialchars($css, ENT_QUOTES) . "'"
+            . " data-title-color='" . htmlspecialchars(strtolower(trim((string)$titleColor)), ENT_QUOTES) . "'",
+    ];
+}
+
+/**
+ * Pieces of a folder name element, in every view that names a folder (notes
+ * tree, Kanban, Dashboard, Folders page): data-folder-title-for always, so
+ * js/folder-icon.js finds the names to repaint after the icon picker, and,
+ * for a coloured name (folders.title_color, discussion #1729), the stored
+ * hex, ' has-title-color' and the --folder-title-color declaration that
+ * css/components/folder-title.css paints. Already escaped for an attribute.
+ *
+ * @return array{class: string, style: string, data: string}
+ */
+function poznoteFolderTitleAttrs($folderId, $titleColor) {
+    $data = ' data-folder-title-for="' . (int)$folderId . '"';
+    $css = poznoteIconColorCss($titleColor);
+    if ($css === '') {
+        return ['class' => '', 'style' => '', 'data' => $data];
+    }
+    return [
+        'class' => ' has-title-color',
+        'style' => '--folder-title-color: ' . htmlspecialchars($css, ENT_QUOTES) . ';',
+        'data' => $data . ' data-title-color="' . htmlspecialchars(strtolower(trim((string)$titleColor)), ENT_QUOTES) . '"',
+    ];
+}
+
+/**
+ * Title colour of a note or folder once its icon colour changes, for the
+ * icon picker's "Apply the color to the title" box (discussion #1729): the
+ * box ticked, the title takes the new icon colour (or the default when the
+ * icon has none); unticked, a title that had the old icon colour goes back
+ * to the default, and a title coloured otherwise (note title menu) is kept.
+ * Titles only hold #rrggbb, so another icon colour leaves the default.
+ *
+ * @return string|null the title colour to store, lowercase, or null
+ */
+function poznoteTitleColorAfterIconChange($applyToTitle, $oldIconColor, $newIconColor, $oldTitleColor) {
+    $oldTitle = strtolower(trim((string)$oldTitleColor));
+    if ($applyToTitle) {
+        $new = strtolower(trim((string)$newIconColor));
+        return preg_match('/^#[0-9a-f]{6}$/', $new) ? $new : null;
+    }
+    $oldIcon = strtolower(trim((string)$oldIconColor));
+    if ($oldTitle !== '' && $oldTitle === $oldIcon) {
+        return null;
+    }
+    return $oldTitle !== '' ? $oldTitle : null;
+}
+
+/**
  * The CSS value to paint a stored icon colour with: the theme token for a
  * palette colour (current or legacy) with the stored hex as fallback, the
  * colour itself for anything else that is safe, '' otherwise.

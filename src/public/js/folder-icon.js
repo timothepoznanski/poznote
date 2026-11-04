@@ -666,6 +666,7 @@ function showChangeIconModal(targetType, targetId, targetName) {
     if (currentColor) {
         selectedIconColor = currentColor;
     }
+    setupApplyToTitleBox(currentIconTargetType, targetId, currentColor);
 
     // Setup search functionality
     const searchInput = document.getElementById('folderIconSearchInput');
@@ -864,6 +865,7 @@ function saveFolderIcon() {
     const endpoint = isNoteIcon
         ? '/api/v1/notes/' + currentFolderIdForIcon + '/icon'
         : '/api/v1/folders/' + currentFolderIdForIcon + '/icon';
+    const applyToTitleBox = document.getElementById('folderIconApplyToTitle');
 
     // Send request to API
     fetch(endpoint, {
@@ -874,7 +876,9 @@ function saveFolderIcon() {
         credentials: 'same-origin',
         body: JSON.stringify({
             icon: selectedIconClass,
-            icon_color: selectedIconColor
+            icon_color: selectedIconColor,
+            // Discussion #1729: the title takes the icon colour, or drops it
+            apply_to_title: !!(applyToTitleBox && applyToTitleBox.checked)
         })
     })
         .then(response => response.json())
@@ -886,8 +890,10 @@ function saveFolderIcon() {
                 // Update the icon in the UI
                 if (isNoteIcon) {
                     updateNoteIconInUI(currentFolderIdForIcon, selectedIconClass, selectedIconColor);
+                    paintNoteTitleColor(currentFolderIdForIcon, data.title_color);
                 } else {
                     updateFolderIconInUI(currentFolderIdForIcon, selectedIconClass, selectedIconColor);
+                    paintFolderTitleColor(currentFolderIdForIcon, data.title_color);
                 }
 
                 // Close modal
@@ -936,7 +942,9 @@ function resetFolderIcon() {
         credentials: 'same-origin',
         body: JSON.stringify({
             icon: '',
-            icon_color: ''
+            icon_color: '',
+            // A title that had the icon colour goes back to the default too
+            apply_to_title: false
         })
     })
         .then(response => response.json())
@@ -945,8 +953,10 @@ function resetFolderIcon() {
                 // Update the icon in the UI (default toggle + default color)
                 if (isNoteIcon) {
                     updateNoteIconInUI(currentFolderIdForIcon, '', '');
+                    paintNoteTitleColor(currentFolderIdForIcon, data.title_color);
                 } else {
                     updateFolderIconInUI(currentFolderIdForIcon, '', '');
+                    paintFolderTitleColor(currentFolderIdForIcon, data.title_color);
                 }
                 closeFolderIconModal();
             } else {
@@ -965,13 +975,104 @@ function resetFolderIcon() {
 }
 
 /**
+ * The names of a folder on the page: notes tree, Favorites shortcut, Kanban
+ * board, Folders page (lib/color-palette.php poznoteFolderTitleAttrs()).
+ */
+function folderTitleElements(folderId) {
+    return Array.from(document.querySelectorAll(`[data-folder-title-for="${folderId}"]`));
+}
+
+/**
+ * Paint the title colour (folders.title_color, discussion #1729) on every
+ * name of the folder, the way poznoteFolderTitleAttrs() renders it.
+ */
+function paintFolderTitleColor(folderId, titleColor) {
+    const color = (titleColor || '').toLowerCase();
+    const css = color ? (window.poznoteIconColorCss ? window.poznoteIconColorCss(color) : color) : '';
+    folderTitleElements(folderId).forEach(el => {
+        if (css) {
+            el.classList.add('has-title-color');
+            el.style.setProperty('--folder-title-color', css);
+            el.setAttribute('data-title-color', color);
+        } else {
+            el.classList.remove('has-title-color');
+            el.style.removeProperty('--folder-title-color');
+            el.removeAttribute('data-title-color');
+            if (!el.getAttribute('style')) el.removeAttribute('style');
+        }
+    });
+}
+
+/**
+ * Paint a note's title colour (entries.title_color): the opened note's title
+ * and its rows in the tree (js/note-title-menu.js).
+ */
+function paintNoteTitleColor(noteId, titleColor) {
+    if (typeof window.poznoteSetNoteTitleColor === 'function') {
+        window.poznoteSetNoteTitleColor(noteId, titleColor || '');
+    }
+}
+
+/**
+ * Whether the title of the picker's target already has its icon colour.
+ * The page answers when it shows both (the icon read by the picker, the
+ * title's data-title-color); elsewhere (the Folders page) the API does.
+ */
+function targetTitleHasIconColor(targetType, targetId, pageIconColor) {
+    const same = (title, icon) => {
+        const t = String(title || '').toLowerCase();
+        return t !== '' && t === String(icon || '').toLowerCase();
+    };
+    let titleSource = null;
+    if (targetType === 'note') {
+        const input = document.getElementById('inp' + targetId);
+        titleSource = (input && input.closest('.note-title-heading'))
+            || document.querySelector(`#left_col a.links_arbo_left[data-note-id="${targetId}"] .note-title`);
+    } else {
+        titleSource = folderTitleElements(targetId)[0] || null;
+    }
+    if (titleSource) {
+        return Promise.resolve(same(titleSource.getAttribute('data-title-color'), pageIconColor));
+    }
+    const endpoint = (targetType === 'note' ? '/api/v1/notes/' : '/api/v1/folders/') + encodeURIComponent(targetId);
+    return fetch(endpoint, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } })
+        .then(response => response.json())
+        .then(data => {
+            const item = (data && (data.note || data.folder)) || {};
+            return same(item.title_color, item.icon_color);
+        })
+        .catch(() => false);
+}
+
+/**
+ * Set up the "Apply the color to the folder/note title" box: the label that
+ * fits the target, ticked when the title already has the icon colour.
+ */
+function setupApplyToTitleBox(targetType, targetId, currentColor) {
+    const box = document.getElementById('folderIconApplyToTitle');
+    if (!box) return;
+    document.querySelectorAll('#folderIconModal [data-icon-target]').forEach(label => {
+        label.hidden = label.getAttribute('data-icon-target') !== targetType;
+    });
+    box.checked = false;
+    targetTitleHasIconColor(targetType, targetId, currentColor).then(hasIt => {
+        // The picker may have been closed or reopened on another target meanwhile
+        if (currentFolderIdForIcon !== targetId || currentIconTargetType !== targetType) return;
+        box.checked = hasIt;
+    });
+}
+
+/**
  * Update folder icon in the UI
  */
 function updateFolderIconInUI(folderId, iconClass, iconColor) {
     const elementsToUpdate = [];
+    const iconColorCss = iconColor ? (window.poznoteIconColorCss ? window.poznoteIconColorCss(iconColor) : iconColor) : '';
 
-    // 1. Update in the notes list (sidebar) - find only direct child icon
-    const folderElement = document.querySelector(`[data-folder-id="${folderId}"]`);
+    // 1. Update in the notes list (sidebar) - find only direct child icon.
+    // .folder-header: a favorite folder's shortcut in Favorites carries the
+    // same data-folder-id and comes first in the tree.
+    const folderElement = document.querySelector(`.folder-header[data-folder-id="${folderId}"]`);
     if (folderElement) {
         // Find only the direct child .folder-icon (not descendants from subfolders)
         // Use > child combinator to target only immediate children within .folder-toggle
@@ -980,6 +1081,15 @@ function updateFolderIconInUI(folderId, iconClass, iconColor) {
             elementsToUpdate.push(iconElement);
         }
     }
+
+    // The folder's shortcut in Favorites shows the same colour
+    document.querySelectorAll(`a.favorite-folder-link[data-folder-id="${folderId}"] .favorite-folder-icon`).forEach(favIcon => {
+        if (iconColorCss) {
+            favIcon.style.setProperty('color', iconColorCss, 'important');
+        } else {
+            favIcon.style.removeProperty('color');
+        }
+    });
 
     // 2. Update in Kanban view
     // In kanban view, the icon has data-folder-id directly on it
@@ -1020,7 +1130,7 @@ function updateFolderIconInUI(folderId, iconClass, iconColor) {
 
         // Apply color with !important to override CSS rules
         if (iconColor) {
-            folderIconElement.style.setProperty('color', window.poznoteIconColorCss ? window.poznoteIconColorCss(iconColor) : iconColor, 'important');
+            folderIconElement.style.setProperty('color', iconColorCss, 'important');
             folderIconElement.setAttribute('data-icon-color', iconColor);
         } else {
             folderIconElement.style.removeProperty('color');

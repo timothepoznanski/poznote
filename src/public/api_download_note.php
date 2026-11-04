@@ -368,7 +368,20 @@ const EXPORT_STYLES = '
     }
     .task-item.important .task-text {
         color: #c62828;
-        font-weight: 600;
+    }
+    .task-item.priority-medium {
+        border-color: #fed7aa;
+        background: #fff7ed;
+    }
+    .task-item.priority-medium .task-text {
+        color: #c2410c;
+    }
+    .task-item.priority-low {
+        border-color: #bbf7d0;
+        background: #f0fdf4;
+    }
+    .task-item.priority-low .task-text {
+        color: #15803d;
     }
     .mermaid {
         margin: 1em 0;
@@ -485,7 +498,7 @@ switch ($noteType) {
                 $text = isset($task['text']) ? htmlspecialchars($task['text'], ENT_QUOTES, 'UTF-8') : '';
                 $completed = !empty($task['completed']) ? ' completed' : '';
                 $checked = !empty($task['completed']) ? ' checked' : '';
-                $important = !empty($task['important']) ? ' important' : '';
+                $important = tasklistPriorityClasses($task);
                 
                 $tasksContent .= '<div class="task-item' . $completed . $important . '">';
                 $tasksContent .= '<input type="checkbox" disabled' . $checked . ' /> ';

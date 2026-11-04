@@ -72,9 +72,9 @@ Ein im Browser geöffneter Poznote-Tab übernimmt die über MCP vorgenommenen Ä
 - `remove_reminder`: Die Erinnerung von einer Notiz entfernen
 - `list_reminders`: Erinnerungs-Benachrichtigungen auflisten, die bereits ausgelöst wurden und noch offen sind (der Glocken-Feed der Oberfläche); kommende Erinnerungen lassen sich nicht auflisten
 - `list_tasks`: Die Aufgaben einer Aufgabenlisten-Notiz mit ihren IDs, Fälligkeitsdaten und Markierungen auflisten
-- `list_all_tasks`: Die offenen Aufgaben aller Notizen eines Arbeitsbereichs auflisten, die dringendsten zuerst, mit Filtern (Fälligkeit, Wichtigkeit, erledigte Aufgaben, Kontrollkästchen in Notizen)
+- `list_all_tasks`: Die offenen Aufgaben aller Notizen eines Arbeitsbereichs auflisten, die dringendsten zuerst, mit Filtern (Fälligkeit, hohe Priorität, erledigte Aufgaben, Kontrollkästchen in Notizen)
 - `add_task`: Eine einzelne Aufgabe zu einer Aufgabenlisten-Notiz hinzufügen, optional mit Fälligkeitsdatum und Erinnerung
-- `update_task`: Eine Aufgabe aktualisieren (Text, Fälligkeitsdatum, Erinnerung, Markierung als wichtig)
+- `update_task`: Eine Aufgabe aktualisieren (Text, Fälligkeitsdatum, Erinnerung, Priorität)
 - `complete_task`: Eine Aufgabe als erledigt markieren oder wieder öffnen
 - `delete_task`: Eine Aufgabe aus einer Aufgabenlisten-Notiz löschen
 - `add_subtask`: Eine Unteraufgabe zu einer Aufgabe einer Aufgabenlisten-Notiz hinzufügen

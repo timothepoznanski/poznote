@@ -28,13 +28,15 @@ test('raw HTML inside a markdown entry never becomes live markup', function () {
 
 test('a tasklist entry lists its tasks as disabled boxes with escaped labels', function () {
     $json = json_encode([
-        ['text' => 'Buy <milk>', 'completed' => false],
+        ['text' => 'Buy <milk>', 'completed' => false, 'priority' => 'medium'],
         ['text' => 'Call mum', 'completed' => true, 'important' => true],
         ['text' => '   ', 'completed' => false],
     ]);
     $html = renderDiaryJournalContent($json, 'tasklist');
     assertContains('Buy &lt;milk&gt;', $html);
-    assertContains('class="completed important"', $html);
+    // Only open tasks carry their priority (#1730)
+    assertContains('<li class="priority-medium">', $html);
+    assertContains('<li class="completed">', $html);
     assertSame(2, substr_count($html, '<li'), 'blank tasks are skipped');
     assertSame(2, substr_count($html, 'disabled'));
 });

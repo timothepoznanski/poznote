@@ -710,7 +710,7 @@ $aiTools = [
                 'properties' => [
                     'note_id' => ['type' => 'integer', 'description' => 'The task list note id'],
                     'text' => ['type' => 'string', 'description' => 'The task text'],
-                    'important' => ['type' => 'boolean', 'description' => 'Mark the task as important (default false)'],
+                    'priority' => ['type' => 'string', 'enum' => ['high', 'medium', 'low', 'none'], 'description' => 'Task priority (default none)'],
                     'due_at' => ['type' => 'string', 'description' => 'Due date, "YYYY-MM-DD" or "YYYY-MM-DD HH:MM" in the user\'s timezone (optional)'],
                     'reminder' => ['type' => 'boolean', 'description' => 'Raise a notification at the due date (requires due_at)'],
                 ],
@@ -722,14 +722,14 @@ $aiTools = [
         'type' => 'function',
         'function' => [
             'name' => 'update_task',
-            'description' => 'Change one task of a task list note: check or uncheck it, mark it important, rename it, set or clear its due date and reminder. Only the fields given change. Checking a task that repeats adds its next occurrence to the list, returned as next_occurrence. Call it once per task; several calls in one turn are fine.',
+            'description' => 'Change one task of a task list note: check or uncheck it, set its priority, rename it, set or clear its due date and reminder. Only the fields given change. Checking a task that repeats adds its next occurrence to the list, returned as next_occurrence. Call it once per task; several calls in one turn are fine.',
             'parameters' => [
                 'type' => 'object',
                 'properties' => [
                     'note_id' => ['type' => 'integer', 'description' => 'The task list note id'],
                     'task' => ['type' => 'string', 'description' => 'The task: its id (from get_note) or its text'],
                     'completed' => ['type' => 'boolean', 'description' => 'true to check the task, false to uncheck it'],
-                    'important' => ['type' => 'boolean', 'description' => 'Important flag'],
+                    'priority' => ['type' => 'string', 'enum' => ['high', 'medium', 'low', 'none'], 'description' => 'Task priority; "none" clears it'],
                     'text' => ['type' => 'string', 'description' => 'New task text'],
                     'due_at' => ['type' => 'string', 'description' => 'New due date, "YYYY-MM-DD" or "YYYY-MM-DD HH:MM"; "" clears it'],
                     'reminder' => ['type' => 'boolean', 'description' => 'Raise a notification at the due date'],
@@ -757,7 +757,7 @@ $aiTools = [
         'type' => 'function',
         'function' => [
             'name' => 'add_subtask',
-            'description' => 'Add a subtask under one task of a task list note. Subtasks go one level deep and carry a text and a done flag only (no due date, reminder or important flag). Call it once per subtask; several calls in one turn are fine.',
+            'description' => 'Add a subtask under one task of a task list note. Subtasks go one level deep and carry a text and a done flag only (no due date, reminder or priority). Call it once per subtask; several calls in one turn are fine.',
             'parameters' => [
                 'type' => 'object',
                 'properties' => [

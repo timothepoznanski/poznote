@@ -442,7 +442,12 @@ components:
           type: boolean
         important:
           type: boolean
-          description: Sorts the task to the top of its list.
+          description: True when the priority is "high". Older spelling of the priority, kept for existing clients.
+        priority:
+          type: string
+          nullable: true
+          enum: [high, medium, low]
+          description: Task priority, null for none. Open tasks are kept in high, medium, low, none order.
         dueAt:
           type: string
           nullable: true
@@ -1435,9 +1440,17 @@ paths:
                   type: string
                   example: "#ff9800"
                   description: Icon color (empty string resets)
+                apply_to_title:
+                  type: boolean
+                  description: >
+                    Optional. true gives the note title the icon color too
+                    (title_color, a #rrggbb icon color only). false takes it
+                    back to the default when it had the previous icon color,
+                    and keeps any other title color. Omitted, the title color
+                    is left as it is.
       responses:
         '200':
-          description: Icon updated
+          description: Icon updated, with the resulting title_color
 
   /notes/{id}/offline:
     put:
@@ -2349,8 +2362,13 @@ paths:
                   nullable: true
                   description: Repeat interval, "<count><unit>" with unit i/h/d/w/m/y.
                   example: "1w"
+                priority:
+                  type: string
+                  enum: [high, medium, low, none]
+                  description: Task priority (default none).
                 important:
                   type: boolean
+                  description: Older spelling of priority "high"; ignored when priority is given.
                 completed:
                   type: boolean
       responses:
@@ -2420,8 +2438,14 @@ paths:
                   type: string
                 completed:
                   type: boolean
+                priority:
+                  type: string
+                  nullable: true
+                  enum: [high, medium, low, none]
+                  description: Task priority; "none" or null clears it.
                 important:
                   type: boolean
+                  description: Older spelling of priority "high"; false only clears a high priority. Ignored when priority is given.
                 due_at:
                   type: string
                   nullable: true
@@ -4024,9 +4048,20 @@ paths:
                 icon:
                   type: string
                   example: "lucide-folder-open"
+                icon_color:
+                  type: string
+                  example: "#2563eb"
+                  description: Icon color (empty string resets)
+                apply_to_title:
+                  type: boolean
+                  description: >
+                    Optional. true shows the folder name in the icon color too
+                    (title_color, a #rrggbb icon color only). false takes it
+                    back to the default when it had the previous icon color.
+                    Omitted, the name color is left as it is.
       responses:
         '200':
-          description: Icon updated
+          description: Icon updated, with the resulting title_color
         '404':
           description: Folder not found
 

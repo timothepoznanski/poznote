@@ -1,6 +1,6 @@
 // Task lists: shared state and helpers.
 // 
-// Reading a note's task data, the save/render cycle, progress, grouping (important
+// Reading a note's task data, the save/render cycle, progress, grouping (priority
 // incomplete, then incomplete, then completed) and due-date formatting. The grouping
 // order is mirrored server-side in api/v1/controllers/TasksController.php.
 
@@ -93,16 +93,29 @@ function updateTaskListProgress(noteId, tasks) {
     section.style.display = '';
 }
 
-// Group tasks by status: important incomplete, normal incomplete, completed
+// Priority of a task (#1730, js/task-priority.js): 'high', 'medium', 'low' or null
+function getTaskPriority(task) {
+    return window.poznoteTaskPriority ? window.poznoteTaskPriority.get(task) : (task && task.important ? 'high' : null);
+}
+
+// Open tasks by priority (high, medium, low, none), completed ones last. Stable:
+// the order inside each level is kept.
+function sortTasksByPriority(tasks) {
+    return window.poznoteTaskPriority ? window.poznoteTaskPriority.sort(tasks) : tasks;
+}
+
+// Group tasks by status: open tasks with a priority (already in high, medium,
+// low order), open tasks without one, completed. The first group keeps its
+// historical name, `important`.
 function groupTasksByStatus(tasks) {
     const important = [], normal = [], completed = [];
     for (let i = 0; i < tasks.length; i++) {
         const t = tasks[i];
         if (t.completed) completed.push(t);
-        else if (t.important) important.push(t);
+        else if (getTaskPriority(t)) important.push(t);
         else normal.push(t);
     }
-    return { important, normal, completed };
+    return { important: sortTasksByPriority(important), normal, completed };
 }
 
 // Initialize task list for a note
@@ -166,6 +179,9 @@ function initializeTaskList(noteId, noteType) {
             dueAt: normalizeTaskDueAt(task.dueAt)
         };
 
+        // One priority, mirrored into `important` (js/task-priority.js)
+        if (window.poznoteTaskPriority) window.poznoteTaskPriority.set(normalized, getTaskPriority(task));
+
         // Optional subtasks (js/tasklist-subtasks.js); the key only exists on
         // tasks that have some
         const subtasks = normalizeSubtasks(task.subtasks);
@@ -200,16 +216,18 @@ function extractTasksFromHTML(noteEntry) {
             const taskId = item.dataset.taskId;
             const textSpan = item.querySelector('.task-text');
             const checkbox = item.querySelector('.task-checkbox');
-            const importantBtn = item.querySelector('.task-important-btn');
+            const priority = item.dataset.priority || (item.classList.contains('important') ? 'high' : '');
             
             if (taskId && textSpan) {
-                tasks.push({
+                const recovered = {
                     id: parseFloat(taskId) || Date.now() + Math.random(),
                     text: textSpan.textContent || '',
                     completed: checkbox ? checkbox.checked : false,
                     noteId: parseInt(noteEntry.id.replace('entry', '')),
-                    important: importantBtn ? importantBtn.classList.contains('important') : false
-                });
+                    important: priority === 'high'
+                };
+                if (window.poznoteTaskPriority) window.poznoteTaskPriority.set(recovered, priority);
+                tasks.push(recovered);
             }
         });
         

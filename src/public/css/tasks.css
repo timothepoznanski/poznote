@@ -369,7 +369,7 @@
     font-size: 16px !important;
 }
 
-.task-important-btn i {
+.task-priority-btn i {
     font-size: 16px !important;
 }
 
@@ -379,7 +379,7 @@
 }
 
 .task-delete-btn i,
-.task-important-btn i,
+.task-priority-btn i,
 .task-move-btn i,
 .task-subtask-btn i,
 .task-drag-handle i {
@@ -393,8 +393,9 @@
     color: var(--pz-danger-text);
 }
 
-.task-important-btn:hover i {
-    color: var(--pz-warning-hover);
+.task-priority-btn:hover i,
+.task-priority-btn:hover i[class*="lucide-"] {
+    color: var(--pz-text-muted);
 }
 
 .task-move-btn:hover i,
@@ -666,7 +667,7 @@
 @media (max-width: 768px) {
     /* Incomplete tasks: collapse the individual action buttons into the menu */
     .task-item:not(.completed) .task-row-actions .task-due-btn,
-    .task-item:not(.completed) .task-row-actions .task-important-btn,
+    .task-item:not(.completed) .task-row-actions .task-priority-btn,
     .task-item:not(.completed) .task-row-actions .task-move-btn,
     .task-item:not(.completed) .task-row-actions .task-subtask-btn {
         display: none;
@@ -713,29 +714,22 @@
     }
 }
 
-/* Important task styling */
-.task-item.important {
-    border-color: var(--pz-danger-soft);
-    background: var(--pz-surface);
+/* Priority (#1730): an open task takes the colour of its level, which
+   css/components/task-priority.css hands over as --pz-task-priority. */
+.task-item:is(.priority-high, .priority-medium, .priority-low) {
+    border-color: color-mix(in srgb, var(--pz-task-priority) 45%, var(--pz-bg));
 }
 
-.task-item.important .task-text {
-    color: var(--pz-danger-hover);
-    /* red text for important tasks */
-    font-weight: var(--pz-weight-semibold);
+.task-item:is(.priority-high, .priority-medium, .priority-low) .task-text,
+.task-item:is(.priority-high, .priority-medium, .priority-low) .task-text a {
+    color: var(--pz-task-priority);
 }
 
-.task-item.important .task-text a {
-    color: var(--pz-danger-hover);
-    font-weight: var(--pz-weight-semibold);
-}
-
-.task-item.important .task-text a:hover {
-    color: var(--pz-danger-strong);
+.task-item:is(.priority-high, .priority-medium, .priority-low) .task-text a:hover {
     text-decoration: underline;
 }
 
-.task-important-btn {
+.task-priority-btn {
     padding: 4px 8px;
     background: transparent;
     border: none;
@@ -748,13 +742,14 @@
     justify-content: center;
 }
 
-/* Red star icon for important tasks */
-.task-item.important .lucide-star {
-    color: var(--pz-danger-text);
+/* The flag takes the colour of the task's priority */
+.task-priority-btn.has-priority {
+    opacity: 1;
 }
 
-.task-important-btn.is-favorite i {
-    color: var(--pz-danger-text);
+.task-priority-btn.has-priority i,
+.task-priority-btn.has-priority i[class*="lucide-"] {
+    color: var(--pz-task-priority);
 }
 
 
@@ -1198,6 +1193,12 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     color: var(--pz-text-muted);
 }
 
+/* Priority (#1730): the text of an open task takes the colour of its level
+   (css/components/task-priority.css) */
+.noteentry .tasklist-embed-task:is(.priority-high, .priority-medium, .priority-low) .tasklist-embed-text {
+    color: var(--pz-task-priority);
+}
+
 /* Subtasks of an embedded task: indented under its text (checkbox width plus
    the row gap) */
 .noteentry .tasklist-embed-subtasks {
@@ -1266,7 +1267,7 @@ html[data-theme='dark'] .toggle-block[open]>summary {
 }
 
 /* Row controls (due date, important, delete): revealed while the row is
-   hovered or focused; the star of an important task stays visible */
+   hovered or focused; the flag of a task with a priority stays visible */
 .noteentry .tasklist-embed-actions {
     display: flex;
     align-items: center;
@@ -1303,9 +1304,14 @@ html[data-theme='dark'] .toggle-block[open]>summary {
     }
 }
 
-.noteentry .tasklist-embed-action-important.is-active,
-.noteentry .tasklist-embed-action-important:hover {
-    color: var(--pz-warning-text-hover);
+.noteentry .tasklist-embed-action-priority:hover,
+.noteentry .tasklist-embed-action-priority:hover i[class*="lucide-"] {
+    color: var(--pz-text-muted);
+}
+
+.noteentry .tasklist-embed-action-priority.is-active,
+.noteentry .tasklist-embed-action-priority.is-active i[class*="lucide-"] {
+    color: var(--pz-task-priority);
 }
 
 .noteentry .tasklist-embed-action-due:hover {

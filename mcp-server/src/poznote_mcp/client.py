@@ -1023,6 +1023,7 @@ class PoznoteClient:
         important: bool | None = None,
         completed: bool | None = None,
         user_id: str | int | None = None,
+        priority: str | None = None,
     ) -> dict | None:
         """Append a task to a tasklist note"""
         payload: dict = {"text": text}
@@ -1032,6 +1033,7 @@ class PoznoteClient:
             ("reminder_email", reminder_email),
             ("recurrence", recurrence),
             ("important", important),
+            ("priority", priority),
             ("completed", completed),
         ):
             if value is not None:

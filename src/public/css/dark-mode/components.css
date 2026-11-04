@@ -131,17 +131,18 @@ html[data-theme='dark'] .task-checkbox {
 }
 
 html[data-theme='dark'] .task-delete-btn i,
-html[data-theme='dark'] .task-important-btn i,
+html[data-theme='dark'] .task-priority-btn i,
 html[data-theme='dark'] .task-drag-handle i {
     color: var(--pz-text);
 }
 
-html[data-theme='dark'] .task-important-btn:hover i {
-    color: var(--pz-warning-text);
+html[data-theme='dark'] .task-priority-btn:hover i {
+    color: var(--pz-text-muted);
 }
 
-html[data-theme='dark'] .task-important-btn.is-favorite i {
-    color: var(--pz-danger-text) !important;
+/* Same boost as the priority row colours below: the flag sits in .noteentry */
+html[data-theme='dark'] .task-priority-btn.has-priority i:is(#pz-specificity-boost, *) {
+    color: var(--pz-task-priority) !important;
 }
 
 html[data-theme='dark'] .task-due-btn i {
@@ -197,24 +198,16 @@ html[data-theme='dark'] .tasklist-progress-bar {
     background-color: var(--pz-surface);
 }
 
-/* Important task styling for dark mode */
-html[data-theme='dark'] .task-item.important {
-    border-color: var(--pz-danger-text-hover);
-    background: var(--pz-bg);
+/* Priority colours (#1730). The task list of a note sits in .noteentry, so
+   the :is() ID boost + !important outguns the `.noteentry *` --pz-text
+   blanket from dark-mode/editor.css (links are spared by the blanket). */
+html[data-theme='dark'] .task-item:is(.priority-high, .priority-medium, .priority-low) {
+    border-color: color-mix(in srgb, var(--pz-task-priority) 45%, var(--pz-bg));
 }
 
-html[data-theme='dark'] .task-item.important .task-text {
-    color: var(--pz-danger-text);
-}
-
-html[data-theme='dark'] .task-item.important .task-text a {
-    color: var(--pz-danger-text);
-    font-weight: var(--pz-weight-semibold);
-}
-
-html[data-theme='dark'] .task-item.important .task-text a:hover {
-    color: var(--pz-danger-text);
-    text-decoration: underline;
+html[data-theme='dark'] .task-item:is(.priority-high, .priority-medium, .priority-low) .task-text:is(#pz-specificity-boost, *),
+html[data-theme='dark'] .task-item:is(.priority-high, .priority-medium, .priority-low) .task-text a {
+    color: var(--pz-task-priority) !important;
 }
 
 /* Task order buttons */
@@ -739,9 +732,12 @@ html[data-theme='dark'] .tasklist-embed-add:is(#pz-specificity-boost, *) {
     color: var(--pz-text-muted) !important;
 }
 
-html[data-theme='dark'] .tasklist-embed-action-important.is-active:is(#pz-specificity-boost, *),
-html[data-theme='dark'] .tasklist-embed-action-important:hover:is(#pz-specificity-boost, *) {
-    color: var(--pz-warning-text-hover) !important;
+html[data-theme='dark'] .tasklist-embed-action-priority.is-active:is(#pz-specificity-boost, *) {
+    color: var(--pz-task-priority) !important;
+}
+
+html[data-theme='dark'] .tasklist-embed-task:is(.priority-high, .priority-medium, .priority-low) .tasklist-embed-text:is(#pz-specificity-boost, *) {
+    color: var(--pz-task-priority) !important;
 }
 
 html[data-theme='dark'] .tasklist-embed-action-due:hover:is(#pz-specificity-boost, *),

@@ -180,3 +180,51 @@ test('the next due date is the first one of the schedule still ahead', function 
     assertSame('2026-11-05', $due('2026-08-05', '1m', '2026-10-10 12:00'));
     assertSame('2027-02-01T10:00', $due('2025-02-01T10:00', '1y', '2026-10-10 12:00'));
 });
+
+test('a task priority (#1730): stored value first, the old important star reads as high', function () {
+    assertSame('medium', getTasklistTaskPriority(['priority' => 'Medium']));
+    assertSame('high', getTasklistTaskPriority(['important' => true]));
+    assertSame('low', getTasklistTaskPriority(['priority' => 'low', 'important' => true]), 'the priority wins');
+    assertSame(null, getTasklistTaskPriority(['priority' => 'urgent']));
+    assertSame(null, getTasklistTaskPriority('not a task'));
+
+    assertSame(null, normalizeTasklistPriority('none'));
+    assertSame(null, normalizeTasklistPriority(''));
+    assertSame(false, normalizeTasklistPriority('urgent'));
+    assertSame(false, normalizeTasklistPriority(2));
+});
+
+test('setting a priority keeps important in step', function () {
+    $task = setTasklistTaskPriority(['text' => 'a', 'important' => false], 'high');
+    assertSame('high', $task['priority']);
+    assertTrue($task['important']);
+
+    $task = setTasklistTaskPriority($task, 'low');
+    assertSame('low', $task['priority']);
+    assertFalse($task['important']);
+
+    $task = setTasklistTaskPriority($task, null);
+    assertFalse(array_key_exists('priority', $task));
+    assertFalse($task['important']);
+});
+
+test('open tasks regroup high, medium, low, none, completed last, order kept inside a level', function () {
+    $tasks = [
+        ['text' => 'none 1'],
+        ['text' => 'low', 'priority' => 'low'],
+        ['text' => 'done high', 'priority' => 'high', 'completed' => true],
+        ['text' => 'old star', 'important' => true],
+        ['text' => 'medium', 'priority' => 'medium'],
+        ['text' => 'none 2'],
+        ['text' => 'high', 'priority' => 'high'],
+    ];
+    $texts = array_column(regroupTasklistTasks($tasks), 'text');
+    assertSame(['old star', 'high', 'medium', 'low', 'none 1', 'none 2', 'done high'], $texts);
+});
+
+test('row classes: open tasks only, important kept on high', function () {
+    assertSame(' important priority-high', tasklistPriorityClasses(['priority' => 'high']));
+    assertSame(' priority-low', tasklistPriorityClasses(['priority' => 'low']));
+    assertSame('', tasklistPriorityClasses(['priority' => 'low', 'completed' => true]));
+    assertSame('', tasklistPriorityClasses([]));
+});

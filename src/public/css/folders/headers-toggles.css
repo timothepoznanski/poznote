@@ -20,6 +20,13 @@
     font-size: var(--sidebar-font-size, 13px);
 }
 
+/* A coloured folder name (css/components/folder-title.css) on its shortcut
+   in Favorites takes the accent on hover like the other rows there
+   (css/sidebar.css). !important: so does the colour it answers. */
+#left_col a.links_arbo_left:hover .favorite-folder-name.has-title-color {
+    color: inherit !important;
+}
+
 /* Number of notes of a folder: a discreet pill after its name, as on the
    Shares and Offline pages (css/shared/notes-list.css), sized from the
    sidebar font */

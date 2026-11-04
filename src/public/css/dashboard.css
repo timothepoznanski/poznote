@@ -2456,9 +2456,12 @@ html.dashboard-note-modal-open body {
     cursor: pointer;
 }
 
-#dashboardNoteModal .dashboard-note-task.is-important .dashboard-note-task-text {
-    font-weight: var(--pz-weight-semibold);
+/* Priority (#1730): the colour of the task's level, from
+   css/components/task-priority.css */
+#dashboardNoteModal .dashboard-note-task:is(.priority-high, .priority-medium, .priority-low) .dashboard-note-task-text {
+    color: var(--pz-task-priority);
 }
+
 
 #dashboardNoteModal .dashboard-note-task.is-done .dashboard-note-task-text {
     color: var(--pz-text-muted);

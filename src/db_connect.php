@@ -161,7 +161,7 @@ try {
     // migrations, indexes, default settings, welcome note, legacy repair)
     // is skipped when the database is already at the current version, leaving
     // a single SELECT on the settings table per request.
-    $CURRENT_SCHEMA_VERSION = 51; // 51: the speed dial's rail entry shown again; 50: entries.speed_dial_order
+    $CURRENT_SCHEMA_VERSION = 52; // 52: folders.title_color (#1729); 51: the speed dial's rail entry shown again; 50: entries.speed_dial_order
     $currentVersion = 0;
 
     // Whether this database is being created right now, as opposed to an
@@ -408,6 +408,13 @@ try {
             }
             if (!in_array('color', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN color TEXT");
+            }
+            // Colour of the folder name in the tree (#rrggbb, painted with
+            // the palette token like an icon colour), set from the icon
+            // picker's "Apply the color to the title" box (discussion #1729).
+            // NULL means the default look. Twin of entries.title_color.
+            if (!in_array('title_color', $existingColumns)) {
+                $con->exec("ALTER TABLE folders ADD COLUMN title_color TEXT");
             }
             if (!in_array('kanban_enabled', $existingColumns)) {
                 $con->exec("ALTER TABLE folders ADD COLUMN kanban_enabled INTEGER DEFAULT 0");
