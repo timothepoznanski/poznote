@@ -612,6 +612,14 @@ body:not(.markdown-colored) .markdown-codemirror-host .cm-live-preview .poznote-
     letter-spacing: 0;
 }
 
+/* Same in the lines of a code block, whose own size rule (top of this file,
+   span:not(.cm-live-code-lang)) outweighs the one above: without this, the
+   closing ``` of every block stayed in sight in rich text. */
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line) :is(.cm-live-empty-pair, .cm-live-squeezed-tail),
+.markdown-editor .cm-live-preview .cm-line:is(#poznote-md-code-font-boost, .cm-md-code-line) :is(.cm-live-empty-pair, .cm-live-squeezed-tail) * {
+    font-size: 0 !important;
+}
+
 /* In the middle of that empty pair: something of the line's height for the
    caret to be drawn against, of no width for bold, italic or strikethrough,
    and for inline code the start of its grey ground, so that the place where
@@ -801,6 +809,11 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :
 
 .markdown-codemirror-host .cm-live-preview .cm-live-code-lang:hover {
     background: rgba(var(--pz-shadow-rgb), 0.1);
+}
+
+/* Plain block (bare ``` fence): no badge, as in the preview */
+.markdown-codemirror-host .cm-live-preview .cm-live-code-lang.cm-live-code-lang-none {
+    display: none;
 }
 
 .markdown-codemirror-host .cm-live-preview .cm-live-code-actions {

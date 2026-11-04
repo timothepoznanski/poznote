@@ -3463,6 +3463,15 @@
                 submenu: [
                     { id: 'inline-code', icon: 'lucide-terminal', label: t('slash_menu.inline_code', null, 'Inline code'), action: () => wrapMarkdownSelection('`', '`', 1) },
                     {
+                        // A bare ``` fence: no badge, like the HTML menu's plain block
+                        id: 'plain-block',
+                        icon: 'lucide-file-text',
+                        label: t('slash_menu.plain_block', null, 'Plain block'),
+                        action: function () {
+                            insertMarkdownAtCursor('```\n\n```\n', -5);
+                        }
+                    },
+                    {
                         id: 'code-normal',
                         icon: 'lucide-file-code',
                         label: t('slash_menu.code_block', null, 'Code block'),

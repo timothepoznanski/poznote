@@ -476,10 +476,13 @@ class CodeLanguageWidget extends WidgetType {
     return other.language === this.language
   }
 
+  // A bare ``` fence is a plain block: no badge, as in the preview, where
+  // the untagged <pre> has none either (js/markdown-parser.js). The fence
+  // still gives way to the widget, which then draws nothing.
   toDOM() {
     const badge = document.createElement('span')
-    badge.className = 'cm-live-code-lang'
-    badge.textContent = this.language || 'code'
+    badge.className = this.language ? 'cm-live-code-lang' : 'cm-live-code-lang cm-live-code-lang-none'
+    badge.textContent = this.language
     return badge
   }
 
