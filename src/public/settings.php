@@ -1409,7 +1409,7 @@ $s3RestoreCardVisible = S3BackupService::isEnabled()
 
             <!-- View mode of a new, empty note (split / edit / live preview / rich text) -->
             <div class="home-card settings-inline-card settings-card-stacks" id="markdown-new-note-view-mode-card">
-                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_new_note_view_mode', [], 'Choose whether a new markdown note opens in split, edit or live rendering mode. Live rendering is then turned on for the other notes too. On a phone a new note never opens in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.markdown_new_note_view_mode', [], 'Choose whether a new markdown note opens in split, edit, live preview or rich text mode. With live preview or rich text, the other notes switch to that view too. On a phone a new note never opens in split mode.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-file-plus"></i></div>
                 <div class="home-card-content">
                     <label class="home-card-title" for="markdown-new-note-view-mode-select"><?php echo t_h('display.cards.markdown_new_note_view_mode', [], 'New note view mode'); ?></label>

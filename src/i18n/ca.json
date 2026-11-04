@@ -134,7 +134,7 @@
       "main_font": "Trieu el tipus de lletra que es fa servir a tota l'aplicació.",
       "markdown_font": "Trieu el tipus de lletra de l'editor Markdown.",
       "markdown_default_view_mode": "Trieu si les notes Markdown s'obren en mode de previsualització, d'edició o dividit.",
-      "markdown_new_note_view_mode": "Trieu si una nota Markdown nova s'obre en mode dividit, d'edició o de renderització en directe. Aleshores, la renderització en directe també s'activa per a les altres notes. En un telèfon, una nota nova no s'obre mai en mode dividit.",
+      "markdown_new_note_view_mode": "Trieu si una nota Markdown nova s'obre en mode dividit, d'edició, de previsualització en directe o de text enriquit. Amb la previsualització en directe o el text enriquit, les altres notes també passen a aquesta vista. En un telèfon, una nota nova no s'obre mai en mode dividit.",
       "font_size": "Ajusteu la mida de la lletra de les notes, la barra lateral, els blocs de codi i la pàgina de paràmetres.",
       "index_icon_scale": "Ajusteu la mida de les icones de la llista de notes.",
       "icon_rail_scale": "Ajusteu la mida de les icones de la barra lateral d'icones.",

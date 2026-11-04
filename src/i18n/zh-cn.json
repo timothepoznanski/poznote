@@ -465,7 +465,7 @@
       "main_font": "选择整个应用使用的字体。",
       "markdown_font": "选择 Markdown 编辑器使用的字体。",
       "markdown_default_view_mode": "选择 Markdown 笔记以预览、编辑还是分栏模式打开。",
-      "markdown_new_note_view_mode": "选择新建的 Markdown 笔记以分栏、编辑还是实时渲染模式打开。选择实时渲染后，其他笔记也会启用实时渲染。在手机上新笔记不会以分栏模式打开。",
+      "markdown_new_note_view_mode": "选择新建的 Markdown 笔记以分栏、编辑、实时预览还是富文本模式打开。选择实时预览或富文本后，其他笔记也会切换到该视图。在手机上新笔记不会以分栏模式打开。",
       "font_size": "调整笔记、侧边栏、代码块和设置页面的字体大小。",
       "index_icon_scale": "调整笔记列表中图标的大小。",
       "icon_rail_scale": "调整图标侧边栏中图标的大小。",

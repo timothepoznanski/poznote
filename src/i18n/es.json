@@ -466,7 +466,7 @@
       "main_font": "Elige la fuente utilizada en toda la aplicación.",
       "markdown_font": "Elige la fuente utilizada en el editor markdown.",
       "markdown_default_view_mode": "Elige si las notas markdown se abren en vista previa, edición o vista dividida.",
-      "markdown_new_note_view_mode": "Elige si una nota markdown nueva se abre en vista dividida, en edición o con renderizado en vivo. El renderizado en vivo se activa entonces también para las demás notas. En el móvil una nota nueva nunca se abre en vista dividida.",
+      "markdown_new_note_view_mode": "Elige si una nota markdown nueva se abre en vista dividida, en edición, en vista previa en vivo o en texto enriquecido. Con la vista previa en vivo o el texto enriquecido, las demás notas pasan también a esa vista. En el móvil una nota nueva nunca se abre en vista dividida.",
       "font_size": "Ajusta el tamaño de fuente de las notas, la barra lateral, los bloques de código y la página de configuración.",
       "index_icon_scale": "Ajusta el tamaño de los iconos en la lista de notas.",
       "icon_rail_scale": "Ajusta el tamaño de los iconos de la barra de iconos.",

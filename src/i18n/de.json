@@ -466,7 +466,7 @@
       "main_font": "Wählen Sie die Schriftart für die gesamte Anwendung.",
       "markdown_font": "Wählen Sie die Schriftart für den Markdown-Editor.",
       "markdown_default_view_mode": "Festlegen, ob Markdown-Notizen in der Vorschau, im Bearbeitungsmodus oder geteilt geöffnet werden.",
-      "markdown_new_note_view_mode": "Festlegen, ob eine neue Markdown-Notiz geteilt, im Bearbeitungsmodus oder in der Live-Darstellung geöffnet wird. Die Live-Darstellung wird dann auch für die anderen Notizen eingeschaltet. Auf dem Smartphone öffnet sich eine neue Notiz nie geteilt.",
+      "markdown_new_note_view_mode": "Festlegen, ob eine neue Markdown-Notiz geteilt, im Bearbeitungsmodus, in der Live-Vorschau oder als Rich Text geöffnet wird. Bei Live-Vorschau oder Rich Text wechseln auch die anderen Notizen in diese Ansicht. Auf dem Smartphone öffnet sich eine neue Notiz nie geteilt.",
       "font_size": "Passen Sie die Schriftgröße von Notizen, Seitenleiste, Codeblöcken und der Einstellungsseite an.",
       "index_icon_scale": "Passen Sie die Größe der Symbole in der Notizenliste an.",
       "icon_rail_scale": "Passen Sie die Größe der Symbole in der Icon-Seitenleiste an.",

@@ -417,8 +417,13 @@ function initializeMarkdownNote(noteId) {
         // ?view=preview (issue #1714, a note used as a start page) opens like a
         // search result: rendered, whatever the account's view. Opening another
         // note drops it from the URL (js/note-loader.js).
-        isSearchContext = (params.get('search') && params.get('search').trim() !== '') ||
-                         (params.get('tags_search') && params.get('tags_search').trim() !== '') ||
+        // An empty note is no search result, there is nothing in it to
+        // highlight: a note created while a search is active (the search
+        // stays in the URL) opens like any new note, in the account's view,
+        // instead of in the classic preview with the editor hidden.
+        isSearchContext = (!isEmpty && (
+                             (params.get('search') && params.get('search').trim() !== '') ||
+                             (params.get('tags_search') && params.get('tags_search').trim() !== ''))) ||
                          params.get('view') === 'preview';
 
         // Clean up the URL parameter after reading it
