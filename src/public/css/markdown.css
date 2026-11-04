@@ -842,6 +842,41 @@ body[data-markdown-live-syntax='0'] .markdown-codemirror-host .cm-live-preview :
     -webkit-user-select: none;
 }
 
+/* "Code block word wrap" off (<body class="code-block-no-wrap">): the lines of
+   a block no longer wrap and the block scrolls sideways on its own, as the
+   preview's <pre> does (css/code-blocks.css). The lines sit in one element,
+   .cm-live-code-block (live-preview.js), which then scrolls and draws the
+   frame: the lines' own side borders would scroll away with them. Every line
+   is as wide as the longest one, and at least as wide as the block (the
+   min-width counts in the column's max-content width), so that the ground
+   goes all the way. The opening and closing lines stay in place, at the
+   visible width, with the badge and the buttons. */
+body.code-block-no-wrap .markdown-codemirror-host .cm-live-preview .cm-live-code-block {
+    display: grid;
+    grid-template-columns: max-content;
+    overflow-x: auto;
+    container-type: inline-size;
+    border: 1px solid var(--pz-border-light);
+    border-radius: var(--pz-radius-sm);
+}
+
+body.code-block-no-wrap .markdown-codemirror-host .cm-live-preview .cm-live-code-block > .cm-line.cm-live-code {
+    box-sizing: border-box;
+    min-width: 100cqw;
+    white-space: pre;
+    overflow-wrap: normal;
+    word-break: normal;
+    border-width: 0;
+    border-radius: 0;
+}
+
+body.code-block-no-wrap .markdown-codemirror-host .cm-live-preview .cm-live-code-block > .cm-line:is(.cm-live-code-open, .cm-live-code-close) {
+    position: sticky;
+    left: 0;
+    width: 100cqw;
+    box-sizing: border-box;
+}
+
 .markdown-codemirror-host .cm-live-preview :is(.cm-live-code-copy, .cm-live-code-lines, .cm-live-code-delete) {
     width: 28px;
     height: 28px;

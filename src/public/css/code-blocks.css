@@ -493,37 +493,43 @@ body.code-block-no-wrap .noteentry div[style*='monospace'] {
 /* ── Desktop scrollbar for code blocks ─────────────────────────────────── */
 .noteentry pre::-webkit-scrollbar,
 pre.code-block::-webkit-scrollbar,
-.code-block::-webkit-scrollbar {
+.code-block::-webkit-scrollbar,
+.markdown-editor .cm-live-code-block::-webkit-scrollbar {
     height: 8px;
 }
 
 .noteentry pre::-webkit-scrollbar-track,
 pre.code-block::-webkit-scrollbar-track,
-.code-block::-webkit-scrollbar-track {
+.code-block::-webkit-scrollbar-track,
+.markdown-editor .cm-live-code-block::-webkit-scrollbar-track {
     background: transparent;
 }
 
 .noteentry pre::-webkit-scrollbar-thumb,
 pre.code-block::-webkit-scrollbar-thumb,
-.code-block::-webkit-scrollbar-thumb {
+.code-block::-webkit-scrollbar-thumb,
+.markdown-editor .cm-live-code-block::-webkit-scrollbar-thumb {
     background: rgba(var(--pz-shadow-rgb), 0.15);
     border-radius: var(--pz-radius-sm);
 }
 
 .noteentry pre::-webkit-scrollbar-thumb:hover,
 pre.code-block::-webkit-scrollbar-thumb:hover,
-.code-block::-webkit-scrollbar-thumb:hover {
+.code-block::-webkit-scrollbar-thumb:hover,
+.markdown-editor .cm-live-code-block::-webkit-scrollbar-thumb:hover {
     background: rgba(var(--pz-shadow-rgb), 0.30);
 }
 
 html[data-theme='dark'] .noteentry pre::-webkit-scrollbar-thumb,
 html[data-theme='dark'] pre.code-block::-webkit-scrollbar-thumb,
-html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb {
+html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb,
+html[data-theme='dark'] .markdown-editor .cm-live-code-block::-webkit-scrollbar-thumb {
     background: rgba(var(--pz-highlight-rgb), 0.2);
 }
 
 html[data-theme='dark'] .noteentry pre::-webkit-scrollbar-thumb:hover,
 html[data-theme='dark'] pre.code-block::-webkit-scrollbar-thumb:hover,
-html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb:hover {
+html[data-theme='dark'] .code-block::-webkit-scrollbar-thumb:hover,
+html[data-theme='dark'] .markdown-editor .cm-live-code-block::-webkit-scrollbar-thumb:hover {
     background: rgba(var(--pz-highlight-rgb), 0.35);
 }
