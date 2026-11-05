@@ -365,24 +365,19 @@ html[data-theme='light'] .public-folder-body {
     flex: 0 0 auto;
 }
 
-.public-folder-filter {
-    max-width: 900px;
-    margin: 0 auto 30px auto;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
+/* The filter, folded behind the magnifier of the header row
+   (js/search-toggle.js, css/components/search-toggle.css) */
 .filter-input-wrapper {
     position: relative;
     display: flex;
     align-items: center;
-    flex: 1 1 260px;
 }
 
 .filter-input {
     width: 100%;
-    padding: 10px 40px 10px 12px;
+    height: 38px;
+    padding: 0 40px 0 12px;
+    font-family: inherit;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
     font-size: 14px;
@@ -422,63 +417,9 @@ html[data-theme='light'] .public-folder-body {
     color: var(--text-color, var(--pz-text));
 }
 
-.filter-stats {
-    font-size: 12px;
-    color: var(--muted-color, var(--pz-text-muted));
-    white-space: nowrap;
-    padding: 4px 10px;
-    background-color: rgba(var(--pz-accent-rgb), 0.08);
-    border-radius: var(--pz-radius);
-    align-self: flex-start;
-    font-weight: var(--pz-weight-medium);
-}
-
-.public-folder-toggle-all {
-    min-height: 38px;
-    padding: 0 12px;
-    margin-left: auto;
-    border: 1px solid var(--border-color, var(--pz-border));
-    border-radius: var(--pz-radius-lg);
-    background: var(--panel-bg, var(--pz-bg));
-    color: var(--text-color, var(--pz-text));
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
-.public-folder-toggle-all:hover {
-    background: var(--hover-bg, var(--pz-surface-hover));
-}
-
-.public-folder-toggle-all:focus:not(:focus-visible) {
-    outline: none;
-}
-
-@media (hover: none) and (pointer: coarse) {
-    .public-folder-toggle-all {
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    .public-folder-toggle-all:not(.is-disabled):hover,
-    .public-folder-toggle-all:not(.is-disabled):active,
-    .public-folder-toggle-all:not(.is-disabled):focus {
-        background: var(--panel-bg, var(--pz-bg));
-        box-shadow: none;
-        outline: none;
-    }
-}
-
 .public-folder-toggle-all.is-disabled {
     cursor: default;
     opacity: 0.6;
-}
-
-.public-folder-toggle-all.is-disabled:hover {
-    background: var(--panel-bg, var(--pz-bg));
 }
 
 .notes-list {
@@ -533,6 +474,21 @@ html[data-theme='light'] .public-folder-body {
     gap: 10px;
     padding-bottom: 4px;
     margin-left: calc(var(--public-folder-depth, 0) * 22px);
+    width: fit-content;
+    max-width: 100%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body.public-folder-filter-active .public-folder-group-title {
+    cursor: default;
+}
+
+@media (hover: hover) {
+    body:not(.public-folder-filter-active) .public-folder-group-title:hover .public-folder-toggle {
+        background: var(--hover-bg);
+        color: var(--text-color);
+    }
 }
 
 .public-folder-toggle {
@@ -581,36 +537,73 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
     display: none;
 }
 
+/* Magnifier, Collapse all, view and theme: one row, top right */
 .header-controls {
     position: fixed;
     top: 20px;
     right: 20px;
     display: flex;
+    align-items: center;
     gap: 8px;
     z-index: 1000;
+    --pz-search-toggle-size: 38px;
 }
 
-.theme-toggle, .view-toggle {
-    background: var(--toggle-bg, var(--pz-surface-sunken));
-    border: 1px solid var(--border-color, var(--pz-border));
-    padding: 10px 15px;
-    border-radius: var(--pz-radius);
-    cursor: pointer;
-    color: var(--text-color);
+/* The four buttons have the page's ground (white in light), not a grey one */
+.public-folder-header-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--border-color, var(--pz-border));
+    border-radius: var(--pz-radius-lg);
+    background: var(--panel-bg, var(--pz-bg));
+    color: var(--text-color);
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease;
 }
 
-.theme-toggle:hover, .view-toggle:hover {
-    background: var(--toggle-bg-hover, var(--pz-border));
+.public-folder-header-btn .lucide {
+    width: 18px;
+    height: 18px;
+    color: inherit;
 }
 
-html[data-theme='dark'] .theme-toggle, 
-html[data-theme='dark'] .view-toggle {
-    --toggle-bg: #333;
-    --toggle-bg-hover: #444;
+@media (hover: hover) {
+    .public-folder-header-btn:not(.is-disabled):hover {
+        border-color: var(--link-color, var(--pz-accent));
+        color: var(--link-color, var(--pz-accent));
+    }
+}
+
+.public-folder-header-btn:focus:not(:focus-visible) {
+    outline: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .public-folder-header-btn {
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* Phone: the row is no longer pinned to the corner, it opens the page,
+   centred above the title (the open field takes the whole row, the buttons
+   go below, css/components/search-toggle.css) */
+@media (max-width: 800px) {
+    .public-folder-body {
+        padding-top: 20px;
+    }
+
+    .header-controls {
+        position: static;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 0 0 20px;
+    }
 }
 
 /* Kanban in public view */
@@ -815,15 +808,6 @@ html[data-theme='light'] {
 
     .public-folder-body h1 i {
         font-size: 1.1rem;
-    }
-
-    .public-folder-filter {
-        flex-wrap: nowrap;
-        align-items: center;
-    }
-
-    .public-folder-toggle-all {
-        margin-left: auto;
     }
 
     .note-item {

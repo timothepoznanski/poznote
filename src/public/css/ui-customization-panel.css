@@ -798,8 +798,10 @@ html[data-theme='dark'] .keyboard-shortcuts-keys kbd {
 }
 
 /* Raised over the arrows below it: one arrow showing is a button plus a gap,
-   both is twice that. The arrows are disabled, not hidden, when there is
-   nowhere to scroll (js/index-events.js), so both show for any open note. On mobile the arrows show only with the note on screen
+   both is twice that. The arrows are hidden for a note that fits, and only
+   disabled at the top or the bottom of a longer one (js/index-events.js), so
+   the stack moves when the note starts or stops overflowing, never as it
+   scrolls. On mobile the arrows show only with the note on screen
    (body.note-open, css/notes/noteentry.css), so the lift follows that. */
 @media (min-width: 801px) {
     body:has(.note-scroll-edge-btn:not([hidden])) .pz-edge-stack {

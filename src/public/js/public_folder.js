@@ -89,6 +89,7 @@ function toggleView() {
             body.classList.add('view-kanban');
             // Re-apply filter to kanban cards
             applyFilterToKanban();
+            updatePublicFolderToggleAll();
         }
     }
 }
@@ -198,7 +199,9 @@ function updatePublicFolderToggleAll() {
 
     var groups = getPublicFolderGroups();
     var body = document.body;
-    var isFilterActive = body.classList.contains('public-folder-filter-active');
+    // Nothing to fold in the Kanban view: the button stays in place, greyed
+    var isFilterActive = body.classList.contains('public-folder-filter-active')
+        || body.classList.contains('view-kanban');
 
     if (groups.length === 0) {
         button.style.display = 'none';
@@ -220,16 +223,13 @@ function updatePublicFolderToggleAll() {
     button.setAttribute('aria-label', label);
     button.title = label;
 
+    // The chevron alone, as on the Offline and Shares pages: the label goes
+    // to the tooltip
     var icon = button.querySelector('.lucide');
     if (icon) {
         icon.className = shouldCollapse
-            ? 'lucide lucide-folder-minus'
-            : 'lucide lucide-folder-open';
-    }
-
-    var labelEl = button.querySelector('span');
-    if (labelEl) {
-        labelEl.textContent = label;
+            ? 'lucide lucide-chevron-up'
+            : 'lucide lucide-chevron-down';
     }
 }
 
@@ -249,6 +249,23 @@ function bindPublicFolderToggles() {
             group.classList.toggle('is-collapsed');
             savePublicFolderCollapsedState();
             updatePublicFolderToggles();
+        });
+    });
+
+    // The folder name (and its icon) toggles too, not only the chevron.
+    document.querySelectorAll('.public-folder-group-title').forEach(function(title) {
+        title.addEventListener('click', function(event) {
+            if (event.target.closest('.public-folder-toggle')) {
+                return;
+            }
+            var selection = window.getSelection ? window.getSelection() : null;
+            if (selection && !selection.isCollapsed && title.contains(selection.anchorNode)) {
+                return;
+            }
+            var button = title.querySelector('.public-folder-toggle');
+            if (button && !button.disabled) {
+                button.click();
+            }
         });
     });
 
@@ -279,7 +296,6 @@ function bindPublicFolderToggles() {
 function applyFilter() {
     var filterInput = document.getElementById('folderFilterInput');
     var clearFilterBtn = document.getElementById('clearFilterBtn');
-    var stats = document.getElementById('folderFilterStats');
     var listItems = Array.prototype.slice.call(document.querySelectorAll('.public-note-item'));
     var emptyMessage = document.getElementById('folderEmptyMessage');
     var noResultsMessage = document.getElementById('folderNoResults');
@@ -320,10 +336,6 @@ function applyFilter() {
         if (clearFilterBtn) {
             clearFilterBtn.style.display = 'flex';
         }
-        if (stats) {
-            stats.textContent = visibleCount + ' / ' + listItems.length;
-            stats.style.display = visibleCount < listItems.length ? 'inline-flex' : 'none';
-        }
         if (noResultsMessage) {
             noResultsMessage.classList.toggle('is-hidden', visibleCount !== 0);
         }
@@ -333,9 +345,6 @@ function applyFilter() {
     } else {
         if (clearFilterBtn) {
             clearFilterBtn.style.display = 'none';
-        }
-        if (stats) {
-            stats.style.display = 'none';
         }
         if (noResultsMessage) {
             noResultsMessage.classList.add('is-hidden');

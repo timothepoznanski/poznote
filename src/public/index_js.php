@@ -70,6 +70,7 @@ function poznoteGetIndexJsGroups(): array {
     'app' => [
         'js/error-handler.js',
         'js/panel-back.js',
+        'js/note-back.js',
         'js/globals.js',
         'js/shortcut-key.js',
         'js/workspaces-core.js',

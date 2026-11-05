@@ -2755,6 +2755,7 @@
     },
     "actions": {
       "open": "Open",
+      "open_url": "Open URL",
       "copy_url": "Copy URL",
       "url_copied": "URL copied!",
       "revoke": "Revoke"

@@ -28,6 +28,7 @@
 	data-txt-no-users-found="<?php echo t_h('public.no_users_found', [], 'No other users found'); ?>"
 	data-txt-note-editable="<?php echo t_h('index.note_permissions.editable', [], 'Allow text editing'); ?>"
 	data-txt-open="<?php echo t_h('public.actions.open', [], 'Open public view'); ?>"
+	data-txt-open-url="<?php echo t_h('public.actions.open_url', [], 'Open URL'); ?>"
 	data-txt-password-label="<?php echo t_h('index.public_modal.password', [], 'Password (optional)'); ?>"
 	data-txt-password-placeholder="<?php echo t_h('index.public_modal.password_placeholder', [], 'Enter a password'); ?>"
 	data-txt-renew="<?php echo t_h('index.public_modal.renew_token', [], 'Renew token'); ?>"

@@ -210,8 +210,8 @@ class NotesController {
             // script) never holds the lock itself. The same rule as the other
             // one-shot writers (tasks, AI chat, trash): only a lock held by
             // another user or a public visitor blocks the write. The user's
-            // own lock does not, the app takes it as soon as a note is opened,
-            // viewing included (issue 1366), and the open tab protects itself:
+            // own lock does not, the app holds it while the note is being
+            // edited in a tab (issue 1366), and that tab protects itself:
             // its autosave sends if_version and js/live-refresh.js reloads the
             // note or shows the banner.
             $blockingLock = getBlockingNoteEditLock($targetUserId, $noteId, $holderUserId);

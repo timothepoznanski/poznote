@@ -584,18 +584,37 @@ body.public-note-page {
     cursor: default;
 }
 
+/* Shown at once, faded out on close: with visibility transitioned on the way
+   in too, the reopened modal was still hidden when its textarea was
+   focused, so the focus (and the mobile keyboard) never came */
+.alert-modal-overlay.public-task-edit-overlay.show {
+    transition: opacity 0.3s ease;
+}
+
 /* .alert-modal.* specificity needed: modal-alerts.css loads after this file
    and its .alert-modal { max-width: 400px } would win otherwise */
 .alert-modal.public-task-edit-modal {
     width: min(92vw, 720px);
     max-width: 720px;
+    /* The textarea grows with the task (js/public-note.js); capped to the
+       window, the column shrinks it and it scrolls only past that point */
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
 }
 
 .alert-modal-body.public-task-edit-body {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    flex: 0 1 auto;
+    min-height: 0;
     padding: 24px !important;
+}
+
+.public-task-edit-textarea {
+    flex: 0 1 auto;
+    overflow-y: auto;
 }
 
 .public-task-edit-title {
@@ -606,6 +625,7 @@ body.public-note-page {
 }
 
 .public-task-edit-footer {
+    flex-shrink: 0;
     padding: 0 24px 24px 24px;
 }
 
@@ -616,6 +636,48 @@ body.public-note-page {
 
 .public-task-edit-cancel:hover {
     background: var(--pz-neutral-hover);
+}
+
+/* Mobile: the edit modal sits at the top of the space left above the virtual
+   keyboard (--public-vv-*, set by js/public-note.js), not in the middle of
+   the screen where the keyboard covers it; the textarea gives up height
+   first when that space is short. Two classes: modal-alerts.css loads after
+   this file. */
+@media screen and (max-width: 800px) {
+    .alert-modal-overlay.public-task-edit-overlay {
+        top: var(--public-vv-top, 0px);
+        height: var(--public-vv-height, 100%);
+        align-items: flex-start;
+        padding: 12px;
+        box-sizing: border-box;
+    }
+
+    .alert-modal.public-task-edit-modal {
+        /* modal-alerts.css gives .alert-modal a 20px margin under 480px,
+           on top of the overlay padding */
+        margin: 0;
+        width: 100%;
+        max-height: 100%;
+    }
+
+    .alert-modal-body.public-task-edit-body {
+        padding: 16px !important;
+    }
+
+    /* Two classes: tasks.css, loaded after, sets 80px under 600px */
+    .task-edit-textarea.public-task-edit-textarea {
+        min-height: 160px;
+        overscroll-behavior: contain;
+    }
+
+    .public-task-edit-footer {
+        padding: 0 16px 16px 16px;
+    }
+
+    /* Ctrl+Enter means nothing on a touch keyboard */
+    #publicTaskEditHint {
+        display: none;
+    }
 }
 
 /* Priority (#1730): the colour of the task's level, from

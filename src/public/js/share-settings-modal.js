@@ -31,6 +31,7 @@ window.PoznoteShareSettings = (function() {
             txtNoUsersFound: el.getAttribute('data-txt-no-users-found') || 'No other users found',
             txtNoteEditable: el.getAttribute('data-txt-note-editable') || 'Allow text editing',
             txtOpen: el.getAttribute('data-txt-open') || 'Open public view',
+            txtOpenUrl: el.getAttribute('data-txt-open-url') || 'Open URL',
             txtPasswordLabel: el.getAttribute('data-txt-password-label') || 'Password',
             txtPasswordPlaceholder: el.getAttribute('data-txt-password-placeholder') || 'Enter a password',
             txtRenew: el.getAttribute('data-txt-renew') || 'Renew',
@@ -382,30 +383,26 @@ window.PoznoteShareSettings = (function() {
         title.appendChild(titleText);
         titleBlock.appendChild(title);
 
-        var titleCopyBtn = document.createElement('button');
-        titleCopyBtn.type = 'button';
-        titleCopyBtn.className = 'btn btn-secondary shared-edit-token-url-copy';
-        titleCopyBtn.title = config.txtCopyUrl;
-        titleCopyBtn.setAttribute('aria-label', config.txtCopyUrl);
-        titleCopyBtn.innerHTML = '<i class="lucide lucide-copy"></i>';
-        titleCopyBtn.addEventListener('click', function() {
-            copyShareLink(titleText.textContent);
-        });
+        content.appendChild(titleBlock);
 
-        var titleOpenBtn = document.createElement('button');
-        titleOpenBtn.type = 'button';
-        titleOpenBtn.className = 'btn btn-secondary shared-edit-token-url-copy';
-        titleOpenBtn.title = config.txtOpen;
-        titleOpenBtn.setAttribute('aria-label', config.txtOpen);
-        titleOpenBtn.innerHTML = '<i class="lucide lucide-external-link"></i>';
-        titleOpenBtn.addEventListener('click', function() {
+        // Open and Copy act on the link: they sit with the dialog's own
+        // buttons at the bottom, as text, on a line of their own on mobile.
+        var openBtn = document.createElement('button');
+        openBtn.type = 'button';
+        openBtn.className = 'btn btn-success';
+        openBtn.textContent = config.txtOpenUrl;
+        openBtn.addEventListener('click', function() {
             // The saved token: the one being typed does not exist yet
             window.open(buildPreviewUrlForModal(options), '_blank', 'noopener');
         });
-        titleBlock.appendChild(titleOpenBtn);
-        titleBlock.appendChild(titleCopyBtn);
 
-        content.appendChild(titleBlock);
+        var copyBtn = document.createElement('button');
+        copyBtn.type = 'button';
+        copyBtn.className = 'btn btn-secondary';
+        copyBtn.textContent = config.txtCopyUrl;
+        copyBtn.addEventListener('click', function() {
+            copyShareLink(titleText.textContent);
+        });
 
         var tokenRow = document.createElement('div');
         tokenRow.className = 'shared-edit-token-field-row';
@@ -901,6 +898,11 @@ window.PoznoteShareSettings = (function() {
             }
         });
 
+        var linkActions = document.createElement('div');
+        linkActions.className = 'shared-edit-token-modal-link-actions';
+        linkActions.appendChild(copyBtn);
+        linkActions.appendChild(openBtn);
+        actions.appendChild(linkActions);
         actions.appendChild(cancelBtn);
         if (options.revoke) {
             actions.appendChild(buildRevokeButton());

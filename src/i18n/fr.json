@@ -3164,6 +3164,7 @@
     },
     "actions": {
       "open": "Ouvrir",
+      "open_url": "Ouvrir l'URL",
       "copy_url": "Copier l'URL",
       "url_copied": "URL copiée !",
       "revoke": "Révoquer"
