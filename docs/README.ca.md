@@ -1108,7 +1108,7 @@ Cada opció es detalla més avall, i les notes individuals també es poden expor
 
 <a id="complete-backup"></a>
 <details>
-<summary><strong>Còpia de seguretat completa en un zip del Poznote</strong></summary>
+<summary><strong>Còpia de seguretat en un fitxer ZIP del Poznote</strong></summary>
 <br>
 
 Un sol ZIP que conté la base de dades, totes les notes i els fitxers adjunts de tots els espais de treball:
@@ -1134,12 +1134,12 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 <a id="local-backups"></a>
 <details>
-<summary><strong>Còpies de seguretat planificades a una carpeta local</strong></summary>
+<summary><strong>Còpies de seguretat planificades a una carpeta del servidor</strong></summary>
 <br>
 
-Els administradors poden fer que es desin arxius de còpia de seguretat completa (un ZIP per usuari, idèntic a la baixada de la còpia de seguretat completa) en una carpeta del servidor, manualment o automàticament de manera planificada, i que només se'n conservin els més recents. No cal res fora del Poznote: ni cubell, ni tasca cron, ni script.
+Els administradors poden fer que es desin arxius de còpia de seguretat completa (un ZIP per usuari, idèntic al que es baixa amb «Còpia de seguretat en un fitxer ZIP del Poznote») en una carpeta del servidor, manualment o automàticament de manera planificada, i que només se'n conservin els més recents. No cal res fora del Poznote: ni cubell, ni tasca cron, ni script.
 
-Configureu-ho a **Paràmetres > Còpies de seguretat locals** (només administradors).
+Configureu-ho a **Paràmetres > Còpies de seguretat al servidor** (només administradors).
 
 - **Carpeta de còpies de seguretat**: un camí absolut al servidor (dins del contenidor, amb Docker). Si es deixa buit, els arxius van a `data/backups`, que ja forma part del volum de dades. La carpeta es crea si cal, i l'usuari del servidor web hi ha de poder escriure.
 - **Selecció d'usuaris**: unes caselles trien quins usuaris inclouen les còpies de seguretat. Per defecte estan tots marcats, i mentre estan tots marcats, els comptes nous s'inclouen automàticament.
@@ -1169,7 +1169,7 @@ Es rebutja una carpeta dins de la mateixa aplicació, excepte `data/backups`. Qu
 <summary><strong>Còpies de seguretat planificades a un cubell S3</strong></summary>
 <br>
 
-Els administradors poden enviar arxius de còpia de seguretat completa (un ZIP per usuari, idèntic a la baixada de la còpia de seguretat completa) a un cubell compatible amb S3, manualment o automàticament de manera planificada. La configuració és independent de la de l'emmagatzematge de fitxers adjunts a S3, de manera que les còpies de seguretat poden anar a un altre cubell o proveïdor.
+Els administradors poden enviar arxius de còpia de seguretat completa (un ZIP per usuari, idèntic al que es baixa amb «Còpia de seguretat en un fitxer ZIP del Poznote») a un cubell compatible amb S3, manualment o automàticament de manera planificada. La configuració és independent de la de l'emmagatzematge de fitxers adjunts a S3, de manera que les còpies de seguretat poden anar a un altre cubell o proveïdor.
 
 Configureu-ho a **Paràmetres > Còpies de seguretat a S3** (només administradors).
 
@@ -1181,7 +1181,7 @@ Configureu-ho a **Paràmetres > Còpies de seguretat a S3** (només administrado
 - **Retenció**: només es conserven els N arxius més recents per usuari, i els més antics se suprimeixen del cubell després de cada còpia de seguretat (0 ho conserva tot).
 - **Navegació**: la pàgina llista els arxius que hi ha al cubell, amb accions per baixar-los i suprimir-los.
 - **Restauració**: els arxius s'emmagatzemen a `backups/{user id}/` al cubell i es poden restaurar amb la pàgina estàndard [Restauració / Importació](#restauració--importació).
-- **Autoservei**: un cop el cubell està configurat, cada usuari té una secció «Còpies de seguretat a S3» a la seva pàgina Còpia de seguretat / Exportació per pujar un arxiu nou del seu compte i per baixar o suprimir els arxius existents. Una secció «Restauració des d'S3» a la pàgina Restauració / Importació restaura el compte directament a partir d'un d'aquests arxius.
+- **Autoservei**: un cop el cubell està configurat, cada usuari té una secció «Còpia de seguretat a S3» a la seva pàgina Còpia de seguretat / Exportació per pujar un arxiu nou del seu compte i per baixar o suprimir els arxius existents. Una secció «Restauració des d'S3» a la pàgina Restauració / Importació restaura el compte directament a partir d'un d'aquests arxius.
 - **Aïllament d'inquilins**: dues opcions («Còpies de seguretat a S3 a la pàgina de còpia de seguretat» i «Restauració des d'S3 a la pàgina de restauració») desactiven aquestes seccions d'autoservei per als usuaris que no són administradors. S'apliquen al servidor, de manera que les accions bloquejades es rebutgen fins i tot quan es criden directament.
 
 Quan els fitxers adjunts s'emmagatzemen a S3 (emmagatzematge de fitxers adjunts a S3), s'inclouen per defecte als arxius, obtinguts del cubell al moment. Una opció permet deixar-los fora de les còpies de seguretat per obtenir arxius més lleugers i execucions més ràpides.
@@ -1264,7 +1264,7 @@ El Poznote ofereix opcions de restauració flexibles des de la interfície web (
 
 <a id="complete-restore"></a>
 <details>
-<summary><strong>Restauració completa a partir d'una còpia de seguretat zip del Poznote</strong></summary>
+<summary><strong>Restaura des d'una còpia ZIP del Poznote</strong></summary>
 <br>
 
 Pugeu el ZIP de la còpia de seguretat completa per restaurar-ho tot:
@@ -1276,7 +1276,7 @@ No hi ha cap límit de mida pràctic. L'arxiu es puja per parts (una part que fa
 
 La restauració des d'un cubell S3 (vegeu [Còpies de seguretat a S3](#s3-backups)) s'executa com la mateixa tasca en segon pla, de manera que obtenir un arxiu gran del cubell i restaurar-lo tampoc no depèn que una sol·licitud continuï activa.
 
-Si la pujada no és possible de cap manera, la pàgina Restauració / Importació també ofereix una alternativa de còpia directa: copieu l'arxiu al contenidor del Poznote exactament a `/tmp/backup_restore.zip` per SSH, torneu a carregar la pàgina i restaureu des d'allà.
+Si la pujada no és possible de cap manera, la pàgina Restauració / Importació també ofereix una alternativa, «Restauració per còpia directa»: copieu l'arxiu al contenidor del Poznote exactament a `/tmp/backup_restore.zip` per SSH, torneu a carregar la pàgina i restaureu des d'allà.
 
 </details>
 
@@ -1412,7 +1412,7 @@ Les notes que heu modificat els últims 5 dies es conserven a cada navegador on 
 <summary><strong>Exportació fora de línia</strong></summary>
 <br>
 
-La **📦 còpia de seguretat completa** crea una versió fora de línia independent de les vostres notes. Només cal que extraieu el ZIP i obriu `index.html` amb qualsevol navegador web. Això us permet llegir les notes fora de línia, però sense totes les funcions del Poznote: és una exportació de només lectura.
+La **📦 Còpia de seguretat en un fitxer ZIP del Poznote** crea una versió fora de línia independent de les vostres notes. Només cal que extraieu el ZIP i obriu `index.html` amb qualsevol navegador web. Això us permet llegir les notes fora de línia, però sense totes les funcions del Poznote: és una exportació de només lectura.
 
 </details>
 

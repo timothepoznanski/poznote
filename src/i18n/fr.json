@@ -661,7 +661,7 @@
       "custom_fonts": "Polices personnalisées",
       "restore_direct_copy": "Restauration par copie directe",
       "import_notes": "Importer des notes",
-      "local_backup": "Sauvegardes locales",
+      "local_backup": "Sauvegardes sur le serveur",
       "whats_new": "Nouveautés après une mise à jour",
       "login_disabled": "Ouverture sans connexion",
       "outbound_hosts": "Accès au réseau local",
@@ -1477,11 +1477,11 @@
       "uncheck_all": "Tout décocher",
       "collapse_all": "Tout replier",
       "expand_all": "Tout déplier",
-      "direct_copy_restore_section": "Page Restauration : section « Restauration quand la restauration standard ne fonctionne pas »",
-      "local_backups_section": "Page Sauvegarde : section « Sauvegardes locales »",
-      "s3_backups_section": "Page Sauvegarde : section « Sauvegardes S3 »",
+      "direct_copy_restore_section": "Page Restauration : section « Restauration par copie directe »",
+      "local_backups_section": "Page Sauvegarde : section « Sauvegarde dans un dossier du serveur »",
+      "s3_backups_section": "Page Sauvegarde : section « Sauvegarde vers S3 »",
       "s3_restore_section": "Page Restauration : section « Restauration depuis S3 »",
-      "local_restore_section": "Page Restauration : section « Restauration depuis une sauvegarde locale »",
+      "local_restore_section": "Page Restauration : section « Restauration depuis un dossier du serveur »",
       "toggle_all_warning": "Cette action va perdre toutes vos personnalisations existantes. Voulez-vous continuer ?",
       "folder_actions_toggle": "Bouton de menu (⋮) sur les dossiers",
       "note_actions_toggle": "Bouton de menu (⋮) sur les notes",
@@ -1903,7 +1903,7 @@
         "user_webhooks": "Webhooks utilisateur",
         "user_webhooks_help": "Les utilisateurs non administrateurs ne peuvent plus enregistrer de webhooks envoyant des événements sur leurs notes vers des services externes.",
         "user_s3_backups": "Sauvegardes S3 sur la page Sauvegarde",
-        "user_s3_backups_help": "Les utilisateurs non administrateurs ne voient plus la section Sauvegardes S3 de la page Sauvegarde / Export et ne peuvent plus envoyer ni télécharger d'archives du bucket.",
+        "user_s3_backups_help": "Les utilisateurs non administrateurs ne voient plus la section « Sauvegarde vers S3 » de la page Sauvegarde / Export et ne peuvent plus envoyer ni télécharger d'archives du bucket.",
         "user_s3_restore": "Restauration S3 sur la page Restauration",
         "user_s3_restore_help": "Les utilisateurs non administrateurs ne voient plus la section Restauration depuis S3 de la page Restauration / Import et ne peuvent plus restaurer d'archives du bucket."
       }
@@ -2576,7 +2576,7 @@
     },
     "sections": {
       "complete_backup": {
-        "title": "Sauvegarde complète",
+        "title": "Sauvegarde dans un fichier ZIP Poznote",
         "description_prefix": "Téléchargez une sauvegarde complète contenant la base de données, les notes et les pièces jointes pour",
         "description_suffix": "dans un seul fichier ZIP.",
         "use_cases": "Deux cas d’usage :",
@@ -2600,7 +2600,7 @@
         "description_s3": "Avec le stockage S3 activé, les fichiers sont récupérés depuis le bucket ; utilisez cette archive pour ajouter les fichiers manquants à un backup créé sans les pièces jointes S3 avant de le restaurer."
       },
       "local_backup": {
-        "title": "Sauvegardes locales",
+        "title": "Sauvegarde dans un dossier du serveur",
         "description": "Enregistrez une archive de sauvegarde de votre compte dans le dossier de sauvegarde de ce serveur, et téléchargez les archives qui s'y trouvent déjà.",
         "backup_now": "Sauvegarder mon compte dans le dossier",
         "running": "Enregistrement de la sauvegarde dans le dossier...",
@@ -2610,7 +2610,7 @@
         "delete_disabled": "La suppression des sauvegardes est désactivée par votre administrateur."
       },
       "s3_backup": {
-        "title": "Sauvegardes S3",
+        "title": "Sauvegarde vers S3",
         "description": "Envoie une archive de sauvegarde de votre compte vers le bucket S3 configuré sur cette instance, et télécharge les archives qui y sont déjà stockées.",
         "backup_now": "Sauvegarder mon compte vers S3",
         "confirm_run": "Sauvegarder votre compte vers le bucket S3 maintenant ? L'archive peut mettre un certain temps à être envoyée.",
@@ -2829,7 +2829,7 @@
         "description": "Restaurez votre base de données Poznote à partir d'une sauvegarde complète"
       },
       "standard_restore": {
-        "title": "Restauration classique",
+        "title": "Restauration depuis une sauvegarde ZIP Poznote",
         "description": "Choisissez une sauvegarde complète au format ZIP.",
         "helper": "Pas de limite de taille : l'archive est envoyée par tranches et restaurée en arrière-plan."
       },
@@ -2871,7 +2871,7 @@
         "confirm": "Restaurer votre compte depuis {{filename}} ? Vos notes, pièces jointes et réglages actuels seront remplacés par le contenu de l'archive."
       },
       "local_restore": {
-        "title": "Restauration depuis une sauvegarde locale",
+        "title": "Restauration depuis un dossier du serveur",
         "description": "Restaure votre compte directement depuis l'une des archives de sauvegarde enregistrées dans le dossier de sauvegarde de ce serveur.",
         "confirm": "Restaurer votre compte depuis {{filename}} ? Vos notes, pièces jointes et réglages actuels seront remplacés par le contenu de l'archive.",
         "disabled": "Votre compte a {{count}} sauvegarde(s) dans le dossier de sauvegarde de ce serveur, mais la restauration par vous-même n'est pas activée. Demandez à votre administrateur d'en restaurer une pour vous, ou d'activer la restauration depuis cette page."
@@ -5361,7 +5361,7 @@
   },
   "s3_backup": {
     "title": "Sauvegardes S3",
-    "description": "Envoie des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement « Sauvegarde complète ») vers un bucket compatible S3, manuellement ou automatiquement selon une planification.",
+    "description": "Envoie des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement « Sauvegarde dans un fichier ZIP Poznote ») vers un bucket compatible S3, manuellement ou automatiquement selon une planification.",
     "description_scope": "Le réglage s'applique à tous les utilisateurs de cette instance et est indépendant du stockage S3 des pièces jointes.",
     "config_title": "Configuration",
     "enable_label": "Sauvegardes automatiques",
@@ -5428,7 +5428,7 @@
     "users_count_filtered": "{{selected}} utilisateur(s) sélectionné(s) sur {{total}}, {{shown}} affiché(s)"
   },
   "local_backup": {
-    "title": "Sauvegardes locales",
+    "title": "Sauvegardes sur le serveur",
     "description": "Enregistrez des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement de la sauvegarde complète) dans un dossier du serveur, manuellement ou automatiquement selon une planification.",
     "description_scope": "Ce réglage s'applique à tous les utilisateurs de cette instance.",
     "enable_description": "Sauvegarde les utilisateurs cochés ci-dessous dans le dossier selon la fréquence choisie.",

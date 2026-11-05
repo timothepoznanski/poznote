@@ -308,7 +308,7 @@
       "custom_fonts": "Tipus de lletra personalitzats",
       "restore_direct_copy": "Restauració per còpia directa",
       "import_notes": "Importació de notes",
-      "local_backup": "Còpies de seguretat locals",
+      "local_backup": "Còpies de seguretat al servidor",
       "whats_new": "Novetats després de les actualitzacions",
       "login_disabled": "Obertura sense inici de sessió",
       "outbound_hosts": "Accés a la xarxa local",
@@ -961,11 +961,11 @@
       "uncheck_all": "Desmarca-ho tot",
       "collapse_all": "Redueix-ho tot",
       "expand_all": "Amplia-ho tot",
-      "direct_copy_restore_section": "Pàgina de restauració: secció «Restaura quan la restauració estàndard no funciona»",
-      "local_backups_section": "Pàgina de còpia: secció «Còpies locals»",
-      "s3_backups_section": "Pàgina de còpia de seguretat: secció «Còpies de seguretat a S3»",
+      "direct_copy_restore_section": "Pàgina de restauració: secció «Restauració per còpia directa»",
+      "local_backups_section": "Pàgina de còpia: secció «Còpia de seguretat en una carpeta del servidor»",
+      "s3_backups_section": "Pàgina de còpia de seguretat: secció «Còpia de seguretat a S3»",
       "s3_restore_section": "Pàgina de restauració: secció «Restaura des d'S3»",
-      "local_restore_section": "Pàgina de restauració: secció «Restaura des d'una còpia local»",
+      "local_restore_section": "Pàgina de restauració: secció «Restaura des d'una carpeta del servidor»",
       "toggle_all_warning": "Es perdran totes les personalitzacions existents. Voleu continuar?",
       "folder_actions_toggle": "Botó de menú (⋮) a les carpetes",
       "note_actions_toggle": "Botó de menú (⋮) a les notes",
@@ -1381,7 +1381,7 @@
         "user_webhooks": "Webhooks d'usuari",
         "user_webhooks_help": "Els usuaris que no són administradors ja no poden registrar webhooks que enviïn esdeveniments sobre les seves notes a punts finals externs.",
         "user_s3_backups": "Còpies de seguretat a S3 a la pàgina de còpia de seguretat",
-        "user_s3_backups_help": "Els usuaris que no són administradors ja no veuen la secció Còpies de seguretat a S3 de la pàgina Còpia de seguretat / Exportació i no poden pujar ni baixar arxius del cubell.",
+        "user_s3_backups_help": "Els usuaris que no són administradors ja no veuen la secció «Còpia de seguretat a S3» de la pàgina Còpia de seguretat / Exportació i no poden pujar ni baixar arxius del cubell.",
         "user_s3_restore": "Restauració des d'S3 a la pàgina de restauració",
         "user_s3_restore_help": "Els usuaris que no són administradors ja no veuen la secció Restaura des d'S3 de la pàgina Restauració / Importació i no poden restaurar arxius del cubell."
       }
@@ -2167,7 +2167,7 @@
     },
     "sections": {
       "complete_backup": {
-        "title": "Còpia de seguretat completa",
+        "title": "Còpia de seguretat en un fitxer ZIP del Poznote",
         "description_prefix": "Baixeu una còpia de seguretat completa amb la base de dades, les notes i els fitxers adjunts de",
         "description_suffix": "en un sol fitxer ZIP.",
         "use_cases": "Dos casos d'ús:",
@@ -2191,7 +2191,7 @@
         "description_s3": "Amb l'emmagatzematge S3 activat, els fitxers s'obtenen del cubell. Feu servir aquest arxiu per afegir els fitxers que falten a una còpia de seguretat feta sense els fitxers adjunts d'S3 abans de restaurar-la."
       },
       "local_backup": {
-        "title": "Còpies locals",
+        "title": "Còpia de seguretat en una carpeta del servidor",
         "description": "Desa un arxiu de còpia de seguretat del teu compte a la carpeta de còpies d'aquest servidor i baixa els arxius que ja hi ha.",
         "backup_now": "Copia el meu compte a la carpeta",
         "running": "S'està desant la còpia a la carpeta...",
@@ -2201,7 +2201,7 @@
         "delete_disabled": "El teu administrador ha desactivat la supressió de còpies."
       },
       "s3_backup": {
-        "title": "Còpies de seguretat a S3",
+        "title": "Còpia de seguretat a S3",
         "description": "Pugeu un arxiu de còpia de seguretat del compte al cubell S3 configurat en aquesta instància i baixeu els arxius que ja hi ha emmagatzemats.",
         "backup_now": "Fes una còpia de seguretat del meu compte a S3",
         "confirm_run": "Voleu fer ara una còpia de seguretat del compte al cubell S3? L'arxiu pot trigar una estona a pujar-se.",
@@ -2420,7 +2420,7 @@
         "description": "Restaureu la base de dades del Poznote a partir d'una còpia de seguretat completa"
       },
       "standard_restore": {
-        "title": "Restauració estàndard",
+        "title": "Restaura des d'una còpia ZIP del Poznote",
         "description": "Trieu un fitxer ZIP de còpia de seguretat completa.",
         "helper": "Sense límit de mida: l'arxiu es puja per parts i es restaura en segon pla."
       },
@@ -2462,7 +2462,7 @@
         "confirm": "Voleu restaurar el compte a partir de {{filename}}? Les notes, els fitxers adjunts i els paràmetres actuals se substituiran pel contingut de l'arxiu."
       },
       "local_restore": {
-        "title": "Restaura des d'una còpia local",
+        "title": "Restaura des d'una carpeta del servidor",
         "description": "Restaura el teu compte directament des d'un dels arxius de còpia de seguretat desats a la carpeta de còpies d'aquest servidor.",
         "confirm": "Vols restaurar el teu compte des de {{filename}}? Les teves notes, adjunts i configuració actuals se substituiran pel contingut de l'arxiu.",
         "disabled": "El teu compte té {{count}} còpia(es) a la carpeta de còpies d'aquest servidor, però la restauració per tu mateix no està activada. Demana al teu administrador que en restauri una per tu, o que activi la restauració des d'aquesta pàgina."
@@ -4996,7 +4996,7 @@
     "users_count_filtered": "{{selected}} de {{total}} usuaris seleccionats, {{shown}} visibles"
   },
   "local_backup": {
-    "title": "Còpies de seguretat locals",
+    "title": "Còpies de seguretat al servidor",
     "description": "Deseu arxius de còpia de seguretat completa (un ZIP per usuari, idèntic a la baixada de la còpia de seguretat completa) en una carpeta del servidor, manualment o automàticament de manera planificada.",
     "description_scope": "Aquest paràmetre s'aplica a tots els usuaris d'aquesta instància.",
     "enable_description": "Copia els usuaris marcats a sota a la carpeta segons la freqüència triada.",

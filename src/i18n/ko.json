@@ -308,7 +308,7 @@
       "custom_fonts": "사용자 지정 글꼴",
       "restore_direct_copy": "직접 복사로 복원",
       "import_notes": "노트 가져오기",
-      "local_backup": "로컬 백업",
+      "local_backup": "서버 백업",
       "whats_new": "업데이트 후 새로운 기능",
       "login_disabled": "로그인 없이 열기",
       "outbound_hosts": "로컬 네트워크 접근",
@@ -961,11 +961,11 @@
       "uncheck_all": "모두 선택 취소",
       "collapse_all": "모두 접기",
       "expand_all": "모두 펼치기",
-      "direct_copy_restore_section": "복원 페이지: \"표준 복원이 작동하지 않는 경우 복원\" 섹션",
-      "local_backups_section": "백업 페이지: \"로컬 백업\" 섹션",
-      "s3_backups_section": "백업 페이지: \"S3 백업\" 섹션",
+      "direct_copy_restore_section": "복원 페이지: \"직접 복사로 복원\" 섹션",
+      "local_backups_section": "백업 페이지: \"서버의 폴더에 백업\" 섹션",
+      "s3_backups_section": "백업 페이지: \"S3에 백업\" 섹션",
       "s3_restore_section": "복원 페이지: \"S3에서 복원\" 섹션",
-      "local_restore_section": "복원 페이지: \"로컬 백업에서 복원\" 섹션",
+      "local_restore_section": "복원 페이지: \"서버의 폴더에서 복원\" 섹션",
       "toggle_all_warning": "이렇게 하면 기존 사용자 지정이 모두 손실됩니다. 계속하시겠습니까?",
       "folder_actions_toggle": "폴더의 메뉴 버튼(⋮)",
       "note_actions_toggle": "노트의 메뉴 버튼(⋮)",
@@ -1381,7 +1381,7 @@
         "user_webhooks": "사용자 웹훅",
         "user_webhooks_help": "관리자가 아닌 사용자는 노트에 대한 이벤트를 외부 엔드포인트로 보내는 웹후크를 더 이상 등록할 수 없습니다.",
         "user_s3_backups": "백업 페이지의 S3 백업",
-        "user_s3_backups_help": "관리자가 아닌 사용자는 더 이상 백업/내보내기 페이지의 S3 백업 섹션을 볼 수 없으며 버킷 아카이브를 업로드하거나 다운로드할 수 없습니다.",
+        "user_s3_backups_help": "관리자가 아닌 사용자는 더 이상 백업/내보내기 페이지의 \"S3에 백업\" 섹션을 볼 수 없으며 버킷 아카이브를 업로드하거나 다운로드할 수 없습니다.",
         "user_s3_restore": "복원 페이지의 S3 복원",
         "user_s3_restore_help": "관리자가 아닌 사용자는 더 이상 복원/가져오기 페이지의 S3에서 복원 섹션을 볼 수 없으며 버킷 아카이브를 복원할 수 없습니다."
       }
@@ -2167,7 +2167,7 @@
     },
     "sections": {
       "complete_backup": {
-        "title": "전체 백업",
+        "title": "Poznote ZIP 파일로 백업",
         "description_prefix": "데이터베이스, 노트, 첨부 파일이 포함된 전체 백업을 다운로드합니다.",
         "description_suffix": "하나의 ZIP 파일로 저장됩니다.",
         "use_cases": "두 가지 사용 사례:",
@@ -2191,7 +2191,7 @@
         "description_s3": "S3 저장소가 활성화되면 버킷에서 파일을 가져옵니다. 복원하기 전에 이 아카이브를 사용하여 S3 첨부 파일 없이 만든 백업에 누락된 파일을 추가하세요."
       },
       "local_backup": {
-        "title": "로컬 백업",
+        "title": "서버의 폴더에 백업",
         "description": "계정의 백업 아카이브를 이 서버의 백업 폴더에 저장하고, 이미 저장된 아카이브를 다운로드합니다.",
         "backup_now": "내 계정을 폴더에 백업",
         "running": "폴더에 백업을 저장하는 중...",
@@ -2201,7 +2201,7 @@
         "delete_disabled": "관리자가 백업 삭제를 사용하지 않도록 설정했습니다."
       },
       "s3_backup": {
-        "title": "S3 백업",
+        "title": "S3에 백업",
         "description": "이 인스턴스에 설정된 S3 버킷에 계정의 백업 아카이브를 업로드하고 이미 저장된 아카이브를 다운로드하세요.",
         "backup_now": "내 계정을 S3에 백업",
         "confirm_run": "지금 S3 버킷에 계정을 백업하시겠습니까? 아카이브를 업로드하는 데 시간이 걸릴 수 있습니다.",
@@ -2420,7 +2420,7 @@
         "description": "전체 백업에서 Poznote 데이터베이스 복원"
       },
       "standard_restore": {
-        "title": "표준 복원",
+        "title": "Poznote ZIP 백업에서 복원",
         "description": "전체 백업 ZIP 파일을 선택하세요.",
         "helper": "크기 제한 없음: 아카이브가 조각으로 업로드되고 백그라운드에서 복원됩니다."
       },
@@ -2462,7 +2462,7 @@
         "confirm": "{{filename}}에서 계정을 복원하시겠습니까? 현재 노트, 첨부 파일 및 설정이 아카이브 내용으로 대체됩니다."
       },
       "local_restore": {
-        "title": "로컬 백업에서 복원",
+        "title": "서버의 폴더에서 복원",
         "description": "이 서버의 백업 폴더에 저장된 백업 아카이브 중 하나에서 계정을 직접 복원합니다.",
         "confirm": "{{filename}}에서 계정을 복원할까요? 현재 노트, 첨부 파일 및 설정이 아카이브 내용으로 대체됩니다.",
         "disabled": "이 서버의 백업 폴더에 계정 백업이 {{count}}개 있지만 직접 복원하는 기능은 사용하도록 설정되어 있지 않습니다. 관리자에게 대신 복원해 달라고 하거나 이 페이지에서 복원할 수 있도록 설정해 달라고 요청하세요."
@@ -4996,7 +4996,7 @@
     "users_count_filtered": "{{total}} 사용자 중 {{selected}}가 선택됨, {{shown}}가 표시됨"
   },
   "local_backup": {
-    "title": "로컬 백업",
+    "title": "서버 백업",
     "description": "전체 백업 아카이브(사용자당 ZIP 하나, 전체 백업 다운로드와 동일)를 서버의 폴더에 수동으로 또는 일정에 따라 자동으로 저장합니다.",
     "description_scope": "이 설정은 이 인스턴스의 모든 사용자에게 적용됩니다.",
     "enable_description": "아래에서 선택한 사용자를 선택한 주기로 폴더에 백업합니다.",

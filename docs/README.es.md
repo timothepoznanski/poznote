@@ -1107,7 +1107,7 @@ Cada opción se detalla a continuación, y las notas también se pueden exportar
 
 <a id="complete-backup"></a>
 <details>
-<summary><strong>Copia de seguridad completa en zip de Poznote</strong></summary>
+<summary><strong>Copia de seguridad en un archivo ZIP de Poznote</strong></summary>
 <br>
 
 Un único ZIP que contiene la base de datos, todas las notas y los adjuntos de todos los espacios de trabajo:
@@ -1133,12 +1133,12 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 <a id="local-backups"></a>
 <details>
-<summary><strong>Copias de seguridad programadas en una carpeta local</strong></summary>
+<summary><strong>Copias de seguridad programadas en una carpeta del servidor</strong></summary>
 <br>
 
-Los administradores pueden hacer que se guarden archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga de la copia de seguridad completa) en una carpeta del servidor, manualmente o automáticamente según una programación, conservando solo los más recientes. No hace falta nada fuera de Poznote: ni bucket, ni tarea cron, ni script.
+Los administradores pueden hacer que se guarden archivos de copia de seguridad completos (un ZIP por usuario, idéntico al que se descarga con «Copia de seguridad en un archivo ZIP de Poznote») en una carpeta del servidor, manualmente o automáticamente según una programación, conservando solo los más recientes. No hace falta nada fuera de Poznote: ni bucket, ni tarea cron, ni script.
 
-Configúralas en **Configuración > Copias de seguridad locales** (solo administradores).
+Configúralas en **Configuración > Copias de seguridad en el servidor** (solo administradores).
 
 - **Carpeta de copias de seguridad**: una ruta absoluta en el servidor (dentro del contenedor con Docker). Si se deja vacía, los archivos van a `data/backups`, que ya forma parte del volumen de datos. La carpeta se crea si es necesario y el usuario del servidor web debe poder escribir en ella.
 - **Selección de usuarios**: unas casillas eligen qué usuarios cubren las copias. Todos están marcados por defecto y, mientras todos lo estén, las cuentas nuevas se incluyen automáticamente.
@@ -1168,7 +1168,7 @@ Una carpeta situada dentro de la propia aplicación se rechaza, salvo `data/back
 <summary><strong>Copias de seguridad programadas en un bucket S3</strong></summary>
 <br>
 
-Los administradores pueden enviar archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga de Copia de seguridad completa) a un bucket compatible con S3, manualmente o de forma automática según una programación. La configuración es independiente de la del almacenamiento de adjuntos en S3, así que las copias de seguridad pueden ir a otro bucket u otro proveedor.
+Los administradores pueden enviar archivos de copia de seguridad completos (un ZIP por usuario, idéntico al que se descarga con «Copia de seguridad en un archivo ZIP de Poznote») a un bucket compatible con S3, manualmente o de forma automática según una programación. La configuración es independiente de la del almacenamiento de adjuntos en S3, así que las copias de seguridad pueden ir a otro bucket u otro proveedor.
 
 Configúralo en **Configuración > Copias de seguridad S3** (solo administradores).
 
@@ -1180,7 +1180,7 @@ Configúralo en **Configuración > Copias de seguridad S3** (solo administradore
 - **Conservación**: solo se conservan los N archivos más recientes por usuario, los más antiguos se eliminan del bucket después de cada copia (0 lo conserva todo).
 - **Exploración**: la página lista los archivos que hay actualmente en el bucket, con acciones de descarga y eliminación.
 - **Restauración**: los archivos se guardan en `backups/{user id}/` dentro del bucket y pueden restaurarse con la página estándar de [Restaurar / Importar](#restaurar--importar).
-- **Autoservicio**: una vez configurado el bucket, cada usuario tiene una sección «Copias de seguridad S3» en su página de Copia de seguridad / Exportar para subir un archivo nuevo de su propia cuenta, y para descargar o eliminar sus archivos existentes. Una sección «Restaurar desde S3» en la página de Restaurar / Importar restaura su cuenta directamente desde uno de esos archivos.
+- **Autoservicio**: una vez configurado el bucket, cada usuario tiene una sección «Copia de seguridad en S3» en su página de Copia de seguridad / Exportar para subir un archivo nuevo de su propia cuenta, y para descargar o eliminar sus archivos existentes. Una sección «Restaurar desde S3» en la página de Restaurar / Importar restaura su cuenta directamente desde uno de esos archivos.
 - **Aislamiento de cuentas**: dos opciones («Copias S3 en la página de copias de seguridad» y «Restauración S3 en la página de restauración») desactivan estas secciones de autoservicio para los usuarios que no son administradores. Se aplican en el servidor, así que las acciones bloqueadas se rechazan incluso cuando se llaman directamente.
 
 Cuando los adjuntos se guardan en S3 (almacenamiento de adjuntos en S3), se incluyen por defecto en los archivos, obtenidos del bucket sobre la marcha. Una opción permite dejarlos fuera de las copias de seguridad para obtener archivos más ligeros y ejecuciones más rápidas.
@@ -1263,7 +1263,7 @@ Poznote ofrece opciones de restauración flexibles desde la interfaz web (**Conf
 
 <a id="complete-restore"></a>
 <details>
-<summary><strong>Restauración completa desde una copia de seguridad zip de Poznote</strong></summary>
+<summary><strong>Restaurar desde una copia ZIP de Poznote</strong></summary>
 <br>
 
 Sube el ZIP de la copia de seguridad completa para restaurarlo todo:
@@ -1275,7 +1275,7 @@ No hay límite de tamaño en la práctica. El archivo se sube por fragmentos (un
 
 La restauración desde un bucket S3 (consulta [Copias de seguridad S3](#s3-backups)) se ejecuta como el mismo trabajo en segundo plano, así que obtener un archivo grande del bucket y restaurarlo tampoco depende de que una petición siga activa.
 
-Si la subida no es posible en absoluto, la página de Restaurar / Importar también ofrece una alternativa de copia directa: copia el archivo en el contenedor de Poznote exactamente en `/tmp/backup_restore.zip` por SSH, recarga la página y restaura desde ahí.
+Si la subida no es posible en absoluto, la página de Restaurar / Importar también ofrece una alternativa, «Restauración por copia directa»: copia el archivo en el contenedor de Poznote exactamente en `/tmp/backup_restore.zip` por SSH, recarga la página y restaura desde ahí.
 
 </details>
 
@@ -1411,7 +1411,7 @@ Las notas que modificaste en los últimos 5 días se guardan en cada navegador d
 <summary><strong>Exportación sin conexión</strong></summary>
 <br>
 
-La **📦 Copia de seguridad completa** crea una versión independiente de tus notas para consultarla sin conexión. Solo tienes que extraer el ZIP y abrir `index.html` en cualquier navegador web. Así puedes leer tus notas sin conexión, pero sin todas las funciones de Poznote: es una exportación de solo lectura.
+La **📦 Copia de seguridad en un archivo ZIP de Poznote** crea una versión independiente de tus notas para consultarla sin conexión. Solo tienes que extraer el ZIP y abrir `index.html` en cualquier navegador web. Así puedes leer tus notas sin conexión, pero sin todas las funciones de Poznote: es una exportación de solo lectura.
 
 </details>
 

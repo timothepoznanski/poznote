@@ -18,7 +18,7 @@
  *
  * Self-service actions (any user, own account only, once the admin allowed
  * users to back up their account, see LocalBackupService::canCurrentUserBackup;
- * they feed the "Local Backups" section of the Backup / Export page):
+ * they feed the "Backup to a folder on the server" section of the Backup / Export page):
  *   GET  ?action=self_status    Own archives in the folder and backup policy
  *   POST ?action=self_run       Queue a background job backing up the current
  *                               user's account, returns the job id

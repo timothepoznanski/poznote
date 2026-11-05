@@ -325,7 +325,7 @@ class LocalBackupService {
 
     /**
      * Whether the current user may back up their own account into the
-     * folder, and see and download its archives there ("Local Backups" on
+     * folder, and see and download its archives there ("Backup to a folder on the server" on
      * the Backup / Export page): administrators always, other users once the
      * admin enabled it, unless the section is hidden with Elements
      * visibility. Needs the user database (the hidden-elements rule reads
@@ -357,7 +357,7 @@ class LocalBackupService {
 
     /**
      * Whether the current user may start a restore from their own archives
-     * ("Restore from a local backup" on the Restore page): administrators
+     * ("Restore from a folder on the server" on the Restore page): administrators
      * always (they can restore any archive from the Local Backups page
      * anyway), other users once the admin enabled it. The section must not
      * be hidden with Elements visibility either. Needs the user database

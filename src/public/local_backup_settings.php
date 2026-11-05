@@ -170,7 +170,7 @@ function localBackupRenderUsersPicker(array $users, string $prefix, string $inpu
     <meta charset="utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
-    <title><?php echo t_h('local_backup.title', [], 'Local Backups'); ?> - <?php echo getPageTitle(); ?></title>
+    <title><?php echo t_h('local_backup.title', [], 'Server Backups'); ?> - <?php echo getPageTitle(); ?></title>
     <meta name="color-scheme" content="dark light">
     <?php
     // getAppVersion() reads version.txt through an absolute path. Reading it
@@ -260,7 +260,7 @@ function localBackupRenderUsersPicker(array $users, string $prefix, string $inpu
 </head>
 <body class="home-page git-sync-page has-icon-sidebar" data-workspace="<?php echo htmlspecialchars($pageWorkspace, ENT_QUOTES, 'UTF-8'); ?>">
     <?php $iconSidebarWorkspace = $pageWorkspace; include __DIR__ . '/../icon_sidebar.php'; ?>
-    <?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.local_backup', [], 'Local Backups')]); ?>
+    <?php poznoteSettingsShellOpen(['section' => 'admin-tools-grid', 'title' => t('settings.cards.local_backup', [], 'Server Backups')]); ?>
     <div class="home-container git-sync-container local-backup-container">
 
 

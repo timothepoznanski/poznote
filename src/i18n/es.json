@@ -662,7 +662,7 @@
       "custom_fonts": "Fuentes personalizadas",
       "restore_direct_copy": "Restauración por copia directa",
       "import_notes": "Importar notas",
-      "local_backup": "Copias de seguridad locales",
+      "local_backup": "Copias de seguridad en el servidor",
       "whats_new": "Novedades tras una actualización",
       "login_disabled": "Abrir sin iniciar sesión",
       "outbound_hosts": "Acceso a la red local",
@@ -1477,11 +1477,11 @@
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} por el administrador)",
       "badge_hidden_count_admin_columns": "{{me}} oculto(s) para ti, {{users}} para los usuarios",
       "badge_hidden_count": "{{count}} oculto(s)",
-      "direct_copy_restore_section": "Página de restauración: sección «Restaurar cuando la restauración estándar no funciona»",
-      "local_backups_section": "Página de copia: sección \"Copias locales\"",
-      "s3_backups_section": "Página de copia de seguridad: sección «Copias de seguridad S3»",
+      "direct_copy_restore_section": "Página de restauración: sección «Restauración por copia directa»",
+      "local_backups_section": "Página de copia: sección \"Copia de seguridad en una carpeta del servidor\"",
+      "s3_backups_section": "Página de copia de seguridad: sección «Copia de seguridad en S3»",
       "s3_restore_section": "Página de restauración: sección «Restaurar desde S3»",
-      "local_restore_section": "Página de restauración: sección \"Restaurar desde una copia local\"",
+      "local_restore_section": "Página de restauración: sección \"Restaurar desde una carpeta del servidor\"",
       "toggle_all_warning": "Esta acción hará perder todas sus personalizaciones existentes. ¿Desea continuar?",
       "folder_actions_toggle": "Botón de menú (⋮) en las carpetas",
       "note_actions_toggle": "Botón de menú (⋮) en las notas",
@@ -1897,7 +1897,7 @@
         "user_webhooks": "Webhooks de usuario",
         "user_webhooks_help": "Los usuarios no administradores ya no pueden registrar webhooks que envíen eventos sobre sus notas a servicios externos.",
         "user_s3_backups": "Copias S3 en la página de copias de seguridad",
-        "user_s3_backups_help": "Los usuarios no administradores ya no ven la sección Copias de seguridad S3 de la página Copia de seguridad / Exportar y no pueden subir ni descargar archivos del bucket.",
+        "user_s3_backups_help": "Los usuarios no administradores ya no ven la sección «Copia de seguridad en S3» de la página Copia de seguridad / Exportar y no pueden subir ni descargar archivos del bucket.",
         "user_s3_restore": "Restauración S3 en la página de restauración",
         "user_s3_restore_help": "Los usuarios no administradores ya no ven la sección Restaurar desde S3 de la página Restaurar / Importar y no pueden restaurar archivos del bucket."
       }
@@ -2571,7 +2571,7 @@
     },
     "sections": {
       "complete_backup": {
-        "title": "Copia de seguridad completa",
+        "title": "Copia de seguridad en un archivo ZIP de Poznote",
         "description_prefix": "Descarga una copia de seguridad completa que contenga base de datos, notas y adjuntos para",
         "description_suffix": "en un solo archivo ZIP.",
         "use_cases": "Dos casos de uso:",
@@ -2595,7 +2595,7 @@
         "description_s3": "Con el almacenamiento S3 activado, los archivos se obtienen del bucket; use este archivo para añadir los archivos que faltan a una copia de seguridad creada sin los adjuntos S3 antes de restaurarla."
       },
       "local_backup": {
-        "title": "Copias locales",
+        "title": "Copia de seguridad en una carpeta del servidor",
         "description": "Guarde un archivo de copia de seguridad de su cuenta en la carpeta de copias de este servidor y descargue los archivos que ya están allí.",
         "backup_now": "Copiar mi cuenta en la carpeta",
         "running": "Guardando la copia en la carpeta...",
@@ -2605,7 +2605,7 @@
         "delete_disabled": "Su administrador ha desactivado la eliminación de copias."
       },
       "s3_backup": {
-        "title": "Copias de seguridad S3",
+        "title": "Copia de seguridad en S3",
         "description": "Sube un archivo de copia de seguridad de su cuenta al bucket S3 configurado en esta instancia y descarga los archivos ya almacenados allí.",
         "backup_now": "Respaldar mi cuenta en S3",
         "confirm_run": "Respaldar tu cuenta en el bucket S3 ahora? La subida del archivo puede tardar un rato.",
@@ -2824,7 +2824,7 @@
         "description": "Restaure su base de datos Poznote desde una copia de seguridad completa"
       },
       "standard_restore": {
-        "title": "Restauración estándar",
+        "title": "Restaurar desde una copia ZIP de Poznote",
         "description": "Elige un archivo de copia de seguridad completa ZIP.",
         "helper": "Sin límite de tamaño: el archivo se sube por partes y se restaura en segundo plano."
       },
@@ -2866,7 +2866,7 @@
         "confirm": "¿Restaurar su cuenta desde {{filename}}? Sus notas, adjuntos y ajustes actuales serán reemplazados por el contenido del archivo."
       },
       "local_restore": {
-        "title": "Restaurar desde una copia local",
+        "title": "Restaurar desde una carpeta del servidor",
         "description": "Restaure su cuenta directamente desde uno de los archivos de copia de seguridad guardados en la carpeta de copias de este servidor.",
         "confirm": "¿Restaurar su cuenta desde {{filename}}? Sus notas, adjuntos y ajustes actuales se sustituirán por el contenido del archivo.",
         "disabled": "Su cuenta tiene {{count}} copia(s) en la carpeta de copias de este servidor, pero la restauración por usted mismo no está activada. Pida a su administrador que restaure una por usted, o que active la restauración desde esta página."
@@ -5257,7 +5257,7 @@
   },
   "s3_backup": {
     "title": "Copias de seguridad S3",
-    "description": "Sube archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga «Copia de seguridad completa») a un bucket compatible con S3, manualmente o automáticamente según una programación.",
+    "description": "Sube archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga «Copia de seguridad en un archivo ZIP de Poznote») a un bucket compatible con S3, manualmente o automáticamente según una programación.",
     "description_scope": "El ajuste se aplica a todos los usuarios de esta instancia y es independiente del almacenamiento S3 de adjuntos.",
     "config_title": "Configuración",
     "enable_label": "Copias de seguridad automáticas",
@@ -5324,7 +5324,7 @@
     "users_count_filtered": "{{selected}} de {{total}} usuario(s) seleccionado(s), {{shown}} mostrado(s)"
   },
   "local_backup": {
-    "title": "Copias de seguridad locales",
+    "title": "Copias de seguridad en el servidor",
     "description": "Guarda archivos de copia de seguridad completos (un ZIP por usuario, idéntico a la descarga de la copia de seguridad completa) en una carpeta del servidor, manualmente o automáticamente según una programación.",
     "description_scope": "El ajuste se aplica a todos los usuarios de esta instancia.",
     "enable_description": "Copia los usuarios marcados abajo en la carpeta según la frecuencia elegida.",

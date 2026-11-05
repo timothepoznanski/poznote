@@ -1107,7 +1107,7 @@ Chaque option est détaillée ci-dessous, et les notes peuvent aussi être expor
 
 <a id="complete-backup"></a>
 <details>
-<summary><strong>Sauvegarde complète au format zip Poznote</strong></summary>
+<summary><strong>Sauvegarde dans un fichier ZIP Poznote</strong></summary>
 <br>
 
 Un seul ZIP contenant la base de données, toutes les notes et les pièces jointes de tous les espaces de travail :
@@ -1133,12 +1133,12 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 <a id="local-backups"></a>
 <details>
-<summary><strong>Sauvegardes planifiées dans un dossier local</strong></summary>
+<summary><strong>Sauvegardes planifiées dans un dossier du serveur</strong></summary>
 <br>
 
-Les administrateurs peuvent faire enregistrer des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement de la sauvegarde complète) dans un dossier du serveur, manuellement ou automatiquement selon une planification, en ne conservant que les plus récentes. Rien d'autre que Poznote n'est nécessaire : ni bucket, ni tâche cron, ni script.
+Les administrateurs peuvent faire enregistrer des archives de sauvegarde complètes (un ZIP par utilisateur, identique à celui téléchargé par « Sauvegarde dans un fichier ZIP Poznote ») dans un dossier du serveur, manuellement ou automatiquement selon une planification, en ne conservant que les plus récentes. Rien d'autre que Poznote n'est nécessaire : ni bucket, ni tâche cron, ni script.
 
-Configurez-les dans **Paramètres > Sauvegardes locales** (administrateurs uniquement).
+Configurez-les dans **Paramètres > Sauvegardes sur le serveur** (administrateurs uniquement).
 
 - **Dossier de sauvegarde** : un chemin absolu sur le serveur (dans le conteneur avec Docker). Laissé vide, les archives vont dans `data/backups`, qui fait déjà partie du volume de données. Le dossier est créé si nécessaire et doit être accessible en écriture par l'utilisateur du serveur web.
 - **Sélection des utilisateurs** : des cases à cocher choisissent les utilisateurs couverts par les sauvegardes. Tout le monde est coché par défaut, et tant que tout le monde est coché, les nouveaux comptes sont inclus automatiquement.
@@ -1168,7 +1168,7 @@ Un dossier situé dans l'application elle-même est refusé, hormis `data/backup
 <summary><strong>Sauvegardes planifiées vers un bucket S3</strong></summary>
 <br>
 
-Les administrateurs peuvent envoyer des archives de sauvegarde complètes (un ZIP par utilisateur, identique au téléchargement de la sauvegarde complète) vers un bucket compatible S3, manuellement ou automatiquement selon une planification. Cette configuration est indépendante de celle du stockage des pièces jointes sur S3 : les sauvegardes peuvent donc cibler un autre bucket ou un autre fournisseur.
+Les administrateurs peuvent envoyer des archives de sauvegarde complètes (un ZIP par utilisateur, identique à celui téléchargé par « Sauvegarde dans un fichier ZIP Poznote ») vers un bucket compatible S3, manuellement ou automatiquement selon une planification. Cette configuration est indépendante de celle du stockage des pièces jointes sur S3 : les sauvegardes peuvent donc cibler un autre bucket ou un autre fournisseur.
 
 Configurez-les dans **Paramètres > Sauvegardes S3** (administrateurs uniquement).
 
@@ -1180,7 +1180,7 @@ Configurez-les dans **Paramètres > Sauvegardes S3** (administrateurs uniquement
 - **Rétention** : seules les N archives les plus récentes sont conservées par utilisateur, les plus anciennes sont supprimées du bucket après chaque sauvegarde (0 conserve tout).
 - **Consultation** : la page liste les archives actuellement présentes dans le bucket, avec des actions de téléchargement et de suppression.
 - **Restauration** : les archives sont stockées sous `backups/{user id}/` dans le bucket et peuvent être restaurées avec la page standard [Restauration / Import](#restauration--import).
-- **Libre-service** : une fois le bucket configuré, chaque utilisateur dispose d'une section « Sauvegardes S3 » sur sa page Sauvegarde / Export pour envoyer une archive fraîche de son propre compte, et télécharger ou supprimer ses archives existantes. Une section « Restauration depuis S3 » sur la page Restauration / Import restaure directement son compte à partir de l'une de ces archives.
+- **Libre-service** : une fois le bucket configuré, chaque utilisateur dispose d'une section « Sauvegarde vers S3 » sur sa page Sauvegarde / Export pour envoyer une archive fraîche de son propre compte, et télécharger ou supprimer ses archives existantes. Une section « Restauration depuis S3 » sur la page Restauration / Import restaure directement son compte à partir de l'une de ces archives.
 - **Isolation des comptes** : deux options (« Sauvegardes S3 sur la page Sauvegarde » et « Restauration S3 sur la page Restauration ») désactivent ces sections en libre-service pour les utilisateurs non administrateurs. Elles sont appliquées côté serveur : les actions bloquées sont refusées même lorsqu'elles sont appelées directement.
 
 Lorsque les pièces jointes sont stockées dans S3 (stockage des pièces jointes sur S3), elles sont incluses par défaut dans les archives, récupérées à la volée depuis le bucket. Une option permet de les exclure des sauvegardes pour obtenir des archives plus légères et des exécutions plus rapides.
@@ -1263,7 +1263,7 @@ Poznote propose des options de restauration flexibles, via l'interface web (**Pa
 
 <a id="complete-restore"></a>
 <details>
-<summary><strong>Restauration complète à partir d'une sauvegarde zip Poznote</strong></summary>
+<summary><strong>Restauration depuis une sauvegarde ZIP Poznote</strong></summary>
 <br>
 
 Téléversez le ZIP de sauvegarde complète pour tout restaurer :
@@ -1275,7 +1275,7 @@ Il n'y a pas de limite de taille en pratique. L'archive est téléversée par tr
 
 La restauration depuis un bucket S3 (voir [Sauvegardes S3](#s3-backups)) s'exécute comme la même tâche en arrière-plan : récupérer une grosse archive depuis le bucket et la restaurer ne dépend donc pas non plus du maintien d'une requête.
 
-Si le téléversement est tout simplement impossible, la page Restauration / Import propose aussi une solution de repli par copie directe : copiez l'archive dans le conteneur Poznote exactement à l'emplacement `/tmp/backup_restore.zip` via SSH, rechargez la page et lancez la restauration depuis celle-ci.
+Si le téléversement est tout simplement impossible, la page Restauration / Import propose aussi une solution de repli, « Restauration par copie directe » : copiez l'archive dans le conteneur Poznote exactement à l'emplacement `/tmp/backup_restore.zip` via SSH, rechargez la page et lancez la restauration depuis celle-ci.
 
 </details>
 
@@ -1411,7 +1411,7 @@ Les notes modifiées ces 5 derniers jours sont conservées dans chaque navigateu
 <summary><strong>Export hors ligne</strong></summary>
 <br>
 
-La **📦 Sauvegarde complète** crée une version hors ligne autonome de vos notes. Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans n'importe quel navigateur web. Vous pouvez ainsi lire vos notes hors ligne, mais sans toutes les fonctionnalités de Poznote : il s'agit d'un export en lecture seule.
+La **📦 Sauvegarde dans un fichier ZIP Poznote** crée une version hors ligne autonome de vos notes. Il suffit d'extraire le ZIP et d'ouvrir `index.html` dans n'importe quel navigateur web. Vous pouvez ainsi lire vos notes hors ligne, mais sans toutes les fonctionnalités de Poznote : il s'agit d'un export en lecture seule.
 
 </details>
 

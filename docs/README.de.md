@@ -1107,7 +1107,7 @@ Jede Option wird unten beschrieben, und einzelne Notizen lassen sich auch für s
 
 <a id="complete-backup"></a>
 <details>
-<summary><strong>Vollständige Sicherung als Poznote-ZIP</strong></summary>
+<summary><strong>Sicherung als Poznote-ZIP-Datei</strong></summary>
 <br>
 
 Eine einzige ZIP-Datei mit der Datenbank, allen Notizen und Anhängen aller Arbeitsbereiche:
@@ -1133,12 +1133,12 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 <a id="local-backups"></a>
 <details>
-<summary><strong>Geplante Sicherungen in einen lokalen Ordner</strong></summary>
+<summary><strong>Geplante Sicherungen in einen Ordner auf dem Server</strong></summary>
 <br>
 
-Administratoren können vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit dem Download der vollständigen Sicherung) manuell oder automatisch nach Zeitplan in einem Ordner des Servers speichern lassen, wobei nur die neuesten aufbewahrt werden. Außer Poznote wird nichts benötigt: kein Bucket, kein Cronjob, kein Skript.
+Administratoren können vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit der über „Sicherung als Poznote-ZIP-Datei“ heruntergeladenen) manuell oder automatisch nach Zeitplan in einem Ordner des Servers speichern lassen, wobei nur die neuesten aufbewahrt werden. Außer Poznote wird nichts benötigt: kein Bucket, kein Cronjob, kein Skript.
 
-Konfigurieren Sie sie unter **Einstellungen > Lokale Sicherungen** (nur Administratoren).
+Konfigurieren Sie sie unter **Einstellungen > Sicherungen auf dem Server** (nur Administratoren).
 
 - **Sicherungsordner**: Ein absoluter Pfad auf dem Server (mit Docker: im Container). Bleibt das Feld leer, landen die Archive in `data/backups`, das bereits zum Daten-Volume gehört. Der Ordner wird bei Bedarf angelegt und muss für den Benutzer des Webservers beschreibbar sein.
 - **Benutzerauswahl**: Kontrollkästchen legen fest, welche Benutzer gesichert werden. Standardmäßig sind alle ausgewählt, und solange alle ausgewählt sind, werden neue Konten automatisch einbezogen.
@@ -1168,7 +1168,7 @@ Ein Ordner innerhalb der Anwendung selbst wird abgelehnt, außer `data/backups`.
 <summary><strong>Geplante Sicherungen in einen S3-Bucket</strong></summary>
 <br>
 
-Administratoren können vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit dem Download der vollständigen Sicherung) manuell oder automatisch nach Zeitplan an einen S3-kompatiblen Bucket senden. Die Konfiguration ist unabhängig von der des S3-Speichers für Anhänge, sodass Sicherungen einen anderen Bucket oder Anbieter nutzen können.
+Administratoren können vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit der über „Sicherung als Poznote-ZIP-Datei“ heruntergeladenen) manuell oder automatisch nach Zeitplan an einen S3-kompatiblen Bucket senden. Die Konfiguration ist unabhängig von der des S3-Speichers für Anhänge, sodass Sicherungen einen anderen Bucket oder Anbieter nutzen können.
 
 Konfigurieren Sie sie unter **Einstellungen > S3-Sicherungen** (nur Administratoren).
 
@@ -1180,7 +1180,7 @@ Konfigurieren Sie sie unter **Einstellungen > S3-Sicherungen** (nur Administrato
 - **Aufbewahrung**: Pro Benutzer werden nur die N neuesten Archive aufbewahrt, ältere werden nach jeder Sicherung aus dem Bucket gelöscht (0 bewahrt alles auf).
 - **Durchsuchen**: Die Seite listet die aktuell im Bucket vorhandenen Archive mit Aktionen zum Herunterladen und Löschen auf.
 - **Wiederherstellung**: Archive werden im Bucket unter `backups/{user id}/` gespeichert und können über die normale Seite [Wiederherstellen / Importieren](#wiederherstellen--importieren) wiederhergestellt werden.
-- **Self-Service**: Sobald der Bucket konfiguriert ist, erhält jeder Benutzer auf seiner Seite **Sicherung / Export** einen Bereich „S3-Sicherungen“, um ein neues Archiv seines eigenen Kontos hochzuladen und seine vorhandenen Archive herunterzuladen oder zu löschen. Ein Bereich „Aus S3 wiederherstellen“ auf der Seite **Wiederherstellen / Importieren** stellt sein Konto direkt aus einem dieser Archive wieder her.
+- **Self-Service**: Sobald der Bucket konfiguriert ist, erhält jeder Benutzer auf seiner Seite **Sicherung / Export** einen Bereich „Sicherung nach S3“, um ein neues Archiv seines eigenen Kontos hochzuladen und seine vorhandenen Archive herunterzuladen oder zu löschen. Ein Bereich „Aus S3 wiederherstellen“ auf der Seite **Wiederherstellen / Importieren** stellt sein Konto direkt aus einem dieser Archive wieder her.
 - **Mandantentrennung**: Zwei Optionen („S3-Sicherungen auf der Sicherungsseite“ und „S3-Wiederherstellung auf der Wiederherstellungsseite“) deaktivieren diese Self-Service-Bereiche für Benutzer ohne Administratorrechte. Sie werden serverseitig durchgesetzt, sodass die gesperrten Aktionen auch bei direktem Aufruf abgelehnt werden.
 
 Werden Anhänge in S3 gespeichert (S3-Speicher für Anhänge), sind sie standardmäßig in den Archiven enthalten und werden dabei direkt aus dem Bucket geholt. Mit einer Option können Sie sie für schlankere Archive und schnellere Durchläufe aus den Sicherungen herauslassen.
@@ -1263,7 +1263,7 @@ Poznote bietet flexible Wiederherstellungsoptionen über die Weboberfläche (**E
 
 <a id="complete-restore"></a>
 <details>
-<summary><strong>Vollständige Wiederherstellung aus einer Poznote-ZIP-Sicherung</strong></summary>
+<summary><strong>Aus einer Poznote-ZIP-Sicherung wiederherstellen</strong></summary>
 <br>
 
 Laden Sie die vollständige Sicherungs-ZIP hoch, um alles wiederherzustellen:
@@ -1275,7 +1275,7 @@ Es gibt praktisch keine Größenbeschränkung. Das Archiv wird in Teilstücken h
 
 Die Wiederherstellung aus einem S3-Bucket (siehe [S3-Sicherungen](#s3-backups)) läuft als derselbe Hintergrundauftrag, sodass auch das Abrufen eines großen Archivs aus dem Bucket und seine Wiederherstellung nicht davon abhängen, dass eine Anfrage bestehen bleibt.
 
-Ist ein Upload überhaupt nicht möglich, bietet die Seite **Wiederherstellen / Importieren** zusätzlich eine Alternative per Direktkopie: Kopieren Sie das Archiv per SSH in den Poznote-Container, genau nach `/tmp/backup_restore.zip`, laden Sie die Seite neu und stellen Sie von dort aus wieder her.
+Ist ein Upload überhaupt nicht möglich, bietet die Seite **Wiederherstellen / Importieren** zusätzlich eine Alternative, „Wiederherstellung per Direktkopie“: Kopieren Sie das Archiv per SSH in den Poznote-Container, genau nach `/tmp/backup_restore.zip`, laden Sie die Seite neu und stellen Sie von dort aus wieder her.
 
 </details>
 
@@ -1411,7 +1411,7 @@ Die in den letzten 5 Tagen geänderten Notizen werden in jedem Browser aufbewahr
 <summary><strong>Offline-Export</strong></summary>
 <br>
 
-Die **📦 Vollständige Sicherung** erzeugt eine eigenständige Offline-Version Ihrer Notizen. Entpacken Sie einfach die ZIP-Datei und öffnen Sie `index.html` in einem beliebigen Webbrowser. So können Sie Ihre Notizen offline lesen, allerdings ohne den vollen Funktionsumfang von Poznote: Es handelt sich um einen schreibgeschützten Export.
+Die **📦 Sicherung als Poznote-ZIP-Datei** erzeugt eine eigenständige Offline-Version Ihrer Notizen. Entpacken Sie einfach die ZIP-Datei und öffnen Sie `index.html` in einem beliebigen Webbrowser. So können Sie Ihre Notizen offline lesen, allerdings ohne den vollen Funktionsumfang von Poznote: Es handelt sich um einen schreibgeschützten Export.
 
 </details>
 

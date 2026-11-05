@@ -36,15 +36,15 @@ $localBackupSectionVisible = LocalBackupService::canCurrentUserBackup();
 // ?part= shows one part of the page alone, under its own title: the cards of
 // Settings > Backup & restore and Export & import each open one. Without it the page shows them all.
 $backupExportParts = [
-    'backup' => ['id' => 'complete-backup-section', 'title' => t('backup_export.sections.complete_backup.title', [], 'Complete Backup')],
+    'backup' => ['id' => 'complete-backup-section', 'title' => t('backup_export.sections.complete_backup.title', [], 'Backup to a Poznote ZIP file')],
     'structured-export' => ['id' => 'structured-export-section', 'title' => t('backup_export.sections.structured_export.title', [], 'Structured Export')],
     'attachments-export' => ['id' => 'attachments-export-section', 'title' => t('backup_export.sections.attachments_export.title', [], 'Attachments Export')],
 ];
 if ($localBackupSectionVisible) {
-    $backupExportParts['local'] = ['id' => 'local-user-backup-section', 'title' => t('backup_export.sections.local_backup.title', [], 'Local Backups')];
+    $backupExportParts['local'] = ['id' => 'local-user-backup-section', 'title' => t('backup_export.sections.local_backup.title', [], 'Backup to a folder on the server')];
 }
 if ($s3BackupSectionVisible) {
-    $backupExportParts['s3'] = ['id' => 's3-user-backup-section', 'title' => t('backup_export.sections.s3_backup.title', [], 'S3 Backups')];
+    $backupExportParts['s3'] = ['id' => 's3-user-backup-section', 'title' => t('backup_export.sections.s3_backup.title', [], 'Backup to S3')];
 }
 $backupExportPart = (string)($_GET['part'] ?? '');
 if (!isset($backupExportParts[$backupExportPart])) {
@@ -349,7 +349,7 @@ function createBackup() {
         <script src="<?php echo poznoteAsset('js/row-actions-menu.js'); ?>"></script>
         <!-- Local Backups Section (own account), same shape as S3 Backups below -->
         <div class="backup-section" id="local-user-backup-section"<?php echo $backupPartHidden('local-user-backup-section'); ?>>
-            <h3><?php echo t_h('backup_export.sections.local_backup.title', [], 'Local Backups'); ?></h3>
+            <h3><?php echo t_h('backup_export.sections.local_backup.title', [], 'Backup to a folder on the server'); ?></h3>
             <p><?php echo t_h('backup_export.sections.local_backup.description', [], 'Save a backup archive of your account into the backup folder of this server, and download the archives already stored there.'); ?></p>
             <p id="localSelfBackupPolicy" class="s3-self-policy" hidden></p>
             <button id="localSelfBackupBtn" type="button" class="btn btn-primary">
@@ -681,7 +681,7 @@ function createBackup() {
         <?php if ($s3BackupSectionVisible): ?>
         <!-- S3 Backups Section (own account) -->
         <div class="backup-section" id="s3-user-backup-section"<?php echo $backupPartHidden('s3-user-backup-section'); ?>>
-            <h3><?php echo t_h('backup_export.sections.s3_backup.title', [], 'S3 Backups'); ?></h3>
+            <h3><?php echo t_h('backup_export.sections.s3_backup.title', [], 'Backup to S3'); ?></h3>
             <p><?php echo t_h('backup_export.sections.s3_backup.description', [], 'Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.'); ?></p>
             <p id="s3SelfBackupPolicy" class="s3-self-policy" hidden></p>
             <button id="s3SelfBackupBtn" type="button" class="btn btn-primary">

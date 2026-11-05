@@ -1107,7 +1107,7 @@ Cada opção é detalhada abaixo, e as notas também podem ser exportadas uma a 
 
 <a id="complete-backup"></a>
 <details>
-<summary><strong>Backup completo em zip do Poznote</strong></summary>
+<summary><strong>Backup num arquivo ZIP do Poznote</strong></summary>
 <br>
 
 Um único ZIP com o banco de dados, todas as notas e os anexos de todos os espaços de trabalho:
@@ -1133,12 +1133,12 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 <a id="local-backups"></a>
 <details>
-<summary><strong>Backups agendados em uma pasta local</strong></summary>
+<summary><strong>Backups agendados em uma pasta do servidor</strong></summary>
 <br>
 
-Os administradores podem fazer com que arquivos de backup completos (um ZIP por usuário, idêntico ao download do backup completo) sejam salvos em uma pasta do servidor, manualmente ou automaticamente conforme um agendamento, mantendo apenas os mais recentes. Nada além do Poznote é necessário: nem bucket, nem tarefa cron, nem script.
+Os administradores podem fazer com que arquivos de backup completos (um ZIP por usuário, idêntico ao baixado por "Backup num arquivo ZIP do Poznote") sejam salvos em uma pasta do servidor, manualmente ou automaticamente conforme um agendamento, mantendo apenas os mais recentes. Nada além do Poznote é necessário: nem bucket, nem tarefa cron, nem script.
 
-Configure em **Configurações > Backups locais** (somente administradores).
+Configure em **Configurações > Backups no servidor** (somente administradores).
 
 - **Pasta de backup**: um caminho absoluto no servidor (dentro do contêiner com Docker). Se ficar vazio, os arquivos vão para `data/backups`, que já faz parte do volume de dados. A pasta é criada se necessário e o usuário do servidor web precisa ter permissão de escrita nela.
 - **Seleção de usuários**: caixas de seleção escolhem quais usuários são cobertos pelos backups. Todos vêm marcados por padrão e, enquanto todos estiverem marcados, as novas contas são incluídas automaticamente.
@@ -1168,7 +1168,7 @@ Uma pasta dentro da própria aplicação é recusada, exceto `data/backups`. Qua
 <summary><strong>Backups agendados em um bucket S3</strong></summary>
 <br>
 
-Os administradores podem enviar arquivos de backup completos (um ZIP por usuário, idêntico ao download do Backup Completo) para um bucket compatível com S3, manualmente ou automaticamente de acordo com uma programação. A configuração é independente da do Armazenamento de anexos no S3, então os backups podem ir para outro bucket ou provedor.
+Os administradores podem enviar arquivos de backup completos (um ZIP por usuário, idêntico ao baixado por "Backup num arquivo ZIP do Poznote") para um bucket compatível com S3, manualmente ou automaticamente de acordo com uma programação. A configuração é independente da do Armazenamento de anexos no S3, então os backups podem ir para outro bucket ou provedor.
 
 Configure isso em **Configurações > Backups S3** (somente administradores).
 
@@ -1180,7 +1180,7 @@ Configure isso em **Configurações > Backups S3** (somente administradores).
 - **Retenção**: apenas os N arquivos mais recentes são mantidos por usuário; os mais antigos são excluídos do bucket após cada backup (0 mantém tudo).
 - **Navegação**: a página lista os arquivos que estão no bucket no momento, com ações de download e exclusão.
 - **Restauração**: os arquivos ficam em `backups/{user id}/` no bucket e podem ser restaurados pela página padrão de [Restaurar / Importar](#restaurar--importar).
-- **Autoatendimento**: depois que o bucket é configurado, cada usuário ganha uma seção "Backups S3" na página Backup / Exportar para enviar um arquivo novo da própria conta e para baixar ou excluir os arquivos existentes. Uma seção "Restaurar do S3" na página Restaurar / Importar restaura a conta diretamente a partir de um desses arquivos.
+- **Autoatendimento**: depois que o bucket é configurado, cada usuário ganha uma seção "Backup no S3" na página Backup / Exportar para enviar um arquivo novo da própria conta e para baixar ou excluir os arquivos existentes. Uma seção "Restaurar do S3" na página Restaurar / Importar restaura a conta diretamente a partir de um desses arquivos.
 - **Isolamento de contas**: duas opções ("Backups S3 na página de backup" e "Restauração S3 na página de restauração") desativam essas seções de autoatendimento para usuários que não são administradores. Elas são aplicadas no servidor, então as ações bloqueadas são recusadas mesmo quando chamadas diretamente.
 
 Quando os anexos estão armazenados no S3 (Armazenamento de anexos no S3), eles são incluídos nos arquivos por padrão, buscados no bucket na hora. Uma opção permite deixá-los de fora dos backups para arquivos mais leves e execuções mais rápidas.
@@ -1263,7 +1263,7 @@ O Poznote oferece opções de restauração flexíveis pela interface web (**Con
 
 <a id="complete-restore"></a>
 <details>
-<summary><strong>Restauração completa a partir de um backup zip do Poznote</strong></summary>
+<summary><strong>Restaurar a partir de uma cópia ZIP do Poznote</strong></summary>
 <br>
 
 Envie o ZIP do backup completo para restaurar tudo:
@@ -1275,7 +1275,7 @@ Não há limite de tamanho na prática. O arquivo é enviado em partes (uma part
 
 A restauração a partir de um bucket S3 (veja [Backups S3](#s3-backups)) é executada pela mesma tarefa em segundo plano, então buscar um arquivo grande no bucket e restaurá-lo também não depende de uma requisição continuar ativa.
 
-Se o envio não for possível de forma alguma, a página Restaurar / Importar também oferece uma alternativa por cópia direta: copie o arquivo para dentro do contêiner do Poznote exatamente em `/tmp/backup_restore.zip` via SSH, recarregue a página e restaure a partir dali.
+Se o envio não for possível de forma alguma, a página Restaurar / Importar também oferece uma alternativa, "Restauração por cópia direta": copie o arquivo para dentro do contêiner do Poznote exatamente em `/tmp/backup_restore.zip` via SSH, recarregue a página e restaure a partir dali.
 
 </details>
 
@@ -1411,7 +1411,7 @@ As notas que você modificou nos últimos 5 dias são mantidas em cada navegador
 <summary><strong>Exportação offline</strong></summary>
 <br>
 
-O **📦 Backup Completo** cria uma versão offline e independente das suas notas. Basta extrair o ZIP e abrir o `index.html` em qualquer navegador. Assim você pode ler suas notas offline, mas sem todas as funcionalidades do Poznote: é uma exportação somente leitura.
+O **📦 Backup num arquivo ZIP do Poznote** cria uma versão offline e independente das suas notas. Basta extrair o ZIP e abrir o `index.html` em qualquer navegador. Assim você pode ler suas notas offline, mas sem todas as funcionalidades do Poznote: é uma exportação somente leitura.
 
 </details>
 
