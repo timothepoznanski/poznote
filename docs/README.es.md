@@ -1120,7 +1120,7 @@ El archivo lo genera en segundo plano un proceso de trabajo, no la petición que
 
 #### Copias por usuario frente a copias completas
 
-Todos los métodos anteriores producen **copias de seguridad por usuario**: un archivo contiene solo los datos de una cuenta (su base de datos, sus notas y sus adjuntos). Cada usuario puede hacer una copia de su propia cuenta y restaurarla, los administradores pueden elegir cualquier cuenta.
+Todos los métodos anteriores producen **copias de seguridad por usuario**: un archivo contiene solo los datos de una cuenta (su base de datos, sus notas y sus adjuntos). Cada usuario puede hacer una copia de su propia cuenta y restaurarla, los administradores pueden elegir cualquier cuenta. El archivo de un administrador también incluye el logo de la instancia si se subió uno, y restaurarlo en una cuenta de administrador vuelve a poner ese logo.
 
 Una **copia de seguridad completa del sistema**, que incluye la configuración maestra (cuentas, ajustes globales, enlaces compartidos) y todos los usuarios a la vez, se hace copiando todo el directorio `/data`:
 

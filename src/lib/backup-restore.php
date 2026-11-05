@@ -387,6 +387,27 @@ function restoreCompleteBackup($uploadedFile, $isLocalFile = false) {
             $results[] = 'Attachments: No attachments directory found in backup (attachments directory cleared)';
         }
 
+        // The instance logo (discussion #1336), carried by an administrator's
+        // archive. It belongs to the instance, so only an administrator
+        // account takes it back: a crafted archive restored into an ordinary
+        // account must not change what every user sees. An archive without
+        // it leaves the current logo in place.
+        if ($databaseRestored && is_dir($tempExtractDir . '/branding')) {
+            require_once __DIR__ . '/branding.php';
+            require_once __DIR__ . '/../users/db_master.php';
+            $restoreTargetProfile = getUserProfileById((int)($_SESSION['user_id'] ?? 0));
+            if (empty($restoreTargetProfile['is_admin'])) {
+                $results[] = 'Logo: Not restored, only an administrator account restores the instance logo';
+            } else {
+                $logoRestored = poznoteRestoreCustomLogoFromDir($tempExtractDir);
+                if ($logoRestored === true) {
+                    $results[] = 'Logo: Restored';
+                } elseif ($logoRestored === false) {
+                    $results[] = 'Logo: Not restored, the files in the backup are not a valid logo (the current logo is kept)';
+                }
+            }
+        }
+
         // Fix orphaned folders and missing entry snippets, now that both the
         // database and the note files are restored. Use a fresh connection to
         // the restored database: the global $con still points at the deleted

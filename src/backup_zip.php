@@ -534,6 +534,14 @@ function buildUserBackupZip($userId, $skipS3Attachments = false) {
 
     // No external icon/font files added to ZIP — index.html is icon-free
 
+    // The instance logo an admin uploaded (discussion #1336) lives outside
+    // every account, in data/branding/: an administrator's archive carries
+    // it, so restoring the instance elsewhere brings the logo back too.
+    if (!empty($userProfile['is_admin'])) {
+        require_once __DIR__ . '/lib/branding.php';
+        poznoteAddCustomLogoToZip($zip);
+    }
+
     $zip->close();
 
     // The staged files and the bucket downloads were only needed until

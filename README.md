@@ -1122,7 +1122,7 @@ The archive is built in the background by a worker process, not during the reque
 
 #### Per-User vs Complete Backups
 
-All the methods above produce **per-user backups**: an archive contains only the data belonging to one account (its database, notes and attachments). Every user can back up and restore their own account, administrators can pick any account.
+All the methods above produce **per-user backups**: an archive contains only the data belonging to one account (its database, notes and attachments). Every user can back up and restore their own account, administrators can pick any account. An administrator's archive also carries the instance logo, if one was uploaded, and restoring it into an administrator account puts the logo back.
 
 A **complete system backup**, including the master configuration (accounts, global settings, shared links) and every user at once, is made by copying the entire `/data` directory:
 

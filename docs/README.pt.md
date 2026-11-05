@@ -1120,7 +1120,7 @@ O arquivo é montado em segundo plano por um processo de trabalho, e não durant
 
 #### Backups por usuário e backups completos
 
-Todos os métodos acima produzem **backups por usuário**: um arquivo contém apenas os dados de uma conta (banco de dados, notas e anexos dela). Cada usuário pode fazer backup e restaurar a própria conta, e os administradores podem escolher qualquer conta.
+Todos os métodos acima produzem **backups por usuário**: um arquivo contém apenas os dados de uma conta (banco de dados, notas e anexos dela). Cada usuário pode fazer backup e restaurar a própria conta, e os administradores podem escolher qualquer conta. O arquivo de um administrador também inclui o logotipo da instância, se um tiver sido enviado, e restaurá-lo em uma conta de administrador traz esse logotipo de volta.
 
 Um **backup completo do sistema**, que inclui a configuração mestre (contas, configurações globais, links compartilhados) e todos os usuários de uma só vez, é feito copiando todo o diretório `/data`:
 

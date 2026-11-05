@@ -220,6 +220,51 @@ function poznoteStoreCustomLogo(array $files): bool {
     return true;
 }
 
+/**
+ * Folder of the logo inside a backup archive: branding/logo-512.png and
+ * branding/logo-192.png. Only an administrator's archive carries it (the logo
+ * belongs to the instance, not to one account), and only an administrator
+ * account puts it back on restore.
+ */
+const POZNOTE_LOGO_BACKUP_DIR = 'branding';
+
+/**
+ * Add the custom logo to a backup archive being built. Nothing is added when
+ * the instance shows Poznote's logo. Returns whether the logo was added.
+ */
+function poznoteAddCustomLogoToZip(ZipArchive $zip): bool {
+    if (poznoteCustomLogoVersion(true) === '') {
+        return false;
+    }
+    foreach (POZNOTE_LOGO_SIZES as $size) {
+        if (!$zip->addFile(poznoteLogoPath($size), POZNOTE_LOGO_BACKUP_DIR . '/logo-' . $size . '.png')) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
+ * Put back the logo of an extracted backup archive ($extractDir: its root).
+ * null when the archive has no logo (made before the logo went into backups,
+ * or while the instance showed Poznote's): the current logo is left alone.
+ * Otherwise whether it was stored; a file that is not a PNG of the right size
+ * is refused like an upload, and the current logo then stays too.
+ */
+function poznoteRestoreCustomLogoFromDir(string $extractDir): ?bool {
+    $files = [];
+    foreach (POZNOTE_LOGO_SIZES as $size) {
+        $path = rtrim($extractDir, '/') . '/' . POZNOTE_LOGO_BACKUP_DIR . '/logo-' . $size . '.png';
+        if (is_file($path)) {
+            $files[$size] = $path;
+        }
+    }
+    if ($files === []) {
+        return null;
+    }
+    return count($files) === count(POZNOTE_LOGO_SIZES) && poznoteStoreCustomLogo($files);
+}
+
 /** Back to Poznote's logo. */
 function poznoteRemoveCustomLogo(): bool {
     $removed = true;

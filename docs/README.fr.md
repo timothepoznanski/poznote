@@ -1120,7 +1120,7 @@ L'archive est construite en arrière-plan par un processus dédié, et non penda
 
 #### Sauvegardes par utilisateur et sauvegardes complètes
 
-Toutes les méthodes ci-dessus produisent des **sauvegardes par utilisateur** : une archive ne contient que les données d'un seul compte (sa base de données, ses notes et ses pièces jointes). Chaque utilisateur peut sauvegarder et restaurer son propre compte, les administrateurs peuvent choisir n'importe quel compte.
+Toutes les méthodes ci-dessus produisent des **sauvegardes par utilisateur** : une archive ne contient que les données d'un seul compte (sa base de données, ses notes et ses pièces jointes). Chaque utilisateur peut sauvegarder et restaurer son propre compte, les administrateurs peuvent choisir n'importe quel compte. L'archive d'un administrateur contient aussi le logo de l'instance s'il a été remplacé, et la restaurer dans un compte administrateur remet ce logo en place.
 
 Une **sauvegarde complète du système**, qui inclut la configuration maîtresse (comptes, réglages globaux, liens partagés) et tous les utilisateurs en une fois, se fait en copiant tout le répertoire `/data` :
 

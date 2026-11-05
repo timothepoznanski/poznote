@@ -1120,7 +1120,7 @@ Das Archiv wird im Hintergrund von einem Worker-Prozess erstellt, nicht während
 
 #### Sicherungen pro Benutzer und vollständige Sicherungen
 
-Alle oben genannten Methoden erzeugen **Sicherungen pro Benutzer**: Ein Archiv enthält nur die Daten eines einzelnen Kontos (seine Datenbank, Notizen und Anhänge). Jeder Benutzer kann sein eigenes Konto sichern und wiederherstellen, Administratoren können jedes Konto auswählen.
+Alle oben genannten Methoden erzeugen **Sicherungen pro Benutzer**: Ein Archiv enthält nur die Daten eines einzelnen Kontos (seine Datenbank, Notizen und Anhänge). Jeder Benutzer kann sein eigenes Konto sichern und wiederherstellen, Administratoren können jedes Konto auswählen. Das Archiv eines Administrators enthält außerdem das Logo der Instanz, falls eines hochgeladen wurde, und die Wiederherstellung in einem Administratorkonto bringt dieses Logo zurück.
 
 Eine **vollständige Systemsicherung**, die die Master-Konfiguration (Konten, globale Einstellungen, geteilte Links) und alle Benutzer auf einmal umfasst, erfolgt durch Kopieren des gesamten Verzeichnisses `/data`:
 

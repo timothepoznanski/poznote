@@ -117,6 +117,62 @@ test('a refused file leaves the current logo untouched', function () {
     assertFalse(is_file(poznoteLogoPath(512) . '.tmp'), 'no temporary file left behind');
 });
 
+test('a backup archive carries the logo, and restoring it puts the logo back', function () {
+    if (!class_exists('ZipArchive')) {
+        return;
+    }
+    $zipPath = sys_get_temp_dir() . '/poznote-branding-upload-' . getmypid() . '-backup.zip';
+    $extractDir = sys_get_temp_dir() . '/poznote-branding-upload-' . getmypid() . '-extract';
+
+    brandingTestReset();
+    $zip = new ZipArchive();
+    $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    assertFalse(poznoteAddCustomLogoToZip($zip), 'nothing to add with Poznote\'s logo');
+    $zip->addFromString('database/poznote_backup.sql', '');
+    $zip->close();
+    $zip->open($zipPath);
+    assertSame(false, $zip->locateName('branding/logo-512.png'));
+    $zip->close();
+
+    brandingTestStoreValid();
+    $stored = file_get_contents(poznoteLogoPath(512));
+    $zip = new ZipArchive();
+    $zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    assertTrue(poznoteAddCustomLogoToZip($zip));
+    $zip->close();
+    $zip->open($zipPath);
+    assertSame($stored, $zip->getFromName('branding/logo-512.png'));
+    assertTrue($zip->locateName('branding/logo-192.png') !== false);
+    $zip->extractTo($extractDir);
+    $zip->close();
+
+    poznoteRemoveCustomLogo();
+    assertTrue(poznoteRestoreCustomLogoFromDir($extractDir));
+    assertTrue(poznoteHasCustomLogo());
+    assertSame($stored, file_get_contents(poznoteLogoPath(512)));
+
+    // A half logo, or one that is not a PNG of the right size, is refused and
+    // the current logo stays
+    $before = poznoteCustomLogoVersion(true);
+    unlink($extractDir . '/branding/logo-192.png');
+    assertFalse(poznoteRestoreCustomLogoFromDir($extractDir));
+    file_put_contents($extractDir . '/branding/logo-192.png', brandingTestPng(64, 64));
+    assertFalse(poznoteRestoreCustomLogoFromDir($extractDir));
+    assertSame($before, poznoteCustomLogoVersion(true));
+
+    // An archive without the folder (older archives) leaves it alone too
+    assertSame(null, poznoteRestoreCustomLogoFromDir($extractDir . '/database'));
+    assertTrue(poznoteHasCustomLogo());
+
+    @unlink($zipPath);
+    foreach (['branding/logo-512.png', 'branding/logo-192.png', 'database/poznote_backup.sql'] as $file) {
+        @unlink($extractDir . '/' . $file);
+    }
+    @rmdir($extractDir . '/branding');
+    @rmdir($extractDir . '/database');
+    @rmdir($extractDir);
+});
+
 test('removing the logo brings Poznote\'s back', function () {
     brandingTestReset();
     brandingTestStoreValid();

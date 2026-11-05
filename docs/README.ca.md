@@ -1121,7 +1121,7 @@ L'arxiu el genera en segon pla un procés de treball, no durant la sol·licitud 
 
 #### Còpies de seguretat per usuari i còpies completes
 
-Tots els mètodes de més amunt produeixen **còpies de seguretat per usuari**: un arxiu només conté les dades d'un compte (la seva base de dades, les notes i els fitxers adjunts). Cada usuari pot fer una còpia de seguretat del seu compte i restaurar-lo, i els administradors poden triar qualsevol compte.
+Tots els mètodes de més amunt produeixen **còpies de seguretat per usuari**: un arxiu només conté les dades d'un compte (la seva base de dades, les notes i els fitxers adjunts). Cada usuari pot fer una còpia de seguretat del seu compte i restaurar-lo, i els administradors poden triar qualsevol compte. L'arxiu d'un administrador també inclou el logotip de la instància si se n'ha pujat un, i restaurar-lo en un compte d'administrador torna a posar aquest logotip.
 
 Una **còpia de seguretat completa del sistema**, que inclou la configuració principal (comptes, paràmetres globals, enllaços compartits) i tots els usuaris alhora, es fa copiant tot el directori `/data`:
 
