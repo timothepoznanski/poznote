@@ -417,6 +417,7 @@ function poznoteCssManifest(): array
             '@components',
             '@theme',
             'css/public_folder.css',
+            'css/components/search-toggle.css',
         ],
         'public_note' => [
             'css/lucide.css',

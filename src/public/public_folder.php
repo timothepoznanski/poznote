@@ -332,11 +332,24 @@ $noteBaseUrl = '';
       data-txt-collapse-folder="<?php echo t_h('public.collapse_folder', [], 'Collapse folder'); ?>"
       data-txt-expand-all="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>"
       data-txt-collapse-all="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>">
-    <div class="header-controls">
-        <button id="viewToggle" class="view-toggle" onclick="toggleView()" title="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
+    <?php // Folded filter, Collapse all, view and theme on one row of buttons (js/search-toggle.js) ?>
+    <div class="header-controls<?php echo !empty($sharedNotes) ? ' pz-search-row' : ''; ?>">
+        <?php if (!empty($sharedNotes)): ?>
+            <?php echo poznoteRenderSearchToggle('publicFolderFilter', t('public_folder.filter_placeholder', [], 'Filter notes by title'), 'public-folder-header-btn'); ?>
+            <div id="publicFolderFilter" class="filter-input-wrapper pz-search-collapsible is-search-collapsed">
+                <input type="text" id="folderFilterInput" class="filter-input" placeholder="<?php echo t_h('public_folder.filter_placeholder', [], 'Filter notes by title'); ?>" autocomplete="off" />
+                <button id="clearFilterBtn" class="clear-filter-btn" type="button" aria-label="Clear search" style="display: none;">
+                    <i class="lucide lucide-x"></i>
+                </button>
+            </div>
+            <button id="publicFolderToggleAll" class="public-folder-toggle-all public-folder-header-btn" type="button" title="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>" aria-label="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>">
+                <i class="lucide lucide-chevron-up"></i>
+            </button>
+        <?php endif; ?>
+        <button id="viewToggle" class="view-toggle public-folder-header-btn" onclick="toggleView()" title="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
             <i class="lucide lucide-columns-2" id="viewIcon"></i>
         </button>
-        <button class="theme-toggle" onclick="toggleTheme()">
+        <button class="theme-toggle public-folder-header-btn" onclick="toggleTheme()">
             <i class="lucide lucide-moon" id="themeIcon"></i>
         </button>
     </div>
@@ -361,21 +374,6 @@ $noteBaseUrl = '';
         <?php echo htmlspecialchars($folder['name']); ?>
     </h1>
 
-    <?php if (!empty($sharedNotes)): ?>
-        <div class="public-folder-filter">
-            <div class="filter-input-wrapper">
-                <input type="text" id="folderFilterInput" class="filter-input" placeholder="<?php echo t_h('public_folder.filter_placeholder', [], 'Filter notes by title'); ?>" autocomplete="off" />
-                <button id="clearFilterBtn" class="clear-filter-btn" type="button" aria-label="Clear search" style="display: none;">
-                    <i class="lucide lucide-x"></i>
-                </button>
-            </div>
-            <div id="folderFilterStats" class="filter-stats" style="display: none;"></div>
-            <button id="publicFolderToggleAll" class="public-folder-toggle-all" type="button">
-                <i class="lucide lucide-folder-minus"></i>
-                <span><?php echo t_h('public.collapse_all', [], 'Collapse all'); ?></span>
-            </button>
-        </div>
-    <?php endif; ?>
 
     <?php if (empty($sharedNotes)): ?>
         <div id="folderEmptyMessage" class="empty-folder">
@@ -562,6 +560,7 @@ $noteBaseUrl = '';
     ?>
 
     <script src="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('js/pwa-helpers.js'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
+    <script src="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('js/search-toggle.js'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
     <script src="<?php echo htmlspecialchars(getVersionedPublicAppAssetHref('js/public_folder.js'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"></script>
 </body>
 </html>
