@@ -252,6 +252,23 @@ function bindPublicFolderToggles() {
         });
     });
 
+    // The folder name (and its icon) toggles too, not only the chevron.
+    document.querySelectorAll('.public-folder-group-title').forEach(function(title) {
+        title.addEventListener('click', function(event) {
+            if (event.target.closest('.public-folder-toggle')) {
+                return;
+            }
+            var selection = window.getSelection ? window.getSelection() : null;
+            if (selection && !selection.isCollapsed && title.contains(selection.anchorNode)) {
+                return;
+            }
+            var button = title.querySelector('.public-folder-toggle');
+            if (button && !button.disabled) {
+                button.click();
+            }
+        });
+    });
+
     var toggleAllButton = document.getElementById('publicFolderToggleAll');
     if (toggleAllButton) {
         toggleAllButton.addEventListener('click', function(event) {

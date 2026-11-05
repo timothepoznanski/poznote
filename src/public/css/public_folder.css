@@ -533,6 +533,21 @@ html[data-theme='light'] .public-folder-body {
     gap: 10px;
     padding-bottom: 4px;
     margin-left: calc(var(--public-folder-depth, 0) * 22px);
+    width: fit-content;
+    max-width: 100%;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body.public-folder-filter-active .public-folder-group-title {
+    cursor: default;
+}
+
+@media (hover: hover) {
+    body:not(.public-folder-filter-active) .public-folder-group-title:hover .public-folder-toggle {
+        background: var(--hover-bg);
+        color: var(--text-color);
+    }
 }
 
 .public-folder-toggle {
