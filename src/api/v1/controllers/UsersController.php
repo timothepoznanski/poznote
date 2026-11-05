@@ -615,6 +615,9 @@ class UsersController {
             http_response_code(500);
             return ['error' => 'Failed to update password'];
         }
+        // Every other session of this profile ends on its next request; this
+        // one stays signed in.
+        refreshSessionPasswordStamp((int)$userId);
         
         return ['success' => true, 'message' => 'Password changed successfully'];
     }
@@ -797,6 +800,7 @@ class UsersController {
                 http_response_code(500);
                 return ['error' => 'Failed to reset password'];
             }
+            refreshSessionPasswordStamp((int)$id);
             // A profile provisioned without a credential has no default to
             // fall back on, so clearing the hash leaves it without password
             // login. Say so instead of reporting a reset that restores no access.
@@ -821,6 +825,9 @@ class UsersController {
                 http_response_code(500);
                 return ['error' => 'Failed to set password'];
             }
+            // The user's open sessions end; the administrator's own stays
+            // signed in when the profile is theirs.
+            refreshSessionPasswordStamp((int)$id);
             return ['success' => true, 'message' => 'Password updated successfully'];
         }
         
