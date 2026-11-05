@@ -700,6 +700,12 @@ body:not(.dark-mode) #changePasswordModal .change-password-description {
     text-transform: none;
 }
 
+/* Backup & restore: a little more air under "Backup" and "Restore" (the
+   wide layout has its own rule further down) */
+#settings-backup-restore-section-grid > .settings-group-title {
+    margin-bottom: 0;
+}
+
 .home-container.settings-filtering .settings-group-title {
     display: none;
 }
@@ -1565,6 +1571,11 @@ html[data-theme='dark'] .settings-scope-option.is-active {
     .home-container.settings-with-nav .settings-grouped > .settings-group-title {
         padding: 0 4px 8px;
         border-top: 0;
+    }
+
+    /* Backup & restore: a little more air under "Backup" and "Restore" */
+    .home-container.settings-with-nav #settings-backup-restore-section-grid > .settings-group-title {
+        padding-bottom: 14px;
     }
 
     .home-container.settings-with-nav .settings-grouped > .settings-group {

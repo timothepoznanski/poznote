@@ -253,6 +253,15 @@ function setAuthenticatedIdentity(array $authUser, ?string $authMethod = null): 
     $_SESSION['authenticated'] = true;
     $_SESSION['login_user_id'] = $authUserId;
     $_SESSION['login_user'] = $authUser;
+    // Password fingerprint at sign-in: a later change ends this session
+    // (sessionMatchesCurrentCredentials()). Unreadable, it is left unset and
+    // the next request adopts the current one, never a wrong one.
+    $stamp = poznoteReadPasswordSessionStamp($authUserId);
+    if ($stamp !== null) {
+        $_SESSION['password_stamp'] = $stamp;
+    } else {
+        unset($_SESSION['password_stamp']);
+    }
 
     if ($authMethod !== null && $authMethod !== '') {
         $_SESSION['auth_method'] = $authMethod;
@@ -573,17 +582,25 @@ function isAuthenticated() {
             }
         }
 
-        if (!sessionMeetsRequiredTwoFactor()) {
-            return false;
+        if (sessionMatchesCurrentCredentials()) {
+            if (!sessionMeetsRequiredTwoFactor()) {
+                return false;
+            }
+
+            if (isAccountSelectionRequired()) {
+                return false;
+            }
+
+            return validateActiveAccountAccess();
         }
 
-        if (isAccountSelectionRequired()) {
-            return false;
-        }
-
-        return validateActiveAccountAccess();
+        // The session has just ended (password changed, account disabled or
+        // deleted): the request is judged again from scratch below, like one
+        // that never had a session. A remember-me cookie signed with the old
+        // password fails there and is removed; "Open without login" opens
+        // its account again.
     }
-    
+
     // Check remember me cookie
     if (isset($_COOKIE[REMEMBER_ME_COOKIE])) {
         $token = $_COOKIE[REMEMBER_ME_COOKIE];
@@ -1733,6 +1750,131 @@ function sessionMeetsRequiredTwoFactor(): bool {
         setRememberMeCookie('', time() - 3600);
     }
     return false;
+}
+
+/**
+ * Fingerprint of a profile's password, kept in the session at sign-in so a
+ * password change can end the sessions opened before it. Built from the
+ * stored bcrypt hash (which changes on every set, even to the same
+ * password); a profile on the default password has none.
+ */
+function poznotePasswordSessionStamp(?string $storedHash): string {
+    return ($storedHash === null || $storedHash === '') ? 'none' : substr(hash('sha256', $storedHash), 0, 32);
+}
+
+/**
+ * The profile's state for sessionMatchesCurrentCredentials(): ['active' =>
+ * bool, 'stamp' => string], false when the profile no longer exists, null
+ * when master.db cannot be read (unlike getUserPasswordHash(), which answers
+ * null for both "no password" and "error").
+ */
+function poznoteReadSessionProfileState(int $userId): array|false|null {
+    try {
+        require_once __DIR__ . '/users/db_master.php';
+        $stmt = getMasterConnection()->prepare('SELECT active, password_hash FROM users WHERE id = ?');
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {
+        error_log("Poznote Auth: profile unreadable for session user $userId: " . $e->getMessage());
+        return null;
+    }
+    if (!is_array($row)) {
+        return false;
+    }
+    return [
+        'active' => !empty($row['active']),
+        'stamp' => poznotePasswordSessionStamp($row['password_hash'] ?? null),
+    ];
+}
+
+/** Current fingerprint of a profile, null when it cannot be read. */
+function poznoteReadPasswordSessionStamp(int $userId): ?string {
+    $state = poznoteReadSessionProfileState($userId);
+    return is_array($state) ? $state['stamp'] : null;
+}
+
+/**
+ * Ends the session when the profile it was opened for has changed under it:
+ * password changed or reset (by the person elsewhere, or by an
+ * administrator), account disabled or deleted. The browser that changed the
+ * password keeps its session, refreshSessionPasswordStamp() having recorded
+ * the new fingerprint. Remember-me cookies need no such check: they are
+ * signed with the password hash (getRememberMeSecret()), isAuthenticated()
+ * rejects and removes one signed with the old password.
+ *
+ * Sessions opened before the fingerprint existed adopt the current one, so
+ * an update does not sign anyone out. When master.db cannot be read the
+ * session is kept and the request goes on, as before this check existed:
+ * a busy database must never sign anyone out. Checked once per request and
+ * login. Returns false only when it has just ended the session.
+ */
+function sessionMatchesCurrentCredentials(): bool {
+    static $verifiedLoginUserId = null;
+    $loginUserId = (int)($_SESSION['login_user_id'] ?? 0);
+    if ($loginUserId <= 0 || $verifiedLoginUserId === $loginUserId) {
+        return true;
+    }
+    // An API identity (setApiAuthenticatedUser()) is judged from its
+    // credentials on every request and never kept in a session.
+    if (!empty($_SESSION['login_user']['_api_auth_method'])) {
+        $verifiedLoginUserId = $loginUserId;
+        return true;
+    }
+
+    $state = poznoteReadSessionProfileState($loginUserId);
+    if ($state === null) {
+        // Unknown state: the session is kept and checked again next request.
+        return true;
+    }
+
+    $valid = $state !== false && $state['active'];
+    if ($valid) {
+        if (!isset($_SESSION['password_stamp'])) {
+            $_SESSION['password_stamp'] = $state['stamp'];
+        }
+        $valid = hash_equals((string)$_SESSION['password_stamp'], $state['stamp']);
+    }
+    if ($valid) {
+        $verifiedLoginUserId = $loginUserId;
+        return true;
+    }
+
+    unset($_SESSION['authenticated'], $_SESSION['user_id'], $_SESSION['user'], $_SESSION['login_user_id'],
+        $_SESSION['login_user'], $_SESSION['auth_method'], $_SESSION['account_selection_required'],
+        $_SESSION['password_stamp']);
+    clearSharedWorkspaceScope();
+    return false;
+}
+
+/**
+ * After a password change, keeps the current session (and its remember-me
+ * cookie) signed in when it belongs to that profile; every other session of
+ * the profile ends on its next request (sessionMatchesCurrentCredentials()).
+ * No-op for another profile's change (an administrator setting a user's
+ * password) and for API requests, which carry no session.
+ */
+function refreshSessionPasswordStamp(int $userId): void {
+    if ($userId <= 0 || session_status() !== PHP_SESSION_ACTIVE
+        || (int)($_SESSION['login_user_id'] ?? 0) !== $userId
+        || !empty($_SESSION['login_user']['_api_auth_method'])) {
+        return;
+    }
+    // Unreadable right after the write: left unset, the next request adopts
+    // the new fingerprint instead of ending this session.
+    $stamp = poznoteReadPasswordSessionStamp($userId);
+    if ($stamp !== null) {
+        $_SESSION['password_stamp'] = $stamp;
+    } else {
+        unset($_SESSION['password_stamp']);
+    }
+
+    require_once __DIR__ . '/users/db_master.php';
+    if (isset($_COOKIE[REMEMBER_ME_COOKIE]) && !headers_sent()) {
+        $user = getUserProfileById($userId);
+        if ($user) {
+            issueRememberMeCookie($user);
+        }
+    }
 }
 
 /**

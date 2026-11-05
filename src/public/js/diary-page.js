@@ -384,7 +384,7 @@
 
         appendJournalChunk();
         fillJournalViewport();
-        renderOutline();
+        renderOutline(journalNotes);
 
         var sentinel = container.querySelector('.diary-journal-sentinel');
         if (sentinel && 'IntersectionObserver' in window) {
@@ -1023,12 +1023,13 @@
         });
     }
 
-    // --- Journal dates panel ---
+    // --- Dates panel ---
     //
-    // The note outline's panel (css/outline.css) on the right of the journal,
+    // The note outline's panel (css/outline.css) on the right of both views,
     // listing the entries' dates grouped by month. A click scrolls to the
-    // entry, appending the chunks up to it first when it is not rendered yet;
-    // the entry being read is highlighted as the page scrolls.
+    // entry (in the journal, appending the chunks up to it first when it is
+    // not rendered yet) or to its card; the entry being read, or the first
+    // card in sight, is highlighted as the page scrolls.
 
     var OUTLINE_COLLAPSED_KEY = 'diaryOutlineCollapsed';
     // Shared with the note outline (js/outline-panel.js), which keeps it in
@@ -1046,6 +1047,8 @@
     // the reader scrolls on their own.
     var outlineJumpId = null;
     var outlineJumpUntil = 0;
+    // Entries the panel lists: the journal's or the board's, filter applied
+    var outlineNotes = [];
 
     function isMobileLayout() {
         return window.innerWidth <= 800;
@@ -1062,17 +1065,18 @@
         }
     }
 
-    function renderOutline() {
+    function renderOutline(list) {
+        outlineNotes = list || [];
         var nav = document.getElementById('diaryOutlineNav');
         if (!nav) return;
 
         var html = '';
         var currentMonth = null;
-        journalNotes.forEach(function (note) {
+        outlineNotes.forEach(function (note) {
             var key = monthKey(note);
             if (key !== currentMonth) {
                 currentMonth = key;
-                html += '<li class="outline-nav-item"><a class="outline-nav-link" data-level="1" href="#" data-note-id="' + note.id + '">' +
+                html += '<li class="outline-nav-item"><a class="outline-nav-link" data-level="1" href="#" data-note-id="' + note.id + '" data-month-link="1">' +
                     esc(monthLabel(key)) + '</a></li>';
             }
             var label = outlineDayLabel(note);
@@ -1081,13 +1085,32 @@
         });
         nav.innerHTML = html;
         // No entries: css/outline.css hides the toggle while the panel is closed
-        document.documentElement.classList.toggle('outline-no-headings', journalNotes.length === 0);
+        document.documentElement.classList.toggle('outline-no-headings', outlineNotes.length === 0);
         outlineActiveId = null;
         updateOutlineActive();
     }
 
     function entryElement(noteId) {
         return document.querySelector('.diary-journal-entry[data-note-id="' + noteId + '"]');
+    }
+
+    function cardElement(noteId) {
+        return document.querySelector('#diaryContent .dash-note-card[data-note-id="' + noteId + '"]');
+    }
+
+    // Board: a month goes to its title, a day to its card
+    function jumpToCard(noteId, toMonth) {
+        var card = cardElement(noteId);
+        if (!card) return;
+        var month = toMonth ? card.closest('.diary-month') : null;
+        var anchor = (month && month.querySelector('.diary-month-title')) || card;
+        var top = anchor.getBoundingClientRect().top + window.pageYOffset - stickyTopbarHeight() - OUTLINE_JUMP_OFFSET_PX;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        // The clicked day stays highlighted while its card is in sight, even
+        // when the page cannot scroll it up to the top
+        outlineJumpId = noteId;
+        setOutlineActive(noteId);
+        if (isMobileLayout()) setMobileOutlineOpen(false);
     }
 
     // The topbar (actions + filter) is sticky (css/dashboard.css) and covers
@@ -1173,7 +1196,25 @@
 
     function updateOutlineActive() {
         outlineSpyFrame = 0;
-        if (viewMode !== 'journal') return;
+        if (viewMode !== 'journal') {
+            var line = stickyTopbarHeight() + OUTLINE_ACTIVE_LINE_PX;
+            var jumped = outlineJumpId !== null ? cardElement(outlineJumpId) : null;
+            if (jumped) {
+                var rect = jumped.getBoundingClientRect();
+                if (rect.bottom > stickyTopbarHeight() && rect.top < window.innerHeight) {
+                    setOutlineActive(outlineJumpId);
+                    return;
+                }
+            }
+            // The first card not yet scrolled past the topbar
+            var cards = document.querySelectorAll('#diaryContent .dash-note-card');
+            var first = null;
+            for (var c = 0; c < cards.length; c++) {
+                if (cards[c].getBoundingClientRect().bottom > line) { first = cards[c]; break; }
+            }
+            setOutlineActive(first ? parseInt(first.getAttribute('data-note-id'), 10) : null);
+            return;
+        }
         var entries = document.querySelectorAll('.diary-journal-list > .diary-journal-entry');
         var current = entries.length ? entries[0] : null;
         var activeLine = stickyTopbarHeight() + OUTLINE_ACTIVE_LINE_PX;
@@ -1235,7 +1276,7 @@
     }
 
     // Phones open the panel like the note outline (js/outline-panel.js): a
-    // right-to-left swipe on the journal slides it in, a left-to-right swipe
+    // right-to-left swipe on the entries or the cards slides it in, a left-to-right swipe
     // on the panel slides it out. Same distances as there.
     var SWIPE_MIN_DISTANCE_PX = 80;
     var SWIPE_MAX_VERTICAL_PX = 100;
@@ -1261,8 +1302,8 @@
 
         document.addEventListener('touchstart', function (e) {
             tracking = false;
-            if (!isMobileLayout() || viewMode !== 'journal' || e.touches.length !== 1) return;
-            var root = e.target.closest ? e.target.closest('.diary-journal') : null;
+            if (!isMobileLayout() || e.touches.length !== 1) return;
+            var root = e.target.closest ? e.target.closest('#diaryContent') : null;
             if (!root || isInHorizontalScroller(e.target, root)) return;
             startX = e.touches[0].clientX;
             startY = e.touches[0].clientY;
@@ -1307,7 +1348,9 @@
             var link = e.target.closest('.outline-nav-link');
             if (!link) return;
             e.preventDefault();
-            jumpToEntry(parseInt(link.getAttribute('data-note-id'), 10));
+            var noteId = parseInt(link.getAttribute('data-note-id'), 10);
+            if (viewMode === 'journal') jumpToEntry(noteId);
+            else jumpToCard(noteId, link.hasAttribute('data-month-link'));
             link.blur();
         });
 
@@ -1329,14 +1372,26 @@
         });
     }
 
+    // The view button goes to the other view: the journal's scroll on the
+    // board, the board's grid in the journal
     function applyViewMode() {
         var isJournal = viewMode === 'journal';
         document.body.classList.toggle('diary-journal-active', isJournal);
-        if (!isJournal) setMobileOutlineOpen(false);
+        setMobileOutlineOpen(false);
+        // The card controls stay greyed out in the journal (css/diary.css)
+        document.querySelectorAll('.board-view-controls').forEach(function (controls) {
+            controls.inert = isJournal;
+        });
         var toggle = document.getElementById('diaryJournalToggle');
         if (toggle) {
-            toggle.classList.toggle('active', isJournal);
-            toggle.setAttribute('aria-pressed', isJournal ? 'true' : 'false');
+            var label = isJournal ? (txt.boardView || 'Card view') : (txt.journalView || 'Journal view');
+            toggle.title = label;
+            toggle.setAttribute('aria-label', label);
+            var icon = toggle.querySelector('.lucide');
+            if (icon) {
+                icon.classList.toggle('lucide-scroll', !isJournal);
+                icon.classList.toggle('lucide-layout-dashboard', isJournal);
+            }
         }
     }
 
@@ -1389,6 +1444,7 @@
         if (currentMonth !== null) html += '</div></section>';
 
         container.innerHTML = html;
+        renderOutline(visibleNotes);
     }
 
     // --- Card color picker ---

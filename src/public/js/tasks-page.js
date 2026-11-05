@@ -14,6 +14,7 @@
             txtHideList: body.getAttribute('data-txt-hide-list') || 'Hide from this page',
             txtUnhideList: body.getAttribute('data-txt-unhide-list') || 'Show on this page again',
             txtShowHidden: body.getAttribute('data-txt-show-hidden') || 'Show hidden lists',
+            txtShowNoteChecklists: body.getAttribute('data-txt-show-note-checklists') || 'Display tasks in notes',
             canHideNotes: body.getAttribute('data-can-hide-notes') === '1',
             txtCollapse: body.getAttribute('data-txt-collapse') || 'Collapse',
             txtExpand: body.getAttribute('data-txt-expand') || 'Expand',
@@ -285,6 +286,18 @@
         input.disabled = count === 0;
         input.checked = showHiddenNotes;
         if (label) label.textContent = config.txtShowHidden + (count > 0 ? ' (' + count + ')' : '');
+    }
+
+    // "Display tasks in notes" counts, like "Show hidden lists", the groups
+    // it adds: the ordinary notes holding checkboxes, hidden ones left out
+    // unless they are shown again
+    function syncNoteChecklistsOption() {
+        var label = document.getElementById('tasksShowNoteChecklistsLabel');
+        if (!label) return;
+        var count = taskNotes.filter(function (note) {
+            return isChecklistNote(note) && (showHiddenNotes || !isHiddenNote(note));
+        }).length;
+        label.textContent = config.txtShowNoteChecklists + (count > 0 ? ' (' + count + ')' : '');
     }
 
     // Same per-tab editor session identity as note-edit-lock.js, so saving
@@ -616,6 +629,7 @@
         // First: it unticks "Show hidden lists" once nothing is hidden any
         // more, which the counts below depend on
         syncShowHiddenOption();
+        syncNoteChecklistsOption();
         updateProgress();
         syncViewUi();
 

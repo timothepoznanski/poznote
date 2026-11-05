@@ -729,68 +729,66 @@ $localRestoreCardVisible = !empty(LocalBackupService::restorePageBackups());
             <div class="settings-group">
 
                 <!-- Complete backup -->
-                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=backup" class="home-card" id="backup-export-card" title="<?php echo t_h('backup_export.sections.complete_backup.title', [], 'Complete Backup'); ?>">
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=backup" class="home-card" id="backup-export-card" title="<?php echo t_h('backup_export.sections.complete_backup.title', [], 'Backup to a Poznote ZIP file'); ?>">
                     <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.backup_export', [], 'Download your notes, attachments and database as a backup.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
                         <i class="lucide lucide-upload"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('backup_export.sections.complete_backup.title', [], 'Complete Backup'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('backup_export.sections.complete_backup.title', [], 'Backup to a Poznote ZIP file'); ?></span>
                     </div>
                 </a>
 
                 <?php if ($localBackupCardVisible): ?>
                 <!-- Local backups of the own account: same rule as the part of the page it opens -->
-                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=local" class="home-card" id="local-backup-user-card" title="<?php echo t_h('backup_export.sections.local_backup.title', [], 'Local Backups'); ?>">
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=local" class="home-card" id="local-backup-user-card" title="<?php echo t_h('backup_export.sections.local_backup.title', [], 'Backup to a folder on the server'); ?>">
                     <span class="setting-help" data-tooltip="<?php echo t_h('backup_export.sections.local_backup.description', [], 'Save a backup archive of your account into the backup folder of this server, and download the archives already stored there.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
                         <i class="lucide lucide-hard-drive"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('backup_export.sections.local_backup.title', [], 'Local Backups'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('backup_export.sections.local_backup.title', [], 'Backup to a folder on the server'); ?></span>
                     </div>
                 </a>
                 <?php endif; ?>
 
                 <?php if ($s3BackupCardVisible): ?>
                 <!-- S3 backups of the own account: same rule as the part of the page it opens -->
-                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=s3" class="home-card" id="s3-backup-card" title="<?php echo t_h('backup_export.sections.s3_backup.title', [], 'S3 Backups'); ?>">
+                <a href="backup_export.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=s3" class="home-card" id="s3-backup-card" title="<?php echo t_h('backup_export.sections.s3_backup.title', [], 'Backup to S3'); ?>">
                     <span class="setting-help" data-tooltip="<?php echo t_h('backup_export.sections.s3_backup.description', [], 'Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
                         <i class="lucide lucide-cloud"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('backup_export.sections.s3_backup.title', [], 'S3 Backups'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('backup_export.sections.s3_backup.title', [], 'Backup to S3'); ?></span>
                     </div>
                 </a>
                 <?php endif; ?>
             </div>
 
-            <!-- The question that headed this part of restore_import.php
-                 tells Restore and Import apart; same under Import below -->
-            <div class="settings-group-title"><?php echo t_h('settings.groups.restore', [], 'Restore'); ?><span class="settings-group-hint"><?php echo t_h('restore_import.sections.restore_from_backup.title', [], 'Do you want to restore from a Poznote ZIP backup file?'); ?></span></div>
+            <div class="settings-group-title"><?php echo t_h('settings.groups.restore', [], 'Restore'); ?></div>
             <div class="settings-group">
 
-                <!-- Standard restore, from an uploaded backup -->
-                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=restore-standard" class="home-card" id="restore-import-card" title="<?php echo t_h('restore_import.sections.standard_restore.title', [], 'Standard Restore'); ?>">
+                <!-- Restore from an uploaded Poznote ZIP backup -->
+                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=restore-standard" class="home-card" id="restore-import-card" title="<?php echo t_h('restore_import.sections.standard_restore.title', [], 'Restore from a Poznote ZIP backup'); ?>">
                     <span class="setting-help" data-tooltip="<?php echo t_h('restore_import.sections.restore_from_backup.description', [], 'Restore your Poznote database from a complete backup'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
                         <i class="lucide lucide-download"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('restore_import.sections.standard_restore.title', [], 'Standard Restore'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('restore_import.sections.standard_restore.title', [], 'Restore from a Poznote ZIP backup'); ?></span>
                     </div>
                 </a>
 
                 <?php if ($localRestoreCardVisible): ?>
                 <!-- Restore from the own archives in the local backup folder: same rule as the part it opens -->
-                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=restore-local" class="home-card" id="restore-local-card" title="<?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a local backup'); ?>">
+                <a href="restore_import.php?workspace=<?php echo urlencode($pageWorkspace); ?>&amp;part=restore-local" class="home-card" id="restore-local-card" title="<?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a folder on the server'); ?>">
                     <span class="setting-help" data-tooltip="<?php echo t_h('restore_import.sections.local_restore.description', [], 'Restore your account directly from one of the backup archives saved in the backup folder of this server.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                     <div class="home-card-icon">
                         <i class="lucide lucide-hard-drive"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a local backup'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a folder on the server'); ?></span>
                     </div>
                 </a>
                 <?php endif; ?>
@@ -1870,7 +1868,7 @@ $localRestoreCardVisible = !empty(LocalBackupService::restorePageBackups());
                         <i class="lucide lucide-hard-drive"></i>
                     </div>
                     <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.local_backup', [], 'Local Backups'); ?></span>
+                        <span class="home-card-title"><?php echo t_h('settings.cards.local_backup', [], 'Server Backups'); ?></span>
                         <?php
                         require_once __DIR__ . '/../LocalBackupService.php';
                         $localBackupEnabledCard = LocalBackupService::getConfig()['auto_enabled'];

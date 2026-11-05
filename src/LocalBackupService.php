@@ -31,7 +31,17 @@ class LocalBackupService {
 
     // Only files with this shape are ever listed, served or deleted, so a
     // folder shared with something else is never touched beyond our archives.
-    const FILENAME_PATTERN = '/^poznote_backup_.+_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.zip$/';
+    const FILENAME_PATTERN = '/^poznote_backup_.+_(\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2})\.zip$/D';
+
+    // Archives a user started themself (Backup / Export page) are listed in
+    // this file of their folder. They are kept apart from the scheduled and
+    // administrator ones: each group keeps its own most recent `retention`
+    // archives, so backing up again and again only ever replaces the user's
+    // own archives, never the history the schedule built (which they may not
+    // be allowed to delete). With retention 0 (keep all), the user's group is
+    // still capped, or repeated runs could fill the disk.
+    const USER_STARTED_INDEX = '.poznote_user_started.json';
+    const USER_STARTED_CAP_WHEN_KEEP_ALL = 7;
 
     /**
      * Folder used when none is configured: data/backups, next to the users'
@@ -200,11 +210,12 @@ class LocalBackupService {
      *
      * $trigger is recorded in the activity log as the entry's source: 'manual'
      * for an admin run, 'auto' when runAll() passes its own scheduled trigger
-     * down.
+     * down. $userStarted marks an archive the user started themself, which
+     * is pruned with their own ones only (USER_STARTED_INDEX).
      *
      * @return array ['success' => bool, 'filename' => ?string, 'size' => int, 'error' => ?string]
      */
-    public static function backupUser(int $userId, ?array $config = null, string $trigger = 'manual'): array {
+    public static function backupUser(int $userId, ?array $config = null, string $trigger = 'manual', bool $userStarted = false): array {
         $config = $config ?? self::getConfig();
         $userDir = self::userDirectory($userId, $config);
         $dirError = self::ensureDirectory($userDir);
@@ -248,6 +259,12 @@ class LocalBackupService {
 
         $pruneError = null;
         try {
+            if ($userStarted) {
+                self::updateUserStartedIndex($userId, $config, function (array $names) use ($filename): array {
+                    $names[] = $filename;
+                    return $names;
+                });
+            }
             self::pruneUserBackups($userId, $config['retention'], $config);
         } catch (Exception $e) {
             // A failed prune must not fail the backup itself
@@ -325,7 +342,7 @@ class LocalBackupService {
 
     /**
      * Whether the current user may back up their own account into the
-     * folder, and see and download its archives there ("Local Backups" on
+     * folder, and see and download its archives there ("Backup to a folder on the server" on
      * the Backup / Export page): administrators always, other users once the
      * admin enabled it, unless the section is hidden with Elements
      * visibility. Needs the user database (the hidden-elements rule reads
@@ -357,7 +374,7 @@ class LocalBackupService {
 
     /**
      * Whether the current user may start a restore from their own archives
-     * ("Restore from a local backup" on the Restore page): administrators
+     * ("Restore from a folder on the server" on the Restore page): administrators
      * always (they can restore any archive from the Local Backups page
      * anyway), other users once the admin enabled it. The section must not
      * be hidden with Elements visibility either. Needs the user database
@@ -400,21 +417,76 @@ class LocalBackupService {
     }
 
     /**
-     * Keep only the most recent $retention archives of a user (0 = keep all).
+     * Keep only the most recent $retention archives of a user (0 = keep all),
+     * counted apart for the archives the user started themself and for the
+     * others (USER_STARTED_INDEX).
      */
     public static function pruneUserBackups(int $userId, int $retention, ?array $config = null): int {
-        if ($retention <= 0) {
-            return 0;
-        }
+        $config = $config ?? self::getConfig();
         $userDir = self::userDirectory($userId, $config);
         $deleted = 0;
-        foreach (array_slice(self::listUserBackups($userId, $config), $retention) as $backup) {
-            if (!@unlink($userDir . '/' . $backup['filename'])) {
-                throw new RuntimeException('Cannot delete the old archive ' . $backup['filename']);
+        $failed = null;
+        self::updateUserStartedIndex($userId, $config, function (array $names) use ($userId, $retention, $config, $userDir, &$deleted, &$failed): array {
+            $userStarted = array_flip($names);
+            $groups = ['user' => [], 'other' => []];
+            foreach (self::listUserBackups($userId, $config) as $backup) {
+                $groups[isset($userStarted[$backup['filename']]) ? 'user' : 'other'][] = $backup['filename'];
             }
-            $deleted++;
+            $limits = [
+                'user' => $retention > 0 ? $retention : self::USER_STARTED_CAP_WHEN_KEEP_ALL,
+                'other' => $retention,
+            ];
+            foreach ($groups as $group => $filenames) {
+                if ($limits[$group] <= 0) {
+                    continue;
+                }
+                foreach (array_slice($filenames, $limits[$group]) as $filename) {
+                    if (@unlink($userDir . '/' . $filename)) {
+                        $deleted++;
+                    } elseif ($failed === null) {
+                        $failed = $filename;
+                    }
+                }
+            }
+            // Names of archives gone (pruned, or deleted from a list) are dropped
+            $existing = [];
+            foreach (self::listUserBackups($userId, $config) as $backup) {
+                $existing[$backup['filename']] = true;
+            }
+            return array_values(array_filter($names, fn($name) => isset($existing[$name])));
+        });
+        if ($failed !== null) {
+            throw new RuntimeException('Cannot delete the old archive ' . $failed);
         }
         return $deleted;
+    }
+
+    /**
+     * Read, change and write the list of archives the user started themself,
+     * under a lock (a scheduled run and the user's own can end together).
+     *
+     * @param callable(string[]): string[] $change
+     */
+    private static function updateUserStartedIndex(int $userId, array $config, callable $change): void {
+        $path = self::userDirectory($userId, $config) . '/' . self::USER_STARTED_INDEX;
+        $handle = @fopen($path, 'c+');
+        if ($handle === false) {
+            throw new RuntimeException('Cannot open ' . $path);
+        }
+        try {
+            flock($handle, LOCK_EX);
+            $raw = stream_get_contents($handle);
+            $names = json_decode($raw === false ? '' : $raw, true);
+            $names = is_array($names) ? array_values(array_filter($names, 'is_string')) : [];
+            $names = array_values(array_unique($change($names)));
+            ftruncate($handle, 0);
+            rewind($handle);
+            fwrite($handle, (string)json_encode($names));
+            fflush($handle);
+        } finally {
+            flock($handle, LOCK_UN);
+            fclose($handle);
+        }
     }
 
     /**
@@ -497,6 +569,7 @@ class LocalBackupService {
                 $deleted++;
             }
         }
+        @unlink($userDir . '/' . self::USER_STARTED_INDEX);
         @rmdir($userDir);
         return $deleted;
     }

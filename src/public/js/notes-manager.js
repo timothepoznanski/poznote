@@ -12,7 +12,6 @@
         txtTypeMarkdown: body.getAttribute('data-txt-type-markdown') || 'Markdown',
         txtTypeTasklist: body.getAttribute('data-txt-type-tasklist') || 'Tasklist',
         txtTypeExcalidraw: body.getAttribute('data-txt-type-excalidraw') || 'Excalidraw',
-        txtSelected:    body.getAttribute('data-txt-selected') || 'selected',
         txtSelectAllFolder: body.getAttribute('data-txt-select-all-folder') || 'Select all in this folder',
         txtSelectAll:   body.getAttribute('data-txt-select-all') || 'Select all visible',
         txtDeselectAll: body.getAttribute('data-txt-deselect-all') || 'Deselect all',
@@ -94,8 +93,6 @@
     var nmAgeFilter      = document.getElementById('nmAgeFilter');
     var nmClearFilter    = document.getElementById('nmClearFilter');
     var nmFilterStats    = document.getElementById('nmFilterStats');
-    var nmBulkBar        = document.getElementById('nmBulkBar');
-    var nmSelectedCount  = document.getElementById('nmSelectedCount');
     var nmSelectAllBtn   = document.getElementById('nmSelectAllBtn');
     var nmDeselectAllBtn = document.getElementById('nmDeselectAllBtn');
     var nmBulkActionSelect = document.getElementById('nmBulkActionSelect');
@@ -292,13 +289,14 @@
                         }
                         filteredOpt.textContent = label;
                     }
-                    nmAgeFilter.style.display = '';
+                    // Its wrapper holds the icon shown on a phone
+                    (nmAgeFilter.closest('.nm-select-wrap') || nmAgeFilter).style.display = '';
                     // Default to the configured filter
                     filterAge = 'filtered';
                     nmAgeFilter.value = 'filtered';
                 } else {
                     // No age filter configured in settings — hide the selector
-                    nmAgeFilter.style.display = 'none';
+                    (nmAgeFilter.closest('.nm-select-wrap') || nmAgeFilter).style.display = 'none';
                     filterAge = '';
                     nmAgeFilter.value = '';
                 }
@@ -673,18 +671,16 @@
         return row;
     }
 
-    // ── Bulk bar ──────────────────────────────────────────────────────────────
+    // ── Selection buttons ─────────────────────────────────────────────────────
+    // On the filter row, greyed out while they have nothing to act on:
+    // "Deselect all" and the actions without a selection, "Select all
+    // visible" without a visible note
     function updateBulkBar() {
         var count = selectedIds.size;
-        if (count > 0) {
-            nmBulkBar.classList.remove('nm-bulk-bar-hidden');
-            nmBulkActionSelect.disabled = false;
-        } else {
-            nmBulkBar.classList.add('nm-bulk-bar-hidden');
-            nmBulkActionSelect.disabled = true;
-            nmBulkActionSelect.value = '';
-        }
-        nmSelectedCount.textContent = count + ' ' + cfg.txtSelected;
+        nmBulkActionSelect.disabled = count === 0;
+        if (count === 0) nmBulkActionSelect.value = '';
+        nmDeselectAllBtn.disabled = count === 0;
+        nmSelectAllBtn.disabled = filteredNotes.length === 0;
         groupCheckboxes.forEach(syncGroupCheckbox);
     }
 

@@ -26,8 +26,10 @@ html[data-theme='dark'] .tag-item {
     color: var(--pz-text) !important;
 }
 
+/* The dark count chip of the other list pages */
 html[data-theme='dark'] .tags-info {
-    color: var(--pz-text);
+    background-color: var(--pz-accent-soft);
+    color: var(--pz-accent-text-hover);
 }
 
 /* Editable tags */

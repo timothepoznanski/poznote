@@ -494,7 +494,7 @@ function runLocalBackupJob(int $userId, string $jobId, array $payload): void {
     poznoteJobUpdate($userId, $jobId, ['phase' => 'building', 'stage' => 'building']);
     poznoteJobInstallProgressHook($userId, $jobId);
 
-    $result = LocalBackupService::backupUser($targetUserId);
+    $result = LocalBackupService::backupUser($targetUserId, null, 'manual', !empty($payload['user_started']));
     unset($GLOBALS['poznote_restore_progress_hook']);
 
     if (empty($result['success'])) {

@@ -523,6 +523,41 @@ $currentLang = getUserLanguage();
 		   caps it at 480px for shared.php, which would push the button below) */
 		.folders-filter-row {
 			margin-top: 0;
+			/* Centred on a phone too (shared/responsive.css centres it on wider screens) */
+			justify-content: center;
+		}
+		/* The magnifier of the filter (js/search-toggle.js) has the size and
+		   the look of the Expand all / Collapse all button on its right */
+		.folders-filter-row .pz-search-toggle {
+			--pz-search-toggle-size: 36px;
+			border-radius: var(--pz-radius-sm);
+			background: var(--pz-bg);
+			color: var(--text-muted, var(--pz-text-muted));
+		}
+		/* Both white inside in the light theme, like the filter field. Weighs
+		   less than the dark rule and leaves the hover its own ground. */
+		:where(.folders-filter-row) .shared-filter-tree-actions .btn:not(:hover) {
+			background: var(--pz-bg);
+		}
+		html[data-theme='dark'] .folders-filter-row .pz-search-toggle {
+			background: color-mix(in srgb, var(--pz-accent-soft) 38%, transparent);
+			border-color: color-mix(in srgb, var(--pz-text-muted) 22%, transparent);
+			color: var(--pz-text-strong);
+		}
+		.folders-filter-row .pz-search-toggle .lucide,
+		.folders-filter-row .shared-filter-tree-actions .btn .lucide {
+			width: 16px;
+			height: 16px;
+		}
+		/* Expand all / Collapse all: its chevron alone, the magnifier's square */
+		.folders-filter-row .shared-filter-tree-actions .btn {
+			width: 36px;
+			height: 36px;
+			padding: 0;
+		}
+		.folders-filter-row .pz-search-toggle:hover,
+		.folders-filter-row .pz-search-toggle:focus-visible {
+			color: var(--pz-accent-text);
 		}
 		@media (min-width: 801px) {
 			.folders-filter-row {
@@ -706,8 +741,10 @@ $currentLang = getUserLanguage();
 
 		
 		<div class="shared-filter-bar">
-			<div class="filter-search-row folders-filter-row">
-				<div class="filter-input-wrapper">
+			<?php // The filter folds behind a magnifier, first on the row (js/search-toggle.js) ?>
+			<div class="filter-search-row folders-filter-row pz-search-row">
+				<?php echo poznoteRenderSearchToggle('foldersFilterWrapper', t('folders.filter_placeholder', [], 'Filter by folder name...')); ?>
+				<div class="filter-input-wrapper pz-search-collapsible is-search-collapsed" id="foldersFilterWrapper">
 					<input 
 						type="text" 
 						id="filterInput"
@@ -720,9 +757,9 @@ $currentLang = getUserLanguage();
 				</div>
 				<?php // Shown by list_folders.js when at least one folder has subfolders ?>
 				<div class="shared-filter-tree-actions initially-hidden" id="foldersTreeToolbar">
-					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary" aria-expanded="true">
+					<?php // Its chevron alone, its label in the tooltip (list_folders.js) ?>
+					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary" aria-expanded="true" title="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>" aria-label="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>">
 						<i class="lucide lucide-chevron-up"></i>
-						<span id="toggleAllFoldersLabel"><?php echo t_h('public.collapse_all', [], 'Collapse all'); ?></span>
 					</button>
 				</div>
 			</div>
@@ -1012,6 +1049,7 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
 	<?php endif; ?>
 	<script src="<?php echo poznoteAsset('js/list_folders.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 	<?php if ($listFoldersOfflineMode): ?>
 	<?php // Marks the notes and folders kept offline in this browser ?>
 	<script src="<?php echo poznoteAsset('js/offline-marks.js'); ?>" defer

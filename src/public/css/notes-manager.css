@@ -28,9 +28,12 @@ body.notes-manager-page {
     max-width: 900px;
     margin: 0 auto 20px;
     display: flex;
+    justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 8px;
+    /* The magnifier (css/components/search-toggle.css) as tall as the dropdowns */
+    --pz-search-toggle-size: 40px;
 }
 
 .nm-filter-icon {
@@ -88,13 +91,30 @@ body.notes-manager-page {
 .nm-filter-select {
     min-width: 130px;
     flex: 0 0 auto;
-    padding: 10px 12px;
+    /* The magnifier's height (css/components/search-toggle.css), whatever
+       the font's line box */
+    height: var(--pz-search-toggle-size, 40px);
+    padding: 0 12px;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
+    /* The page's font, as the buttons of the row: a select falls back to the
+       browser's own (Arial on Windows) */
+    font-family: inherit;
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, var(--pz-bg));
     box-sizing: border-box;
+}
+
+/* A dropdown and the icon that stands for it on a phone (@media below) */
+.nm-select-wrap {
+    position: relative;
+    display: inline-flex;
+    flex: 0 0 auto;
+}
+
+.nm-mobile-icon {
+    display: none;
 }
 
 .nm-filter-select:focus {
@@ -103,19 +123,59 @@ body.notes-manager-page {
     box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
-/* Single collapse-all / expand-all toggle, right of the type dropdown: the
-   Tasks page's button, as tall as the dropdowns of this row */
+/* The type dropdown: as wide as its words and without the arrow, like the
+   collapse toggle beside it, its label centred. Chromium's dropdown list
+   (Chrome and Edge, Windows too) copies the select's left padding to its
+   options but not its right one, so centred options came out 6px right of
+   centre. The 12px of air are transparent side borders instead, the visible
+   border an outline drawn just inside them. */
+.nm-filter-bar #nmTypeFilter {
+    min-width: 0;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    text-align: center;
+    text-align-last: center;
+    padding-left: 0;
+    padding-right: 0;
+    border: solid transparent;
+    border-width: 1px 12px;
+    outline: 1px solid var(--border-color, var(--pz-border));
+    outline-offset: -1px;
+}
+
+.nm-filter-bar #nmTypeFilter:focus {
+    border-color: transparent;
+    outline-color: var(--pz-accent-text);
+}
+
+/* Single collapse-all / expand-all toggle, right of the magnifier: its
+   chevron alone, the magnifier's square. Select all visible and Deselect
+   all share the rest of this look. */
+#nmToggleAllBtn {
+    width: 40px;
+    padding: 0;
+}
+
+#nmToggleAllBtn .lucide {
+    width: 16px;
+    height: 16px;
+}
+
 .nm-collapse-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
     flex: 0 0 auto;
-    align-self: stretch;
+    box-sizing: border-box;
+    /* The magnifier's height, also alone on a line when the row wraps */
+    height: var(--pz-search-toggle-size, 40px);
     padding: 0 12px;
+    /* The look of the "All types" dropdown beside it */
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
-    background: transparent;
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     font-size: 14px;
     font-family: inherit;
@@ -124,108 +184,28 @@ body.notes-manager-page {
     transition: all 0.2s ease;
 }
 
-.nm-collapse-btn:hover {
+.nm-collapse-btn:not(:disabled):hover {
     border-color: var(--pz-accent);
     color: var(--pz-accent);
 }
 
-html[data-theme='dark'] .nm-collapse-btn:hover {
+html[data-theme='dark'] .nm-collapse-btn:not(:disabled):hover {
     color: var(--pz-accent-text);
 }
 
-/* Bulk action bar */
-.nm-bulk-bar {
-    display: flex;
-    width: 100%;
-    box-sizing: border-box;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-    max-width: 900px;
-    margin: 0 auto 16px;
-    padding: 12px 14px;
-    background: var(--bulk-bar-bg, var(--pz-bg));
-    border: 1px solid var(--bulk-bar-border, var(--pz-border));
-    border-radius: var(--pz-radius-lg);
-    transition: opacity 0.2s, transform 0.2s;
+/* The selection controls on the filter row: Select all visible and Deselect
+   all have the collapse toggle's look, the actions the dropdowns'. Greyed out
+   while there is nothing to act on (js/notes-manager.js). */
+.nm-collapse-btn:disabled,
+.nm-filter-select:disabled {
+    opacity: 0.5;
+    cursor: default;
 }
 
-.nm-bulk-bar-hidden {
-    display: none;
-}
-
-.nm-bulk-count-wrap {
-    display: flex;
-    align-items: center;
-}
-
-.nm-bulk-actions {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.nm-selected-count {
-    font-size: 14px;
-    font-weight: var(--pz-weight-semibold);
-    color: var(--text-color, var(--pz-text));
-}
-
-#nmBulkBar .nm-bulk-btn {
-    font-size: 13px;
-    padding: 8px 14px;
-    font-weight: var(--pz-weight-medium);
-    background: transparent;
-    color: var(--pz-text-muted);
-    border: 1px solid var(--pz-border-strong);
-}
-
-#nmBulkBar .nm-bulk-btn:hover {
-    background: var(--pz-surface-hover);
-    color: var(--pz-text-secondary);
-    border-color: var(--pz-text-subtle);
-}
-
-.nm-bulk-select {
-    min-width: 240px;
-    max-width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--action-border, var(--pz-border-strong));
-    border-radius: var(--pz-radius-lg);
-    background: var(--action-bg, var(--pz-bg));
-    color: var(--action-color, var(--pz-text-strong));
-    font-size: 14px;
-    font-weight: var(--pz-weight-medium);
-    cursor: pointer;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.nm-bulk-select:focus {
-    outline: none;
-    border-color: var(--pz-accent-text);
-    box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.12);
-}
-
-.nm-bulk-select:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-}
-
-.nm-bulk-select option {
-    color: var(--pz-text);
-}
-
-html[data-theme='dark'] .nm-bulk-select {
-    color-scheme: dark;
-    background: var(--action-bg, var(--pz-accent-soft));
-    border-color: var(--action-border, var(--pz-accent-soft));
-}
-
-html[data-theme='dark'] .nm-bulk-select option {
-    background-color: var(--action-bg, var(--pz-accent-soft));
-    color: var(--action-color, var(--pz-text-strong));
+/* The ground of the enabled controls, not the grey forms.css gives a
+   disabled select: only the fading tells them apart */
+.nm-filter-select:disabled {
+    background-color: var(--input-bg, var(--pz-bg));
 }
 
 .nm-modal-input {
@@ -256,20 +236,11 @@ html[data-theme='dark'] {
     --folder-header-hover: var(--pz-surface-hover);
     --row-hover-bg: var(--pz-surface-hover);
     --row-selected-bg: rgba(148, 163, 184, 0.12);
-    --bulk-bar-bg: #1f2937;
-    --bulk-bar-border: #334155;
-    --action-bg: #1f2937;
-    --action-color: #e5e7eb;
-    --action-border: #475569;
     --selected-bg: rgba(148, 163, 184, 0.16);
     --selected-color: #e5e7eb;
     --badge-bg: #3730a3;
     --badge-bg-subtle: var(--pz-border);
     --muted-color: #888888;
-}
-
-html[data-theme='dark'] .nm-selected-count {
-    color: var(--pz-text-inverse);
 }
 
 html[data-theme='dark'] .nm-note-link {
@@ -500,33 +471,67 @@ html[data-theme='dark'] .nm-folder-option-selected {
 @media (max-width: 768px) {
     .nm-filter-bar {
         align-items: stretch;
+        gap: 6px;
     }
 
-    .nm-filter-select {
-        width: 100%;
-    }
-
-    /* The type dropdown and the collapse toggle share the filter input's row,
-       the age dropdown wraps below */
     .nm-filter-bar .filter-input-wrapper {
         flex: 1 1 0;
         min-width: 0;
     }
 
-    .nm-filter-bar #nmTypeFilter {
-        width: auto;
-        min-width: 0;
-        max-width: 45%;
-    }
-
-    /* Icon only, like on the Tasks page (its label moves to the title) */
-    .nm-collapse-btn {
-        width: 40px;
+    /* One line: every control of the row is its icon alone, in the
+       magnifier's square. The dropdowns stay real selects (the phone's own
+       picker opens on a tap): their text goes transparent under the icon. */
+    .nm-filter-bar .nm-bulk-btn {
+        width: var(--pz-search-toggle-size, 40px);
         padding: 0;
     }
 
-    #nmToggleAllLabel {
+    .nm-btn-label {
         display: none;
+    }
+
+    .nm-mobile-icon {
+        display: block;
+        width: 16px;
+        height: 16px;
+    }
+
+    .nm-filter-bar .nm-select-wrap > .nm-filter-select {
+        width: var(--pz-search-toggle-size, 40px);
+        min-width: 0;
+        max-width: none;
+        padding: 0;
+        color: transparent;
+    }
+
+    .nm-filter-bar .nm-select-wrap option {
+        color: var(--text-color, var(--pz-text));
+    }
+
+    .nm-select-wrap > .nm-mobile-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        color: var(--text-color, var(--pz-text));
+    }
+
+    .nm-select-wrap:has(> select:disabled) > .nm-mobile-icon {
+        opacity: 0.5;
+    }
+
+    /* A filter in use (a type, recent notes only) is told by the accent,
+       its name no longer being in sight */
+    /* :is() with the id outweighs the outline of the type dropdown */
+    .nm-select-wrap:has(> select:not(:disabled) option:checked:not([value=""])) > :is(#nmTypeFilter, .nm-filter-select) {
+        outline: 1px solid var(--pz-accent-text);
+        outline-offset: -1px;
+    }
+
+    .nm-select-wrap:has(> select:not(:disabled) option:checked:not([value=""])) > .nm-mobile-icon {
+        color: var(--pz-accent-text);
     }
 
     /* One line per note: the title keeps its width and ends in an ellipsis
@@ -663,35 +668,16 @@ html[data-theme='dark'] .nm-note-row:has(.nm-note-checkbox:checked) {
     background: var(--row-selected-bg, color-mix(in srgb, var(--pz-text-muted) 12%, transparent));
 }
 
-html[data-theme='dark'] .nm-bulk-bar {
-    background: var(--bulk-bar-bg, var(--pz-bg));
-    border-color: var(--bulk-bar-border, var(--pz-border));
-}
-
-html[data-theme='dark'] #nmBulkBar .nm-bulk-btn {
-    background: transparent;
-    color: var(--pz-text-muted);
-    border-color: var(--pz-border-strong);
-}
-
-html[data-theme='dark'] #nmBulkBar .nm-bulk-btn:hover {
-    background: rgba(var(--pz-highlight-rgb), 0.05);
-    color: var(--pz-text-strong);
-    border-color: var(--pz-text-subtle);
-}
-
-html[data-theme='dark'] .nm-bulk-select {
-    border-color: var(--action-border, var(--pz-border-strong));
-}
-
-html[data-theme='dark'] .nm-bulk-select option {
-    background-color: var(--action-bg, var(--pz-bg));
-    color: var(--action-color, var(--pz-text-strong));
-}
-
 html[data-theme='dark'] .nm-folder-option-selected {
     background: var(--selected-bg, color-mix(in srgb, var(--pz-text-muted) 16%, transparent));
     color: var(--selected-color, var(--pz-text-strong));
+}
+
+/* The six squares of the filter row on one line down to a 360px phone */
+@media (max-width: 380px) {
+    .nm-filter-bar {
+        gap: 4px;
+    }
 }
 
 /* ── Responsive ───────────────────────────────────────────────────────── */
@@ -705,14 +691,6 @@ html[data-theme='dark'] .nm-folder-option-selected {
     .nm-folder-section.nm-collapsed .nm-folder-header { padding-bottom: 10px; }
 
     .nm-note-row               { padding: 5px 10px; }
-
-    .nm-bulk-bar               { align-items: stretch; }
-
-    .nm-bulk-actions           { width: 100%; }
-
-    #nmBulkBar .nm-bulk-btn    { flex: 1 1 100%; justify-content: center; }
-
-    .nm-bulk-select            { width: 100%; }
 
     /* No room for the date on a phone */
     .nm-note-meta {

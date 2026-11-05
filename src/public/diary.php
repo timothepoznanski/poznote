@@ -227,7 +227,22 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 				<?php endforeach; ?>
 			</nav>
 			<?php endif; ?>
-			<div class="board-filter-row">
+			<?php // The filter folds behind a magnifier, first on the row (js/search-toggle.js) ?>
+			<div class="board-filter-row pz-search-row">
+			<?php echo poznoteRenderSearchToggle('dashboardTopbarFilter', t('dashboard.filter_placeholder', [], 'Filter by title, content or tag...'), 'dashboard-color-filter-btn'); ?>
+			<div id="dashboardTopbarFilter" class="dashboard-topbar-filter pz-search-collapsible is-search-collapsed">
+				<i class="lucide lucide-search dashboard-filter-icon"></i>
+				<input
+					type="text"
+					id="filterInput"
+					class="dashboard-filter-input"
+					placeholder="<?php echo t_h('dashboard.filter_placeholder', [], 'Filter by title, content or tag...'); ?>"
+					autocomplete="off"
+				/>
+				<button type="button" id="clearFilterBtn" class="dashboard-filter-clear initially-hidden" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+					<i class="lucide lucide-x"></i>
+				</button>
+			</div>
 			<?php $todayLabel = $todayNoteId !== null ? t_h('diary.today_button_go', [], "Go to today's entry") : t_h('diary.today_button_create', [], "Create today's entry"); ?>
 			<button type="button" id="diaryTodayBtn" class="dashboard-color-filter-btn" title="<?php echo $todayLabel; ?>" aria-label="<?php echo $todayLabel; ?>">
 				<i class="lucide <?php echo $todayNoteId !== null ? 'lucide-calendar' : 'lucide-calendar-plus'; ?>"></i>
@@ -238,7 +253,8 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 		<i class="lucide lucide-plus"></i>
 	</button>
 	<?php endif; ?>
-			<button type="button" id="diaryJournalToggle" class="board-view-btn diary-journal-toggle" aria-pressed="false" title="<?php echo t_h('diary.journal_view', [], 'Journal view'); ?>">
+			<?php // Goes to the other view: the journal's scroll from the cards, the cards' grid from the journal (applyViewMode in js/diary-page.js) ?>
+			<button type="button" id="diaryJournalToggle" class="board-view-btn diary-journal-toggle" title="<?php echo t_h('diary.journal_view', [], 'Journal view'); ?>" aria-label="<?php echo t_h('diary.journal_view', [], 'Journal view'); ?>">
 				<i class="lucide lucide-scroll"></i>
 			</button>
 			<?php // Opens (or creates) the entry of the day picked in the calendar, the way back to a past day on phones, which have no mini calendar ?>
@@ -261,19 +277,6 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 						<button type="button" id="diaryFilterResetBtn" class="dashboard-filter-reset"><i class="lucide lucide-x"></i> <?php echo t_h('dashboard.filters.reset', [], 'Reset filters'); ?></button>
 					</div>
 				</div>
-			</div>
-			<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
-				<i class="lucide lucide-search dashboard-filter-icon"></i>
-				<input
-					type="text"
-					id="filterInput"
-					class="dashboard-filter-input"
-					placeholder="<?php echo t_h('dashboard.filter_placeholder', [], 'Filter by title, content or tag...'); ?>"
-					autocomplete="off"
-				/>
-				<button type="button" id="clearFilterBtn" class="dashboard-filter-clear initially-hidden" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
-					<i class="lucide lucide-x"></i>
-				</button>
 			</div>
 			</div>
 		</header>
@@ -370,6 +373,8 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 			renameDiaryError: <?php echo json_encode(t('diary.rename_error', [], 'Could not rename the diary.')); ?>,
 			journalEdit: <?php echo json_encode(t('diary.journal_edit', [], 'Edit here')); ?>,
 			journalEditDone: <?php echo json_encode(t('diary.journal_edit_done', [], 'Done editing')); ?>,
+			journalView: <?php echo json_encode(t('diary.journal_view', [], 'Journal view')); ?>,
+			boardView: <?php echo json_encode(t('diary.board_view', [], 'Card view')); ?>,
 			journalEditPlaceholder: <?php echo json_encode(t('diary.journal_edit_placeholder', [], 'Write here...')); ?>,
 			journalSaving: <?php echo json_encode(t('diary.journal_saving', [], 'Saving...')); ?>,
 			journalSaved: <?php echo json_encode(t('diary.journal_saved', [], 'Saved')); ?>,
@@ -398,6 +403,7 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
 	<script src="<?php echo poznoteAsset('js/shortcut-key.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/date-picker-popup.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/diary-page.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
 </body>
 </html>

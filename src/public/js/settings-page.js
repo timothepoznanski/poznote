@@ -4763,7 +4763,11 @@
             if (!card) return;
             var href = card.getAttribute('data-href') || (card.tagName === 'A' ? card.getAttribute('href') : '');
             if (!href || card.getAttribute('target') === '_blank' || /^[a-z]+:/i.test(href)) return;
-            var activeItem = homeContainer && !homeContainer.classList.contains('settings-filtering')
+            // Only the desktop list says which section is on display: the
+            // stacked layout of narrow screens shows them all, and the hidden
+            // list still holds the section saved on a wide screen (Markdown,
+            // say, for a card of Admin Tools). There, the card's own grid.
+            var activeItem = homeContainer && !homeContainer.classList.contains('settings-filtering') && isSettingsNavLayout()
                 ? document.querySelector('.settings-nav-item.is-active')
                 : null;
             var grid = card.closest('.home-grid');

@@ -26,8 +26,10 @@ $currentLang = getUserLanguage();
 
 
 		
-		<div class="shared-filter-bar attachments-filter-bar">
-			<div class="filter-input-wrapper">
+		<?php // The filter folds behind a magnifier, first on the row (js/search-toggle.js) ?>
+		<div class="shared-filter-bar attachments-filter-bar pz-search-row">
+			<?php echo poznoteRenderSearchToggle('attachmentsFilterWrapper', t('attachments.list.filter_placeholder', [], 'Filter by note title or attachment name...')); ?>
+			<div class="filter-input-wrapper pz-search-collapsible is-search-collapsed" id="attachmentsFilterWrapper">
 				<input type="text" id="filterInput" class="filter-input" placeholder="<?php echo t_h('attachments.list.filter_placeholder', [], 'Filter by note title or attachment name...'); ?>"/>
 				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
 					<i class="lucide lucide-x"></i>
@@ -56,5 +58,6 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/navigation.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/icon-sidebar-toggle.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/attachments-list.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 </body>
 </html>

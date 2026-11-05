@@ -308,7 +308,7 @@
       "custom_fonts": "Custom fonts",
       "restore_direct_copy": "Restore by direct copy",
       "import_notes": "Import notes",
-      "local_backup": "Local Backups",
+      "local_backup": "Server Backups",
       "whats_new": "What's new after updates",
       "login_disabled": "Open without login",
       "outbound_hosts": "Local network access",
@@ -961,11 +961,11 @@
       "uncheck_all": "Uncheck all",
       "collapse_all": "Collapse all",
       "expand_all": "Expand all",
-      "direct_copy_restore_section": "Restore page: \"Restore when standard restore doesn't work\" section",
-      "local_backups_section": "Backup page: \"Local Backups\" section",
-      "s3_backups_section": "Backup page: \"S3 Backups\" section",
+      "direct_copy_restore_section": "Restore page: \"Restore by direct copy\" section",
+      "local_backups_section": "Backup page: \"Backup to a folder on the server\" section",
+      "s3_backups_section": "Backup page: \"Backup to S3\" section",
       "s3_restore_section": "Restore page: \"Restore from S3\" section",
-      "local_restore_section": "Restore page: \"Restore from a local backup\" section",
+      "local_restore_section": "Restore page: \"Restore from a folder on the server\" section",
       "toggle_all_warning": "This will lose all your existing customizations. Do you want to continue?",
       "folder_actions_toggle": "Menu button (⋮) on folders",
       "note_actions_toggle": "Menu button (⋮) on notes",
@@ -1381,7 +1381,7 @@
         "user_webhooks": "User webhooks",
         "user_webhooks_help": "Non-admin users can no longer register webhooks that send events about their notes to external endpoints.",
         "user_s3_backups": "S3 backups on the Backup page",
-        "user_s3_backups_help": "Non-admin users no longer see the S3 Backups section of the Backup / Export page and cannot upload or download bucket archives.",
+        "user_s3_backups_help": "Non-admin users no longer see the \"Backup to S3\" section of the Backup / Export page and cannot upload or download bucket archives.",
         "user_s3_restore": "S3 restore on the Restore page",
         "user_s3_restore_help": "Non-admin users no longer see the Restore from S3 section of the Restore / Import page and cannot restore bucket archives."
       }
@@ -2167,7 +2167,7 @@
     },
     "sections": {
       "complete_backup": {
-        "title": "Complete Backup",
+        "title": "Backup to a Poznote ZIP file",
         "description_prefix": "Download a complete backup containing database, notes and attachments for",
         "description_suffix": "in a single ZIP file.",
         "use_cases": "Two use cases:",
@@ -2191,7 +2191,7 @@
         "description_s3": "With S3 storage enabled, the files are fetched from the bucket; use this archive to add the missing files to a backup made without S3 attachments before restoring it."
       },
       "local_backup": {
-        "title": "Local Backups",
+        "title": "Backup to a folder on the server",
         "description": "Save a backup archive of your account into the backup folder of this server, and download the archives already stored there.",
         "backup_now": "Back up my account to the folder",
         "running": "Saving the backup into the folder...",
@@ -2201,7 +2201,7 @@
         "delete_disabled": "Deleting backups is disabled by your administrator."
       },
       "s3_backup": {
-        "title": "S3 Backups",
+        "title": "Backup to S3",
         "description": "Upload a backup archive of your account to the S3 bucket configured on this instance, and download the archives already stored there.",
         "backup_now": "Back up my account to S3",
         "confirm_run": "Back up your account to the S3 bucket now? The archive can take a while to upload.",
@@ -2420,7 +2420,7 @@
         "description": "Restore your Poznote database from a complete backup"
       },
       "standard_restore": {
-        "title": "Standard Restore",
+        "title": "Restore from a Poznote ZIP backup",
         "description": "Choose a complete backup ZIP file.",
         "helper": "No size limit: the archive is uploaded in slices and restored in the background."
       },
@@ -2462,7 +2462,7 @@
         "confirm": "Restore your account from {{filename}}? Your current notes, attachments and settings will be replaced by the archive content."
       },
       "local_restore": {
-        "title": "Restore from a local backup",
+        "title": "Restore from a folder on the server",
         "description": "Restore your account directly from one of the backup archives saved in the backup folder of this server.",
         "confirm": "Restore your account from {{filename}}? Your current notes, attachments and settings will be replaced by the archive content.",
         "disabled": "Your account has {{count}} backup(s) in the backup folder of this server, but restoring them yourself is not enabled. Ask your administrator to restore one for you, or to enable restoring from this page."
@@ -4767,6 +4767,7 @@
     "new_name_placeholder": "Diary name",
     "new_create_error": "Could not create the diary.",
     "journal_view": "Journal view",
+    "board_view": "Card view",
     "journal_edit": "Edit here",
     "journal_edit_done": "Done editing",
     "journal_edit_placeholder": "Write here...",
@@ -4928,7 +4929,7 @@
   },
   "s3_backup": {
     "title": "S3 Backups",
-    "description": "Upload complete backup archives (one ZIP per user, identical to the Complete Backup download) to an S3-compatible bucket, manually or automatically on a schedule.",
+    "description": "Upload complete backup archives (one ZIP per user, identical to the one downloaded by \"Backup to a Poznote ZIP file\") to an S3-compatible bucket, manually or automatically on a schedule.",
     "description_scope": "The setting applies to all users of this instance and is independent from the S3 attachment storage.",
     "config_title": "Configuration",
     "enable_label": "Automatic backups",
@@ -4995,8 +4996,8 @@
     "users_count_filtered": "{{selected}} of {{total}} user(s) selected, {{shown}} shown"
   },
   "local_backup": {
-    "title": "Local Backups",
-    "description": "Save complete backup archives (one ZIP per user, identical to the Complete Backup download) into a folder of the server, manually or automatically on a schedule.",
+    "title": "Server Backups",
+    "description": "Save complete backup archives (one ZIP per user, identical to the one downloaded by \"Backup to a Poznote ZIP file\") into a folder of the server, manually or automatically on a schedule.",
     "description_scope": "The setting applies to all users of this instance.",
     "enable_description": "Back up the users checked below into the folder on the chosen schedule.",
     "directory_label": "Backup folder",

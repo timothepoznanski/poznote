@@ -662,7 +662,7 @@
       "custom_fonts": "Benutzerdefinierte Schriftarten",
       "restore_direct_copy": "Wiederherstellung per Direktkopie",
       "import_notes": "Notizen importieren",
-      "local_backup": "Lokale Sicherungen",
+      "local_backup": "Sicherungen auf dem Server",
       "whats_new": "Neuigkeiten nach Updates",
       "login_disabled": "Ohne Anmeldung öffnen",
       "outbound_hosts": "Zugriff auf das lokale Netzwerk",
@@ -1477,11 +1477,11 @@
       "badge_hidden_count_admin": "{{count}} ausgeblendet ({{admin}} durch den Administrator)",
       "badge_hidden_count_admin_columns": "{{me}} für Sie ausgeblendet, {{users}} für Benutzer",
       "badge_hidden_count": "{{count}} ausgeblendet",
-      "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellen, wenn die Standard-Wiederherstellung nicht funktioniert“",
-      "local_backups_section": "Sicherungsseite: Abschnitt „Lokale Sicherungen“",
-      "s3_backups_section": "Sicherungsseite: Abschnitt „S3-Sicherungen“",
+      "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellung per Direktkopie“",
+      "local_backups_section": "Sicherungsseite: Abschnitt „Sicherung in einen Ordner auf dem Server“",
+      "s3_backups_section": "Sicherungsseite: Abschnitt „Sicherung nach S3“",
       "s3_restore_section": "Wiederherstellungsseite: Abschnitt „Aus S3 wiederherstellen“",
-      "local_restore_section": "Wiederherstellungsseite: Abschnitt „Aus einer lokalen Sicherung wiederherstellen“",
+      "local_restore_section": "Wiederherstellungsseite: Abschnitt „Aus einem Ordner auf dem Server wiederherstellen“",
       "toggle_all_warning": "Dadurch gehen alle Ihre bestehenden Anpassungen verloren. Möchten Sie fortfahren?",
       "folder_actions_toggle": "Menüschaltfläche (⋮) bei Ordnern",
       "note_actions_toggle": "Menüschaltfläche (⋮) bei Notizen",
@@ -1897,7 +1897,7 @@
         "user_webhooks": "Benutzer-Webhooks",
         "user_webhooks_help": "Benutzer ohne Administratorrechte können keine Webhooks mehr registrieren, die Ereignisse über ihre Notizen an externe Dienste senden.",
         "user_s3_backups": "S3-Sicherungen auf der Sicherungsseite",
-        "user_s3_backups_help": "Nicht-Admin-Benutzer sehen den Abschnitt S3-Sicherungen der Seite Sicherung / Export nicht mehr und können keine Bucket-Archive mehr hochladen oder herunterladen.",
+        "user_s3_backups_help": "Nicht-Admin-Benutzer sehen den Abschnitt „Sicherung nach S3“ der Seite Sicherung / Export nicht mehr und können keine Bucket-Archive mehr hochladen oder herunterladen.",
         "user_s3_restore": "S3-Wiederherstellung auf der Wiederherstellungsseite",
         "user_s3_restore_help": "Nicht-Admin-Benutzer sehen den Abschnitt Aus S3 wiederherstellen der Seite Wiederherstellen / Importieren nicht mehr und können keine Bucket-Archive mehr wiederherstellen."
       }
@@ -2571,7 +2571,7 @@
     },
     "sections": {
       "complete_backup": {
-        "title": "Vollständige Sicherung",
+        "title": "Sicherung als Poznote-ZIP-Datei",
         "description_prefix": "Laden Sie eine vollständige Sicherung herunter, die Datenbank, Notizen und Anhänge für",
         "description_suffix": "in einer einzigen ZIP-Datei enthält.",
         "use_cases": "Zwei Anwendungsfälle:",
@@ -2595,7 +2595,7 @@
         "description_s3": "Bei aktiviertem S3-Speicher werden die Dateien aus dem Bucket geholt; verwenden Sie dieses Archiv, um einem ohne S3-Anhänge erstellten Backup vor der Wiederherstellung die fehlenden Dateien hinzuzufügen."
       },
       "local_backup": {
-        "title": "Lokale Sicherungen",
+        "title": "Sicherung in einen Ordner auf dem Server",
         "description": "Speichern Sie ein Sicherungsarchiv Ihres Kontos im Sicherungsordner dieses Servers und laden Sie die dort bereits gespeicherten Archive herunter.",
         "backup_now": "Mein Konto in den Ordner sichern",
         "running": "Sicherung wird im Ordner gespeichert...",
@@ -2605,7 +2605,7 @@
         "delete_disabled": "Das Löschen von Sicherungen wurde von Ihrem Administrator deaktiviert."
       },
       "s3_backup": {
-        "title": "S3-Sicherungen",
+        "title": "Sicherung nach S3",
         "description": "Lädt ein Sicherungsarchiv Ihres Kontos in den auf dieser Instanz konfigurierten S3-Bucket hoch und lädt die dort bereits gespeicherten Archive herunter.",
         "backup_now": "Mein Konto nach S3 sichern",
         "confirm_run": "Ihr Konto jetzt in den S3-Bucket sichern? Das Hochladen des Archivs kann eine Weile dauern.",
@@ -2824,7 +2824,7 @@
         "description": "Stellen Sie Ihre Poznote-Datenbank aus einer vollständigen Sicherung wieder her"
       },
       "standard_restore": {
-        "title": "Standardwiederherstellung",
+        "title": "Aus einer Poznote-ZIP-Sicherung wiederherstellen",
         "description": "Wählen Sie eine vollständige ZIP-Sicherungsdatei.",
         "helper": "Keine Größenbeschränkung: Das Archiv wird in Teilen hochgeladen und im Hintergrund wiederhergestellt."
       },
@@ -2866,7 +2866,7 @@
         "confirm": "Ihr Konto aus {{filename}} wiederherstellen? Ihre aktuellen Notizen, Anhänge und Einstellungen werden durch den Archivinhalt ersetzt."
       },
       "local_restore": {
-        "title": "Aus einer lokalen Sicherung wiederherstellen",
+        "title": "Aus einem Ordner auf dem Server wiederherstellen",
         "description": "Stellen Sie Ihr Konto direkt aus einem der Sicherungsarchive wieder her, die im Sicherungsordner dieses Servers gespeichert sind.",
         "confirm": "Ihr Konto aus {{filename}} wiederherstellen? Ihre aktuellen Notizen, Anhänge und Einstellungen werden durch den Inhalt des Archivs ersetzt.",
         "disabled": "Ihr Konto hat {{count}} Sicherung(en) im Sicherungsordner dieses Servers, aber die Wiederherstellung durch Sie selbst ist nicht aktiviert. Bitten Sie Ihren Administrator, eine für Sie wiederherzustellen oder die Wiederherstellung auf dieser Seite zu aktivieren."
@@ -5110,6 +5110,7 @@
     "new_name_placeholder": "Name des Tagebuchs",
     "new_create_error": "Das Tagebuch konnte nicht erstellt werden.",
     "journal_view": "Journalansicht",
+    "board_view": "Kartenansicht",
     "journal_edit": "Hier bearbeiten",
     "journal_edit_done": "Bearbeitung beenden",
     "journal_edit_placeholder": "Hier schreiben...",
@@ -5255,7 +5256,7 @@
   },
   "s3_backup": {
     "title": "S3-Sicherungen",
-    "description": "Lädt vollständige Sicherungsarchive (ein ZIP pro Benutzer, identisch mit dem Download „Vollständige Sicherung“) in einen S3-kompatiblen Bucket hoch, manuell oder automatisch nach Zeitplan.",
+    "description": "Lädt vollständige Sicherungsarchive (ein ZIP pro Benutzer, identisch mit dem Download „Sicherung als Poznote-ZIP-Datei“) in einen S3-kompatiblen Bucket hoch, manuell oder automatisch nach Zeitplan.",
     "description_scope": "Die Einstellung gilt für alle Benutzer dieser Instanz und ist unabhängig vom S3-Anhangspeicher.",
     "config_title": "Konfiguration",
     "enable_label": "Automatische Sicherungen",
@@ -5322,7 +5323,7 @@
     "users_count_filtered": "{{selected}} von {{total}} Benutzer(n) ausgewählt, {{shown}} angezeigt"
   },
   "local_backup": {
-    "title": "Lokale Sicherungen",
+    "title": "Sicherungen auf dem Server",
     "description": "Speichern Sie vollständige Sicherungsarchive (eine ZIP-Datei pro Benutzer, identisch mit dem Download der vollständigen Sicherung) in einem Ordner des Servers, manuell oder automatisch nach Zeitplan.",
     "description_scope": "Die Einstellung gilt für alle Benutzer dieser Instanz.",
     "enable_description": "Sichert die unten ausgewählten Benutzer im gewählten Intervall in den Ordner.",

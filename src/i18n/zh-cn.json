@@ -661,7 +661,7 @@
       "custom_fonts": "自定义字体",
       "restore_direct_copy": "通过直接复制恢复",
       "import_notes": "导入笔记",
-      "local_backup": "本地备份",
+      "local_backup": "服务器上的备份",
       "whats_new": "更新后显示新功能",
       "login_disabled": "免登录打开",
       "outbound_hosts": "本地网络访问",
@@ -1475,11 +1475,11 @@
       "badge_hidden_count_admin": "{{count}} 个已隐藏（其中 {{admin}} 个由管理员隐藏）",
       "badge_hidden_count_admin_columns": "为您隐藏 {{me}} 个，为用户隐藏 {{users}} 个",
       "badge_hidden_count": "{{count}} 个已隐藏",
-      "direct_copy_restore_section": "恢复页面:“标准恢复不起作用时的恢复”部分",
-      "local_backups_section": "备份页面：\"本地备份\"部分",
-      "s3_backups_section": "备份页面:“S3 备份”部分",
+      "direct_copy_restore_section": "恢复页面:“通过直接复制恢复”部分",
+      "local_backups_section": "备份页面：\"备份到服务器上的文件夹\"部分",
+      "s3_backups_section": "备份页面:“备份到 S3”部分",
       "s3_restore_section": "恢复页面:“从 S3 恢复”部分",
-      "local_restore_section": "恢复页面：\"从本地备份恢复\"部分",
+      "local_restore_section": "恢复页面：\"从服务器上的文件夹恢复\"部分",
       "toggle_all_warning": "此操作将丢失您现有的所有自定义设置。要继续吗?",
       "folder_actions_toggle": "文件夹上的菜单按钮（⋮）",
       "note_actions_toggle": "笔记上的菜单按钮（⋮）",
@@ -1878,7 +1878,7 @@
         "user_webhooks": "用户 Webhook",
         "user_webhooks_help": "非管理员用户无法再注册向外部服务发送笔记事件的 webhook。",
         "user_s3_backups": "备份页面上的 S3 备份",
-        "user_s3_backups_help": "非管理员用户将不再看到备份 / 导出页面中的 S3 备份部分,也无法上传或下载存储桶归档。",
+        "user_s3_backups_help": "非管理员用户将不再看到备份 / 导出页面中的 “备份到 S3”部分,也无法上传或下载存储桶归档。",
         "user_s3_restore": "恢复页面上的 S3 恢复",
         "user_s3_restore_help": "非管理员用户将不再看到恢复 / 导入页面中的从 S3 恢复部分,也无法恢复存储桶归档。"
       }
@@ -2569,7 +2569,7 @@
     },
     "sections": {
       "complete_backup": {
-        "title": "完整备份",
+        "title": "备份为 Poznote ZIP 文件",
         "description_prefix": "下载一个包含数据库、笔记和附件的完整备份，适用于",
         "description_suffix": "并打包在单个 ZIP 文件中。",
         "use_cases": "两种用途：",
@@ -2593,7 +2593,7 @@
         "description_s3": "启用 S3 存储时,文件会从存储桶中获取;恢复前,可用此压缩包为不含 S3 附件的备份补全缺失的文件。"
       },
       "local_backup": {
-        "title": "本地备份",
+        "title": "备份到服务器上的文件夹",
         "description": "将您账户的备份归档保存到本服务器的备份文件夹，并下载其中已有的归档。",
         "backup_now": "将我的账户备份到文件夹",
         "running": "正在将备份保存到文件夹...",
@@ -2603,7 +2603,7 @@
         "delete_disabled": "管理员已禁用删除备份。"
       },
       "s3_backup": {
-        "title": "S3 备份",
+        "title": "备份到 S3",
         "description": "将您账户的备份归档上传到此实例配置的 S3 存储桶,并下载已存储在那里的归档。",
         "backup_now": "将我的账户备份到 S3",
         "confirm_run": "现在将您的账户备份到 S3 存储桶？归档上传可能需要一些时间。",
@@ -2822,7 +2822,7 @@
         "description": "从完整备份还原您的 Poznote 数据库"
       },
       "standard_restore": {
-        "title": "标准还原",
+        "title": "从 Poznote ZIP 备份恢复",
         "description": "选择一个完整的备份 ZIP 文件。",
         "helper": "没有大小限制：存档分片上传并在后台恢复。"
       },
@@ -2864,7 +2864,7 @@
         "confirm": "从 {{filename}} 恢复您的账户?您当前的笔记、附件和设置将被归档内容替换。"
       },
       "local_restore": {
-        "title": "从本地备份恢复",
+        "title": "从服务器上的文件夹恢复",
         "description": "直接从本服务器备份文件夹中保存的某个备份归档恢复您的账户。",
         "confirm": "要从 {{filename}} 恢复您的账户吗？您当前的笔记、附件和设置将被归档内容替换。",
         "disabled": "您的账户在本服务器的备份文件夹中有 {{count}} 个备份，但未启用自行恢复。请让管理员为您恢复其中一个，或为您启用从此页面恢复。"
@@ -5207,6 +5207,7 @@
     "new_name_placeholder": "日记名称",
     "new_create_error": "无法创建日记。",
     "journal_view": "连续阅读视图",
+    "board_view": "卡片视图",
     "journal_edit": "在此编辑",
     "journal_edit_done": "完成编辑",
     "journal_edit_placeholder": "在此书写...",
@@ -5352,7 +5353,7 @@
   },
   "s3_backup": {
     "title": "S3 备份",
-    "description": "将完整备份归档(每个用户一个 ZIP,与“完整备份”下载内容相同)上传到 S3 兼容的存储桶,可手动或按计划自动执行。",
+    "description": "将完整备份归档(每个用户一个 ZIP,与“备份为 Poznote ZIP 文件”下载内容相同)上传到 S3 兼容的存储桶,可手动或按计划自动执行。",
     "description_scope": "该设置适用于此实例的所有用户,并且独立于 S3 附件存储。",
     "config_title": "配置",
     "enable_label": "自动备份",
@@ -5419,8 +5420,8 @@
     "users_count_filtered": "已选择 {{selected}}/{{total}} 位用户，显示 {{shown}} 位"
   },
   "local_backup": {
-    "title": "本地备份",
-    "description": "将完整备份归档（每位用户一个 ZIP，与“完整备份”下载的内容相同）保存到服务器上的文件夹，可手动执行或按计划自动执行。",
+    "title": "服务器上的备份",
+    "description": "将完整备份归档（每位用户一个 ZIP，与“备份为 Poznote ZIP 文件”下载的内容相同）保存到服务器上的文件夹，可手动执行或按计划自动执行。",
     "description_scope": "此设置适用于本实例的所有用户。",
     "enable_description": "按所选频率将下方勾选的用户备份到文件夹。",
     "directory_label": "备份文件夹",

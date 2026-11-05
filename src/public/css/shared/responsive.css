@@ -116,17 +116,6 @@
         border-radius: 0;
     }
 
-    /* Shares page: Expand all / Collapse all on its own full-width row */
-    body.shared-table-page:not(.offline-list-page) .shared-filter-tree-actions {
-        width: 100%;
-        justify-content: stretch;
-    }
-
-    body.shared-table-page:not(.offline-list-page) .shared-filter-tree-actions .btn {
-        flex: 1 1 0;
-        justify-content: center;
-    }
-
     .filter-type-buttons {
         flex-wrap: wrap;
     }
@@ -138,33 +127,14 @@
         flex-wrap: wrap;
     }
 
-    /* Folders and Offline pages: the button stays right of the search field,
-       which shrinks to leave it room */
-    .folders-filter-row,
-    .offline-list-page .filter-search-row {
+    /* Folders page: the button stays right of the search field, which
+       shrinks to leave it room */
+    .folders-filter-row {
         flex-wrap: nowrap;
     }
 
-    .folders-filter-row .filter-input-wrapper,
-    .offline-list-page .filter-search-row .filter-input-wrapper {
+    .folders-filter-row .filter-input-wrapper {
         min-width: 0;
-    }
-
-    /* Offline page: the reason filter goes to its own full-width line under
-       the search field, which keeps the button on its right */
-    .offline-list-page .filter-search-row:has(.offline-reason-select:not(.initially-hidden)) {
-        flex-wrap: wrap;
-    }
-
-    .offline-list-page .offline-reason-select,
-    .shared-sort-select {
-        order: 1;
-        flex: 1 1 100%;
-    }
-
-    /* Shares page: its tree button stays under the sort, not above it */
-    .shared-filter-tree-actions {
-        order: 2;
     }
 
     .filter-type-btn {

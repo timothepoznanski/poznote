@@ -399,8 +399,17 @@ class AttachmentsController {
                 http_response_code(403);
                 exit('Access denied');
             }
+            // The router skips requireApiAuth() for a browser session (or a
+            // request carrying a token, even one that names no share), so a
+            // session confined to a shared workspace is held to it here: the
+            // note must be one of that workspace's, and the workspace
+            // parameter is forced to it.
+            if (function_exists('enforceSharedWorkspaceScopeAccess')) {
+                enforceSharedWorkspaceScopeAccess();
+                $workspace = $_GET['workspace'] ?? $workspace;
+            }
         }
-        
+
         try {
             // Get attachment info
             if ($workspace) {

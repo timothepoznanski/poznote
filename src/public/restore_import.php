@@ -24,7 +24,7 @@ $s3RestoreSectionVisible = S3BackupService::isEnabled()
     && (isCurrentUserAdmin() || !in_array('user_s3_restore', TENANT_ISOLATION_FEATURES, true))
     && !poznoteIsUiElementHidden('card:s3RestoreSection');
 
-// Restore from a local backup section: the account's own archives in the
+// "Restore from a folder on the server" section: the account's own archives in the
 // local backup folder (Admin Tools > Local Backups). No master switch, so it
 // only shows when there is something to restore. Restoring itself needs the
 // admin's "Restore by users" switch (off by default, admins always may);
@@ -195,11 +195,11 @@ $directCopyRestoreSubmitted = $restoreImportPostAllowed && $restoreImportAction 
 // parts are the sub-cards of the restore card; a part that is not offered to
 // this account shows the whole page instead.
 $restoreImportParts = [
-    'restore-standard' => t('restore_import.sections.standard_restore.title', [], 'Standard Restore'),
+    'restore-standard' => t('restore_import.sections.standard_restore.title', [], 'Restore from a Poznote ZIP backup'),
     'import' => t('settings.cards.import_notes', [], 'Import notes'),
 ];
 if ($localRestoreSectionVisible) {
-    $restoreImportParts['restore-local'] = t('restore_import.sections.local_restore.title', [], 'Restore from a local backup');
+    $restoreImportParts['restore-local'] = t('restore_import.sections.local_restore.title', [], 'Restore from a folder on the server');
 }
 if (!poznoteIsUiElementHidden('card:directCopyRestoreCard')) {
     $restoreImportParts['restore-direct-copy'] = t('settings.cards.restore_direct_copy', [], 'Restore by direct copy');
@@ -348,7 +348,7 @@ $localRestoreContentOpen = $restoreImportPart === 'restore-local';
         <div class="sub-card" id="localRestoreSection"<?php echo $restoreSubCardHidden('restore-local'); ?>>
             <div class="sub-card-header" data-action="toggle-sub-card" data-target="localRestoreContent">
                 <h4>
-                    <?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a local backup'); ?>
+                    <?php echo t_h('restore_import.sections.local_restore.title', [], 'Restore from a folder on the server'); ?>
                 </h4>
             </div>
             <div class="sub-card-content<?php echo $localRestoreContentOpen ? ' open' : ''; ?>" id="localRestoreContent">
@@ -389,7 +389,7 @@ $localRestoreContentOpen = $restoreImportPart === 'restore-local';
         document.addEventListener('DOMContentLoaded', function() {
             var i18n = {
                 confirm: <?php echo json_encode(t('restore_import.sections.local_restore.confirm', [], 'Restore your account from {{filename}}? Your current notes, attachments and settings will be replaced by the archive content.')); ?>,
-                confirmTitle: <?php echo json_encode(t('restore_import.sections.local_restore.title', [], 'Restore from a local backup')); ?>
+                confirmTitle: <?php echo json_encode(t('restore_import.sections.local_restore.title', [], 'Restore from a folder on the server')); ?>
             };
             var select = document.getElementById('localRestoreSelect');
             var btn = document.getElementById('localRestoreBtn');
@@ -931,7 +931,7 @@ $localRestoreContentOpen = $restoreImportPart === 'restore-local';
        the hidden state or the cancel control stays on screen for the whole
        transfer and after the job has finished. */
     .chunked-restore-cancel.initially-hidden { display: none; }
-        /* Restore from a local backup, when the admin has not enabled it */
+        /* Restore from a folder on the server, when the admin has not enabled it */
         .local-restore-disabled { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 0; }
         .local-restore-disabled .lucide { flex: none; margin-top: 2px; background-color: currentColor; }
     </style>

@@ -226,7 +226,13 @@ function dashboardResolveRememberedScope(PDO $con, array $params, string $pageWo
     // that workspace alone, whatever the URL or the owner's saved scope says.
     $sharedWorkspaceName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
     if ($sharedWorkspaceName !== null) {
-        return poznoteResolveWorkspaceScope($con, ['workspace' => $sharedWorkspaceName], $sharedWorkspaceName);
+        $scope = poznoteResolveWorkspaceScope($con, ['workspace' => $sharedWorkspaceName], $sharedWorkspaceName);
+        // The maps cover every workspace of the account and reach the page
+        // (scope.colors): only the shared one is the session's to see.
+        $keep = [$sharedWorkspaceName => true];
+        $scope['tags_map'] = array_intersect_key($scope['tags_map'] ?? [], $keep);
+        $scope['colors_map'] = array_intersect_key($scope['colors_map'] ?? [], $keep);
+        return $scope;
     }
 
     $requested = strtolower(trim((string)($params['scope'] ?? '')));
@@ -530,7 +536,22 @@ $pageWidthStyle = poznotePageWidthStyle('dashboard');
 			<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-layout-dashboard"></i> <?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></span> <?php echo $dashboardTitleWorkspace; ?></h1>
 
 			<header class="dashboard-topbar">
-				<div class="board-filter-row">
+				<?php // The filter folds behind a magnifier, first on the row (js/search-toggle.js) ?>
+				<div class="board-filter-row pz-search-row">
+				<?php echo poznoteRenderSearchToggle('dashboardTopbarFilter', t('dashboard.filter_placeholder', [], 'Filter by title, content or tag...'), 'dashboard-color-filter-btn'); ?>
+				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter pz-search-collapsible is-search-collapsed">
+					<i class="lucide lucide-search dashboard-filter-icon"></i>
+					<input
+						type="text"
+						id="filterInput"
+						class="dashboard-filter-input"
+						placeholder="<?php echo t_h('dashboard.filter_placeholder', [], 'Filter by title, content or tag...'); ?>"
+						autocomplete="off"
+					/>
+					<button type="button" id="clearFilterBtn" class="dashboard-filter-clear initially-hidden" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
+						<i class="lucide lucide-x"></i>
+					</button>
+				</div>
 				<?php renderBoardViewMenu('dashboard'); ?>
 				<?php // Width of the board: a slider in a popover (js/page-width.js). The setting belongs to the account. ?>
 				<?php if (isActiveAccountOwnedByAuthenticatedUser()): ?>
@@ -570,19 +591,6 @@ $pageWidthStyle = poznotePageWidthStyle('dashboard');
 							<button type="button" id="dashboardFilterResetBtn" class="dashboard-filter-reset"><i class="lucide lucide-x"></i> <?php echo t_h('dashboard.filters.reset', [], 'Reset filters'); ?></button>
 						</div>
 					</div>
-				</div>
-				<div id="dashboardTopbarFilter" class="dashboard-topbar-filter">
-					<i class="lucide lucide-search dashboard-filter-icon"></i>
-					<input
-						type="text"
-						id="filterInput"
-						class="dashboard-filter-input"
-						placeholder="<?php echo t_h('dashboard.filter_placeholder', [], 'Filter by title, content or tag...'); ?>"
-						autocomplete="off"
-					/>
-					<button type="button" id="clearFilterBtn" class="dashboard-filter-clear initially-hidden" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
-						<i class="lucide lucide-x"></i>
-					</button>
 				</div>
 				</div>
 				<?php // Touch: a long press on a card selects it and swaps the filter row for this bar (initTouchCards in js/dashboard-page.js) ?>
@@ -759,6 +767,7 @@ $pageWidthStyle = poznotePageWidthStyle('dashboard');
 		<?php // Before dashboard-page.js: the card size and column count are set before the cards are drawn ?>
 		<script src="<?php echo poznoteAsset('js/board-view-menu.js'); ?>"></script>
 		<script src="<?php echo poznoteAsset('js/dashboard-page.js'); ?>"></script>
+		<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 		<?php if ($aiChatEnabled): ?>
 		<!-- AI chat panel: js/globals.js brings the i18n runtime (window.t) and
 		     getSelectedWorkspace(). The assistant's answers are rendered with

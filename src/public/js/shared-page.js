@@ -857,11 +857,20 @@
         });
     }
 
+    // Whether the tree of the All view had folders to fold, null before it
+    // was first drawn
+    var lastTreeCollapsible = null;
+
+    // A view with nothing to fold (Notes, Shared with me, or Folders when the
+    // shared folders sit side by side) keeps the button in its place greyed
+    // out, as on offline_notes.php, as long as the All view has folders to
+    // fold (shared folders, before it was drawn).
     function updateTreeToolbar(presentation) {
         var toolbar = document.getElementById('sharedTreeToolbar');
         var searchHint = document.getElementById('sharedTreeSearchHint');
         var toggleBtn = document.getElementById('toggleAllFoldersBtn');
         var showToolbar = !!(presentation && presentation.collapsibleFolderIds.length > 0 && (filterType === 'all' || filterType === 'folders'));
+        if (presentation && filterType === 'all') lastTreeCollapsible = showToolbar;
 
         currentHierarchyBranchMeta = presentation ? presentation.branchMeta : {};
         currentCollapsibleFolderIds = presentation ? presentation.collapsibleFolderIds.slice() : [];
@@ -870,10 +879,15 @@
             return;
         }
 
-        toolbar.classList.toggle('initially-hidden', !showToolbar);
         if (!showToolbar) {
+            var greyed = lastTreeCollapsible !== null ? lastTreeCollapsible : sharedFolders.length > 0;
+            toolbar.classList.toggle('initially-hidden', !greyed);
+            if (toggleBtn) toggleBtn.disabled = true;
+            if (searchHint) searchHint.classList.add('initially-hidden');
             return;
         }
+
+        toolbar.classList.remove('initially-hidden');
 
         if (searchHint) {
             searchHint.classList.toggle('initially-hidden', !presentation.searchExpanded);
@@ -890,6 +904,9 @@
             if (labelEl) {
                 labelEl.textContent = label;
             }
+            // The button shows its chevron alone: the label goes to its tooltip
+            toggleBtn.title = label;
+            toggleBtn.setAttribute('aria-label', label);
             if (icon) {
                 icon.classList.toggle('lucide-chevron-down', shouldExpand);
                 icon.classList.toggle('lucide-chevron-up', !shouldExpand);

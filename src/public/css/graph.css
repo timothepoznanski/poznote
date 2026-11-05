@@ -632,11 +632,11 @@ html[data-theme='dark'] .graph-tooltip-meta {
         text-overflow: ellipsis;
     }
 
-    /* The open search field takes the room left on its row; what no longer
-       fits beside it goes to the next one */
+    /* The open search field takes its row, the buttons after it go to the
+       next one, as on the other pages (css/components/search-toggle.css) */
     .graph-search-wrapper {
-        flex: 1 1 0;
-        min-width: 140px;
+        flex: 0 0 100%;
+        min-width: 0;
     }
 
 }

@@ -63,6 +63,13 @@ html[data-theme='dark'] .shared-filter-tree-actions .btn {
     color: var(--pz-text-strong);
 }
 
+/* Offline page: the tree button next to the magnifier keeps its look */
+html[data-theme='dark'] .filter-type-buttons .shared-filter-tree-actions .btn:not(:hover):not(:disabled) {
+    background: var(--pz-bg);
+    border-color: var(--pz-border);
+    color: var(--pz-icon, var(--pz-text-muted));
+}
+
 html[data-theme='dark'] .shared-filter-tree-actions .btn:hover {
     background: rgba(var(--pz-accent-text-rgb), 0.12);
     border-color: rgba(var(--pz-accent-text-rgb), 0.24);

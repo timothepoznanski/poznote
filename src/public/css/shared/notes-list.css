@@ -522,15 +522,30 @@ html[data-theme='dark'] .folder-name-path {
     font-family: inherit;
 }
 
-/* Reason filter, beside the search field and drawn like it */
+/* Sort of the Shares page and reason filter of the Offline page: as wide
+   as their words and without the arrow, like the type dropdowns of
+   notes_manager.php and attachments_list.php */
 .offline-reason-select,
 .shared-sort-select {
     flex: 0 0 auto;
     max-width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    /* The label centred in the box: text-align-last is what a select reads */
+    text-align: center;
+    text-align-last: center;
     /* The search field's 38px: a select's own line box would make it 40 */
     height: 38px;
-    padding: 0 12px;
-    border: 1px solid var(--border-color, var(--pz-border));
+    /* Chromium's dropdown list (Chrome and Edge,
+       Windows too) copies the select's left padding to its options but not
+       its right one, so centred options came out 6px right of centre. The
+       12px of air are transparent side borders instead, the visible border
+       an outline drawn just inside them. */
+    padding: 0;
+    border: solid transparent;
+    border-width: 1px 12px;
+    outline: 1px solid var(--border-color, var(--pz-border));
+    outline-offset: -1px;
     border-radius: var(--pz-radius-lg);
     font-size: 14px;
     font-family: inherit;
@@ -540,10 +555,18 @@ html[data-theme='dark'] .folder-name-path {
     cursor: pointer;
 }
 
+/* On the row of the type buttons (the sort of Shares, the reasons of
+   Offline): at their height and with their round ends */
+.filter-type-buttons .offline-reason-select,
+.filter-type-buttons .shared-sort-select {
+    height: var(--pz-search-toggle-size);
+    border-radius: var(--pz-radius-2xl);
+    font-size: 13px;
+}
+
 .offline-reason-select:focus,
 .shared-sort-select:focus {
-    outline: none;
-    border-color: var(--pz-accent);
+    outline-color: var(--pz-accent);
     box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 

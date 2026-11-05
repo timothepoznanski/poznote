@@ -662,7 +662,7 @@
       "custom_fonts": "Fontes personalizadas",
       "restore_direct_copy": "Restauração por cópia direta",
       "import_notes": "Importar notas",
-      "local_backup": "Backups locais",
+      "local_backup": "Backups no servidor",
       "whats_new": "Novidades após uma atualização",
       "login_disabled": "Abrir sem login",
       "outbound_hosts": "Acesso à rede local",
@@ -1477,11 +1477,11 @@
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} pelo administrador)",
       "badge_hidden_count_admin_columns": "{{me}} oculto(s) para você, {{users}} para os usuários",
       "badge_hidden_count": "{{count}} oculto(s)",
-      "direct_copy_restore_section": "Página de restauração: seção «Restaurar quando a restauração padrão não funciona»",
-      "local_backups_section": "Página de cópia: seção \"Cópias locais\"",
-      "s3_backups_section": "Página de backup: seção «Backups S3»",
+      "direct_copy_restore_section": "Página de restauração: seção «Restauração por cópia direta»",
+      "local_backups_section": "Página de cópia: seção \"Backup numa pasta do servidor\"",
+      "s3_backups_section": "Página de backup: seção «Backup no S3»",
       "s3_restore_section": "Página de restauração: seção «Restaurar do S3»",
-      "local_restore_section": "Página de restauração: seção \"Restaurar a partir de uma cópia local\"",
+      "local_restore_section": "Página de restauração: seção \"Restaurar a partir de uma pasta do servidor\"",
       "toggle_all_warning": "Esta ação fará perder todas as suas personalizações existentes. Deseja continuar?",
       "folder_actions_toggle": "Botão de menu (⋮) nas pastas",
       "note_actions_toggle": "Botão de menu (⋮) nas notas",
@@ -1897,7 +1897,7 @@
         "user_webhooks": "Webhooks de usuário",
         "user_webhooks_help": "Os utilizadores não administradores deixam de poder registar webhooks que enviam eventos sobre as suas notas para serviços externos.",
         "user_s3_backups": "Backups S3 na página de backup",
-        "user_s3_backups_help": "Usuários não administradores deixam de ver a seção Backups S3 da página Backup / Exportar e não podem enviar nem baixar arquivos do bucket.",
+        "user_s3_backups_help": "Usuários não administradores deixam de ver a seção «Backup no S3» da página Backup / Exportar e não podem enviar nem baixar arquivos do bucket.",
         "user_s3_restore": "Restauração S3 na página de restauração",
         "user_s3_restore_help": "Usuários não administradores deixam de ver a seção Restaurar do S3 da página Restaurar / Importar e não podem restaurar arquivos do bucket."
       }
@@ -2571,7 +2571,7 @@
     },
     "sections": {
       "complete_backup": {
-        "title": "Backup Completo",
+        "title": "Backup num arquivo ZIP do Poznote",
         "description_prefix": "Baixe um backup completo contendo banco de dados, notas e anexos para",
         "description_suffix": "em um único arquivo ZIP.",
         "use_cases": "Dois casos de uso:",
@@ -2595,7 +2595,7 @@
         "description_s3": "Com o armazenamento S3 ativado, os arquivos são obtidos do bucket; use este arquivo para adicionar os arquivos ausentes a um backup criado sem os anexos S3 antes de restaurá-lo."
       },
       "local_backup": {
-        "title": "Cópias locais",
+        "title": "Backup numa pasta do servidor",
         "description": "Guarde um arquivo de cópia de segurança da sua conta na pasta de cópias deste servidor e transfira os arquivos que já lá estão.",
         "backup_now": "Copiar a minha conta para a pasta",
         "running": "A guardar a cópia na pasta...",
@@ -2605,7 +2605,7 @@
         "delete_disabled": "A eliminação de cópias foi desativada pelo seu administrador."
       },
       "s3_backup": {
-        "title": "Backups S3",
+        "title": "Backup no S3",
         "description": "Envia um arquivo de backup da sua conta para o bucket S3 configurado nesta instância e baixa os arquivos já armazenados lá.",
         "backup_now": "Fazer backup da minha conta para o S3",
         "confirm_run": "Fazer backup da sua conta para o bucket S3 agora? O envio do arquivo pode demorar um pouco.",
@@ -2824,7 +2824,7 @@
         "description": "Restaure seu banco de dados Poznote a partir de um backup completo"
       },
       "standard_restore": {
-        "title": "Restauração padrão",
+        "title": "Restaurar a partir de uma cópia ZIP do Poznote",
         "description": "Escolha um arquivo de backup ZIP completo.",
         "helper": "Sem limite de tamanho: o arquivo é enviado por partes e restaurado em segundo plano."
       },
@@ -2866,7 +2866,7 @@
         "confirm": "Restaurar sua conta a partir de {{filename}}? Suas notas, anexos e configurações atuais serão substituídos pelo conteúdo do arquivo."
       },
       "local_restore": {
-        "title": "Restaurar a partir de uma cópia local",
+        "title": "Restaurar a partir de uma pasta do servidor",
         "description": "Restaure a sua conta diretamente a partir de um dos arquivos de cópia de segurança guardados na pasta de cópias deste servidor.",
         "confirm": "Restaurar a sua conta a partir de {{filename}}? As suas notas, anexos e definições atuais serão substituídos pelo conteúdo do arquivo.",
         "disabled": "A sua conta tem {{count}} cópia(s) na pasta de cópias deste servidor, mas o restauro por si próprio não está ativado. Peça ao seu administrador que restaure uma por si, ou que ative o restauro a partir desta página."
@@ -5111,6 +5111,7 @@
     "new_name_placeholder": "Nome do diário",
     "new_create_error": "Não foi possível criar o diário.",
     "journal_view": "Vista contínua",
+    "board_view": "Vista de cartões",
     "journal_edit": "Editar aqui",
     "journal_edit_done": "Concluir a edição",
     "journal_edit_placeholder": "Escreva aqui...",
@@ -5256,7 +5257,7 @@
   },
   "s3_backup": {
     "title": "Backups S3",
-    "description": "Envia arquivos de backup completos (um ZIP por usuário, idêntico ao download «Backup completo») para um bucket compatível com S3, manualmente ou automaticamente conforme um agendamento.",
+    "description": "Envia arquivos de backup completos (um ZIP por usuário, idêntico ao download «Backup num arquivo ZIP do Poznote») para um bucket compatível com S3, manualmente ou automaticamente conforme um agendamento.",
     "description_scope": "A configuração se aplica a todos os usuários desta instância e é independente do armazenamento S3 de anexos.",
     "config_title": "Configuração",
     "enable_label": "Backups automáticos",
@@ -5323,7 +5324,7 @@
     "users_count_filtered": "{{selected}} de {{total}} utilizador(es) selecionado(s), {{shown}} apresentado(s)"
   },
   "local_backup": {
-    "title": "Backups locais",
+    "title": "Backups no servidor",
     "description": "Salve arquivos de backup completos (um ZIP por usuário, idêntico ao download do backup completo) em uma pasta do servidor, manualmente ou automaticamente conforme um agendamento.",
     "description_scope": "A configuração se aplica a todos os usuários desta instância.",
     "enable_description": "Copia os utilizadores marcados abaixo para a pasta segundo a frequência escolhida.",

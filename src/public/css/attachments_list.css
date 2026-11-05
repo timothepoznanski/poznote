@@ -68,28 +68,48 @@ body.attachments-page {
     margin: 0 auto 10px auto;
     display: flex;
     flex-direction: row;
+    justify-content: center;
     align-items: center;
     gap: 12px;
+    /* The magnifier (css/components/search-toggle.css) as tall as the type dropdown */
+    --pz-search-toggle-size: 38px;
 }
 
+/* As wide as its words and without the arrow, like the type dropdown of
+   notes_manager.php */
 .file-type-filter {
     flex: 0 0 auto;
-    min-width: 130px;
+    min-width: 0;
     max-width: 180px;
-    padding: 10px 34px 10px 12px;
-    border: 1px solid var(--border-color, var(--pz-border));
+    -webkit-appearance: none;
+    appearance: none;
+    /* Its label centred. Chromium's dropdown list (Chrome and Edge,
+       Windows too) copies the select's left padding to its options but not
+       its right one, so centred options came out 6px right of centre. The
+       12px of air are transparent side borders instead, the visible border
+       an outline drawn just inside them. */
+    text-align: center;
+    text-align-last: center;
+    /* The magnifier's height, whatever the font's line box */
+    box-sizing: border-box;
+    height: var(--pz-search-toggle-size, 38px);
+    padding: 0;
+    outline: 1px solid var(--border-color, var(--pz-border));
+    outline-offset: -1px;
+    border: solid transparent;
+    border-width: 1px 12px;
     border-radius: var(--pz-radius-lg);
+    /* The page's font: a select falls back to the browser's own (Arial on Windows) */
+    font-family: inherit;
     font-size: 14px;
     color: var(--text-color, var(--pz-text));
     background-color: var(--input-bg, var(--pz-bg));
     cursor: pointer;
-    box-sizing: border-box;
     transition: all 0.2s ease;
 }
 
 .file-type-filter:focus {
-    outline: none;
-    border-color: var(--pz-accent-text);
+    outline-color: var(--pz-accent-text);
     box-shadow: 0 0 0 3px rgba(var(--pz-accent-text-rgb), 0.1);
 }
 
@@ -268,8 +288,12 @@ html[data-theme='dark'] .filter-input {
 
 html[data-theme='dark'] .file-type-filter {
     background-color: var(--pz-surface);
-    border-color: var(--pz-border);
+    outline-color: var(--pz-border);
     color: var(--pz-text);
+}
+
+html[data-theme='dark'] .file-type-filter:focus {
+    outline-color: var(--pz-accent-text);
 }
 
 html[data-theme='dark'] .filter-stats {
@@ -378,21 +402,17 @@ html[data-theme='dark'] .attachment-image-preview img {
 }
 
 @media (max-width: 600px) {
+    /* One row that wraps: the magnifier of the filter first, then the type
+       list and the thumbnails switch. Once open, the filter takes the row and
+       they go below (css/components/search-toggle.css). */
     .attachments-filter-bar {
-        flex-direction: column;
-        align-items: stretch;
+        gap: 8px 12px;
     }
 
-    .attachments-filter-bar .filter-input-wrapper,
     .file-type-filter,
     .thumbnails-toggle {
-        width: 100%;
-        max-width: none;
+        max-width: 100%;
         min-width: 0;
-    }
-
-    .attachments-filter-bar .filter-stats {
-        align-self: flex-start;
     }
 
     .attachment-files-list {

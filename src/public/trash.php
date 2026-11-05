@@ -169,15 +169,13 @@ $trashOrderBy = $trashSort === 'created'
             </div>
         <?php endif; ?>
         
-        <div class="trash-buttons-container">
-            <button class="btn btn-danger" id="emptyTrashBtn" title="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>">
-                <?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>
-            </button>
-        </div>
 
-        <div class="trash-filter-bar">
-            <div class="filter-input-wrapper">
+        <?php // The search folds behind a magnifier, first on the row (js/search-toggle.js) ?>
+        <div class="trash-filter-bar pz-search-row">
+            <?php echo poznoteRenderSearchToggle('trashSearchWrapper', t('trash.search.placeholder', [], 'Search in trash...')); ?>
+            <div class="filter-input-wrapper pz-search-collapsible<?php echo $search === '' ? ' is-search-collapsed' : ''; ?>" id="trashSearchWrapper">
                 <form action="trash.php" method="POST" id="trashSearchForm">
+                    <i class="lucide lucide-search trash-search-icon"></i>
                     <input type="hidden" name="sort" value="<?php echo htmlspecialchars($trashSort, ENT_QUOTES, 'UTF-8'); ?>">
                     <input
                         type="text" 
@@ -195,6 +193,10 @@ $trashOrderBy = $trashSort === 'created'
                     </button>
                 <?php endif; ?>
             </div>
+            <?php // Right of the magnifier and in its look, its bin alone in red, its label in the tooltip (js/trash.js) ?>
+            <button type="button" class="trash-empty-btn" id="emptyTrashBtn" title="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>" aria-label="<?php echo t_h('trash.actions.empty_trash', [], 'Empty trash'); ?>">
+                <i class="lucide lucide-trash-2"></i>
+            </button>
             <?php
             // Each option is a link so the sort survives without JavaScript;
             // the active search is carried over so re-sorting does not drop it.
@@ -388,6 +390,7 @@ $trashOrderBy = $trashSort === 'created'
     <script src="<?php echo poznoteAsset('js/utils-note-rename.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/utils-kanban.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/search-highlight.js'); ?>"></script>
+    <script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/toolbar-popups.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/toolbar-editor-utils.js'); ?>"></script>
     <script src="<?php echo poznoteAsset('js/toolbar-format.js'); ?>"></script>

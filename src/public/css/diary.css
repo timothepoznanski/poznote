@@ -61,6 +61,15 @@
     background: var(--pz-accent-hover);
 }
 
+/* The sticky bar of buttons keeps a wider band of the page's ground below
+   it, so the entry or card scrolling under it stays clear of the buttons.
+   The negative margin takes the room back: the page at rest does not move
+   (the first month of the cards starts 8px below the bar, the journal 18px). */
+.diary-page .dashboard-topbar {
+    padding-bottom: 16px;
+    margin-bottom: -8px;
+}
+
 /* Diary switcher: one pill per diary, once there are several */
 .diary-switcher {
     display: flex;
@@ -78,9 +87,15 @@
         gap: 8px 2px;
     }
 
+    /* Narrow enough for the magnifier of the filter (js/search-toggle.js)
+       and the seven buttons to share one line on a phone */
     .diary-page .board-filter-row .dashboard-color-filter-btn,
     .diary-page .board-filter-row .board-view-btn:not(.board-view-layout-toggle) {
-        width: 32px;
+        width: 28px;
+    }
+
+    .diary-page .board-filter-row .board-view-layout-toggle {
+        padding: 0 6px;
     }
 
     .diary-page .board-filter-row .board-view-controls {
@@ -252,26 +267,24 @@ html[data-theme='dark'] .diary-context-menu-item.danger [class*="lucide-"] {
 
 /* ---------- Journal view ----------
    Every entry in one reading column, newest first, full body shown. The
-   board's size/layout controls act on cards only, so they step aside. */
+   board's size/layout controls act on cards only: they stay in place,
+   greyed out like the full-height toggle in list layout, and out of reach
+   (inert, js/diary-page.js). The view button shows the other view's icon. */
 
-.diary-journal-toggle.active {
-    border-color: var(--pz-accent-text);
-    color: var(--pz-accent-text);
-    background: var(--pz-surface-hover);
+.diary-journal-active .board-view-controls .board-view-btn {
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: none;
 }
 
-.diary-journal-active .board-view-controls {
-    display: none;
-}
+/* ---------- Dates panel ----------
+   The note outline's panel and edge handle (css/outline.css), in both views.
+   On index.php they are flex children of a full-height layout; this page
+   scrolls the body, so they stick to the top of the viewport instead, as the
+   last items of the body's flex row. The body's right padding would leave a
+   strip of page between the panel and the window edge. */
 
-/* ---------- Journal dates panel ----------
-   The note outline's panel and edge handle (css/outline.css). On index.php
-   they are flex children of a full-height layout; this page scrolls the
-   body, so they stick to the top of the viewport instead, as the last items
-   of the body's flex row. The body's right padding would leave a strip of
-   page between the panel and the window edge. */
-
-body.diary-journal-active {
+body.diary-page {
     padding-right: 0;
 }
 
@@ -286,10 +299,6 @@ body.diary-journal-active {
     margin-bottom: -20px;
 }
 
-body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outlineMobileBackdrop) {
-    display: none;
-}
-
 /* A month opens its group, a day sits under it */
 .diary-outline .outline-nav-link[data-level="1"] {
     margin-top: 10px;
@@ -300,7 +309,7 @@ body:not(.diary-journal-active) :is(.diary-outline-handle, #outline-panel, #outl
 }
 
 /* Phones have no edge handle (css/outline.css hides it): the panel opens
-   with a right-to-left swipe on the journal (js/diary-page.js). */
+   with a right-to-left swipe on the entries or the cards (js/diary-page.js). */
 
 .diary-journal {
     max-width: 760px;

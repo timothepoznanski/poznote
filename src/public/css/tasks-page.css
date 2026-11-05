@@ -73,15 +73,14 @@ body.tasks-page {
     transition: width 0.3s ease;
 }
 
-/* "Display tasks in notes" toggle, right of the progress label: shows or
-   hides the groups built from the checklists of regular notes. "Show hidden
-   lists" follows it, greyed out until a group is hidden (the eye button of a
-   group header). */
+/* "Display tasks in notes" toggle, on the filter row right of the collapse
+   toggle: shows or hides the groups built from the checklists of regular
+   notes. "Show hidden lists" follows it, greyed out until a group is hidden
+   (the eye button of a group header). */
 .tasks-progress-option {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    order: 4;
     flex-shrink: 0;
     font-size: 13px;
     color: var(--pz-text-muted);
@@ -128,13 +127,16 @@ body.tasks-page {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.15s ease;
+    transition: opacity 0.15s ease, visibility 0.15s ease;
     z-index: 50;
 }
 
+/* Shown after a short rest of the pointer, not as it passes by; it goes
+   away at once */
 .tasks-progress-option[data-tooltip]:hover::after {
     opacity: 1;
     visibility: visible;
+    transition-delay: 0.5s;
 }
 
 /* No hover on touch screens */
@@ -156,12 +158,15 @@ body.tasks-page {
     cursor: default;
 }
 
-/* Filter bar. On desktop the filter input sits on the same row, to the right
-   of the filter chips; the mobile media query restores the stacked layout. */
+/* Filter bar: the magnifier of the filter first (js/search-toggle.js), the
+   view toggle, the filter button, then the collapse/expand toggle.
+   Once open on a phone, the filter takes the row and the buttons go below. */
 .tasks-filter-bar {
     max-width: 900px;
     margin: 0 auto 25px auto;
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     gap: 12px;
 }
@@ -184,7 +189,8 @@ body.tasks-page {
     padding: 0;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
-    background: transparent;
+    /* The ground of the filter field, not the page's */
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
     cursor: pointer;
     transition: all 0.2s ease;
@@ -293,14 +299,6 @@ body.tasks-page {
     color: var(--pz-text-inverse);
 }
 
-/* Filter input and the collapse/expand toggle stay together on one row */
-.tasks-filter-search {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
 .filter-input-wrapper {
     position: relative;
     flex: 1;
@@ -347,7 +345,8 @@ body.tasks-page {
     color: var(--pz-accent);
 }
 
-/* Single collapse-all / expand-all toggle, right of the filter input */
+/* Single collapse-all / expand-all toggle, right of the filter button and
+   in its format: the chevron alone, the label in its tooltip */
 .tasks-collapse-actions {
     display: flex;
     gap: 8px;
@@ -358,23 +357,25 @@ body.tasks-page {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    /* Same vertical metrics as the filter chips and the filter input */
-    padding: 6px 12px;
+    width: 31px;
+    height: 29px;
+    padding: 0;
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
-    background: transparent;
+    background: var(--input-bg, var(--pz-bg));
     color: var(--text-color, var(--pz-text));
-    font-size: 13px;
-    font-family: inherit;
-    white-space: nowrap;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
+.tasks-collapse-btn .lucide {
+    width: 16px;
+    height: 16px;
+}
+
 .tasks-collapse-btn:hover {
     border-color: var(--pz-accent);
-    color: var(--pz-accent);
+    color: var(--pz-accent-text);
 }
 
 /* Note groups. Each group is framed as a card so consecutive sections read
@@ -749,6 +750,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
     border: 1px solid var(--border-color, var(--pz-border));
     border-radius: var(--pz-radius-lg);
     overflow: hidden;
+    background: var(--input-bg, var(--pz-bg));
 }
 
 .tasks-view-btn {
@@ -1158,14 +1160,7 @@ html[data-theme='dark'] .tasks-note-source-badge {
         margin-bottom: 14px;
     }
 
-    /* One row: view toggle, filter button, filter input, then the
-       collapse/expand toggle as an icon only (its label moves to the title) */
     .tasks-filter-bar {
-        gap: 8px;
-    }
-
-    .tasks-filter-search {
-        min-width: 0;
         gap: 8px;
     }
 
@@ -1173,24 +1168,9 @@ html[data-theme='dark'] .tasks-note-source-badge {
         min-width: 0;
     }
 
-    .tasks-collapse-btn {
-        width: 31px;
-        height: 29px;
-        padding: 0;
-    }
-
-    #toggleAllNotesLabel {
-        display: none;
-    }
-
     .tasks-progress-header {
         display: flex;
         gap: 20px;
-    }
-
-    .tasks-progress-option {
-        margin-top: 10px;
-        margin-right: 16px;
     }
 
     .btn {
@@ -1233,6 +1213,7 @@ html[data-theme='dark'] .tasks-filter-chip.active {
 
 html[data-theme='dark'] .tasks-filter-btn {
     border-color: var(--pz-border);
+    background: var(--pz-surface);
     color: var(--pz-text);
 }
 
@@ -1254,6 +1235,7 @@ html[data-theme='dark'] .tasks-filter-panel {
 
 html[data-theme='dark'] .tasks-collapse-btn {
     border-color: var(--pz-border);
+    background: var(--pz-surface);
     color: var(--pz-text);
 }
 
@@ -1324,6 +1306,7 @@ html[data-theme='dark'] .task-due-chip.overdue {
 
 html[data-theme='dark'] .tasks-view-toggle {
     border-color: var(--pz-border);
+    background: var(--pz-surface);
 }
 
 html[data-theme='dark'] .tasks-view-btn {

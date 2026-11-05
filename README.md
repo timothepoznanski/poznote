@@ -1109,7 +1109,7 @@ Each option is detailed below, and individual notes can also be exported on thei
 
 <a id="complete-backup"></a>
 <details>
-<summary><strong>Complete Backup to Poznote zip</strong></summary>
+<summary><strong>Backup to a Poznote ZIP file</strong></summary>
 <br>
 
 Single ZIP containing database, all notes, and attachments for all workspaces:
@@ -1122,7 +1122,7 @@ The archive is built in the background by a worker process, not during the reque
 
 #### Per-User vs Complete Backups
 
-All the methods above produce **per-user backups**: an archive contains only the data belonging to one account (its database, notes and attachments). Every user can back up and restore their own account, administrators can pick any account.
+All the methods above produce **per-user backups**: an archive contains only the data belonging to one account (its database, notes and attachments). Every user can back up and restore their own account, administrators can pick any account. An administrator's archive also carries the instance logo, if one was uploaded, and restoring it into an administrator account puts the logo back.
 
 A **complete system backup**, including the master configuration (accounts, global settings, shared links) and every user at once, is made by copying the entire `/data` directory:
 
@@ -1135,12 +1135,12 @@ tar -czvf poznote-full-backup.tar.gz data/
 
 <a id="local-backups"></a>
 <details>
-<summary><strong>Scheduled backups to a local folder</strong></summary>
+<summary><strong>Scheduled backups to a folder on the server</strong></summary>
 <br>
 
-Administrators can have complete backup archives (one ZIP per user, identical to the Complete Backup download) saved into a folder of the server, manually or automatically on a schedule, with only the most recent ones kept. It needs nothing outside Poznote: no bucket, no cron job, no script.
+Administrators can have complete backup archives (one ZIP per user, identical to the one downloaded by "Backup to a Poznote ZIP file") saved into a folder of the server, manually or automatically on a schedule, with only the most recent ones kept. It needs nothing outside Poznote: no bucket, no cron job, no script.
 
-Configure it in **Settings > Local Backups** (administrators only).
+Configure it in **Settings > Server Backups** (administrators only).
 
 - **Configuration**: The backup folder and the retention, shared by the automatic and the manual backups.
   - **Backup folder**: An absolute path on the server (inside the container with Docker). Left empty, the archives go to `data/backups`, which is already part of the data volume. The folder is created if needed and must be writable by the web server user.
@@ -1149,10 +1149,10 @@ Configure it in **Settings > Local Backups** (administrators only).
 - **Manual backups**: The manual backup box has its own user checkboxes, nothing checked by default, and a "Back up now" button that saves a fresh archive for each checked user, one user at a time, with per-user progress. This selection is not saved and does not change the automatic backups, which may even be off.
 - **Browsing**: The page lists the archives currently in the folder. The actions menu of each archive downloads it, restores it into the account it belongs to, or deletes it.
 - **Access for users**: Archives are stored under `{user id}/` in the backup folder. Three switches, all off by default, open the folder to the users:
-  - **Allow users to back up their account** adds a "Local Backups" section to the Backup / Export page of every user, placed before the S3 one. Each user can save a backup of their own account into the folder, then download their archives from the actions menu of each one. These archives count toward the retention limit like the others.
+  - **Allow users to back up their account** adds a "Backup to a folder on the server" section to the Backup / Export page of every user, placed before the S3 one. Each user can save a backup of their own account into the folder, then download their archives from the actions menu of each one. These archives count toward the retention limit like the others.
   - **Allow users to delete their archives**: while it is off, the Delete entry of that menu is greyed out, so users cannot remove the archives of their account, including those of the automatic backups. The retention limit still prunes the oldest ones.
-  - **Allow users to restore their account** adds a "Restore from a local backup" section to the [Restore / Import](#restore--import) page of every user who has archives in the folder. While it is off, those users see a message asking their administrator to restore an archive for them or to enable restoring.
-  - Administrators can always do both, and restore any archive from the list. A downloaded archive can still be restored with the standard restore.
+  - **Allow users to restore their account** adds a "Restore from a folder on the server" section to the [Restore / Import](#restore--import) page of every user who has archives in the folder. While it is off, those users see a message asking their administrator to restore an archive for them or to enable restoring.
+  - Administrators can always do both, and restore any archive from the list. A downloaded archive can still be restored with "Restore from a Poznote ZIP backup".
 - **Account deletion**: Deleting an account also deletes its archives from the backup folder.
 
 To keep the backups on another disk or on a network share, mount it in the container and enter the container path (`/backups` in this example) as the backup folder:
@@ -1174,7 +1174,7 @@ A folder inside the application itself is refused, apart from `data/backups`. Wh
 <summary><strong>Scheduled backups to an S3 bucket</strong></summary>
 <br>
 
-Administrators can send complete backup archives (one ZIP per user, identical to the Complete Backup download) to an S3-compatible bucket, manually or automatically on a schedule. The configuration is independent from the S3 Attachment Storage one, so backups can target a different bucket or provider.
+Administrators can send complete backup archives (one ZIP per user, identical to the one downloaded by "Backup to a Poznote ZIP file") to an S3-compatible bucket, manually or automatically on a schedule. The configuration is independent from the S3 Attachment Storage one, so backups can target a different bucket or provider.
 
 Configure it in **Settings > S3 Backups** (administrators only).
 
@@ -1186,7 +1186,7 @@ Configure it in **Settings > S3 Backups** (administrators only).
 - **Retention**: Only the most recent N archives are kept per user, older ones are deleted from the bucket after each backup (0 keeps everything).
 - **Browsing**: The page lists the archives currently in the bucket, with download and delete actions.
 - **Restore**: Archives are stored under `backups/{user id}/` in the bucket and can be restored with the standard [Restore / Import](#restore--import) page.
-- **Self-service**: Once the bucket is configured, every user gets an "S3 Backups" section on their Backup / Export page to upload a fresh archive of their own account, and to download or delete their existing archives. A "Restore from S3" section on the Restore / Import page restores their account directly from one of those archives.
+- **Self-service**: Once the bucket is configured, every user gets a "Backup to S3" section on their Backup / Export page to upload a fresh archive of their own account, and to download or delete their existing archives. A "Restore from S3" section on the Restore / Import page restores their account directly from one of those archives.
 - **Tenant isolation**: Two options ("S3 backups on the Backup page" and "S3 restore on the Restore page") disable these self-service sections for non-admin users. They are enforced server-side, so the blocked actions are refused even when called directly.
 
 When attachments are stored in S3 (S3 Attachment Storage), they are included in the archives by default, fetched from the bucket on the fly. An option lets you leave them out of the backups for lighter archives and faster runs.
@@ -1269,7 +1269,7 @@ Poznote provides flexible restoration options through the web interface (**Setti
 
 <a id="complete-restore"></a>
 <details>
-<summary><strong>Complete Restore from Poznote zip backup</strong></summary>
+<summary><strong>Restore from a Poznote ZIP backup</strong></summary>
 <br>
 
 Upload the complete backup ZIP to restore everything:
@@ -1281,7 +1281,7 @@ There is no practical size limit. The archive is uploaded in slices (a slice tha
 
 Restoring from an S3 bucket (see [S3 Backups](#s3-backups)) runs as the same background job, so fetching a large archive from the bucket and restoring it does not depend on a request staying alive either.
 
-If the upload is not possible at all, the Restore / Import page also offers a direct copy fallback: copy the archive into the Poznote container at exactly `/tmp/backup_restore.zip` over SSH, reload the page, and restore from there.
+If the upload is not possible at all, the Restore / Import page also offers a fallback, "Restore by direct copy": copy the archive into the Poznote container at exactly `/tmp/backup_restore.zip` over SSH, reload the page, and restore from there.
 
 </details>
 
@@ -1417,7 +1417,7 @@ The notes you modified in the last 5 days are kept in each browser where you use
 <summary><strong>Offline export</strong></summary>
 <br>
 
-The **📦 Complete Backup** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser. This allows you to read your notes offline, but without the full Poznote functionality, it's a read-only export.
+The **📦 Backup to a Poznote ZIP file** creates a standalone offline version of your notes. Simply extract the ZIP and open `index.html` in any web browser. This allows you to read your notes offline, but without the full Poznote functionality, it's a read-only export.
 
 </details>
 
