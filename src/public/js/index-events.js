@@ -1868,7 +1868,11 @@
                 if (window.modalAlert && typeof window.modalAlert.confirm === 'function') {
                     window.modalAlert.confirm(message, title).then(function (isConfirmed) {
                         if (!isConfirmed) {
-                            return; // User cancelled, don't navigate
+                            // User cancelled, don't navigate. Back may have
+                            // already used the note's history entry: put it
+                            // back for the next press (js/note-back.js).
+                            if (window.PoznoteNoteBack) window.PoznoteNoteBack.ensure();
+                            return;
                         }
 
                         // User confirmed, try to save before leaving
@@ -1886,6 +1890,7 @@
                 } else {
                     // Fallback to native confirm if modal system not available
                     if (!confirm(message)) {
+                        if (window.PoznoteNoteBack) window.PoznoteNoteBack.ensure();
                         return; // User cancelled, don't navigate
                     }
 
