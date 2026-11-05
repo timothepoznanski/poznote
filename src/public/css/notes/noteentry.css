@@ -155,8 +155,9 @@ p.code-block-placeholder-after[data-ph]:empty:before {
     display: none !important;
 }
 
-/* Nowhere to go that way (top of the note, bottom, or a note that fits): the
-   arrow stays in its place, dimmed, and lets the pointer through. */
+/* Nowhere to go that way (top or bottom of a long note): the arrow stays in
+   its place, dimmed, and lets the pointer through. A note that fits has none
+   (hidden, js/index-events.js). */
 .note-scroll-edge-btn:disabled {
     opacity: 0.35;
     cursor: default;

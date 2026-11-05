@@ -366,6 +366,8 @@
             var topButton = controls.querySelector('.note-scroll-top-btn');
             var bottomButton = controls.querySelector('.note-scroll-bottom-btn');
             var state = getNoteScrollState(getNoteScrollTargets(controls), colFits ? rightCol : null);
+            // Nothing to scroll at all (the note fits): no arrows
+            var scrollable = state.canScrollUp || state.canScrollDown;
 
             if (noteScrollLockEdge === 'bottom') {
                 state.canScrollUp = false;
@@ -373,13 +375,13 @@
                 state.canScrollDown = false;
             }
 
-            // Disabled rather than hidden: the arrows keep their place, and
-            // the floating stack above them no longer moves as the note scrolls
-            // (hidden is cleared for a note rendered before that change and
-            // kept by the offline cache)
+            // At the top or the bottom of a long note, disabled rather than
+            // hidden: the arrows keep their place, and the floating stack
+            // above them does not move as the note scrolls. A note that fits
+            // hides both, the stack then comes down to their place.
             [[topButton, state.canScrollUp], [bottomButton, state.canScrollDown]].forEach(function (pair) {
                 if (!pair[0]) return;
-                pair[0].hidden = false;
+                pair[0].hidden = !scrollable;
                 pair[0].disabled = !pair[1];
             });
         });
