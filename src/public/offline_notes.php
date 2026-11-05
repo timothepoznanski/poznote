@@ -60,7 +60,6 @@ $currentLang = getUserLanguage();
 	data-txt-disabled="<?php echo t_h('offline.page.disabled', [], 'Offline notes are turned off.'); ?>"
 	data-txt-disabled-hint="<?php echo t_h('offline.page.disabled_hint', [], 'Choose how many days of notes to keep in Settings, Offline notes.'); ?>"
 	data-txt-no-notes="<?php echo t_h('offline.page.no_notes', [], 'No notes available offline.'); ?>"
-	data-txt-no-folders="<?php echo t_h('offline.page.no_folders', [], 'No folders kept offline.'); ?>"
 	data-txt-own-account-only="<?php echo t_h('offline.page.own_account_only', [], 'Offline copies are only kept for your own account.'); ?>"
 	data-txt-no-filter-results="<?php echo t_h('public.no_filter_results', [], 'No notes match your search.'); ?>"
 	data-txt-expand-folder="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>"
@@ -102,20 +101,6 @@ $currentLang = getUserLanguage();
 					<option value="favorite"><?php echo t_h('offline.page.reason_favorite', [], 'Favorite'); ?></option>
 					<option value="recent"></option>
 				</select>
-				<button class="filter-type-btn active" data-filter="all">
-					<i class="lucide lucide-layers"></i>
-					<?php echo t_h('public.filter_all', [], 'All'); ?>
-				</button>
-				<button class="filter-type-btn" data-filter="notes">
-					<i class="lucide lucide-sticky-note"></i>
-					<?php echo t_h('public.filter_notes', [], 'Notes'); ?>
-				</button>
-				<button class="filter-type-btn" data-filter="folders">
-					<i class="lucide lucide-folder"></i>
-					<?php echo t_h('public.filter_folders', [], 'Folders'); ?>
-				</button>
-				<?php // The count of the list, at the end of the row (js/offline-list.js) ?>
-				<div id="filterStats" class="filter-stats initially-hidden"></div>
 			</div>
 		</div>
 

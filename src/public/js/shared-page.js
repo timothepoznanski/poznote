@@ -36,13 +36,10 @@
             txtCancel: body.getAttribute('data-txt-cancel') || 'Cancel',
             txtViaFolder: body.getAttribute('data-txt-via-folder') || 'Shared via folder',
 
-            txtNoSharedNotes: body.getAttribute('data-txt-no-shared-notes') || 'No shared notes yet.',
-            txtNoSharedFolders: body.getAttribute('data-txt-no-shared-folders') || 'No shared folders yet.',
             txtRestrictedBadge: body.getAttribute('data-txt-restricted-badge') || 'Restricted',
             txtRestrictedHelp: body.getAttribute('data-txt-restricted-help') || 'When restricted, only the listed users can access this share after logging in.',
 
             txtSharedBy: body.getAttribute('data-txt-shared-by') || 'Shared by',
-            txtNoSharedWithMe: body.getAttribute('data-txt-no-shared-with-me') || 'Nothing has been shared with you yet.',
             txtExpandFolder: body.getAttribute('data-txt-expand-folder') || 'Expand folder',
             txtCollapseFolder: body.getAttribute('data-txt-collapse-folder') || 'Collapse folder',
             txtExpandAll: body.getAttribute('data-txt-expand-all') || 'Expand all',
@@ -82,7 +79,6 @@
     var allItems = [];
     var filteredItems = [];
     var filterText = '';
-    var filterType = 'all';
     var sharedFolderLookup = {};
     var COLLAPSED_FOLDERS_STORAGE_KEY = 'poznote.shared.collapsedFolders';
     var currentHierarchyBranchMeta = {};
@@ -285,20 +281,8 @@
         return true;
     }
 
-    function updateSortControl() {
-        var sortSelect = document.getElementById('sharedSortSelect');
-        if (sortSelect) {
-            // Shares received from other users carry no dates to sort on
-            sortSelect.classList.toggle('initially-hidden', filterType === 'shared_with_me');
-        }
-    }
-
     function applyFilter() {
-        updateSortControl();
         filteredItems = allItems.filter(function(item) {
-            if (filterType === 'notes' && item._type !== 'note') return false;
-            if (filterType === 'folders' && item._type !== 'folder') return false;
-            if (filterType === 'shared_with_me' && item._type !== 'shared_with_me_note' && item._type !== 'shared_with_me_folder') return false;
             if (!filterText) return true;
             if (item._type === 'shared_with_me_note') {
                 return (item.heading || '').toLowerCase().includes(filterText) || (item.owner_name || '').toLowerCase().includes(filterText) || (item.token || '').toLowerCase().includes(filterText);
@@ -320,36 +304,6 @@
             }
         });
         renderItems();
-        updateFilterStats();
-    }
-
-    function getCurrentScopeTotal() {
-        if (filterType === 'notes') {
-            return sharedNotes.length;
-        }
-
-        if (filterType === 'folders') {
-            return sharedFolders.length;
-        }
-
-        if (filterType === 'shared_with_me') {
-            return sharedWithMe.length;
-        }
-
-        return allItems.length;
-    }
-
-    function updateFilterStats() {
-        var statsDiv = document.getElementById('filterStats');
-        var totalCount = getCurrentScopeTotal();
-        if (statsDiv) {
-            if (totalCount > 0) {
-                statsDiv.textContent = filteredItems.length + ' / ' + totalCount;
-                statsDiv.style.display = 'block';
-            } else {
-                statsDiv.style.display = 'none';
-            }
-        }
     }
 
     function syncUrl() {
@@ -359,38 +313,12 @@
         } else {
             params.delete('filter');
         }
-        if (filterType && filterType !== 'all') {
-            params.set('type', filterType);
-        } else {
-            params.delete('type');
-        }
+        // Left over from the type buttons (All / Notes / Folders / Shared with me), now gone
+        params.delete('type');
         // Keep non-filter params (workspace, etc.) intact
         var newSearch = params.toString();
         var newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '');
         window.history.replaceState(null, '', newUrl);
-    }
-
-    function updateFilterTypeButtons() {
-        var counts = {
-            notes: sharedNotes.length,
-            folders: sharedFolders.length,
-            shared_with_me: sharedWithMe.length
-        };
-        var buttons = document.querySelectorAll('.filter-type-btn');
-
-        buttons.forEach(function(btn) {
-            var type = btn.getAttribute('data-filter');
-            btn.classList.toggle('initially-hidden', type !== 'all' && !counts[type]);
-        });
-
-        // Fall back to "all" when the active category has nothing left to show.
-        if (filterType !== 'all' && !counts[filterType]) {
-            filterType = 'all';
-            buttons.forEach(function(btn) {
-                btn.classList.toggle('active', btn.getAttribute('data-filter') === 'all');
-            });
-            syncUrl();
-        }
     }
 
     // ========== Data loading ==========
@@ -742,7 +670,6 @@
                 if (spinner) spinner.style.display = 'none';
                 mergeItems();
                 if (filterBar) filterBar.classList.toggle('initially-hidden', allItems.length === 0);
-                updateFilterTypeButtons();
                 if (allItems.length === 0) {
                     if (emptyMessage) emptyMessage.style.display = 'block';
                     return;
@@ -857,20 +784,12 @@
         });
     }
 
-    // Whether the tree of the All view had folders to fold, null before it
-    // was first drawn
-    var lastTreeCollapsible = null;
-
-    // A view with nothing to fold (Notes, Shared with me, or Folders when the
-    // shared folders sit side by side) keeps the button in its place greyed
-    // out, as on offline_notes.php, as long as the All view has folders to
-    // fold (shared folders, before it was drawn).
+    // The button is only shown when the tree has folders to fold
     function updateTreeToolbar(presentation) {
         var toolbar = document.getElementById('sharedTreeToolbar');
         var searchHint = document.getElementById('sharedTreeSearchHint');
         var toggleBtn = document.getElementById('toggleAllFoldersBtn');
-        var showToolbar = !!(presentation && presentation.collapsibleFolderIds.length > 0 && (filterType === 'all' || filterType === 'folders'));
-        if (presentation && filterType === 'all') lastTreeCollapsible = showToolbar;
+        var showToolbar = !!(presentation && presentation.collapsibleFolderIds.length > 0);
 
         currentHierarchyBranchMeta = presentation ? presentation.branchMeta : {};
         currentCollapsibleFolderIds = presentation ? presentation.collapsibleFolderIds.slice() : [];
@@ -880,8 +799,7 @@
         }
 
         if (!showToolbar) {
-            var greyed = lastTreeCollapsible !== null ? lastTreeCollapsible : sharedFolders.length > 0;
-            toolbar.classList.toggle('initially-hidden', !greyed);
+            toolbar.classList.add('initially-hidden');
             if (toggleBtn) toggleBtn.disabled = true;
             if (searchHint) searchHint.classList.add('initially-hidden');
             return;
@@ -997,21 +915,6 @@
                 noResultsDiv.className = 'empty-message';
                 noResultsDiv.innerHTML = '<p>' + config.txtNoFilterResults + '</p>';
                 container.appendChild(noResultsDiv);
-            } else if (filterType === 'shared_with_me') {
-                var noSharedDiv = document.createElement('div');
-                noSharedDiv.className = 'empty-message';
-                noSharedDiv.innerHTML = '<p>' + config.txtNoSharedWithMe + '</p>';
-                container.appendChild(noSharedDiv);
-            } else if (filterType === 'notes') {
-                var noNotesDiv = document.createElement('div');
-                noNotesDiv.className = 'empty-message';
-                noNotesDiv.innerHTML = '<p>' + config.txtNoSharedNotes + '</p>';
-                container.appendChild(noNotesDiv);
-            } else if (filterType === 'folders') {
-                var noFoldersDiv = document.createElement('div');
-                noFoldersDiv.className = 'empty-message';
-                noFoldersDiv.innerHTML = '<p>' + config.txtNoSharedFolders + '</p>';
-                container.appendChild(noFoldersDiv);
             } else if (emptyMessage) {
                 emptyMessage.style.display = 'block';
             }
@@ -1060,22 +963,10 @@
 
         list.appendChild(header);
 
-        var itemsToRender = filteredItems.slice().sort(compareItems);
+        var hierarchyPresentation = buildHierarchyPresentation(buildAllViewSequence(filteredItems));
+        updateTreeToolbar(hierarchyPresentation);
 
-        if (filterType === 'all' || filterType === 'folders') {
-            var hierarchyPresentation = buildHierarchyPresentation(buildAllViewSequence(filteredItems));
-            updateTreeToolbar(hierarchyPresentation);
-            itemsToRender = hierarchyPresentation.visibleItems;
-        } else {
-            updateTreeToolbar(null);
-            // A flat list: drop the indent the tree view left on these items
-            itemsToRender.forEach(function(item) {
-                delete item._renderAsChildOfFolderId;
-                delete item._hierarchyDepth;
-            });
-        }
-
-        itemsToRender.forEach(function(item) {
+        hierarchyPresentation.visibleItems.forEach(function(item) {
             if (item._type === 'note') {
                 list.appendChild(renderNoteItem(item));
             } else if (item._type === 'shared_with_me_note' || item._type === 'shared_with_me_folder') {
@@ -1670,18 +1561,6 @@
             });
         }
 
-        // Type filter buttons
-        var filterBtns = document.querySelectorAll('.filter-type-btn');
-        filterBtns.forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                filterBtns.forEach(function(b) { b.classList.remove('active'); });
-                this.classList.add('active');
-                filterType = this.getAttribute('data-filter');
-                applyFilter();
-                syncUrl();
-            });
-        });
-
         var sortSelect = document.getElementById('sharedSortSelect');
         if (sortSelect) {
             sortSelect.value = sortMode;
@@ -1702,14 +1581,6 @@
             filterInput.value = initialFilter;
             filterText = initialFilter.trim().toLowerCase();
             updateClearButton();
-        }
-
-        var initialType = urlParams.get('type');
-        if (initialType && ['all', 'notes', 'folders', 'shared_with_me'].indexOf(initialType) !== -1) {
-            filterType = initialType;
-            filterBtns.forEach(function(btn) {
-                btn.classList.toggle('active', btn.getAttribute('data-filter') === filterType);
-            });
         }
 
         if (filterInput) {

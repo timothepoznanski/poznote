@@ -35,7 +35,6 @@
             txtDisabled: txt('disabled', 'Offline notes are turned off.'),
             txtDisabledHint: txt('disabled-hint', ''),
             txtNoNotes: txt('no-notes', 'No notes available offline.'),
-            txtNoFolders: txt('no-folders', 'No folders kept offline.'),
             txtOwnAccountOnly: txt('own-account-only', 'Offline copies are only kept for your own account.'),
             txtNoFilterResults: txt('no-filter-results', 'No notes match your search.'),
             txtExpandFolder: txt('expand-folder', 'Expand folder'),
@@ -59,7 +58,6 @@
     var allItems = [];
     var filteredItems = [];
     var filterText = '';
-    var filterType = 'all';
     // '' or one of the note reasons (note, folder, favorite, recent)
     var filterReason = '';
     var REASONS = ['note', 'folder', 'favorite', 'recent'];
@@ -146,8 +144,6 @@
     function applyFilter() {
         var reasonFolders = foldersForReason();
         filteredItems = allItems.filter(function(item) {
-            if (filterType === 'notes' && item._type !== 'note') return false;
-            if (filterType === 'folders' && item._type !== 'folder') return false;
             if (filterReason) {
                 if (item._type === 'note' && noteReasons(item).indexOf(filterReason) === -1) return false;
                 if (item._type === 'folder' && !reasonFolders[String(item.folder_id)]) return false;
@@ -158,21 +154,6 @@
                 || (item.folder_path || '').toLowerCase().indexOf(filterText) !== -1;
         });
         renderItems();
-        updateFilterStats();
-    }
-
-    function getCurrentScopeTotal() {
-        if (filterType === 'notes') return offlineNotes.length;
-        if (filterType === 'folders') return offlineFolders.length;
-        return allItems.length;
-    }
-
-    function updateFilterStats() {
-        var statsDiv = document.getElementById('filterStats');
-        if (!statsDiv) return;
-        var total = getCurrentScopeTotal();
-        statsDiv.textContent = filteredItems.length + ' / ' + total;
-        statsDiv.style.display = total > 0 ? 'block' : 'none';
     }
 
     function syncUrl() {
@@ -182,11 +163,8 @@
         } else {
             params.delete('filter');
         }
-        if (filterType !== 'all') {
-            params.set('type', filterType);
-        } else {
-            params.delete('type');
-        }
+        // Left over from the type buttons (All / Notes / Folders), now gone
+        params.delete('type');
         if (filterReason) {
             params.set('reason', filterReason);
         } else {
@@ -194,28 +172,6 @@
         }
         var search = params.toString();
         window.history.replaceState(null, '', window.location.pathname + (search ? '?' + search : ''));
-    }
-
-    function updateFilterTypeButtons() {
-        var counts = { notes: offlineNotes.length, folders: offlineFolders.length };
-        var buttons = document.querySelectorAll('.filter-type-btn');
-        // "All" only means something when there are folders to mix with the notes
-        var showAll = counts.folders > 0;
-        buttons.forEach(function(btn) {
-            var type = btn.getAttribute('data-filter');
-            btn.classList.toggle('initially-hidden', type === 'all' ? !showAll : !counts[type]);
-        });
-        // Back to "All" (or "Notes" when "All" is hidden) when the active
-        // category has nothing left to show
-        var fallback = showAll ? 'all' : 'notes';
-        if ((counts.notes || counts.folders) && filterType !== fallback
-            && (filterType === 'all' ? !showAll : !counts[filterType])) {
-            filterType = fallback;
-            buttons.forEach(function(btn) {
-                btn.classList.toggle('active', btn.getAttribute('data-filter') === fallback);
-            });
-            syncUrl();
-        }
     }
 
     // The reasons the notes have, each with its count; the list only offers a
@@ -365,12 +321,11 @@
         return currentCollapsibleFolderIds.some(isFolderCollapsed);
     }
 
-    // The button is always there, greyed out in a view with nothing to fold:
-    // the flat list of Notes (notesOnly), no folder at all, or folders side
-    // by side
-    function updateTreeToolbar(presentation, notesOnly) {
+    // The button is always there, greyed out with nothing to fold: no folder
+    // at all, or folders side by side
+    function updateTreeToolbar(presentation) {
         var toggleBtn = document.getElementById('toggleAllFoldersBtn');
-        var show = !notesOnly && !!(presentation && presentation.collapsibleFolderIds.length > 0);
+        var show = !!(presentation && presentation.collapsibleFolderIds.length > 0);
 
         currentBranchMeta = presentation ? presentation.branchMeta : {};
         currentCollapsibleFolderIds = presentation ? presentation.collapsibleFolderIds.slice() : [];
@@ -459,7 +414,6 @@
 
                 if (filterBar) filterBar.classList.toggle('initially-hidden', allItems.length === 0);
                 if (emptyMessage) emptyMessage.style.display = 'none';
-                updateFilterTypeButtons();
                 updateReasonSelect();
                 if (allItems.length === 0) {
                     document.getElementById('sharedItemsContainer').innerHTML = '';
@@ -724,9 +678,8 @@
         container.innerHTML = '';
 
         if (filteredItems.length === 0) {
-            updateTreeToolbar(null, filterType === 'notes');
-            var message = isFiltering() ? config.txtNoFilterResults
-                : (filterType === 'folders' ? config.txtNoFolders : config.txtNoNotes);
+            updateTreeToolbar(null);
+            var message = isFiltering() ? config.txtNoFilterResults : config.txtNoNotes;
             var empty = document.createElement('div');
             empty.className = 'empty-message';
             var p = document.createElement('p');
@@ -740,18 +693,10 @@
         list.className = 'shared-notes-list';
         list.appendChild(renderHeader());
 
-        var itemsToRender = filteredItems;
-        if (filterType === 'notes') {
-            updateTreeToolbar(null, true);
-            itemsToRender = filteredItems.slice().sort(byName(function(note) { return note.heading || config.txtUntitled; }));
-            itemsToRender.forEach(function(note) { delete note._depth; });
-        } else {
-            var presentation = buildPresentation(buildTreeSequence(filteredItems));
-            updateTreeToolbar(presentation);
-            itemsToRender = presentation.visibleItems;
-        }
+        var presentation = buildPresentation(buildTreeSequence(filteredItems));
+        updateTreeToolbar(presentation);
 
-        itemsToRender.forEach(function(item) {
+        presentation.visibleItems.forEach(function(item) {
             list.appendChild(item._type === 'note' ? renderNoteItem(item) : renderFolderItem(item));
         });
 
@@ -817,7 +762,6 @@
     // ========== Initialization ==========
 
     document.addEventListener('DOMContentLoaded', function() {
-        var filterBtns = document.querySelectorAll('.filter-type-btn');
         var filterInput = document.getElementById('filterInput');
         var clearFilterBtn = document.getElementById('clearFilterBtn');
         var toggleAllBtn = document.getElementById('toggleAllFoldersBtn');
@@ -830,28 +774,10 @@
             filterText = initialFilter.trim().toLowerCase();
             updateClearButton();
         }
-        var initialType = urlParams.get('type');
-        if (initialType === 'notes' || initialType === 'folders') {
-            filterType = initialType;
-            filterBtns.forEach(function(btn) {
-                btn.classList.toggle('active', btn.getAttribute('data-filter') === filterType);
-            });
-        }
-
         var initialReason = urlParams.get('reason');
         if (REASONS.indexOf(initialReason) !== -1) {
             filterReason = initialReason;
         }
-
-        filterBtns.forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                filterBtns.forEach(function(b) { b.classList.remove('active'); });
-                btn.classList.add('active');
-                filterType = btn.getAttribute('data-filter');
-                applyFilter();
-                syncUrl();
-            });
-        });
 
         function setFilterText(value) {
             filterText = value.trim().toLowerCase();

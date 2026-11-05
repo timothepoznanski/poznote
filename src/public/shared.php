@@ -133,15 +133,9 @@ usort($shared_folders, function($a, $b) {
 	data-txt-table-actions="<?php echo t_h('public.table.actions', [], 'Actions'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
       data-txt-via-folder="<?php echo t_h('public.via_folder', [], 'Shared via folder'); ?>"
-      data-txt-filter-all="<?php echo t_h('public.filter_all', [], 'All'); ?>"
-      data-txt-filter-notes="<?php echo t_h('public.filter_notes', [], 'Notes'); ?>"
-      data-txt-filter-folders="<?php echo t_h('public.filter_folders', [], 'Folders'); ?>"
-	data-txt-no-shared-notes="<?php echo t_h('public.no_shared_notes', [], 'No shared notes yet.'); ?>"
-	data-txt-no-shared-folders="<?php echo t_h('public.no_shared_folders', [], 'No shared folders yet.'); ?>"
 	data-txt-restricted-badge="<?php echo t_h('public.restricted_badge', [], 'Restricted'); ?>"
 	data-txt-restricted-help="<?php echo t_h('public.restricted_help', [], 'When restricted, only the listed users can access this share after logging in.'); ?>"
       data-txt-shared-by="<?php echo t_h('public.shared_by', [], 'Shared by'); ?>"
-      data-txt-no-shared-with-me="<?php echo t_h('public.no_shared_with_me', [], 'Nothing has been shared with you yet.'); ?>"
       data-txt-copy-url="<?php echo t_h('public.actions.copy_url', [], 'Copy URL'); ?>"
       data-txt-url-copied="<?php echo t_h('public.actions.url_copied', [], 'URL copied!'); ?>"
       data-txt-login-required-title="<?php echo t_h('public.login_required_title', [], 'Login Required'); ?>"
@@ -165,7 +159,7 @@ usort($shared_folders, function($a, $b) {
 		
 		<div class="shared-filter-bar initially-hidden" id="sharedFilterBar">
 			<?php // As on offline_notes.php: the magnifier of the filter (js/search-toggle.js), the
-			// sort, the expand/collapse chevron, the type buttons, then the count ?>
+			// sort, then the expand/collapse chevron ?>
 			<div class="filter-type-buttons pz-search-row">
 				<?php echo poznoteRenderSearchToggle('sharedFilterWrapper', t('public.filter_placeholder', [], 'Filter by name or token...')); ?>
 				<div class="filter-input-wrapper pz-search-collapsible is-search-collapsed" id="sharedFilterWrapper">
@@ -191,24 +185,6 @@ usort($shared_folders, function($a, $b) {
 						<i class="lucide lucide-chevron-down"></i>
 					</button>
 				</div>
-				<button class="filter-type-btn active" data-filter="all">
-					<i class="lucide lucide-layers"></i>
-					<?php echo t_h('public.filter_all', [], 'All'); ?>
-				</button>
-				<button class="filter-type-btn" data-filter="notes">
-					<i class="lucide lucide-sticky-note"></i>
-					<?php echo t_h('public.filter_notes', [], 'Notes'); ?>
-				</button>
-				<button class="filter-type-btn" data-filter="folders">
-					<i class="lucide lucide-folder"></i>
-					<?php echo t_h('public.filter_folders', [], 'Folders'); ?>
-				</button>
-				<button class="filter-type-btn" data-filter="shared_with_me">
-					<i class="lucide lucide-users"></i>
-					<?php echo t_h('public.shared_with_me', [], 'Shared with me'); ?>
-				</button>
-				<?php // The count of the list, at the end of the row (js/shared-page.js) ?>
-				<div id="filterStats" class="filter-stats initially-hidden"></div>
 			</div>
 		</div>
 		
