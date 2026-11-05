@@ -56,6 +56,21 @@
     font-weight: var(--pz-weight-normal) !important;
 }
 
+/* The icon of a filled button takes the label's colour, not the --pz-icon
+   grey every lucide icon gets from icons.css, which reads as a dark smudge on
+   the blue or red fill (the revoke share dialog). Dark mode has the same rule
+   in dark-mode/components.css, where the default hover is more specific. */
+.btn-primary [class*="lucide-"],
+.btn-primary [class*="lucide-"]:hover,
+.btn-secondary [class*="lucide-"],
+.btn-secondary [class*="lucide-"]:hover,
+.btn-danger [class*="lucide-"],
+.btn-danger [class*="lucide-"]:hover,
+.btn-success [class*="lucide-"],
+.btn-success [class*="lucide-"]:hover {
+    color: inherit;
+}
+
 .btn.disabled,
 .btn:disabled {
     opacity: 0.5;

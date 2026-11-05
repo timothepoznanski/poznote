@@ -533,6 +533,27 @@
         return ['full', 'edit'].includes(getTaskAccessMode());
     }
 
+    // A refused tick is undone in place and said: reloading the page used to
+    // undo it silently, as if the box had unticked itself.
+    function showTaskUpdateRefused(status, data) {
+        const config = getPublicConfig();
+        const i18n = (config && config.i18n) || {};
+        const message = status === 423
+            ? (i18n.editLocked || 'Someone else is currently editing this note. Please try again later.')
+            : ((data && data.error) || i18n.saveFailed || 'Failed to save changes');
+        if (window.modalAlert && typeof window.modalAlert.alert === 'function') {
+            window.modalAlert.alert(message);
+        } else {
+            alert(message);
+        }
+    }
+
+    function readTaskUpdateResponse(response) {
+        return response.json()
+            .catch(() => ({}))
+            .then(data => ({ ok: response.ok && !!(data && data.success), status: response.status, data: data }));
+    }
+
     // Subtask of a tasklist task: ticked in place, it keeps its position
     function togglePublicSubtask(checkbox) {
         const config = getPublicConfig();
@@ -567,11 +588,12 @@
                 subtask: parseInt(checkbox.getAttribute('data-subtask-index'), 10)
             })
         })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error('Failed to update subtask', data.error);
+            .then(readTaskUpdateResponse)
+            .then(result => {
+                if (!result.ok) {
+                    console.error('Failed to update subtask', result.data && result.data.error);
                     revert();
+                    showTaskUpdateRefused(result.status, result.data);
                 }
             })
             .catch(err => {
@@ -621,28 +643,33 @@
             }
         }
 
+        const revert = function () {
+            checkbox.checked = !completed;
+            if (taskItem) {
+                taskItem.classList.toggle('completed', !completed);
+                if (revertPosition && revertPosition.parent) {
+                    revertPosition.parent.insertBefore(taskItem, revertPosition.next);
+                    renumberPublicTasks(revertPosition.parent);
+                }
+            }
+        };
+
         fetch(`${apiBaseUrl}/public/tasks/${idOrIndex}?${getApiAuthQuery(config)}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ completed: completed })
         })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error('Failed to update task', data.error);
-                    location.reload(); // Revert by reloading
+            .then(readTaskUpdateResponse)
+            .then(result => {
+                if (!result.ok) {
+                    console.error('Failed to update task', result.data && result.data.error);
+                    revert();
+                    showTaskUpdateRefused(result.status, result.data);
                 }
             })
             .catch(err => {
                 console.error('Network error', err);
-                checkbox.checked = !completed;
-                if (taskItem) {
-                    taskItem.classList.toggle('completed', !completed);
-                    if (revertPosition && revertPosition.parent) {
-                        revertPosition.parent.insertBefore(taskItem, revertPosition.next);
-                        renumberPublicTasks(revertPosition.parent);
-                    }
-                }
+                revert();
             });
     });
 
@@ -743,9 +770,47 @@
         errorEl.style.display = message ? 'block' : 'none';
     }
 
+    // Mobile: the overlay follows the visual viewport, the part of the screen
+    // above the virtual keyboard, so the modal (top-aligned there by
+    // public_note.css) stays in sight and a long task scrolls inside the
+    // textarea instead of under the keyboard.
+    function trackPublicTaskEditViewport(overlay, on) {
+        const vv = window.visualViewport;
+        if (!vv || !overlay) return;
+        if (!on) {
+            if (overlay._viewportSync) {
+                vv.removeEventListener('resize', overlay._viewportSync);
+                vv.removeEventListener('scroll', overlay._viewportSync);
+                overlay._viewportSync = null;
+            }
+            overlay.style.removeProperty('--public-vv-top');
+            overlay.style.removeProperty('--public-vv-height');
+            return;
+        }
+        if (overlay._viewportSync) return;
+        overlay._viewportSync = function () {
+            overlay.style.setProperty('--public-vv-top', vv.offsetTop + 'px');
+            overlay.style.setProperty('--public-vv-height', vv.height + 'px');
+        };
+        overlay._viewportSync();
+        vv.addEventListener('resize', overlay._viewportSync);
+        vv.addEventListener('scroll', overlay._viewportSync);
+    }
+
+    // Height of the whole task, so no scrollbar while it fits; the modal's
+    // column (public_note.css) caps it to the window or the space above the
+    // keyboard, and the textarea scrolls past that.
+    function autoSizePublicTaskEditTextarea(textarea) {
+        if (!textarea) return;
+        textarea.style.height = 'auto';
+        const borders = textarea.offsetHeight - textarea.clientHeight;
+        textarea.style.height = (textarea.scrollHeight + borders) + 'px';
+    }
+
     function closePublicTaskEditModal() {
         const overlay = document.getElementById('publicTaskEditOverlay');
         if (overlay) overlay.classList.remove('show');
+        trackPublicTaskEditViewport(overlay, false);
 
         const lastFocusedElement = publicTaskEditState.lastFocusedElement;
         publicTaskEditState = {
@@ -821,6 +886,7 @@
 
             textarea.addEventListener('input', function() {
                 setPublicTaskEditError('');
+                autoSizePublicTaskEditTextarea(textarea);
             });
         }
 
@@ -862,9 +928,14 @@
         setPublicTaskEditError('');
         textarea.value = originalText;
         overlay.classList.add('show');
+        trackPublicTaskEditViewport(overlay, true);
+        autoSizePublicTaskEditTextarea(textarea);
 
+        // Focused right away, inside the tap: a mobile browser opens the
+        // keyboard only for a focus made during the user's gesture (iOS)
+        textarea.focus();
         requestAnimationFrame(function() {
-            textarea.focus();
+            if (document.activeElement !== textarea) textarea.focus();
             const end = textarea.value.length;
             try {
                 textarea.setSelectionRange(end, end);

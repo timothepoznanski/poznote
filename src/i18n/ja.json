@@ -2755,6 +2755,7 @@
     },
     "actions": {
       "open": "開く",
+      "open_url": "URLを開く",
       "copy_url": "URLをコピー",
       "url_copied": "URLをコピーしました！",
       "revoke": "取り消す"

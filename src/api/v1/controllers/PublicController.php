@@ -118,7 +118,7 @@ class PublicController {
             return;
         }
 
-        if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(is_array($input) ? $input : null))) {
+        if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(is_array($input) ? $input : null), $type)) {
             return;
         }
 
@@ -175,7 +175,7 @@ class PublicController {
             $updatedContent = rtrim($content) . "\n" . $prefix . $this->normalizePublicTaskText((string)$input['text'], $type);
         }
 
-        if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(is_array($input) ? $input : null))) {
+        if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(is_array($input) ? $input : null), $type)) {
             return;
         }
 
@@ -211,7 +211,7 @@ class PublicController {
         if (is_array($tasks) && isset($tasks[$index])) {
             array_splice($tasks, $index, 1);
             $updatedContent = json_encode($tasks, JSON_UNESCAPED_UNICODE);
-            if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(null))) {
+            if (!$this->currentRequestMayWriteNote($noteId, $this->getEditorSessionId(null), 'tasklist')) {
                 return;
             }
             $this->saveNote($noteId, 'tasklist', $updatedContent);
@@ -403,8 +403,14 @@ class PublicController {
     /**
      * True when no other editor holds the note's edit lock. On conflict the
      * 423 error response is sent here.
+     *
+     * A task list is not blocked by an app tab: the app keeps the lock for 15
+     * seconds after each change, and ticking a task there would make every
+     * public tick fail meanwhile. That tab is not typing over the tasks: its
+     * own saves carry the content version (409 on a stale copy) and the live
+     * refresh brings the public change in.
      */
-    private function currentRequestMayWriteNote(int $noteId, string $editorSessionId): bool {
+    private function currentRequestMayWriteNote(int $noteId, string $editorSessionId, string $type = ''): bool {
         $ownerId = $this->getShareOwnerUserId();
         if ($ownerId <= 0) {
             return true;
@@ -412,6 +418,10 @@ class PublicController {
 
         $lock = getNoteEditLock($ownerId, $noteId);
         if (!$lock) {
+            return true;
+        }
+
+        if ($type === 'tasklist' && ($lock['holder_kind'] ?? 'user') !== 'public') {
             return true;
         }
 

@@ -2755,6 +2755,7 @@
     },
     "actions": {
       "open": "Открыть",
+      "open_url": "Открыть URL",
       "copy_url": "Копировать URL",
       "url_copied": "URL скопирован!",
       "revoke": "Отозвать"

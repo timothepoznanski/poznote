@@ -2755,6 +2755,7 @@
     },
     "actions": {
       "open": "열기",
+      "open_url": "URL 열기",
       "copy_url": "URL 복사",
       "url_copied": "URL이 복사되었습니다!",
       "revoke": "철회"

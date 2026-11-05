@@ -3156,6 +3156,7 @@
     },
     "actions": {
       "open": "打开",
+      "open_url": "打开链接",
       "copy_url": "复制链接",
       "url_copied": "链接已复制！",
       "revoke": "撤销"

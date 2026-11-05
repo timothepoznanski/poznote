@@ -5,7 +5,17 @@
     // Waits before each new attempt when the lock request gets no answer
     var ACQUIRE_RETRY_DELAYS_MS = [500, 2000];
     var SESSION_STORAGE_KEY = 'poznote_editor_session_id';
+    // The lock is taken on the first change, not when the note is opened: a
+    // note someone only reads stays editable for everyone else. It is given
+    // back after this long without a change (and nothing left to save), and
+    // taken again by the next change.
+    var IDLE_RELEASE_MS = 15000;
     var activeNoteId = null;
+    // Note whose lock this tab holds, and the one being asked for
+    var holdingNoteId = null;
+    var acquiringNoteId = null;
+    var lastEditAt = 0;
+    var idleReleaseTimer = null;
     var heartbeatTimer = null;
     var statusCheckTimer = null;
     var acquireRequestId = 0;
@@ -316,7 +326,7 @@
     }
 
     function getLockConflictMessage(lock, fallbackMessage, reason) {
-        if (reason === 'acquire') {
+        if (reason === 'acquire' || reason === 'edit') {
             return lock ? getLockBannerMessage(lock) : fallbackMessage;
         }
 
@@ -424,7 +434,7 @@
             if (button) {
                 button.disabled = true;
             }
-            // Same guards as acquireLock(): a status check still in flight
+            // Same guards as openNoteLock(): a status check still in flight
             // would otherwise answer with the old holder and lock the note
             // again right after it was taken over.
             stopHeartbeat();
@@ -451,6 +461,8 @@
                     editable: true,
                     lock: result.data.lock || null
                 };
+                holdingNoteId = noteId;
+                noteEdited();
                 clearNoteLockedState(noteId);
                 startHeartbeat(noteId);
                 startStatusChecks(noteId);
@@ -694,12 +706,17 @@
         stopStatusChecks();
         var released = releaseLock(noteId);
         activeNoteId = null;
+        holdingNoteId = null;
+        acquiringNoteId = null;
         delete noteStates[noteId];
         return released;
     }
 
     function handleLockConflict(noteId, lock, message, reason) {
         stopHeartbeat();
+        if (normalizeNoteId(holdingNoteId) === normalizeNoteId(noteId)) {
+            holdingNoteId = null;
+        }
         setNoteLockedState(noteId, lock || null);
         if (normalizeNoteId(activeNoteId) === normalizeNoteId(noteId)) {
             startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
@@ -740,39 +757,107 @@
             }
 
             var lock = result.data.lock || null;
+            var lockedHere = !!(noteStates[noteId] && noteStates[noteId].editable === false);
             if (isLockHeldByDifferentUser(lock)) {
-                if (noteStates[noteId] && noteStates[noteId].editable === false) {
+                if (lockedHere) {
                     setNoteLockedState(noteId, lock);
-                } else {
+                } else if (holdingNoteId === noteId || hasUnsavedEdits(noteId)) {
+                    // Taken over while this tab was editing
                     handleLockConflict(noteId, lock, 'This note is currently locked for editing.', 'lost');
+                } else {
+                    // Someone started editing a note only read here: the
+                    // banner says so, no popup
+                    handleLockConflict(noteId, lock, 'This note is currently locked for editing.', 'acquire');
                 }
                 return;
             }
 
-            if (lock && lock.holder_is_current_user && noteStates[noteId] && noteStates[noteId].editable === false) {
+            if (lock && lock.holder_is_current_editor_session) {
+                if (holdingNoteId !== noteId) {
+                    holdingNoteId = noteId;
+                    noteEdited();
+                    startHeartbeat(noteId);
+                }
+                if (lockedHere) {
+                    clearNoteLockedState(noteId);
+                    startStatusChecks(noteId);
+                }
+                return;
+            }
+
+            if (holdingNoteId === noteId) {
+                // The lock this tab held has expired on the server
+                holdingNoteId = null;
+                stopHeartbeat();
+            }
+
+            // Free, or held by this user in another tab: editable here, the
+            // lock is taken by the next change
+            if (lockedHere) {
                 clearNoteLockedState(noteId);
-                startHeartbeat(noteId);
                 startStatusChecks(noteId);
-                return;
-            }
-
-            if (!lock && noteStates[noteId] && noteStates[noteId].editable === false) {
-                acquireLock(noteId);
-                return;
-            }
-
-            if (lock && lock.holder_is_current_editor_session && noteStates[noteId] && noteStates[noteId].editable === false) {
-                clearNoteLockedState(noteId);
-                startHeartbeat(noteId);
             }
         }).catch(function () {
             return null;
         });
     }
 
+    // Its own timer, not the 20 s heartbeat: the lock goes back
+    // IDLE_RELEASE_MS after the last change, not up to a heartbeat later.
+    function noteEdited() {
+        lastEditAt = Date.now();
+        armIdleRelease(IDLE_RELEASE_MS);
+    }
+
+    function armIdleRelease(delay) {
+        if (idleReleaseTimer) {
+            window.clearTimeout(idleReleaseTimer);
+        }
+        idleReleaseTimer = window.setTimeout(releaseIfIdle, delay);
+    }
+
+    function releaseIfIdle() {
+        idleReleaseTimer = null;
+        var noteId = normalizeNoteId(activeNoteId);
+        if (!noteId || holdingNoteId !== noteId) {
+            return;
+        }
+        var idleFor = Date.now() - lastEditAt;
+        if (idleFor < IDLE_RELEASE_MS) {
+            armIdleRelease(IDLE_RELEASE_MS - idleFor);
+            return;
+        }
+        // The autosave has not gone through yet: looked at again shortly
+        if (hasUnsavedEdits(noteId)) {
+            armIdleRelease(2000);
+            return;
+        }
+        holdingNoteId = null;
+        stopHeartbeat();
+        releaseLock(noteId);
+    }
+
+    function hasUnsavedEdits(noteId) {
+        return typeof window.hasUnsavedChanges === 'function' && !!window.hasUnsavedChanges(noteId);
+    }
+
     function refreshLock(noteId) {
         noteId = normalizeNoteId(noteId);
         if (!noteId || String(activeNoteId) !== noteId || isReadOnlyShare()) {
+            return;
+        }
+
+        if (holdingNoteId !== noteId) {
+            stopHeartbeat();
+            return;
+        }
+
+        // Nothing changed here for a while: the note is only being read, the
+        // lock goes back so that others can edit it
+        if (Date.now() - lastEditAt >= IDLE_RELEASE_MS && !hasUnsavedEdits(noteId)) {
+            holdingNoteId = null;
+            stopHeartbeat();
+            releaseLock(noteId);
             return;
         }
 
@@ -801,7 +886,7 @@
         });
     }
 
-    function acquireLock(noteId) {
+    function openNoteLock(noteId) {
         noteId = normalizeNoteId(noteId);
         if (!noteId) {
             return;
@@ -816,30 +901,50 @@
         stopHeartbeat();
         stopStatusChecks();
         activeNoteId = noteId;
+        holdingNoteId = null;
+        acquiringNoteId = null;
         acquireRequestId += 1;
         if (isReadOnlyShare()) {
             setNoteLockedState(noteId, null);
             return;
         }
         setNoteCheckingState(noteId);
-        sendAcquireRequest(noteId, acquireRequestId, 0);
+        sendOpenStatusRequest(noteId, acquireRequestId, 0);
     }
 
-    function sendAcquireRequest(noteId, requestId, attempt) {
-        postJson('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
-            editor_session_id: getEditorSessionId()
+    // Opening a note only looks at the lock: read-only when someone else is
+    // editing it, editable otherwise, without taking it.
+    function sendOpenStatusRequest(noteId, requestId, attempt) {
+        fetch('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-Editor-Session-ID': getEditorSessionId()
+            },
+            credentials: 'same-origin'
         }).then(parseResponse).then(function (result) {
             if (requestId !== acquireRequestId || String(activeNoteId) !== noteId) {
                 return;
             }
 
             if (result.ok && result.data && result.data.success) {
+                var lock = result.data.lock || null;
+                if (isLockHeldByDifferentUser(lock)) {
+                    handleLockConflict(noteId, lock, 'This note is currently locked for editing.', 'acquire');
+                    return;
+                }
                 noteStates[noteId] = {
                     editable: true,
-                    lock: result.data.lock || null
+                    lock: lock
                 };
+                // Still held by this tab (page reloaded): kept until idle
+                if (lock && lock.holder_is_current_editor_session) {
+                    holdingNoteId = noteId;
+                    noteEdited();
+                    startHeartbeat(noteId);
+                }
                 clearNoteLockedState(noteId);
-                startHeartbeat(noteId);
                 startStatusChecks(noteId);
                 return;
             }
@@ -868,7 +973,7 @@
             if (attempt < ACQUIRE_RETRY_DELAYS_MS.length) {
                 window.setTimeout(function () {
                     if (requestId === acquireRequestId && String(activeNoteId) === noteId) {
-                        sendAcquireRequest(noteId, requestId, attempt + 1);
+                        sendOpenStatusRequest(noteId, requestId, attempt + 1);
                     }
                 }, ACQUIRE_RETRY_DELAYS_MS[attempt]);
                 return;
@@ -879,6 +984,61 @@
             }
             setNoteLockUnavailableState(noteId);
             startStatusChecks(noteId, LOCKED_STATUS_CHECK_INTERVAL_MS);
+        });
+    }
+
+    /**
+     * A change of the open note is being saved (saveNoteToServer, js/notes.js):
+     * the lock is taken now if this tab does not hold it yet. Refused because
+     * someone else started editing first, the note turns read-only and the
+     * change stays in the local draft.
+     */
+    function noteEditActivity(noteId) {
+        noteId = normalizeNoteId(noteId) || normalizeNoteId(activeNoteId);
+        if (!noteId || String(activeNoteId) !== noteId || isReadOnlyShare()) {
+            return;
+        }
+        noteEdited();
+        if (holdingNoteId === noteId || acquiringNoteId === noteId) {
+            return;
+        }
+        if (!noteStates[noteId] || noteStates[noteId].editable === false) {
+            return;
+        }
+
+        acquiringNoteId = noteId;
+        var requestId = acquireRequestId;
+        postJson('/api/v1/notes/' + encodeURIComponent(noteId) + '/lock', {
+            editor_session_id: getEditorSessionId()
+        }).then(parseResponse).then(function (result) {
+            if (acquiringNoteId === noteId) {
+                acquiringNoteId = null;
+            }
+            if (requestId !== acquireRequestId || String(activeNoteId) !== noteId) {
+                return;
+            }
+
+            if (result.ok && result.data && result.data.success) {
+                holdingNoteId = noteId;
+                noteEdited();
+                noteStates[noteId] = {
+                    editable: true,
+                    lock: result.data.lock || null
+                };
+                startHeartbeat(noteId);
+                return;
+            }
+
+            var responseLock = result.data ? (result.data.lock || null) : null;
+            if ((result.status === 423 || responseLock) && isLockHeldByDifferentUser(responseLock)) {
+                handleLockConflict(noteId, responseLock, (result.data && result.data.error) || 'This note is currently locked for editing.', 'edit');
+            }
+            // Any other failure: the save takes the lock itself when the
+            // note is free (NotesController), or answers 423.
+        }).catch(function () {
+            if (acquiringNoteId === noteId) {
+                acquiringNoteId = null;
+            }
         });
     }
 
@@ -893,7 +1053,7 @@
         }
 
         ensureStyles();
-        acquireLock(noteId);
+        openNoteLock(noteId);
     }
 
     window.getCurrentEditorSessionId = getEditorSessionId;
@@ -913,6 +1073,7 @@
         handleLockConflict(noteId, lock, message, reason || 'lost');
     };
     window.releaseCurrentNoteEditLock = releaseCurrentLock;
+    window.noteEditLockActivity = noteEditActivity;
     window.acquireNoteEditLockForCurrentNote = handleCurrentNoteLoaded;
 
     function initializeCurrentNoteLock() {
@@ -925,6 +1086,21 @@
     } else {
         initializeCurrentNoteLock();
     }
+
+    // Typing in the open note takes the lock at once, without waiting for
+    // the autosave a few seconds later: someone else could take it meanwhile.
+    // An input event is a real change, a caret move (keyup) is not.
+    document.addEventListener('input', function (event) {
+        var target = event.target;
+        var noteId = normalizeNoteId(activeNoteId);
+        if (!noteId || !target || !target.closest) {
+            return;
+        }
+        if (!target.closest('#note' + noteId) || target.closest('.search-replace-bar')) {
+            return;
+        }
+        noteEditActivity(noteId);
+    }, true);
 
     document.addEventListener('noteLoaded', function (event) {
         var detail = event && event.detail ? event.detail : {};

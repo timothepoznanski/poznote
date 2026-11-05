@@ -233,6 +233,13 @@ function saveNoteToServer(options) {
         return;
     }
 
+    // A real change is about to be saved: the edit lock is taken now, and
+    // kept while changes keep coming (js/note-edit-lock.js). Not on
+    // markNoteAsModified, which also runs on a caret move (keyup).
+    if (typeof window.noteEditLockActivity === 'function') {
+        window.noteEditLockActivity(noteid);
+    }
+
     // Get note elements of the note
     var elements = getNoteElements(noteid);
     var titleInput = elements.title;

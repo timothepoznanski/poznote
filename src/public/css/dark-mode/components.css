@@ -294,7 +294,13 @@ html[data-theme='dark'] .btn-primary:hover {
    dark-mode/icons.css paints every glyph with the icon grey, which all but
    disappears on a light accent fill (Catppuccin). */
 html[data-theme='dark'] .btn-primary [class*="lucide-"],
-html[data-theme='dark'] .btn-primary [class*="lucide-"]:hover {
+html[data-theme='dark'] .btn-primary [class*="lucide-"]:hover,
+html[data-theme='dark'] .btn-secondary [class*="lucide-"],
+html[data-theme='dark'] .btn-secondary [class*="lucide-"]:hover,
+html[data-theme='dark'] .btn-danger [class*="lucide-"],
+html[data-theme='dark'] .btn-danger [class*="lucide-"]:hover,
+html[data-theme='dark'] .btn-success [class*="lucide-"],
+html[data-theme='dark'] .btn-success [class*="lucide-"]:hover {
     color: inherit;
 }
 
