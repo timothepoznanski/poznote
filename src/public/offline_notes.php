@@ -74,7 +74,34 @@ $currentLang = getUserLanguage();
 		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-wifi-off"></i> <?php echo t_h('offline.page.title', [], 'Offline'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
 		<div class="shared-filter-bar initially-hidden" id="sharedFilterBar">
-			<div class="filter-type-buttons">
+			<?php // The filter folds behind a magnifier, first on the row of buttons (js/search-toggle.js) ?>
+			<div class="filter-type-buttons pz-search-row">
+				<?php echo poznoteRenderSearchToggle('offlineFilterWrapper', t('offline.page.filter_placeholder', [], 'Filter by name or folder...')); ?>
+				<div class="filter-input-wrapper pz-search-collapsible is-search-collapsed" id="offlineFilterWrapper">
+					<input
+						type="text"
+						id="filterInput"
+						class="filter-input"
+						placeholder="<?php echo t_h('offline.page.filter_placeholder', [], 'Filter by name or folder...'); ?>"
+					/>
+					<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
+						<i class="lucide lucide-x"></i>
+					</button>
+				</div>
+				<?php // Right of the magnifier: its chevron alone, its label in the tooltip; always there, greyed out while there is nothing to fold (js/offline-list.js) ?>
+				<div class="shared-filter-tree-actions" id="sharedTreeToolbar">
+					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary" disabled title="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>" aria-label="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>">
+						<i class="lucide lucide-chevron-down"></i>
+					</button>
+				</div>
+				<?php // Right of the chevron. Reasons no note has are hidden by js/offline-list.js, which also puts the day count in the recent one ?>
+				<select id="reasonFilter" class="offline-reason-select initially-hidden" aria-label="<?php echo t_h('offline.page.filter_reason', [], 'Filter by reason'); ?>">
+					<option value=""><?php echo t_h('offline.page.reason_all', [], 'All reasons'); ?></option>
+					<option value="note"><?php echo t_h('offline.page.reason_note', [], 'Kept offline'); ?></option>
+					<option value="folder"><?php echo t_h('offline.page.reason_folder', [], 'In a folder kept offline'); ?></option>
+					<option value="favorite"><?php echo t_h('offline.page.reason_favorite', [], 'Favorite'); ?></option>
+					<option value="recent"></option>
+				</select>
 				<button class="filter-type-btn active" data-filter="all">
 					<i class="lucide lucide-layers"></i>
 					<?php echo t_h('public.filter_all', [], 'All'); ?>
@@ -87,34 +114,8 @@ $currentLang = getUserLanguage();
 					<i class="lucide lucide-folder"></i>
 					<?php echo t_h('public.filter_folders', [], 'Folders'); ?>
 				</button>
-			</div>
-			<div class="filter-search-row">
-				<div class="filter-input-wrapper">
-					<input
-						type="text"
-						id="filterInput"
-						class="filter-input"
-						placeholder="<?php echo t_h('offline.page.filter_placeholder', [], 'Filter by name or folder...'); ?>"
-					/>
-					<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-						<i class="lucide lucide-x"></i>
-					</button>
-				</div>
-				<?php // Reasons no note has are hidden by js/offline-list.js, which also puts the day count in the recent one ?>
-				<select id="reasonFilter" class="offline-reason-select initially-hidden" aria-label="<?php echo t_h('offline.page.filter_reason', [], 'Filter by reason'); ?>">
-					<option value=""><?php echo t_h('offline.page.reason_all', [], 'All reasons'); ?></option>
-					<option value="note"><?php echo t_h('offline.page.reason_note', [], 'Kept offline'); ?></option>
-					<option value="folder"><?php echo t_h('offline.page.reason_folder', [], 'In a folder kept offline'); ?></option>
-					<option value="favorite"><?php echo t_h('offline.page.reason_favorite', [], 'Favorite'); ?></option>
-					<option value="recent"></option>
-				</select>
+				<?php // The count of the list, at the end of the row (js/offline-list.js) ?>
 				<div id="filterStats" class="filter-stats initially-hidden"></div>
-				<div class="shared-filter-tree-actions initially-hidden" id="sharedTreeToolbar">
-					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary">
-						<i class="lucide lucide-chevron-down" style="margin-right: 6px;"></i>
-						<span id="toggleAllFoldersLabel"><?php echo t_h('public.expand_all', [], 'Expand all'); ?></span>
-					</button>
-				</div>
 			</div>
 		</div>
 
@@ -140,5 +141,6 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/offline-store.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
 	<script src="<?php echo poznoteAsset('js/offline-list.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 </body>
 </html>

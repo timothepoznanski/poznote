@@ -4769,6 +4769,7 @@
     "new_name_placeholder": "Название дневника",
     "new_create_error": "Не удалось создать дневник.",
     "journal_view": "Лента записей",
+    "board_view": "Вид карточек",
     "journal_edit": "Редактировать здесь",
     "journal_edit_done": "Завершить редактирование",
     "journal_edit_placeholder": "Пишите здесь...",

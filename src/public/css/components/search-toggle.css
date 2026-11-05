@@ -1,0 +1,65 @@
+/* Folded search field (js/search-toggle.js), as on graph.php: a magnifier
+   button first on the row of buttons, replaced by the field while it is open.
+   Loaded after each page's own stylesheet (css_assets.php), so the open and
+   folded states win over the page's sizing of the field. */
+
+/* The button. :where() keeps it at no weight: a page can give it the class
+   of its other icon buttons and their look wins. Its size follows the row's
+   controls through --pz-search-toggle-size, set on the row by the page. */
+:where(.pz-search-toggle) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: var(--pz-search-toggle-size, 36px);
+    height: var(--pz-search-toggle-size, 36px);
+    padding: 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-icon, var(--pz-text-muted));
+    cursor: pointer;
+}
+
+:where(.pz-search-toggle):hover,
+:where(.pz-search-toggle):focus-visible {
+    border-color: var(--pz-accent-text);
+    color: var(--pz-accent-text);
+}
+
+:where(.pz-search-toggle) .lucide {
+    width: 18px;
+    height: 18px;
+    color: inherit;
+}
+
+/* Open: the button gives its place to the field */
+.pz-search-toggle.is-search-open {
+    display: none;
+}
+
+.pz-search-collapsible.is-search-collapsed {
+    display: none;
+}
+
+/* The open field has one width on every page, the graph's */
+.pz-search-row > .pz-search-collapsible:not(.is-search-collapsed) {
+    flex: 0 1 340px;
+    width: auto;
+    min-width: 180px;
+    max-width: 100%;
+    margin: 0;
+}
+
+/* Phone: the open field takes its row, the buttons after it go below */
+@media (max-width: 800px) {
+    .pz-search-row.has-open-search {
+        flex-wrap: wrap;
+    }
+
+    .pz-search-row.has-open-search > .pz-search-collapsible:not(.is-search-collapsed) {
+        flex: 0 0 100%;
+        min-width: 0;
+    }
+}

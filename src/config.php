@@ -5,6 +5,7 @@ require_once __DIR__ . '/css_assets.php';
 require_once __DIR__ . '/theme_catalog.php';
 require_once __DIR__ . '/font_catalog.php';
 require_once __DIR__ . '/lib/color-palette.php';
+require_once __DIR__ . '/lib/search-toggle.php';
 
 // ============================================================
 // HELPER: Read environment variable safely

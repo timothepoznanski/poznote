@@ -34,9 +34,6 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-network"></i> <?php echo t_h('home.graph', [], 'Graph'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($workspace); ?></h1>
 
 			<div class="graph-toolbar">
-				<button type="button" id="graphViewToggle" class="graph-reset-btn graph-icon-btn initially-hidden" data-txt-view="<?php echo t_h('graph.view_toggle', [], 'View'); ?>" data-txt-network="<?php echo t_h('graph.view_network', [], 'Network'); ?>" data-txt-tree="<?php echo t_h('graph.view_tree', [], 'Tree'); ?>">
-					<i class="lucide lucide-share-2"></i>
-				</button>
 				<button type="button" id="graphSearchBtn" class="graph-reset-btn graph-icon-btn" aria-expanded="false" aria-controls="graphSearchWrapper" aria-label="<?php echo t_h('graph.search.placeholder', [], 'Find a note or a tag...'); ?>" title="<?php echo t_h('graph.search.placeholder', [], 'Find a note or a tag...'); ?>">
 					<i class="lucide lucide-search"></i>
 				</button>
@@ -52,6 +49,9 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 						<i class="lucide lucide-x"></i>
 					</button>
 				</div>
+				<button type="button" id="graphViewToggle" class="graph-reset-btn graph-icon-btn initially-hidden" data-txt-view="<?php echo t_h('graph.view_toggle', [], 'View'); ?>" data-txt-network="<?php echo t_h('graph.view_network', [], 'Network'); ?>" data-txt-tree="<?php echo t_h('graph.view_tree', [], 'Tree'); ?>">
+					<i class="lucide lucide-share-2"></i>
+				</button>
 				<button type="button" id="graphFolderFilterBtn" class="graph-reset-btn graph-icon-btn graph-folder-btn initially-hidden" aria-haspopup="dialog" data-txt-all="<?php echo t_h('graph.folder_filter_all', [], 'All folders'); ?>" aria-label="<?php echo t_h('graph.folder_filter_hint', [], 'Show only the notes of one folder'); ?>" title="<?php echo t_h('graph.folder_filter_hint', [], 'Show only the notes of one folder'); ?>">
 					<i class="lucide lucide-folder"></i>
 				</button>

@@ -5207,6 +5207,7 @@
     "new_name_placeholder": "日记名称",
     "new_create_error": "无法创建日记。",
     "journal_view": "连续阅读视图",
+    "board_view": "卡片视图",
     "journal_edit": "在此编辑",
     "journal_edit_done": "完成编辑",
     "journal_edit_placeholder": "在此书写...",

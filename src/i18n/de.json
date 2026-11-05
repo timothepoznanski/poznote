@@ -5110,6 +5110,7 @@
     "new_name_placeholder": "Name des Tagebuchs",
     "new_create_error": "Das Tagebuch konnte nicht erstellt werden.",
     "journal_view": "Journalansicht",
+    "board_view": "Kartenansicht",
     "journal_edit": "Hier bearbeiten",
     "journal_edit_done": "Bearbeitung beenden",
     "journal_edit_placeholder": "Hier schreiben...",

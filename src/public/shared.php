@@ -164,26 +164,11 @@ usort($shared_folders, function($a, $b) {
 
 		
 		<div class="shared-filter-bar initially-hidden" id="sharedFilterBar">
-			<div class="filter-type-buttons">
-				<button class="filter-type-btn active" data-filter="all">
-					<i class="lucide lucide-layers"></i>
-					<?php echo t_h('public.filter_all', [], 'All'); ?>
-				</button>
-				<button class="filter-type-btn" data-filter="notes">
-					<i class="lucide lucide-sticky-note"></i>
-					<?php echo t_h('public.filter_notes', [], 'Notes'); ?>
-				</button>
-			<button class="filter-type-btn" data-filter="folders">
-					<i class="lucide lucide-folder"></i>
-					<?php echo t_h('public.filter_folders', [], 'Folders'); ?>
-				</button>
-				<button class="filter-type-btn" data-filter="shared_with_me">
-					<i class="lucide lucide-users"></i>
-					<?php echo t_h('public.shared_with_me', [], 'Shared with me'); ?>
-				</button>
-			</div>
-			<div class="filter-search-row">
-				<div class="filter-input-wrapper">
+			<?php // As on offline_notes.php: the magnifier of the filter (js/search-toggle.js), the
+			// sort, the expand/collapse chevron, the type buttons, then the count ?>
+			<div class="filter-type-buttons pz-search-row">
+				<?php echo poznoteRenderSearchToggle('sharedFilterWrapper', t('public.filter_placeholder', [], 'Filter by name or token...')); ?>
+				<div class="filter-input-wrapper pz-search-collapsible is-search-collapsed" id="sharedFilterWrapper">
 					<input 
 						type="text" 
 						id="filterInput" 
@@ -194,18 +179,36 @@ usort($shared_folders, function($a, $b) {
 						<i class="lucide lucide-x"></i>
 					</button>
 				</div>
-				<div id="filterStats" class="filter-stats initially-hidden"></div>
+				<?php // Right of the magnifier ?>
 				<select id="sharedSortSelect" class="shared-sort-select" aria-label="<?php echo t_h('public.sort_label', [], 'Sort shares'); ?>">
 					<option value="name"><?php echo t_h('public.sort_name', [], 'Sort by name'); ?></option>
 					<option value="updated"><?php echo t_h('public.sort_updated', [], 'Sort by last edit'); ?></option>
 					<option value="shared"><?php echo t_h('public.sort_shared', [], 'Sort by share date'); ?></option>
 				</select>
+				<?php // Its chevron alone, its label in the tooltip (js/shared-page.js) ?>
 				<div class="shared-filter-tree-actions initially-hidden" id="sharedTreeToolbar">
-					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary">
-						<i class="lucide lucide-chevron-down" style="margin-right: 6px;"></i>
-						<span id="toggleAllFoldersLabel"><?php echo t_h('public.expand_all', [], 'Expand all'); ?></span>
+					<button type="button" id="toggleAllFoldersBtn" class="btn btn-secondary" title="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>" aria-label="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>">
+						<i class="lucide lucide-chevron-down"></i>
 					</button>
 				</div>
+				<button class="filter-type-btn active" data-filter="all">
+					<i class="lucide lucide-layers"></i>
+					<?php echo t_h('public.filter_all', [], 'All'); ?>
+				</button>
+				<button class="filter-type-btn" data-filter="notes">
+					<i class="lucide lucide-sticky-note"></i>
+					<?php echo t_h('public.filter_notes', [], 'Notes'); ?>
+				</button>
+				<button class="filter-type-btn" data-filter="folders">
+					<i class="lucide lucide-folder"></i>
+					<?php echo t_h('public.filter_folders', [], 'Folders'); ?>
+				</button>
+				<button class="filter-type-btn" data-filter="shared_with_me">
+					<i class="lucide lucide-users"></i>
+					<?php echo t_h('public.shared_with_me', [], 'Shared with me'); ?>
+				</button>
+				<?php // The count of the list, at the end of the row (js/shared-page.js) ?>
+				<div id="filterStats" class="filter-stats initially-hidden"></div>
 			</div>
 		</div>
 		
@@ -227,5 +230,6 @@ usort($shared_folders, function($a, $b) {
 	<script src="<?php echo poznoteAsset('js/pwa-helpers.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/share-settings-modal.js'); ?>"></script>
 	<script src="js/shared-page.js?v=<?php echo @filemtime('js/shared-page.js') ?: time(); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 </body>
 </html>

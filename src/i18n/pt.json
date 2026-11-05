@@ -5111,6 +5111,7 @@
     "new_name_placeholder": "Nome do diário",
     "new_create_error": "Não foi possível criar o diário.",
     "journal_view": "Vista contínua",
+    "board_view": "Vista de cartões",
     "journal_edit": "Editar aqui",
     "journal_edit_done": "Concluir a edição",
     "journal_edit_placeholder": "Escreva aqui...",

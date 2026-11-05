@@ -133,6 +133,9 @@
         toggleAllBtn.setAttribute('aria-expanded', expand ? 'false' : 'true');
         const label = document.getElementById('toggleAllFoldersLabel');
         if (label) label.textContent = expand ? txt.expandAll : txt.collapseAll;
+        // The button shows its chevron alone: the label goes to its tooltip
+        toggleAllBtn.title = expand ? txt.expandAll : txt.collapseAll;
+        toggleAllBtn.setAttribute('aria-label', toggleAllBtn.title);
         const icon = toggleAllBtn.querySelector('.lucide');
         if (icon) {
             icon.classList.toggle('lucide-chevron-down', expand);

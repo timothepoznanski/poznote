@@ -45,6 +45,7 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
       data-txt-hide-list="<?php echo t_h('tasks_page.hide_list', [], 'Hide from this page'); ?>"
       data-txt-unhide-list="<?php echo t_h('tasks_page.unhide_list', [], 'Show on this page again'); ?>"
       data-txt-show-hidden="<?php echo t_h('tasks_page.show_hidden', [], 'Show hidden lists'); ?>"
+      data-txt-show-note-checklists="<?php echo t_h('tasks_page.show_note_checklists', [], 'Display tasks in notes'); ?>"
       data-txt-collapse="<?php echo t_h('tasks_page.collapse', [], 'Collapse'); ?>"
       data-txt-expand="<?php echo t_h('tasks_page.expand', [], 'Expand'); ?>"
       data-txt-collapse-all="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>"
@@ -67,19 +68,22 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 			<div class="tasks-progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="tasksProgressBar">
 				<div class="tasks-progress-fill" id="tasksProgressFill"></div>
 			</div>
-			<?php // What each option does, in a bubble on hover like the help icons of the settings cards ?>
-			<label class="tasks-progress-option" for="tasksShowNoteChecklists" data-tooltip="<?php echo t_h('tasks_page.show_note_checklists_help', [], 'Also list the checkboxes written inside ordinary notes, next to the tasks of your task lists. Their group carries a Note badge.'); ?>">
-				<input type="checkbox" id="tasksShowNoteChecklists" checked>
-				<span><?php echo t_h('tasks_page.show_note_checklists', [], 'Display tasks in notes'); ?></span>
-			</label>
-			<?php // Greyed out until a group is hidden; the label then gets their count (js/tasks-page.js) ?>
-			<label class="tasks-progress-option disabled" id="tasksShowHiddenOption" for="tasksShowHidden" data-tooltip="<?php echo t_h('tasks_page.show_hidden_help', [], 'A list hidden with the eye of its header leaves this page, the calendar and the counts. Tick this to show hidden lists again, dimmed, with an eye to bring each one back. Greyed out while no list is hidden.'); ?>">
-				<input type="checkbox" id="tasksShowHidden" disabled>
-				<span id="tasksShowHiddenLabel"><?php echo t_h('tasks_page.show_hidden', [], 'Show hidden lists'); ?></span>
-			</label>
 		</div>
 
-		<div class="tasks-filter-bar">
+		<?php // The filter folds behind a magnifier, first on the row (js/search-toggle.js) ?>
+		<div class="tasks-filter-bar pz-search-row">
+			<?php echo poznoteRenderSearchToggle('tasksFilterWrapper', t('tasks_page.filter_placeholder', [], 'Filter by task, title or folder name...'), 'tasks-filter-btn'); ?>
+			<div class="filter-input-wrapper pz-search-collapsible is-search-collapsed" id="tasksFilterWrapper">
+				<input
+					type="text"
+					id="filterInput"
+					class="filter-input"
+					placeholder="<?php echo t_h('tasks_page.filter_placeholder', [], 'Filter by task, title or folder name...'); ?>"
+				/>
+				<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
+					<i class="lucide lucide-x"></i>
+				</button>
+			</div>
 			<div class="tasks-view-toggle" id="tasksViewToggle" role="group">
 				<button type="button" class="tasks-view-btn active" data-view="list" title="<?php echo t_h('tasks_page.view_list', [], 'List view'); ?>">
 					<i class="lucide lucide-layout-list"></i>
@@ -108,26 +112,22 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 					</div>
 				</div>
 			</div>
-			<?php // Filter input + collapse/expand toggle: one row, desktop and mobile ?>
-			<div class="tasks-filter-search">
-				<div class="filter-input-wrapper">
-					<input
-						type="text"
-						id="filterInput"
-						class="filter-input"
-						placeholder="<?php echo t_h('tasks_page.filter_placeholder', [], 'Filter by task, title or folder name...'); ?>"
-					/>
-					<button id="clearFilterBtn" class="clear-filter-btn initially-hidden">
-						<i class="lucide lucide-x"></i>
-					</button>
-				</div>
-				<div class="tasks-collapse-actions">
-					<button type="button" id="toggleAllNotesBtn" class="tasks-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
-						<i class="lucide lucide-chevron-up"></i>
-						<span id="toggleAllNotesLabel"><?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?></span>
-					</button>
-				</div>
+			<?php // Collapse/expand toggle, right of the filter button: its chevron alone, its label in the tooltip (js/tasks-page.js) ?>
+			<div class="tasks-collapse-actions">
+				<button type="button" id="toggleAllNotesBtn" class="tasks-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
+					<i class="lucide lucide-chevron-up"></i>
+				</button>
 			</div>
+			<?php // Right of the collapse toggle; what each option does, in a bubble on hover like the help icons of the settings cards ?>
+			<label class="tasks-progress-option" for="tasksShowNoteChecklists" data-tooltip="<?php echo t_h('tasks_page.show_note_checklists_help', [], 'Also list the checkboxes written inside ordinary notes, next to the tasks of your task lists. Their group carries a Note badge.'); ?>">
+				<input type="checkbox" id="tasksShowNoteChecklists" checked>
+				<span id="tasksShowNoteChecklistsLabel"><?php echo t_h('tasks_page.show_note_checklists', [], 'Display tasks in notes'); ?></span>
+			</label>
+			<?php // Greyed out until a group is hidden; the label then gets their count (js/tasks-page.js) ?>
+			<label class="tasks-progress-option disabled" id="tasksShowHiddenOption" for="tasksShowHidden" data-tooltip="<?php echo t_h('tasks_page.show_hidden_help', [], 'A list hidden with the eye of its header leaves this page, the calendar and the counts. Tick this to show hidden lists again, dimmed, with an eye to bring each one back. Greyed out while no list is hidden.'); ?>">
+				<input type="checkbox" id="tasksShowHidden" disabled>
+				<span id="tasksShowHiddenLabel"><?php echo t_h('tasks_page.show_hidden', [], 'Show hidden lists'); ?></span>
+			</label>
 		</div>
 
 		<div class="tasks-content">
@@ -179,5 +179,6 @@ $cache_v = urlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="<?php echo poznoteAsset('js/reminder-notifications.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/task-priority.js'); ?>"></script>
 	<script src="<?php echo poznoteAsset('js/tasks-page.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 </body>
 </html>

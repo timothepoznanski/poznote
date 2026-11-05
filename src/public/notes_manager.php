@@ -36,7 +36,6 @@ $currentLang = getUserLanguage();
       data-txt-select-folder="<?php echo t_h('notes_manager.select_folder', [], 'Select a target folder'); ?>"
       data-txt-move="<?php echo t_h('notes_manager.move', [], 'Move'); ?>"
       data-txt-cancel="<?php echo t_h('common.cancel', [], 'Cancel'); ?>"
-      data-txt-selected="<?php echo t_h('notes_manager.selected', [], 'selected'); ?>"
       data-txt-select-all="<?php echo t_h('notes_manager.select_all', [], 'Select all'); ?>"
       data-txt-select-all-folder="<?php echo t_h('notes_manager.select_all_in_folder', [], 'Select all in this folder'); ?>"
       data-txt-deselect-all="<?php echo t_h('notes_manager.deselect_all', [], 'Deselect all'); ?>"
@@ -74,8 +73,10 @@ $currentLang = getUserLanguage();
 		<h1 class="poznote-page-title"><span class="poznote-page-title-name"><i class="lucide lucide-sticky-note"></i> <?php echo t_h('common.back_to_notes', [], 'Notes'); ?></span> <?php echo poznoteRenderPageTitleWorkspace($pageWorkspace); ?></h1>
 
 		<!-- Filter bar -->
-		<div class="nm-filter-bar">
-			<div class="filter-input-wrapper">
+		<?php // The filter folds behind a magnifier, first on the row (js/search-toggle.js) ?>
+		<div class="nm-filter-bar pz-search-row">
+			<?php echo poznoteRenderSearchToggle('nmFilterWrapper', t('notes_manager.filter_placeholder', [], 'Filter notes by title or tags...')); ?>
+			<div class="filter-input-wrapper pz-search-collapsible is-search-collapsed" id="nmFilterWrapper">
 				<i class="lucide lucide-search nm-filter-icon"></i>
 				<input
 					type="text"
@@ -88,47 +89,24 @@ $currentLang = getUserLanguage();
 					<i class="lucide lucide-x"></i>
 				</button>
 			</div>
-			<select
-				id="nmTypeFilter"
-				class="nm-filter-select"
-				aria-label="<?php echo t_h('notes_manager.filter_type', [], 'Filter by type'); ?>"
-			>
-				<option value=""><?php echo t_h('notes_manager.all_types', [], 'All types'); ?></option>
-				<option value="html"><?php echo t_h('notes_manager.type_html', [], 'Rich text'); ?></option>
-				<option value="markdown"><?php echo t_h('notes_manager.type_markdown', [], 'Markdown'); ?></option>
-				<option value="tasklist"><?php echo t_h('notes_manager.type_tasklist', [], 'Tasklist'); ?></option>
-			</select>
-			<?php // Single collapse-all / expand-all toggle for the folder groups, like tasks.php ?>
+			<?php // Single collapse-all / expand-all toggle for the folder groups: its chevron alone, its label in the tooltip (js/notes-manager.js) ?>
 			<button type="button" id="nmToggleAllBtn" class="nm-collapse-btn" aria-expanded="true" title="<?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?>">
 				<i class="lucide lucide-chevron-up"></i>
-				<span id="nmToggleAllLabel"><?php echo t_h('tasks_page.collapse_all', [], 'Collapse all'); ?></span>
 			</button>
-			<select
-				id="nmAgeFilter"
-				class="nm-filter-select"
-				aria-label="<?php echo t_h('notes_manager.filter_age', [], 'Filter by age'); ?>"
-			>
-				<option value=""><?php echo t_h('notes_manager.age_all', [], 'All notes'); ?></option>
-				<option value="filtered"><?php echo t_h('notes_manager.age_recent', [], 'Recent only'); ?></option>
-			</select>
-			<div id="nmFilterStats" class="filter-stats initially-hidden"></div>
-		</div>
-
-		<!-- Bulk action bar (hidden by default) -->
-		<div id="nmBulkBar" class="nm-bulk-bar nm-bulk-bar-hidden">
-			<div class="nm-bulk-count-wrap">
-				<span id="nmSelectedCount" class="nm-selected-count">0 <?php echo t_h('notes_manager.selected', [], 'selected'); ?></span>
-			</div>
-			<div class="nm-bulk-actions">
-				<button id="nmSelectAllBtn" class="btn btn-sm btn-secondary nm-bulk-btn">
-					<?php echo t_h('notes_manager.select_all', [], 'Select all visible'); ?>
-				</button>
-				<button id="nmDeselectAllBtn" class="btn btn-sm btn-secondary nm-bulk-btn">
-					<?php echo t_h('notes_manager.deselect_all', [], 'Deselect all'); ?>
-				</button>
+			<?php // The selection, greyed out while nothing is selected (updateBulkBar in js/notes-manager.js).
+			// On a phone every control of the row is its icon alone, so the row holds on one line (css/notes-manager.css). ?>
+			<button type="button" id="nmSelectAllBtn" class="nm-collapse-btn nm-bulk-btn" title="<?php echo t_h('notes_manager.select_all', [], 'Select all visible'); ?>">
+				<i class="lucide lucide-check-square nm-mobile-icon" aria-hidden="true"></i>
+				<span class="nm-btn-label"><?php echo t_h('notes_manager.select_all', [], 'Select all visible'); ?></span>
+			</button>
+			<button type="button" id="nmDeselectAllBtn" class="nm-collapse-btn nm-bulk-btn" disabled title="<?php echo t_h('notes_manager.deselect_all', [], 'Deselect all'); ?>">
+				<i class="lucide lucide-square nm-mobile-icon" aria-hidden="true"></i>
+				<span class="nm-btn-label"><?php echo t_h('notes_manager.deselect_all', [], 'Deselect all'); ?></span>
+			</button>
+			<span class="nm-select-wrap" title="<?php echo t_h('notes_manager.actions', [], 'Bulk actions'); ?>">
 				<select
 					id="nmBulkActionSelect"
-					class="nm-bulk-select"
+					class="nm-filter-select nm-bulk-select"
 					disabled
 					aria-label="<?php echo t_h('notes_manager.actions', [], 'Bulk actions'); ?>"
 				>
@@ -144,8 +122,35 @@ $currentLang = getUserLanguage();
 					<?php endif; ?>
 					<option value="trash"><?php echo t_h('notes_manager.move_to_trash', [], 'Move to trash'); ?></option>
 				</select>
-			</div>
+				<i class="lucide lucide-more-horizontal nm-mobile-icon" aria-hidden="true"></i>
+			</span>
+			<span class="nm-select-wrap" title="<?php echo t_h('notes_manager.filter_type', [], 'Filter by type'); ?>">
+				<select
+					id="nmTypeFilter"
+					class="nm-filter-select"
+					aria-label="<?php echo t_h('notes_manager.filter_type', [], 'Filter by type'); ?>"
+				>
+					<option value=""><?php echo t_h('notes_manager.all_types', [], 'All types'); ?></option>
+					<option value="html"><?php echo t_h('notes_manager.type_html', [], 'Rich text'); ?></option>
+					<option value="markdown"><?php echo t_h('notes_manager.type_markdown', [], 'Markdown'); ?></option>
+					<option value="tasklist"><?php echo t_h('notes_manager.type_tasklist', [], 'Tasklist'); ?></option>
+				</select>
+				<i class="lucide lucide-shapes nm-mobile-icon" aria-hidden="true"></i>
+			</span>
+			<span class="nm-select-wrap" title="<?php echo t_h('notes_manager.filter_age', [], 'Filter by age'); ?>">
+				<select
+					id="nmAgeFilter"
+					class="nm-filter-select"
+					aria-label="<?php echo t_h('notes_manager.filter_age', [], 'Filter by age'); ?>"
+				>
+					<option value=""><?php echo t_h('notes_manager.age_all', [], 'All notes'); ?></option>
+					<option value="filtered"><?php echo t_h('notes_manager.age_recent', [], 'Recent only'); ?></option>
+				</select>
+				<i class="lucide lucide-clock nm-mobile-icon" aria-hidden="true"></i>
+			</span>
+			<div id="nmFilterStats" class="filter-stats initially-hidden"></div>
 		</div>
+
 
 		<!-- Notes list -->
 		<div class="nm-content">
@@ -229,6 +234,7 @@ $currentLang = getUserLanguage();
 	<script src="<?php echo poznoteAsset('js/offline-sync.js'); ?>" data-offline-mode="writes"></script>
 	<?php endif; ?>
 	<script src="<?php echo poznoteAsset('js/notes-manager.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 	<?php // Marks the notes and folders kept offline in this browser, unless the
 	      // offline dots are hidden (sidebar_offline_marks, the tree's view options menu) ?>
 	<?php if ($notesManagerOfflineMode && !in_array(getSetting('sidebar_offline_marks', '1'), ['0', 'false'], true)): ?>

@@ -27,13 +27,24 @@ html.tags-page {
     overflow: auto;
 }
 
+/* "There are N tags total": a label, the count chip of the other list pages
+   (.filter-stats in css/shared/base.css), centred under the filter */
 .tags-info {
+    width: fit-content;
+    margin: 20px auto;
+    padding: 6px 12px;
+    border-radius: var(--pz-radius);
+    background-color: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
+    font-size: 13px;
+    font-weight: var(--pz-weight-medium);
+    color: var(--pz-text-muted);
     text-align: center;
-    margin: 20px;
 }
 
 .tags-page .home-search-container {
     display: flex;
+    /* The magnifier (css/components/search-toggle.css) as tall as the field */
+    --pz-search-toggle-size: 40px;
 }
 
 /* Adjust padding for search input without icon */

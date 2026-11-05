@@ -4767,6 +4767,7 @@
     "new_name_placeholder": "日記の名前",
     "new_create_error": "日記を作成できませんでした。",
     "journal_view": "ジャーナル表示",
+    "board_view": "カード表示",
     "journal_edit": "ここで編集",
     "journal_edit_done": "編集を終了",
     "journal_edit_placeholder": "ここに書きます...",

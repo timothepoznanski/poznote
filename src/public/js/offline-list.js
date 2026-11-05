@@ -365,16 +365,21 @@
         return currentCollapsibleFolderIds.some(isFolderCollapsed);
     }
 
-    function updateTreeToolbar(presentation) {
-        var toolbar = document.getElementById('sharedTreeToolbar');
+    // The button is always there, greyed out in a view with nothing to fold:
+    // the flat list of Notes (notesOnly), no folder at all, or folders side
+    // by side
+    function updateTreeToolbar(presentation, notesOnly) {
         var toggleBtn = document.getElementById('toggleAllFoldersBtn');
-        var show = !!(presentation && presentation.collapsibleFolderIds.length > 0);
+        var show = !notesOnly && !!(presentation && presentation.collapsibleFolderIds.length > 0);
 
         currentBranchMeta = presentation ? presentation.branchMeta : {};
         currentCollapsibleFolderIds = presentation ? presentation.collapsibleFolderIds.slice() : [];
 
-        if (toolbar) toolbar.classList.toggle('initially-hidden', !show);
-        if (!show || !toggleBtn) return;
+        if (!toggleBtn) return;
+        if (!show) {
+            toggleBtn.disabled = true;
+            return;
+        }
 
         var expand = shouldExpandAllFolders();
         var labelEl = document.getElementById('toggleAllFoldersLabel');
@@ -382,6 +387,9 @@
         toggleBtn.disabled = presentation.searchExpanded;
         toggleBtn.setAttribute('aria-expanded', expand ? 'false' : 'true');
         if (labelEl) labelEl.textContent = expand ? config.txtExpandAll : config.txtCollapseAll;
+        // The button shows its chevron alone: the label goes to its tooltip
+        toggleBtn.title = expand ? config.txtExpandAll : config.txtCollapseAll;
+        toggleBtn.setAttribute('aria-label', toggleBtn.title);
         if (icon) {
             icon.classList.toggle('lucide-chevron-down', expand);
             icon.classList.toggle('lucide-chevron-up', !expand);
@@ -716,7 +724,7 @@
         container.innerHTML = '';
 
         if (filteredItems.length === 0) {
-            updateTreeToolbar(null);
+            updateTreeToolbar(null, filterType === 'notes');
             var message = isFiltering() ? config.txtNoFilterResults
                 : (filterType === 'folders' ? config.txtNoFolders : config.txtNoNotes);
             var empty = document.createElement('div');
@@ -734,7 +742,7 @@
 
         var itemsToRender = filteredItems;
         if (filterType === 'notes') {
-            updateTreeToolbar(null);
+            updateTreeToolbar(null, true);
             itemsToRender = filteredItems.slice().sort(byName(function(note) { return note.heading || config.txtUntitled; }));
             itemsToRender.forEach(function(note) { delete note._depth; });
         } else {

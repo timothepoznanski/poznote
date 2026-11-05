@@ -73,12 +73,16 @@ body.trash-page {
     /* Extra space to ensure scrolling */
 }
 
+/* "x notes in trash": a label after the sort switch, the count chip of the
+   other list pages (.filter-stats in css/shared/base.css) */
 .trash-page-count {
+    padding: 6px 12px;
+    border-radius: var(--pz-radius);
+    background-color: color-mix(in srgb, var(--pz-accent) 5%, var(--pz-bg));
     font-size: 13px;
+    font-weight: var(--pz-weight-medium);
     color: var(--pz-text-muted);
-    text-align: center;
-    width: 100%;
-    margin-top: 10px;
+    white-space: nowrap;
 }
 
 .trash-search-results {
@@ -98,8 +102,11 @@ body.trash-page {
     margin: 32px auto 30px auto;
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     gap: 15px;
+    /* The magnifier (css/components/search-toggle.css) as tall as the sort switch */
+    --pz-search-toggle-size: 38px;
 }
 
 .trash-filter-bar .filter-input-wrapper {
@@ -115,6 +122,11 @@ body.trash-page {
 
 #trashSearchForm {
     width: 100%;
+}
+
+/* Magnifier inside the search box: mobile only, like dashboard.php */
+.trash-search-icon {
+    display: none;
 }
 
 .trash-search-input {
@@ -200,12 +212,34 @@ body.trash-page {
     box-shadow: 0 1px 2px rgba(var(--pz-shadow-rgb), 0.08);
 }
 
-.trash-buttons-container {
-    display: flex;
+/* Empty trash, right of the magnifier: its square, ground and border
+   (css/components/search-toggle.css), the bin alone in the danger red */
+.trash-empty-btn {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
-    margin-bottom: 30px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: var(--pz-search-toggle-size);
+    height: var(--pz-search-toggle-size);
+    padding: 0;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius-lg);
+    background: var(--pz-bg);
+    color: var(--pz-danger-text);
+    cursor: pointer;
+}
+
+.trash-empty-btn:hover,
+.trash-empty-btn:focus-visible {
+    border-color: var(--pz-danger-text);
+    color: var(--pz-danger-text-hover);
+}
+
+.trash-empty-btn .lucide {
+    width: 18px;
+    height: 18px;
+    color: inherit;
 }
 
 .trash-content {
@@ -545,37 +579,30 @@ body.trash-page {
         padding-bottom: 20px !important;
     }
 
+    /* The magnifier, Empty trash, the sort switch and the count, 10px apart */
     .trash-filter-bar {
-        justify-content: center;
-        margin-bottom: 20px;
+        margin: 10px auto 16px;
+        gap: 10px;
     }
 
-    .filter-input-wrapper {
-        flex: 0 0 95%;
-        max-width: 95%;
+    /* Same search box as dashboard.php on mobile */
+    .trash-search-icon {
+        display: block;
+        position: absolute;
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        color: var(--pz-text-subtle);
+        pointer-events: none;
     }
 
     .trash-search-input {
         width: 100% !important;
-        font-size: 1.1em;
-        padding: 12px;
-        margin: 10px 0;
-    }
-
-    .trash-buttons-container {
-        display: flex;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
-        margin: 15px 5px;
-        gap: 8px;
-        padding-left: 0;
-    }
-
-    .trash-buttons-container .btn {
-        padding: 8px 12px;
+        padding: 7px 38px 7px 40px;
         font-size: 13px;
-        white-space: nowrap;
+        background-color: var(--pz-bg);
     }
 
     .trash-content {
@@ -686,9 +713,14 @@ html[data-theme='dark'] .noteentry {
     color: var(--pz-text-strong);
 }
 
-html[data-theme='dark'] .trash-page-count,
 html[data-theme='dark'] .trash-limit-notice {
     color: var(--pz-text-subtle);
+}
+
+/* The dark count chip of the other list pages (css/attachments_list.css) */
+html[data-theme='dark'] .trash-page-count {
+    background-color: var(--pz-accent-soft);
+    color: var(--pz-accent-text-hover);
 }
 
 html[data-theme='dark'] .trash-notecard {

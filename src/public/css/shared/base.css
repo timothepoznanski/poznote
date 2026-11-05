@@ -78,14 +78,57 @@ body.shared-page {
     border: none;
     border-radius: 0;
     background: transparent;
+    /* The magnifier (css/components/search-toggle.css) as tall as the field */
+    --pz-search-toggle-size: 40px;
     box-shadow: none;
 }
 
-/* Type filter toggle buttons */
+/* Type filter toggle buttons, after the magnifier of the filter
+   (js/search-toggle.js), which takes their height and their round ends */
 .filter-type-buttons {
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 6px;
+    --pz-search-toggle-size: 32px;
+}
+
+.filter-type-buttons .pz-search-toggle {
+    border-radius: var(--pz-radius-2xl);
+}
+
+/* Offline and Shares pages: Expand all / Collapse all right of the
+   magnifier, in its format, its chevron alone */
+.filter-type-buttons .shared-filter-tree-actions .btn {
+    width: var(--pz-search-toggle-size);
+    height: var(--pz-search-toggle-size);
+    padding: 0;
+    border-color: var(--pz-border);
+    border-radius: var(--pz-radius-2xl);
+    color: var(--pz-icon, var(--pz-text-muted));
+}
+
+.filter-type-buttons .shared-filter-tree-actions .btn:not(:hover):not(:disabled) {
+    background: var(--pz-bg);
+}
+
+/* Greyed out in the flat views, which have no folder to fold
+   (js/offline-list.js, js/shared-page.js) */
+.filter-type-buttons .shared-filter-tree-actions .btn:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.filter-type-buttons .shared-filter-tree-actions .btn .lucide {
+    width: 16px;
+    height: 16px;
+}
+
+/* The open filter, a little lower than elsewhere to sit with the buttons */
+.filter-type-buttons .filter-input {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    border-radius: var(--pz-radius-2xl);
 }
 
 .filter-type-btn {

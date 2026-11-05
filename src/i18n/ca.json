@@ -4767,6 +4767,7 @@
     "new_name_placeholder": "Nom del diari",
     "new_create_error": "No s'ha pogut crear el diari.",
     "journal_view": "Visualització de diari",
+    "board_view": "Vista de targetes",
     "journal_edit": "Edita aquí",
     "journal_edit_done": "Acaba l'edició",
     "journal_edit_placeholder": "Escriviu aquí...",

@@ -145,6 +145,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<?php poznoteRenderStylesheets('speed_dial'); ?>
 	<script src="js/theme-manager.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="<?php echo poznoteAsset('js/speed-dial.js'); ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 	<?php poznoteRenderBrandIcons(); ?>
 	<?php poznoteRenderUiCustomizationBootstrap(); ?>
 </head>
@@ -219,17 +220,19 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 		<?php endif; ?>
 		<p class="speed-dial-empty"><?php echo t_h('speed_dial.empty', ['tag' => $board], 'Your speed dial is empty.'); ?></p>
 		<?php else: ?>
-		<div class="speed-dial-toolbar">
-		<div class="speed-dial-toolbar-actions">
-		<?php echo $toolbarButtons; ?>
-		</div>
-		<div id="speedDialFilter" class="home-search-container">
+		<?php // The filter folds behind a magnifier, first on the row (js/search-toggle.js) ?>
+		<div class="speed-dial-toolbar pz-search-row">
+		<?php echo poznoteRenderSearchToggle('speedDialFilter', t('public.filter_placeholder', [], 'Filter by name or link...'), 'speed-dial-size-btn'); ?>
+		<div id="speedDialFilter" class="home-search-container pz-search-collapsible is-search-collapsed">
 			<div class="home-search-wrapper">
 				<input type="text" id="speedDialFilterInput" class="home-search-input" placeholder="<?php echo t_h('public.filter_placeholder', [], 'Filter by name or link...'); ?>" autocomplete="off">
 				<button type="button" id="speedDialFilterClear" class="home-search-clear" aria-label="<?php echo t_h('search.clear', [], 'Clear search'); ?>" title="<?php echo t_h('search.clear', [], 'Clear search'); ?>">
 					<i class="lucide lucide-x"></i>
 				</button>
 			</div>
+		</div>
+		<div class="speed-dial-toolbar-actions">
+		<?php echo $toolbarButtons; ?>
 		</div>
 		</div>
 		<div id="speedDialGrid" class="speed-dial-grid" data-label-colors="<?php echo htmlspecialchars((string)json_encode($labelColors, JSON_FORCE_OBJECT), ENT_QUOTES, 'UTF-8'); ?>" data-txt-reorder-error="<?php echo t_h('dashboard.reorder_error', [], 'Could not save the card order.'); ?>">

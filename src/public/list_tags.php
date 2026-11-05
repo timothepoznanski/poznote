@@ -80,8 +80,10 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 
 		
 		
-		<div class="home-search-container">
-			<div class="home-search-wrapper">
+		<?php // The filter folds behind a magnifier (js/search-toggle.js) ?>
+		<div class="home-search-container pz-search-row">
+			<?php echo poznoteRenderSearchToggle('tagsSearchWrapper', t('tags.search.placeholder', [], 'Filter tags...')); ?>
+			<div class="home-search-wrapper pz-search-collapsible is-search-collapsed" id="tagsSearchWrapper">
 				<input 
 					type="text" 
 					id="tagsSearchInput"
@@ -179,6 +181,7 @@ $cache_v = rawurlencode(poznoteBuildAssetCacheVersion(getAppVersion()));
 	<script src="js/modal-alerts.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/tag-actions.js?v=<?php echo $cache_v; ?>"></script>
 	<script src="js/list_tags.js?v=<?php echo $cache_v; ?>"></script>
+	<script src="<?php echo poznoteAsset('js/search-toggle.js'); ?>"></script>
 	<script src="js/clickable-tags.js?v=<?php echo $cache_v; ?>"></script>
 </body>
 </html>

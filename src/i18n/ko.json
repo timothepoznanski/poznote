@@ -4767,6 +4767,7 @@
     "new_name_placeholder": "일기 이름",
     "new_create_error": "일기를 생성할 수 없습니다.",
     "journal_view": "일지 보기",
+    "board_view": "카드 보기",
     "journal_edit": "여기에서 편집하세요",
     "journal_edit_done": "편집 완료",
     "journal_edit_placeholder": "여기에 쓰세요...",

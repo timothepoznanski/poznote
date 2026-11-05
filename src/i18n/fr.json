@@ -5215,6 +5215,7 @@
     "new_name_placeholder": "Nom du journal",
     "new_create_error": "Impossible de créer le journal.",
     "journal_view": "Vue en fil continu",
+    "board_view": "Vue cartes",
     "journal_edit": "Modifier ici",
     "journal_edit_done": "Terminer la modification",
     "journal_edit_placeholder": "Écrivez ici...",
