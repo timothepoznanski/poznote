@@ -65,8 +65,58 @@ class SettingsController {
         $this->con = $con;
     }
 
+    /**
+     * Settings of the owner's own use of the account, not of the workspace:
+     * kept from a session confined to a workspace shared with it (their
+     * private AI text, recent notes, Git and assistant configuration).
+     */
+    private const OWNER_PRIVATE_SETTINGS = [
+        'ai_custom_instructions', 'ai_saved_prompts', 'recently_opened_notes', 'dashboard_scope',
+        'login_email', 'mcp_default_workspace',
+    ];
+    private const OWNER_PRIVATE_SETTING_PREFIXES = ['ai_user_', 'stt_user_', 'git_'];
+
+    /**
+     * Settings named after a workspace: a shared-workspace session reads only
+     * those of its own workspace, the others would name the owner's other
+     * workspaces. speed_dial_background_opacity_ is followed by the
+     * workspace, then optionally by "_" and a board key.
+     */
+    private const WORKSPACE_SETTING_PREFIXES = ['speed_dial_background_opacity_', 'speed_dial_boards_', 'background_opacity_'];
+
     private function isSecretSetting(string $key): bool {
         return in_array($key, self::SECRET_SETTINGS, true);
+    }
+
+    /** Whether a read of this user setting answers nothing (empty, or left out of the list). */
+    private function isUnreadableSetting(string $key): bool {
+        return $this->isSecretSetting($key) || $this->isHiddenFromSharedWorkspace($key);
+    }
+
+    private function isHiddenFromSharedWorkspace(string $key): bool {
+        $workspace = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+        if ($workspace === null) {
+            return false;
+        }
+        if (in_array($key, self::OWNER_PRIVATE_SETTINGS, true)) {
+            return true;
+        }
+        foreach (self::OWNER_PRIVATE_SETTING_PREFIXES as $prefix) {
+            if (strncmp($key, $prefix, strlen($prefix)) === 0) {
+                return true;
+            }
+        }
+        foreach (self::WORKSPACE_SETTING_PREFIXES as $prefix) {
+            if (strncmp($key, $prefix, strlen($prefix)) !== 0) {
+                continue;
+            }
+            $rest = substr($key, strlen($prefix));
+            if ($prefix === 'speed_dial_background_opacity_') {
+                return $rest !== $workspace && strncmp($rest, $workspace . '_', strlen($workspace) + 1) !== 0;
+            }
+            return $rest !== $workspace;
+        }
+        return false;
     }
 
     private function isGlobalSetting(string $key): bool {
@@ -740,7 +790,7 @@ class SettingsController {
         if ($keys === null) {
             $stmt = $this->con->query('SELECT key, value FROM settings');
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                if ($this->isSecretSetting((string)$row['key'])) {
+                if ($this->isUnreadableSetting((string)$row['key'])) {
                     continue;
                 }
                 $settings[$row['key']] = $row['value'];
@@ -760,7 +810,7 @@ class SettingsController {
         $stmt = $this->con->prepare("SELECT key, value FROM settings WHERE key IN ($placeholders)");
         $stmt->execute($keys);
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($this->isSecretSetting((string)$row['key'])) {
+            if ($this->isUnreadableSetting((string)$row['key'])) {
                 continue;
             }
             $settings[$row['key']] = $row['value'];
@@ -887,7 +937,7 @@ class SettingsController {
                 $stmt = $this->con->prepare('SELECT value FROM settings WHERE key = ?');
                 $stmt->execute([$key]);
                 $value = $stmt->fetchColumn();
-                if ($value === false || $this->isSecretSetting($key)) {
+                if ($value === false || $this->isUnreadableSetting($key)) {
                     $value = '';
                 }
             }

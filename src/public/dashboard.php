@@ -226,7 +226,13 @@ function dashboardResolveRememberedScope(PDO $con, array $params, string $pageWo
     // that workspace alone, whatever the URL or the owner's saved scope says.
     $sharedWorkspaceName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
     if ($sharedWorkspaceName !== null) {
-        return poznoteResolveWorkspaceScope($con, ['workspace' => $sharedWorkspaceName], $sharedWorkspaceName);
+        $scope = poznoteResolveWorkspaceScope($con, ['workspace' => $sharedWorkspaceName], $sharedWorkspaceName);
+        // The maps cover every workspace of the account and reach the page
+        // (scope.colors): only the shared one is the session's to see.
+        $keep = [$sharedWorkspaceName => true];
+        $scope['tags_map'] = array_intersect_key($scope['tags_map'] ?? [], $keep);
+        $scope['colors_map'] = array_intersect_key($scope['colors_map'] ?? [], $keep);
+        return $scope;
     }
 
     $requested = strtolower(trim((string)($params['scope'] ?? '')));

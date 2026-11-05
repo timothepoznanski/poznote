@@ -56,6 +56,9 @@ $selfActions = ['self_status', 'self_run', 'run_status', 'self_download', 'self_
 if (in_array($action, $selfActions, true) && !isCurrentUserAdmin()) {
     // Admins always pass: run_status also serves the admin page's manual
     // runs. The Elements visibility rule reads the user's settings table.
+    // The archives are the open account's: someone given access to another
+    // account, and switched into it, is refused like on the Backup page.
+    requireActiveAccountOwner();
     require_once __DIR__ . '/../db_connect.php';
     if (!LocalBackupService::canCurrentUserBackup()) {
         http_response_code(403);
@@ -103,7 +106,7 @@ function localBackupStreamArchive(string $path): void {
  * runs its users sequentially anyway, and a dead worker's job is replaced
  * rather than blocking until the daily cleanup.
  */
-function localBackupStartJob(int $callerUserId, int $targetUserId): array {
+function localBackupStartJob(int $callerUserId, int $targetUserId, bool $userStarted = false): array {
     poznoteJobCleanup($callerUserId);
     $active = poznoteJobFindActive($callerUserId, POZNOTE_JOB_TYPE_LOCAL_BACKUP);
     if ($active !== null) {
@@ -115,6 +118,8 @@ function localBackupStartJob(int $callerUserId, int $targetUserId): array {
     try {
         $job = poznoteJobCreate($callerUserId, POZNOTE_JOB_TYPE_LOCAL_BACKUP, [
             'target_user_id' => $targetUserId,
+            // Pruned with the user's own archives only (LocalBackupService::USER_STARTED_INDEX)
+            'user_started' => $userStarted,
         ], 'queued');
         poznoteJobSpawnRunner($callerUserId, (string)$job['id']);
     } catch (Throwable $e) {
@@ -234,7 +239,7 @@ switch ($action) {
             echo json_encode(['success' => false, 'error' => $dirError]);
             break;
         }
-        echo json_encode(localBackupStartJob((int)getCurrentUserId(), (int)getCurrentUserId()));
+        echo json_encode(localBackupStartJob((int)getCurrentUserId(), (int)getCurrentUserId(), true));
         break;
     }
 
