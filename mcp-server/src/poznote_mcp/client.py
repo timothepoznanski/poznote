@@ -191,6 +191,9 @@ class PoznoteClient:
         offset: int | None = None,
         folder_id: int | None = None,
         folder: str | None = None,
+        tags: str | None = None,
+        updated_from: str | None = None,
+        updated_to: str | None = None,
     ) -> dict:
         """
         List notes, one page at a time
@@ -210,6 +213,12 @@ class PoznoteClient:
             params["folder_id"] = folder_id
         if folder:
             params["folder"] = folder
+        if tags:
+            params["tags"] = tags
+        if updated_from:
+            params["updated_from"] = updated_from
+        if updated_to:
+            params["updated_to"] = updated_to
         
         response = self.client.get("/notes", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
@@ -258,6 +267,11 @@ class PoznoteClient:
         created_from: str | None = None,
         created_to: str | None = None,
         user_id: str | int | None = None,
+        mode: str | None = None,
+        tags: str | None = None,
+        folder: str | None = None,
+        updated_from: str | None = None,
+        updated_to: str | None = None,
     ) -> list[dict]:
         """
         Search notes by text query
@@ -270,6 +284,16 @@ class PoznoteClient:
             params["created_from"] = created_from
         if created_to:
             params["created_to"] = created_to
+        if mode:
+            params["mode"] = mode
+        if tags:
+            params["tags"] = tags
+        if folder:
+            params["folder"] = folder
+        if updated_from:
+            params["updated_from"] = updated_from
+        if updated_to:
+            params["updated_to"] = updated_to
         
         response = self.client.get("/notes/search", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()

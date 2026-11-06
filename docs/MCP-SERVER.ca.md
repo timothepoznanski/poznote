@@ -62,8 +62,8 @@ Una pestanya del Poznote oberta al navegador recull en pocs segons els canvis fe
 
 ### Eines (accions)
 - `get_note`: obté una nota concreta pel seu ID, sencera o part per part (`offset`/`max_chars`, amb el `type` de la nota i la seva `length` total)
-- `list_notes`: llista les notes d'un espai de treball, una pàgina cada vegada (`limit`/`offset`, amb el `total` real de l'espai de treball al resultat)
-- `search_notes`: cerca notes per text, amb un interval opcional de dates de creació
+- `list_notes`: llista les notes d'un espai de treball, una pàgina cada vegada (`limit`/`offset`, amb el `total` real de l'espai de treball al resultat), filtrades per carpeta, `tags` o data de modificació
+- `search_notes`: cerca notes per text, exigint cada paraula de la consulta, amb filtres `tags`, `folder`, dates de creació i de modificació
 - `create_note`: crea una nota, opcionalment a partir d'una plantilla i/o amb una data de venciment o un recordatori
 - `update_note`: actualitza una nota existent, la mou i/o en defineix la data de venciment o el recordatori
 - `append_to_note`: afegeix text al final d'una nota sense llegir ni reenviar la resta
@@ -133,6 +133,8 @@ Una pestanya del Poznote oberta al navegador recull en pocs segons els canvis fe
 **Fitxers adjunts.** `add_attachment(note_id, filename, content_base64)` desa un fitxer en una nota exactament com ho fa arrossegar i deixar anar a la interfície web, de manera que un gràfic generat o un fitxer de registre es pot adjuntar sense intervenció humana; s'accepta un URI `data:` com a contingut. Les regles del Poznote continuen aplicant-se, de manera que un tipus executable o una quota d'emmagatzematge plena tornen com un rebuig amb el motiu. Els bytes viatgen codificats en base64 dins de la crida a l'eina, de manera que l'eina limita una pujada a 25 MB i remet a la interfície web per a qualsevol cosa més gran.
 
 **Moure elements.** `move_note` i `move_folder` mouen, no copien: els ids, el contingut, l'historial i els enllaços que apunten a una nota es conserven. A `update_note`, `workspace` indica on *cal buscar la nota*; l'argument que la mou és `target_workspace`. Una nota que canvia d'espai de treball sense que se li doni una carpeta de destinació va a l'arrel d'aquell espai de treball, perquè la seva carpeta antiga pertany a l'espai de treball que deixa. Una carpeta s'emporta les seves subcarpetes i totes les notes que contenen.
+
+**Trobar notes.** `search_notes` exigeix que cada paraula de la consulta aparegui en algun lloc de la nota, en qualsevol ordre i per separades que estiguin, de manera que una cerca de dues paraules ja no necessita que vagin juntes. Les `"cometes dobles"` mantenen diverses paraules unides, i `mode="any"` o `mode="phrase"` canvien aquesta lectura. `search_notes` i `list_notes` filtren també per `tags` (cada etiqueta hi ha de ser, i una etiqueta es compara sencera, així que `topic/ai` no és `topic/ai-safety`) i per `updated_from`/`updated_to`, que és com un client que guarda una còpia pregunta què ha canviat des d'un dia determinat en lloc de llistar-ho tot. `search_notes` accepta a més un `folder`, un nom o un camí.
 
 **Carpetes.** Totes les eines que reben una carpeta reben el mateix: un nom o un camí separat per barres. `create_note(folder="Diary/2026/08")` crea els nivells que falten pel camí; `create_folder(folder_path=…)` fa el mateix per a una carpeta; `list_notes(folder_id=…)` limita una llista a una carpeta al servidor, de manera que el seu `total` només compta aquella carpeta. Un nom sol arriba a una carpeta existent a qualsevol profunditat quan només una carpeta de l'espai de treball el porta, en lloc de crear-ne una segona a l'arrel; quan el porten diverses, la crida es rebutja i les llista, de manera que cal passar el camí complet o l'id.
 

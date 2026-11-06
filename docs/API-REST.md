@@ -193,11 +193,15 @@ List all notes for a user with optional filtering and sorting.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `workspace` | string | Filter by workspace name |
-| `folder` | string | Filter by folder name |
+| `folder` | string | Filter by folder name, or by path (`Projects/Alpha`) to address one precise folder |
 | `folder_id` | integer | Filter by folder ID |
-| `search` | string | Search in heading and content |
+| `search` | string | Search in heading and content. Every word must appear, in any order |
+| `mode` | string | How to read `search`: `all` (default), `any`, or `phrase` |
+| `tags` | string | Only notes carrying every one of these tags, comma-separated |
 | `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
 | `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
+| `updated_from` | date | Filter notes updated on or after this date (`YYYY-MM-DD`) |
+| `updated_to` | date | Filter notes updated on or before this date (`YYYY-MM-DD`) |
 | `favorite` | boolean | Filter favorites only |
 | `sort` | string | Sort order: `updated_desc`, `created_desc`, `heading_asc`, `type_asc`, `manual`; defaults to the account's own setting |
 | `get_folders` | boolean | Include folder information |
@@ -226,6 +230,12 @@ Filter notes by creation date:
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes?created_from=2026-01-01&created_to=2026-01-31"
+```
+
+List what changed since a given day, which is how a client holding a copy catches up without reading everything:
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes?updated_from=2026-01-30&tags=topic/ai"
 ```
 
 ### List Notes with Attachments
@@ -320,19 +330,33 @@ GET /notes/search
 
 Search notes by heading or content.
 
+Every word of the query has to appear in the note, in any order and anywhere apart: a search for `staging pipeline` finds a note whose first paragraph says "staging" and whose last one says "pipeline". Words inside `"double quotes"` stay side by side. The comparison ignores case and accents, and `%` or `_` in a query are read as text rather than as SQL wildcards.
+
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `q` | string | Search query (required) |
+| `q` | string | Words to find in the title or the body (required) |
 | `workspace` | string | Restrict search to a workspace |
 | `limit` | integer | Max results (1–100, default `10`) |
+| `mode` | string | `all` (default, every word), `any` (one is enough), or `phrase` (the query as one string) |
+| `tags` | string | Only notes carrying every one of these tags, comma-separated |
+| `folder` | string | Only notes in this folder; a path (`Projects/Alpha`) addresses one precisely |
 | `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
 | `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
+| `updated_from` | date | Filter notes updated on or after this date (`YYYY-MM-DD`) |
+| `updated_to` | date | Filter notes updated on or before this date (`YYYY-MM-DD`) |
+
+A tag matches whole: `tags=topic/ai` finds the notes tagged `topic/ai` and not those tagged `topic/ai-safety`. An unknown `mode` is answered with a 400, and a `folder` path that names no folder with a 404.
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/search?q=docker&created_from=2026-01-01&created_to=2026-01-31"
+```
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/search?q=staging%20pipeline&tags=topic/ai&updated_from=2026-01-30"
 ```
 
 ### Search Note Ids

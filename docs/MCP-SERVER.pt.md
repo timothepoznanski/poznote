@@ -62,8 +62,8 @@ Uma aba do Poznote aberta no navegador recebe as alterações feitas via MCP em 
 
 ### Ferramentas (ações)
 - `get_note`: obtém uma nota específica pelo ID, inteira ou parte por parte (`offset`/`max_chars`, com o `type` da nota e seu `length` total)
-- `list_notes`: lista as notas de um espaço de trabalho, uma página por vez (`limit`/`offset`, com o `total` real do espaço de trabalho no resultado)
-- `search_notes`: pesquisa notas por texto, com um intervalo opcional de datas de criação
+- `list_notes`: lista as notas de um espaço de trabalho, uma página por vez (`limit`/`offset`, com o `total` real do espaço de trabalho no resultado), filtradas por pasta, `tags` ou data de modificação
+- `search_notes`: pesquisa notas por texto, exigindo cada palavra da consulta, com filtros `tags`, `folder`, datas de criação e de modificação
 - `create_note`: cria uma nova nota, opcionalmente a partir de um modelo e/ou com prazo/lembrete
 - `update_note`: atualiza uma nota existente, move a nota e/ou define o prazo/lembrete dela
 - `append_to_note`: acrescenta texto ao final de uma nota sem ler nem reenviar o resto
@@ -133,6 +133,8 @@ Uma aba do Poznote aberta no navegador recebe as alterações feitas via MCP em 
 **Anexos.** `add_attachment(note_id, filename, content_base64)` armazena um arquivo em uma nota exatamente como faz um arrastar e soltar na interface web, de modo que um gráfico gerado ou um arquivo de log pode ser anexado sem intervenção humana; uma URI `data:` é aceita como conteúdo. As regras do próprio Poznote continuam valendo, então um tipo executável ou uma cota de armazenamento cheia voltam como uma recusa acompanhada do motivo. Os bytes trafegam codificados em base64 dentro da chamada da ferramenta, por isso a ferramenta limita um upload a 25 MB e indica a interface web para qualquer arquivo maior.
 
 **Mover itens.** `move_note` e `move_folder` movem, não copiam: ids, conteúdo, histórico e os links que apontam para uma nota são todos preservados. Em `update_note`, `workspace` indica onde *procurar a nota*; o argumento que a move é `target_workspace`. Uma nota que muda de espaço de trabalho sem receber uma pasta do destino vai para a raiz desse espaço de trabalho, já que a pasta antiga dela pertence ao espaço de trabalho que ela deixou. Uma pasta leva junto suas subpastas e todas as notas que elas contêm.
+
+**Encontrar notas.** `search_notes` exige que cada palavra da consulta apareça em algum lugar da nota, em qualquer ordem e por afastadas que estejam, pelo que uma pesquisa de duas palavras já não precisa que fiquem lado a lado. As `"aspas duplas"` mantêm palavras juntas, e `mode="any"` ou `mode="phrase"` mudam essa leitura. `search_notes` e `list_notes` filtram também por `tags` (cada etiqueta tem de estar presente, e uma etiqueta é comparada por inteiro, pelo que `topic/ai` não é `topic/ai-safety`) e por `updated_from`/`updated_to`, que é como um cliente que guarda uma cópia pergunta o que mudou desde um dia determinado em vez de listar tudo. `search_notes` aceita ainda um `folder`, um nome ou um caminho.
 
 **Pastas.** Toda ferramenta que recebe uma pasta aceita a mesma coisa: um nome ou um caminho separado por barras. `create_note(folder="Diary/2026/08")` cria os níveis que faltam pelo caminho; `create_folder(folder_path=…)` faz o mesmo para uma pasta; `list_notes(folder_id=…)` restringe uma listagem a uma pasta no lado do servidor, de modo que o `total` conta só essa pasta. Um nome simples alcança uma pasta existente em qualquer profundidade quando só uma pasta do espaço de trabalho tem esse nome, em vez de criar uma segunda na raiz; quando várias têm, a chamada é recusada e as lista, então passe o caminho completo ou o id.
 

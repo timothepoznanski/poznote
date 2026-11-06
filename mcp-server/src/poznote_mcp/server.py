@@ -763,6 +763,9 @@ def list_notes(
     offset: int = 0,
     folder_id: Optional[int] = None,
     folder: Optional[str] = None,
+    tags: Optional[str] = None,
+    updated_from: Optional[str] = None,
+    updated_to: Optional[str] = None,
     user_id: Optional[int] = None,
 ) -> str:
     """List the notes of a workspace or a folder, one page at a time
@@ -779,7 +782,14 @@ def list_notes(
         folder_id: Only notes in this folder (see list_folders). Scoped by the
             server, so paging still counts only that folder's notes.
         folder: Name of the folder to scope to, when its id is not at hand.
-            A name is not unique across a workspace; prefer folder_id.
+            A name is not unique across a workspace; prefer folder_id, or pass
+            a path like "Projects/Alpha", which addresses one precise folder.
+        tags: Only notes carrying every one of these tags, comma-separated.
+            A tag matches whole, so "topic/ai" does not match "topic/ai-safety".
+        updated_from: Only notes updated on or after this date (YYYY-MM-DD).
+            With no other filter, this is how to list what changed since a
+            given day instead of paging through everything.
+        updated_to: Only notes updated on or before this date (YYYY-MM-DD)
         user_id: User profile ID to access (optional, overrides default)
     """
     client, err = _get_client_or_error()
@@ -801,6 +811,9 @@ def list_notes(
             offset=start,
             folder_id=folder_id,
             folder=folder,
+            tags=tags,
+            updated_from=updated_from,
+            updated_to=updated_to,
         )
     except Exception as exc:
         return _api_error_json(exc)
@@ -838,25 +851,70 @@ def list_notes(
 
 
 @_tool()
-def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, created_from: Optional[str] = None, created_to: Optional[str] = None, user_id: Optional[int] = None) -> str:
+def search_notes(
+    query: str,
+    workspace: Optional[str] = None,
+    limit: int = 10,
+    mode: str = "all",
+    tags: Optional[str] = None,
+    folder: Optional[str] = None,
+    created_from: Optional[str] = None,
+    created_to: Optional[str] = None,
+    updated_from: Optional[str] = None,
+    updated_to: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
     """Search notes by text query. Returns matching notes with excerpts.
-    
+
+    Every word of the query has to appear somewhere in the note, in any order
+    and anywhere apart: a search for "staging pipeline" finds a note whose
+    first paragraph says "staging" and whose last one says "pipeline". Put
+    "double quotes" around words that must stay side by side.
+
     Args:
-        query: Search query (text to find in notes)
+        query: Words to find in the title or the body.
         workspace: Workspace name (optional)
         limit: Maximum number of results (default: 10)
+        mode: How to read the query. "all" (the default) requires every word,
+            "any" one of them, "phrase" treats the whole query as one string.
+        tags: Only notes carrying every one of these tags, comma-separated.
+            A tag matches whole, so "topic/ai" does not match "topic/ai-safety";
+            see list_tags for what exists.
+        folder: Only notes in this folder. A path like "Projects/Alpha"
+            addresses one precise folder; a bare name matches any folder so
+            called.
         created_from: Filter notes created on or after this date (YYYY-MM-DD)
         created_to: Filter notes created on or before this date (YYYY-MM-DD)
+        updated_from: Filter notes updated on or after this date (YYYY-MM-DD),
+            the way to ask what changed since a given day.
+        updated_to: Filter notes updated on or before this date (YYYY-MM-DD)
         user_id: User profile ID to access (optional, overrides default)
     """
     if not query:
         return json.dumps({"error": "query parameter is required"}, ensure_ascii=False)
+
+    if mode not in ("all", "any", "phrase"):
+        return json.dumps(
+            {"error": "mode must be one of 'all', 'any' or 'phrase'"}, ensure_ascii=False
+        )
     
     client, err = _get_client_or_error()
     if err:
         return err
     try:
-        results = client.search_notes(query, limit=limit, workspace=workspace, created_from=created_from, created_to=created_to, user_id=user_id)
+        results = client.search_notes(
+            query,
+            limit=limit,
+            workspace=workspace,
+            created_from=created_from,
+            created_to=created_to,
+            user_id=user_id,
+            mode=mode,
+            tags=tags,
+            folder=folder,
+            updated_from=updated_from,
+            updated_to=updated_to,
+        )
     except Exception as exc:
         return _api_error_json(exc)
     
@@ -875,6 +933,7 @@ def search_notes(query: str, workspace: Optional[str] = None, limit: int = 10, c
     
     return json.dumps({
         "query": query,
+        "mode": mode,
         "count": len(formatted),
         "results": formatted,
     }, indent=2, ensure_ascii=False)

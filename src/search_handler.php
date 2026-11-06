@@ -1,4 +1,8 @@
 <?php
+// parseSearchTerms() and the tag/term WHERE builders live here, shared with
+// the REST API so both search the same way (issue #1737).
+require_once __DIR__ . '/lib/search-text.php';
+
 function handleUnifiedSearch() {
     global $search, $tags_search, $using_unified_search;
     
@@ -39,27 +43,6 @@ function handleUnifiedSearch() {
     return $using_unified_search;
 }
 
-/**
- * Parse search terms with support for quoted phrases
- */
-function parseSearchTerms($search) {
-    $terms = [];
-    $pattern = '/"([^"]+)"|\S+/';
-    
-    preg_match_all($pattern, $search, $matches);
-    
-    foreach ($matches[0] as $match) {
-        // If the match starts and ends with quotes, it's an exact phrase
-        if (preg_match('/^"(.+)"$/', $match, $phrase_match)) {
-            $terms[] = ['type' => 'phrase', 'value' => $phrase_match[1]];
-        } else {
-            // Otherwise it's a simple word
-            $terms[] = ['type' => 'word', 'value' => $match];
-        }
-    }
-    
-    return $terms;
-}
 
 /**
  * Collect a folder's id plus the ids of all its descendants.

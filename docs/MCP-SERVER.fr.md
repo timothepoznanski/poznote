@@ -62,8 +62,8 @@ Un onglet Poznote ouvert dans le navigateur prend en compte les modifications fa
 
 ### Outils (actions)
 - `get_note` : obtenir une note précise par son ID, en entier ou tranche par tranche (`offset`/`max_chars`, avec le `type` de la note et sa `length` totale)
-- `list_notes` : lister les notes d'un espace de travail, une page à la fois (`limit`/`offset`, avec le `total` réel de l'espace de travail dans le résultat)
-- `search_notes` : rechercher des notes par texte, avec une plage de dates de création facultative
+- `list_notes` : lister les notes d'un espace de travail, une page à la fois (`limit`/`offset`, avec le `total` réel de l'espace de travail dans le résultat), filtrées par dossier, `tags` ou date de modification
+- `search_notes` : rechercher des notes par texte, chaque mot de la requête devant y figurer, avec des filtres `tags`, `folder`, dates de création et de modification
 - `create_note` : créer une note, éventuellement à partir d'un modèle et/ou avec une date d'échéance ou un rappel
 - `update_note` : mettre à jour une note existante, la déplacer et/ou définir sa date d'échéance ou son rappel
 - `append_to_note` : ajouter du texte à la fin d'une note sans lire ni renvoyer le reste
@@ -133,6 +133,8 @@ Un onglet Poznote ouvert dans le navigateur prend en compte les modifications fa
 **Pièces jointes.** `add_attachment(note_id, filename, content_base64)` enregistre un fichier sur une note exactement comme le fait un glisser-déposer dans l'interface web, de sorte qu'un graphique généré ou un fichier de log peut être joint sans intervention humaine ; une URI `data:` est acceptée comme contenu. Les règles de Poznote s'appliquent toujours : un type exécutable ou un quota de stockage plein renvoient un refus accompagné de sa raison. Les octets transitent encodés en base64 dans l'appel d'outil, c'est pourquoi l'outil limite un envoi à 25 Mo et renvoie vers l'interface web pour tout fichier plus volumineux.
 
 **Déplacements.** `move_note` et `move_folder` déplacent, ils ne copient pas : les id, le contenu, l'historique et les liens pointant vers une note sont tous conservés. Sur `update_note`, `workspace` indique où *chercher la note* ; l'argument qui la déplace est `target_workspace`. Une note qui change d'espace de travail sans qu'on lui indique un dossier de destination arrive à la racine de cet espace de travail, puisque son ancien dossier appartient à l'espace de travail qu'elle a quitté. Un dossier emporte avec lui ses sous-dossiers et toutes les notes qu'ils contiennent.
+
+**Trouver des notes.** `search_notes` demande que chaque mot de la requête figure quelque part dans la note, dans n'importe quel ordre et aussi éloignés soient-ils : une recherche de deux mots n'a plus besoin qu'ils soient côte à côte. Les `"guillemets doubles"` gardent des mots ensemble, et `mode="any"` ou `mode="phrase"` changent cette lecture. `search_notes` et `list_notes` filtrent aussi sur `tags` (chaque étiquette doit être présente, et une étiquette est comparée en entier, donc `topic/ai` n'est pas `topic/ai-safety`) et sur `updated_from` / `updated_to`, la façon pour un client qui garde une copie de demander ce qui a changé depuis un jour donné au lieu de tout lister. `search_notes` accepte en plus un `folder`, un nom ou un chemin.
 
 **Dossiers.** Tous les outils qui prennent un dossier acceptent la même chose : un nom, ou un chemin séparé par des barres obliques. `create_note(folder="Diary/2026/08")` crée les niveaux manquants au passage ; `create_folder(folder_path=…)` fait de même pour un dossier ; `list_notes(folder_id=…)` limite une liste à un seul dossier côté serveur, si bien que son `total` ne compte que ce dossier. Un nom seul désigne un dossier existant à n'importe quelle profondeur lorsqu'un seul dossier de l'espace de travail porte ce nom, plutôt que d'en créer un second à la racine ; lorsque plusieurs le portent, l'appel est refusé et les liste : passez alors le chemin complet ou l'id.
 

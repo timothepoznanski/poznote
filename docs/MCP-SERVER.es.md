@@ -62,8 +62,8 @@ Una pestaña de Poznote abierta en el navegador recoge en pocos segundos los cam
 
 ### Herramientas (acciones)
 - `get_note`: obtiene una nota concreta por su ID, completa o por partes (`offset`/`max_chars`, con el `type` de la nota y su `length` total)
-- `list_notes`: lista las notas de un espacio de trabajo, página a página (`limit`/`offset`, con el `total` real del espacio de trabajo en el resultado)
-- `search_notes`: busca notas por texto, con un intervalo opcional de fechas de creación
+- `list_notes`: lista las notas de un espacio de trabajo, página a página (`limit`/`offset`, con el `total` real del espacio de trabajo en el resultado), filtradas por carpeta, `tags` o fecha de modificación
+- `search_notes`: busca notas por texto, exigiendo cada palabra de la consulta, con filtros `tags`, `folder`, fechas de creación y de modificación
 - `create_note`: crea una nota nueva, opcionalmente a partir de una plantilla y/o con fecha de vencimiento/recordatorio
 - `update_note`: actualiza una nota existente, la mueve y/o define su fecha de vencimiento/recordatorio
 - `append_to_note`: añade texto al final de una nota sin leer ni reenviar el resto
@@ -133,6 +133,8 @@ Una pestaña de Poznote abierta en el navegador recoge en pocos segundos los cam
 **Archivos adjuntos.** `add_attachment(note_id, filename, content_base64)` guarda un archivo en una nota exactamente como lo hace arrastrar y soltar en la interfaz web, de modo que un gráfico generado o un archivo de log se pueden adjuntar sin intervención humana; se acepta una URI `data:` como contenido. Las reglas propias de Poznote siguen aplicándose, así que un tipo ejecutable o una cuota de almacenamiento llena se devuelven como un rechazo con el motivo. Los bytes viajan codificados en base64 dentro de la llamada a la herramienta, por lo que la herramienta limita una subida a 25 MB y remite a la interfaz web para cualquier archivo mayor.
 
 **Mover elementos.** `move_note` y `move_folder` mueven, no copian: los ids, el contenido, el historial y los enlaces que apuntan a una nota se conservan. En `update_note`, `workspace` indica dónde *buscar la nota*; el argumento que la mueve es `target_workspace`. Una nota que cambia de espacio de trabajo sin recibir una carpeta del destino queda en la raíz de ese espacio de trabajo, ya que su carpeta anterior pertenece al espacio de trabajo que ha dejado. Una carpeta se lleva consigo sus subcarpetas y todas las notas que contienen.
+
+**Encontrar notas.** `search_notes` exige que cada palabra de la consulta aparezca en algún lugar de la nota, en cualquier orden y por separadas que estén, así que una búsqueda de dos palabras ya no necesita que vayan juntas. Las `"comillas dobles"` mantienen varias palabras unidas, y `mode="any"` o `mode="phrase"` cambian esa lectura. `search_notes` y `list_notes` filtran también por `tags` (cada etiqueta debe estar presente, y una etiqueta se compara entera, así que `topic/ai` no es `topic/ai-safety`) y por `updated_from`/`updated_to`, que es como un cliente que guarda una copia pregunta qué ha cambiado desde un día dado en lugar de listarlo todo. `search_notes` acepta además un `folder`, un nombre o una ruta.
 
 **Carpetas.** Todas las herramientas que reciben una carpeta aceptan lo mismo: un nombre o una ruta separada por barras. `create_note(folder="Diary/2026/08")` crea los niveles que faltan por el camino; `create_folder(folder_path=…)` hace lo mismo para una carpeta; `list_notes(folder_id=…)` limita un listado a una carpeta en el lado del servidor, de modo que su `total` cuenta solo esa carpeta. Un nombre sin ruta llega a una carpeta existente a cualquier profundidad cuando solo una carpeta del espacio de trabajo lo lleva, en lugar de crear una segunda en la raíz; cuando varias lo llevan, la llamada se rechaza y las enumera, así que indica la ruta completa o el id.
 

@@ -62,8 +62,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 
 ### Tools (actions)
 - `get_note` — Get a specific note by ID, whole or one part at a time (`offset`/`max_chars`, with the note's `type` and its full `length`)
-- `list_notes` — List the notes of a workspace, one page at a time (`limit`/`offset`, with the workspace's real `total` in the result)
-- `search_notes` — Search notes by text query, with optional creation date range
+- `list_notes` — List the notes of a workspace, one page at a time (`limit`/`offset`, with the workspace's real `total` in the result), narrowed by folder, `tags` or update date
+- `search_notes` — Search notes by text query, every word of it, with `tags`, `folder`, creation and update date filters
 - `create_note` — Create a new note, optionally from a template and/or with a due date/reminder
 - `update_note` — Update an existing note, move it, and/or set its due date/reminder
 - `append_to_note` — Add text to the end of a note without reading or resending the rest
@@ -133,6 +133,8 @@ A Poznote tab open in the browser picks up the changes made through MCP within a
 **Attachments.** `add_attachment(note_id, filename, content_base64)` stores a file on a note exactly as a drag-and-drop in the web UI does, so a generated chart or a log file can be attached without a human in the loop; a `data:` URI is accepted as the content. Poznote's own rules still apply, so an executable type and a full storage quota come back as a refusal carrying the reason. The bytes travel base64-encoded inside the tool call, so the tool caps an upload at 25 MB and points at the web UI for anything larger.
 
 **Moving things.** `move_note` and `move_folder` move, they do not copy: ids, content, history and the links pointing at a note all survive. On `update_note`, `workspace` says where to *look the note up*; the argument that moves it is `target_workspace`. A note that changes workspace without being given a folder of the destination lands at that workspace's root, since its old folder belongs to the workspace it left. A folder takes its subfolders and every note inside them along.
+
+**Finding notes.** `search_notes` asks for every word of the query to appear somewhere in the note, in any order and however far apart, so a search for two words no longer needs them side by side. `"Double quotes"` keep words together, and `mode="any"` or `mode="phrase"` change that reading. Both `search_notes` and `list_notes` also filter on `tags` (every tag has to be there, and a tag matches whole, so `topic/ai` is not `topic/ai-safety`) and on `updated_from`/`updated_to`, which is how a client holding a copy asks what changed since a given day instead of listing everything. `search_notes` takes a `folder` as well, a name or a path.
 
 **Folders.** Every tool that takes a folder takes the same thing: a name, or a slash-separated path. `create_note(folder="Diary/2026/08")` creates the missing levels on the way down; `create_folder(folder_path=…)` does the same for a folder; `list_notes(folder_id=…)` scopes a listing to one folder server-side, so its `total` counts that folder alone. A bare name reaches an existing folder at any depth when only one folder of the workspace carries it, rather than creating a second one at the root; when several do, the call is refused and lists them, so pass the full path or the id.
 

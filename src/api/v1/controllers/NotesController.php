@@ -530,14 +530,18 @@ class NotesController {
      * 
      * Query params:
      *   - workspace: Filter by workspace name
-     *   - folder: Filter by folder name
+     *   - folder: Filter by folder name, or by path ("A/B") for one precise folder
      *   - folder_id: Filter by folder ID
      *   - sort: Sort order (updated_desc, created_desc, heading_asc)
      *   - get_folders: If set, return folders instead of notes
     *   - favorite: Filter by favorite status (0 or 1)
      *   - search: Search query to filter notes by heading or content
+     *   - mode: How to read the search query: all (default), any, or phrase
+     *   - tags: Only notes carrying every one of these tags
      *   - created_from: Filter notes created on or after this date (YYYY-MM-DD)
      *   - created_to: Filter notes created on or before this date (YYYY-MM-DD)
+     *   - updated_from: Filter notes updated on or after this date (YYYY-MM-DD)
+     *   - updated_to: Filter notes updated on or before this date (YYYY-MM-DD)
      *   - limit: Maximum number of notes to return (1-1000, default: all)
      *   - offset: Number of notes to skip, for paging through a limit
      *
@@ -553,6 +557,12 @@ class NotesController {
         $sort = $_GET['sort'] ?? null;
         $favorite = isset($_GET['favorite']) ? (int)$_GET['favorite'] : null;
         $search = $_GET['search'] ?? null;
+        $searchMode = poznoteNormalizeSearchMode($_GET['mode'] ?? '');
+        $tagFilter = poznoteParseTagFilter($_GET['tags'] ?? '');
+        $updatedFromRaw = trim((string)($_GET['updated_from'] ?? ''));
+        $updatedToRaw = trim((string)($_GET['updated_to'] ?? ''));
+        $updatedFrom = normalizeDateOnlyFilter($updatedFromRaw);
+        $updatedTo = normalizeDateOnlyFilter($updatedToRaw);
         $createdFromRaw = trim((string)($_GET['created_from'] ?? ''));
         $createdToRaw = trim((string)($_GET['created_to'] ?? ''));
         $createdFrom = normalizeDateOnlyFilter($createdFromRaw);
@@ -594,6 +604,26 @@ class NotesController {
                 return;
             }
 
+            if ($searchMode === null) {
+                $this->sendError(400, "mode must be one of 'all', 'any' or 'phrase'");
+                return;
+            }
+
+            if ($updatedFromRaw !== '' && $updatedFrom === '') {
+                $this->sendError(400, 'updated_from must use YYYY-MM-DD format');
+                return;
+            }
+
+            if ($updatedToRaw !== '' && $updatedTo === '') {
+                $this->sendError(400, 'updated_to must use YYYY-MM-DD format');
+                return;
+            }
+
+            if ($updatedFrom !== '' && $updatedTo !== '' && $updatedFrom > $updatedTo) {
+                $this->sendError(400, 'updated_from must be before or equal to updated_to');
+                return;
+            }
+
             // Validate workspace if provided
             if ($workspace) {
                 $chk = $this->con->prepare("SELECT COUNT(*) FROM workspaces WHERE name = ?");
@@ -621,8 +651,28 @@ class NotesController {
             }
             
             if ($folder) {
-                $where .= " AND folder = ?";
-                $params[] = $folder;
+                if (strpos((string)$folder, '/') !== false) {
+                    // A path addresses one precise folder, the way create_note
+                    // reads it. A bare name keeps matching any folder of that
+                    // name, which is what callers already rely on. A path is
+                    // relative to a workspace, so without one it is read in
+                    // the default workspace, as elsewhere in the controller.
+                    $pathFolderId = resolveFolderPathToId(
+                        ($workspace !== null && $workspace !== '') ? $workspace : 'Poznote',
+                        (string)$folder,
+                        false,
+                        $this->con
+                    );
+                    if ($pathFolderId === null) {
+                        $this->sendError(404, 'Folder not found: ' . $folder);
+                        return;
+                    }
+                    $where .= " AND folder_id = ?";
+                    $params[] = $pathFolderId;
+                } else {
+                    $where .= " AND folder = ?";
+                    $params[] = $folder;
+                }
             }
             
             if ($folderId) {
@@ -635,12 +685,19 @@ class NotesController {
                 $params[] = $favorite;
             }
             
-            // Add search filter if provided
-            if ($search !== null && $search !== '') {
-                $where .= " AND (remove_accents(heading) LIKE remove_accents(?) 
-                         OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))";
-                $params[] = '%' . $search . '%';
-                $params[] = '%' . $search . '%';
+            // Add search filter if provided. Every term has to match, so a
+            // two-word query no longer needs the words to sit side by side
+            // (issue #1737); mode=phrase asks for the old whole-string match.
+            $textCondition = poznoteBuildNoteTextCondition($search, $searchMode);
+            if ($textCondition !== null) {
+                $where .= ' AND ' . $textCondition['sql'];
+                $params = array_merge($params, $textCondition['params']);
+            }
+
+            $tagsCondition = poznoteBuildTagsCondition($tagFilter);
+            if ($tagsCondition !== null) {
+                $where .= ' AND ' . $tagsCondition['sql'];
+                $params = array_merge($params, $tagsCondition['params']);
             }
 
             $createdFromUtc = dateOnlyFilterToUtcBoundary($createdFrom, false);
@@ -655,6 +712,17 @@ class NotesController {
                 $params[] = $createdToUtc;
             }
 
+            $updatedFromUtc = dateOnlyFilterToUtcBoundary($updatedFrom, false);
+            if ($updatedFromUtc !== null) {
+                $where .= " AND updated >= ?";
+                $params[] = $updatedFromUtc;
+            }
+
+            $updatedToUtc = dateOnlyFilterToUtcBoundary($updatedTo, true);
+            if ($updatedToUtc !== null) {
+                $where .= " AND updated <= ?";
+                $params[] = $updatedToUtc;
+            }
 
             $sql = "SELECT id, heading, type, tags, folder, folder_id, workspace, updated, created, favorite, icon, icon_color, color, content_width, title_color, title_size, display_order, dashboard_order FROM entries" . $where;
             
@@ -3179,17 +3247,29 @@ class NotesController {
      *   - q: Search query (required)
      *   - limit: Maximum number of results (default: 10)
      *   - workspace: Filter by workspace
+     *   - mode: all (default, every term must match), any, or phrase
+     *   - tags: Only notes carrying every one of these tags
+     *   - folder: Only notes in this folder; a path addresses one precisely
      *   - created_from: Filter notes created on or after this date (YYYY-MM-DD)
      *   - created_to: Filter notes created on or before this date (YYYY-MM-DD)
+     *   - updated_from: Filter notes updated on or after this date (YYYY-MM-DD)
+     *   - updated_to: Filter notes updated on or before this date (YYYY-MM-DD)
      */
     public function search(): void {
         $query = $_GET['q'] ?? '';
         $limit = isset($_GET['limit']) ? max(1, min(100, (int)$_GET['limit'])) : 10;
         $workspace = $_GET['workspace'] ?? null;
+        $folder = $_GET['folder'] ?? null;
+        $searchMode = poznoteNormalizeSearchMode($_GET['mode'] ?? '');
+        $tagFilter = poznoteParseTagFilter($_GET['tags'] ?? '');
         $createdFromRaw = trim((string)($_GET['created_from'] ?? ''));
         $createdToRaw = trim((string)($_GET['created_to'] ?? ''));
         $createdFrom = normalizeDateOnlyFilter($createdFromRaw);
         $createdTo = normalizeDateOnlyFilter($createdToRaw);
+        $updatedFromRaw = trim((string)($_GET['updated_from'] ?? ''));
+        $updatedToRaw = trim((string)($_GET['updated_to'] ?? ''));
+        $updatedFrom = normalizeDateOnlyFilter($updatedFromRaw);
+        $updatedTo = normalizeDateOnlyFilter($updatedToRaw);
         
         if (empty($query)) {
             $this->sendError(400, 'Search query (q) is required');
@@ -3210,21 +3290,72 @@ class NotesController {
             $this->sendError(400, 'created_from must be before or equal to created_to');
             return;
         }
+
+        if ($searchMode === null) {
+            $this->sendError(400, "mode must be one of 'all', 'any' or 'phrase'");
+            return;
+        }
+
+        if ($updatedFromRaw !== '' && $updatedFrom === '') {
+            $this->sendError(400, 'updated_from must use YYYY-MM-DD format');
+            return;
+        }
+
+        if ($updatedToRaw !== '' && $updatedTo === '') {
+            $this->sendError(400, 'updated_to must use YYYY-MM-DD format');
+            return;
+        }
+
+        if ($updatedFrom !== '' && $updatedTo !== '' && $updatedFrom > $updatedTo) {
+            $this->sendError(400, 'updated_from must be before or equal to updated_to');
+            return;
+        }
         
         try {
             // Build search query using accent-insensitive search
+            $textCondition = poznoteBuildNoteTextCondition($query, $searchMode);
+            if ($textCondition === null) {
+                $this->sendError(400, 'Search query (q) is required');
+                return;
+            }
+
             $sql = "SELECT id, heading, tags, folder, folder_id, workspace, updated, created, 
                                                      SUBSTR(search_clean_entry(entry, type), 1, 300) as excerpt
                     FROM entries 
                     WHERE trash = 0 
-                    AND (remove_accents(heading) LIKE remove_accents(?) 
-                                                 OR remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?))";
+                    AND " . $textCondition['sql'];
             
-            $params = ['%' . $query . '%', '%' . $query . '%'];
+            $params = $textCondition['params'];
             
             if ($workspace) {
                 $sql .= " AND workspace = ?";
                 $params[] = $workspace;
+            }
+
+            $tagsCondition = poznoteBuildTagsCondition($tagFilter);
+            if ($tagsCondition !== null) {
+                $sql .= ' AND ' . $tagsCondition['sql'];
+                $params = array_merge($params, $tagsCondition['params']);
+            }
+
+            if ($folder) {
+                if (strpos((string)$folder, '/') !== false) {
+                    $pathFolderId = resolveFolderPathToId(
+                        ($workspace !== null && $workspace !== '') ? $workspace : 'Poznote',
+                        (string)$folder,
+                        false,
+                        $this->con
+                    );
+                    if ($pathFolderId === null) {
+                        $this->sendError(404, 'Folder not found: ' . $folder);
+                        return;
+                    }
+                    $sql .= " AND folder_id = ?";
+                    $params[] = $pathFolderId;
+                } else {
+                    $sql .= " AND folder = ?";
+                    $params[] = $folder;
+                }
             }
 
             $createdFromUtc = dateOnlyFilterToUtcBoundary($createdFrom, false);
@@ -3239,12 +3370,25 @@ class NotesController {
                 $params[] = $createdToUtc;
             }
 
-            
+            $updatedFromUtc = dateOnlyFilterToUtcBoundary($updatedFrom, false);
+            if ($updatedFromUtc !== null) {
+                $sql .= " AND updated >= ?";
+                $params[] = $updatedFromUtc;
+            }
+
+            $updatedToUtc = dateOnlyFilterToUtcBoundary($updatedTo, true);
+            if ($updatedToUtc !== null) {
+                $sql .= " AND updated <= ?";
+                $params[] = $updatedToUtc;
+            }
+
+            // A title carrying the query comes first, as it always has
+            $headingCondition = poznoteBuildHeadingMatchCondition($query, $searchMode);
             $sql .= " ORDER BY 
-                        CASE WHEN remove_accents(heading) LIKE remove_accents(?) THEN 0 ELSE 1 END,
+                        CASE WHEN " . $headingCondition['sql'] . " THEN 0 ELSE 1 END,
                         updated DESC
                       LIMIT ?";
-            $params[] = '%' . $query . '%';
+            $params = array_merge($params, $headingCondition['params']);
             $params[] = $limit;
             
             $stmt = $this->con->prepare($sql);
