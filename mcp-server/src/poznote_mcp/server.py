@@ -36,6 +36,7 @@ import argparse
 import atexit
 import base64
 import binascii
+import hashlib
 import hmac
 import ipaddress
 import json
@@ -189,6 +190,38 @@ REMINDERS_MAX_LIMIT = 500
 # the bytes reach this tool base64-encoded inside a JSON tool call, which is a
 # bad way to carry a film; refuse early and say so instead of timing out.
 MAX_ATTACHMENT_BYTES = 25 * 1024 * 1024
+
+# Types get_attachment(encoding="text") decodes. Anything else comes back
+# base64-encoded: a PDF read as text is mojibake, not a document.
+TEXT_ATTACHMENT_MIME_TYPES = frozenset({
+    "application/json",
+    "application/ld+json",
+    "application/xml",
+    "application/javascript",
+    "application/x-javascript",
+    "application/ecmascript",
+    "application/yaml",
+    "application/x-yaml",
+    "application/x-ndjson",
+    "application/sql",
+    "application/x-sql",
+    "application/toml",
+    "application/x-sh",
+    "application/x-shellscript",
+    "application/csv",
+    "image/svg+xml",
+})
+
+# What decides it when the recorded type says nothing (a file Poznote stored
+# as application/octet-stream): the extensions the app itself displays as
+# text, see getSafeInlineTextContentType() in AttachmentsController.php.
+TEXT_ATTACHMENT_EXTENSIONS = frozenset({
+    "txt", "md", "markdown", "log", "csv", "tsv", "json", "xml",
+    "yml", "yaml", "toml", "ini", "cfg", "conf", "sql",
+})
+
+# Types that name no format, so the extension has the last word.
+OPAQUE_MIME_TYPES = frozenset({"application/octet-stream", "binary/octet-stream"})
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8045
@@ -554,6 +587,7 @@ TOOL_SCOPES: dict[str, str] = {
     "list_tags": "read",
     "get_trash": "read",
     "list_attachments": "read",
+    "get_attachment": "read",
     "get_note_share_status": "read",
     "get_folder_share_status": "read",
     "list_snapshots": "read",
@@ -3144,6 +3178,288 @@ def list_attachments(
         "count": len(attachments),
         "attachments": attachments,
     }, indent=2, ensure_ascii=False)
+
+
+def _attachment_extension(*names: str) -> str:
+    """Lower-case extension of the first of these names that has one."""
+    for name in names:
+        candidate = (name or "").strip()
+        if "." in candidate:
+            return candidate.rsplit(".", 1)[-1].lower()
+    return ""
+
+
+def _attachment_is_textual(mime_type: str, *names: str) -> bool:
+    """Whether this attachment's bytes are a text format.
+
+    The recorded type decides it when it names a format. Poznote stores a
+    good number of plain files as application/octet-stream, so for those the
+    extension does, from the same list the app displays inline.
+    """
+    mime = (mime_type or "").split(";")[0].strip().lower()
+    if mime.startswith("text/"):
+        return True
+    if mime in TEXT_ATTACHMENT_MIME_TYPES or mime.endswith("+json") or mime.endswith("+xml"):
+        return True
+    if mime and mime not in OPAQUE_MIME_TYPES:
+        return False
+    return _attachment_extension(*names) in TEXT_ATTACHMENT_EXTENSIONS
+
+
+def _attachment_summary(attachment: dict) -> dict:
+    """One attachment as a candidate is described to the caller."""
+    return {
+        "attachment_id": attachment.get("id"),
+        "filename": attachment.get("original_filename") or attachment.get("filename"),
+        "mime_type": attachment.get("file_type"),
+        "size": attachment.get("file_size"),
+        "uploaded_at": attachment.get("uploaded_at"),
+    }
+
+
+def _pick_attachment(
+    attachments: list[dict],
+    attachment_id: Optional[str],
+    filename: Optional[str],
+) -> tuple[Optional[dict], Optional[dict]]:
+    """The attachment a caller named, by its id or by its filename.
+
+    A name is matched against the name the file was uploaded under and
+    against the unique name it is stored as, both ignoring case and
+    surrounding spaces, since list_attachments shows both. Nothing is picked
+    in silence: a name two attachments of the note answer to comes back as a
+    refusal carrying them, the way an ambiguous note path does (#1738).
+
+    Returns (attachment, None) or (None, error payload).
+    """
+    wanted_id = (attachment_id or "").strip()
+    if wanted_id:
+        for attachment in attachments:
+            if str(attachment.get("id") or "") == wanted_id:
+                return attachment, None
+        return None, {
+            "success": False,
+            "error": f"No attachment {wanted_id!r} on this note.",
+            "attachments": [_attachment_summary(a) for a in attachments],
+        }
+
+    wanted = (filename or "").strip().lower()
+    matches = [
+        a for a in attachments
+        if str(a.get("original_filename") or "").strip().lower() == wanted
+        or str(a.get("filename") or "").strip().lower() == wanted
+    ]
+
+    if not matches:
+        return None, {
+            "success": False,
+            "error": f"No attachment named {(filename or '').strip()!r} on this note.",
+            "attachments": [_attachment_summary(a) for a in attachments],
+        }
+
+    if len(matches) > 1:
+        return None, {
+            "success": False,
+            "error": "ambiguous_attachment_filename",
+            "message": (
+                f"{len(matches)} attachments of this note are named "
+                f"{(filename or '').strip()!r}; pass one of these attachment_id."
+            ),
+            "candidates": [_attachment_summary(a) for a in matches],
+        }
+
+    return matches[0], None
+
+
+@_tool()
+def get_attachment(
+    note_id: Optional[int] = None,
+    *,
+    filename: Optional[str] = None,
+    attachment_id: Optional[str] = None,
+    encoding: str = "base64",
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
+    """Read one attachment of a note back: its bytes, its type and its sha256
+
+    The counterpart of add_attachment (issue #1741). Use it to check that a
+    file was stored as it should have been, to read an attached text file or
+    log, or to hand the bytes of a PDF or an image to something that can
+    parse them. The sha256 is of the bytes returned, so the same file can be
+    recognised across notes, or against a local copy, without reading it
+    twice.
+
+    Say which attachment with 'filename' or with 'attachment_id';
+    list_attachments shows both. A name carried by two attachments of the
+    note is refused with the candidates rather than resolved to one of them.
+
+    Args:
+        note_id: ID of the note carrying the attachment
+        filename: Name of the attachment, as list_attachments shows it
+            ('report.pdf'). Case and surrounding spaces do not matter.
+        attachment_id: Id of the attachment, instead of its filename.
+        encoding: 'base64' (the default) returns the bytes base64-encoded, in
+            'content_base64', for the client to decode. 'text' returns the
+            file decoded as UTF-8 in 'content', and is refused for anything
+            that is not a text format, so a PDF never comes back as mojibake.
+        workspace: Workspace of the note (optional)
+        user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
+    """
+    note_id, err = _note_target(note_id, path, workspace, user_id)
+    if err:
+        return err
+
+    wanted_name = (filename or "").strip()
+    wanted_id = (attachment_id or "").strip()
+    if wanted_name and wanted_id:
+        return json.dumps({
+            "success": False,
+            "error": "Pass either the attachment's filename or its attachment_id, not both.",
+            "hint": "They can disagree, and nothing here can tell which one you meant.",
+        }, indent=2, ensure_ascii=False)
+    if not wanted_name and not wanted_id:
+        return json.dumps({
+            "success": False,
+            "error": "No attachment given: pass its filename, or its attachment_id.",
+            "hint": "list_attachments(note_id) lists both for every attachment of the note.",
+        }, indent=2, ensure_ascii=False)
+
+    mode = (encoding or "").strip().lower() or "base64"
+    if mode not in ("base64", "text"):
+        return json.dumps({
+            "success": False,
+            "error": f"Unknown encoding {encoding!r}.",
+            "hint": "encoding is 'base64' (any file) or 'text' (text formats only).",
+        }, indent=2, ensure_ascii=False)
+
+    client, err = _get_client_or_error()
+    if err:
+        return err
+
+    # The listing is where a filename becomes an id, and it carries the type
+    # and the size Poznote recorded at upload: the type the response headers
+    # give is the one chosen for serving, not the one on file.
+    try:
+        attachments = client.list_attachments(note_id, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not attachments:
+        return json.dumps({
+            "success": False,
+            "error": f"Note {note_id} has no attachment.",
+        }, indent=2, ensure_ascii=False)
+
+    attachment, pick_error = _pick_attachment(attachments, wanted_id, wanted_name)
+    if pick_error is not None:
+        return json.dumps(pick_error, indent=2, ensure_ascii=False)
+
+    display_name = str(attachment.get("original_filename") or attachment.get("filename") or "")
+    recorded_type = str(attachment.get("file_type") or "")
+    try:
+        recorded_size = int(attachment.get("file_size"))  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        recorded_size = None
+
+    # Both refusals land before the file is fetched at all: the type is on
+    # record, and so is the size (the download is capped as well, in case
+    # that size is stale or absent).
+    if mode == "text" and not _attachment_is_textual(
+        recorded_type, display_name, str(attachment.get("filename") or "")
+    ):
+        return json.dumps({
+            "success": False,
+            "error": "Not a text format",
+            "message": (
+                f"'{display_name}' is {recorded_type or 'of an unknown type'}; "
+                "reading it as text would return mojibake."
+            ),
+            "filename": display_name,
+            "mime_type": recorded_type or None,
+            "size": recorded_size,
+            "hint": "Call it again with encoding='base64' and decode the bytes.",
+        }, indent=2, ensure_ascii=False)
+
+    if recorded_size is not None and recorded_size > MAX_ATTACHMENT_BYTES:
+        return json.dumps({
+            "success": False,
+            "error": "Attachment too large for a tool call",
+            "filename": display_name,
+            "size": recorded_size,
+            "max_size": MAX_ATTACHMENT_BYTES,
+            "hint": "Download it from the web UI, or through GET /api/v1/notes/{id}/attachments/{attachment_id}.",
+        }, indent=2, ensure_ascii=False)
+
+    try:
+        result = client.get_attachment(
+            note_id=note_id,
+            attachment_id=str(attachment.get("id") or ""),
+            workspace=workspace,
+            user_id=user_id,
+            max_bytes=MAX_ATTACHMENT_BYTES,
+        )
+    except Exception as exc:
+        return _api_error_json(exc)
+
+    if not result.get("success"):
+        if result.get("error") == "too_large":
+            payload = {
+                "success": False,
+                "error": "Attachment too large for a tool call",
+                "filename": display_name,
+                "max_size": MAX_ATTACHMENT_BYTES,
+                "hint": "Download it from the web UI, or through GET /api/v1/notes/{id}/attachments/{attachment_id}.",
+            }
+            if result.get("size"):
+                payload["size"] = result["size"]
+            return json.dumps(payload, indent=2, ensure_ascii=False)
+        return json.dumps({
+            "success": False,
+            "error": result.get("error") or "Failed to read the attachment",
+            "status": result.get("status"),
+        }, indent=2, ensure_ascii=False)
+
+    content = result.get("content") or b""
+    mime_type = recorded_type or str(result.get("content_type") or "")
+
+    payload = {
+        "success": True,
+        "note_id": note_id,
+        "attachment_id": attachment.get("id"),
+        "filename": display_name,
+        "stored_filename": attachment.get("filename"),
+        "mime_type": mime_type or None,
+        "size": len(content),
+        "sha256": hashlib.sha256(content).hexdigest(),
+        "uploaded_at": attachment.get("uploaded_at"),
+        "encoding": mode,
+    }
+
+    if mode == "text":
+        try:
+            decoded = content.decode("utf-8")
+        except UnicodeDecodeError as exc:
+            return json.dumps({
+                "success": False,
+                "error": "Not valid UTF-8",
+                "detail": str(exc),
+                "filename": display_name,
+                "mime_type": mime_type or None,
+                "size": len(content),
+                "hint": "Call it again with encoding='base64' and decode the bytes yourself.",
+            }, indent=2, ensure_ascii=False)
+        # A byte-order mark is an encoding marker, not the first character of
+        # the file's text.
+        payload["content"] = decoded.lstrip("﻿")
+    else:
+        payload["content_base64"] = base64.b64encode(content).decode("ascii")
+
+    return json.dumps(payload, indent=2, ensure_ascii=False)
 
 
 @_tool()

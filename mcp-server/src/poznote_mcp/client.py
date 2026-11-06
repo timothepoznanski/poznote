@@ -732,6 +732,107 @@ class PoznoteClient:
         response.raise_for_status()
         return response.json()
 
+    def get_attachment(
+        self,
+        note_id: int,
+        attachment_id: str,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+        max_bytes: int | None = None,
+    ) -> dict:
+        """Read one attachment of a note back, bytes and recorded type.
+
+        Issue #1741: attachments could be written over the API and listed, but
+        not read, so an agent could file a document and never check it or read
+        it again.
+
+        The endpoint answers with the file itself, not JSON, and says why it
+        refused in a plain-text body ('Attachment not found'), which
+        raise_for_status() would throw away: the status is read first and the
+        body only then.
+
+        The body is streamed and abandoned as soon as it passes max_bytes, so
+        a file too large to carry in a tool call is never pulled into memory
+        whole.
+
+        Returns {'success': True, 'content': bytes, 'content_type': str} or
+        {'success': False, 'error': ..., 'status': ...}, with
+        error='too_large' when max_bytes was passed.
+        """
+        headers = self._headers_for_user(user_id)
+        # The client-wide Accept is application/json; this body is a file.
+        headers["Accept"] = "*/*"
+
+        params: dict = {}
+        self._set_workspace(params, workspace)
+
+        with self.client.stream(
+            "GET",
+            f"/notes/{note_id}/attachments/{_path_segment(attachment_id)}",
+            params=params,
+            headers=headers,
+            timeout=HEAVY_TIMEOUT,
+        ) as response:
+            if response.status_code != 200:
+                response.read()
+                return {
+                    "success": False,
+                    "status": response.status_code,
+                    "error": self._binary_error_text(response),
+                }
+
+            declared = response.headers.get("content-length") or ""
+            if max_bytes is not None and declared.isdigit() and int(declared) > max_bytes:
+                return {
+                    "success": False,
+                    "status": response.status_code,
+                    "error": "too_large",
+                    "size": int(declared),
+                }
+
+            chunks: list[bytes] = []
+            size = 0
+            for chunk in response.iter_bytes():
+                size += len(chunk)
+                if max_bytes is not None and size > max_bytes:
+                    # A file whose size the response did not declare, or
+                    # declared wrongly; stop reading rather than finish it.
+                    return {
+                        "success": False,
+                        "status": response.status_code,
+                        "error": "too_large",
+                        "size": None,
+                    }
+                chunks.append(chunk)
+
+            content_type = (response.headers.get("content-type") or "").split(";")[0].strip()
+
+        return {
+            "success": True,
+            "status": 200,
+            "content": b"".join(chunks),
+            "content_type": content_type,
+        }
+
+    @staticmethod
+    def _binary_error_text(response: httpx.Response) -> str:
+        """The reason a request for a file was refused.
+
+        Those endpoints answer in plain text, but the router's own refusals
+        (authentication, scope) are JSON, so both shapes are read.
+        """
+        body = (response.text or "").strip()
+        if body.startswith("{"):
+            try:
+                payload = response.json()
+            except ValueError:
+                payload = None
+            if isinstance(payload, dict):
+                message = payload.get("message") or payload.get("error")
+                if message:
+                    return str(message)
+        return body[:500] or f"HTTP {response.status_code}"
+
     def move_note_to_folder(self, note_id: int, folder_id: int, user_id: str | int | None = None) -> bool:
         """Move a note to a specific folder"""
         payload = {"folder_id": folder_id}
