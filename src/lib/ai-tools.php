@@ -21,6 +21,7 @@ require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../markdown_parser.php';
 require_once __DIR__ . '/../html_to_markdown.php';
 require_once __DIR__ . '/ai-note-diagrams.php';
+require_once __DIR__ . '/ai-note-images.php';
 require_once __DIR__ . '/ai-note-edit.php';
 
 // Largest part of a note (in bytes of its Markdown view) one get_note hands
@@ -170,6 +171,11 @@ function aiReadNote($con, $noteId, $maxLen = 24000, $workspace = '', $offset = 0
         // Repeated next to the content: models that skim the system prompt
         // still see it right where they read the note
         $result['hint'] = 'Rich-text note shown as Markdown. To edit it, send Markdown (never HTML) to update_note_content; it is converted back.';
+    }
+    if ($format === 'html' && strpos($content, '![') !== false) {
+        // Issue #1744: Markdown cannot carry width/height, so the model is
+        // told rather than left to believe it dropped them or can change them
+        $result['images'] = 'The display size the user gave an image is kept when you rewrite the note, although Markdown cannot show it here. Resizing an image is not something you can do.';
     }
     if (strpos($content, AI_DIAGRAM_PREFIX) !== false) {
         $result['diagrams'] = 'Each image whose address starts with ' . AI_DIAGRAM_PREFIX . ' stands for an Excalidraw diagram of the note. Keep that line exactly as it is in update_note_content to keep the diagram; it can be moved, and removing it deletes the diagram.';
@@ -1008,6 +1014,9 @@ function aiWriteNoteFromMarkdown($con, array $note, string $content, $actorUserI
         if (strpos($content, AI_INLINE_IMAGE_PREFIX) !== false) {
             $content = aiRestoreInlineImages($content, $stored);
         }
+        // The Markdown view has nowhere to carry the size of a resized image
+        // (issue #1744): it comes back from the stored note, by src
+        $content = aiRestoreImageSizes($content, $stored);
     }
     // After the sanitizers: the diagrams go back as they were stored
     if (strpos($content, AI_DIAGRAM_PREFIX) !== false) {
