@@ -1718,17 +1718,30 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
 GET /reminders
 ```
 
-List triggered notifications (most recent first, max 50).
+List pending notifications: the reminders that have already fired, the ones still to come, or both.
 
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
+| `scope` | string | `fired` (default) for the reminders whose time has passed and that have not been dismissed, most recent first, which is what the bell shows; `upcoming` for the ones still scheduled, soonest first; `all` for both, the fired ones first. Anything else answers 400 |
+| `limit` | int | Rows to return, 1 to 500 (default 50, the historical cap). Out of range answers 400 |
 | `workspace` | string | Filter by workspace |
 
+Each row carries `state` (`fired` or `upcoming`), `note_id`, `note_heading`, `workspace`, `message`, `trigger_at` (UTC), `recurrence`, `is_read` and `created`, plus a `task_id` when it is the reminder of one task of a tasklist note rather than of the note itself. A row whose note has since been moved to the trash keeps its reminder, with `note_heading` null.
+
+`unread_count` and `total_count` always count what has fired, whatever the scope, since they are the counters behind the bell; `upcoming_count` is added for `upcoming` and `all`. A session confined to a shared workspace only ever sees the reminders of that workspace.
+
+Only reminders are listed, never a due date without one: a task due tomorrow with no reminder has no row here (see `GET /tasks`).
+
 ```bash
+# What is still waiting, as the bell shows it
 curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/reminders
+
+# What is coming, soonest first
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/reminders?scope=upcoming&limit=100"
 ```
 
 ### Get Notification Count
@@ -4278,7 +4291,7 @@ curl http://YOUR_SERVER/api_health.php
 | `DELETE` | `/notes/{id}/reminder` | Remove note reminder |
 | `POST` | `/notes/{id}/task-reminder` | Set task reminder |
 | `DELETE` | `/notes/{id}/task-reminder` | Remove task reminder |
-| `GET` | `/reminders` | List notifications |
+| `GET` | `/reminders` | List notifications (fired, upcoming or all) |
 | `GET` | `/reminders/count` | Notification count |
 | `POST` | `/reminders/{id}/read` | Mark as read |
 | `POST` | `/reminders/{id}/dismiss` | Dismiss notification |

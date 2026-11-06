@@ -175,9 +175,15 @@ def _assert_port_available(host: str, port: int) -> None:
 # caller gets a clear error instead of the API's 400.
 MAX_NOTES_PAGE_SIZE = 1000
 
-# Hard LIMIT baked into RemindersController::index. list_reminders reports when
-# a feed came back at that size, so a truncated list is never read as complete.
+# Default page of RemindersController::index, the LIMIT 50 it used to have
+# baked in. list_reminders reports when a page came back full, so a truncated
+# list is never read as complete.
 REMINDERS_API_LIMIT = 50
+
+# Largest page that endpoint serves (POZNOTE_REMINDER_LIMIT_MAX in
+# src/lib/reminder-queries.php); list_reminders refuses more so the caller gets
+# a clear error instead of the API's 400.
+REMINDERS_MAX_LIMIT = 500
 
 # Largest attachment add_attachment accepts. Poznote itself allows 200 MB, but
 # the bytes reach this tool base64-encoded inside a JSON tool call, which is a
@@ -1869,57 +1875,135 @@ def delete_note(
 # REMINDERS
 # =============================================================================
 
+_REMINDER_SCOPES = ("fired", "upcoming", "all")
+
+_REMINDER_SCOPE_MEANING = {
+    "fired": "triggered and not dismissed (the bell feed), latest first",
+    "upcoming": "scheduled for later and not dismissed, soonest first",
+    "all": "pending reminders on both sides of now, the fired ones first",
+}
+
+
+def _reminder_row(row: dict) -> dict:
+    """One notification, with the field names the other tools use.
+
+    The API answers with "note_heading" and "trigger_at"; a reminder is
+    "note_title" and "reminder_at" everywhere else in this server
+    (get_reminder, set_reminder, list_all_tasks), and an agent should not have
+    to learn two spellings of the same thing.
+    """
+    task_id = row.get("task_id")
+    return {
+        "id": row.get("id"),
+        "state": row.get("state"),
+        "note_id": row.get("note_id"),
+        # None when the note is in the trash: the reminder still fires, but it
+        # no longer belongs to a note that can be opened.
+        "note_title": row.get("note_heading"),
+        "workspace": row.get("workspace"),
+        # Set for the reminder of one task of a tasklist note, absent for a
+        # reminder on the note itself.
+        "task_id": str(task_id) if task_id not in (None, "") else None,
+        "message": row.get("message", ""),
+        "reminder_at": row.get("trigger_at"),
+        "recurrence": row.get("recurrence") or None,
+        "is_read": bool(row.get("is_read")),
+        "created": row.get("created"),
+    }
+
+
 @_tool()
 def list_reminders(
     workspace: Optional[str] = None,
     unread_only: bool = False,
+    scope: str = "fired",
+    limit: int = REMINDERS_API_LIMIT,
     user_id: Optional[int] = None,
 ) -> str:
-    """List reminder notifications that have ALREADY FIRED and are still pending
+    """List pending reminders, the ones that already fired or the ones to come
 
-    This is the notification feed behind the bell icon in the UI: reminders
-    whose time has passed and that have not been dismissed.
+    "scope" picks the side of now:
+      * "fired" (default) - reminders whose time has passed and that have not
+        been dismissed: the notification feed behind the bell icon of the UI,
+        latest first.
+      * "upcoming" - reminders scheduled for later, soonest first. This is the
+        view a weekly review needs, and it costs one call instead of one
+        get_reminder per note.
+      * "all" - both, the fired ones first, so a limit never hides a
+        notification that is already waiting.
 
-    It is NOT a list of upcoming reminders. Poznote has no endpoint for those,
-    so an empty result here does NOT mean nothing is scheduled: future
-    reminders exist but can only be read one note at a time with get_reminder.
-    Never answer "you have nothing planned" on the strength of this tool.
+    Each row carries "state" ("fired" or "upcoming"), "note_id", "note_title",
+    "reminder_at", "recurrence" and "message". "reminder_at" is UTC
+    ('YYYY-MM-DD HH:MM:SS'), as everywhere in the reminder tools; the due
+    dates of list_all_tasks, in contrast, are local wall-clock time. A row
+    with a "task_id" is the reminder of one task of a tasklist note, and its
+    message is the task text; without one it is a reminder on the note itself.
+    "note_title" is null when the note has since been moved to the trash.
 
-    The API caps the feed at 50 notifications; "capped_by_api" says when that
-    limit was hit. "total_count" is the real number of pending notifications.
+    Only reminders are listed, not due dates: a task with a due date and no
+    reminder never appears here. Use list_all_tasks(due_after=…, due_before=…)
+    for those.
+
+    "unread_count" and "total_count" always count what has fired, whatever
+    the scope, since that is the badge of the bell; "upcoming_count" comes
+    back for "upcoming" and "all". "capped_by_limit" says the page came back
+    full, so there may be more than these.
 
     Args:
         workspace: Workspace name to filter by (optional)
-        unread_only: Only notifications not yet marked as read (default: False)
+        unread_only: Only notifications not yet marked as read (default:
+            False). Upcoming reminders are never read, so this only narrows
+            the fired half.
+        scope: 'fired' (default), 'upcoming' or 'all'
+        limit: Maximum number of reminders to return, 1-500 (default: 50)
         user_id: User profile ID to access (optional, overrides default)
     """
+    scope = str(scope or "fired").strip().lower()
+    if scope not in _REMINDER_SCOPES:
+        return json.dumps(
+            {"error": "scope must be 'fired', 'upcoming' or 'all'"}, ensure_ascii=False
+        )
+
+    # 0 is out of range, not "unset": validate the value as given rather than
+    # letting a falsy limit slide back to the default.
+    page_size = REMINDERS_API_LIMIT if limit is None else int(limit)
+    if page_size < 1 or page_size > REMINDERS_MAX_LIMIT:
+        return json.dumps(
+            {"error": f"limit must be between 1 and {REMINDERS_MAX_LIMIT}"}, ensure_ascii=False
+        )
+
     client, err = _get_client_or_error()
     if err:
         return err
     try:
-        payload = client.list_reminders(workspace=workspace, user_id=user_id)
+        payload = client.list_reminders(
+            workspace=workspace, user_id=user_id, scope=scope, limit=page_size
+        )
     except Exception as exc:
         return _api_error_json(exc)
 
-    notifications = payload.get("notifications", [])
+    rows = [_reminder_row(r) for r in payload.get("notifications", [])]
     # The cap applies to what the API returned, before any local filtering.
-    capped = len(notifications) >= REMINDERS_API_LIMIT
+    capped = len(rows) >= page_size
 
     if unread_only:
-        notifications = [n for n in notifications if not n.get("is_read")]
+        rows = [r for r in rows if not r["is_read"]]
 
     result = {
-        "count": len(notifications),
+        "count": len(rows),
         "unread_count": payload.get("unread_count", 0),
         "total_count": payload.get("total_count", 0),
-        "capped_by_api": capped,
-        "scope": "already triggered and not dismissed; upcoming reminders are not listable",
-        "notifications": notifications,
+        "capped_by_limit": capped,
+        "scope": scope,
+        "scope_meaning": _REMINDER_SCOPE_MEANING[scope],
+        "reminders": rows,
     }
+    if "upcoming_count" in payload:
+        result["upcoming_count"] = payload.get("upcoming_count")
     if capped:
         result["note"] = (
-            f"The API returns at most {REMINDERS_API_LIMIT} notifications; "
-            "older pending ones are not shown."
+            f"The page came back full at {page_size} reminders, so there may be "
+            f"more; ask for a higher limit (up to {REMINDERS_MAX_LIMIT})."
         )
     if workspace is not None:
         result["workspace"] = workspace
@@ -2169,6 +2253,8 @@ def list_all_tasks(
     workspace: Optional[str] = None,
     include_completed: bool = False,
     due_before: Optional[str] = None,
+    due_after: Optional[str] = None,
+    include_undated: bool = True,
     only_important: bool = False,
     include_checklists: bool = True,
     limit: int = 100,
@@ -2199,6 +2285,13 @@ def list_all_tasks(
             what is left to do)
         due_before: Keep only tasks due on or before this 'YYYY-MM-DD' date,
             inclusive. Undated tasks are dropped by this filter.
+        due_after: Keep only tasks due on or after this 'YYYY-MM-DD' date,
+            inclusive. Undated tasks are dropped by this filter. With
+            due_before, the two bound a window: due_after='2026-11-09',
+            due_before='2026-11-15' is "what is due next week".
+        include_undated: Include the tasks that carry no due date (default:
+            True). Pass False to keep the dated ones only; a date bound
+            already drops them, so this matters when neither is given.
         only_important: Keep only high priority tasks (default: False)
         include_checklists: Include in-note checkbox items (default: True)
         limit: Maximum number of tasks to return, 1-1000 (default: 100)
@@ -2214,12 +2307,18 @@ def list_all_tasks(
     if page_size < 1 or page_size > 1000:
         return json.dumps({"error": "limit must be between 1 and 1000"}, ensure_ascii=False)
 
-    if due_before is not None:
-        due_before = str(due_before).strip()
-        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", due_before):
+    for name, value in (("due_before", due_before), ("due_after", due_after)):
+        if value is None:
+            continue
+        value = str(value).strip()
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
             return json.dumps(
-                {"error": "due_before must be a 'YYYY-MM-DD' date"}, ensure_ascii=False
+                {"error": f"{name} must be a 'YYYY-MM-DD' date"}, ensure_ascii=False
             )
+        if name == "due_before":
+            due_before = value
+        else:
+            due_after = value
 
     try:
         payload = client.list_all_tasks(workspace=workspace, user_id=user_id)
@@ -2232,11 +2331,16 @@ def list_all_tasks(
         tasks = [t for t in tasks if not t["completed"]]
     if only_important:
         tasks = [t for t in tasks if t["important"]]
+    if not include_undated:
+        tasks = [t for t in tasks if t["dueAt"]]
+    # dueAt is local wall-clock time with no offset ('YYYY-MM-DD' or
+    # 'YYYY-MM-DDTHH:MM'); comparing the date part as a string keeps each bound
+    # inclusive of the whole day without any timezone conversion. An undated
+    # task answers neither bound, so a bound drops it.
     if due_before:
-        # dueAt is local wall-clock time with no offset ('YYYY-MM-DD' or
-        # 'YYYY-MM-DDTHH:MM'); comparing the date part as a string keeps the
-        # bound inclusive of the whole day without any timezone conversion.
         tasks = [t for t in tasks if t["dueAt"] and t["dueAt"][:10] <= due_before]
+    if due_after:
+        tasks = [t for t in tasks if t["dueAt"] and t["dueAt"][:10] >= due_after]
 
     tasks.sort(key=_task_sort_key)
 

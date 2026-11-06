@@ -25,6 +25,7 @@ require_once __DIR__ . '/lib/paths.php';
 require_once __DIR__ . '/lib/folders.php';
 require_once __DIR__ . '/lib/note-titles.php';
 require_once __DIR__ . '/lib/note-paths.php';
+require_once __DIR__ . '/lib/reminder-queries.php';
 require_once __DIR__ . '/lib/checklists.php';
 require_once __DIR__ . '/lib/tasklists.php';
 require_once __DIR__ . '/lib/branding.php';

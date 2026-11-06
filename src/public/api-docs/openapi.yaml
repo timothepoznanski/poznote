@@ -385,17 +385,37 @@ components:
     Notification:
       type: object
       description: >
-        A triggered reminder. Datetimes are UTC in "YYYY-MM-DD HH:MM:SS" format
-        with no timezone suffix, not ISO 8601.
+        A pending reminder, already triggered or still scheduled. Datetimes are
+        UTC in "YYYY-MM-DD HH:MM:SS" format with no timezone suffix, not
+        ISO 8601.
       properties:
         id:
           type: integer
           description: Notification ID, used by /reminders/{id}/read and /reminders/{id}/dismiss.
           example: 12
+        state:
+          type: string
+          enum: [fired, upcoming]
+          description: >
+            Which side of now this reminder is on, so a scope=all listing is
+            readable without comparing timestamps to another clock.
+          example: fired
         note_id:
           type: integer
           description: ID of the note this reminder belongs to.
           example: 42
+        task_id:
+          type: string
+          nullable: true
+          description: >
+            Set when this is the reminder of one task of a tasklist note, whose
+            text is then the message; null for a reminder on the note itself.
+          example: "1762000000001"
+        workspace:
+          type: string
+          nullable: true
+          description: Workspace of the linked note, null if the note was deleted or trashed.
+          example: Poznote
         type:
           type: string
           example: reminder
@@ -3058,16 +3078,38 @@ paths:
   /reminders:
     get:
       tags: [Reminders]
-      summary: List triggered notifications
+      summary: List pending notifications, fired or upcoming
       description: >
-        Lists reminders that are already due (trigger_at <= now) and not
-        dismissed, newest first, capped at 50. Reminders scheduled in the future
-        are not returned.
+        Lists the reminders that are not dismissed, on the side of now that
+        scope names: already due (trigger_at <= now), still scheduled, or both.
+        Only reminders are listed, never a due date without one.
       parameters:
         - $ref: '#/components/parameters/UserIdHeader'
+        - name: scope
+          in: query
+          description: >
+            fired (default) for the reminders already due and not dismissed,
+            newest first, which is what the bell shows; upcoming for the ones
+            still scheduled, soonest first; all for both, the fired ones first,
+            so a limit cuts into the future.
+          schema:
+            type: string
+            enum: [fired, upcoming, all]
+            default: fired
+        - name: limit
+          in: query
+          description: Rows to return, 1 to 500. Defaults to 50, the cap this endpoint used to have baked in.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 50
         - name: workspace
           in: query
-          description: Restrict to notifications whose note belongs to this workspace.
+          description: >
+            Restrict to notifications whose note belongs to this workspace. A
+            session confined to a shared workspace is restricted to that one
+            whatever this says.
           schema:
             type: string
       responses:
@@ -3083,17 +3125,34 @@ paths:
                     example: true
                   notifications:
                     type: array
-                    description: Due, non-dismissed notifications, newest first, max 50.
+                    description: The non-dismissed reminders of the requested scope, at most limit of them.
                     items:
                       $ref: '#/components/schemas/Notification'
                   unread_count:
                     type: integer
-                    description: Due, non-dismissed notifications with is_read = 0. Not capped at 50.
+                    description: Due, non-dismissed notifications with is_read = 0. Counts what has fired whatever the scope, and is not capped by limit.
                     example: 1
                   total_count:
                     type: integer
-                    description: All due, non-dismissed notifications. Not capped at 50.
+                    description: All due, non-dismissed notifications. Counts what has fired whatever the scope, and is not capped by limit.
                     example: 3
+                  upcoming_count:
+                    type: integer
+                    description: All non-dismissed reminders still scheduled. Only sent for scope=upcoming and scope=all.
+                    example: 7
+                  scope:
+                    type: string
+                    enum: [fired, upcoming, all]
+                    example: fired
+                  limit:
+                    type: integer
+                    example: 50
+        '400':
+          description: Invalid scope or limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '500':
           description: Failed to fetch notifications
           content:

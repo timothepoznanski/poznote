@@ -1041,26 +1041,47 @@ class PoznoteClient:
         response.raise_for_status()
         return response.json().get("success", False)
 
-    def list_reminders(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
-        """List the reminder notifications that have already fired.
+    def list_reminders(
+        self,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+        scope: str | None = None,
+        limit: int | None = None,
+    ) -> dict:
+        """List pending reminder notifications, fired or still to come.
 
-        RemindersController::index filters on ``trigger_at <= now`` and
-        ``dismissed = 0`` with a hard ``LIMIT 50``: this is the notification
-        feed behind the UI bell, not a list of upcoming reminders. There is no
-        endpoint for future reminders.
+        RemindersController::index filters on ``dismissed = 0`` and, since
+        issue #1740, on the side of now that ``scope`` names: ``fired``
+        (``trigger_at <= now``, the notification feed behind the UI bell, and
+        the default so that every older caller is unaffected), ``upcoming``
+        (``trigger_at > now``, soonest first) or ``all`` (both, fired first).
+
+        ``unread_count`` and ``total_count`` always count what has fired, so
+        they stay the badge of the bell whatever the scope; ``upcoming_count``
+        comes back for the two other scopes.
         """
         params: dict = {}
         self._set_workspace(params, workspace)
+        if scope:
+            params["scope"] = scope
+        if limit is not None:
+            params["limit"] = limit
         response = self.client.get("/reminders", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         if data.get("success"):
-            return {
+            result = {
                 "notifications": data.get("notifications", []),
                 "unread_count": data.get("unread_count", 0),
                 "total_count": data.get("total_count", 0),
+                "scope": data.get("scope", scope or "fired"),
+                "limit": data.get("limit"),
             }
-        return {"notifications": [], "unread_count": 0, "total_count": 0}
+            if "upcoming_count" in data:
+                result["upcoming_count"] = data.get("upcoming_count")
+            return result
+        return {"notifications": [], "unread_count": 0, "total_count": 0,
+                "scope": scope or "fired", "limit": limit}
 
     # ------------------------------------------------------------------
     # Tasks (inside a tasklist note)

@@ -20,37 +20,70 @@ class RemindersController {
     
     /**
      * GET /api/v1/reminders
-     * List pending notifications (triggered reminders that are not dismissed)
+     * List pending notifications that are not dismissed
+     *
+     * Query parameters:
+     *   - scope: 'fired' (default, what the bell shows), 'upcoming' (still to
+     *     come) or 'all' (both, fired first). Issue #1740.
+     *   - limit: 1 to 500 rows (default 50, the historical cap)
+     *   - workspace: only the reminders of the notes of that workspace
      */
     public function index(): void {
         $this->rememberDetectedAppUrl();
 
+        $scope = poznoteNormalizeReminderScope($_GET['scope'] ?? null);
+        if ($scope === null) {
+            $this->sendError(400, "Invalid scope (expected 'fired', 'upcoming' or 'all')");
+            return;
+        }
+        $limit = poznoteNormalizeReminderLimit($_GET['limit'] ?? null);
+        if ($limit === null) {
+            $this->sendError(400, 'Invalid limit (expected 1 to ' . POZNOTE_REMINDER_LIMIT_MAX . ')');
+            return;
+        }
+
         try {
             $now = gmdate('Y-m-d H:i:s');
-            $workspace = $_GET['workspace'] ?? null;
-            $hasWorkspace = $workspace !== null && $workspace !== '';
+            $workspace = $this->requestedWorkspace();
+            $hasWorkspace = $workspace !== null;
 
             $workspaceClause = $hasWorkspace ? 'AND e.workspace = ?' : '';
-            $params = $hasWorkspace ? [$now, $workspace] : [$now];
+            $workspaceParams = $hasWorkspace ? [$workspace] : [];
+
+            $filter = poznoteReminderScopeFilter($scope, $now);
+            $order = poznoteReminderScopeOrder($scope, $now);
 
             $stmt = $this->con->prepare("
-                SELECT n.id, n.note_id, n.type, n.message, n.is_read, n.created, n.trigger_at,
-                       e.heading AS note_heading,
+                SELECT n.id, n.note_id, n.task_id, n.type, n.message, n.is_read, n.created, n.trigger_at,
+                       e.heading AS note_heading, e.workspace AS workspace,
                        CASE WHEN n.task_id IS NOT NULL AND n.task_id != ''
                             THEN n.recurrence
                             ELSE e.reminder_recurrence END AS recurrence
                 FROM notifications n
                 LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
                 WHERE n.dismissed = 0
-                  AND n.trigger_at <= ?
+                  {$filter['sql']}
                   $workspaceClause
-                ORDER BY n.trigger_at DESC
-                LIMIT 50
+                ORDER BY {$order['sql']}
+                LIMIT ?
             ");
-            $stmt->execute($params);
+            $params = array_merge($filter['params'], $workspaceParams, $order['params'], [$limit]);
+            foreach ($params as $i => $value) {
+                $stmt->bindValue($i + 1, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+            }
+            $stmt->execute();
             $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Also count triggered notifications (read or unread) and triggered unread notifications
+            // Each row says which side of now it is on, so 'all' is readable
+            // without comparing timestamps to another machine's clock.
+            foreach ($notifications as &$notification) {
+                $notification['state'] = poznoteReminderState((string)($notification['trigger_at'] ?? ''), $now);
+            }
+            unset($notification);
+
+            // total_count and unread_count keep counting what has fired, read
+            // or not: they are the badge of the bell and must not move when a
+            // caller asks for another scope.
             $countParams = $hasWorkspace ? [$now, $workspace] : [$now];
             $countStmt = $this->con->prepare("
                 SELECT
@@ -65,16 +98,54 @@ class RemindersController {
             $counts = $countStmt->fetch(PDO::FETCH_ASSOC) ?: [];
             $unreadCount = (int)($counts['unread_count'] ?? 0);
             $totalCount = (int)($counts['total_count'] ?? 0);
-            
-            $this->sendSuccess([
+
+            $payload = [
                 'notifications' => $notifications,
-                    'unread_count' => $unreadCount,
-                    'total_count' => $totalCount
-            ]);
+                'unread_count' => $unreadCount,
+                'total_count' => $totalCount,
+                'scope' => $scope,
+                'limit' => $limit,
+            ];
+
+            // One more aggregate only for the callers that asked about the
+            // future, so the bell's own call stays two queries.
+            if ($scope !== 'fired') {
+                $upcomingStmt = $this->con->prepare("
+                    SELECT COUNT(*) FROM notifications n
+                    LEFT JOIN entries e ON e.id = n.note_id AND e.trash = 0
+                    WHERE n.dismissed = 0 AND n.trigger_at > ?
+                      $workspaceClause
+                ");
+                $upcomingStmt->execute($countParams);
+                $payload['upcoming_count'] = (int)$upcomingStmt->fetchColumn();
+            }
+
+            $this->sendSuccess($payload);
         } catch (Exception $e) {
             error_log('RemindersController::index error: ' . $e->getMessage());
             $this->sendError(500, 'Failed to fetch notifications');
         }
+    }
+
+    /**
+     * The workspace the listing is restricted to, or null for all of them.
+     *
+     * A session confined to a shared workspace reads that workspace and no
+     * other, whatever ?workspace says: the notifications table has no
+     * workspace of its own, and without this the feed would carry the headings
+     * of the owner's other workspaces.
+     */
+    private function requestedWorkspace(): ?string {
+        $scopeWorkspace = $this->sharedWorkspaceScope();
+        if ($scopeWorkspace !== null) {
+            return $scopeWorkspace;
+        }
+        $workspace = $_GET['workspace'] ?? null;
+        if (!is_scalar($workspace)) {
+            return null;
+        }
+        $workspace = (string)$workspace;
+        return $workspace !== '' ? $workspace : null;
     }
     
     /**
@@ -86,8 +157,8 @@ class RemindersController {
 
         try {
             $now = gmdate('Y-m-d H:i:s');
-            $workspace = $_GET['workspace'] ?? null;
-            $hasWorkspace = $workspace !== null && $workspace !== '';
+            $workspace = $this->requestedWorkspace();
+            $hasWorkspace = $workspace !== null;
             $workspaceClause = $hasWorkspace ? 'AND e.workspace = ?' : '';
             $params = $hasWorkspace ? [$now, $workspace] : [$now];
 
