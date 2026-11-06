@@ -121,8 +121,8 @@ def test_an_empty_payload_is_refused():
     client = MagicMock()
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        assert "required" in json.loads(server.add_attachment(42, "x.png", "  "))["error"]
-        assert "required" in json.loads(server.add_attachment(42, "  ", "eA=="))["error"]
+        assert "required" in json.loads(server.add_attachment(42, filename="x.png", content_base64="  "))["error"]
+        assert "required" in json.loads(server.add_attachment(42, filename="  ", content_base64="eA=="))["error"]
 
     client.add_attachment.assert_not_called()
 
@@ -143,7 +143,7 @@ def test_a_refusal_is_surfaced_as_a_failure():
     client.add_attachment.return_value = {"success": False, "error": "Storage quota reached", "status": 413}
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.add_attachment(42, "x.png", base64.b64encode(PNG).decode()))
+        payload = json.loads(server.add_attachment(42, filename="x.png", content_base64=base64.b64encode(PNG).decode()))
 
     assert payload["success"] is False
     assert payload["error"] == "Storage quota reached"

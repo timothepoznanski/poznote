@@ -2734,12 +2734,23 @@ class NotesController {
     /**
      * GET /api/v1/notes/resolve
      * Resolve a note reference by ID or heading (the whole title, whatever
-     * the case and the accents)
+     * the case and the accents), or a path (folder/sub/Title, issue #1738)
      */
     public function resolveReference(): void {
         $reference = $_GET['reference'] ?? null;
         $workspace = $_GET['workspace'] ?? null;
-        
+
+        if (isset($_GET['path']) && trim((string)$_GET['path']) !== '') {
+            if ($reference !== null && trim((string)$reference) !== '') {
+                // Two addresses for one note, and they can disagree: the one
+                // that would be dropped is the one worth arguing about.
+                $this->sendError(400, 'Pass either reference or path, not both.');
+                return;
+            }
+            $this->resolvePath((string)$_GET['path'], $workspace !== null ? (string)$workspace : null);
+            return;
+        }
+
         if (!$reference) {
             $this->sendError(400, 'No reference provided');
             return;
@@ -2783,6 +2794,64 @@ class NotesController {
         }
     }
     
+    /**
+     * The note a path addresses, or a refusal that says what to do instead.
+     *
+     * A path is an address: the folder part is matched the way every other
+     * folder argument of the API is, the title in full, and a path two notes
+     * answer to is refused with both of them rather than resolved to one of
+     * them (issue #1738).
+     */
+    private function resolvePath(string $path, ?string $workspace): void {
+        // A session confined to a shared workspace (auth.php) resolves paths
+        // inside it only, as changes() and listTemplates() already do: a path
+        // is a way of asking "what is there", and it must not answer for the
+        // owner's other workspaces.
+        $scopeName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+        if ($scopeName !== null) {
+            $workspace = $scopeName;
+        }
+
+        try {
+            $outcome = poznoteResolveNotePath($this->con, $path, $workspace);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error: ' . $e->getMessage());
+            return;
+        }
+
+        if ($outcome['status'] === 'ok') {
+            $this->sendSuccess($outcome['note']);
+            return;
+        }
+
+        if ($outcome['status'] === 'empty_path') {
+            $this->sendError(400, 'path is empty. Pass "Folder/Sub/Note title", or just the note title.');
+            return;
+        }
+
+        if ($outcome['status'] === 'ambiguous') {
+            // Poznote keeps note titles unique inside a folder, so a full path
+            // addresses at most one note per workspace: what is ambiguous here
+            // is either the workspace or how much of the path was given, and
+            // the hint says which rather than listing both every time.
+            $paths = array_unique(array_column($outcome['candidates'], 'path'));
+            $hint = count($paths) === 1
+                ? 'The same path exists in several workspaces: name the workspace, or use the id.'
+                : 'Pass the whole path, "Folder/Sub/Note title", or use the id.';
+            apiSendJson([
+                'success' => false,
+                'error' => 'Several notes answer to the path "' . $path . '". ' . $hint,
+                'code' => 'ambiguous_note_path',
+                'total' => $outcome['total'],
+                'candidates' => $outcome['candidates'],
+            ], 409);
+            return;
+        }
+
+        $this->sendError(404, 'No note at the path "' . $path . '"'
+            . ($workspace !== null && $workspace !== '' ? ' in workspace "' . $workspace . '"' : '') . '.');
+    }
+
     /**
      * GET /api/v1/notes/with-attachments
      * List notes that have attachments

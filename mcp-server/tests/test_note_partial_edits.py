@@ -263,7 +263,7 @@ def test_append_sends_the_merged_content_under_the_version_it_read():
     client.update_note.return_value = {"id": 7, "version": "v2"}
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.append_to_note(7, "- second"))
+        payload = json.loads(server.append_to_note(7, content="- second"))
 
     _, kwargs = client.update_note.call_args
     assert kwargs["content"] == "# Log\n\n- first\n\n- second\n"
@@ -279,7 +279,7 @@ def test_append_refuses_a_task_list_before_writing_anything():
     client.get_note.return_value = _note("[]", note_type="tasklist")
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.append_to_note(7, "- second"))
+        payload = json.loads(server.append_to_note(7, content="- second"))
 
     assert payload["error"] == "unsupported_note_type"
     assert "add_task" in payload["message"]
@@ -303,7 +303,7 @@ def test_append_rebuilds_on_the_content_a_conflict_hands_back():
     ]
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.append_to_note(7, "- mine"))
+        payload = json.loads(server.append_to_note(7, content="- mine"))
 
     assert client.update_note.call_count == 2
     _, kwargs = client.update_note.call_args
@@ -321,7 +321,7 @@ def test_a_note_locked_by_someone_else_is_reported_as_such():
     client.update_note.side_effect = _http_error(423)
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.append_to_note(7, "- second"))
+        payload = json.loads(server.append_to_note(7, content="- second"))
 
     assert payload["error"] == "note_locked"
     assert "nothing was changed" in payload["message"]
@@ -334,7 +334,7 @@ def test_a_timeout_says_the_write_may_have_landed():
     client.update_note.side_effect = httpx.ReadTimeout("too slow")
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.append_to_note(7, "- second"))
+        payload = json.loads(server.append_to_note(7, content="- second"))
 
     assert payload["error"] == "write_outcome_unknown"
     assert "may or may not" in payload["message"]
@@ -346,7 +346,7 @@ def test_a_timeout_is_not_retried():
     client.update_note.side_effect = httpx.ReadTimeout("too slow")
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        server.append_to_note(7, "- second")
+        server.append_to_note(7, content="- second")
 
     assert client.update_note.call_count == 1
 
@@ -360,7 +360,7 @@ def test_endless_conflicts_end_in_a_refusal_not_a_loop():
     }
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.append_to_note(7, "- mine"))
+        payload = json.loads(server.append_to_note(7, content="- mine"))
 
     assert payload["error"] == "version_conflict"
     assert client.update_note.call_count == 3
@@ -370,7 +370,7 @@ def test_append_refuses_empty_text_without_touching_the_note():
     client = MagicMock()
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.append_to_note(7, "   "))
+        payload = json.loads(server.append_to_note(7, content="   "))
 
     assert "non-empty" in payload["error"]
     client.get_note.assert_not_called()
@@ -384,7 +384,7 @@ def test_replace_in_note_writes_only_the_changed_passage():
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
         payload = json.loads(
             server.replace_in_note(
-                7, [{"find": "Status: draft", "replace": "Status: final"}]
+                7, replacements=[{"find": "Status: draft", "replace": "Status: final"}]
             )
         )
 
@@ -399,7 +399,7 @@ def test_an_ambiguous_find_stops_before_the_write():
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
         payload = json.loads(
-            server.replace_in_note(7, [{"find": "done", "replace": "pending"}])
+            server.replace_in_note(7, replacements=[{"find": "done", "replace": "pending"}])
         )
 
     assert payload["error"] == "replacement_failed"
@@ -414,7 +414,7 @@ def test_a_replacement_that_changes_nothing_is_not_written():
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
         payload = json.loads(
             server.replace_in_note(
-                7, [{"find": "Status: final", "replace": "Status: final"}]
+                7, replacements=[{"find": "Status: final", "replace": "Status: final"}]
             )
         )
 

@@ -690,15 +690,84 @@ mcp.add_middleware(AuthMiddleware(auth=_caller_scope_check))
 # TOOLS - Actions for searching and modifying notes
 # =============================================================================
 
+
+def _note_target(
+    note_id: Optional[int],
+    path: Optional[str],
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> tuple[Optional[int], Optional[str]]:
+    """The note a tool was given: its id, or the path that leads to it.
+
+    Issue #1738. A caller that knows where a note lives had to turn that into
+    an id first, with a listing and a client-side scan of up to a page of
+    notes, before every single read. Every tool that takes a note id therefore
+    also takes a path, "Folder/Sub/Exact title", and exactly one of the two.
+
+    Both at once is refused rather than resolved in some order: a caller
+    passing both believes they agree, and the one the server would drop is the
+    one it should be arguing about. A path that leads to several notes is
+    refused too, with every candidate, since an address two notes answer to is
+    a question for the caller.
+
+    Returns (id, None) or (None, error JSON for the tool to return).
+    """
+    wanted = path.strip() if isinstance(path, str) else ""
+
+    if note_id is not None and wanted:
+        return None, json.dumps({
+            "success": False,
+            "error": "Pass either the note's id or its path, not both.",
+            "hint": "They can disagree, and nothing here can tell which one you meant.",
+        }, indent=2, ensure_ascii=False)
+
+    if note_id is None and not wanted:
+        return None, json.dumps({
+            "success": False,
+            "error": "No note given: pass its id, or its path.",
+            "hint": (
+                'A path is the note\'s folder path and its exact title, for '
+                'example "Projects/Alpha/Status", or just the title for a note '
+                "at the root of a workspace."
+            ),
+        }, indent=2, ensure_ascii=False)
+
+    if note_id is not None:
+        return int(note_id), None
+
+    client, err = _get_client_or_error()
+    if err:
+        return None, err
+
+    try:
+        resolved = client.resolve_note_path(wanted, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return None, _api_error_json(exc)
+
+    if resolved.get("id") is None:
+        payload = {
+            "success": False,
+            "error": resolved.get("error") or f"No note at the path {wanted!r}.",
+            "path": wanted,
+        }
+        for key in ("code", "total", "candidates"):
+            if resolved.get(key) is not None:
+                payload[key] = resolved[key]
+        return None, json.dumps(payload, indent=2, ensure_ascii=False)
+
+    return int(resolved["id"]), None
+
+
 @_tool()
 def get_note(
-    id: int,
+    id: Optional[int] = None,
     workspace: Optional[str] = None,
     user_id: Optional[int] = None,
     offset: int = 0,
     max_chars: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
-    """Get a specific note by its ID, whole or one part at a time
+    """Get a specific note by its ID or its path, whole or one part at a time
 
     The result includes a "version" token; pass it as if_version to update_note
     to make the write fail safely if the note changed in between. It also
@@ -721,7 +790,14 @@ def get_note(
             The part is cut back to a line end when one is near its end, so it
             can be shorter than asked. "next_offset" is where the next part
             starts, or null when this one ends the note.
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, workspace, user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -1217,7 +1293,7 @@ def create_note(
 
 @_tool()
 def update_note(
-    id: int,
+    id: Optional[int] = None,
     workspace: Optional[str] = None,
     content: Optional[Union[str, list]] = None,
     title: Optional[str] = None,
@@ -1231,6 +1307,7 @@ def update_note(
     reminder_recurrence: Optional[str] = None,
     reminder_message: Optional[str] = None,
     reminder_email: Optional[bool] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Update an existing note. Only provided fields will be updated.
 
@@ -1271,7 +1348,14 @@ def update_note(
             '1d', '2w', '1y'. Omit for a one-off reminder.
         reminder_message: Notification text (optional, defaults to the note title)
         reminder_email: Whether the reminder also sends an email (optional)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, workspace, user_id)
+    if err:
+        return err
+
     if content is not None:
         content = _normalize_content(content)
     client, err = _get_client_or_error()
@@ -1484,10 +1568,12 @@ def _edit_note_text(
 
 @_tool()
 def append_to_note(
-    id: int,
+    id: Optional[int] = None,
+    *,
     content: str,
     workspace: Optional[str] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Add text to the end of a note without reading or resending the rest
 
@@ -1509,7 +1595,14 @@ def append_to_note(
         content: Text to add at the end, Markdown or HTML to match the note
         workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, workspace, user_id)
+    if err:
+        return err
+
     addition = _normalize_content(content)
     if not isinstance(addition, str) or addition.strip() == "":
         return json.dumps(
@@ -1525,10 +1618,12 @@ def append_to_note(
 
 @_tool()
 def replace_in_note(
-    id: int,
+    id: Optional[int] = None,
+    *,
     replacements: list,
     workspace: Optional[str] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Change parts of a note by exact text, leaving the rest untouched
 
@@ -1553,7 +1648,14 @@ def replace_in_note(
             "all": true to replace every occurrence of that find
         workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, workspace, user_id)
+    if err:
+        return err
+
     def transform(current: str, note_type: str):
         outcome = note_text.apply_replacements(current, replacements)
         if "error" in outcome:
@@ -1565,9 +1667,10 @@ def replace_in_note(
 
 @_tool()
 def get_note_outline(
-    id: int,
+    id: Optional[int] = None,
     workspace: Optional[str] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """List a note's headings and where each section starts and ends
 
@@ -1595,7 +1698,14 @@ def get_note_outline(
         id: ID of the note to outline
         workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, workspace, user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -1632,7 +1742,8 @@ def get_note_outline(
 
 @_tool()
 def replace_section(
-    id: int,
+    id: Optional[int] = None,
+    *,
     heading: str,
     content: str,
     mode: str = "replace",
@@ -1641,6 +1752,7 @@ def replace_section(
     level: int = 2,
     workspace: Optional[str] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Rewrite or extend one section of a note, named by its heading
 
@@ -1680,7 +1792,14 @@ def replace_section(
             (default 2)
         workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, workspace, user_id)
+    if err:
+        return err
+
     body = _normalize_content(content)
     if not isinstance(body, str):
         return json.dumps(
@@ -1709,14 +1828,26 @@ def replace_section(
 
 
 @_tool()
-def delete_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
-    """Delete a note by its ID
+def delete_note(
+    id: Optional[int] = None,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
+    """Delete a note by its ID or its path
     
     Args:
         id: ID of the note to delete
         workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, workspace, user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -1796,13 +1927,24 @@ def list_reminders(
 
 
 @_tool()
-def get_reminder(note_id: int, user_id: Optional[int] = None) -> str:
+def get_reminder(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Get the reminder currently set on a note
 
     Args:
         note_id: ID of the note
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -1824,12 +1966,14 @@ def get_reminder(note_id: int, user_id: Optional[int] = None) -> str:
 
 @_tool()
 def set_reminder(
-    note_id: int,
+    note_id: Optional[int] = None,
+    *,
     reminder_at: str,
     recurrence: Optional[str] = None,
     message: Optional[str] = None,
     email_enabled: Optional[bool] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Set (or replace) the reminder on a note, as the bell icon does in the UI
 
@@ -1845,7 +1989,14 @@ def set_reminder(
         email_enabled: Whether the reminder also sends an email (optional).
             Ignored when SMTP is not configured.
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -1875,13 +2026,24 @@ def set_reminder(
 
 
 @_tool()
-def remove_reminder(note_id: int, user_id: Optional[int] = None) -> str:
+def remove_reminder(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Remove the reminder from a note
 
     Args:
         note_id: ID of the note
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -1901,7 +2063,11 @@ def remove_reminder(note_id: int, user_id: Optional[int] = None) -> str:
 # =============================================================================
 
 @_tool()
-def list_tasks(note_id: int, user_id: Optional[int] = None) -> str:
+def list_tasks(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """List the tasks of a tasklist note, with their IDs, due dates and flags
 
     Use this to get a task's ID before calling update_task, complete_task or
@@ -1911,7 +2077,14 @@ def list_tasks(note_id: int, user_id: Optional[int] = None) -> str:
     Args:
         note_id: ID of the tasklist note
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2083,7 +2256,8 @@ def list_all_tasks(
 
 @_tool()
 def add_task(
-    note_id: int,
+    note_id: Optional[int] = None,
+    *,
     text: str,
     due_at: Optional[str] = None,
     reminder: Optional[bool] = None,
@@ -2092,6 +2266,7 @@ def add_task(
     reminder_email: Optional[bool] = None,
     user_id: Optional[int] = None,
     priority: Optional[str] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Add a single task to a tasklist note
 
@@ -2114,7 +2289,14 @@ def add_task(
         user_id: User profile ID to access (optional, overrides default)
         priority: 'high', 'medium' or 'low' (default: none). Open tasks are
             kept in high, medium, low, none order.
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     if not text or not str(text).strip():
         return json.dumps({"error": "text is required"}, ensure_ascii=False)
 
@@ -2149,7 +2331,8 @@ def add_task(
 
 @_tool()
 def update_task(
-    note_id: int,
+    note_id: Optional[int] = None,
+    *,
     task_id: str,
     text: Optional[str] = None,
     completed: Optional[bool] = None,
@@ -2160,6 +2343,7 @@ def update_task(
     reminder_email: Optional[bool] = None,
     user_id: Optional[int] = None,
     priority: Optional[str] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Update one task of a tasklist note. Only provided fields change.
 
@@ -2180,7 +2364,14 @@ def update_task(
         reminder_email: Whether the reminder also sends an email (optional)
         user_id: User profile ID to access (optional, overrides default)
         priority: 'high', 'medium', 'low', or 'none' to clear it
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     fields: dict = {}
     for key, value in (
         ("text", text),
@@ -2222,7 +2413,14 @@ def update_task(
 
 
 @_tool()
-def complete_task(note_id: int, task_id: str, completed: bool = True, user_id: Optional[int] = None) -> str:
+def complete_task(
+    note_id: Optional[int] = None,
+    *,
+    task_id: str,
+    completed: bool = True,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Mark a task of a tasklist note as done (or undone)
 
     Args:
@@ -2230,7 +2428,14 @@ def complete_task(note_id: int, task_id: str, completed: bool = True, user_id: O
         task_id: ID of the task (from list_tasks)
         completed: True to complete the task (default), False to reopen it
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2251,14 +2456,27 @@ def complete_task(note_id: int, task_id: str, completed: bool = True, user_id: O
 
 
 @_tool()
-def delete_task(note_id: int, task_id: str, user_id: Optional[int] = None) -> str:
+def delete_task(
+    note_id: Optional[int] = None,
+    *,
+    task_id: str,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Delete one task from a tasklist note
 
     Args:
         note_id: ID of the tasklist note
         task_id: ID of the task (from list_tasks)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2275,11 +2493,13 @@ def delete_task(note_id: int, task_id: str, user_id: Optional[int] = None) -> st
 
 @_tool()
 def add_subtask(
-    note_id: int,
+    note_id: Optional[int] = None,
+    *,
     task_id: str,
     text: str,
     completed: Optional[bool] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Add a subtask under one task of a tasklist note
 
@@ -2294,7 +2514,14 @@ def add_subtask(
         text: Subtask text
         completed: Whether the subtask is already done (default: False)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     if not text or not str(text).strip():
         return json.dumps({"error": "text is required"}, ensure_ascii=False)
 
@@ -2327,12 +2554,14 @@ def add_subtask(
 
 @_tool()
 def update_subtask(
-    note_id: int,
+    note_id: Optional[int] = None,
+    *,
     task_id: str,
     subtask_id: str,
     text: Optional[str] = None,
     completed: Optional[bool] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Rename a subtask, or mark it done or not done. Only provided fields change.
 
@@ -2346,7 +2575,14 @@ def update_subtask(
         text: New subtask text
         completed: Whether the subtask is done
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     fields: dict = {}
     if text is not None:
         fields["text"] = text
@@ -2381,7 +2617,14 @@ def update_subtask(
 
 
 @_tool()
-def delete_subtask(note_id: int, task_id: str, subtask_id: str, user_id: Optional[int] = None) -> str:
+def delete_subtask(
+    note_id: Optional[int] = None,
+    *,
+    task_id: str,
+    subtask_id: str,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Delete one subtask of a task
 
     Args:
@@ -2389,7 +2632,14 @@ def delete_subtask(note_id: int, task_id: str, subtask_id: str, user_id: Optiona
         task_id: ID of the parent task (from list_tasks)
         subtask_id: ID of the subtask (from the "subtasks" of that task)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2699,13 +2949,24 @@ def restore_note(id: int, user_id: Optional[int] = None) -> str:
 
 
 @_tool()
-def duplicate_note(id: int, user_id: Optional[int] = None) -> str:
+def duplicate_note(
+    id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Create a duplicate of an existing note
     
     Args:
         id: ID of the note to duplicate
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2720,13 +2981,24 @@ def duplicate_note(id: int, user_id: Optional[int] = None) -> str:
 
 
 @_tool()
-def toggle_favorite(id: int, user_id: Optional[int] = None) -> str:
+def toggle_favorite(
+    id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Toggle the favorite status of a note
     
     Args:
         id: ID of the note to favor/unfavor
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2738,13 +3010,24 @@ def toggle_favorite(id: int, user_id: Optional[int] = None) -> str:
 
 
 @_tool()
-def list_attachments(note_id: int, user_id: Optional[int] = None) -> str:
+def list_attachments(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """List all attachments for a specific note
     
     Args:
         note_id: ID of the note to list attachments for
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2760,14 +3043,27 @@ def list_attachments(note_id: int, user_id: Optional[int] = None) -> str:
 
 
 @_tool()
-def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = None) -> str:
+def move_note_to_folder(
+    note_id: Optional[int] = None,
+    *,
+    folder_id: int,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Move a note to a specific folder
     
     Args:
         note_id: ID of the note to move
         folder_id: ID of the target folder
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -2780,12 +3076,14 @@ def move_note_to_folder(note_id: int, folder_id: int, user_id: Optional[int] = N
 
 @_tool()
 def add_attachment(
-    note_id: int,
+    note_id: Optional[int] = None,
+    *,
     filename: str,
     content_base64: str,
     mime_type: Optional[str] = None,
     workspace: Optional[str] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Attach a file to a note, from its base64 content
 
@@ -2808,7 +3106,14 @@ def add_attachment(
             detects it from the bytes and the extension anyway.
         workspace: Workspace of the note (optional)
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, workspace, user_id)
+    if err:
+        return err
+
     if not filename or not str(filename).strip():
         return json.dumps({"error": "filename is required"}, ensure_ascii=False)
 
@@ -2882,12 +3187,13 @@ def add_attachment(
 
 @_tool()
 def move_note(
-    note_id: int,
+    note_id: Optional[int] = None,
     target_workspace: Optional[str] = None,
     folder: Optional[str] = None,
     folder_id: Optional[int] = None,
     workspace: Optional[str] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Move a note to another workspace and/or folder, keeping its id
 
@@ -2908,7 +3214,14 @@ def move_note(
         workspace: Workspace to look the note up in (optional). This one never
             moves the note; target_workspace does.
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, workspace, user_id)
+    if err:
+        return err
+
     if target_workspace is None and folder is None and folder_id is None:
         return json.dumps(
             {"error": "Nothing to move to. Provide target_workspace, folder or folder_id."},
@@ -3000,13 +3313,24 @@ def move_folder(
 
 
 @_tool()
-def remove_note_from_folder(note_id: int, user_id: Optional[int] = None) -> str:
+def remove_note_from_folder(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Remove a note from its current folder (moves it to root)
     
     Args:
         note_id: ID of the note to remove from folder
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -3018,13 +3342,24 @@ def remove_note_from_folder(note_id: int, user_id: Optional[int] = None) -> str:
 
 
 @_tool()
-def share_note(note_id: int, user_id: Optional[int] = None) -> str:
+def share_note(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Enable public sharing for a note and get the public URL
     
     Args:
         note_id: ID of the note to share
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -3039,13 +3374,24 @@ def share_note(note_id: int, user_id: Optional[int] = None) -> str:
 
 
 @_tool()
-def unshare_note(note_id: int, user_id: Optional[int] = None) -> str:
+def unshare_note(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Disable public sharing for a note
     
     Args:
         note_id: ID of the note to unshare
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -3057,13 +3403,24 @@ def unshare_note(note_id: int, user_id: Optional[int] = None) -> str:
 
 
 @_tool()
-def get_note_share_status(note_id: int, user_id: Optional[int] = None) -> str:
+def get_note_share_status(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Get the current sharing status and public URL for a note
     
     Args:
         note_id: ID of the note
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -3117,7 +3474,11 @@ _SNAPSHOT_KEY_HINT = "snapshot_key must be a key returned by list_snapshots (YYY
 
 
 @_tool()
-def list_snapshots(note_id: int, user_id: Optional[int] = None) -> str:
+def list_snapshots(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """List the saved earlier versions (snapshots) of a note
 
     The Poznote interface calls these "revisions" (the note's Revisions page):
@@ -3138,7 +3499,14 @@ def list_snapshots(note_id: int, user_id: Optional[int] = None) -> str:
     Args:
         note_id: ID of the note
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -3161,10 +3529,11 @@ def list_snapshots(note_id: int, user_id: Optional[int] = None) -> str:
 
 @_tool()
 def get_snapshot(
-    note_id: int,
+    note_id: Optional[int] = None,
     snapshot_key: Optional[str] = None,
     date: Optional[str] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Read the content of one earlier version of a note, without changing it
 
@@ -3183,7 +3552,14 @@ def get_snapshot(
         snapshot_key: Key of the snapshot, from list_snapshots (preferred)
         date: 'YYYY-MM-DD' day to read instead, when no key is at hand
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -3224,10 +3600,11 @@ def get_snapshot(
 
 @_tool()
 def restore_snapshot(
-    note_id: int,
+    note_id: Optional[int] = None,
     snapshot_key: Optional[str] = None,
     date: Optional[str] = None,
     user_id: Optional[int] = None,
+    path: Optional[str] = None,
 ) -> str:
     """Roll a note back to one of its snapshots, OVERWRITING its current content
 
@@ -3244,7 +3621,14 @@ def restore_snapshot(
         snapshot_key: Key of the snapshot to restore, from list_snapshots
         date: 'YYYY-MM-DD' day to restore instead, when no key is at hand
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -3592,13 +3976,24 @@ def update_app_setting(key: str, value: str, user_id: Optional[int] = None) -> s
 
 
 @_tool()
-def get_backlinks(note_id: int, user_id: Optional[int] = None) -> str:
+def get_backlinks(
+    note_id: Optional[int] = None,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Get all notes that link to (reference) a specific note
     
     Args:
         note_id: ID of the note to find backlinks for
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its note_id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    note_id, err = _note_target(note_id, path, user_id=user_id)
+    if err:
+        return err
+
     client, err = _get_client_or_error()
     if err:
         return err
@@ -3614,14 +4009,27 @@ def get_backlinks(note_id: int, user_id: Optional[int] = None) -> str:
 
 
 @_tool()
-def convert_note(id: int, target: str, user_id: Optional[int] = None) -> str:
+def convert_note(
+    id: Optional[int] = None,
+    *,
+    target: str,
+    user_id: Optional[int] = None,
+    path: Optional[str] = None,
+) -> str:
     """Convert a note between HTML and Markdown formats
     
     Args:
         id: ID of the note to convert
         target: Target format ('html' or 'markdown')
         user_id: User profile ID to access (optional, overrides default)
+        path: Folder path and exact title of the note, instead of its id,
+            like "Projects/Alpha/Status" (just the title for a note at the
+            root of a workspace). Pass one of the two, never both.
     """
+    id, err = _note_target(id, path, user_id=user_id)
+    if err:
+        return err
+
     target = target.strip().lower()
     if target not in {"html", "markdown"}:
         return json.dumps({"error": "Invalid target format. Use 'html' or 'markdown'."}, ensure_ascii=False)

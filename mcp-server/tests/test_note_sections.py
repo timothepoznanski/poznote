@@ -338,7 +338,7 @@ def test_replace_section_writes_the_whole_note_back_once():
     client.update_note.return_value = {"id": 7, "version": "v2"}
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.replace_section(7, "Status", "Stalled."))
+        payload = json.loads(server.replace_section(7, heading="Status", content="Stalled."))
 
     _, kwargs = client.update_note.call_args
     assert "## Status\n\nStalled.\n\n## Notes" in kwargs["content"]
@@ -357,7 +357,7 @@ def test_replace_section_finds_the_heading_again_after_a_conflict():
     ]
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.replace_section(7, "Status", "new"))
+        payload = json.loads(server.replace_section(7, heading="Status", content="new"))
 
     _, kwargs = client.update_note.call_args
     assert kwargs["content"] == "# Added by someone else\n\nlots of new text\n\n## Status\n\nnew\n"
@@ -369,7 +369,7 @@ def test_an_ambiguous_heading_stops_before_the_write():
     client.get_note.return_value = _note("## Notes\n\na\n\n# X\n\n## Notes\n\nb\n")
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.replace_section(7, "Notes", "x"))
+        payload = json.loads(server.replace_section(7, heading="Notes", content="x"))
 
     assert payload["error"] == "heading_ambiguous"
     client.update_note.assert_not_called()

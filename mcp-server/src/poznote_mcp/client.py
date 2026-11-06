@@ -238,6 +238,47 @@ class PoznoteClient:
             }
         return {"notes": [], "total": 0, "offset": offset or 0, "limit": limit, "has_more": False}
     
+    def resolve_note_path(
+        self,
+        path: str,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+    ) -> dict:
+        """The note a path addresses: folder path, then exact title (issue #1738)
+
+        Returns {'id', 'heading', 'workspace', 'folder'} for the one note at
+        that path. A path no note answers to, and a path several notes answer
+        to, come back as a dict carrying 'error' instead of raising, the second
+        one with 'candidates': the caller has to be able to tell the two apart
+        and to pass the list on, since picking one of the candidates is exactly
+        what an address must not do.
+        """
+        params: dict = {"path": path}
+        self._set_workspace(params, workspace)
+
+        response = self.client.get("/notes/resolve", params=params, headers=self._headers_for_user(user_id))
+
+        if response.status_code in (400, 404, 409):
+            try:
+                payload = response.json()
+            except ValueError:
+                payload = None
+            if isinstance(payload, dict) and payload.get("error"):
+                return {key: value for key, value in payload.items() if key != "success"}
+            return {"error": f"Poznote could not resolve the path (HTTP {response.status_code})."}
+
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("success") and data.get("id") is not None:
+            return {
+                "id": int(data["id"]),
+                "heading": data.get("heading"),
+                "workspace": data.get("workspace"),
+                "folder": data.get("folder"),
+            }
+        return {"error": data.get("error") or f"No note at the path {path!r}."}
+
     def get_note(self, note_id: int, workspace: str | None = None, user_id: str | int | None = None) -> dict | None:
         """
         Get a specific note with its content

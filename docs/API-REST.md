@@ -302,7 +302,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123
 ```
 
-### Resolve Note by Reference
+### Resolve Note by Reference or Path
 
 ```
 GET /notes/resolve
@@ -310,16 +310,24 @@ GET /notes/resolve
 
 Resolve a note by ID or title (reference), the way a `[[Note Title]]` link does. A title matches the note called exactly that way, whatever the case and the accents: `Paris` resolves to the note `Paris`, never to `Weekend in Paris`. When several notes share the title, the one written the same way wins, then the most recently updated. The response includes the note's `id`, `heading` and `workspace`, or a `404` when no note has that title.
 
+Pass `path` instead of `reference` to address the note by where it lives, `Folder/Sub/Note title`, which is what the MCP server's `path` arguments go through (issue #1738). The folder part is matched like the `folder` of `POST /notes`: a slash path is walked from the root of the workspace, a bare name reaches a folder at any depth when only one carries it, and `Default` means the root itself. The title has to match in full, ignoring case and accents, and a path with no folder part is just a title, matched wherever the note sits. The response adds the note's `folder` and the `path` it was found at. The separator cannot be escaped, so a note or folder whose own name holds a slash is out of reach this way: `Projects/2026/11/06` means the folder `Projects/2026/11`, and a note called `2026/11/06` is addressed by its id.
+
+Unlike `reference`, a path is never resolved to one of several notes: when more than one answers to it, the answer is a `409` carrying `code: "ambiguous_note_path"` and a `candidates` array of `{id, title, folder, workspace, path}`, so the caller can pass a longer path, name the workspace, or use the id. Titles are unique inside a folder, so that only happens for a bare title, a bare folder name, or the same path in several workspaces. A path no note answers to is a `404`, and an empty one a `400`.
+
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `reference` | string | Note ID, or full note title |
+| `path` | string | Folder path and exact title, `Projects/Alpha/Status` (instead of `reference`, never both) |
 | `workspace` | string | Workspace to search in (omit to search every workspace) |
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/resolve?reference=My+Note&workspace=Personal"
+
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/resolve?path=Projects/Alpha/Status&workspace=Personal"
 ```
 
 ### Search Notes
@@ -4203,7 +4211,7 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/notes` | List notes |
 | `GET` | `/notes/with-attachments` | List notes with attachments |
 | `GET` | `/notes/templates` | List notes usable as templates |
-| `GET` | `/notes/resolve` | Resolve note by reference |
+| `GET` | `/notes/resolve` | Resolve note by reference or by folder path and title |
 | `GET` | `/notes/search` | Search notes |
 | `GET` | `/notes/search/ids` | Ids of the notes holding every word of a query |
 | `GET` | `/notes/{id}` | Get note |
