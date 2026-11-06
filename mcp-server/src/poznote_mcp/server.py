@@ -11,6 +11,10 @@ Tools:
   - search_notes: Search notes by text query, with optional creation date range
   - create_note: Create a new note
   - update_note: Update an existing note
+  - append_to_note: Add text to the end of a note, without resending the rest
+  - replace_in_note: Change passages of a note by their exact text
+  - replace_section: Rewrite or extend the section a heading names
+  - get_note_outline: List a note's headings and where each section ends
   - delete_note: Delete a note by its ID
   - list_notes: List all notes from a specific workspace
   - create_folder: Create a new folder in Poznote
@@ -51,6 +55,7 @@ from mcp.types import ToolAnnotations
 from starlette.middleware import Middleware
 
 from .client import PoznoteClient
+from . import note_sections, note_text
 from fastmcp.server.auth import AuthContext
 from fastmcp.server.middleware import AuthMiddleware
 
@@ -552,11 +557,15 @@ TOOL_SCOPES: dict[str, str] = {
     "list_backups": "read",
     "get_app_setting": "read",
     "get_backlinks": "read",
+    "get_note_outline": "read",
     "list_shared": "read",
     "list_shared_with_me": "read",
     # write
     "create_note": "write",
     "update_note": "write",
+    "append_to_note": "write",
+    "replace_in_note": "write",
+    "replace_section": "write",
     "delete_note": "write",
     "set_reminder": "write",
     "remove_reminder": "write",
@@ -599,7 +608,8 @@ TOOL_SCOPES: dict[str, str] = {
 # Tools that remove or overwrite data, for the MCP destructiveHint annotation.
 # The others above read only add, move or rename.
 DESTRUCTIVE_TOOLS = frozenset({
-    "update_note", "delete_note", "remove_reminder", "delete_task", "delete_subtask",
+    # append_to_note is not here: it only adds after what is already in the note.
+    "update_note", "replace_in_note", "replace_section", "delete_note", "remove_reminder", "delete_task", "delete_subtask",
     "delete_folder", "restore_snapshot", "convert_note", "empty_trash",
     "delete_trash_note", "unshare_note", "git_pull", "restore_backup",
     "delete_backup", "update_app_setting", "delete_workspace",
@@ -681,16 +691,36 @@ mcp.add_middleware(AuthMiddleware(auth=_caller_scope_check))
 # =============================================================================
 
 @_tool()
-def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = None) -> str:
-    """Get a specific note by its ID with full content
+def get_note(
+    id: int,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+    offset: int = 0,
+    max_chars: Optional[int] = None,
+) -> str:
+    """Get a specific note by its ID, whole or one part at a time
 
     The result includes a "version" token; pass it as if_version to update_note
-    to make the write fail safely if the note changed in between.
+    to make the write fail safely if the note changed in between. It also
+    includes "type" (note = HTML, markdown, tasklist, excalidraw) and "length",
+    the note's full size in characters, whatever part was returned.
+
+    Without max_chars the whole content comes back. On a long note, read it in
+    parts with max_chars and follow "next_offset" until it is null, or edit it
+    in place with append_to_note or replace_in_note instead of reading it at
+    all (issue #1736).
 
     Args:
         id: ID of the note to retrieve
         workspace: Workspace name (optional)
         user_id: User profile ID to access (optional, overrides default)
+        offset: Where to start reading, in characters (default: 0). Only
+            meaningful together with max_chars, and only within the version
+            the offset came from: any write to the note may move it.
+        max_chars: Most characters of content to return (default: no limit).
+            The part is cut back to a line end when one is near its end, so it
+            can be shorter than asked. "next_offset" is where the next part
+            starts, or null when this one ends the note.
     """
     client, err = _get_client_or_error()
     if err:
@@ -699,15 +729,19 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
         note = client.get_note(id, workspace=workspace, user_id=user_id)
     except Exception as exc:
         return _api_error_json(exc)
-    
+
     if note is None:
         return json.dumps({"error": f"Note {id} not found"}, ensure_ascii=False)
-    
+
+    page = note_text.page_content(note.get("content") or "", offset, max_chars)
+
     # Format for AI consumption
     result = {
         "id": note.get("id"),
         "title": note.get("heading", "Untitled"),
-        "content": note.get("content", ""),
+        "type": note.get("type") or "note",
+        "content": page["content"],
+        "length": page["length"],
         "tags": [t.strip() for t in (note.get("tags") or "").split(",") if t.strip()],
         "folder": note.get("folder"),
         "updatedAt": note.get("updated"),
@@ -715,6 +749,9 @@ def get_note(id: int, workspace: Optional[str] = None, user_id: Optional[int] = 
         "version": note.get("version"),
         "reminderAt": note.get("reminder_at"),
     }
+    if max_chars is not None:
+        result["offset"] = page["offset"]
+        result["next_offset"] = page["next_offset"]
 
     return json.dumps(result, indent=2, ensure_ascii=False)
 
@@ -1252,6 +1289,364 @@ def update_note(
             )
 
     return json.dumps(payload, indent=2, ensure_ascii=False)
+
+
+def _note_write_error_json(exc: Exception, note_id: int, operation: str) -> str:
+    """Report a failed partial write, saying whether anything was written.
+
+    Two cases must not read like the generic error. A 423 is someone else
+    editing the note, which passes on its own; a timeout leaves the outcome
+    unknown, and an agent that retries it blindly appends the same paragraph
+    twice, on exactly the kind of note that is never read by a human.
+    """
+    if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code == 423:
+        return json.dumps({
+            "success": False,
+            "error": "note_locked",
+            "message": (
+                f"Note {note_id} is being edited by someone else right now, so "
+                f"{operation} was refused and nothing was changed. Wait for them to "
+                "finish and try again."
+            ),
+        }, indent=2, ensure_ascii=False)
+    if isinstance(exc, httpx.TimeoutException):
+        return json.dumps({
+            "success": False,
+            "error": "write_outcome_unknown",
+            "message": (
+                f"The request for {operation} on note {note_id} timed out after it was "
+                "sent, so it may or may not have been applied. Read the note before "
+                "trying again: retrying straight away can write the same change twice."
+            ),
+            "detail": str(exc)[:500],
+        }, indent=2, ensure_ascii=False)
+    return _api_error_json(exc)
+
+
+def _edit_note_text(
+    note_id: int,
+    workspace: Optional[str],
+    user_id: Optional[int],
+    operation: str,
+    transform,
+    attempts: int = 3,
+) -> str:
+    """Read a note, change its text here, and write it back under if_version.
+
+    The whole content still travels between this server and Poznote, since the
+    API has no partial write; what it no longer does is travel to the caller
+    and back, which is where the tokens are (issue #1736).
+
+    transform(content, note_type) returns (new_content, error_payload). It is
+    called again on each attempt, on the content the conflict handed back, so
+    anything it derives from the text (a position, a heading boundary) is
+    derived afresh from the version actually being written.
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+
+    try:
+        note = client.get_note(note_id, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if note is None:
+        return json.dumps({"error": f"Note {note_id} not found"}, ensure_ascii=False)
+
+    note_type = note.get("type") or "note"
+    refusal = note_text.refuse_type(note_type, operation)
+    if refusal:
+        return json.dumps({
+            "success": False,
+            "error": "unsupported_note_type",
+            "type": note_type,
+            "message": refusal,
+        }, indent=2, ensure_ascii=False)
+
+    content = note.get("content") or ""
+    version = note.get("version")
+
+    for attempt in range(1, max(1, attempts) + 1):
+        new_content, failure = transform(content, note_type)
+        if failure is not None:
+            return json.dumps(failure, indent=2, ensure_ascii=False)
+
+        if new_content == content:
+            return json.dumps({
+                "success": True,
+                "id": note_id,
+                "message": f"Nothing to change in note {note_id}: it already reads that way.",
+                "length": len(content),
+                "version": version,
+            }, indent=2, ensure_ascii=False)
+
+        try:
+            result = client.update_note(
+                note_id=note_id,
+                content=new_content,
+                workspace=workspace,
+                user_id=user_id,
+                if_version=version,
+            )
+        except Exception as exc:
+            return _note_write_error_json(exc, note_id, operation)
+
+        if result and result.get("code") == "version_conflict":
+            current = result.get("current") or {}
+            content = current.get("content") or ""
+            version = current.get("version")
+            continue
+
+        if not result:
+            return json.dumps(
+                {"error": f"Note {note_id} not found or {operation} failed"},
+                ensure_ascii=False,
+            )
+
+        return json.dumps({
+            "success": True,
+            "id": note_id,
+            "message": f"Note {note_id}: {operation} applied.",
+            "version": result.get("version"),
+            "length": len(new_content),
+            "attempts": attempt,
+        }, indent=2, ensure_ascii=False)
+
+    return json.dumps({
+        "success": False,
+        "error": "version_conflict",
+        "message": (
+            f"Note {note_id} kept changing while {operation} was being applied "
+            f"({attempts} attempts), so nothing was changed. Something else is "
+            "writing to it; try again in a moment."
+        ),
+    }, indent=2, ensure_ascii=False)
+
+
+@_tool()
+def append_to_note(
+    id: int,
+    content: str,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Add text to the end of a note without reading or resending the rest
+
+    Made for the notes an agent keeps adding to, a running log or a status
+    page: the cost of the call no longer grows with the note's length
+    (issue #1736). Nothing already in the note is touched or returned.
+
+    Works on HTML notes (type "note") and Markdown ones. A task list is
+    refused, because its content is a JSON array of tasks: use add_task.
+
+    The separator is added for you. In a Markdown note a blank line goes
+    between what was there and what you add, or your text would continue the
+    last paragraph. In an HTML note, text that does not already start with a
+    block tag becomes a paragraph, or it would land inside the note's last
+    element; blank lines in it become separate paragraphs.
+
+    Args:
+        id: ID of the note to add to
+        content: Text to add at the end, Markdown or HTML to match the note
+        workspace: Workspace name (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    addition = _normalize_content(content)
+    if not isinstance(addition, str) or addition.strip() == "":
+        return json.dumps(
+            {"error": "content must be a non-empty text to add to the note."},
+            ensure_ascii=False,
+        )
+
+    def transform(current: str, note_type: str):
+        return note_text.merge_append(current, addition, note_type), None
+
+    return _edit_note_text(id, workspace, user_id, "append_to_note", transform)
+
+
+@_tool()
+def replace_in_note(
+    id: int,
+    replacements: list,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Change parts of a note by exact text, leaving the rest untouched
+
+    The way to edit one passage of a long note without resending the whole of
+    it (issue #1736). Each replacement is {"find": "...", "replace": "..."},
+    applied in order, and either all of them go through or none does.
+
+    A find that is not in the note is an error, and so is one that matches
+    several places: in a long note a short find can match in fifty, and an
+    agent that meant one of them would not find out. Include enough
+    surrounding text to match one passage, or set "all": true on that
+    replacement to mean every occurrence.
+
+    find must match the note's stored text exactly, as get_note returns it.
+    Note that an HTML note is sanitized when it is saved, so what the note
+    holds is not always character-for-character what was last written to it;
+    read it with get_note rather than assuming.
+
+    Args:
+        id: ID of the note to edit
+        replacements: List of {find, replace} objects, with an optional
+            "all": true to replace every occurrence of that find
+        workspace: Workspace name (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    def transform(current: str, note_type: str):
+        outcome = note_text.apply_replacements(current, replacements)
+        if "error" in outcome:
+            return None, {"success": False, "error": "replacement_failed", "message": outcome["error"]}
+        return outcome["content"], None
+
+    return _edit_note_text(id, workspace, user_id, "replace_in_note", transform)
+
+
+@_tool()
+def get_note_outline(
+    id: int,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """List a note's headings and where each section starts and ends
+
+    The cheap way to find your way around a long note: the plan comes back
+    without the content, and each entry carries the offsets to read or edit
+    just that section (issue #1736).
+
+    Each heading has its `level` (1 to 6), its text, the `offset` where its
+    line starts, the `body_offset` where its body starts, and the `end` where
+    its section stops, which is the next heading of the same level or higher.
+    Read one section with get_note(offset=body_offset, max_chars=…) and
+    rewrite it with replace_section.
+
+    Offsets count characters and belong to the `version` in the answer: any
+    write to the note moves them, so read the outline again after one.
+
+    In an HTML note a heading also carries `addressable`. It is false for a
+    heading buried inside another element, whose section has no boundary that
+    can be replaced without breaking the markup; replace_section refuses those
+    and replace_in_note is the way through. Markdown headings are always
+    addressable. Poznote reads `# ` to `###### ` as headings, not underlined
+    titles, and ignores anything inside a ``` fence.
+
+    Args:
+        id: ID of the note to outline
+        workspace: Workspace name (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    client, err = _get_client_or_error()
+    if err:
+        return err
+    try:
+        note = client.get_note(id, workspace=workspace, user_id=user_id)
+    except Exception as exc:
+        return _api_error_json(exc)
+    if note is None:
+        return json.dumps({"error": f"Note {id} not found"}, ensure_ascii=False)
+
+    note_type = note.get("type") or "note"
+    refusal = note_text.refuse_type(note_type, "get_note_outline")
+    if refusal:
+        return json.dumps({
+            "success": False,
+            "error": "unsupported_note_type",
+            "type": note_type,
+            "message": refusal,
+        }, indent=2, ensure_ascii=False)
+
+    content = note.get("content") or ""
+    sections = note_sections.outline(content, note_type)
+
+    return json.dumps({
+        "id": note.get("id"),
+        "title": note.get("heading", "Untitled"),
+        "type": note_type,
+        "length": len(content),
+        "version": note.get("version"),
+        "count": len(sections),
+        "headings": sections,
+    }, indent=2, ensure_ascii=False)
+
+
+@_tool()
+def replace_section(
+    id: int,
+    heading: str,
+    content: str,
+    mode: str = "replace",
+    occurrence: Optional[int] = None,
+    create_if_missing: bool = False,
+    level: int = 2,
+    workspace: Optional[str] = None,
+    user_id: Optional[int] = None,
+) -> str:
+    """Rewrite or extend one section of a note, named by its heading
+
+    Addresses a section the way a reader would, by the heading above it, with
+    the rest of the note never leaving the server (issue #1736). A section
+    runs from its heading to the next heading of the same level or higher, so
+    its subsections travel with it.
+
+    The heading line itself always survives: `mode="replace"` replaces the
+    text under it, `mode="append"` adds to the end of the section, before the
+    next heading. Use get_note_outline to see what a note offers.
+
+    `mode="replace"` is as wide as the section: everything between this
+    heading and the next one of the same level or higher goes, including its
+    subsections and, in an HTML note, any box sitting under it. Check the
+    outline first when you only meant to change a paragraph, or use
+    replace_in_note, which touches nothing but the text you name.
+
+    Matching ignores case and extra spaces. When several headings read the
+    same, the call is refused and lists them, and `occurrence` picks one: a
+    long note often repeats "Notes" or "Next steps", and guessing would edit
+    the wrong one silently.
+
+    In an HTML note, only a heading at the top level of the markup can be
+    addressed this way; one inside another element is refused, with
+    replace_in_note as the way through.
+
+    Args:
+        id: ID of the note to edit
+        heading: Text of the heading whose section to change
+        content: The section's new text, Markdown or HTML to match the note
+        mode: 'replace' to rewrite the section's body, 'append' to add to its end
+        occurrence: Which heading to use, 1 for the first, when several match
+        create_if_missing: When the heading is nowhere in the note, add the
+            section at the end instead of failing
+        level: Heading level 1 to 6 for a section added by create_if_missing
+            (default 2)
+        workspace: Workspace name (optional)
+        user_id: User profile ID to access (optional, overrides default)
+    """
+    body = _normalize_content(content)
+    if not isinstance(body, str):
+        return json.dumps(
+            {"error": "content must be the section's new text."},
+            ensure_ascii=False,
+        )
+    if not isinstance(heading, str) or heading.strip() == "":
+        return json.dumps(
+            {"error": "heading must be the text of a heading in the note."},
+            ensure_ascii=False,
+        )
+
+    def transform(current: str, note_type: str):
+        return note_sections.replace_section(
+            current,
+            note_type,
+            heading,
+            body,
+            mode=mode,
+            occurrence=occurrence,
+            create_if_missing=create_if_missing,
+            level=level,
+        )
+
+    return _edit_note_text(id, workspace, user_id, "replace_section", transform)
 
 
 @_tool()
