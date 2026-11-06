@@ -634,6 +634,28 @@ function normalizeMarkdownUrlForAttribute($url, $context = 'link') {
     return $value;
 }
 
+/**
+ * The note id a link address points at, null when it points elsewhere.
+ *
+ * An internal link ("index.php?note=123", with or without a workspace, and
+ * the bare "?note=123") carries the class note-internal-link paints and the
+ * attributes note-reference.js listens on, as the editor's own preview has
+ * always done (_mdTryParseInternalNoteId() of js/markdown-parser.js). The
+ * server-side renderer (public shares, exports, the AI assistant's writes)
+ * made an ordinary outside link of it: the note the assistant rewrote kept
+ * its links working, since a click inside a note is handled from the href,
+ * but they lost their look and the in-app handling of every other page.
+ */
+function markdownInternalNoteId($url): ?int
+{
+    $value = html_entity_decode((string)$url, ENT_QUOTES, 'UTF-8');
+    if (!preg_match('#(?:^|/)?index\.php\?[^\s\#]*\bnote=(\d+)\b|^\?[^\s\#]*\bnote=(\d+)\b#', $value, $m)) {
+        return null;
+    }
+    $id = ($m[1] !== '' ? $m[1] : ($m[2] ?? ''));
+    return $id === '' ? null : (int)$id;
+}
+
 function buildMarkdownExcalidrawAttributes(DOMElement $element, array $allowedAttrs) {
     $attrs = [];
 
@@ -907,10 +929,19 @@ function parseMarkdown($text) {
             return $matches[0];
         }
         $placeholder = "\x00PLNK" . $protectedIndex . "\x00";
-        if ($title) {
-            $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" title="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . renderMarkdownLinkText($linkText) . '</a>';
+        $href = htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8');
+        $titleAttr = $title ? ' title="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '"' : '';
+        $internalNoteId = markdownInternalNoteId($safeUrl);
+        if ($internalNoteId !== null) {
+            // An internal link keeps target="_blank", unlike the editor's own
+            // preview: inside a note every anchor click is taken over by
+            // setupLinkClickHandling() (js/events-rte-fields.js), which opens
+            // the note in the app whatever the target says, while on a public
+            // share nothing takes the click over and a visitor sent to
+            // index.php in the same tab would lose the page they were reading.
+            $linkTag = '<a href="' . $href . '" class="note-internal-link" data-note-id="' . $internalNoteId . '" data-note-reference="true"' . $titleAttr . ' target="_blank" rel="noopener">' . renderMarkdownLinkText($linkText) . '</a>';
         } else {
-            $linkTag = '<a href="' . htmlspecialchars($safeUrl, ENT_QUOTES, 'UTF-8') . '" target="_blank" rel="noopener">' . renderMarkdownLinkText($linkText) . '</a>';
+            $linkTag = '<a href="' . $href . '"' . $titleAttr . ' target="_blank" rel="noopener">' . renderMarkdownLinkText($linkText) . '</a>';
         }
         $protectedElements[$protectedIndex] = $linkTag;
         $placeholderSources[$placeholder] = $matches[0];
@@ -1136,11 +1167,21 @@ function parseMarkdown($text) {
             return $matches[0];
         }, $text);
         
-        // Restore protected elements (images, links, spans, tags, iframes, videos, audio, and Excalidraw)
-        $text = preg_replace_callback('/\x00P(IMG|LNK|SPAN|TAG|IFRAME|VIDEO|AUDIO|EXCALIDRAW)(\d+)\x00/', function($matches) use ($protectedElements) {
-            $index = (int)$matches[2];
-            return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
-        }, $text);
+        // Restore protected elements (images, links, spans, tags, iframes, videos, audio, and Excalidraw).
+        // A link around an image ([![alt](src)](url)) holds the image's placeholder
+        // in its text, so the restore runs again until nothing nested is left
+        // (as js/markdown-parser.js has always done: the single pass here left
+        // the raw placeholder in the link, and the image was lost).
+        for ($pass = 0; $pass < 3; $pass++) {
+            $restored = preg_replace_callback('/\x00P(IMG|LNK|SPAN|TAG|IFRAME|VIDEO|AUDIO|EXCALIDRAW)(\d+)\x00/', function($matches) use ($protectedElements) {
+                $index = (int)$matches[2];
+                return isset($protectedElements[$index]) ? $protectedElements[$index] : $matches[0];
+            }, $text);
+            if ($restored === null || $restored === $text) {
+                break;
+            }
+            $text = $restored;
+        }
 
         $text = preg_replace_callback('/\x00RAWCODE(\d+)\x00/', function($matches) use ($protectedInlineCode) {
             $index = (int)$matches[1];
