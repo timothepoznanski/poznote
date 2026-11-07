@@ -26,6 +26,8 @@ Nach der Konfiguration erscheint in der linken Icon-Seitenleiste, auf der Notizs
 
 Der Assistent verfügt über Tools, um **Ihre Notizen zu durchsuchen und zu lesen**, und setzt sie selbstständig ein: Fragen Sie „Was steht in meinen Notizen über X?“, lassen Sie sich eine Zusammenfassung über mehrere Notizen erstellen oder lassen Sie ihn die Notiz finden, an die Sie sich nur noch halb erinnern. Die Antworten werden gestreamt und als Markdown dargestellt.
 
+Er kann auch **die Bilder in Ihren Notizen ansehen**. Fügen Sie ein Bild in eine Notiz ein, ziehen Sie es hinein oder hängen Sie es an, und fragen Sie dann, was es zeigt, was auf dem Etikett darauf steht, oder lassen Sie die Angaben daraus in die Notiz schreiben: Der Assistent bittet darum, das Bild zu sehen, und liest es. PNG, JPEG, GIF und WebP werden gezeigt, ob an die Notiz angehängt oder darin enthalten, bis zu vier Bilder pro Antwort, je 5 MB und insgesamt 8 MB; ein Excalidraw-Diagramm, ein SVG und ein PDF können nicht gezeigt werden. Dafür ist ein Modell nötig, das Bilder akzeptiert, siehe **Ein Modell wählen** weiter unten. Was in einem Bild steht, wird als Daten behandelt und nie als Anweisung: Ein Bild, das den Assistenten auffordert, Ihre Notizen zu löschen, wird Ihnen gemeldet, nicht befolgt.
+
 Wenn Sie ausdrücklich darum bitten, kann er auch Ihre Notizen bearbeiten:
 
 - **Schreiben**: eine Notiz erstellen, umbenennen oder ihren Inhalt neu schreiben;
@@ -34,7 +36,7 @@ Wenn Sie ausdrücklich darum bitten, kann er auch Ihre Notizen bearbeiten:
 - **Aufgaben**: die Aufgaben einer Aufgabenlisten-Notiz und ihre Unteraufgaben hinzufügen, abhaken, wieder öffnen, umbenennen oder entfernen, einschließlich der Fälligkeitsdaten und Erinnerungen der Aufgaben, sowie ein Kontrollkästchen in einer normalen Notiz an- oder abhaken, ohne den Rest der Notiz neu zu schreiben;
 - **Löschen**: eine Notiz in den Papierkorb verschieben, oder einen Ordner samt Unterordnern und allen darin enthaltenen Notizen. Alles lässt sich über die Seite **Papierkorb** wiederherstellen: Der Assistent hat keine Möglichkeit, etwas endgültig zu löschen, und kein Tool, um den Papierkorb zu leeren.
 
-Die geöffnete Notiz gehört zum Kontext: Sagen Sie „Verbessere die Formatierung dieser Notiz“ oder „Füge hier ein Fazit hinzu“, und der Assistent bearbeitet sie, ganz ohne ID oder Titel. Er liest die zuletzt vom Editor gespeicherte Version, und „diese Notiz“ wechselt mit, wenn Sie während der Unterhaltung eine andere Notiz öffnen. Nennen Sie in Ihrer Frage eine andere Notiz, hat diese weiterhin Vorrang. Auf dem Dashboard ist keine Notiz geöffnet, nennen Sie dort also die gemeinte Notiz.
+Die geöffnete Notiz gehört zum Kontext: Sagen Sie „Verbessere die Formatierung dieser Notiz“ oder „Füge hier ein Fazit hinzu“, und der Assistent bearbeitet sie, ganz ohne ID oder Titel. Eine Änderung, die Sie gerade getippt oder eingefügt haben, wird vor dem Absenden Ihrer Nachricht gespeichert, der Assistent liest die Notiz also so, wie Sie sie sehen, und „diese Notiz“ wechselt mit, wenn Sie während der Unterhaltung eine andere Notiz öffnen. Nennen Sie in Ihrer Frage eine andere Notiz, hat diese weiterhin Vorrang. Auf dem Dashboard ist keine Notiz geöffnet, nennen Sie dort also die gemeinte Notiz.
 
 Zwei Zeilen über dem Eingabefeld zeigen, womit der Assistent arbeitet: den **Arbeitsbereich**, in dem jedes Tool ausgeführt wird, und die **Notiz**, auf die sich „diese Notiz“ bezieht, sofern eine geöffnet ist.
 
@@ -62,7 +64,7 @@ Unterhaltungen werden auf dem Poznote-Server gespeichert, in Ihrer eigenen Daten
 
 Verwenden Sie anschließend **Zugang prüfen und Modelle auflisten**: Damit wird geprüft, ob der Server erreichbar ist, und die Auswahlliste **Modell** mit den dort angebotenen Modellen gefüllt. Die Liste bleibt leer, bis diese Prüfung erfolgreich war; erst dieser Schritt ermöglicht also die Wahl eines Modells.
 
-Die Konfiguration gilt für die gesamte Instanz: Sobald der Administrator den Assistenten aktiviert hat, erhält jedes Benutzerprofil den Chat.
+Die Konfiguration gilt für die gesamte Instanz, der Zugriff wird jedoch Profil für Profil erteilt: Auf derselben Seite gibt es die Liste **Benutzer, die den globalen KI-Assistenten verwenden dürfen**, und nur die dort angehakten Benutzer sehen den Chat. Ein neuer Benutzer hat keinen Zugriff, bis ein Administrator ihn hinzufügt. Administratoren haben immer Zugriff, ihre Zeile ist daher angehakt und ausgegraut.
 
 ### Persönliche API-Schlüssel
 
@@ -71,6 +73,8 @@ Dieselbe Seite bietet die Option **Persönliche API-Schlüssel erlauben**. Ist s
 ## Modell auswählen
 
 Wählen Sie ein Modell, das **Tool Calling** unterstützt (auch „Function Calling“ genannt), z. B. `qwen3`, `llama3.1` oder `mistral`. Tool Calling ermöglicht es dem Assistenten, Ihre Notizen zu durchsuchen: Mit einem Modell ohne diese Fähigkeit funktioniert der Chat zwar weiterhin (ein Hinweis weist Sie darauf hin), kann aber nicht selbstständig auf Ihre Notizen zugreifen.
+
+Damit der Assistent **die Bilder in Ihren Notizen ansieht**, muss das Modell außerdem Bilder akzeptieren (ein „Vision"- oder „multimodales" Modell). Die meisten gehosteten Modelle von OpenAI, Anthropic und Google lesen Bilder; bei Ollama brauchen Sie eines, das das ausdrücklich angibt, etwa `qwen2.5vl` oder `llava`. Keine OpenAI-kompatible API teilt Poznote vorab mit, ob ein Modell Bilder akzeptiert, also probiert es der Assistent: Bei einem reinen Textmodell erscheint ein Hinweis im Chat und die Antwort kommt ohne das Bild.
 
 ### Denkaufwand
 
@@ -242,4 +246,4 @@ Ein Fehler, der auftritt, nachdem die Antwort bereits zu streamen begonnen hat, 
 
 ## Datenschutz
 
-Der KI-Server wird vom Poznote-Server aus aufgerufen, niemals von Ihrem Browser. Mit einer lokalen Ollama- oder LM Studio-Instanz verlassen Ihre Notizen und Unterhaltungen nie Ihren Rechner. Mit einem Cloud-Anbieter werden die Teile Ihrer Notizen, die der Assistent zum Beantworten liest, an diesen Anbieter gesendet. Sind externe Tools eingeschaltet, geht das, was der Assistent ihnen sendet, etwa eine Suchanfrage, an die von Ihnen verbundenen Server.
+Der KI-Server wird vom Poznote-Server aus aufgerufen, niemals von Ihrem Browser. Mit einer lokalen Ollama- oder LM Studio-Instanz verlassen Ihre Notizen und Unterhaltungen nie Ihren Rechner. Mit einem Cloud-Anbieter werden die Teile Ihrer Notizen, die der Assistent zum Beantworten liest, an diesen Anbieter gesendet, auch ein Bild, das er ansehen soll. Sind externe Tools eingeschaltet, geht das, was der Assistent ihnen sendet, etwa eine Suchanfrage, an die von Ihnen verbundenen Server.

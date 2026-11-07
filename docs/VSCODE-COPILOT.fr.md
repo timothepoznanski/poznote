@@ -148,7 +148,7 @@ Une fois la configuration faite, vous pouvez interagir avec votre instance Pozno
 
 ### Créer et modifier des notes
 
-> **Espace de travail** : si vous ne précisez pas l'espace de travail dans votre requête, la note est créée dans l'espace de travail par défaut de l'utilisateur connecté. Nommez explicitement l'espace de travail cible pour éviter toute confusion, par exemple : *« dans l'espace de travail 'Projets' »*.
+> **Espace de travail** : nommez l'espace de travail cible dans votre requête, par exemple *« dans l'espace de travail 'Projets' »*. Sans lui, le serveur se rabat sur le réglage `mcp_default_workspace`, ou sur le seul espace de travail du compte, et refuse l'appel quand le compte en a plusieurs et que ce réglage est vide.
 
 ```
 @poznote Crée une note intitulée "Meeting Notes" dans l'espace de travail "Projets" avec un contenu sur la nouvelle fonctionnalité
@@ -285,7 +285,7 @@ Si VS Code Copilot ne parvient pas à se connecter au serveur MCP :
 2. **Vérifiez l'état du conteneur Docker :**
    ```bash
    docker ps | grep mcp
-  docker compose logs mcp-server
+   docker compose logs mcp-server
    ```
 
 3. **Vérifiez la publication du port :**
@@ -334,76 +334,7 @@ docker compose logs -f mcp-server
 
 ## Outils MCP disponibles
 
-Le serveur MCP de Poznote fournit les outils suivants, que VS Code Copilot peut utiliser :
-
-### Gestion des notes
-- `get_note` : obtenir une note précise par son ID
-- `list_notes` : lister toutes les notes
-- `search_notes` : rechercher des notes par texte, avec une plage de dates de création facultative
-- `create_note` : créer une note, éventuellement avec une date d'échéance ou un rappel
-- `update_note` : mettre à jour une note existante et/ou définir sa date d'échéance ou son rappel
-- `delete_note` : supprimer une note
-- `duplicate_note` : dupliquer une note
-- `convert_note` : convertir une note entre HTML et Markdown
-- `get_backlinks` : obtenir les notes qui pointent vers une note
-
-### Rappels
-- `get_reminder` : obtenir le rappel défini sur une note
-- `set_reminder` : définir ou remplacer le rappel d'une note, avec un intervalle de répétition facultatif
-- `remove_reminder` : supprimer le rappel d'une note
-
-### Tâches
-- `list_tasks` : lister les tâches d'une liste de tâches, avec leurs ID et leurs dates d'échéance
-- `add_task` : ajouter une tâche, avec une date d'échéance et un rappel facultatifs
-- `update_task` : mettre à jour une tâche (texte, date d'échéance, rappel, priorité)
-- `complete_task` : marquer une tâche comme terminée, ou la rouvrir
-- `delete_task` : supprimer une tâche d'une liste de tâches
-- `add_subtask` : ajouter une sous-tâche à une tâche d'une liste de tâches
-- `update_subtask` : renommer une sous-tâche, la cocher ou la décocher
-- `delete_subtask` : supprimer une sous-tâche d'une tâche
-
-### Organisation
-- `create_folder` : créer un dossier
-- `list_folders` : lister tous les dossiers
-- `rename_folder` : renommer un dossier
-- `delete_folder` : supprimer un dossier et mettre ses notes à la corbeille
-- `list_workspaces` : lister tous les espaces de travail
-- `create_workspace` : créer un espace de travail
-- `rename_workspace` : renommer un espace de travail
-- `delete_workspace` : supprimer un espace de travail (impossible de supprimer le dernier)
-- `list_tags` : lister tous les tags
-- `move_note_to_folder` : déplacer une note dans un dossier
-- `remove_note_from_folder` : retirer une note d'un dossier
-- `toggle_favorite` : ajouter aux favoris ou en retirer
-
-### Gestion de la corbeille
-- `get_trash` : lister les notes de la corbeille
-- `restore_note` : restaurer depuis la corbeille
-- `empty_trash` : vider la corbeille
-
-### Partage
-- `share_note` : activer le partage public
-- `unshare_note` : désactiver le partage public
-- `get_note_share_status` : obtenir l'état du partage
-- `list_shared` : lister toutes les notes et tous les dossiers partagés publiquement
-- `list_shared_with_me` : lister les notes et dossiers que d'autres utilisateurs ont partagés avec ce profil
-
-### Pièces jointes
-- `list_attachments` : lister les pièces jointes d'une note
-
-### Synchronisation Git
-- `get_git_sync_status` : obtenir l'état de la synchronisation Git
-- `git_push` : envoyer vers le dépôt Git
-- `git_pull` : récupérer depuis le dépôt Git
-
-### Système
-- `get_system_info` : obtenir les informations de version de Poznote
-- `list_backups` : lister les sauvegardes système
-- `create_backup` : créer une sauvegarde
-- `restore_backup` : restaurer une sauvegarde (remplace les données actuelles de l'utilisateur)
-- `delete_backup` : supprimer un fichier de sauvegarde
-- `get_app_setting` : obtenir un paramètre de l'application
-- `update_app_setting` : modifier un paramètre de l'application
+Le serveur propose des outils pour les notes, les tâches, les rappels, les dossiers, les espaces de travail, les étiquettes, les pièces jointes, les révisions, le partage, la synchronisation Git et les sauvegardes. Ils sont listés un par un, avec ce que chacun fait, dans la [documentation du serveur MCP](MCP-SERVER.fr.md#fonctionnalités), le seul endroit où cette liste est tenue à jour.
 
 ### Prise en charge multi-utilisateur
 

@@ -2377,6 +2377,11 @@ function listAiChatCandidates(): array {
 /**
  * Replace the set of users allowed to use the AI assistant.
  * Ids that are not eligible profiles are ignored rather than rejected.
+ *
+ * Administrator rows are left exactly as they are: their access does not come
+ * from this column (see isAiChatAllowedForUser()), their checkbox is disabled
+ * so it posts nothing, and wiping the column would quietly revoke access the
+ * day the admin flag is taken away.
  */
 function setAiChatUsers(array $userIds): bool {
     try {
@@ -2384,7 +2389,9 @@ function setAiChatUsers(array $userIds): bool {
 
         $eligible = [];
         foreach (listAiChatCandidates() as $candidate) {
-            $eligible[(int)$candidate['id']] = true;
+            if (empty($candidate['is_admin'])) {
+                $eligible[(int)$candidate['id']] = true;
+            }
         }
 
         $selected = [];
@@ -2396,7 +2403,7 @@ function setAiChatUsers(array $userIds): bool {
         }
 
         $con->beginTransaction();
-        $con->exec("UPDATE users SET ai_chat_enabled = 0 WHERE ai_chat_enabled = 1");
+        $con->exec("UPDATE users SET ai_chat_enabled = 0 WHERE ai_chat_enabled = 1 AND is_admin = 0");
         if (!empty($selected)) {
             $stmt = $con->prepare("UPDATE users SET ai_chat_enabled = 1 WHERE id = ?");
             foreach (array_keys($selected) as $userId) {
@@ -2418,6 +2425,12 @@ function setAiChatUsers(array $userIds): bool {
 /**
  * True when the given profile has been granted access to the AI assistant.
  * Access is opt-in: an unknown or unlisted profile has none.
+ *
+ * Administrators always have it, whatever the stored column says: they own
+ * the connection on ai_settings.php (URL, model, API key) and could grant
+ * themselves in one click, so the checkbox was a formality. Their row in the
+ * list is shown ticked and disabled, and setAiChatUsers() leaves their column
+ * alone so it still decides should they lose the admin flag.
  */
 function isAiChatAllowedForUser(?int $userId): bool {
     if ($userId === null || $userId <= 0) {
@@ -2425,10 +2438,13 @@ function isAiChatAllowedForUser(?int $userId): bool {
     }
     try {
         $con = getMasterConnection();
-        $stmt = $con->prepare("SELECT ai_chat_enabled FROM users WHERE id = ? AND active = 1");
+        $stmt = $con->prepare("SELECT ai_chat_enabled, is_admin FROM users WHERE id = ? AND active = 1");
         $stmt->execute([$userId]);
-        $value = $stmt->fetchColumn();
-        return $value !== false && (int)$value === 1;
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            return false;
+        }
+        return !empty($row['is_admin']) || (int)$row['ai_chat_enabled'] === 1;
     } catch (Exception $e) {
         return false;
     }
@@ -2457,6 +2473,7 @@ function listSttCandidates(): array {
 /**
  * Replace the set of users allowed to use the instance transcription server.
  * Ids that are not eligible profiles are ignored rather than rejected.
+ * Administrator rows are left alone, as in setAiChatUsers().
  */
 function setSttUsers(array $userIds): bool {
     try {
@@ -2464,7 +2481,9 @@ function setSttUsers(array $userIds): bool {
 
         $eligible = [];
         foreach (listSttCandidates() as $candidate) {
-            $eligible[(int)$candidate['id']] = true;
+            if (empty($candidate['is_admin'])) {
+                $eligible[(int)$candidate['id']] = true;
+            }
         }
 
         $selected = [];
@@ -2476,7 +2495,7 @@ function setSttUsers(array $userIds): bool {
         }
 
         $con->beginTransaction();
-        $con->exec("UPDATE users SET stt_enabled = 0 WHERE stt_enabled = 1");
+        $con->exec("UPDATE users SET stt_enabled = 0 WHERE stt_enabled = 1 AND is_admin = 0");
         if (!empty($selected)) {
             $stmt = $con->prepare("UPDATE users SET stt_enabled = 1 WHERE id = ?");
             foreach (array_keys($selected) as $userId) {
@@ -2494,17 +2513,23 @@ function setSttUsers(array $userIds): bool {
     }
 }
 
-/** Whether this profile may use the instance transcription configuration. */
+/**
+ * Whether this profile may use the instance transcription configuration.
+ * Administrators always may, same reasoning as isAiChatAllowedForUser().
+ */
 function isSttAllowedForUser(?int $userId): bool {
     if ($userId === null || $userId <= 0) {
         return false;
     }
     try {
         $con = getMasterConnection();
-        $stmt = $con->prepare("SELECT stt_enabled FROM users WHERE id = ? AND active = 1");
+        $stmt = $con->prepare("SELECT stt_enabled, is_admin FROM users WHERE id = ? AND active = 1");
         $stmt->execute([$userId]);
-        $value = $stmt->fetchColumn();
-        return $value !== false && (int)$value === 1;
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$row) {
+            return false;
+        }
+        return !empty($row['is_admin']) || (int)$row['stt_enabled'] === 1;
     } catch (Exception $e) {
         return false;
     }

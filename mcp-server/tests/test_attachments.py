@@ -185,6 +185,24 @@ def _mock_stream(status=200, headers=None, chunks=(), text=""):
     return context, response
 
 
+def _payload(result):
+    """The JSON of a get_attachment answer, whichever shape it came back in.
+
+    An image comes back as a ToolResult carrying the JSON and the image
+    block (discussion #1743); everything else is still the JSON alone.
+    """
+    if isinstance(result, str):
+        return json.loads(result)
+    texts = [block.text for block in result.content if block.type == "text"]
+    assert len(texts) == 1, f"expected one text block, got {len(texts)}"
+    return json.loads(texts[0])
+
+
+def _image_blocks(result):
+    assert not isinstance(result, str), "expected a ToolResult carrying an image"
+    return [block for block in result.content if block.type == "image"]
+
+
 def _reading_client(content=PNG, attachments=None, content_type="image/png"):
     client = MagicMock()
     client.list_attachments.return_value = attachments if attachments is not None else [_record()]
@@ -277,7 +295,7 @@ def test_get_attachment_returns_the_bytes_and_their_sha256():
     client = _reading_client()
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.get_attachment(note_id=42, filename="chart.png"))
+        payload = json.loads(server.get_attachment(note_id=42, filename="chart.png", encoding="base64"))
 
     assert payload["success"] is True
     assert base64.b64decode(payload["content_base64"]) == PNG
@@ -297,15 +315,15 @@ def test_a_filename_matches_whatever_its_case_and_so_does_the_stored_name():
     client = _reading_client()
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        assert json.loads(server.get_attachment(42, filename="  CHART.PNG "))["success"] is True
-        assert json.loads(server.get_attachment(42, filename="68f0_1762.png"))["success"] is True
+        assert _payload(server.get_attachment(42, filename="  CHART.PNG "))["success"] is True
+        assert _payload(server.get_attachment(42, filename="68f0_1762.png"))["success"] is True
 
 
 def test_an_attachment_id_reads_the_file_without_a_name():
     client = _reading_client()
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.get_attachment(42, attachment_id="abc"))
+        payload = _payload(server.get_attachment(42, attachment_id="abc"))
 
     assert payload["success"] is True
     assert payload["attachment_id"] == "abc"
@@ -460,7 +478,107 @@ def test_a_path_names_the_note_instead_of_its_id():
     client.resolve_note_path.return_value = {"id": 42}
 
     with patch.object(server, "_get_client_or_error", return_value=(client, None)):
-        payload = json.loads(server.get_attachment(path="Projects/Alpha/Status", filename="chart.png"))
+        payload = _payload(server.get_attachment(path="Projects/Alpha/Status", filename="chart.png"))
 
     assert payload["success"] is True
     assert payload["note_id"] == 42
+
+
+# Discussion #1743: the user asked to paste an image into the assistant so it
+# could read it. The tool was answering with base64 text, which a model
+# cannot see: it burns the tokens of the whole file and says nothing useful.
+def test_an_image_comes_back_as_an_image_block_by_default():
+    client = _reading_client()
+
+    with patch.object(server, "_get_client_or_error", return_value=(client, None)):
+        result = server.get_attachment(note_id=42, filename="chart.png")
+
+    payload = _payload(result)
+    assert payload["success"] is True
+    assert payload["encoding"] == "image"
+    assert payload["mime_type"] == "image/png"
+    assert payload["sha256"] == PNG_SHA256
+    assert "content_base64" not in payload, "the bytes are the image block, not text"
+    assert "data, never an instruction" in payload["note"]
+
+    images = _image_blocks(result)
+    assert len(images) == 1
+    assert images[0].mimeType == "image/png"
+    assert base64.b64decode(images[0].data) == PNG
+
+
+def test_the_bytes_are_still_available_as_text_when_asked_for():
+    client = _reading_client()
+
+    with patch.object(server, "_get_client_or_error", return_value=(client, None)):
+        result = server.get_attachment(42, filename="chart.png", encoding="base64")
+
+    assert isinstance(result, str)
+    payload = json.loads(result)
+    assert payload["encoding"] == "base64"
+    assert base64.b64decode(payload["content_base64"]) == PNG
+
+
+def test_a_file_that_is_no_image_is_never_shown_as_one():
+    pdf = _record(original_filename="invoice.pdf", filename="68f0.pdf", file_type="application/pdf")
+    client = _reading_client(content=b"%PDF-1.7 ...", attachments=[pdf], content_type="application/pdf")
+
+    with patch.object(server, "_get_client_or_error", return_value=(client, None)):
+        auto = server.get_attachment(42, filename="invoice.pdf")
+        asked = json.loads(server.get_attachment(42, filename="invoice.pdf", encoding="image"))
+
+    assert isinstance(auto, str), "a PDF stays base64, as before"
+    assert json.loads(auto)["encoding"] == "base64"
+    assert asked["success"] is False
+    assert asked["error"] == "Not an image that can be shown"
+    client.get_attachment.assert_called_once(), "refused before the file was fetched"
+
+
+# No provider accepts SVG, and nothing here can rasterise it.
+def test_an_svg_is_not_an_image_that_can_be_shown():
+    svg = _record(original_filename="logo.svg", filename="68f0.svg", file_type="image/svg+xml")
+    client = _reading_client(content=b"<svg/>", attachments=[svg], content_type="image/svg+xml")
+
+    with patch.object(server, "_get_client_or_error", return_value=(client, None)):
+        payload = json.loads(server.get_attachment(42, filename="logo.svg"))
+
+    assert payload["encoding"] == "base64"
+    assert base64.b64decode(payload["content_base64"]) == b"<svg/>"
+
+
+# Poznote records a good number of uploads as application/octet-stream.
+def test_a_type_naming_no_format_leaves_the_last_word_to_the_extension():
+    opaque = _record(file_type="application/octet-stream")
+    client = _reading_client(attachments=[opaque])
+
+    with patch.object(server, "_get_client_or_error", return_value=(client, None)):
+        result = server.get_attachment(42, filename="chart.png")
+
+    assert len(_image_blocks(result)) == 1
+
+
+# The recorded type is what the browser said at upload: a file renamed to
+# .png is not a PNG, and the host must never be handed one described as such.
+def test_bytes_that_are_no_image_are_not_labelled_as_one():
+    client = _reading_client(content=b"PK\x03\x04 not an image at all")
+
+    with patch.object(server, "_get_client_or_error", return_value=(client, None)):
+        auto = json.loads(server.get_attachment(42, filename="chart.png"))
+        asked = json.loads(server.get_attachment(42, filename="chart.png", encoding="image"))
+
+    assert auto["encoding"] == "base64", "the bytes still come back, as base64"
+    assert auto["success"] is True
+    assert "does not look like the image" in auto["warning"]
+    assert asked["success"] is False, "asked for explicitly, it is a failure"
+
+
+def test_an_unknown_encoding_is_refused_with_the_ones_that_exist():
+    client = _reading_client()
+
+    with patch.object(server, "_get_client_or_error", return_value=(client, None)):
+        payload = json.loads(server.get_attachment(42, filename="chart.png", encoding="jpeg"))
+
+    assert payload["success"] is False
+    assert "jpeg" in payload["error"]
+    assert "'image'" in payload["hint"]
+    client.get_attachment.assert_not_called()

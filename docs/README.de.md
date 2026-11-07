@@ -409,7 +409,7 @@ Die meisten alltäglichen Einstellungen ändern Sie in der Poznote-Oberfläche. 
 - `POZNOTE_PHP_MEMORY_LIMIT`, um das PHP-Speicherlimit pro Anfrage in MB zu ändern (Standard 512), siehe [Leitfaden zur Fehlerbehebung](TROUBLESHOOTING.de.md#a-request-runs-out-of-memory)
 - `POZNOTE_LISTEN_PORT`, um den Port zu ändern, auf dem der Webserver im Container lauscht (Standard 80), nur mit `network_mode: host` nötig, siehe [Leitfaden zur Fehlerbehebung](TROUBLESHOOTING.de.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD`, um vor dem Öffnen der Einstellungsseite ein zusätzliches Passwort abzufragen, standardmäßig leer
-- `POZNOTE_MCP_AUTH_TOKEN`, um von MCP-Clients ein Bearer-Token zu verlangen, siehe [MCP-Server](#mcp-server)
+- `POZNOTE_MCP_AUTH_TOKEN`, um von MCP-Clients ein Bearer-Token zu verlangen, und die übrigen `POZNOTE_MCP_*`-Variablen, die festlegen, wie sich Clients anmelden und welche Tools sie erreichen, siehe [MCP-Server](#mcp-server)
 
 </details>
 
@@ -638,7 +638,7 @@ Die vollständige Liste der Einschränkungen und die Endpunkte zur Verwaltung de
 
 ## Notiztypen
 
-Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschiedliche Arbeitsweisen zugeschnitten sind.
+Poznote bietet mehrere Notiztypen, die jeweils auf eine andere Arbeitsweise zugeschnitten sind. Rich Text und Markdown sind die beiden Notizformate; die übrigen unten bauen darauf auf.
 
 <details>
 <summary><strong>Rich-Text-Notizen</strong></summary>
@@ -670,7 +670,7 @@ Poznote unterstützt zwei Hauptformate für Notizen, die jeweils auf unterschied
 *   **Verwendung:** Verwalten Sie Aufgaben und Projekte mit interaktiven Checklisten.
 *   **Arbeitsablauf:** Verfolgen Sie den Fortschritt mit Kontrollkästchen, die sich direkt im Editor oder in der Notizliste abhaken lassen. Ein Fortschrittsbalken zeigt, wie weit jede Liste erledigt ist.
 *   **Aufgabenoptionen:** Jede Aufgabe kann ein Fälligkeitsdatum mit optionaler Uhrzeit, eine Erinnerung, die zum Fälligkeitszeitpunkt ausgelöst wird, und eine Priorität (hoch, mittel oder niedrig, in Rot, Orange oder Grün) erhalten und lässt sich in eine andere Liste verschieben.
-*   **Aufgaben-Seite:** Eine eigene Seite **Aufgaben**, die Sie über die linke Symbolleiste öffnen, sammelt an einem Ort alle Aufgaben Ihrer Aufgabenlisten und auf Wunsch auch die Kontrollkästchen in gewöhnlichen Notizen. Sie bietet Statusfilter (Offen, Priorität, Überfällig, Mit Datum, Erledigt), einen Textfilter und eine Kalenderansicht der Aufgaben mit Fälligkeitsdatum. Eine Aufgabenliste oder die Kontrollkästchen einer Notiz lassen sich mit der Augen-Schaltfläche in ihrer Kopfzeile auf der Seite ausblenden und mit **Ausgeblendete Listen anzeigen** wieder einblenden. Diese Auswahl wird in Ihrem Konto gespeichert und gilt daher auf allen Ihren Geräten.
+*   **Aufgaben-Seite:** Eine eigene Seite **Aufgaben**, die Sie über die linke Symbolleiste öffnen, sammelt an einem Ort alle Aufgaben Ihrer Aufgabenlisten und auf Wunsch auch die Kontrollkästchen in gewöhnlichen Notizen. Sie bietet Statusfilter (Offen, Hohe, Mittlere oder Niedrige Priorität, Überfällig, Mit Datum, Erledigt), einen Textfilter und eine Kalenderansicht der Aufgaben mit Fälligkeitsdatum. Eine Aufgabenliste oder die Kontrollkästchen einer Notiz lassen sich mit der Augen-Schaltfläche in ihrer Kopfzeile auf der Seite ausblenden und mit **Ausgeblendete Listen anzeigen** wieder einblenden. Diese Auswahl wird in Ihrem Konto gespeichert und gilt daher auf allen Ihren Geräten.
 *   **Öffentliche Zusammenarbeit:** Aufgabenlisten können über eine öffentliche URL geteilt werden. Wurden Bearbeitungsrechte vergeben, können externe Mitwirkende Einträge abhaken, ohne ein Poznote-Konto zu benötigen.
 </details>
 
@@ -742,36 +742,19 @@ Versionen bewahren frühere Stände des Inhalts einer Notiz samt Titel und Tags 
 Poznote bietet direkt in der Anwendung mehrere integrierte Personalisierungsoptionen, ganz ohne Änderungen an Konfigurationsdateien.
 
 <details>
-<summary><strong>Einstellungen für Anzeige, Verhalten und Markdown</strong></summary>
+<summary><strong>Anzeige, Markdown und weitere Einstellungen der Oberfläche</strong></summary>
 <br>
 
-Unter **Einstellungen > Anzeige** können Sie Folgendes konfigurieren:
+Die Einstellungsseite ist in Abschnitte unterteilt, jeder mit den Karten, die zu ihm gehören:
 
-- **App-Schriftart:** die Schrift für die gesamte Oberfläche wählen
-- **Schriftgröße:** die Textgröße für Notizen, Seitenleiste, Codeblöcke und die Einstellungsseite anpassen
-- **Notizfarben:** die Palette wählen, die beim Einfärben einer Notiz angeboten wird
-- **Symbole nach Notiztyp:** Aufgabenlisten und Markdown-Notizen in der Notizliste ein eigenes Symbol geben
-- **Skalierung der Index-Symbole:** die Größe der Symbole im Notizindex ändern
-- **Reihenfolge der Icon-Seitenleiste:** die Schaltflächen der linken Symbolleiste neu anordnen und ihre Farbe ändern (ein Rechtsklick auf eine Schaltfläche der Leiste öffnet ebenfalls die Farbauswahl)
-- **Breite des Notizinhalts:** die maximale Breite des Notizeditors festlegen
-- **Anhangsvorschauen:** Anhänge als Vorschau in der Notiz anzeigen
-- **Standard-Bildrahmen:** eingefügte Bilder ohne zusätzlichen Innenabstand einrahmen
-- **Aktuellen Ordnerbaum hervorheben:** Notizen und Ordner außerhalb der Ordnerhierarchie, in der Sie gerade arbeiten, abblenden
-- **Login-Seiten-Titel:** den auf der Anmeldeseite angezeigten Titel ändern
-- **Sichtbarkeit von Elementen:** nicht genutzte Oberflächenelemente ausblenden, siehe unten
-
-Unter **Einstellungen > Verhalten** können Sie Folgendes konfigurieren:
-
-- **Notizen-Sortierreihenfolge:** festlegen, wie Notizen in der Liste sortiert werden
-- **Altersfilter für Notizen:** nur Notizen auflisten, die innerhalb der gewählten Anzahl von Tagen geändert wurden
-- **Versionen:** wie viele Tage automatische Versionen aufbewahrt werden (eine pro Tag jenseits der letzten 24 Stunden) und wie viele Sicherheitsversionen pro Notiz aufbewahrt werden
-- **Einfüge-Reihenfolge der Aufgaben:** festlegen, wo neue Aufgaben eingefügt werden
-- **Notizen nach Ordnern anzeigen:** Notizen ohne Ordner unterhalb der Ordnerliste anzeigen
-- **Codeblock-Zeilenumbruch:** den Zeilenumbruch in Codeblöcken ein- oder ausschalten
-- **Format der Tagebucheinträge:** Tagebucheinträge als Rich-Text- oder Markdown-Notizen anlegen
-- Sprache der Oberfläche, Zeitzone und Datumsformat, Anhänge und Backlinks am Ende einer Notiz, Rechtschreibprüfung und die Tastenkürzel
-
-Unter **Einstellungen > Markdown** können Sie die Standardansicht, die Schriftart des Editors, Markdown mit Rahmen und farbiges Markdown sowie die Codeblock-Zeilennummern konfigurieren.
+- **Anzeige:** die Schriftart der Anwendung, die Größe von Text und Symbolen, die Palette zum Einfärben einer Notiz, der Titel der Anmeldeseite.
+- **Sichtbarkeit von Elementen:** Elemente der Oberfläche ausblenden, die Sie nicht nutzen, siehe unten.
+- **Seitenleiste:** die Reihenfolge und die Farben der Schaltflächen der linken Symbolleiste (ein Rechtsklick auf eine davon öffnet ebenfalls die Farbauswahl), der Zeitfilter für Notizen, wo Notizen ohne Ordner stehen, das Abdunkeln der Ordner, in denen Sie nicht arbeiten.
+- **Notizinhalt:** die Breite der Notiz, die Vorschau von Anhängen, der Standardrahmen für Bilder, die Einfügestelle neuer Aufgaben, Codeblöcke, Anhänge und Backlinks am Ende einer Notiz, die Rechtschreibprüfung, das Tastenkürzel des Befehlsmenüs, der Platz der Formatierungsleiste.
+- **Markdown:** der Standard-Anzeigemodus, die Ansichten, die die Ansichtsschaltfläche einer Notiz durchläuft (Live-Vorschau, Rich Text, geteilt), die Schriftart des Editors, gerahmtes und farbiges Markdown.
+- **Tagebuch:** das Format, die Vorlage und das Datumsformat neuer Einträge.
+- **Synchronisierung und Verlauf:** Git Sync, die Offline-Notizen und wie lange Revisionen aufbewahrt werden (eine automatische Revision pro Tag jenseits der letzten 24 Stunden, und die Sicherheitsrevisionen pro Notiz).
+- **Mein Konto:** die Sprache der Oberfläche, die Zeitzone und das Datumsformat.
 
 Das Design ist hier keine eigene Karte: Die Schaltfläche unten in der linken Symbolleiste schaltet der Reihe nach durch die Designs, und ein Administrator legt unter **Einstellungen > Admin-Werkzeuge > Theme-Liste** fest, welche sie anbietet.
 
@@ -791,7 +774,7 @@ Sie können für jeden Arbeitsbereich ein Hintergrundbild festlegen: Öffnen Sie
 
 Mit Poznote können Sie die Oberfläche entrümpeln, indem Sie Elemente ausblenden, die Sie nicht verwenden.
 
-Konfigurieren Sie dies unter **Einstellungen > Anzeige > Sichtbarkeit von Elementen**.
+Konfigurieren Sie dies unter **Einstellungen > Sichtbarkeit von Elementen**.
 
 - **Feine Steuerung:** Schalten Sie die Sichtbarkeit von Karten der Startseite, Aktionen der Werkzeugleiste, Einträgen des Slash-Menüs und mehr um. Auch das Abzeichen mit dem Erstellungsdatum an Notizen (**Erstellungsdatum der Notiz anzeigen**) und die Anzahl der Notizen neben jedem Ordner (**Ordner-Notizzähler anzeigen**) werden hier ein- und ausgeschaltet.
 - **Pro Benutzer:** Jeder Benutzer kann seine eigene Oberflächengestaltung haben.
@@ -1438,17 +1421,17 @@ Server: my-server.com
 │   └── Data: ./poznote-tom/data/
 │
 └── Poznote-Alice
-  ├── Port: YOUR_POZNOTE_API_PORT
-  ├── URL: http://my-server.com:YOUR_POZNOTE_API_PORT
+    ├── Port: 8041
+    ├── URL: http://my-server.com:8041
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```
 
 ## KI-Assistent
 
-Poznote enthält einen integrierten KI-Chat, der sich mit einer lokalen [Ollama](https://ollama.com)- oder [LM Studio](https://lmstudio.ai)-Instanz, einem Cloud-Anbieter wie [Anthropic (Claude)](https://www.anthropic.com) oder OpenAI oder jedem OpenAI-kompatiblen Server verbindet. Er durchsucht und liest Ihre Notizen, um Fragen zu beantworten, und erstellt, überarbeitet und organisiert sie auf Wunsch, innerhalb des Arbeitsbereichs, in dem Sie den Chat geöffnet haben.
+Poznote enthält einen integrierten KI-Chat, der sich mit einer lokalen [Ollama](https://ollama.com)- oder [LM Studio](https://lmstudio.ai)-Instanz, einem Cloud-Anbieter wie [Anthropic (Claude)](https://www.anthropic.com) oder OpenAI oder jedem OpenAI-kompatiblen Server verbindet. Er durchsucht und liest Ihre Notizen, um Fragen zu beantworten, sieht sich die Bilder darin an und erstellt, überarbeitet und organisiert sie auf Wunsch, innerhalb des Arbeitsbereichs, in dem Sie den Chat geöffnet haben.
 
-Ein Administrator aktiviert ihn unter **Einstellungen → Admin-Werkzeuge → KI-Assistent**, danach erhält jedes Profil eine Schaltfläche **KI-Assistent** in der linken Symbolleiste. Der KI-Server wird vom Poznote-Server aus aufgerufen, nie aus Ihrem Browser, sodass Ihre Notizen mit einer lokalen Ollama-Instanz nie Ihren Rechner verlassen.
+Ein Administrator aktiviert ihn unter **Einstellungen → Admin-Werkzeuge → KI-Assistent** und hakt dort die Profile an, die ihn verwenden dürfen, was Administratoren immer dürfen; jedes dieser Profile erhält danach eine Schaltfläche **KI-Assistent** in der linken Symbolleiste. Der KI-Server wird vom Poznote-Server aus aufgerufen, nie aus Ihrem Browser, sodass Ihre Notizen mit einer lokalen Ollama-Instanz nie Ihren Rechner verlassen.
 
 Was der Assistent kann, die Wahl eines Anbieters und eines Modells, persönliche API-Schlüssel, externe Tools wie eine Websuche (entfernte MCP-Server) und die Anbindung eines lokalen Servers aus dem Poznote-Container heraus sind in der [Dokumentation zum KI-Assistenten](AI-ASSISTANT.de.md) beschrieben. Wenn stattdessen ein externer KI-Assistent (VS Code Copilot, Claude CLI...) Ihre Notizen verwalten soll, lesen Sie weiter unten den Abschnitt [MCP-Server](#mcp-server).
 
@@ -1456,7 +1439,7 @@ Was der Assistent kann, die Wahl eines Anbieters und eines Modells, persönliche
 
 Verwandeln Sie Sprache in Notiztext, mit einem Speech-to-Text-Server, den Sie selbst betreiben. Poznote enthält kein eigenes Sprachmodell: Es kommuniziert mit jedem Server, der die OpenAI-Audio-API bereitstellt (`POST /v1/audio/transcriptions`), etwa einem selbst gehosteten Whisper, sodass die Audiodaten Ihren Rechner nie verlassen müssen.
 
-Sobald ein Administrator die Funktion unter **Einstellungen → Admin-Werkzeuge → Transkription** aktiviert, finden Sie im Slash-Menü unter **Einfügen** den Eintrag **Diktieren** sowie an Audio-Anhängen eine Schaltfläche **Transkribieren**.
+Sobald ein Administrator die Funktion unter **Einstellungen → Admin-Werkzeuge → Transkription** aktiviert und die Profile anhakt, die sie verwenden dürfen, was Administratoren immer dürfen, finden Sie im Slash-Menü unter **Einfügen** den Eintrag **Diktieren** sowie an Audio-Anhängen eine Schaltfläche **Transkribieren**.
 
 Die Einrichtung eines Servers, die Wahl eines Modells und alles Weitere sind in der [Dokumentation zur Transkription](TRANSCRIPTION.de.md) beschrieben.
 

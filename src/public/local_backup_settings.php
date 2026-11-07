@@ -400,7 +400,7 @@ function localBackupRenderUsersPicker(array $users, string $prefix, string $inpu
                         </label>
                         <div class="check-label">
                             <span class="label-title"><?php echo t_h('local_backup.user_backup_label', [], 'Allow users to back up their account'); ?></span>
-                            <span class="label-desc"><?php echo t_h('local_backup.user_backup_description', [], 'When enabled, each user can save a backup of their own account into the folder and download their archives, from the Backup / Export page. These archives count toward the retention limit like the others.'); ?></span>
+                            <span class="label-desc"><?php echo t_h('local_backup.user_backup_description', [], 'When enabled, each user can save a backup of their own account into the folder and download their archives, from the Backup / Export page. These archives count toward the retention limit like the others. Administrators can always back up their account, whatever this switch says.'); ?></span>
                         </div>
                     </div>
 
@@ -411,7 +411,7 @@ function localBackupRenderUsersPicker(array $users, string $prefix, string $inpu
                         </label>
                         <div class="check-label">
                             <span class="label-title"><?php echo t_h('local_backup.user_delete_label', [], 'Allow users to delete their archives'); ?></span>
-                            <span class="label-desc"><?php echo t_h('local_backup.user_delete_description', [], 'When disabled, the Delete entry of the users\' actions menu is greyed out, so they cannot remove the archives of their account, including those of the automatic backups. Older archives are still pruned by the retention limit.'); ?></span>
+                            <span class="label-desc"><?php echo t_h('local_backup.user_delete_description', [], 'When disabled, the Delete entry of the users\' actions menu is greyed out, so they cannot remove the archives of their account, including those of the automatic backups. Older archives are still pruned by the retention limit. Administrators can always delete archives.'); ?></span>
                         </div>
                     </div>
 

@@ -77,7 +77,7 @@ Al cap d'uns segons respon `Model 'Systran/faster-whisper-small' downloaded` (un
 - activeu **Activa la transcripció**;
 - trieu **Speaches (local)** i definiu l'URL com a `http://speaches:8000`;
 - feu clic a **Comprova l'accés i llista els models** i, després, trieu `Systran/faster-whisper-small` a **Model**;
-- marqueu els usuaris que el poden fer servir, inclòs vós;
+- marqueu els usuaris que el poden fer servir (com a administrador, sempre hi teniu accés);
 - deseu.
 
 **5. Proveu-ho.** Torneu a carregar una nota amb HTTPS (o a través de `localhost`; vegeu els [requisits del navegador](#requisits-del-navegador)), escriviu `/dict`, permeteu el micròfon, parleu i atureu l'enregistrament.
@@ -119,7 +119,7 @@ Tot és a **Paràmetres → Eines d'administració → Transcripció** (només a
 | Paràmetre | Què fa |
 |---|---|
 | **Activa la transcripció** | Commutador principal de la configuració de la instància de més avall. |
-| **Usuaris permesos** | Perfils que poden fer servir el servidor de la instància. Ningú no hi té accés fins que no es marca, perfils nous inclosos. |
+| **Usuaris permesos** | Perfils que poden fer servir el servidor de la instància. Ningú no hi té accés fins que no es marca, perfils nous inclosos. Els administradors sempre hi tenen accés, així que la seva fila apareix marcada i en gris. |
 | **Servidor de transcripció** | Configuracions predefinides que omplen l'URL i mostren o amaguen la clau de l'API: Speaches, whisper.cpp, LocalAI, OpenAI o Un altre. |
 | **URL del servidor** | URL base del servidor, per exemple `http://speaches:8000`. També s'accepten `/v1` i el camí complet `/v1/audio/transcriptions`. |
 | **Clau de l'API** | S'envia com a `Authorization: Bearer`. Els servidors locals normalment no en necessiten; OpenAI sí. |

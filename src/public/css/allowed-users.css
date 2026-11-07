@@ -67,3 +67,26 @@
 }
 
 .ai-user-meta::before { content: '\00b7'; margin-right: 6px; }
+
+/* Administrators always have access, whatever the column says, so their row
+   is ticked and disabled with a badge saying so rather than offering a choice
+   with no effect (same idea as the "Own account" row of the Note access
+   modal). The badge sits against the right edge of the list; its wash and
+   its text are the accent pair, which tokens.css already swaps per theme,
+   so no dark override is needed here. */
+.ai-user-always {
+    cursor: default;
+    opacity: 0.82;
+}
+
+.ai-user-badge {
+    flex: 0 0 auto;
+    margin-left: auto;
+    padding: 2px 6px;
+    border-radius: var(--pz-radius-sm);
+    background: var(--pz-accent-soft);
+    color: var(--pz-accent-strong);
+    font-size: 0.75rem;
+    font-weight: var(--pz-weight-semibold);
+    white-space: nowrap;
+}

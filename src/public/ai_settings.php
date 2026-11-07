@@ -21,6 +21,7 @@ require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../ai_config.php';
 require_once __DIR__ . '/../ai_mcp_settings.php';
+require_once __DIR__ . '/../lib/allowed-users-list.php';
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
@@ -178,44 +179,11 @@ $aiLocalHost = aiChatLocalDefaultHost();
 
                     <div class="git-field-group" id="ai-users-group">
                         <label class="git-field-label"><?php echo t_h('ai_settings.users_label', [], 'Users allowed to use the global AI assistant configured by the administrator'); ?></label>
-                        <span class="label-desc"><?php echo t_h('ai_settings.users_description', [], 'Only the selected users see the AI chat button for the configuration on this page. New users have no access until you add them here.'); ?></span>
+                        <span class="label-desc"><?php echo t_h('ai_settings.users_description', [], 'Only the selected users see the AI chat button for the configuration on this page. New users have no access until you add them here. Administrators always have access.'); ?></span>
                         <input type="search" id="ai-user-filter" class="git-field-input ai-user-filter"
                                placeholder="<?php echo t_h('ai_settings.users_filter_placeholder', [], 'Filter users'); ?>"
                                autocomplete="off">
-                        <div class="ai-user-list">
-                            <?php foreach ($aiUserCandidates as $candidate): ?>
-                                <?php
-                                    $candidateId = (int)$candidate['id'];
-                                    $candidateUsername = (string)$candidate['username'];
-                                    $candidateName = trim(trim((string)($candidate['first_name'] ?? '')) . ' ' . trim((string)($candidate['last_name'] ?? '')));
-                                    if ($candidateName === '') {
-                                        $candidateName = $candidateUsername;
-                                    }
-                                    // The second line only adds information when it is not
-                                    // just the name again
-                                    $candidateMeta = ($candidateName === $candidateUsername) ? '' : $candidateUsername;
-                                    if (!empty($candidate['is_admin'])) {
-                                        $adminTag = t('ai_settings.users_admin', [], 'Administrator');
-                                        $candidateMeta = ($candidateMeta === '') ? $adminTag : $candidateMeta . ' · ' . $adminTag;
-                                    }
-                                ?>
-                                <label class="ai-user" for="ai_user_<?php echo $candidateId; ?>">
-                                    <input
-                                        type="checkbox"
-                                        id="ai_user_<?php echo $candidateId; ?>"
-                                        name="ai_user_ids[]"
-                                        value="<?php echo $candidateId; ?>"
-                                        <?php echo !empty($candidate['ai_chat_enabled']) ? 'checked' : ''; ?>>
-                                    <span class="ai-user-copy">
-                                        <span class="ai-user-name"><?php echo htmlspecialchars($candidateName, ENT_QUOTES, 'UTF-8'); ?></span>
-                                        <?php if ($candidateMeta !== ''): ?>
-                                        <span class="ai-user-meta"><?php echo htmlspecialchars($candidateMeta, ENT_QUOTES, 'UTF-8'); ?></span>
-                                        <?php endif; ?>
-                                    </span>
-                                </label>
-                            <?php endforeach; ?>
-                            <div class="ai-user-empty" id="ai-user-filter-empty" hidden><?php echo t_h('ai_settings.users_filter_empty', [], 'No user matches this filter.'); ?></div>
-                        </div>
+                        <?php poznoteRenderAllowedUsersList($aiUserCandidates, 'ai', 'ai_chat_enabled'); ?>
                     </div>
 
                     <div class="git-field-group">

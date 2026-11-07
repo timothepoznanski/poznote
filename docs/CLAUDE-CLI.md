@@ -19,11 +19,11 @@ This guide explains how to configure and use the Poznote MCP server with Claude 
 
 ## Prerequisites
 
-- **Anthropic API key:** Claude CLI requires a paid [Anthropic API key](https://console.anthropic.com/). Set it before using the CLI:
+- **An Anthropic account:** Claude CLI signs in with a Claude subscription, or with an [Anthropic API key](https://console.anthropic.com/). With an API key, set it before using the CLI:
   ```bash
   export ANTHROPIC_API_KEY=sk-ant-...
   ```
-- Claude CLI installed (`npm install -g @anthropic-ai/claude-cli` or similar)
+- Claude CLI installed (`npm install -g @anthropic-ai/claude-code`)
 - Poznote MCP server running (via Docker Compose)
 - MCP server accessible on 127.0.0.1 (default port: 8045)
 
@@ -106,8 +106,9 @@ claude "Show me all folders in my Poznote workspace"
 
 ```bash
 # Create a new note
-# IMPORTANT: if you do not specify the workspace, the note is created in the
-# connected user's default workspace. Always specify the target workspace.
+# IMPORTANT: always name the target workspace. Without one, the server uses the
+# mcp_default_workspace setting, or the account's only workspace, and refuses the
+# call when the account has several and that setting is empty.
 claude "Create a note in Poznote titled 'Meeting Notes' in workspace 'Projets' with content 'Discussion about the new feature'"
 
 # Update an existing note
@@ -309,7 +310,7 @@ If Claude CLI cannot connect to the MCP server:
 2. **Verify Docker container status:**
    ```bash
    docker ps | grep mcp
-  docker compose logs mcp-server
+   docker compose logs mcp-server
    ```
 
 3. **Check port binding:**
@@ -361,76 +362,7 @@ Full details: [MCP Server Security](MCP-SERVER.md#security).
 
 ## Available MCP Tools
 
-The Poznote MCP server provides the following tools:
-
-### Note Management
-- `get_note` - Get a specific note by ID
-- `list_notes` - List all notes
-- `search_notes` - Search notes by text query, with optional creation date range
-- `create_note` - Create a new note, optionally with a due date/reminder
-- `update_note` - Update an existing note, and/or set its due date/reminder
-- `delete_note` - Delete a note
-- `duplicate_note` - Duplicate a note
-- `convert_note` - Convert a note between HTML and Markdown
-- `get_backlinks` - Get the notes linking to a note
-
-### Reminders
-- `get_reminder` - Get the reminder set on a note
-- `set_reminder` - Set or replace a note's reminder, with an optional repeat interval
-- `remove_reminder` - Remove the reminder from a note
-
-### Tasks
-- `list_tasks` - List the tasks of a tasklist note, with their IDs and due dates
-- `add_task` - Add a single task, with an optional due date and reminder
-- `update_task` - Update one task (text, due date, reminder, priority)
-- `complete_task` - Mark a task as done, or reopen it
-- `delete_task` - Delete one task from a tasklist note
-- `add_subtask` - Add a subtask under a task of a tasklist note
-- `update_subtask` - Rename a subtask, or mark it done or not done
-- `delete_subtask` - Delete one subtask of a task
-
-### Organization
-- `create_folder` - Create a new folder
-- `list_folders` - List all folders
-- `rename_folder` - Rename a folder
-- `delete_folder` - Delete a folder and move its notes to trash
-- `list_workspaces` - List all workspaces
-- `create_workspace` - Create a new workspace
-- `rename_workspace` - Rename a workspace
-- `delete_workspace` - Delete a workspace (cannot delete the last one)
-- `list_tags` - List all tags
-- `move_note_to_folder` - Move note to folder
-- `remove_note_from_folder` - Remove note from folder
-- `toggle_favorite` - Toggle favorite status
-
-### Trash Management
-- `get_trash` - List notes in trash
-- `restore_note` - Restore from trash
-- `empty_trash` - Empty trash
-
-### Sharing
-- `share_note` - Enable public sharing
-- `unshare_note` - Disable public sharing
-- `get_note_share_status` - Get sharing status
-- `list_shared` - List all publicly shared notes and folders
-- `list_shared_with_me` - List notes and folders other users have shared with this profile
-
-### Attachments
-- `list_attachments` - List note attachments
-
-### Git Synchronization
-- `get_git_sync_status` - Get Git sync status
-- `git_push` - Push to Git repository
-- `git_pull` - Pull from Git repository
-
-### System
-- `get_system_info` - Get Poznote version info
-- `list_backups` - List system backups
-- `create_backup` - Create a backup
-- `restore_backup` - Restore a backup (replaces current user data)
-- `delete_backup` - Delete a backup file
-- `get_app_setting` - Get application setting
-- `update_app_setting` - Update application setting
+The server exposes tools for notes, tasks, reminders, folders, workspaces, tags, attachments, revisions, sharing, Git sync and backups. They are listed one by one, with what each of them does, in the [MCP server documentation](MCP-SERVER.md#features), which is the single place that list is kept up to date.
 
 ### Multi-User Support
 

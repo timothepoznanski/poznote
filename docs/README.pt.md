@@ -409,7 +409,7 @@ A maioria das configurações do dia a dia é alterada pela interface do Poznote
 - `POZNOTE_PHP_MEMORY_LIMIT` para alterar o limite de memória do PHP por requisição, em MB (padrão 512), veja o [Guia de solução de problemas](TROUBLESHOOTING.pt.md#a-request-runs-out-of-memory)
 - `POZNOTE_LISTEN_PORT` para alterar a porta em que o servidor web escuta dentro do contêiner (padrão 80), necessário apenas com `network_mode: host`, veja o [Guia de solução de problemas](TROUBLESHOOTING.pt.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD` para pedir uma senha adicional antes de abrir a página de Configurações, vazio por padrão
-- `POZNOTE_MCP_AUTH_TOKEN` para exigir um token bearer dos clientes MCP, veja [Servidor MCP](#servidor-mcp)
+- `POZNOTE_MCP_AUTH_TOKEN` para exigir um token bearer dos clientes MCP, e as outras variáveis `POZNOTE_MCP_*`, que definem como os clientes entram e quais ferramentas alcançam, veja [Servidor MCP](#servidor-mcp)
 
 </details>
 
@@ -638,7 +638,7 @@ A lista completa de limites e os endpoints que gerenciam as senhas de aplicativo
 
 ## Tipos de nota
 
-O Poznote oferece dois formatos principais de nota, cada um pensado para um fluxo de trabalho diferente.
+O Poznote tem vários tipos de nota, cada um pensado para uma forma de trabalhar diferente. Texto formatado e Markdown são os dois formatos de nota; os outros, abaixo, se apoiam neles.
 
 <details>
 <summary><strong>Notas de texto formatado</strong></summary>
@@ -670,7 +670,7 @@ O Poznote oferece dois formatos principais de nota, cada um pensado para um flux
 *   **Uso:** gerencie tarefas e projetos com checklists interativas.
 *   **Fluxo de trabalho:** acompanhe o andamento com caixas de seleção que podem ser marcadas diretamente no editor ou na lista de notas. Uma barra de progresso mostra a conclusão de cada lista.
 *   **Opções das tarefas:** cada tarefa pode ter uma data de vencimento com horário opcional, uma notificação de lembrete disparada no horário de vencimento e uma prioridade (alta, média ou baixa, em vermelho, laranja ou verde), e pode ser movida para outra lista.
-*   **Página Tarefas:** uma página Tarefas dedicada, aberta pela barra de ícones à esquerda, reúne em um só lugar todas as tarefas das suas listas de tarefas e, opcionalmente, as caixas de seleção que estão dentro de notas comuns. Ela oferece filtros de status (a fazer, com prioridade, atrasadas, com data de vencimento, concluídas), um filtro de texto e uma visualização em calendário das tarefas que têm data de vencimento. Uma lista de tarefas, ou as caixas de seleção de uma nota, pode ser ocultada na página com o botão de olho do cabeçalho e trazida de volta com **Mostrar as listas ocultas**. Essa escolha fica salva na sua conta, então acompanha você de um dispositivo para outro.
+*   **Página Tarefas:** uma página Tarefas dedicada, aberta pela barra de ícones à esquerda, reúne em um só lugar todas as tarefas das suas listas de tarefas e, opcionalmente, as caixas de seleção que estão dentro de notas comuns. Ela oferece filtros de status (a fazer, prioridade alta, média ou baixa, atrasadas, com data de vencimento, concluídas), um filtro de texto e uma visualização em calendário das tarefas que têm data de vencimento. Uma lista de tarefas, ou as caixas de seleção de uma nota, pode ser ocultada na página com o botão de olho do cabeçalho e trazida de volta com **Mostrar as listas ocultas**. Essa escolha fica salva na sua conta, então acompanha você de um dispositivo para outro.
 *   **Colaboração pública:** as listas de tarefas podem ser compartilhadas por uma URL pública. Se a permissão de edição for concedida, colaboradores externos podem marcar os itens da lista sem precisar de uma conta no Poznote.
 </details>
 
@@ -742,36 +742,19 @@ As revisões guardam versões anteriores do conteúdo de uma nota, junto com o t
 O Poznote oferece várias opções de personalização integradas diretamente no aplicativo, sem exigir alterações em arquivos de configuração.
 
 <details>
-<summary><strong>Configurações de Tela, Comportamento e Markdown</strong></summary>
+<summary><strong>Tela, Markdown e outras configurações da interface</strong></summary>
 <br>
 
-Em **Configurações > Tela**, você pode configurar:
+A página de configurações é dividida em seções, cada uma com os cartões que lhe pertencem:
 
-- **Fonte do aplicativo:** escolha a fonte usada em toda a interface
-- **Tamanho da Fonte:** ajuste o tamanho do texto das notas, da barra lateral, dos blocos de código e da página de configurações
-- **Cores das notas:** escolha a paleta oferecida ao colorir uma nota
-- **Ícones por tipo de nota:** dê às listas de tarefas e às notas Markdown um ícone próprio na lista de notas
-- **Escala de ícones do índice:** redimensione os ícones do índice de notas
-- **Ordem da barra de ícones:** reordene os botões da barra de ícones à esquerda e altere a sua cor (um clique direito num botão da barra também abre o seletor de cor)
-- **Largura do conteúdo da nota:** controle a largura máxima da área do editor de notas
-- **Pré-visualizações de anexos:** exiba os anexos como pré-visualizações dentro da nota
-- **Borda padrão de imagem:** emoldure as imagens inseridas sem adicionar espaçamento interno
-- **Realçar a árvore de pastas atual:** esmaeça as notas e pastas fora da hierarquia de pastas em que você está trabalhando
-- **Título da Página de Login:** altere o título exibido na página de login
-- **Visibilidade dos elementos:** oculte os elementos da interface que você não usa, veja abaixo
-
-Em **Configurações > Comportamento**, você pode configurar:
-
-- **Ordem de classificação das notas:** escolha como as notas são ordenadas na lista
-- **Filtro de antiguidade:** liste apenas as notas atualizadas dentro do número de dias escolhido
-- **Revisões:** por quantos dias as revisões automáticas são mantidas (uma por dia depois das últimas 24 horas) e quantas revisões de segurança são mantidas por nota
-- **Ordem de inserção das tarefas:** controle onde as novas tarefas são inseridas
-- **Mostrar notas após as pastas:** liste as notas sem pasta abaixo da lista de pastas
-- **Quebra de linha em blocos de código:** ative ou desative a quebra de linha nos blocos de código
-- **Formato das entradas do diário:** crie as entradas do diário como notas de texto formatado ou Markdown
-- Idioma da interface, fuso horário e formato de data, anexos e backlinks no fim da nota, verificação ortográfica e atalhos de teclado
-
-Em **Configurações > Markdown**, você pode configurar o modo de visualização padrão, a fonte do editor, o Markdown emoldurado e colorido e a numeração de linhas dos blocos de código.
+- **Tela:** a fonte do aplicativo, o tamanho do texto e dos ícones, a paleta oferecida ao colorir uma nota, o título da página de login.
+- **Visibilidade dos elementos:** oculte os elementos da interface que você não usa, veja abaixo.
+- **Barra lateral:** a ordem e as cores dos botões da barra de ícones da esquerda (um clique com o botão direito em um deles também abre o seletor de cores), o filtro de idade das notas, onde ficam as notas sem pasta, o esmaecimento das pastas em que você não está trabalhando.
+- **Conteúdo das notas:** a largura da nota, as pré-visualizações dos anexos, a borda padrão das imagens, onde uma nova tarefa é inserida, os blocos de código, os anexos e os backlinks no fim de uma nota, a verificação ortográfica, o atalho do menu de comandos, o lugar da barra de formatação.
+- **Markdown:** o modo de visualização padrão, as visualizações que o botão de visualização de uma nota percorre (pré-visualização ao vivo, texto formatado, tela dividida), a fonte do editor, o Markdown emoldurado e colorido.
+- **Diário:** o formato, o modelo e o formato de data das novas entradas.
+- **Sincronização e histórico:** Git Sync, as notas offline e por quanto tempo as revisões são mantidas (uma revisão automática por dia além das últimas 24 horas, e as revisões de segurança por nota).
+- **Minha conta:** o idioma da interface, o fuso horário e o formato de data.
 
 O tema não é um cartão aqui: o botão na parte de baixo da barra de ícones à esquerda percorre os temas, e um administrador escolhe quais ele oferece em **Configurações > Ferramentas de administração > Lista de temas**.
 
@@ -791,7 +774,7 @@ Você pode definir uma imagem de fundo por espaço de trabalho: abra **Configura
 
 O Poznote permite deixar a interface mais limpa ocultando os elementos que você não usa.
 
-Configure isso em **Configurações > Tela > Visibilidade dos elementos**.
+Configure isso em **Configurações > Visibilidade dos elementos**.
 
 - **Controle granular:** ative ou desative a exibição de cartões da página inicial, ações da barra de ferramentas, itens do menu de barra (slash) e mais. O selo com a data de criação das notas (**Mostrar Data de Criação da Nota**) e a contagem de notas ao lado de cada pasta (**Mostrar Contagem de Notas das Pastas**) também são ligados e desligados aqui.
 - **Por usuário:** cada usuário pode ter o próprio layout de interface.
@@ -1438,17 +1421,17 @@ Server: my-server.com
 │   └── Data: ./poznote-tom/data/
 │
 └── Poznote-Alice
-  ├── Port: YOUR_POZNOTE_API_PORT
-  ├── URL: http://my-server.com:YOUR_POZNOTE_API_PORT
+    ├── Port: 8041
+    ├── URL: http://my-server.com:8041
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```
 
 ## Assistente IA
 
-O Poznote inclui um chat de IA integrado que se conecta a uma instância local do [Ollama](https://ollama.com) ou do [LM Studio](https://lmstudio.ai), a um provedor em nuvem como a [Anthropic (Claude)](https://www.anthropic.com) ou a OpenAI, ou a qualquer servidor compatível com OpenAI. Ele pesquisa e lê suas notas para responder perguntas e, quando você pede, cria, reescreve e organiza as notas, dentro do espaço de trabalho em que você abriu o chat.
+O Poznote inclui um chat de IA integrado que se conecta a uma instância local do [Ollama](https://ollama.com) ou do [LM Studio](https://lmstudio.ai), a um provedor em nuvem como a [Anthropic (Claude)](https://www.anthropic.com) ou a OpenAI, ou a qualquer servidor compatível com OpenAI. Ele pesquisa e lê suas notas para responder perguntas, olha as imagens que elas contêm e, quando você pede, cria, reescreve e organiza as notas, dentro do espaço de trabalho em que você abriu o chat.
 
-Um administrador o ativa em **Configurações → Ferramentas de administração → Assistente IA**, e cada perfil passa então a ter um botão **Assistente IA** na barra de ícones à esquerda. O servidor de IA é chamado pelo servidor do Poznote, nunca pelo seu navegador, então com uma instância local do Ollama suas notas nunca saem da sua máquina.
+Um administrador o ativa em **Configurações → Ferramentas de administração → Assistente IA** e marca ali os perfis autorizados a usá-lo, o que os administradores sempre estão; cada um deles passa então a ter um botão **Assistente IA** na barra de ícones à esquerda. O servidor de IA é chamado pelo servidor do Poznote, nunca pelo seu navegador, então com uma instância local do Ollama suas notas nunca saem da sua máquina.
 
 O que o assistente sabe fazer, a escolha de um provedor e de um modelo, as chaves de API pessoais, as ferramentas externas como uma pesquisa na web (servidores MCP remotos) e a conexão de um servidor local a partir do contêiner do Poznote estão descritos na [documentação do Assistente IA](AI-ASSISTANT.pt.md). Para deixar um assistente de IA externo (VS Code Copilot, Claude CLI...) gerenciar suas notas, veja o [Servidor MCP](#servidor-mcp) abaixo.
 
@@ -1456,7 +1439,7 @@ O que o assistente sabe fazer, a escolha de um provedor e de um modelo, as chave
 
 Transforme voz em texto de nota com um servidor de fala para texto que você mesmo executa. O Poznote não embute nenhum modelo de fala: ele se comunica com qualquer servidor que exponha a API de áudio da OpenAI (`POST /v1/audio/transcriptions`), como um Whisper auto-hospedado, então o áudio nunca precisa sair da sua máquina.
 
-Depois que um administrador ativa o recurso em **Configurações → Ferramentas de administração → Transcrição**, você ganha **Ditar** em **Inserir** no menu de barra (slash), e um botão **Transcrever** nos anexos de áudio.
+Depois que um administrador ativa o recurso em **Configurações → Ferramentas de administração → Transcrição** e marca os perfis autorizados a usá-lo, o que os administradores sempre estão, você ganha **Ditar** em **Inserir** no menu de barra (slash), e um botão **Transcrever** nos anexos de áudio.
 
 A configuração de um servidor, a escolha do modelo e todo o resto estão na [documentação da Transcrição](TRANSCRIPTION.pt.md).
 

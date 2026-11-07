@@ -32,6 +32,7 @@
     var conversation = [];   // [{role: 'user'|'assistant', content: string}]
     var conversationId = ''; // names the conversation on the server
     var streaming = false;
+    var savingOpenNote = false; // the open note is being saved before a message goes out
     var abortController = null;
 
     var STORAGE_KEY = 'poznote-ai-chat-conversation'; // legacy, see restoreConversation()
@@ -356,6 +357,9 @@
         } else if (name === 'get_note') {
             label = t('ai_chat.tool_read', { id: args.note_id || '?' }, 'Reading note #{{id}}')
                 .replace('{{id}}', args.note_id || '?');
+        } else if (name === 'view_note_image') {
+            label = t('ai_chat.tool_view_image', {}, 'Looking at an image of note #{{id}}')
+                .replace('{{id}}', args.note_id || '?');
         } else if (name === 'list_recent_notes') {
             label = t('ai_chat.tool_list', {}, 'Listing recent notes');
         } else if (name === 'rename_note') {
@@ -432,6 +436,7 @@
         }
         var ICONS = {
             get_note: 'lucide-file-text',
+            view_note_image: 'lucide-image',
             rename_note: 'lucide-pencil',
             update_note_content: 'lucide-pencil',
             replace_in_note: 'lucide-pencil',
@@ -480,7 +485,10 @@
         icon.className = 'lucide lucide-alert-triangle';
         div.appendChild(icon);
         var text;
-        if (reason === 'external_tools_refused') {
+        if (reason === 'images_unsupported') {
+            text = t('ai_chat.images_unsupported_notice', {},
+                'This model does not accept images, so the assistant cannot look at the pictures in your notes. Choose a model that reads images in the AI Assistant settings.');
+        } else if (reason === 'external_tools_refused') {
             text = t('ai_chat.external_tools_refused', {},
                 'The AI server refused the external tools, so this answer is given without them: {{error}}')
                 .replace('{{error}}', String(detail || ''));
@@ -530,6 +538,39 @@
         });
         errorBubble.appendChild(document.createElement('br'));
         errorBubble.appendChild(btn);
+    }
+
+    /**
+     * Save the open note before the message goes out, when it has changes
+     * the server has not seen yet. Returns true when the caller must wait:
+     * `then` is called once the save came back, or after a moment, since a
+     * save can also be dropped without a word (another editor holds the
+     * lock, the title is empty) and never call back.
+     */
+    function saveOpenNoteFirst(then) {
+        var id = currentNoteId();
+        if (!id || typeof window.hasUnsavedChangesOnScreen !== 'function'
+            || typeof window.saveNoteImmediately !== 'function'
+            || !window.hasUnsavedChangesOnScreen(id)) {
+            return false;
+        }
+        var resumed = false;
+        var resume = function () {
+            if (resumed) return;
+            resumed = true;
+            savingOpenNote = false;
+            then();
+        };
+        var timer = setTimeout(resume, 2500);
+        savingOpenNote = true;
+        try {
+            window.saveNoteImmediately({ onSaved: function () { clearTimeout(timer); resume(); } });
+        } catch (e) {
+            console.debug('ai-chat: saving the open note failed:', e);
+            clearTimeout(timer);
+            resume();
+        }
+        return true;
     }
 
     /** A fresh id for a conversation: only ever compared with stored ones. */
@@ -920,12 +961,12 @@
         hint.className = 'ai-chat-empty';
         var text;
         if (readOnlyWorkspaces().length) {
-            text = t('ai_chat.empty_read_only', {}, 'Ask a question.\nThe assistant searches and reads the notes of every workspace shown on this dashboard, but changes nothing here.');
+            text = t('ai_chat.empty_read_only', {}, 'Ask a question.\n\nThe assistant searches and reads the notes of every workspace shown on this dashboard, but changes nothing here.\n\nIt can also look at the images they contain.');
         } else {
-            text = t('ai_chat.empty', {}, 'Ask a question.\nThe assistant can search, read, create, edit, organize and delete your notes.');
+            text = t('ai_chat.empty', {}, 'Ask a question.\n\nThe assistant can search, read, create, edit,\norganize and delete your notes.\n\nIt can also look at the images they contain.');
         }
         if (currentNoteId() && !readOnlyWorkspaces().length) {
-            text += '\n' + t('ai_chat.empty_open_note', {}, 'Say "this note" for the one you have open.');
+            text += '\n\n' + t('ai_chat.empty_open_note', {}, 'Say "this note" for the one you have open.');
         }
         hint.textContent = text;
         el.appendChild(hint);
@@ -983,8 +1024,8 @@
      * the given text is a new message (a saved prompt) and the input field
      * is left as it is.
      */
-    function send(retryText, fresh) {
-        if (streaming) {
+    function send(retryText, fresh, noteSaved) {
+        if (streaming || savingOpenNote) {
             if (abortController) abortController.abort();
             return;
         }
@@ -999,6 +1040,17 @@
             input.value = '';
             input.style.height = 'auto';
             input.style.overflowY = 'hidden';
+        }
+
+        // The assistant reads the note as the server holds it, so a question
+        // about what was just typed or pasted into it (an image, discussion
+        // #1743) would miss it for as long as the autosave is waiting out its
+        // debounce. The pending save goes first, then the same message is
+        // sent again with the text in hand, the input field already being
+        // empty. `!isRetry` as `fresh` keeps the bubble appended exactly
+        // once: a retry adds none and everything else adds one.
+        if (!noteSaved && saveOpenNoteFirst(function () { send(text, !isRetry, true); })) {
+            return;
         }
 
         closeHistory();
@@ -1070,7 +1122,7 @@
                     return;
                 }
                 if (obj.poznote_notice === 'tools_unsupported' || obj.poznote_notice === 'tools_need_reasoning_none'
-                    || obj.poznote_notice === 'external_tools_refused') {
+                    || obj.poznote_notice === 'external_tools_refused' || obj.poznote_notice === 'images_unsupported') {
                     appendToolsUnsupportedNotice(bubble, obj.poznote_notice, obj.detail);
                     return;
                 }

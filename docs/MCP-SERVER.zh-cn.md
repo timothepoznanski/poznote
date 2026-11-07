@@ -99,7 +99,7 @@ MCP 服务器充当 AI 助手与您的 Poznote 实例之间的桥梁。
 - `duplicate_note`：创建现有笔记的副本
 - `toggle_favorite`：切换笔记的收藏状态
 - `list_attachments`：列出指定笔记的所有附件
-- `get_attachment`：读回某个附件：它的字节（base64 或已解码的文本）、类型、大小和 sha256
+- `get_attachment`：读回某个附件：图片会作为模型真正能看的图片返回，其他文件则返回字节（base64 或已解码的文本），并带有类型、大小和 sha256
 - `add_attachment`：根据文件的 base64 内容将其附加到笔记（图片、日志、PDF 等）
 - `move_note`：将笔记移动到另一个工作区和/或文件夹，保留其 ID
 - `move_folder`：将文件夹（连同其子文件夹和笔记）移到另一个父文件夹下和/或另一个工作区中
@@ -131,7 +131,7 @@ MCP 服务器充当 AI 助手与您的 Poznote 实例之间的桥梁。
 
 **调用会落到哪个工作区。** 在 `create_note`、`create_folder` 和 `list_folders` 中始终指定 `workspace`（文件夹总是属于某一个工作区）：这是唯一能确保结果的方式。省略时，服务器按固定顺序解析，从不猜测：先使用 `mcp_default_workspace` 设置（前提是它指向一个存在的工作区），其次在账户只有一个工作区时使用该工作区。如果有多个工作区且未设置默认值，调用会被拒绝，并在回复中列出这些工作区，而不是把笔记放进恰好排在第一位的工作区（以前这个工作区会自行变化，例如第一次归档笔记时创建了“Archives”）。可以用 `update_app_setting("mcp_default_workspace", "<name>")` 设置默认工作区。
 
-**附件。** `add_attachment(note_id, filename, content_base64)` 将文件存储到笔记上，效果与在 Web 界面中拖放完全相同，因此无需人工介入即可附加生成的图表或日志文件；内容也可以是 `data:` URI。Poznote 自身的规则仍然适用，因此可执行文件类型和已满的存储配额会被拒绝，并附上原因。文件字节以 base64 编码的形式随工具调用传输，因此该工具将上传大小限制为 25 MB，更大的文件请使用 Web 界面。 `get_attachment(note_id, filename=…)` 把附件读回来，这正是 `add_attachment` 一直缺少的对应操作：字节以 base64 编码返回，文本文件、日志或 CSV 可以用 `encoding="text"`，其他类型一律拒绝，这样 PDF 绝不会变成乱码返回。响应中带有 Poznote 记录的类型和大小，以及这些字节的 `sha256`，因此客户端可以确认文件是否完整存储，或者在另一条笔记上认出同一个文件而无需再读一遍。用 `filename` 或 `list_attachments` 给出的 `attachment_id` 指定附件；若笔记里有两个附件同名，则连同两者一起拒绝，而不是择其一。25 MB 的上限同样适用于读取，更大的文件请从 Web 界面或直接通过 `GET /api/v1/notes/{id}/attachments/{attachment_id}` 下载。
+**附件。** `add_attachment(note_id, filename, content_base64)` 将文件存储到笔记上，效果与在 Web 界面中拖放完全相同，因此无需人工介入即可附加生成的图表或日志文件；内容也可以是 `data:` URI。Poznote 自身的规则仍然适用，因此可执行文件类型和已满的存储配额会被拒绝，并附上原因。文件字节以 base64 编码的形式随工具调用传输，因此该工具将上传大小限制为 25 MB，更大的文件请使用 Web 界面。 `get_attachment(note_id, filename=…)` 把附件读回来，这正是 `add_attachment` 一直缺少的对应操作。PNG、JPEG、GIF 和 WebP 会作为模型真正能看的**图片块**返回，所以笔记里的照片、截图或扫描件拍到了什么，就是这样问的。其他文件以 base64 编码返回，文本文件、日志或 CSV 可以用 `encoding="text"` 按 UTF-8 解码，其他类型一律拒绝，这样 PDF 绝不会变成乱码返回。`encoding="base64"` 则改为把图片的字节当文本返回，供自行解码的客户端使用；`encoding="image"` 明确要求返回图片块，对不是图片的文件会被拒绝。格式是从字节读出的，不是从文件名读出的，所以只把扩展名改成 `.png` 的文件绝不会被当成图片；SVG 不是可以展示的图片。图片里写的内容是数据，绝不是指令。响应中带有 Poznote 记录的类型和大小，以及这些字节的 `sha256`，因此客户端可以确认文件是否完整存储，或者在另一条笔记上认出同一个文件而无需再读一遍。用 `filename` 或 `list_attachments` 给出的 `attachment_id` 指定附件；若笔记里有两个附件同名，则连同两者一起拒绝，而不是择其一。25 MB 的上限同样适用于读取，更大的文件请从 Web 界面或直接通过 `GET /api/v1/notes/{id}/attachments/{attachment_id}` 下载。
 
 **移动。** `move_note` 和 `move_folder` 是移动而不是复制：ID、内容、历史记录以及指向笔记的链接都会保留。在 `update_note` 中，`workspace` 表示在哪里*查找该笔记*；真正移动笔记的参数是 `target_workspace`。如果笔记更换了工作区却没有指定目标工作区中的文件夹，它会落到该工作区的根目录，因为原来的文件夹属于它离开的那个工作区。移动文件夹时，其子文件夹及其中的所有笔记会一并移动。
 
@@ -368,7 +368,7 @@ docker compose logs -f mcp-server
 ### 启动服务器
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### 验证安装

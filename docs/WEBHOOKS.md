@@ -512,7 +512,7 @@ The three variants let you choose how much data leaves the instance; subscribe t
 
 ### Test ping
 
-The **Test** button on the webhook pages sends a `ping` event to the selected endpoint and reports the HTTP result. It follows the same envelope and signature rules as real events:
+The **Send test** button on the webhook pages sends a `ping` event to the selected endpoint and reports the HTTP result. It follows the same envelope and signature rules as real events:
 
 ```json
 {
@@ -571,4 +571,4 @@ http.createServer((req, res) => {
 }).listen(9099);
 ```
 
-Point a webhook at `http://your-host:9099/` with the matching secret, hit **Test**, and you should see the `ping` delivery arrive.
+Point a webhook at `http://your-host:9099/` with the matching secret, hit **Send test**, and you should see the `ping` delivery arrive.

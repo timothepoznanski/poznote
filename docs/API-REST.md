@@ -161,20 +161,23 @@ Error responses:
 | `200` | OK – Request succeeded |
 | `201` | Created – Resource created successfully |
 | `204` | No Content – CORS preflight |
+| `304` | Not Modified – The `If-None-Match` ETag still matches |
 | `400` | Bad Request – Invalid parameters |
 | `401` | Unauthorized – Missing or invalid credentials |
 | `403` | Forbidden – Insufficient permissions |
 | `404` | Not Found – Resource does not exist |
 | `405` | Method Not Allowed |
-| `409` | Conflict – Resource already exists |
+| `409` | Conflict – The resource already exists, or the note changed since the version sent |
 | `413` | Payload Too Large |
+| `423` | Locked – The note is being edited elsewhere |
+| `429` | Too Many Requests – Too many failed two-factor attempts |
 | `500` | Internal Server Error |
 
 ---
 
 ## Interactive Documentation (Swagger)
 
-Access the **Swagger UI** directly from Poznote at `Settings > API Documentation` to browse all endpoints, view request/response schemas, and test API calls interactively.
+Access the **Swagger UI** directly from Poznote at `Settings > About > API REST` to browse all endpoints, view request/response schemas, and test API calls interactively.
 
 ---
 
@@ -257,7 +260,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 GET /notes/templates
 ```
 
-List the notes the `/template` slash command can insert. A template is an ordinary HTML or Markdown note kept in a folder named `Templates` (sub-folders included) or in a workspace named `Templates`. The folder or workspace name is matched case-insensitively, in English or in the language of the interface (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
+List the notes the `/template` slash command can insert. A template is an ordinary HTML or Markdown note kept in a folder named `Templates` (sub-folders included) or in a workspace named `Templates`. The folder or workspace name is matched case-insensitively, in English or in any shipped interface language (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`, `템플릿`, `テンプレート`, `Plantilles`), singular or plural.
 
 **Query Parameters:**
 - `workspace` (optional): Only look at the `Templates` folders of this workspace. Notes of a `Templates` workspace are always included.
@@ -2397,31 +2400,6 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/folders/reorder
 ```
 
-### Create Kanban Structure
-
-```
-POST /folders/kanban-structure
-```
-
-Create a Kanban board folder structure (a parent folder with column subfolders).
-
-**Request Body (JSON):**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `folder_name` | string | Yes | Name of the Kanban board folder |
-| `columns` | integer | Yes | Number of columns (1–9) |
-| `workspace` | string | No | Target workspace |
-| `parent_folder_id` | integer | No | Create inside this parent folder |
-| `language` | string | No | Language for default column names (default `en`) |
-
-```bash
-curl -X POST -u 'username:password' -H "X-User-ID: 1" \
-  -H "Content-Type: application/json" \
-  -d '{"workspace": "Personal", "folder_name": "Project Board", "columns": 3}' \
-  http://YOUR_SERVER/api/v1/folders/kanban-structure
-```
-
 ### Update Folder Icon
 
 ```
@@ -4246,6 +4224,14 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
 | `POST` | `/notes/reorder` | Reorder a note before/after another |
 | `POST` | `/notes/{id}/archive` | Archive into the Archives workspace |
+| `PUT` | `/notes/{id}/content-width` | Set the note's own width |
+| `PUT` | `/notes/{id}/title-style` | Set the title color and style |
+| `PUT` | `/notes/{id}/offline` | Keep the note offline, or stop |
+
+### Change Detection
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/changes` | Version tokens for a workspace tree and up to 20 notes |
 
 ### Note Locks
 | Method | Endpoint | Description |
@@ -4282,6 +4268,14 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/tasks/{taskId}/subtasks` | Add a subtask to a task |
 | `PATCH` | `/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}` | Update a subtask |
 | `DELETE` | `/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}` | Delete a subtask |
+
+### Mentions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/mentions` | Mentions addressed to this profile |
+| `GET` | `/mentions/members` | Who can be mentioned here |
+| `POST` | `/mentions/{ownerId}/{noteId}/handled` | Mark a mention as handled |
+| `DELETE` | `/mentions/{ownerId}/{noteId}/handled` | Mark it as not handled |
 
 ### Reminders
 | Method | Endpoint | Description |
@@ -4335,7 +4329,8 @@ curl http://YOUR_SERVER/api_health.php
 | `PUT` | `/folders/{id}/favorite` | Set favorite state |
 | `POST` | `/folders/move-files` | Move files |
 | `POST` | `/folders/reorder` | Reorder folders |
-| `POST` | `/folders/kanban-structure` | Create Kanban |
+| `PUT` | `/folders/{id}/offline` | Keep the folder offline, or stop |
+| `POST` | `/folders/restore` | Restore a deleted folder |
 
 ### Folder Sharing
 | Method | Endpoint | Description |
@@ -4461,3 +4456,8 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/public/notes/lock/heartbeat` | Keep the edit lock alive |
 | `POST` | `/public/notes/lock/release` | Release the edit lock |
 | `GET` | `/public/statistics` | Instance statistics (statistics token, or none when public) |
+
+### Health Check
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api_health.php` | Service status, name and version (no authentication, full path) |

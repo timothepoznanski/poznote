@@ -20,6 +20,7 @@ requireSettingsPassword();
 require_once __DIR__ . '/../db_connect.php';
 require_once __DIR__ . '/../users/db_master.php';
 require_once __DIR__ . '/../stt_config.php';
+require_once __DIR__ . '/../lib/allowed-users-list.php';
 
 $currentLang = getUserLanguage();
 $currentUser = getCurrentUser();
@@ -143,44 +144,11 @@ $sttSettingsScope = 'instance';
 
                     <div class="git-field-group" id="stt-users-group">
                         <label class="git-field-label"><?php echo t_h('stt_settings.users_label', [], 'Users allowed to use the transcription server configured by the administrator'); ?></label>
-                        <span class="label-desc"><?php echo t_h('stt_settings.users_description', [], 'Only the selected users can dictate and transcribe with the configuration on this page. New users have no access until you add them here.'); ?></span>
+                        <span class="label-desc"><?php echo t_h('stt_settings.users_description', [], 'Only the selected users can dictate and transcribe with the configuration on this page. New users have no access until you add them here. Administrators always have access.'); ?></span>
                         <input type="search" id="stt-user-filter" class="git-field-input ai-user-filter"
                                placeholder="<?php echo t_h('stt_settings.users_filter_placeholder', [], 'Filter users'); ?>"
                                autocomplete="off">
-                        <div class="ai-user-list">
-                            <?php foreach ($sttUserCandidates as $candidate): ?>
-                                <?php
-                                    $candidateId = (int)$candidate['id'];
-                                    $candidateUsername = (string)$candidate['username'];
-                                    $candidateName = trim(trim((string)($candidate['first_name'] ?? '')) . ' ' . trim((string)($candidate['last_name'] ?? '')));
-                                    if ($candidateName === '') {
-                                        $candidateName = $candidateUsername;
-                                    }
-                                    // The second line only adds information when it is not
-                                    // just the name again
-                                    $candidateMeta = ($candidateName === $candidateUsername) ? '' : $candidateUsername;
-                                    if (!empty($candidate['is_admin'])) {
-                                        $adminTag = t('ai_settings.users_admin', [], 'Administrator');
-                                        $candidateMeta = ($candidateMeta === '') ? $adminTag : $candidateMeta . ' · ' . $adminTag;
-                                    }
-                                ?>
-                                <label class="ai-user" for="stt_user_<?php echo $candidateId; ?>">
-                                    <input
-                                        type="checkbox"
-                                        id="stt_user_<?php echo $candidateId; ?>"
-                                        name="stt_user_ids[]"
-                                        value="<?php echo $candidateId; ?>"
-                                        <?php echo !empty($candidate['stt_enabled']) ? 'checked' : ''; ?>>
-                                    <span class="ai-user-copy">
-                                        <span class="ai-user-name"><?php echo htmlspecialchars($candidateName, ENT_QUOTES, 'UTF-8'); ?></span>
-                                        <?php if ($candidateMeta !== ''): ?>
-                                        <span class="ai-user-meta"><?php echo htmlspecialchars($candidateMeta, ENT_QUOTES, 'UTF-8'); ?></span>
-                                        <?php endif; ?>
-                                    </span>
-                                </label>
-                            <?php endforeach; ?>
-                            <div class="ai-user-empty" id="stt-user-filter-empty" hidden><?php echo t_h('ai_settings.users_filter_empty', [], 'No user matches this filter.'); ?></div>
-                        </div>
+                        <?php poznoteRenderAllowedUsersList($sttUserCandidates, 'stt', 'stt_enabled'); ?>
                     </div>
 
                     <?php include __DIR__ . '/../stt_settings_fields.php'; ?>
