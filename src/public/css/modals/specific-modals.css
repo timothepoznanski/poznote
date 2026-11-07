@@ -1485,6 +1485,19 @@
     cursor: pointer;
 }
 
+/* Settings > About, where the Release notes card opens this popup: the
+   "What's new after updates" card sits right next to it and carries the same
+   setting, so the checkbox would contradict the card until a reload. */
+.settings-page #whatsNewModal .whats-new-never {
+    display: none;
+}
+
+/* Without that checkbox the footer holds the buttons alone, which
+   space-between would then push to the left */
+.settings-page #whatsNewModal .whats-new-footer {
+    justify-content: flex-end;
+}
+
 #whatsNewModal .whats-new-footer .modal-buttons {
     margin: 0;
     padding: 0;

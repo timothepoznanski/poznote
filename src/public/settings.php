@@ -2067,14 +2067,31 @@ $localRestoreCardVisible = !empty(LocalBackupService::restorePageBackups());
             </div>
 
             <!-- "What's new" popup after an update (js/whats-new.js) -->
-            <div class="home-card" id="whats-new-card">
+            <!-- settings-card-stacks: on a phone the Show button would leave
+                 the title too little room, so the title keeps the first line
+                 and the button and the badge go under it. -->
+            <div class="home-card settings-card-stacks" id="whats-new-card">
                 <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.whats_new', [], 'After an update, show the release notes of the new version once when you open your notes.'); ?>"><i class="lucide lucide-help-circle"></i></span>
                 <div class="home-card-icon"><i class="lucide lucide-star"></i></div>
                 <div class="home-card-content">
                     <span class="home-card-title"><?php echo t_h('settings.cards.whats_new', [], "What's new after updates"); ?></span>
+                    <!-- Shows the notes of the installed version right away,
+                         whatever this account has already seen. Inside a
+                         toggle row, so its click must not reach the card. -->
+                    <button type="button" class="settings-inline-control settings-inline-button" id="whats-new-show-btn"><?php echo t_h('settings.cards.whats_new_show_action', [], 'Show the latest one'); ?></button>
                     <span id="whats-new-status" class="setting-status enabled"><?php echo t_h('common.enabled'); ?></span>
                 </div>
             </div>
+
+            <!-- Every version's notes, on GitHub. The Show button of the card
+                 above opens the installed version's notes in the app. -->
+            <a href="https://github.com/timothepoznanski/poznote/releases" target="_blank" rel="noopener noreferrer" class="home-card" id="release-notes-card">
+                <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.release_notes', [], 'Open the notes of every Poznote release on GitHub.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                <div class="home-card-icon"><i class="lucide lucide-sparkles"></i></div>
+                <div class="home-card-content">
+                    <span class="home-card-title"><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span>
+                </div>
+            </a>
 
             <!-- GitHub discussions and Discord: links every user sees,
                  pointing to the Poznote project unless the global setting
@@ -2333,5 +2350,9 @@ $localRestoreCardVisible = !empty(LocalBackupService::restorePageBackups());
     <!-- js/profile.js (My Profile card and modal) is loaded by icon_sidebar.php,
          which every page carrying the rail includes. -->
     <script src="js/delete-account.js?v=<?php echo $cache_v; ?>&m=<?php echo @filemtime('js/delete-account.js') ?: time(); ?>"></script>
+    <!-- "What's new" popup, reopened by the Release notes card of the About
+         section. Same markup and same script as index.php. -->
+    <?php include __DIR__ . '/../modals/whats_new_modal.php'; ?>
+    <script src="<?php echo poznoteAsset('js/whats-new.js'); ?>"></script>
 </body>
 </html>

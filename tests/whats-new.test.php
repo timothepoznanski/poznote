@@ -50,6 +50,21 @@ test('whats new: GitHub screenshots become Markdown images, anything that is not
     assertSame("![image](https://github.com/user-attachments/assets/38)\n", $md);
 });
 
+test('whats new: the <br> a release note puts after a screenshot does not become an empty band', function () {
+    $md = "Intro.\n\n![image](https://x/y.png)\n<br><br>\n\nText after.";
+    assertSame("Intro.\n\n![image](https://x/y.png)\n\nText after.", poznoteWhatsNewCollapseLineBreaks($md));
+});
+
+test('whats new: a <br> run that is the only break between two lines is kept, as one break', function () {
+    assertSame("Line a\n<br>\nLine b", poznoteWhatsNewCollapseLineBreaks("Line a\n<br /><br>\nLine b"));
+    assertSame('Before<br>after', poznoteWhatsNewCollapseLineBreaks('Before<br><br><br>after'));
+});
+
+test('whats new: a <br> inside a code block is left alone', function () {
+    $md = "Text.\n\n```html\n<br><br>\n```";
+    assertSame($md, poznoteWhatsNewCollapseLineBreaks($md));
+});
+
 test('whats new: drafts and malformed entries of the GitHub payload are ignored', function () {
     $releases = poznoteWhatsNewNormalizeReleases([
         ['tag_name' => 'v6.112.0', 'prerelease' => false, 'published_at' => '2026-10-09T05:27:21Z', 'html_url' => 'https://github.com/x', 'body' => "a\r\nb"],

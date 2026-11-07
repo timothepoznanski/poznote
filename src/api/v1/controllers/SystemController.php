@@ -159,7 +159,7 @@ class SystemController {
 
         require_once __DIR__ . '/../../../markdown_parser.php';
         foreach ($selection['releases'] as $release) {
-            $markdown = poznoteWhatsNewImagesToMarkdown(poznoteWhatsNewCleanBody($release['body'], $isAdmin));
+            $markdown = poznoteWhatsNewCollapseLineBreaks(poznoteWhatsNewImagesToMarkdown(poznoteWhatsNewCleanBody($release['body'], $isAdmin)));
             if ($markdown === '') {
                 continue;
             }
