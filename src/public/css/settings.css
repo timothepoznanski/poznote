@@ -1356,6 +1356,13 @@ html[data-theme='dark'] .settings-scope-option.is-active {
         margin-left: auto;
     }
 
+    /* A row whose badge follows an action button ("What's new after
+       updates"): the button already took the free space, so the badge sits
+       right next to it instead of being pushed to the far right again. */
+    .home-container.settings-with-nav .home-card-content > .settings-inline-button + .setting-status {
+        margin-left: 0;
+    }
+
     .home-container.settings-with-nav .home-card-content > div {
         display: flex;
         gap: 6px;
@@ -1890,6 +1897,36 @@ html[data-theme='dark'] body:has(> .settings-shell.settings-subpage) {
 .settings-inline-text {
     width: 240px;
     cursor: text;
+}
+
+/* An action in the row rather than a value: the Show button of the
+   "What's new after updates" card. Same box as the inline list, but it
+   carries the accent so it does not read as a disabled field. */
+.settings-inline-button {
+    box-sizing: border-box;
+    padding: 5px 12px;
+    border: 1px solid var(--pz-border);
+    border-radius: var(--pz-radius);
+    background-color: var(--pz-bg);
+    color: var(--pz-accent-text);
+    font: inherit;
+    font-size: calc(13px * var(--settings-font-scale, 1));
+    cursor: pointer;
+}
+
+.settings-inline-button:hover:not(:disabled) {
+    border-color: var(--pz-accent);
+}
+
+.settings-inline-button:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.settings-inline-button:focus-visible {
+    outline: none;
+    border-color: var(--pz-accent);
+    box-shadow: 0 0 0 3px rgba(var(--pz-accent-rgb), 0.1);
 }
 
 .settings-inline-select:focus,

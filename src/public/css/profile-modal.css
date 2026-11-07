@@ -52,6 +52,15 @@
     overflow-x: hidden;
 }
 
+/* The logout confirmation is a two-line dialog: it sits in the middle of the
+   viewport instead of near the top like the taller ones that share this frame.
+   Auto margins rather than align-items: center, which would clip the top of a
+   dialog taller than the screen; !important beats the margins
+   css/modals/responsive.css gives every .modal-content. */
+#confirmLogoutModal .modal-content {
+    margin: auto !important;
+}
+
 :is(#editProfileModal, #confirmLogoutModal, #offlineLossModal, #iconSidebarColorModal, #themeListModal, #iconSidebarOrderModal) .modal-content h3 {
     margin: 0 0 15px 0;
     color: var(--pz-text);
@@ -550,5 +559,25 @@ html[data-theme='dark'] #iconContextMenu .icon-context-menu-item i {
     #offlineLossModal .modal-buttons button {
         height: auto !important;
         min-height: 44px;
+    }
+}
+
+/* Cancel and Logout stay side by side on a phone: modals/responsive.css turns
+   every dialog's buttons into full-width stacked blocks, which is too much for
+   two short labels (same exception as #confirmModal there). */
+@media (max-width: 800px) {
+    #confirmLogoutModal .modal-buttons {
+        display: flex !important;
+        flex-direction: row !important;
+        width: auto !important;
+        gap: 10px !important;
+        margin-bottom: 0 !important;
+    }
+
+    #confirmLogoutModal .modal-buttons button {
+        flex: 1 1 0 !important;
+        width: auto !important;
+        min-width: 0 !important;
+        margin-bottom: 0 !important;
     }
 }

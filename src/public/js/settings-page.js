@@ -2967,6 +2967,33 @@
             checkUpdatesCard.addEventListener('click', window.checkForUpdates);
         }
 
+        // About > "What's new after updates": the Show button opens the
+        // popup with the notes of the installed version, whatever this
+        // account has already seen. The row is a toggle, so the click must
+        // not reach the card.
+        var whatsNewShowBtn = document.getElementById('whats-new-show-btn');
+        if (whatsNewShowBtn) {
+            var whatsNewShowLabel = whatsNewShowBtn.textContent;
+            whatsNewShowBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                if (typeof window.showWhatsNew !== 'function') return;
+                whatsNewShowBtn.disabled = true;
+                window.showWhatsNew()
+                    .then(function (shown) {
+                        whatsNewShowBtn.disabled = false;
+                        if (shown) return;
+                        // GitHub out of reach, or the notes of the installed
+                        // version are not published yet
+                        whatsNewShowBtn.textContent = window.t ? window.t('settings.cards.whats_new_show_unavailable', null, 'Not available') : 'Not available';
+                        setTimeout(function () { whatsNewShowBtn.textContent = whatsNewShowLabel; }, 4000);
+                    })
+                    .catch(function (error) {
+                        console.debug('settings: showing the release notes failed:', error);
+                        whatsNewShowBtn.disabled = false;
+                    });
+            });
+        }
+
         // Restore update badge if available
         if (typeof window.restoreUpdateBadge === 'function') {
             window.restoreUpdateBadge();

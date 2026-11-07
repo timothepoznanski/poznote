@@ -2,12 +2,17 @@
    Notes board (dashboard.php)
    ============================================ */
 
+/* The AI chat and Element visibility columns dock as the last flex children of
+   <body> (ai_chat_panel.php, ui_customization_panel.php), so the page padding
+   belongs to .dashboard-container, as on the speed dial (css/speed-dial.css),
+   not to the body: padded here, a docked column stopped 20px short of the
+   window and the floating button stack, placed from the window, landed on it. */
 body.dashboard-page {
     display: flex;
     align-items: flex-start;
     background: var(--pz-surface);
     min-height: 100vh;
-    padding-top: 0;
+    padding: 0;
 }
 
 @keyframes dashboardHeartBlink {
@@ -35,7 +40,9 @@ body.dashboard-page {
        allows and centers itself. */
     max-width: 100%;
     padding-top: 0;
-    padding-bottom: 0;
+    /* The air under the cards, which the body carried before it gave its
+       padding up for the docked columns */
+    padding-bottom: 20px;
     min-width: 0;
 }
 

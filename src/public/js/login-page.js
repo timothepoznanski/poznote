@@ -147,56 +147,9 @@
                 });
             }
 
-            // OIDC login: redirect without creating a Poznote remember-me cookie.
-            if (config.oidcEnabled) {
-                var oidcLoginBtn = document.getElementById('oidc-login-btn');
-                var oidcOtherAccountBtn = document.getElementById('oidc-other-account-btn');
-
-                // Email of the last SSO login on this device (stored by
-                // oidc-login-hint.js after a successful SSO login)
-                var loginHint = null;
-                try {
-                    loginHint = localStorage.getItem('poznote_oidc_login_hint');
-                } catch (storageError) {
-                    // localStorage unavailable - hint is best-effort only
-                    console.debug('login-page: dropAutofocus() failed:', storageError);
-                }
-
-                var startOidcLogin = function (options) {
-                    var params = new URLSearchParams();
-                    if (config.redirectAfter) {
-                        params.set('redirect', config.redirectAfter);
-                    }
-                    if (options && options.loginHint) {
-                        // Sending the hint lets the provider skip its account chooser
-                        // (which escapes the PWA Custom Tab on mobile when several
-                        // accounts are signed in)
-                        params.set('login_hint', options.loginHint);
-                    }
-                    if (options && options.selectAccount) {
-                        params.set('prompt', 'select_account');
-                    }
-                    var query = params.toString();
-                    window.location.href = 'oidc_login.php' + (query ? '?' + query : '');
-                };
-
-                if (oidcLoginBtn) {
-                    // The remembered account's label and the "sign in with another
-                    // account" button are set by the inline script in login.php,
-                    // before the first paint
-                    oidcLoginBtn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        startOidcLogin({ loginHint: loginHint });
-                    });
-                }
-
-                if (oidcOtherAccountBtn) {
-                    oidcOtherAccountBtn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        startOidcLogin({ selectAccount: true });
-                    });
-                }
-            }
+            // The SSO buttons are plain links built by login.php (with the
+            // remembered account added to the first one by its inline script),
+            // so a tap works before this file has loaded.
 
             // PWA safety net: if an SSO login escaped to the external browser
             // (session cookies are shared with the PWA on Android), detect the
@@ -229,7 +182,7 @@
             // Note: last_opened_workspace is now stored in database, no localStorage cleanup needed
         } catch (e) {
             // Ignore parse errors
-            console.debug('login-page: startOidcLogin() failed:', e);
+            console.debug('login-page: setup failed:', e);
         }
     });
 })();

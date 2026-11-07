@@ -115,6 +115,7 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:tenant-isolation-card" checked><span><?php echo t_h('settings.cards.tenant_isolation', [], 'Tenant isolation'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:import-limits-card" checked><span><?php echo t_h('settings.cards.import_limits', [], 'Import Limits'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:user-quotas-card" checked><span><?php echo t_h('settings.cards.user_quotas', [], 'User quotas'); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-card" checked><span><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-logo-card" checked><span><?php echo t_h('settings.cards.custom_logo', [], 'Logo'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-css-card" checked><span><?php echo t_h('settings.cards.custom_css', [], 'Custom CSS path'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:custom-fonts-card" checked><span><?php echo t_h('settings.cards.custom_fonts', [], 'Custom fonts'); ?></span></label>
@@ -122,9 +123,9 @@
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:disaster-recovery-card" checked><span><?php echo t_h('multiuser.admin.maintenance.title', [], 'Disaster Recovery'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:orphan-scanner-card" checked><span><?php echo t_h('settings.cards.orphan_scanner', [], 'Orphan attachments scanner'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:activity-log-card" checked><span><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span></label>
-        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:storage-stats-card" checked><span><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:check-updates-card" checked><span><?php echo t_h('settings.cards.version', [], 'Version'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:whats-new-card" checked><span><?php echo t_h('settings.cards.whats_new', [], "What's new after updates"); ?></span></label>
+        <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:release-notes-card" checked><span><?php echo t_h('settings.cards.release_notes', [], 'Release notes'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:github-card" checked><span><?php echo t_h('settings.cards.documentation', [], 'Documentation GitHub'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:discussions-card" checked><span><?php echo t_h('settings.cards.discussions', [], 'GitHub discussions'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:website-card" checked><span><?php echo t_h('settings.cards.website', [], 'Poznote Website'); ?></span></label>
