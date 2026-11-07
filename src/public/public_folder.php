@@ -371,7 +371,19 @@ $noteBaseUrl = '';
       data-txt-collapse-folder="<?php echo t_h('public.collapse_folder', [], 'Collapse folder'); ?>"
       data-txt-expand-all="<?php echo t_h('public.expand_all', [], 'Expand all'); ?>"
       data-txt-collapse-all="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>">
-    <?php // Folded filter, Collapse all, view and theme on one row of buttons (js/search-toggle.js) ?>
+    <?php
+    // Subfolders arrive folded (the visitor opens what they want), so the
+    // button above the tree starts on Expand all. It only exists when a
+    // subfolder branch actually renders, see publicFolderBranchHasNotes().
+    $hasFoldableFolders = false;
+    foreach ($subfoldersByParent[(int)$folder_id] ?? [] as $headerSubfolder) {
+        if (publicFolderBranchHasNotes((int)$headerSubfolder['id'], $subfoldersByParent, $notesByFolder)) {
+            $hasFoldableFolders = true;
+            break;
+        }
+    }
+    ?>
+    <?php // Folded filter, Expand all, view and theme on one row of buttons (js/search-toggle.js) ?>
     <div class="header-controls<?php echo !empty($sharedNotes) ? ' pz-search-row' : ''; ?>">
         <?php if (!empty($sharedNotes)): ?>
             <?php echo poznoteRenderSearchToggle('publicFolderFilter', t('public_folder.filter_placeholder', [], 'Filter notes by title'), 'public-folder-header-btn'); ?>
@@ -381,8 +393,13 @@ $noteBaseUrl = '';
                     <i class="lucide lucide-x"></i>
                 </button>
             </div>
-            <button id="publicFolderToggleAll" class="public-folder-toggle-all public-folder-header-btn" type="button" title="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>" aria-label="<?php echo t_h('public.collapse_all', [], 'Collapse all'); ?>">
-                <i class="lucide lucide-chevron-up"></i>
+            <?php
+            $toggleAllLabel = $hasFoldableFolders
+                ? t_h('public.expand_all', [], 'Expand all')
+                : t_h('public.collapse_all', [], 'Collapse all');
+            ?>
+            <button id="publicFolderToggleAll" class="public-folder-toggle-all public-folder-header-btn" type="button" data-action="<?php echo $hasFoldableFolders ? 'expand' : 'collapse'; ?>" title="<?php echo $toggleAllLabel; ?>" aria-label="<?php echo $toggleAllLabel; ?>">
+                <i class="lucide lucide-chevron-<?php echo $hasFoldableFolders ? 'down' : 'up'; ?>"></i>
             </button>
         <?php endif; ?>
         <button id="viewToggle" class="view-toggle public-folder-header-btn" onclick="toggleView()" title="<?php echo t_h('public_folder.view_kanban', [], 'View as Kanban'); ?>">
@@ -576,11 +593,15 @@ $noteBaseUrl = '';
         } else {
             $subIconClasses = null;
         }
+
+        // Folded by default: a shared folder opens on its own notes, and the
+        // visitor unfolds the subfolders they care about. js/public_folder.js
+        // reopens the ones this browser left open.
         ?>
-        <div class="public-folder-group" data-folder-id="<?php echo (int)$folderId; ?>" style="--public-folder-depth: <?php echo (int)$depth; ?>">
+        <div class="public-folder-group is-collapsed" data-folder-id="<?php echo (int)$folderId; ?>" style="--public-folder-depth: <?php echo (int)$depth; ?>">
             <h2 class="public-folder-group-title">
-                <button type="button" class="public-folder-toggle" aria-expanded="true">
-                    <i class="lucide lucide-chevron-down"></i>
+                <button type="button" class="public-folder-toggle" aria-expanded="false" title="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>" aria-label="<?php echo t_h('public.expand_folder', [], 'Expand folder'); ?>">
+                    <i class="lucide lucide-chevron-right"></i>
                 </button>
                 <?php if ($subIsEmoji): ?>
                     <span class="folder-h1-emoji"><?php echo htmlspecialchars($subIconRaw); ?></span>
