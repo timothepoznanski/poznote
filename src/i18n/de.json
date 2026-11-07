@@ -1480,6 +1480,8 @@
       "badge_hidden_count_admin": "{{count}} ausgeblendet ({{admin}} durch den Administrator)",
       "badge_hidden_count_admin_columns": "{{me}} für Sie ausgeblendet, {{users}} für Benutzer",
       "badge_hidden_count": "{{count}} ausgeblendet",
+      "count_hidden": "{{count}} ausgeblendet",
+      "count_visible": "{{count}} sichtbar",
       "direct_copy_restore_section": "Wiederherstellungsseite: Abschnitt „Wiederherstellung per Direktkopie“",
       "local_backups_section": "Sicherungsseite: Abschnitt „Sicherung in einen Ordner auf dem Server“",
       "s3_backups_section": "Sicherungsseite: Abschnitt „Sicherung nach S3“",

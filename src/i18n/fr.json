@@ -1476,6 +1476,8 @@
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
       "badge_hidden_count_admin_columns": "{{me}} masqué(s) pour vous, {{users}} pour les utilisateurs",
       "badge_hidden_count": "{{count}} masqué(s)",
+      "count_hidden": "{{count}} masqué(s)",
+      "count_visible": "{{count}} affiché(s)",
       "check_all": "Tout cocher",
       "uncheck_all": "Tout décocher",
       "collapse_all": "Tout replier",

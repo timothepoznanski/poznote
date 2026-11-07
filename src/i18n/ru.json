@@ -960,6 +960,8 @@
       "badge_hidden_count_admin": "{{count}} скрыто ({{admin}} администратором)",
       "badge_hidden_count_admin_columns": "{{me}} скрыто для вас, {{users}} для пользователей",
       "badge_hidden_count": "{{count}} скрыто",
+      "count_hidden": "{{count}} скрыто",
+      "count_visible": "{{count}} показано",
       "direct_copy_restore_section": "Страница восстановления: раздел «Восстановление прямым копированием»",
       "local_backups_section": "Страница резервного копирования: раздел «Резервная копия в папку на сервере»",
       "s3_backups_section": "Страница резервного копирования: раздел «Резервная копия в S3»",

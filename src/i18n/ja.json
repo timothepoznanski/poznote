@@ -960,6 +960,8 @@
       "badge_hidden_count_admin": "{{count}}件を非表示（うち管理者による非表示{{admin}}件）",
       "badge_hidden_count_admin_columns": "自分は{{me}}件、ユーザーは{{users}}件を非表示",
       "badge_hidden_count": "{{count}}件を非表示",
+      "count_hidden": "{{count}}件を非表示",
+      "count_visible": "{{count}}件を表示",
       "check_all": "すべてチェック",
       "uncheck_all": "すべてのチェックを外す",
       "collapse_all": "すべて折りたたむ",

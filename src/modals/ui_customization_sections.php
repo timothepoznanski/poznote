@@ -17,11 +17,47 @@
  * means "no live page": the item is only offered in the modal). Sections
  * without it never show in the panel.
  */
+if (!function_exists('poznoteUiCustomizationSectionHeader')) {
+    /**
+     * Section heading: its name, then how many of its items are hidden (in
+     * red) and how many are shown (in green), filled in by js/settings-page.js
+     * and js/ui-customization-panel.js, which also leave a count out when it
+     * is zero. A folded section keeps them, so the list reads at a glance.
+     *
+     * The check/uncheck-all button is not in the heading: it is the first row
+     * of the list itself, see poznoteUiCustomizationListToggleAll().
+     */
+    function poznoteUiCustomizationSectionHeader(string $title): string
+    {
+        return '<h4 class="ui-custom-section-title"><span>' . $title . '</span>'
+            . '<span class="ui-custom-section-counts" role="img" hidden'
+            . ' data-label-hidden="' . t_h('modals.ui_customization.count_hidden', [], '{{count}} hidden') . '"'
+            . ' data-label-visible="' . t_h('modals.ui_customization.count_visible', [], '{{count}} shown') . '">'
+            . '<span class="ui-custom-count ui-custom-count-hidden" hidden></span>'
+            . '<span class="ui-custom-count ui-custom-count-visible" hidden></span>'
+            . '</span></h4>';
+    }
+
+    /**
+     * First row of a section's list: the button checking or unchecking every
+     * item of that list. It spans the width of the list (two columns on the
+     * settings page) and folds away with it.
+     */
+    function poznoteUiCustomizationListToggleAll(): string
+    {
+        return '<div class="ui-custom-items-actions">'
+            . '<button type="button" class="ui-custom-toggle-all"'
+            . ' data-label-check="' . t_h('modals.ui_customization.check_all', [], 'Check all') . '"'
+            . ' data-label-uncheck="' . t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all') . '"></button>'
+            . '</div>';
+    }
+}
 ?>
 <!-- Create Cards Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.create_cards', [], 'Create Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.create_cards', [], 'Create Cards')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-note-card" checked><span><?php echo t_h('modals.create.note.title', [], 'Note'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-markdown-note-card" checked><span><?php echo t_h('modals.create.markdown.title', [], 'Markdown Note'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:create-task-list-card" checked><span><?php echo t_h('modals.create.task_list.title', [], 'Task List'); ?></span></label>
@@ -33,8 +69,9 @@
 
 <!-- Settings Cards Section -->
 <div class="ui-custom-section" data-ui-pages="settings">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.settings_cards', [], 'Settings Cards')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:my-profile-card" checked><span><?php echo t_h('profile.card', [], 'My Profile'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:change-password-card" checked><span><?php echo t_h('settings.cards.change_password', [], 'Change Password'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:two-factor-card" checked><span><?php echo t_h('settings.cards.two_factor', [], 'Two-factor authentication'); ?></span></label>
@@ -139,9 +176,10 @@
      next to the icon rail. data-ui-section-id: the "Customize sidebar" item of
      the tree's view options menu opens the panel on this section. -->
 <div class="ui-custom-section" data-ui-pages="notes" data-ui-section-id="sidebar">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.sidebar', [], 'Sidebar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.sidebar', [], 'Sidebar')); ?>
 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.sidebar_hint', [], 'Column of the notes tree, between the icon rail and the note.'); ?></p>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarNotificationsBtn" checked><span><?php echo t_h('reminder.notifications', [], 'Notifications'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:sidebarCreateBtn" checked><span><?php echo t_h('sidebar.create', [], 'Create'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:search-bar-container" checked><span><?php echo t_h('modals.ui_customization.index_search_bar', [], 'Search bar'); ?></span></label>
@@ -157,9 +195,10 @@
 <!-- Icon Rail Section (icon_sidebar.php): the narrow column of icons on the far
      left of every page, kept apart from the sidebar next to it. -->
 <div class="ui-custom-section" data-ui-pages="notes dashboard settings speed-dial" data-ui-section-id="icon-rail">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon rail'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.icon_sidebar', [], 'Icon rail')); ?>
 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.icon_rail_hint', [], 'Narrow column of icons on the far left of every page.'); ?></p>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarDashboardBtn" checked><span><?php echo t_h('common.back_to_home', [], 'Dashboard'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarNotesBtn" checked><span><?php echo t_h('common.notes', [], 'Notes'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:iconSidebarTagsBtn" checked><span><?php echo t_h('notes_list.system_folders.tags', [], 'Tags'); ?></span></label>
@@ -185,9 +224,10 @@
 
 <!-- Toolbar Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.toolbar', [], 'Toolbar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.toolbar', [], 'Toolbar')); ?>
 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.toolbar_hint', [], 'Formatting buttons (bold, lists, code…) only appear while text is selected in a note. Other actions are grouped in the ⋮ menu.'); ?></p>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-bold" checked><span><?php echo t_h('editor.toolbar.bold', [], 'Bold'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-italic" checked><span><?php echo t_h('editor.toolbar.italic', [], 'Italic'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="toolbar:btn-underline" checked><span><?php echo t_h('editor.toolbar.underline', [], 'Underline'); ?></span></label>
@@ -232,8 +272,9 @@
 
 <!-- Slash Menu Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.slash_menu', [], 'Slash Menu'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.slash_menu', [], 'Slash Menu')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:normal" checked><span><?php echo t_h('slash_menu.back_to_normal', [], 'Back to normal text'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:title" checked><span><?php echo t_h('slash_menu.title', [], 'Title'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="slash:format" checked><span><?php echo t_h('slash_menu.format_text', [], 'Format text'); ?></span></label>
@@ -276,9 +317,10 @@
      data-ui-viewport="mobile": left out of the "Element visibility" panel on a desktop
      viewport, where the bar never shows (css/ui-customization-panel.css). -->
 <div class="ui-custom-section" data-ui-pages="notes" data-ui-section-id="mobile-editor-bar" data-ui-viewport="mobile">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.mobile_editor_bar', [], 'Mobile editor bar'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.mobile_editor_bar', [], 'Mobile editor bar')); ?>
 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.mobile_editor_bar_hint', [], 'Bar shown above the on-screen keyboard while a note is being edited on a phone or tablet.'); ?></p>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileEditorBar" checked><span><?php echo t_h('modals.ui_customization.mobile_editor_bar_show', [], 'Show the bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarInsert" checked><span><?php echo t_h('mobile_editor_bar.insert', [], 'Insert (slash menu)'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:mobileBarRecordAudio" checked><span><?php echo t_h('slash_menu.record_audio', [], 'Record audio'); ?></span></label>
@@ -310,8 +352,9 @@
 <!-- Task Lists Section: the parts of a task list note's rows
      (tasklist:* keys, see poznoteTasklistUiSelectors() in lib/ui-customization.php) -->
 <div class="ui-custom-section" data-ui-pages="notes">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.task_lists', [], 'Task lists'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.task_lists', [], 'Task lists')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:tasklist-progress" checked><span><?php echo t_h('modals.ui_customization.tasklist_progress_bar', [], 'Task list progress bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:add-field" checked><span><?php echo t_h('modals.ui_customization.tasklist_add_field', [], 'Field to add a task'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="tasklist:frame" checked><span><?php echo t_h('modals.ui_customization.tasklist_frame', [], 'Frame around each task'); ?></span></label>
@@ -328,8 +371,9 @@
 
 <!-- Other Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.panels', [], 'Other'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.panels', [], 'Other')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:outline-panel" checked><span><?php echo t_h('common.outline.title', [], 'Outline'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-scrollbar" checked><span><?php echo t_h('modals.ui_customization.note_scrollbar', [], 'Note scrollbar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-scroll-arrows" checked><span><?php echo t_h('modals.ui_customization.note_scroll_arrows', [], 'Scroll to top and bottom arrows'); ?></span></label>
@@ -361,8 +405,9 @@
 
 <!-- Workspace Menu Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.workspace_menu', [], 'Workspace Menu'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.workspace_menu', [], 'Workspace Menu')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:new-workspace" checked><span><?php echo t_h('workspaces.menu.new_workspace', [], 'New workspace'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="wsmenu:edit-workspaces" checked><span><?php echo t_h('workspaces.menu.edit_workspaces', [], 'Edit workspaces'); ?></span></label>
 </div>
@@ -370,8 +415,9 @@
 
 <!-- Speed dial Section -->
 <div class="ui-custom-section" data-ui-pages="speed-dial">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('speed_dial.title', [], 'Speed dial'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('speed_dial.title', [], 'Speed dial')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:speedDialTitle" checked><span><?php echo t_h('speed_dial.visibility.title', [], 'Page title'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:speed-dial-workspace" checked><span><?php echo t_h('speed_dial.visibility.workspace', [], 'Workspace selector'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:speedDialFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
@@ -389,8 +435,9 @@
 
 <!-- Dashboard Toolbar Section -->
 <div class="ui-custom-section" data-ui-pages="dashboard">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.dashboard_toolbar', [], 'Dashboard'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.dashboard_toolbar', [], 'Dashboard')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardTopbarFilter" checked><span><?php echo t_h('modals.ui_customization.dashboard_filter_bar', [], 'Filter bar'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardViewLayoutBtn" checked><span><?php echo t_h('modals.ui_customization.view_layout_toggle', [], 'View toggle (grid / list, card size)'); ?></span></label>
     <label class="ui-custom-item"><input type="checkbox" data-ui-key="card:dashboardFilterBtn" checked><span><?php echo t_h('dashboard.filters.button', [], 'Filters'); ?></span></label>
@@ -399,8 +446,9 @@
 
 <!-- Folder Actions Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.folder_actions', [], 'Folder Actions'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.folder_actions', [], 'Folder Actions')); ?>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:folder-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.folder_actions_toggle', [], 'Menu button (⋮) on folders'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:create-note-in-folder" checked><span><?php echo t_h('notes_list.folder_actions.create', [], 'Create here'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="folder:open-kanban-view" checked><span><?php echo t_h('notes_list.folder_actions.kanban_view', [], 'Kanban view'); ?></span></label>
@@ -422,9 +470,10 @@
 
 <!-- Note Actions Section -->
 <div class="ui-custom-section" data-ui-pages="notes">
-<h4 class="ui-custom-section-title"><span><?php echo t_h('modals.ui_customization.sections.note_actions', [], 'Note Actions'); ?></span><button type="button" class="ui-custom-toggle-all" data-label-check="<?php echo t_h('modals.ui_customization.check_all', [], 'Check all'); ?>" data-label-uncheck="<?php echo t_h('modals.ui_customization.uncheck_all', [], 'Uncheck all'); ?>"></button></h4>
+<?php echo poznoteUiCustomizationSectionHeader(t_h('modals.ui_customization.sections.note_actions', [], 'Note Actions')); ?>
 <p class="ui-custom-section-hint"><?php echo t_h('modals.ui_customization.note_actions_hint', [], 'Items of the ⋮ menu on each note in the sidebar. Unchecking them all hides the menu button.'); ?></p>
 <div class="ui-custom-items">
+<?php echo poznoteUiCustomizationListToggleAll(); ?>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="panel:note-actions-toggle" checked><span><?php echo t_h('modals.ui_customization.note_actions_toggle', [], 'Menu button (⋮) on notes'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:rename-note" checked><span><?php echo t_h('notes_list.note_actions.rename_note', [], 'Rename note'); ?></span></label>
         <label class="ui-custom-item"><input type="checkbox" data-ui-key="note:open-share-modal" checked><span><?php echo t_h('notes_list.note_actions.share_note', [], 'Share note'); ?></span></label>

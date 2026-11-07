@@ -1480,6 +1480,8 @@
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} por el administrador)",
       "badge_hidden_count_admin_columns": "{{me}} oculto(s) para ti, {{users}} para los usuarios",
       "badge_hidden_count": "{{count}} oculto(s)",
+      "count_hidden": "{{count}} oculto(s)",
+      "count_visible": "{{count}} visible(s)",
       "direct_copy_restore_section": "Página de restauración: sección «Restauración por copia directa»",
       "local_backups_section": "Página de copia: sección \"Copia de seguridad en una carpeta del servidor\"",
       "s3_backups_section": "Página de copia de seguridad: sección «Copia de seguridad en S3»",

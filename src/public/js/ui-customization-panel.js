@@ -192,6 +192,12 @@
     }
 
     function updateSectionToggleButton(section) {
+        // The hidden/shown counts in the heading follow the same state as the
+        // button, so they are refreshed from here (js/ui-customization.js).
+        if (typeof window.poznoteUpdateUiCustomizationCounts === 'function') {
+            window.poznoteUpdateUiCustomizationCounts(section);
+        }
+
         var btn = section.querySelector('.ui-custom-toggle-all');
         if (!btn) return;
         var checkboxes = section.querySelectorAll('[data-ui-key]:not(:disabled)');

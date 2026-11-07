@@ -960,6 +960,8 @@
       "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
       "badge_hidden_count_admin_columns": "{{me}} hidden for you, {{users}} for users",
       "badge_hidden_count": "{{count}} hidden",
+      "count_hidden": "{{count}} hidden",
+      "count_visible": "{{count}} shown",
       "check_all": "Check all",
       "uncheck_all": "Uncheck all",
       "collapse_all": "Collapse all",

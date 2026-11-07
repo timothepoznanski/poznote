@@ -960,6 +960,8 @@
       "badge_hidden_count_admin": "{{count}} amagats ({{admin}} per l'administrador)",
       "badge_hidden_count_admin_columns": "{{me}} amagats per a vós, {{users}} per als usuaris",
       "badge_hidden_count": "{{count}} amagats",
+      "count_hidden": "{{count}} amagats",
+      "count_visible": "{{count}} visibles",
       "check_all": "Marca-ho tot",
       "uncheck_all": "Desmarca-ho tot",
       "collapse_all": "Redueix-ho tot",

@@ -566,6 +566,58 @@
         startObserver();
     }
 
+    /**
+     * "Element visibility" lists (modals/ui_customization_sections.php): the
+     * heading of a section says how many of its items are hidden (red) and how
+     * many are shown (green), so a folded list still reads at a glance. Shared
+     * by the settings page list (js/settings-page.js) and the contextual panel
+     * (js/ui-customization-panel.js).
+     *
+     * A count of zero is left out, and the whole group goes when the section
+     * has no item at all. Only the user's own column is counted: the
+     * administrator's "Users" column (data-ui-global-key) is another set.
+     */
+    function updateSectionCounts(section) {
+        if (!section) return;
+
+        var counts = section.querySelector('.ui-custom-section-counts');
+        if (!counts) return;
+
+        var boxes = section.querySelectorAll('[data-ui-key]');
+        var shown = 0;
+        var hidden = 0;
+        Array.prototype.forEach.call(boxes, function (cb) {
+            if (cb.checked) {
+                shown += 1;
+            } else {
+                hidden += 1;
+            }
+        });
+
+        function label(attribute, value) {
+            var template = counts.getAttribute(attribute) || '{{count}}';
+            return template.replace('{{count}}', String(value));
+        }
+
+        function paint(selector, value, attribute) {
+            var element = counts.querySelector(selector);
+            if (!element) return;
+            element.textContent = String(value);
+            element.hidden = value === 0;
+            element.title = label(attribute, value);
+        }
+
+        paint('.ui-custom-count-hidden', hidden, 'data-label-hidden');
+        paint('.ui-custom-count-visible', shown, 'data-label-visible');
+
+        // Read as one group (role="img"): on their own the two numbers say
+        // nothing.
+        counts.setAttribute('aria-label', label('data-label-hidden', hidden) + ', ' + label('data-label-visible', shown));
+        counts.hidden = boxes.length === 0;
+    }
+
+    window.poznoteUpdateUiCustomizationCounts = updateSectionCounts;
+
     function applyHiddenElements() {
         var initialHiddenKeys = getInitialHiddenKeys();
         if (initialHiddenKeys !== null) {
