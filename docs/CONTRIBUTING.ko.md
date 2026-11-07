@@ -52,7 +52,7 @@ git push --force-with-lease
 
 ## 검사
 
-PR에는 PHP 문법, PHP 단위 테스트, 스타일시트, JavaScript, 번역 문서의 다섯 검사가 자동 실행됩니다. 첫 기여는 관리자의 실행 승인이 필요할 수 있습니다.
+PR에는 PHP 문법, PHP 단위 테스트, 정적 분석, 스타일시트, JavaScript, 번역 문서의 여섯 검사가 자동 실행됩니다. 일곱 번째인 Docker 이미지 빌드는 `Dockerfile`, `docker/`, 컴포즈 파일을 건드릴 때만 실행됩니다. 첫 기여는 관리자의 실행 승인이 필요할 수 있습니다.
 
 로컬 실행은 필수는 아닙니다. 먼저 확인하려면 CI와 같은 명령을 사용하세요.
 
@@ -60,11 +60,12 @@ PR에는 PHP 문법, PHP 단위 테스트, 스타일시트, JavaScript, 번역 �
 php tests/run.php                                     # 단위 테스트
 php tools/css-check.php                               # 스타일시트
 find . -name "*.php" -print0 | xargs -0 -n1 php -l >/dev/null   # PHP 문법
+php phpstan.phar analyse                              # 정적 분석
 npx --yes oxlint@1.55.0 src poznote-chrome-extension build    # JavaScript
 python3 tools/docs-i18n.py check                      # 번역 문서
 ```
 
-처음 세 검사는 PHP, JavaScript 검사는 Node, 문서 검사는 Python 3만 필요합니다. JavaScript의 `correctness` 오류만 빌드를 실패시키며 기존 경고는 남겨도 됩니다.
+처음 네 검사는 PHP만 필요하며, `phpstan.phar`는 [PHPStan 릴리스](https://github.com/phpstan/phpstan/releases)에서 한 번 내려받습니다(CI는 `.github/workflows/ci-php.yml`에 버전을 고정합니다). JavaScript 검사는 Node, 문서 검사는 Python 3만 필요합니다. JavaScript의 `correctness` 오류만 빌드를 실패시키며 기존 경고는 남겨도 됩니다.
 
 ## 개발 인스턴스 실행
 

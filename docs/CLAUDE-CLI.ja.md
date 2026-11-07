@@ -19,11 +19,11 @@
 
 ## 前提条件
 
-- **Anthropic APIキー**：Claude CLIを使うには、有料の[Anthropic APIキー](https://console.anthropic.com/)が必要です。CLIを使う前に設定してください。
+- **Anthropicのアカウント**：Claude CLIは、Claudeのサブスクリプション、または[Anthropic APIキー](https://console.anthropic.com/)でサインインします。APIキーを使う場合は、CLIを使う前に設定してください。
   ```bash
   export ANTHROPIC_API_KEY=sk-ant-...
   ```
-- Claude CLIがインストールされていること（`npm install -g @anthropic-ai/claude-cli`などで）
+- Claude CLIがインストールされていること（`npm install -g @anthropic-ai/claude-code`）
 - Poznote MCPサーバーが（Docker Composeで）起動していること
 - MCPサーバーに127.0.0.1でアクセスできること（既定のポート：8045）
 
@@ -106,8 +106,9 @@ claude "Poznoteのワークスペースにあるフォルダーをすべて表�
 
 ```bash
 # 新しいノートを作成
-# 重要：ワークスペースを指定しないと、ノートは接続しているユーザーの
-# 既定のワークスペースに作成されます。作成先のワークスペースは必ず指定してください。
+# 重要：作成先のワークスペースは必ず指定してください。指定しない場合、サーバーは
+# mcp_default_workspace設定、またはアカウントに1つだけあるワークスペースを使い、
+# ワークスペースが複数あってこの設定が空のときは呼び出しを拒否します。
 claude "Poznoteのワークスペース「プロジェクト」に、タイトルが「議事録」、内容が「新機能についての議論」のノートを作成して"
 
 # 既存のノートを更新
@@ -309,7 +310,7 @@ Claude CLIがMCPサーバーに接続できない場合は、次の点を確認�
 2. **Dockerコンテナーの状態を確認する**：
    ```bash
    docker ps | grep mcp
-  docker compose logs mcp-server
+   docker compose logs mcp-server
    ```
 
 3. **ポートのバインドを確認する**：
@@ -361,76 +362,7 @@ ssh -L 8045:127.0.0.1:8045 user@your-server
 
 ## 利用できるMCPツール
 
-Poznote MCPサーバーには、次のツールがあります。
-
-### ノートの管理
-- `get_note` - IDを指定してノートを取得
-- `list_notes` - すべてのノートを一覧表示
-- `search_notes` - テキストでノートを検索（作成日の範囲も指定可能）
-- `create_note` - 新しいノートを作成（期限やリマインダーも設定可能）
-- `update_note` - 既存のノートを更新、または期限やリマインダーを設定
-- `delete_note` - ノートを削除
-- `duplicate_note` - ノートを複製
-- `convert_note` - ノートをHTMLとMarkdownのあいだで変換
-- `get_backlinks` - あるノートにリンクしているノートを取得
-
-### リマインダー
-- `get_reminder` - ノートに設定されたリマインダーを取得
-- `set_reminder` - ノートのリマインダーを設定または置き換え（繰り返しの間隔も指定可能）
-- `remove_reminder` - ノートのリマインダーを解除
-
-### タスク
-- `list_tasks` - タスクリストのノートにあるタスクを、IDと期限とともに一覧表示
-- `add_task` - タスクを1件追加（期限とリマインダーも指定可能）
-- `update_task` - タスクを1件更新（テキスト、期限、リマインダー、優先度）
-- `complete_task` - タスクを完了にする、または未完了に戻す
-- `delete_task` - タスクリストのノートからタスクを1件削除
-- `add_subtask` - タスクリストのノートにあるタスクに、サブタスクを追加
-- `update_subtask` - サブタスクの名前を変更、または完了・未完了を切り替え
-- `delete_subtask` - タスクのサブタスクを1件削除
-
-### 整理
-- `create_folder` - 新しいフォルダーを作成
-- `list_folders` - すべてのフォルダーを一覧表示
-- `rename_folder` - フォルダーの名前を変更
-- `delete_folder` - フォルダーを削除し、中のノートをゴミ箱に移動
-- `list_workspaces` - すべてのワークスペースを一覧表示
-- `create_workspace` - 新しいワークスペースを作成
-- `rename_workspace` - ワークスペースの名前を変更
-- `delete_workspace` - ワークスペースを削除（最後の1つは削除できない）
-- `list_tags` - すべてのタグを一覧表示
-- `move_note_to_folder` - ノートをフォルダーに移動
-- `remove_note_from_folder` - ノートをフォルダーから外す
-- `toggle_favorite` - お気に入りの状態を切り替え
-
-### ゴミ箱の管理
-- `get_trash` - ゴミ箱にあるノートを一覧表示
-- `restore_note` - ゴミ箱から復元
-- `empty_trash` - ゴミ箱を空にする
-
-### 共有
-- `share_note` - 公開リンクで共有
-- `unshare_note` - 公開リンクでの共有を解除
-- `get_note_share_status` - 共有の状態を取得
-- `list_shared` - 公開リンクで共有しているノートとフォルダーをすべて一覧表示
-- `list_shared_with_me` - ほかのユーザーからこのプロフィールに共有されているノートとフォルダーを一覧表示
-
-### 添付ファイル
-- `list_attachments` - ノートの添付ファイルを一覧表示
-
-### Git同期
-- `get_git_sync_status` - Git同期の状態を取得
-- `git_push` - Gitリポジトリにプッシュ
-- `git_pull` - Gitリポジトリからプル
-
-### システム
-- `get_system_info` - Poznoteのバージョン情報を取得
-- `list_backups` - システムのバックアップを一覧表示
-- `create_backup` - バックアップを作成
-- `restore_backup` - バックアップから復元（現在のユーザーのデータは置き換えられる）
-- `delete_backup` - バックアップファイルを削除
-- `get_app_setting` - アプリケーションの設定を取得
-- `update_app_setting` - アプリケーションの設定を変更
+サーバーには、ノート、タスク、リマインダー、フォルダー、ワークスペース、タグ、添付ファイル、リビジョン、共有、Git同期、バックアップのためのツールがあります。それぞれのツールと役割は[MCPサーバーのドキュメント](MCP-SERVER.ja.md#機能)に1つずつ載っており、この一覧が最新に保たれているのはそこだけです。
 
 ### マルチユーザー対応
 

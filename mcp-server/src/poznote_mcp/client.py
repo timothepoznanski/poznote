@@ -191,6 +191,9 @@ class PoznoteClient:
         offset: int | None = None,
         folder_id: int | None = None,
         folder: str | None = None,
+        tags: str | None = None,
+        updated_from: str | None = None,
+        updated_to: str | None = None,
     ) -> dict:
         """
         List notes, one page at a time
@@ -210,6 +213,12 @@ class PoznoteClient:
             params["folder_id"] = folder_id
         if folder:
             params["folder"] = folder
+        if tags:
+            params["tags"] = tags
+        if updated_from:
+            params["updated_from"] = updated_from
+        if updated_to:
+            params["updated_to"] = updated_to
         
         response = self.client.get("/notes", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
@@ -229,6 +238,47 @@ class PoznoteClient:
             }
         return {"notes": [], "total": 0, "offset": offset or 0, "limit": limit, "has_more": False}
     
+    def resolve_note_path(
+        self,
+        path: str,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+    ) -> dict:
+        """The note a path addresses: folder path, then exact title (issue #1738)
+
+        Returns {'id', 'heading', 'workspace', 'folder'} for the one note at
+        that path. A path no note answers to, and a path several notes answer
+        to, come back as a dict carrying 'error' instead of raising, the second
+        one with 'candidates': the caller has to be able to tell the two apart
+        and to pass the list on, since picking one of the candidates is exactly
+        what an address must not do.
+        """
+        params: dict = {"path": path}
+        self._set_workspace(params, workspace)
+
+        response = self.client.get("/notes/resolve", params=params, headers=self._headers_for_user(user_id))
+
+        if response.status_code in (400, 404, 409):
+            try:
+                payload = response.json()
+            except ValueError:
+                payload = None
+            if isinstance(payload, dict) and payload.get("error"):
+                return {key: value for key, value in payload.items() if key != "success"}
+            return {"error": f"Poznote could not resolve the path (HTTP {response.status_code})."}
+
+        response.raise_for_status()
+        data = response.json()
+
+        if data.get("success") and data.get("id") is not None:
+            return {
+                "id": int(data["id"]),
+                "heading": data.get("heading"),
+                "workspace": data.get("workspace"),
+                "folder": data.get("folder"),
+            }
+        return {"error": data.get("error") or f"No note at the path {path!r}."}
+
     def get_note(self, note_id: int, workspace: str | None = None, user_id: str | int | None = None) -> dict | None:
         """
         Get a specific note with its content
@@ -258,6 +308,11 @@ class PoznoteClient:
         created_from: str | None = None,
         created_to: str | None = None,
         user_id: str | int | None = None,
+        mode: str | None = None,
+        tags: str | None = None,
+        folder: str | None = None,
+        updated_from: str | None = None,
+        updated_to: str | None = None,
     ) -> list[dict]:
         """
         Search notes by text query
@@ -270,6 +325,16 @@ class PoznoteClient:
             params["created_from"] = created_from
         if created_to:
             params["created_to"] = created_to
+        if mode:
+            params["mode"] = mode
+        if tags:
+            params["tags"] = tags
+        if folder:
+            params["folder"] = folder
+        if updated_from:
+            params["updated_from"] = updated_from
+        if updated_to:
+            params["updated_to"] = updated_to
         
         response = self.client.get("/notes/search", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
@@ -667,6 +732,107 @@ class PoznoteClient:
         response.raise_for_status()
         return response.json()
 
+    def get_attachment(
+        self,
+        note_id: int,
+        attachment_id: str,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+        max_bytes: int | None = None,
+    ) -> dict:
+        """Read one attachment of a note back, bytes and recorded type.
+
+        Issue #1741: attachments could be written over the API and listed, but
+        not read, so an agent could file a document and never check it or read
+        it again.
+
+        The endpoint answers with the file itself, not JSON, and says why it
+        refused in a plain-text body ('Attachment not found'), which
+        raise_for_status() would throw away: the status is read first and the
+        body only then.
+
+        The body is streamed and abandoned as soon as it passes max_bytes, so
+        a file too large to carry in a tool call is never pulled into memory
+        whole.
+
+        Returns {'success': True, 'content': bytes, 'content_type': str} or
+        {'success': False, 'error': ..., 'status': ...}, with
+        error='too_large' when max_bytes was passed.
+        """
+        headers = self._headers_for_user(user_id)
+        # The client-wide Accept is application/json; this body is a file.
+        headers["Accept"] = "*/*"
+
+        params: dict = {}
+        self._set_workspace(params, workspace)
+
+        with self.client.stream(
+            "GET",
+            f"/notes/{note_id}/attachments/{_path_segment(attachment_id)}",
+            params=params,
+            headers=headers,
+            timeout=HEAVY_TIMEOUT,
+        ) as response:
+            if response.status_code != 200:
+                response.read()
+                return {
+                    "success": False,
+                    "status": response.status_code,
+                    "error": self._binary_error_text(response),
+                }
+
+            declared = response.headers.get("content-length") or ""
+            if max_bytes is not None and declared.isdigit() and int(declared) > max_bytes:
+                return {
+                    "success": False,
+                    "status": response.status_code,
+                    "error": "too_large",
+                    "size": int(declared),
+                }
+
+            chunks: list[bytes] = []
+            size = 0
+            for chunk in response.iter_bytes():
+                size += len(chunk)
+                if max_bytes is not None and size > max_bytes:
+                    # A file whose size the response did not declare, or
+                    # declared wrongly; stop reading rather than finish it.
+                    return {
+                        "success": False,
+                        "status": response.status_code,
+                        "error": "too_large",
+                        "size": None,
+                    }
+                chunks.append(chunk)
+
+            content_type = (response.headers.get("content-type") or "").split(";")[0].strip()
+
+        return {
+            "success": True,
+            "status": 200,
+            "content": b"".join(chunks),
+            "content_type": content_type,
+        }
+
+    @staticmethod
+    def _binary_error_text(response: httpx.Response) -> str:
+        """The reason a request for a file was refused.
+
+        Those endpoints answer in plain text, but the router's own refusals
+        (authentication, scope) are JSON, so both shapes are read.
+        """
+        body = (response.text or "").strip()
+        if body.startswith("{"):
+            try:
+                payload = response.json()
+            except ValueError:
+                payload = None
+            if isinstance(payload, dict):
+                message = payload.get("message") or payload.get("error")
+                if message:
+                    return str(message)
+        return body[:500] or f"HTTP {response.status_code}"
+
     def move_note_to_folder(self, note_id: int, folder_id: int, user_id: str | int | None = None) -> bool:
         """Move a note to a specific folder"""
         payload = {"folder_id": folder_id}
@@ -976,26 +1142,47 @@ class PoznoteClient:
         response.raise_for_status()
         return response.json().get("success", False)
 
-    def list_reminders(self, workspace: str | None = None, user_id: str | int | None = None) -> dict:
-        """List the reminder notifications that have already fired.
+    def list_reminders(
+        self,
+        workspace: str | None = None,
+        user_id: str | int | None = None,
+        scope: str | None = None,
+        limit: int | None = None,
+    ) -> dict:
+        """List pending reminder notifications, fired or still to come.
 
-        RemindersController::index filters on ``trigger_at <= now`` and
-        ``dismissed = 0`` with a hard ``LIMIT 50``: this is the notification
-        feed behind the UI bell, not a list of upcoming reminders. There is no
-        endpoint for future reminders.
+        RemindersController::index filters on ``dismissed = 0`` and, since
+        issue #1740, on the side of now that ``scope`` names: ``fired``
+        (``trigger_at <= now``, the notification feed behind the UI bell, and
+        the default so that every older caller is unaffected), ``upcoming``
+        (``trigger_at > now``, soonest first) or ``all`` (both, fired first).
+
+        ``unread_count`` and ``total_count`` always count what has fired, so
+        they stay the badge of the bell whatever the scope; ``upcoming_count``
+        comes back for the two other scopes.
         """
         params: dict = {}
         self._set_workspace(params, workspace)
+        if scope:
+            params["scope"] = scope
+        if limit is not None:
+            params["limit"] = limit
         response = self.client.get("/reminders", params=params, headers=self._headers_for_user(user_id))
         response.raise_for_status()
         data = response.json()
         if data.get("success"):
-            return {
+            result = {
                 "notifications": data.get("notifications", []),
                 "unread_count": data.get("unread_count", 0),
                 "total_count": data.get("total_count", 0),
+                "scope": data.get("scope", scope or "fired"),
+                "limit": data.get("limit"),
             }
-        return {"notifications": [], "unread_count": 0, "total_count": 0}
+            if "upcoming_count" in data:
+                result["upcoming_count"] = data.get("upcoming_count")
+            return result
+        return {"notifications": [], "unread_count": 0, "total_count": 0,
+                "scope": scope or "fired", "limit": limit}
 
     # ------------------------------------------------------------------
     # Tasks (inside a tasklist note)

@@ -77,7 +77,7 @@ docker compose exec webserver curl -X POST http://speaches:8000/v1/models/Systra
 - **음성 텍스트 변환 활성화** 켜기
 - **Speaches(로컬)** 선택 후 URL에 `http://speaches:8000` 입력
 - **접속 확인 및 모델 목록 조회** 실행 후 **모델**에서 `Systran/faster-whisper-small` 선택
-- 본인을 포함해 사용을 허용할 사용자 선택
+- 사용을 허용할 사용자 선택(관리자는 항상 사용할 수 있음)
 - 저장
 
 **5. 시험하세요.** HTTPS 또는 `localhost`로 노트를 다시 여세요([브라우저 요구 사항](#브라우저-요구-사항) 참고). `/dict`를 입력하고 마이크를 허용한 뒤 말하고 녹음을 중지하세요.
@@ -119,7 +119,7 @@ docker compose exec webserver curl -X POST http://speaches:8000/v1/models/Systra
 | 설정 | 기능 |
 |---|---|
 | **음성 텍스트 변환 활성화** | 아래 인스턴스 설정의 전체 활성화 스위치입니다. |
-| **허용된 사용자** | 인스턴스 서버를 사용할 프로필입니다. 새 프로필을 포함해 선택하기 전에는 누구도 접근할 수 없습니다. |
+| **허용된 사용자** | 인스턴스 서버를 사용할 프로필입니다. 새 프로필을 포함해 선택하기 전에는 누구도 접근할 수 없습니다. 관리자는 항상 사용할 수 있으므로 해당 행은 선택된 상태로 회색 처리됩니다. |
 | **변환 서버** | URL을 채우고 API 키 입력란을 표시하거나 숨기는 사전 설정입니다. Speaches, whisper.cpp, LocalAI, OpenAI, 기타를 지원합니다. |
 | **서버 URL** | 서버 기본 URL(예: `http://speaches:8000`). `/v1`이나 전체 `/v1/audio/transcriptions` 경로도 허용합니다. |
 | **API 키** | `Authorization: Bearer`로 전달합니다. 로컬 서버는 보통 필요 없고 OpenAI는 필요합니다. |

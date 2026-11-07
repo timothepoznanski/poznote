@@ -10,7 +10,7 @@ name: CI - Docs
 # link or anchor, a stale language selector.
 #
 # Rewording English prose does not fail it. Adding or removing a heading, a
-# code block, an image or a link does, until the six translations follow:
+# code block, an image or a link does, until the nine translations follow:
 # update them in the same change, then run
 #     python3 tools/docs-i18n.py fix
 #     python3 tools/docs-i18n.py check

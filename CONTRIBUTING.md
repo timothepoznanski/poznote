@@ -54,7 +54,7 @@ git push --force-with-lease
 
 ## Checks
 
-Five checks run automatically on your pull request: PHP syntax, PHP unit tests, stylesheets, JavaScript linting, and the translated docs. On a first contribution a maintainer has to approve the run, so do not worry if they look stuck at first.
+Six checks run automatically on your pull request: PHP syntax, PHP unit tests, static analysis, stylesheets, JavaScript linting, and the translated docs. A seventh builds the Docker images, and only runs when you touch `Dockerfile`, `docker/` or a compose file. On a first contribution a maintainer has to approve the run, so do not worry if they look stuck at first.
 
 You do not need to run anything locally. If you would rather catch a mistake before pushing, these are the same commands CI uses:
 
@@ -62,11 +62,12 @@ You do not need to run anything locally. If you would rather catch a mistake bef
 php tests/run.php                                     # unit tests
 php tools/css-check.php                               # stylesheets
 find . -name "*.php" -print0 | xargs -0 -n1 php -l >/dev/null   # PHP syntax
+php phpstan.phar analyse                              # static analysis
 npx --yes oxlint@1.55.0 src poznote-chrome-extension build    # JavaScript
 python3 tools/docs-i18n.py check                      # translated docs
 ```
 
-The first three only need PHP. The JavaScript one needs Node, and only its `correctness` errors fail the build, warnings are fine to leave alone. The docs one needs Python 3 and nothing else.
+The first four only need PHP, with `phpstan.phar` downloaded once from the [PHPStan releases](https://github.com/phpstan/phpstan/releases) (CI pins its version in `.github/workflows/ci-php.yml`). The JavaScript one needs Node, and only its `correctness` errors fail the build, warnings are fine to leave alone. The docs one needs Python 3 and nothing else.
 
 ## Running a dev instance
 

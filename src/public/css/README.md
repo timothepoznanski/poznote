@@ -8,7 +8,7 @@ themes work and which variables a custom stylesheet can rely on.
 
 | Path | What it styles |
 |---|---|
-| `tokens.css` | every design token: the colour palette for the three themes, and `--left-col-width`. The one stylesheet every page loads, and the file a theme overrides. |
+| `tokens.css` | every design token: the colour palette of every built-in theme (light, dark, black, lavender, sepia, terminal), and `--left-col-width`. The one stylesheet every page loads, and the file a theme overrides. |
 | `components/` | shared component bases, loaded before the page stylesheets on every page (`@components` in the manifest). A page may add properties on top; it must not redefine what the base owns. |
 | `base.css`, `layout.css`, `utilities.css` | index.php shell: fonts, columns, hide/show helpers |
 | `sidebar.css`, `icon-sidebar*.css`, `searchbars.css`, `menus.css`, `toolbar.css`, `tabs.css`, `outline.css` | left column, icon rail, menus, note toolbar, tab bar |
@@ -98,7 +98,7 @@ reach: a palette could darken a page and leave its fields glowing. Checkboxes,
 radios, colour pickers and ranges are deliberately absent, the browser paints
 them and a background there breaks their native rendering.
 
-`tools/css-check.php` runs in CI and holds six lines:
+`tools/css-check.php` runs in CI and holds these lines:
 
 - brace and comment balance, because the stylesheets are concatenated at request
   time and one unclosed brace silently kills every rule after it in the bundle;

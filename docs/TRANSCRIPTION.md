@@ -77,7 +77,7 @@ It answers `Model 'Systran/faster-whisper-small' downloaded` after a few seconds
 - turn on **Enable transcription**;
 - pick **Speaches (local)** and set the URL to `http://speaches:8000`;
 - click **Check access and list models**, then pick `Systran/faster-whisper-small` in **Model**;
-- tick the users allowed to use it, yourself included;
+- tick the users allowed to use it (as an administrator you always are);
 - save.
 
 **5. Try it.** Reload a note over HTTPS (or through `localhost`, see [browser requirements](#browser-requirements)), type `/dict`, allow the microphone, speak, and stop.
@@ -119,7 +119,7 @@ Everything is on **Settings → Admin Tools → Transcription** (administrator o
 | Setting | What it does |
 |---|---|
 | **Enable transcription** | Master switch for the instance configuration below. |
-| **Users allowed** | Profiles that may use the instance server. Nobody has access until ticked, new profiles included. |
+| **Users allowed** | Profiles that may use the instance server. Nobody has access until ticked, new profiles included. Administrators always have access, so their row is ticked and greyed out. |
 | **Transcription server** | Presets that fill the URL and show or hide the API key: Speaches, whisper.cpp, LocalAI, OpenAI, or Other. |
 | **Server URL** | Base URL of the server, for example `http://speaches:8000`. `/v1` and the full `/v1/audio/transcriptions` path are accepted too. |
 | **API key** | Sent as `Authorization: Bearer`. Local servers usually need none; OpenAI does. |

@@ -409,7 +409,7 @@ La majoria de paràmetres del dia a dia es canvien des de la interfície del Poz
 - `POZNOTE_PHP_MEMORY_LIMIT` per canviar el límit de memòria de PHP per sol·licitud, en MB (512 per defecte); vegeu la [guia de resolució de problemes](TROUBLESHOOTING.ca.md#a-request-runs-out-of-memory)
 - `POZNOTE_LISTEN_PORT` per canviar el port on escolta el servidor web dins del contenidor (80 per defecte), només necessari amb `network_mode: host`; vegeu la [guia de resolució de problemes](TROUBLESHOOTING.ca.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD` per demanar una contrasenya addicional abans d'obrir la pàgina de paràmetres, buit per defecte
-- `POZNOTE_MCP_AUTH_TOKEN` per exigir un testimoni Bearer als clients MCP; vegeu [Servidor MCP](#servidor-mcp)
+- `POZNOTE_MCP_AUTH_TOKEN` per exigir un testimoni Bearer als clients MCP, i la resta de variables `POZNOTE_MCP_*`, que decideixen com inicien la sessió els clients i a quines eines arriben; vegeu [Servidor MCP](#servidor-mcp)
 
 </details>
 
@@ -637,7 +637,7 @@ La llista completa de límits i els punts finals que gestionen les contrasenyes 
 
 ## Tipus de notes
 
-El Poznote admet dos formats de nota principals, cadascun pensat per a una manera de treballar diferent.
+El Poznote té diversos tipus de nota, cadascun pensat per a una manera de treballar diferent. El text enriquit i el Markdown són els dos formats de nota; els altres, més avall, s'hi basen.
 
 <details>
 <summary><strong>Notes de text enriquit</strong></summary>
@@ -669,7 +669,7 @@ El Poznote admet dos formats de nota principals, cadascun pensat per a una maner
 *   **Ús:** gestioneu tasques i projectes amb llistes de comprovació interactives.
 *   **Flux de treball:** seguiu el progrés amb caselles que es poden marcar directament a l'editor o a la llista de notes. Una barra de progrés mostra el grau de compleció de cada llista.
 *   **Opcions de les tasques:** cada tasca pot tenir una data de venciment amb una hora opcional, una notificació de recordatori que s'activa a l'hora de venciment i una prioritat (alta, mitjana o baixa, en vermell, taronja o verd), i es pot moure a una altra llista.
-*   **Pàgina de tasques:** una pàgina Tasques específica, que s'obre des de la barra lateral d'icones de l'esquerra, reuneix en un sol lloc totes les tasques de les llistes de tasques i, opcionalment, les caselles que hi ha dins de les notes normals. Ofereix filtres d'estat (per fer, amb prioritat, vençudes, amb data de venciment, completades), un filtre de text i una visualització de calendari de les tasques que tenen data de venciment. Una llista de tasques, o les caselles d'una nota, es poden amagar de la pàgina amb el botó de l'ull de la seva capçalera i tornar a mostrar amb **Mostra les llistes amagades**. L'elecció es desa al compte, de manera que us segueix d'un dispositiu a l'altre.
+*   **Pàgina de tasques:** una pàgina Tasques específica, que s'obre des de la barra lateral d'icones de l'esquerra, reuneix en un sol lloc totes les tasques de les llistes de tasques i, opcionalment, les caselles que hi ha dins de les notes normals. Ofereix filtres d'estat (per fer, prioritat alta, mitjana o baixa, vençudes, amb data de venciment, completades), un filtre de text i una visualització de calendari de les tasques que tenen data de venciment. Una llista de tasques, o les caselles d'una nota, es poden amagar de la pàgina amb el botó de l'ull de la seva capçalera i tornar a mostrar amb **Mostra les llistes amagades**. L'elecció es desa al compte, de manera que us segueix d'un dispositiu a l'altre.
 *   **Col·laboració pública:** les llistes de tasques es poden compartir amb un URL públic. Si es donen permisos d'edició, els col·laboradors externs poden marcar elements de la llista sense necessitat de compte del Poznote.
 </details>
 
@@ -742,37 +742,19 @@ Les revisions conserven versions anteriors del contingut d'una nota, juntament a
 El Poznote ofereix diverses opcions de personalització integrades directament a l'aplicació, sense haver de canviar cap fitxer de configuració.
 
 <details>
-<summary><strong>Paràmetres de visualització, de comportament i de Markdown</strong></summary>
+<summary><strong>Visualització, Markdown i altres paràmetres de la interfície</strong></summary>
 <br>
 
-A **Paràmetres > Visualització**, podeu configurar:
+La pàgina de paràmetres es divideix en seccions, cadascuna amb les targetes que li pertanyen:
 
-- **Tipus de lletra de l'aplicació:** trieu el tipus de lletra de tota la interfície
-- **Mida de la lletra:** ajusteu la mida del text de les notes, la barra lateral, els blocs de codi i la pàgina de paràmetres
-- **Colors de les notes:** trieu la paleta que s'ofereix per acolorir una nota
-- **Icones per tipus de nota:** doneu a les llistes de tasques i a les notes Markdown la seva pròpia icona a la llista de notes
-- **Escala de les icones de l'índex:** canvieu la mida de les icones de l'índex de notes
-- **Disposició de la barra lateral d'icones:** reordeneu els botons de la barra lateral d'icones de l'esquerra i canvieu-ne els colors (un clic amb el botó dret en un botó de la barra també obre el selector de color)
-- **Amplada del contingut de la nota:** controleu l'amplada màxima de l'àrea de l'editor de notes
-- **Previsualitzacions dels fitxers adjunts:** mostreu els fitxers adjunts com a previsualitzacions dins de la nota
-- **Vora de les imatges per defecte:** emmarqueu les imatges inserides sense afegir-hi farciment
-- **Ressalta l'arbre de la carpeta actual:** atenueu les notes i les carpetes que queden fora de la jerarquia de carpetes en què treballeu
-- **Títol de la pàgina d'inici de sessió:** canvieu el títol que es mostra a la pàgina d'inici de sessió
-- **Visibilitat dels elements:** amagueu els elements de la interfície que no feu servir; vegeu més avall
-
-A **Paràmetres > Comportament**, podeu configurar:
-
-- **Ordenació de les notes:** trieu com s'ordenen les notes a la llista
-- **Filtre per antiguitat de les notes:** llisteu només les notes actualitzades dins del nombre de dies triat
-- **Revisions:** durant quants dies es conserven les revisions automàtiques (una per dia més enllà de les últimes 24 hores) i quantes revisions de seguretat es conserven per nota
-- **Ordre d'inserció a les llistes de tasques:** controleu on s'insereixen les tasques noves
-- **Mostra les notes després de les carpetes:** llisteu les notes sense carpeta sota la llista de carpetes
-- **Ajust de línia als blocs de codi:** activeu o desactiveu l'ajust de línia als blocs de codi
-- **Format de les entrades del diari:** creeu les entrades del diari com a notes de text enriquit o Markdown
-- **Plantilla de les entrades del diari:** una nota de la carpeta `Templates` de l'espai de treball amb la qual comença cada entrada nova del diari d'aquell espai de treball
-- La llengua de la interfície, el fus horari i el format de data, els fitxers adjunts i els enllaços entrants a la part inferior d'una nota, la correcció ortogràfica i les dreceres de teclat
-
-A **Paràmetres > Markdown**, podeu configurar el mode de visualització per defecte, les visualitzacions per les quals passa el botó de visualització d'una nota (previsualització en directe, text enriquit, dividida), el tipus de lletra de l'editor, el Markdown amb marc i acolorit, i els números de línia dels blocs de codi.
+- **Visualització:** la lletra de l'aplicació, la mida del text i de les icones, la paleta que s'ofereix per acolorir una nota, el títol de la pàgina d'inici de sessió.
+- **Visibilitat dels elements:** amagueu els elements de la interfície que no feu servir, vegeu més avall.
+- **Barra lateral:** l'ordre i els colors dels botons de la barra d'icones de l'esquerra (un clic dret sobre un d'ells també obre el selector de color), el filtre d'antiguitat de les notes, on es mostren les notes sense carpeta, l'atenuació de les carpetes en què no treballeu.
+- **Contingut de la nota:** l'amplada de la nota, les previsualitzacions dels adjunts, la vora per defecte de les imatges, on s'insereix una tasca nova, els blocs de codi, els adjunts i els backlinks al final d'una nota, la correcció ortogràfica, la drecera del menú d'ordres, el lloc de la barra de format.
+- **Markdown:** el mode de visualització per defecte, les vistes que recorre el botó de vista d'una nota (previsualització en directe, text enriquit, pantalla partida), la lletra de l'editor, el Markdown emmarcat i amb color.
+- **Diari:** el format, la plantilla i el format de data de les entrades noves.
+- **Sincronització i historial:** Git Sync, les notes fora de línia i quant de temps es conserven les revisions (una revisió automàtica per dia més enllà de les darreres 24 hores, i les revisions de seguretat per nota).
+- **El meu compte:** l'idioma de la interfície, la zona horària i el format de data.
 
 El tema no és una targeta aquí: el botó de la part inferior de la barra lateral d'icones de l'esquerra passa d'un tema a l'altre, i un administrador tria quins ofereix a **Paràmetres > Eines d'administració > Llista de temes**.
 
@@ -792,7 +774,7 @@ Podeu definir una imatge de fons per a cada espai de treball: obriu **Paràmetre
 
 El Poznote permet simplificar la interfície amagant els elements que no feu servir.
 
-Configureu-ho a **Paràmetres > Visualització > Visibilitat dels elements**.
+Configureu-ho a **Paràmetres > Visibilitat dels elements**.
 
 - **Control detallat:** mostreu o amagueu les targetes de l'inici, les accions de la barra d'eines, els elements del menú de barra i molt més. La insígnia de la data de creació de les notes (**Mostra la data de creació**) i el nombre de notes al costat de cada carpeta (**Mostra el nombre de notes de les carpetes**) també s'activen i es desactiven aquí.
 - **Per usuari:** cada usuari pot tenir la seva pròpia disposició de la interfície.
@@ -1439,17 +1421,17 @@ Server: my-server.com
 │   └── Data: ./poznote-tom/data/
 │
 └── Poznote-Alice
-  ├── Port: YOUR_POZNOTE_API_PORT
-  ├── URL: http://my-server.com:YOUR_POZNOTE_API_PORT
+    ├── Port: 8041
+    ├── URL: http://my-server.com:8041
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```
 
 ## Assistent d'IA
 
-El Poznote inclou un xat d'IA integrat que es connecta a una instància local d'[Ollama](https://ollama.com) o d'[LM Studio](https://lmstudio.ai), a un proveïdor al núvol com [Anthropic (Claude)](https://www.anthropic.com) o OpenAI, o a qualsevol servidor compatible amb OpenAI. Cerca i llegeix les vostres notes per respondre preguntes i, quan li ho demaneu, les crea, les torna a escriure i les organitza, dins de l'espai de treball on heu obert el xat.
+El Poznote inclou un xat d'IA integrat que es connecta a una instància local d'[Ollama](https://ollama.com) o d'[LM Studio](https://lmstudio.ai), a un proveïdor al núvol com [Anthropic (Claude)](https://www.anthropic.com) o OpenAI, o a qualsevol servidor compatible amb OpenAI. Cerca i llegeix les vostres notes per respondre preguntes, mira les imatges que contenen i, quan li ho demaneu, les crea, les torna a escriure i les organitza, dins de l'espai de treball on heu obert el xat.
 
-Un administrador l'activa des de **Paràmetres → Eines d'administració → Assistent d'IA**, i aleshores cada perfil té un botó **Assistent d'IA** a la barra lateral d'icones de l'esquerra. El servidor d'IA es crida des del servidor del Poznote, mai des del navegador, de manera que, amb una instància local d'Ollama, les notes no surten mai del vostre ordinador.
+Un administrador l'activa des de **Paràmetres → Eines d'administració → Assistent d'IA** i hi marca els perfils autoritzats a fer-lo servir, cosa que els administradors sempre estan; aleshores cadascun d'ells té un botó **Assistent d'IA** a la barra lateral d'icones de l'esquerra. El servidor d'IA es crida des del servidor del Poznote, mai des del navegador, de manera que, amb una instància local d'Ollama, les notes no surten mai del vostre ordinador.
 
 Què pot fer l'assistent, com triar un proveïdor i un model, les claus de l'API personals, les eines externes com una cerca web (servidors MCP remots) i com connectar un servidor local des del contenidor del Poznote es descriuen a la [documentació de l'assistent d'IA](AI-ASSISTANT.ca.md). Per deixar que un assistent d'IA extern (VS Code Copilot, Claude CLI...) gestioni les notes, vegeu el [Servidor MCP](#servidor-mcp) més avall.
 
@@ -1457,7 +1439,7 @@ Què pot fer l'assistent, com triar un proveïdor i un model, les claus de l'API
 
 Convertiu la veu en text de les notes amb un servidor de veu a text que gestioneu vós mateix. El Poznote no incorpora cap model de veu: es comunica amb qualsevol servidor que exposi l'API d'àudio d'OpenAI (`POST /v1/audio/transcriptions`), com ara un Whisper autoallotjat, de manera que l'àudio no ha de sortir mai del vostre ordinador.
 
-Un cop un administrador l'activa a **Paràmetres → Eines d'administració → Transcripció**, **Enregistra àudio**, a **Insereix** del menú de barra, té un botó **Transcriu** al costat d'**Insereix l'àudio**, i els fitxers d'àudio adjunts tenen un botó **Transcriu**.
+Un cop un administrador l'activa a **Paràmetres → Eines d'administració → Transcripció** i hi marca els perfils autoritzats a fer-la servir, cosa que els administradors sempre estan, **Enregistra àudio**, a **Insereix** del menú de barra, té un botó **Transcriu** al costat d'**Insereix l'àudio**, i els fitxers d'àudio adjunts tenen un botó **Transcriu**.
 
 La configuració d'un servidor, la tria d'un model i tota la resta són a la [documentació de la transcripció](TRANSCRIPTION.ca.md).
 

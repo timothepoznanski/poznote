@@ -409,7 +409,7 @@ Most day-to-day settings are changed from the Poznote interface. Use the `.env` 
 - `POZNOTE_PHP_MEMORY_LIMIT` to change the PHP memory limit per request, in MB (default 512), see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md#a-request-runs-out-of-memory)
 - `POZNOTE_LISTEN_PORT` to change the port the web server listens on inside the container (default 80), only needed with `network_mode: host`, see the [Troubleshooting Guide](docs/TROUBLESHOOTING.md#running-with-host-network)
 - `POZNOTE_SETTINGS_PASSWORD` to ask for an extra password before the Settings page opens, left empty by default
-- `POZNOTE_MCP_AUTH_TOKEN` to require a bearer token from MCP clients, see [MCP Server](#mcp-server)
+- `POZNOTE_MCP_AUTH_TOKEN` to require a bearer token from MCP clients, and the other `POZNOTE_MCP_*` variables, which choose how clients sign in and which tools they reach, see [MCP Server](#mcp-server)
 
 </details>
 
@@ -638,7 +638,7 @@ The full list of limits and the endpoints that manage app passwords are in the [
 
 ## Note types
 
-Poznote supports two primary note formats, each tailored for different workflows.
+Poznote has several note types, each tailored for a different way of working. Rich text and Markdown are the two note formats; the others below build on them.
 
 <details>
 <summary><strong>Rich Text Notes</strong></summary>
@@ -670,7 +670,7 @@ Poznote supports two primary note formats, each tailored for different workflows
 *   **Usage:** Manage tasks and projects with interactive checklists.
 *   **Workflow:** Track progress with checkboxes that can be toggled directly in the editor or the notes list. A progress bar shows the completion of each list.
 *   **Task Options:** Each task can have a due date with an optional time, a reminder notification that fires at the due time, and a priority (high, medium or low, shown in red, orange or green), and can be moved to another list.
-*   **Tasks Page:** A dedicated Tasks page, opened from the left icon rail, gathers in one place every task of your task lists and, optionally, the checkboxes sitting inside ordinary notes. It offers status filters (to do, with a priority, overdue, with due date, completed), a text filter, and a calendar view of the tasks that carry a due date. A task list, or the checkboxes of a note, can be hidden from the page with the eye button of its header and brought back with **Show hidden lists**. The choice is saved in your account, so it follows you from one device to the next.
+*   **Tasks Page:** A dedicated Tasks page, opened from the left icon rail, gathers in one place every task of your task lists and, optionally, the checkboxes sitting inside ordinary notes. It offers status filters (to do, high, medium or low priority, overdue, with due date, completed), a text filter, and a calendar view of the tasks that carry a due date. A task list, or the checkboxes of a note, can be hidden from the page with the eye button of its header and brought back with **Show hidden lists**. The choice is saved in your account, so it follows you from one device to the next.
 *   **Public Collaboration:** Task lists can be shared via a public URL. If edit permissions are granted, external collaborators can check items off the list without needing a Poznote account.
 </details>
 
@@ -743,37 +743,19 @@ Revisions keep earlier versions of a note's content, along with its title and ta
 Poznote offers several built-in personalization options directly from the application, without requiring any configuration file changes.
 
 <details>
-<summary><strong>Display, Behavior and Markdown Settings</strong></summary>
+<summary><strong>Display, Markdown and other interface settings</strong></summary>
 <br>
 
-Under **Settings > Display**, you can configure:
+The Settings page is split into sections, each one holding the cards that belong to it:
 
-- **App font:** pick the typeface used across the interface
-- **Font size:** adjust text size for notes, sidebar, code blocks, and the settings page
-- **Note colors:** choose the palette offered when colouring a note
-- **Icons by note type:** give task lists and Markdown notes their own icon in the notes list
-- **Index icon scaling:** resize icons in the note index
-- **Icon sidebar order:** reorder the buttons of the left icon rail and change their colors (a right-click on a button of the rail also opens the color picker)
-- **Note content width:** control the max width of the note editor area
-- **Attachment previews:** show attachments as previews inside the note
-- **Default image border:** frame inserted images without adding padding
-- **Highlight current folder tree:** dim the notes and folders outside the folder hierarchy you are working in
-- **Login page title:** change the title shown on the login page
-- **Element visibility:** hide the interface elements you do not use, see below
-
-Under **Settings > Behavior**, you can configure:
-
-- **Note sorting:** choose how notes are ordered in the list
-- **Note age filter:** only list the notes updated within the chosen number of days
-- **Revisions:** for how many days automatic revisions are kept (one per day beyond the last 24 hours) and how many safety revisions are kept per note
-- **Task list insert order:** control where new tasks are inserted
-- **Show notes after folders:** list notes without folders below the folder list
-- **Code block word wrap:** enable or disable word wrap in code blocks
-- **Diary entry format:** create diary entries as rich text or Markdown notes
-- **Diary entry template:** a note from the workspace's `Templates` folder that every new diary entry of that workspace starts with
-- Interface language, timezone and date format, attachments and backlinks at the bottom of a note, spell check, and the keyboard shortcuts
-
-Under **Settings > Markdown**, you can configure the default view mode, the views the view button of a note goes through (live preview, rich text, split), the editor font, framed and coloured Markdown, and code block line numbers.
+- **Display:** the app font, the size of the text and of the icons, the palette offered when colouring a note, the title of the login page.
+- **Element visibility:** hide the interface elements you do not use, see below.
+- **Sidebar:** the order and the colors of the buttons of the left icon rail (a right-click on one of them opens the color picker too), the note age filter, where the notes without a folder are listed, the dimming of the folders you are not working in.
+- **Note content:** the width of the note, attachment previews, the default image border, where a new task is inserted, code blocks, attachments and backlinks at the bottom of a note, spell check, the command menu shortcut, the place of the formatting toolbar.
+- **Markdown:** the default view mode, the views the view button of a note goes through (live preview, rich text, split), the editor font, framed and coloured Markdown.
+- **Diary:** the format, the template and the date format of new entries.
+- **Sync & history:** Git Sync, the offline notes, and how long revisions are kept (one automatic revision per day beyond the last 24 hours, and the safety revisions per note).
+- **My Account:** the interface language, the timezone and the date format.
 
 The theme is not a card here: the button at the bottom of the left icon rail walks through the themes, and an administrator chooses which ones it offers in **Settings > Admin Tools > Theme list**.
 
@@ -793,7 +775,7 @@ You can set a background image per workspace: open **Settings > Workspaces** and
 
 Poznote allows you to declutter the interface by hiding elements you don't use.
 
-Configure it in **Settings > Display > Element visibility**.
+Configure it in **Settings > Element visibility**.
 
 - **Granular Control:** Toggle visibility for home cards, toolbar actions, slash menu items, and more. The creation date badge on notes (**Show creation date**) and the note count next to each folder (**Show folder note counts**) are turned on and off here too.
 - **Per-User:** Each user can have their own unique interface layout.
@@ -1444,17 +1426,17 @@ Server: my-server.com
 │   └── Data: ./poznote-tom/data/
 │
 └── Poznote-Alice
-  ├── Port: YOUR_POZNOTE_API_PORT
-  ├── URL: http://my-server.com:YOUR_POZNOTE_API_PORT
+    ├── Port: 8041
+    ├── URL: http://my-server.com:8041
     ├── Container: poznote-alice-webserver-1
     └── Data: ./poznote-alice/data/
 ```
 
 ## AI Assistant
 
-Poznote includes an integrated AI chat that connects to a local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) instance, a cloud provider like [Anthropic (Claude)](https://www.anthropic.com) or OpenAI, or any OpenAI-compatible server. It searches and reads your notes to answer questions and, when you ask for it, creates, rewrites and organizes them, within the workspace you opened the chat in.
+Poznote includes an integrated AI chat that connects to a local [Ollama](https://ollama.com) or [LM Studio](https://lmstudio.ai) instance, a cloud provider like [Anthropic (Claude)](https://www.anthropic.com) or OpenAI, or any OpenAI-compatible server. It searches and reads your notes to answer questions, looks at the pictures they hold, and, when you ask for it, creates, rewrites and organizes them, within the workspace you opened the chat in.
 
-An administrator enables it from **Settings → Admin Tools → AI Assistant**, and every profile then gets an **AI assistant** button in the left icon rail. The AI server is called from the Poznote server, never from your browser, so with a local Ollama instance your notes never leave your machine.
+An administrator enables it from **Settings → Admin Tools → AI Assistant** and ticks there the profiles allowed to use it, which administrators always are; each of them then gets an **AI assistant** button in the left icon rail. The AI server is called from the Poznote server, never from your browser, so with a local Ollama instance your notes never leave your machine.
 
 What the assistant can do, choosing a provider and a model, personal API keys, external tools such as a web search (remote MCP servers), and connecting a local server from the Poznote container are covered in the [AI Assistant documentation](docs/AI-ASSISTANT.md). To let an external AI assistant (VS Code Copilot, Claude CLI...) manage your notes instead, see the [MCP Server](#mcp-server) below.
 
@@ -1462,7 +1444,7 @@ What the assistant can do, choosing a provider and a model, personal API keys, e
 
 Turn voice into note text with a speech-to-text server you run yourself. Poznote embeds no speech model: it talks to any server exposing the OpenAI audio API (`POST /v1/audio/transcriptions`), such as a self-hosted Whisper, so the audio never has to leave your machine.
 
-Once an administrator enables it in **Settings → Admin Tools → Transcription**, **Record audio** under **Insert** in the slash menu gains a **Transcribe** button next to **Insert the audio**, and audio attachments get a **Transcribe** button.
+Once an administrator enables it in **Settings → Admin Tools → Transcription** and ticks the profiles allowed to use it, which administrators always are, **Record audio** under **Insert** in the slash menu gains a **Transcribe** button next to **Insert the audio**, and audio attachments get a **Transcribe** button.
 
 Setting up a server, choosing a model, and everything else is in the [Transcription documentation](docs/TRANSCRIPTION.md).
 

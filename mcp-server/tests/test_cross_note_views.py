@@ -63,20 +63,50 @@ TASKS_PAYLOAD = {
 }
 
 
+# The API answers with the half of the feed the scope names (issue #1740); the
+# fake keeps the two halves apart the same way.
+FIRED_REMINDERS = [
+    {"id": 1, "note_id": 10, "message": "Late report", "is_read": 0, "state": "fired",
+     "trigger_at": "2026-09-10 09:00:00", "note_heading": "Work", "workspace": "Poznote",
+     "task_id": None, "recurrence": None, "created": "2026-09-01 08:00:00"},
+    {"id": 2, "note_id": 11, "message": "Water plants", "is_read": 1, "state": "fired",
+     "trigger_at": "2026-09-09 09:00:00", "note_heading": "Home", "workspace": "Poznote",
+     "task_id": None, "recurrence": None, "created": "2026-09-01 08:00:00"},
+]
+
+UPCOMING_REMINDERS = [
+    {"id": 3, "note_id": 10, "message": "Call the bank", "is_read": 0, "state": "upcoming",
+     "trigger_at": "2026-09-20 09:30:00", "note_heading": "Work", "workspace": "Poznote",
+     "task_id": "a2", "recurrence": "1m", "created": "2026-09-02 08:00:00"},
+    {"id": 4, "note_id": 13, "message": "Quarterly review", "is_read": 0, "state": "upcoming",
+     "trigger_at": "2026-10-01 09:00:00", "note_heading": None, "workspace": None,
+     "task_id": None, "recurrence": None, "created": "2026-09-02 08:00:00"},
+]
+
+
+def _fake_reminders(workspace=None, user_id=None, scope="fired", limit=50):
+    rows = {
+        "fired": FIRED_REMINDERS,
+        "upcoming": UPCOMING_REMINDERS,
+        "all": FIRED_REMINDERS + UPCOMING_REMINDERS,
+    }[scope][:limit]
+    payload = {
+        "notifications": rows,
+        "unread_count": 1,
+        "total_count": 2,
+        "scope": scope,
+        "limit": limit,
+    }
+    if scope != "fired":
+        payload["upcoming_count"] = len(UPCOMING_REMINDERS)
+    return payload
+
+
 def _fake_client():
     client = MagicMock()
     client.list_workspaces.return_value = [{"name": "Poznote"}]
     client.list_all_tasks.return_value = TASKS_PAYLOAD
-    client.list_reminders.return_value = {
-        "notifications": [
-            {"id": 1, "note_id": 10, "message": "Late report", "is_read": 0,
-             "trigger_at": "2026-09-10 09:00:00", "note_heading": "Work"},
-            {"id": 2, "note_id": 11, "message": "Water plants", "is_read": 1,
-             "trigger_at": "2026-09-09 09:00:00", "note_heading": "Home"},
-        ],
-        "unread_count": 1,
-        "total_count": 2,
-    }
+    client.list_reminders.side_effect = _fake_reminders
     client.list_snapshots.return_value = {
         "empty_new_note": False,
         "snapshots": [
@@ -179,6 +209,43 @@ class TestListAllTasks:
         out = json.loads(list_all_tasks(workspace="Poznote", due_before="2026-09-10"))
         assert [t["text"] for t in out["tasks"]] == ["Late report"]
 
+    def test_due_after_is_inclusive_and_drops_undated(self, client):
+        from poznote_mcp.server import list_all_tasks
+        out = json.loads(list_all_tasks(workspace="Poznote", due_after="2026-09-20"))
+        texts = [t["text"] for t in out["tasks"]]
+        assert texts == ["Water plants", "Call the bank"]
+        assert "Someday idea" not in texts
+        assert "Passport" not in texts
+
+    def test_due_after_and_due_before_bound_a_window(self, client):
+        from poznote_mcp.server import list_all_tasks
+        out = json.loads(list_all_tasks(
+            workspace="Poznote", due_after="2026-09-11", due_before="2026-09-20"))
+        # "Late report" is due on the 10th, before the window opens.
+        assert [t["text"] for t in out["tasks"]] == ["Water plants", "Call the bank"]
+
+    def test_a_window_the_wrong_way_round_matches_nothing(self, client):
+        from poznote_mcp.server import list_all_tasks
+        out = json.loads(list_all_tasks(
+            workspace="Poznote", due_after="2026-09-21", due_before="2026-09-20"))
+        assert out["tasks"] == []
+        assert out["total"] == 0
+
+    def test_include_undated_false_keeps_only_dated_tasks(self, client):
+        from poznote_mcp.server import list_all_tasks
+        out = json.loads(list_all_tasks(workspace="Poznote", include_undated=False))
+        assert [t["text"] for t in out["tasks"]] == [
+            "Late report", "Water plants", "Call the bank"]
+        # Checklist items never carry a due date, so none of them survives.
+        assert all(t["source"] == "tasklist" for t in out["tasks"])
+
+    def test_due_after_rejects_a_malformed_date(self, client):
+        from poznote_mcp.server import list_all_tasks
+        out = json.loads(list_all_tasks(workspace="Poznote", due_after="next monday"))
+        assert "error" in out
+        assert "due_after" in out["error"]
+        client.list_all_tasks.assert_not_called()
+
     def test_due_before_rejects_a_malformed_date(self, client):
         from poznote_mcp.server import list_all_tasks
         out = json.loads(list_all_tasks(workspace="Poznote", due_before="16/09/2026"))
@@ -225,33 +292,81 @@ class TestListReminders:
         assert out["count"] == 2
         assert out["unread_count"] == 1
         assert out["total_count"] == 2
-        assert out["capped_by_api"] is False
+        assert out["capped_by_limit"] is False
+        assert out["scope"] == "fired"
+        # The fired feed says nothing about the future, so it does not count it.
+        assert "upcoming_count" not in out
 
-    def test_scope_is_stated_so_upcoming_is_not_implied(self, client):
+    def test_fired_is_the_default_scope(self, client):
         from poznote_mcp.server import list_reminders
-        out = json.loads(list_reminders())
-        assert "upcoming" in out["scope"]
+        list_reminders()
+        assert client.list_reminders.call_args.kwargs["scope"] == "fired"
+
+    def test_rows_carry_the_field_names_the_other_tools_use(self, client):
+        from poznote_mcp.server import list_reminders
+        row = json.loads(list_reminders())["reminders"][0]
+        assert row["note_title"] == "Work"
+        assert row["reminder_at"] == "2026-09-10 09:00:00"
+        assert row["state"] == "fired"
+        assert row["note_id"] == 10
+        assert row["is_read"] is False
+        assert "note_heading" not in row
+        assert "trigger_at" not in row
 
     def test_unread_only_filters_read_notifications(self, client):
         from poznote_mcp.server import list_reminders
         out = json.loads(list_reminders(unread_only=True))
-        assert [n["id"] for n in out["notifications"]] == [1]
+        assert [n["id"] for n in out["reminders"]] == [1]
+
+    def test_upcoming_lists_the_future_with_its_own_count(self, client):
+        from poznote_mcp.server import list_reminders
+        out = json.loads(list_reminders(scope="upcoming"))
+        assert [r["message"] for r in out["reminders"]] == ["Call the bank", "Quarterly review"]
+        assert all(r["state"] == "upcoming" for r in out["reminders"])
+        assert out["upcoming_count"] == 2
+        # The bell counters keep counting what has fired, whatever the scope.
+        assert out["total_count"] == 2
+
+    def test_a_task_reminder_is_told_apart_from_a_note_reminder(self, client):
+        from poznote_mcp.server import list_reminders
+        rows = {r["id"]: r for r in json.loads(list_reminders(scope="upcoming"))["reminders"]}
+        assert rows[3]["task_id"] == "a2"
+        assert rows[3]["recurrence"] == "1m"
+        assert rows[4]["task_id"] is None
+        # A trashed note keeps its reminder, with no title to show for it.
+        assert rows[4]["note_title"] is None
+
+    def test_all_returns_both_halves_fired_first(self, client):
+        from poznote_mcp.server import list_reminders
+        out = json.loads(list_reminders(scope="all"))
+        assert [r["state"] for r in out["reminders"]] == [
+            "fired", "fired", "upcoming", "upcoming"]
+        assert out["upcoming_count"] == 2
+
+    def test_an_unknown_scope_is_refused_rather_than_read_as_fired(self, client):
+        from poznote_mcp.server import list_reminders
+        out = json.loads(list_reminders(scope="upcomming"))
+        assert "error" in out
+        client.list_reminders.assert_not_called()
 
     def test_a_full_page_is_flagged_as_capped(self, client):
         from poznote_mcp.server import list_reminders
-        client.list_reminders.return_value = {
-            "notifications": [{"id": i, "is_read": 0} for i in range(50)],
-            "unread_count": 50,
-            "total_count": 120,
-        }
-        out = json.loads(list_reminders())
-        assert out["capped_by_api"] is True
-        assert "50" in out["note"]
+        out = json.loads(list_reminders(scope="all", limit=2))
+        assert out["count"] == 2
+        assert out["capped_by_limit"] is True
+        assert "2" in out["note"]
 
-    def test_workspace_is_passed_through(self, client):
+    def test_limit_out_of_range_is_refused(self, client):
         from poznote_mcp.server import list_reminders
-        list_reminders(workspace="Poznote")
-        client.list_reminders.assert_called_once_with(workspace="Poznote", user_id=None)
+        assert "error" in json.loads(list_reminders(limit=0))
+        assert "error" in json.loads(list_reminders(limit=501))
+        client.list_reminders.assert_not_called()
+
+    def test_workspace_and_scope_are_passed_through(self, client):
+        from poznote_mcp.server import list_reminders
+        list_reminders(workspace="Poznote", scope="upcoming", limit=10)
+        client.list_reminders.assert_called_once_with(
+            workspace="Poznote", user_id=None, scope="upcoming", limit=10)
 
     def test_api_error_is_reported(self, client):
         from poznote_mcp.server import list_reminders

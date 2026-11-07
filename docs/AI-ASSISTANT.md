@@ -26,6 +26,8 @@ Once configured, an **AI assistant** button appears in the left icon rail, on th
 
 The assistant has tools to **search and read your notes**, and uses them on its own: ask "what do my notes say about X?", request a summary across several notes, or let it find that note you half remember. Answers are streamed and rendered as Markdown.
 
+It can also **look at the pictures in your notes**. Paste, drop or attach an image to a note, then ask what it shows, what the label on it says, or to write the details down in the note: the assistant asks to see the image and reads it. PNG, JPEG, GIF and WebP are shown, whether attached to the note or kept inside it, up to four images in one answer, 5 MB each and 8 MB in all; an Excalidraw diagram, an SVG and a PDF cannot be shown. This needs a model that accepts images, see **Choosing a model** below. Whatever is written inside an image is treated as data and never as an instruction: a picture telling the assistant to delete your notes is reported to you, not obeyed.
+
 When you explicitly ask for it, it can also act on your notes:
 
 - **write**: create a note, rename one, or rewrite its content;
@@ -34,7 +36,7 @@ When you explicitly ask for it, it can also act on your notes:
 - **tasks**: add, check, uncheck, rename or remove the tasks of a task list note and their subtasks, including the due dates and reminders of the tasks, and check or uncheck a checkbox inside a regular note, without rewriting the rest of it;
 - **delete**: move a note to the trash, or a folder with its subfolders and all their notes. Everything can be restored from the Trash page: the assistant has no way to delete anything for good, and no tool to empty the trash.
 
-The note you have open is part of the context: say "improve the formatting of this note" or "add a conclusion here" and the assistant works on it, no id or title needed. It reads the version last saved by the editor, and "this note" follows you if you open another note during the conversation. Naming another note in your question still takes precedence. On the dashboard no note is open, so name the note you mean there.
+The note you have open is part of the context: say "improve the formatting of this note" or "add a conclusion here" and the assistant works on it, no id or title needed. A change you have just typed or pasted is saved before your message goes out, so the assistant reads the note as you see it, and "this note" follows you if you open another note during the conversation. Naming another note in your question still takes precedence. On the dashboard no note is open, so name the note you mean there.
 
 Two lines above the input show what the assistant is working with: the **workspace** every tool runs in, and the **note** "this note" refers to when one is open.
 
@@ -62,7 +64,7 @@ Go to **Settings → Admin Tools → AI Assistant** (administrator only) and pic
 
 Then use **Check access and list models**, which verifies the server is reachable and fills the **Model** dropdown with the models it offers. The dropdown stays empty until that check succeeds, so this is the step that lets you choose a model.
 
-The configuration applies to the whole instance: once enabled by the administrator, every user profile gets the chat.
+The configuration applies to the whole instance, but access to it is granted profile by profile: the same page has a **Users allowed to use the global AI assistant** list, and only the users ticked there see the chat. A new user has no access until an administrator adds them. Administrators always have access, so their row is ticked and greyed out.
 
 ### Personal API keys
 
@@ -71,6 +73,8 @@ The same page has an **Allow personal API keys** option. When it is enabled, eac
 ## Choosing a model
 
 Pick a model that supports **tool calling** (also called "function calling"), e.g. `qwen3`, `llama3.1` or `mistral`. Tool calling is what lets the assistant browse your notes: with a model that lacks it, the chat still works (a notice tells you so) but cannot access your notes on its own.
+
+To have the assistant **look at the images in your notes**, the model also has to accept images (a "vision" or "multimodal" model). Most hosted models of OpenAI, Anthropic and Google read images; on Ollama you need one that says so, such as `qwen2.5vl` or `llava`. No OpenAI-compatible API tells Poznote beforehand whether a model accepts images, so the assistant tries: with a text-only model a notice appears in the chat and the answer is given without the picture.
 
 ### Reasoning effort
 
@@ -242,4 +246,4 @@ An error that occurs once the answer has started streaming is not retried, since
 
 ## Privacy
 
-The AI server is called from the Poznote server, never from your browser. With a local Ollama or LM Studio instance, your notes and conversations never leave your machine. With a cloud provider, the parts of your notes the assistant reads to answer are sent to that provider. With external tools turned on, what the assistant sends to them, a search query for instance, goes to the servers you connected.
+The AI server is called from the Poznote server, never from your browser. With a local Ollama or LM Studio instance, your notes and conversations never leave your machine. With a cloud provider, the parts of your notes the assistant reads to answer are sent to that provider, an image it is asked to look at included. With external tools turned on, what the assistant sends to them, a search query for instance, goes to the servers you connected.

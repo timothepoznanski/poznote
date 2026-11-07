@@ -26,6 +26,8 @@ Une fois configuré, un bouton **Assistant IA** apparaît dans la barre d'icône
 
 L'assistant dispose d'outils pour **rechercher et lire vos notes**, et s'en sert de lui-même : demandez « que disent mes notes à propos de X ? », réclamez un résumé couvrant plusieurs notes, ou laissez-le retrouver cette note dont vous ne vous souvenez qu'à moitié. Les réponses sont diffusées au fil de l'eau et affichées en Markdown.
 
+Il peut aussi **regarder les images de vos notes**. Collez, déposez ou joignez une image à une note, puis demandez ce qu'elle montre, ce qu'indique l'étiquette dessus, ou d'en écrire les détails dans la note : l'assistant demande à voir l'image et la lit. Les PNG, JPEG, GIF et WebP sont montrés, qu'ils soient joints à la note ou conservés dedans, jusqu'à quatre images par réponse, 5 Mo chacune et 8 Mo en tout ; un diagramme Excalidraw, un SVG et un PDF ne peuvent pas être montrés. Cela demande un modèle qui accepte les images, voir **Choisir un modèle** plus bas. Ce qui est écrit dans une image est traité comme une donnée et jamais comme une instruction : une image qui demande à l'assistant de supprimer vos notes vous est signalée, pas obéie.
+
 Lorsque vous le lui demandez explicitement, il peut aussi agir sur vos notes :
 
 - **écrire** : créer une note, en renommer une ou réécrire son contenu ;
@@ -34,7 +36,7 @@ Lorsque vous le lui demandez explicitement, il peut aussi agir sur vos notes :
 - **tâches** : ajouter, cocher, décocher, renommer ou supprimer les tâches d'une note de type liste de tâches et leurs sous-tâches, y compris les dates d'échéance et les rappels des tâches, et cocher ou décocher une case dans une note ordinaire, sans réécrire le reste de celle-ci ;
 - **supprimer** : mettre à la corbeille une note, ou un dossier avec ses sous-dossiers et toutes leurs notes. Tout peut être restauré depuis la page Corbeille : l'assistant n'a aucun moyen de supprimer quoi que ce soit définitivement, ni aucun outil pour vider la corbeille.
 
-La note que vous avez ouverte fait partie du contexte : dites « améliore la mise en forme de cette note » ou « ajoute une conclusion ici » et l'assistant travaille dessus, sans qu'il faille donner d'identifiant ni de titre. Il lit la dernière version enregistrée par l'éditeur, et « cette note » vous suit si vous ouvrez une autre note pendant la conversation. Nommer une autre note dans votre question reste prioritaire. Sur le tableau de bord, aucune note n'est ouverte : nommez donc la note dont vous parlez.
+La note que vous avez ouverte fait partie du contexte : dites « améliore la mise en forme de cette note » ou « ajoute une conclusion ici » et l'assistant travaille dessus, sans qu'il faille donner d'identifiant ni de titre. Une modification que vous venez de taper ou de coller est enregistrée avant l'envoi de votre message, donc l'assistant lit la note telle que vous la voyez, et « cette note » vous suit si vous ouvrez une autre note pendant la conversation. Nommer une autre note dans votre question reste prioritaire. Sur le tableau de bord, aucune note n'est ouverte : nommez donc la note dont vous parlez.
 
 Deux lignes au-dessus du champ de saisie indiquent ce avec quoi l'assistant travaille : l'**espace de travail** dans lequel s'exécutent tous les outils, et la **note** à laquelle « cette note » fait référence lorsqu'une note est ouverte.
 
@@ -62,7 +64,7 @@ Rendez-vous dans **Paramètres → Outils d'administration → Assistant IA** (a
 
 Utilisez ensuite **Vérifier l'accès et lister les modèles**, qui vérifie que le serveur est joignable et remplit la liste déroulante **Modèle** avec les modèles qu'il propose. La liste déroulante reste vide tant que cette vérification n'a pas réussi : c'est donc cette étape qui vous permet de choisir un modèle.
 
-La configuration s'applique à toute l'instance : une fois activé par l'administrateur, chaque profil utilisateur a accès au chat.
+La configuration s'applique à toute l'instance, mais l'accès se donne profil par profil : la même page a une liste **Utilisateurs autorisés à utiliser l'assistant IA global**, et seuls les utilisateurs cochés voient le chat. Un nouvel utilisateur n'y a pas accès tant qu'un administrateur ne l'ajoute pas. Les administrateurs ont toujours accès, leur ligne est donc cochée et grisée.
 
 ### Clés API personnelles
 
@@ -71,6 +73,8 @@ La même page propose l'option **Autoriser les clés API personnelles**. Quand e
 ## Choisir un modèle
 
 Choisissez un modèle qui prend en charge l'**appel d'outils** (aussi appelé « function calling »), par exemple `qwen3`, `llama3.1` ou `mistral`. C'est l'appel d'outils qui permet à l'assistant de parcourir vos notes : avec un modèle qui ne le prend pas en charge, le chat fonctionne toujours (un avertissement vous le signale) mais ne peut pas accéder à vos notes de lui-même.
+
+Pour que l'assistant **regarde les images de vos notes**, le modèle doit aussi accepter les images (un modèle « vision » ou « multimodal »). La plupart des modèles hébergés d'OpenAI, Anthropic et Google lisent les images ; sur Ollama il en faut un qui l'annonce, comme `qwen2.5vl` ou `llava`. Aucune API compatible OpenAI n'indique à Poznote si un modèle accepte les images, alors l'assistant essaie : avec un modèle texte seul, un avertissement apparaît dans le chat et la réponse est donnée sans l'image.
 
 ### Effort de raisonnement
 
@@ -242,4 +246,4 @@ Une erreur survenue une fois que la réponse a commencé à s'afficher n'est pas
 
 ## Confidentialité
 
-Le serveur IA est appelé depuis le serveur Poznote, jamais depuis votre navigateur. Avec une instance locale d'Ollama ou de LM Studio, vos notes et vos conversations ne quittent jamais votre machine. Avec un fournisseur cloud, les parties de vos notes que l'assistant lit pour répondre sont envoyées à ce fournisseur. Avec les outils externes activés, ce que l'assistant leur envoie, une requête de recherche par exemple, part vers les serveurs que vous avez connectés.
+Le serveur IA est appelé depuis le serveur Poznote, jamais depuis votre navigateur. Avec une instance locale d'Ollama ou de LM Studio, vos notes et vos conversations ne quittent jamais votre machine. Avec un fournisseur cloud, les parties de vos notes que l'assistant lit pour répondre sont envoyées à ce fournisseur, y compris une image qu'on lui demande de regarder. Avec les outils externes activés, ce que l'assistant leur envoie, une requête de recherche par exemple, part vers les serveurs que vous avez connectés.

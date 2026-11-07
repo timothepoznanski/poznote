@@ -26,6 +26,8 @@ Un cop configurat, apareix un botó **Assistent d'IA** a la barra lateral d'icon
 
 L'assistent té eines per **cercar i llegir les vostres notes**, i les fa servir pel seu compte: pregunteu «què diuen les meves notes sobre X?», demaneu un resum de diverses notes o deixeu que trobi aquella nota que recordeu a mitges. Les respostes es transmeten a mesura que es generen i es mostren en Markdown.
 
+També pot **mirar les imatges de les notes**. Enganxeu, arrossegueu o adjunteu una imatge a una nota i després pregunteu què mostra, què diu l'etiqueta que porta, o demaneu que n'escrigui els detalls a la nota: l'assistent demana veure la imatge i la llegeix. Es mostren PNG, JPEG, GIF i WebP, tant si estan adjuntats a la nota com si es conserven a dins, fins a quatre imatges per resposta, de 5 MB cadascuna i 8 MB en total; un diagrama d'Excalidraw, un SVG i un PDF no es poden mostrar. Això demana un model que accepti imatges, vegeu **Triar un model** més avall. El que està escrit dins d'una imatge es tracta com una dada i mai com una instrucció: una imatge que demana a l'assistent que esborri les notes se us assenyala, no s'obeeix.
+
 Quan li ho demaneu explícitament, també pot actuar sobre les notes:
 
 - **escriure**: crear una nota, canviar-ne el nom o tornar-ne a escriure el contingut;
@@ -34,7 +36,7 @@ Quan li ho demaneu explícitament, també pot actuar sobre les notes:
 - **tasques**: afegir, marcar, desmarcar, canviar el nom o eliminar les tasques d'una llista de tasques i les seves subtasques, incloses les dates de venciment i els recordatoris de les tasques, i marcar o desmarcar una casella dins d'una nota normal sense tornar a escriure la resta;
 - **suprimir**: moure una nota a la paperera, o una carpeta amb les seves subcarpetes i totes les seves notes. Tot es pot restaurar des de la pàgina de la paperera: l'assistent no té cap manera de suprimir res definitivament ni cap eina per buidar la paperera.
 
-La nota que teniu oberta forma part del context: digueu «millora el format d'aquesta nota» o «afegeix-hi una conclusió» i l'assistent hi treballa, sense necessitat d'identificador ni de títol. Llegeix l'última versió desada per l'editor, i «aquesta nota» us segueix si obriu una altra nota durant la conversa. Si a la pregunta anomeneu una altra nota, aquesta té prioritat. Al tauler no hi ha cap nota oberta, de manera que allà cal anomenar la nota a què us referiu.
+La nota que teniu oberta forma part del context: digueu «millora el format d'aquesta nota» o «afegeix-hi una conclusió» i l'assistent hi treballa, sense necessitat d'identificador ni de títol. Un canvi que acabeu d'escriure o d'enganxar es desa abans que surti el vostre missatge, de manera que l'assistent llegeix la nota tal com la veieu, i «aquesta nota» us segueix si obriu una altra nota durant la conversa. Si a la pregunta anomeneu una altra nota, aquesta té prioritat. Al tauler no hi ha cap nota oberta, de manera que allà cal anomenar la nota a què us referiu.
 
 Dues línies damunt del camp d'entrada mostren amb què treballa l'assistent: l'**espai de treball** on s'executen totes les eines, i la **nota** a què fa referència «aquesta nota» quan n'hi ha una d'oberta.
 
@@ -62,7 +64,7 @@ Aneu a **Paràmetres → Eines d'administració → Assistent d'IA** (només adm
 
 Després feu servir **Comprova l'accés i llista els models**, que verifica que s'accedeix al servidor i omple la llista desplegable **Model** amb els models que ofereix. La llista es queda buida fins que aquesta comprovació funciona, de manera que és el pas que permet triar un model.
 
-La configuració s'aplica a tota la instància: un cop l'administrador l'activa, tots els perfils d'usuari tenen el xat.
+La configuració s'aplica a tota la instància, però l'accés es dona perfil per perfil: la mateixa pàgina té una llista **Usuaris autoritzats a fer servir l'assistent d'IA global**, i només els usuaris marcats veuen el xat. Un usuari nou no hi té accés fins que un administrador l'hi afegeix. Els administradors sempre hi tenen accés, així que la seva fila apareix marcada i en gris.
 
 ### Claus de l'API personals
 
@@ -71,6 +73,8 @@ La mateixa pàgina té l'opció **Permet claus de l'API personals**. Quan està 
 ## Tria d'un model
 
 Trieu un model que admeti **crides a eines** (també anomenades «function calling»), p. ex. `qwen3`, `llama3.1` o `mistral`. Les crides a eines són el que permet a l'assistent explorar les notes: amb un model que no les admet, el xat continua funcionant (un avís us ho indica), però no pot accedir a les notes pel seu compte.
+
+Perquè l'assistent **miri les imatges de les notes**, el model també ha d'acceptar imatges (un model «vision» o «multimodal»). La majoria dels models allotjats d'OpenAI, Anthropic i Google llegeixen imatges; a Ollama en necessiteu un que ho indiqui, com ara `qwen2.5vl` o `llava`. Cap API compatible amb OpenAI no diu al Poznote per endavant si un model accepta imatges, així que l'assistent ho prova: amb un model només de text apareix un avís al xat i la resposta es dona sense la imatge.
 
 ### Esforç de raonament
 
@@ -242,4 +246,4 @@ Un error que es produeix quan la resposta ja ha començat a arribar no es torna 
 
 ## Privadesa
 
-El servidor d'IA es crida des del servidor del Poznote, mai des del navegador. Amb una instància local d'Ollama o d'LM Studio, les notes i les converses no surten mai del vostre ordinador. Amb un proveïdor al núvol, les parts de les notes que l'assistent llegeix per respondre s'envien a aquest proveïdor. Amb les eines externes activades, el que l'assistent els envia, una consulta de cerca per exemple, va als servidors que heu connectat.
+El servidor d'IA es crida des del servidor del Poznote, mai des del navegador. Amb una instància local d'Ollama o d'LM Studio, les notes i les converses no surten mai del vostre ordinador. Amb un proveïdor al núvol, les parts de les notes que l'assistent llegeix per respondre s'envien a aquest proveïdor, inclosa una imatge que li demaneu mirar. Amb les eines externes activades, el que l'assistent els envia, una consulta de cerca per exemple, va als servidors que heu connectat.

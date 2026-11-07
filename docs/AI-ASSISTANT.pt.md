@@ -26,6 +26,8 @@ Depois de configurado, um botão **Assistente IA** aparece na barra de ícones �
 
 O assistente tem ferramentas para **pesquisar e ler suas notas** e as usa por conta própria: pergunte "o que minhas notas dizem sobre X?", peça um resumo que abranja várias notas ou deixe que ele encontre aquela nota de que você mal se lembra. As respostas chegam em streaming e são renderizadas como Markdown.
 
+Ele também pode **olhar as imagens das suas notas**. Cole, arraste ou anexe uma imagem a uma nota e depois pergunte o que ela mostra, o que diz a etiqueta nela, ou peça para escrever os detalhes na nota: o assistente pede para ver a imagem e a lê. PNG, JPEG, GIF e WebP são mostrados, estejam anexados à nota ou guardados dentro dela, até quatro imagens por resposta, de 5 MB cada e 8 MB no total; um diagrama do Excalidraw, um SVG e um PDF não podem ser mostrados. Isso exige um modelo que aceite imagens, veja **Escolher um modelo** mais abaixo. O que está escrito dentro de uma imagem é tratado como um dado e nunca como uma instrução: uma imagem que pede ao assistente para apagar suas notas é relatada a você, não obedecida.
+
 Quando você pede explicitamente, ele também pode agir sobre suas notas:
 
 - **escrever**: criar uma nota, renomear uma nota ou reescrever o conteúdo dela;
@@ -34,7 +36,7 @@ Quando você pede explicitamente, ele também pode agir sobre suas notas:
 - **tarefas**: adicionar, marcar, desmarcar, renomear ou remover as tarefas de uma nota do tipo lista de tarefas e suas subtarefas, incluindo os prazos e lembretes das tarefas, e marcar ou desmarcar uma caixa de seleção dentro de uma nota comum, sem reescrever o resto dela;
 - **excluir**: mover para a lixeira uma nota, ou uma pasta com suas subpastas e todas as notas delas. Tudo pode ser restaurado na página Lixeira: o assistente não tem como excluir nada definitivamente, nem ferramenta para esvaziar a lixeira.
 
-A nota que você tem aberta faz parte do contexto: diga "melhore a formatação desta nota" ou "adicione uma conclusão aqui" e o assistente trabalha nela, sem precisar de id nem de título. Ele lê a última versão salva pelo editor, e "esta nota" acompanha você se abrir outra nota durante a conversa. Citar outra nota na sua pergunta continua tendo prioridade. No Painel nenhuma nota fica aberta, então, ali, indique a nota a que você se refere.
+A nota que você tem aberta faz parte do contexto: diga "melhore a formatação desta nota" ou "adicione uma conclusão aqui" e o assistente trabalha nela, sem precisar de id nem de título. Uma alteração que você acabou de digitar ou colar é salva antes de a sua mensagem sair, então o assistente lê a nota como você a vê, e "esta nota" acompanha você se abrir outra nota durante a conversa. Citar outra nota na sua pergunta continua tendo prioridade. No Painel nenhuma nota fica aberta, então, ali, indique a nota a que você se refere.
 
 Duas linhas acima do campo de entrada mostram com o que o assistente está trabalhando: o **espaço de trabalho** em que todas as ferramentas são executadas e a **nota** a que "esta nota" se refere, quando há uma aberta.
 
@@ -62,7 +64,7 @@ Acesse **Configurações → Ferramentas de administração → Assistente IA** 
 
 Em seguida, use **Verificar o acesso e listar os modelos**, que confirma que o servidor está acessível e preenche a lista suspensa **Modelo** com os modelos que ele oferece. A lista fica vazia até essa verificação dar certo, então é essa etapa que permite escolher um modelo.
 
-A configuração vale para a instância inteira: depois de ativada pelo administrador, todos os perfis de usuário ganham o chat.
+A configuração vale para a instância inteira, mas o acesso é concedido perfil a perfil: a mesma página tem uma lista **Usuários autorizados a usar o assistente de IA global**, e só os usuários marcados veem o chat. Um usuário novo não tem acesso até que um administrador o adicione. Os administradores sempre têm acesso, então a linha deles aparece marcada e esmaecida.
 
 ### Chaves de API pessoais
 
@@ -71,6 +73,8 @@ A mesma página oferece a opção **Permitir chaves de API pessoais**. Quando el
 ## Escolher um modelo
 
 Escolha um modelo que suporte **chamada de ferramentas** (também conhecida como "function calling"), por exemplo `qwen3`, `llama3.1` ou `mistral`. A chamada de ferramentas é o que permite ao assistente navegar pelas suas notas: com um modelo que não a suporta, o chat continua funcionando (um aviso informa isso), mas não consegue acessar suas notas por conta própria.
+
+Para que o assistente **olhe as imagens das suas notas**, o modelo também precisa aceitar imagens (um modelo "vision" ou "multimodal"). A maioria dos modelos hospedados da OpenAI, da Anthropic e do Google lê imagens; no Ollama você precisa de um que diga isso, como `qwen2.5vl` ou `llava`. Nenhuma API compatível com a OpenAI informa ao Poznote de antemão se um modelo aceita imagens, então o assistente tenta: com um modelo somente de texto, um aviso aparece no chat e a resposta é dada sem a imagem.
 
 ### Esforço de raciocínio
 
@@ -242,4 +246,4 @@ Um erro que ocorre depois que a resposta já começou a chegar não é repetido,
 
 ## Privacidade
 
-O servidor de IA é chamado a partir do servidor Poznote, nunca do seu navegador. Com uma instância local do Ollama ou do LM Studio, suas notas e conversas nunca saem da sua máquina. Com um provedor na nuvem, as partes das suas notas que o assistente lê para responder são enviadas a esse provedor. Com as ferramentas externas ativadas, o que o assistente lhes envia, por exemplo uma consulta de pesquisa, vai para os servidores que ligou.
+O servidor de IA é chamado a partir do servidor Poznote, nunca do seu navegador. Com uma instância local do Ollama ou do LM Studio, suas notas e conversas nunca saem da sua máquina. Com um provedor na nuvem, as partes das suas notas que o assistente lê para responder são enviadas a esse provedor, inclusive uma imagem que ele é chamado a olhar. Com as ferramentas externas ativadas, o que o assistente lhes envia, por exemplo uma consulta de pesquisa, vai para os servidores que ligou.

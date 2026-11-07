@@ -19,11 +19,11 @@ Diese Anleitung erklärt, wie Sie den Poznote MCP-Server mit Claude CLI (Command
 
 ## Voraussetzungen
 
-- **Anthropic-API-Schlüssel:** Claude CLI benötigt einen kostenpflichtigen [Anthropic-API-Schlüssel](https://console.anthropic.com/). Setzen Sie ihn, bevor Sie die CLI verwenden:
+- **Ein Anthropic-Konto:** Claude CLI meldet sich mit einem Claude-Abonnement oder mit einem [Anthropic-API-Schlüssel](https://console.anthropic.com/) an. Mit einem API-Schlüssel setzen Sie ihn, bevor Sie die CLI verwenden:
   ```bash
   export ANTHROPIC_API_KEY=sk-ant-...
   ```
-- Claude CLI ist installiert (`npm install -g @anthropic-ai/claude-cli` oder ähnlich)
+- Claude CLI ist installiert (`npm install -g @anthropic-ai/claude-code`)
 - Der Poznote MCP-Server läuft (über Docker Compose)
 - Der MCP-Server ist unter 127.0.0.1 erreichbar (Standardport: 8045)
 
@@ -106,8 +106,9 @@ claude "Zeige mir alle Ordner in meinem Poznote-Arbeitsbereich"
 
 ```bash
 # Eine neue Notiz erstellen
-# WICHTIG: Wenn Sie keinen Arbeitsbereich angeben, wird die Notiz im
-# Standard-Arbeitsbereich des verbundenen Benutzers erstellt. Geben Sie den Ziel-Arbeitsbereich immer an.
+# WICHTIG: Nennen Sie immer den Ziel-Arbeitsbereich. Ohne ihn verwendet der Server die
+# Einstellung mcp_default_workspace oder den einzigen Arbeitsbereich des Kontos und lehnt
+# den Aufruf ab, wenn das Konto mehrere hat und diese Einstellung leer ist.
 claude "Erstelle in Poznote eine Notiz mit dem Titel 'Meeting Notes' im Arbeitsbereich 'Projets' mit dem Inhalt 'Discussion about the new feature'"
 
 # Eine bestehende Notiz aktualisieren
@@ -309,7 +310,7 @@ Wenn Claude CLI keine Verbindung zum MCP-Server herstellen kann:
 2. **Status des Docker-Containers überprüfen:**
    ```bash
    docker ps | grep mcp
-  docker compose logs mcp-server
+   docker compose logs mcp-server
    ```
 
 3. **Port-Bindung prüfen:**
@@ -361,76 +362,7 @@ Alle Details: [Sicherheit des MCP-Servers](MCP-SERVER.de.md#sicherheit).
 
 ## Verfügbare MCP-Tools
 
-Der Poznote MCP-Server stellt die folgenden Tools bereit:
-
-### Notizverwaltung
-- `get_note`: Eine bestimmte Notiz anhand ihrer ID abrufen
-- `list_notes`: Alle Notizen auflisten
-- `search_notes`: Notizen per Textsuche finden, optional mit einem Zeitraum für das Erstellungsdatum
-- `create_note`: Eine neue Notiz erstellen, optional mit Fälligkeitsdatum/Erinnerung
-- `update_note`: Eine bestehende Notiz aktualisieren und/oder ihr Fälligkeitsdatum bzw. ihre Erinnerung setzen
-- `delete_note`: Eine Notiz löschen
-- `duplicate_note`: Eine Notiz duplizieren
-- `convert_note`: Eine Notiz zwischen HTML und Markdown konvertieren
-- `get_backlinks`: Die Notizen abrufen, die auf eine Notiz verlinken
-
-### Erinnerungen
-- `get_reminder`: Die für eine Notiz gesetzte Erinnerung abrufen
-- `set_reminder`: Die Erinnerung einer Notiz setzen oder ersetzen, optional mit Wiederholungsintervall
-- `remove_reminder`: Die Erinnerung von einer Notiz entfernen
-
-### Aufgaben
-- `list_tasks`: Die Aufgaben einer Aufgabenlisten-Notiz mit ihren IDs und Fälligkeitsdaten auflisten
-- `add_task`: Eine einzelne Aufgabe hinzufügen, optional mit Fälligkeitsdatum und Erinnerung
-- `update_task`: Eine Aufgabe aktualisieren (Text, Fälligkeitsdatum, Erinnerung, Priorität)
-- `complete_task`: Eine Aufgabe als erledigt markieren oder wieder öffnen
-- `delete_task`: Eine Aufgabe aus einer Aufgabenlisten-Notiz löschen
-- `add_subtask`: Eine Unteraufgabe zu einer Aufgabe einer Aufgabenlisten-Notiz hinzufügen
-- `update_subtask`: Eine Unteraufgabe umbenennen oder als erledigt oder offen markieren
-- `delete_subtask`: Eine Unteraufgabe einer Aufgabe löschen
-
-### Organisation
-- `create_folder`: Einen neuen Ordner erstellen
-- `list_folders`: Alle Ordner auflisten
-- `rename_folder`: Einen Ordner umbenennen
-- `delete_folder`: Einen Ordner löschen und seine Notizen in den Papierkorb verschieben
-- `list_workspaces`: Alle Arbeitsbereiche auflisten
-- `create_workspace`: Einen neuen Arbeitsbereich erstellen
-- `rename_workspace`: Einen Arbeitsbereich umbenennen
-- `delete_workspace`: Einen Arbeitsbereich löschen (der letzte kann nicht gelöscht werden)
-- `list_tags`: Alle Tags auflisten
-- `move_note_to_folder`: Notiz in einen Ordner verschieben
-- `remove_note_from_folder`: Notiz aus einem Ordner entfernen
-- `toggle_favorite`: Favoritenstatus umschalten
-
-### Papierkorbverwaltung
-- `get_trash`: Notizen im Papierkorb auflisten
-- `restore_note`: Aus dem Papierkorb wiederherstellen
-- `empty_trash`: Papierkorb leeren
-
-### Freigabe
-- `share_note`: Öffentliche Freigabe aktivieren
-- `unshare_note`: Öffentliche Freigabe deaktivieren
-- `get_note_share_status`: Freigabestatus abrufen
-- `list_shared`: Alle öffentlich freigegebenen Notizen und Ordner auflisten
-- `list_shared_with_me`: Notizen und Ordner auflisten, die andere Benutzer für dieses Profil freigegeben haben
-
-### Anhänge
-- `list_attachments`: Anhänge einer Notiz auflisten
-
-### Git-Synchronisierung
-- `get_git_sync_status`: Status der Git-Synchronisierung abrufen
-- `git_push`: In das Git-Repository pushen
-- `git_pull`: Aus dem Git-Repository pullen
-
-### System
-- `get_system_info`: Versionsinformationen zu Poznote abrufen
-- `list_backups`: System-Backups auflisten
-- `create_backup`: Ein Backup erstellen
-- `restore_backup`: Ein Backup wiederherstellen (ersetzt die aktuellen Benutzerdaten)
-- `delete_backup`: Eine Backup-Datei löschen
-- `get_app_setting`: Eine Anwendungseinstellung abrufen
-- `update_app_setting`: Eine Anwendungseinstellung ändern
+Der Server bietet Tools für Notizen, Aufgaben, Erinnerungen, Ordner, Arbeitsbereiche, Tags, Anhänge, Revisionen, Freigaben, Git-Synchronisierung und Backups. Sie sind einzeln, mit ihrer jeweiligen Aufgabe, in der [Dokumentation zum MCP-Server](MCP-SERVER.de.md#funktionen) aufgeführt, der einzigen Stelle, an der diese Liste aktuell gehalten wird.
 
 ### Mehrbenutzer-Unterstützung
 

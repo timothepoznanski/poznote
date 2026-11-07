@@ -77,7 +77,7 @@ Nach einigen Sekunden kommt die Antwort `Model 'Systran/faster-whisper-small' do
 - schalten Sie **Transkription aktivieren** ein;
 - wählen Sie **Speaches (local)** und setzen Sie die URL auf `http://speaches:8000`;
 - klicken Sie auf **Zugang prüfen und Modelle auflisten** und wählen Sie dann `Systran/faster-whisper-small` unter **Modell**;
-- haken Sie die Benutzer an, die die Funktion verwenden dürfen, sich selbst eingeschlossen;
+- haken Sie die Benutzer an, die die Funktion verwenden dürfen (als Administrator dürfen Sie es immer);
 - speichern Sie.
 
 **5. Probieren Sie es aus.** Laden Sie eine Notiz über HTTPS neu (oder über `localhost`, siehe [Browseranforderungen](#browseranforderungen)), tippen Sie `/dict`, erlauben Sie den Mikrofonzugriff, sprechen Sie und stoppen Sie die Aufnahme.
@@ -119,7 +119,7 @@ Alles befindet sich unter **Einstellungen → Admin-Werkzeuge → Transkription*
 | Einstellung | Funktion |
 |---|---|
 | **Transkription aktivieren** | Hauptschalter für die unten stehende Instanzkonfiguration. |
-| **Zugelassene Benutzer** | Profile, die den Server der Instanz verwenden dürfen. Niemand hat Zugriff, solange er nicht angehakt ist, auch neue Profile nicht. |
+| **Zugelassene Benutzer** | Profile, die den Server der Instanz verwenden dürfen. Niemand hat Zugriff, solange er nicht angehakt ist, auch neue Profile nicht. Administratoren haben immer Zugriff, ihre Zeile ist daher angehakt und ausgegraut. |
 | **Transkriptionsserver** | Voreinstellungen, die die URL ausfüllen und das Feld für den API-Schlüssel ein- oder ausblenden: Speaches, whisper.cpp, LocalAI, OpenAI oder Anderer (eigene URL). |
 | **Server-URL** | Basis-URL des Servers, zum Beispiel `http://speaches:8000`. `/v1` und der vollständige Pfad `/v1/audio/transcriptions` werden ebenfalls akzeptiert. |
 | **API-Schlüssel** | Wird als `Authorization: Bearer` gesendet. Lokale Server benötigen meist keinen, OpenAI schon. |

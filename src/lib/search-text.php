@@ -80,3 +80,208 @@ function poznoteReplaceExcalidrawContainers(string $html, string $replacement): 
     );
     return $result ?? $html;
 }
+
+/**
+ * Split a query into the terms a search must match: bare words, and "quoted
+ * phrases" that stay in one piece.
+ *
+ * Each entry is ['type' => 'word'|'phrase', 'value' => string]. The search bar
+ * of the app has worked this way for a long time; the function lives here so
+ * the API can match the same way instead of keeping its own weaker rule
+ * (issue #1737).
+ */
+function parseSearchTerms($search) {
+    $terms = [];
+    $pattern = '/"([^"]+)"|\S+/';
+
+    preg_match_all($pattern, (string)$search, $matches);
+
+    foreach ($matches[0] as $match) {
+        // If the match starts and ends with quotes, it's an exact phrase
+        if (preg_match('/^"(.+)"$/', $match, $phrase_match)) {
+            $terms[] = ['type' => 'phrase', 'value' => $phrase_match[1]];
+        } else {
+            // Otherwise it's a simple word
+            $terms[] = ['type' => 'word', 'value' => $match];
+        }
+    }
+
+    return $terms;
+}
+
+/**
+ * The search mode a caller asked for, or null when the word is not one we
+ * know. An empty value means the default, 'all'.
+ *
+ * 'all' requires every term, 'any' one of them, 'phrase' keeps the query in
+ * one piece, which is what the API did before it learned to tokenise.
+ */
+function poznoteNormalizeSearchMode($raw): ?string
+{
+    $mode = strtolower(trim((string)$raw));
+    if ($mode === '') {
+        return 'all';
+    }
+    return in_array($mode, ['all', 'any', 'phrase'], true) ? $mode : null;
+}
+
+/**
+ * A LIKE pattern matching $needle anywhere, with the wildcards it contains
+ * read as text.
+ *
+ * Tags carry an underscore wherever the user typed a space, so without the
+ * escaping a filter on "code_review" would also match "code review" and
+ * "codeXreview". Used with ESCAPE '\' on the SQL side.
+ */
+function poznoteSearchLikePattern(string $needle): string
+{
+    return '%' . addcslashes($needle, '\\%_') . '%';
+}
+
+/**
+ * The terms of $query, already trimmed of empties. A query made only of
+ * separators falls back to the whole string so a search never matches
+ * everything by accident.
+ *
+ * @return string[]
+ */
+function poznoteSearchTermValues(string $query, string $mode): array
+{
+    if ($mode === 'phrase') {
+        return [$query];
+    }
+
+    $values = [];
+    foreach (parseSearchTerms($query) as $term) {
+        $value = trim((string)$term['value']);
+        if ($value !== '') {
+            $values[] = $value;
+        }
+    }
+
+    return $values !== [] ? $values : [$query];
+}
+
+/**
+ * The WHERE fragment matching notes whose title or rendered body carries the
+ * query, as ['sql' => string, 'params' => string[]], or null for an empty
+ * query.
+ *
+ * The title is tested first and the body only when the title missed, so
+ * search_clean_entry(), which renders the note, runs on as few rows as
+ * possible. That is the shape buildSearchConditions() uses for the app's own
+ * search bar.
+ */
+function poznoteBuildNoteTextCondition($query, string $mode = 'all'): ?array
+{
+    $query = trim((string)$query);
+    if ($query === '') {
+        return null;
+    }
+
+    $pieces = [];
+    $params = [];
+    foreach (poznoteSearchTermValues($query, $mode) as $value) {
+        $pattern = poznoteSearchLikePattern($value);
+        $pieces[] = "(remove_accents(heading) LIKE remove_accents(?) ESCAPE '\\'"
+            . " OR (remove_accents(heading) NOT LIKE remove_accents(?) ESCAPE '\\'"
+            . " AND remove_accents(search_clean_entry(entry, type)) LIKE remove_accents(?) ESCAPE '\\'))";
+        $params[] = $pattern;
+        $params[] = $pattern;
+        $params[] = $pattern;
+    }
+
+    $glue = $mode === 'any' ? ' OR ' : ' AND ';
+
+    return ['sql' => '(' . implode($glue, $pieces) . ')', 'params' => $params];
+}
+
+/**
+ * The same thing against the title alone, for the ORDER BY that floats a
+ * title match to the top of a search.
+ */
+function poznoteBuildHeadingMatchCondition($query, string $mode = 'all'): ?array
+{
+    $query = trim((string)$query);
+    if ($query === '') {
+        return null;
+    }
+
+    $pieces = [];
+    $params = [];
+    foreach (poznoteSearchTermValues($query, $mode) as $value) {
+        $pieces[] = "remove_accents(heading) LIKE remove_accents(?) ESCAPE '\\'";
+        $params[] = poznoteSearchLikePattern($value);
+    }
+
+    $glue = $mode === 'any' ? ' OR ' : ' AND ';
+
+    return ['sql' => '(' . implode($glue, $pieces) . ')', 'params' => $params];
+}
+
+/**
+ * The tags a filter asked for, in the form the tags column stores: a string
+ * ("a, b" or "a b"), or a list of strings.
+ *
+ * A tag never holds a space, the app turns one into an underscore when the
+ * tag is saved, so splitting on spaces is safe and lets a caller pass
+ * "topic/ai topic/mcp" as one value.
+ *
+ * @return string[]
+ */
+function poznoteParseTagFilter($raw): array
+{
+    $parts = [];
+    if (is_array($raw)) {
+        foreach ($raw as $chunk) {
+            foreach (preg_split('/[,\s]+/', (string)$chunk) ?: [] as $part) {
+                $parts[] = $part;
+            }
+        }
+    } else {
+        $parts = preg_split('/[,\s]+/', (string)$raw) ?: [];
+    }
+
+    $tags = [];
+    $seen = [];
+    foreach ($parts as $part) {
+        $tag = trim((string)$part);
+        if ($tag === '') {
+            continue;
+        }
+        $key = mb_strtolower($tag, 'UTF-8');
+        if (isset($seen[$key])) {
+            continue;
+        }
+        $seen[$key] = true;
+        $tags[] = $tag;
+    }
+
+    return $tags;
+}
+
+/**
+ * The WHERE fragment matching notes carrying every tag of $tags, or null for
+ * an empty list.
+ *
+ * The column holds "a, b, c", so both sides are wrapped in commas and the
+ * spaces dropped before matching: a filter on "chat" then matches the tag
+ * "chat" and not "chat/telegram", which a plain substring would have caught.
+ * A caller after the whole family passes the full tag.
+ */
+function poznoteBuildTagsCondition(array $tags): ?array
+{
+    if ($tags === []) {
+        return null;
+    }
+
+    $pieces = [];
+    $params = [];
+    foreach ($tags as $tag) {
+        $pieces[] = "(',' || replace(remove_accents(tags), ' ', '') || ',')"
+            . " LIKE ('%,' || remove_accents(?) || ',%') ESCAPE '\\'";
+        $params[] = addcslashes($tag, '\\%_');
+    }
+
+    return ['sql' => '(' . implode(' AND ', $pieces) . ')', 'params' => $params];
+}

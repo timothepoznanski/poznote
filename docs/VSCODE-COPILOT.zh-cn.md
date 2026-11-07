@@ -148,7 +148,7 @@ SSH 隧道或 VS Code 转发端口会将远程 MCP 服务器暴露到您的本�
 
 ### 创建和更新笔记
 
-> **工作区**：如果您在请求中没有指定工作区，笔记会创建在当前连接用户的默认工作区中。请明确写出目标工作区以避免混淆，例如：*“在工作区 'Projets' 中”*。
+> **工作区**：请在请求中写出目标工作区，例如：*“在工作区 'Projets' 中”*。如果不写，服务器会退回到 `mcp_default_workspace` 设置，或者账户唯一的工作区；当账户有多个工作区而该设置为空时，调用会被拒绝。
 
 ```
 @poznote 在工作区 "Projets" 中创建一条标题为 "Meeting Notes" 的笔记，内容关于新功能
@@ -285,7 +285,7 @@ SSH 隧道或 VS Code 转发端口会将远程 MCP 服务器暴露到您的本�
 2. **确认 Docker 容器状态：**
    ```bash
    docker ps | grep mcp
-  docker compose logs mcp-server
+   docker compose logs mcp-server
    ```
 
 3. **检查端口绑定：**
@@ -334,76 +334,7 @@ docker compose logs -f mcp-server
 
 ## 可用的 MCP 工具
 
-Poznote MCP 服务器提供以下可供 VS Code Copilot 使用的工具：
-
-### 笔记管理
-- `get_note`：按 ID 获取指定笔记
-- `list_notes`：列出所有笔记
-- `search_notes`：按文本查询搜索笔记，可选创建日期范围
-- `create_note`：创建新笔记，可选设置截止日期/提醒
-- `update_note`：更新现有笔记，和/或设置其截止日期/提醒
-- `delete_note`：删除笔记
-- `duplicate_note`：复制笔记
-- `convert_note`：在 HTML 和 Markdown 之间转换笔记
-- `get_backlinks`：获取链接到某条笔记的笔记
-
-### 提醒
-- `get_reminder`：获取笔记上设置的提醒
-- `set_reminder`：设置或替换笔记的提醒，可选重复间隔
-- `remove_reminder`：移除笔记的提醒
-
-### 任务
-- `list_tasks`：列出任务列表笔记中的任务，包括 ID 和截止日期
-- `add_task`：添加单个任务，可选截止日期和提醒
-- `update_task`：更新单个任务（文本、截止日期、提醒、优先级）
-- `complete_task`：将任务标记为已完成，或重新打开
-- `delete_task`：从任务列表笔记中删除单个任务
-- `add_subtask`：为任务列表笔记中的某个任务添加子任务
-- `update_subtask`：重命名子任务，或将其标记为已完成或未完成
-- `delete_subtask`：删除任务的单个子任务
-
-### 整理
-- `create_folder`：创建新文件夹
-- `list_folders`：列出所有文件夹
-- `rename_folder`：重命名文件夹
-- `delete_folder`：删除文件夹并将其中的笔记移到回收站
-- `list_workspaces`：列出所有工作区
-- `create_workspace`：创建新工作区
-- `rename_workspace`：重命名工作区
-- `delete_workspace`：删除工作区（不能删除最后一个）
-- `list_tags`：列出所有标签
-- `move_note_to_folder`：将笔记移动到文件夹
-- `remove_note_from_folder`：将笔记移出文件夹
-- `toggle_favorite`：切换收藏状态
-
-### 回收站管理
-- `get_trash`：列出回收站中的笔记
-- `restore_note`：从回收站恢复
-- `empty_trash`：清空回收站
-
-### 分享
-- `share_note`：启用公开分享
-- `unshare_note`：禁用公开分享
-- `get_note_share_status`：获取分享状态
-- `list_shared`：列出所有公开分享的笔记和文件夹
-- `list_shared_with_me`：列出其他用户与此用户资料分享的笔记和文件夹
-
-### 附件
-- `list_attachments`：列出笔记附件
-
-### Git 同步
-- `get_git_sync_status`：获取 Git 同步状态
-- `git_push`：推送到 Git 仓库
-- `git_pull`：从 Git 仓库拉取
-
-### 系统
-- `get_system_info`：获取 Poznote 版本信息
-- `list_backups`：列出系统备份
-- `create_backup`：创建备份
-- `restore_backup`：还原备份（替换当前用户数据）
-- `delete_backup`：删除备份文件
-- `get_app_setting`：获取应用设置
-- `update_app_setting`：更新应用设置
+服务器提供用于笔记、任务、提醒、文件夹、工作区、标签、附件、修订、共享、Git 同步和备份的工具。每个工具及其作用都逐条列在 [MCP 服务器文档](MCP-SERVER.zh-cn.md#功能) 中，那里是唯一会保持该列表更新的地方。
 
 ### 多用户支持
 

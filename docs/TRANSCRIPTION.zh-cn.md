@@ -77,7 +77,7 @@ docker compose exec webserver curl -X POST http://speaches:8000/v1/models/Systra
 - 打开 **启用转录**；
 - 选择 **Speaches (local)**，并将 URL 设为 `http://speaches:8000`；
 - 点击 **检查访问并列出模型**，然后在 **模型** 中选择 `Systran/faster-whisper-small`；
-- 勾选允许使用该功能的用户，包括您自己；
+- 勾选允许使用该功能的用户（管理员始终可以使用）；
 - 保存。
 
 **5. 试用。** 通过 HTTPS（或通过 `localhost`，参见[浏览器要求](#浏览器要求)）重新加载一条笔记，输入 `/dict`，允许使用麦克风，说话，然后停止。
@@ -119,7 +119,7 @@ docker compose exec webserver curl -X POST http://speaches:8000/v1/models/Systra
 | 设置 | 作用 |
 |---|---|
 | **启用转录** | 下方实例配置的总开关。 |
-| **允许的用户** | 可以使用实例服务器的用户资料。在勾选之前任何人都无权访问，新建的用户资料也是如此。 |
+| **允许的用户** | 可以使用实例服务器的用户资料。在勾选之前任何人都无权访问，新建的用户资料也是如此。管理员始终拥有访问权限，因此其所在行会显示为已勾选并置灰。 |
 | **转录服务器** | 预设选项，会自动填写 URL 并显示或隐藏 API 密钥：Speaches、whisper.cpp、LocalAI、OpenAI 或“其他”。 |
 | **服务器 URL** | 服务器的基础 URL，例如 `http://speaches:8000`。也接受 `/v1` 以及完整的 `/v1/audio/transcriptions` 路径。 |
 | **API 密钥** | 以 `Authorization: Bearer` 形式发送。本地服务器通常不需要，OpenAI 则需要。 |

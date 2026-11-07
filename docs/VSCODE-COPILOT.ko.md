@@ -148,7 +148,7 @@ SSH 터널이나 VS Code 포트 전달을 통해 원격 MCP 서버에 로컬 컴
 
 ### 노트 생성 및 수정
 
-> **작업 공간:** 요청에 작업 공간을 지정하지 않으면 연결된 사용자의 기본 작업 공간을 사용합니다. 혼동을 피하려면 *“'Projets' 작업 공간에”*처럼 대상 공간을 명시하세요.
+> **작업 공간:** *“'Projets' 작업 공간에”*처럼 요청에 대상 작업 공간을 명시하세요. 지정하지 않으면 서버가 `mcp_default_workspace` 설정이나 계정의 유일한 작업 공간을 사용하며, 작업 공간이 여러 개이고 그 설정이 비어 있으면 호출을 거부합니다.
 
 ```
 @poznote "Projets" 작업 공간에 "Meeting Notes" 노트를 만들고 새 기능에 관한 내용을 넣어줘
@@ -285,7 +285,7 @@ VS Code Copilot이 MCP 서버에 연결하지 못하면 다음을 확인하세�
 2. **Docker 컨테이너 상태:**
    ```bash
    docker ps | grep mcp
-  docker compose logs mcp-server
+   docker compose logs mcp-server
    ```
 
 3. **포트 바인딩:**
@@ -334,76 +334,7 @@ docker compose logs -f mcp-server
 
 ## 사용 가능한 MCP 도구
 
-VS Code Copilot은 Poznote MCP 서버의 다음 도구를 사용할 수 있습니다.
-
-### 노트 관리
-- `get_note` - ID로 특정 노트 조회
-- `list_notes` - 모든 노트 목록 조회
-- `search_notes` - 텍스트로 노트 검색. 생성 날짜 범위 지정 가능
-- `create_note` - 새 노트 생성. 마감일과 알림 지정 가능
-- `update_note` - 기존 노트 수정 및 마감일·알림 설정
-- `delete_note` - 노트 삭제
-- `duplicate_note` - 노트 복제
-- `convert_note` - HTML과 마크다운 간 노트 변환
-- `get_backlinks` - 해당 노트를 링크한 노트 조회
-
-### 알림
-- `get_reminder` - 노트의 알림 조회
-- `set_reminder` - 노트의 알림 설정 또는 교체. 반복 간격 지정 가능
-- `remove_reminder` - 노트의 알림 제거
-
-### 할 일
-- `list_tasks` - 할 일 목록 노트의 할 일과 ID·마감일 조회
-- `add_task` - 할 일 하나 추가. 마감일·알림 지정 가능
-- `update_task` - 할 일 하나 수정(내용, 마감일, 알림, 우선순위)
-- `complete_task` - 할 일 완료 또는 완료 취소
-- `delete_task` - 할 일 목록 노트에서 할 일 하나 삭제
-- `add_subtask` - 할 일 아래에 하위 할 일 추가
-- `update_subtask` - 하위 할 일 이름 변경 또는 완료·완료 취소
-- `delete_subtask` - 하위 할 일 하나 삭제
-
-### 정리
-- `create_folder` - 새 폴더 생성
-- `list_folders` - 모든 폴더 목록 조회
-- `rename_folder` - 폴더 이름 변경
-- `delete_folder` - 폴더 삭제 및 포함된 노트를 휴지통으로 이동
-- `list_workspaces` - 모든 작업 공간 목록 조회
-- `create_workspace` - 새 작업 공간 생성
-- `rename_workspace` - 작업 공간 이름 변경
-- `delete_workspace` - 작업 공간 삭제(마지막 작업 공간은 삭제 불가)
-- `list_tags` - 모든 태그 목록 조회
-- `move_note_to_folder` - 노트를 폴더로 이동
-- `remove_note_from_folder` - 노트를 폴더에서 꺼내기
-- `toggle_favorite` - 즐겨찾기 상태 전환
-
-### 휴지통 관리
-- `get_trash` - 휴지통의 노트 목록 조회
-- `restore_note` - 휴지통에서 복원
-- `empty_trash` - 휴지통 비우기
-
-### 공유
-- `share_note` - 공개 공유 활성화
-- `unshare_note` - 공개 공유 비활성화
-- `get_note_share_status` - 공유 상태 조회
-- `list_shared` - 공개 공유된 모든 노트와 폴더 목록 조회
-- `list_shared_with_me` - 다른 사용자가 이 프로필에 공유한 노트와 폴더 목록 조회
-
-### 첨부 파일
-- `list_attachments` - 노트 첨부 파일 목록 조회
-
-### Git 동기화
-- `get_git_sync_status` - Git 동기화 상태 조회
-- `git_push` - Git 저장소로 푸시(보내기)
-- `git_pull` - Git 저장소에서 가져오기(풀)
-
-### 시스템
-- `get_system_info` - Poznote 버전 정보 조회
-- `list_backups` - 시스템 백업 목록 조회
-- `create_backup` - 백업 생성
-- `restore_backup` - 백업 복원(현재 사용자 데이터 교체)
-- `delete_backup` - 백업 파일 삭제
-- `get_app_setting` - 앱 설정 조회
-- `update_app_setting` - 앱 설정 변경
+서버는 노트, 작업, 알림, 폴더, 워크스페이스, 태그, 첨부 파일, 리비전, 공유, Git 동기화, 백업을 위한 도구를 제공합니다. 각 도구와 그 역할은 [MCP 서버 문서](MCP-SERVER.ko.md#기능)에 하나씩 정리되어 있으며, 그 목록은 그곳에서만 최신으로 유지됩니다.
 
 ### 다중 사용자 지원
 

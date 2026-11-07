@@ -161,20 +161,23 @@ Error responses:
 | `200` | OK – Request succeeded |
 | `201` | Created – Resource created successfully |
 | `204` | No Content – CORS preflight |
+| `304` | Not Modified – The `If-None-Match` ETag still matches |
 | `400` | Bad Request – Invalid parameters |
 | `401` | Unauthorized – Missing or invalid credentials |
 | `403` | Forbidden – Insufficient permissions |
 | `404` | Not Found – Resource does not exist |
 | `405` | Method Not Allowed |
-| `409` | Conflict – Resource already exists |
+| `409` | Conflict – The resource already exists, or the note changed since the version sent |
 | `413` | Payload Too Large |
+| `423` | Locked – The note is being edited elsewhere |
+| `429` | Too Many Requests – Too many failed two-factor attempts |
 | `500` | Internal Server Error |
 
 ---
 
 ## Interactive Documentation (Swagger)
 
-Access the **Swagger UI** directly from Poznote at `Settings > API Documentation` to browse all endpoints, view request/response schemas, and test API calls interactively.
+Access the **Swagger UI** directly from Poznote at `Settings > About > API REST` to browse all endpoints, view request/response schemas, and test API calls interactively.
 
 ---
 
@@ -193,11 +196,15 @@ List all notes for a user with optional filtering and sorting.
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `workspace` | string | Filter by workspace name |
-| `folder` | string | Filter by folder name |
+| `folder` | string | Filter by folder name, or by path (`Projects/Alpha`) to address one precise folder |
 | `folder_id` | integer | Filter by folder ID |
-| `search` | string | Search in heading and content |
+| `search` | string | Search in heading and content. Every word must appear, in any order |
+| `mode` | string | How to read `search`: `all` (default), `any`, or `phrase` |
+| `tags` | string | Only notes carrying every one of these tags, comma-separated |
 | `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
 | `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
+| `updated_from` | date | Filter notes updated on or after this date (`YYYY-MM-DD`) |
+| `updated_to` | date | Filter notes updated on or before this date (`YYYY-MM-DD`) |
 | `favorite` | boolean | Filter favorites only |
 | `sort` | string | Sort order: `updated_desc`, `created_desc`, `heading_asc`, `type_asc`, `manual`; defaults to the account's own setting |
 | `get_folders` | boolean | Include folder information |
@@ -228,6 +235,12 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes?created_from=2026-01-01&created_to=2026-01-31"
 ```
 
+List what changed since a given day, which is how a client holding a copy catches up without reading everything:
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes?updated_from=2026-01-30&tags=topic/ai"
+```
+
 ### List Notes with Attachments
 
 ```
@@ -247,7 +260,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
 GET /notes/templates
 ```
 
-List the notes the `/template` slash command can insert. A template is an ordinary HTML or Markdown note kept in a folder named `Templates` (sub-folders included) or in a workspace named `Templates`. The folder or workspace name is matched case-insensitively, in English or in the language of the interface (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`).
+List the notes the `/template` slash command can insert. A template is an ordinary HTML or Markdown note kept in a folder named `Templates` (sub-folders included) or in a workspace named `Templates`. The folder or workspace name is matched case-insensitively, in English or in any shipped interface language (`Modèles`, `Vorlagen`, `Plantillas`, `Modelos`, `Шаблоны`, `模板`, `템플릿`, `テンプレート`, `Plantilles`), singular or plural.
 
 **Query Parameters:**
 - `workspace` (optional): Only look at the `Templates` folders of this workspace. Notes of a `Templates` workspace are always included.
@@ -292,7 +305,7 @@ curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123
 ```
 
-### Resolve Note by Reference
+### Resolve Note by Reference or Path
 
 ```
 GET /notes/resolve
@@ -300,16 +313,24 @@ GET /notes/resolve
 
 Resolve a note by ID or title (reference), the way a `[[Note Title]]` link does. A title matches the note called exactly that way, whatever the case and the accents: `Paris` resolves to the note `Paris`, never to `Weekend in Paris`. When several notes share the title, the one written the same way wins, then the most recently updated. The response includes the note's `id`, `heading` and `workspace`, or a `404` when no note has that title.
 
+Pass `path` instead of `reference` to address the note by where it lives, `Folder/Sub/Note title`, which is what the MCP server's `path` arguments go through (issue #1738). The folder part is matched like the `folder` of `POST /notes`: a slash path is walked from the root of the workspace, a bare name reaches a folder at any depth when only one carries it, and `Default` means the root itself. The title has to match in full, ignoring case and accents, and a path with no folder part is just a title, matched wherever the note sits. The response adds the note's `folder` and the `path` it was found at. The separator cannot be escaped, so a note or folder whose own name holds a slash is out of reach this way: `Projects/2026/11/06` means the folder `Projects/2026/11`, and a note called `2026/11/06` is addressed by its id.
+
+Unlike `reference`, a path is never resolved to one of several notes: when more than one answers to it, the answer is a `409` carrying `code: "ambiguous_note_path"` and a `candidates` array of `{id, title, folder, workspace, path}`, so the caller can pass a longer path, name the workspace, or use the id. Titles are unique inside a folder, so that only happens for a bare title, a bare folder name, or the same path in several workspaces. A path no note answers to is a `404`, and an empty one a `400`.
+
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `reference` | string | Note ID, or full note title |
+| `path` | string | Folder path and exact title, `Projects/Alpha/Status` (instead of `reference`, never both) |
 | `workspace` | string | Workspace to search in (omit to search every workspace) |
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/resolve?reference=My+Note&workspace=Personal"
+
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/resolve?path=Projects/Alpha/Status&workspace=Personal"
 ```
 
 ### Search Notes
@@ -320,19 +341,33 @@ GET /notes/search
 
 Search notes by heading or content.
 
+Every word of the query has to appear in the note, in any order and anywhere apart: a search for `staging pipeline` finds a note whose first paragraph says "staging" and whose last one says "pipeline". Words inside `"double quotes"` stay side by side. The comparison ignores case and accents, and `%` or `_` in a query are read as text rather than as SQL wildcards.
+
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `q` | string | Search query (required) |
+| `q` | string | Words to find in the title or the body (required) |
 | `workspace` | string | Restrict search to a workspace |
 | `limit` | integer | Max results (1–100, default `10`) |
+| `mode` | string | `all` (default, every word), `any` (one is enough), or `phrase` (the query as one string) |
+| `tags` | string | Only notes carrying every one of these tags, comma-separated |
+| `folder` | string | Only notes in this folder; a path (`Projects/Alpha`) addresses one precisely |
 | `created_from` | date | Filter notes created on or after this date (`YYYY-MM-DD`) |
 | `created_to` | date | Filter notes created on or before this date (`YYYY-MM-DD`) |
+| `updated_from` | date | Filter notes updated on or after this date (`YYYY-MM-DD`) |
+| `updated_to` | date | Filter notes updated on or before this date (`YYYY-MM-DD`) |
+
+A tag matches whole: `tags=topic/ai` finds the notes tagged `topic/ai` and not those tagged `topic/ai-safety`. An unknown `mode` is answered with a 400, and a `folder` path that names no folder with a 404.
 
 ```bash
 curl -u 'username:password' -H "X-User-ID: 1" \
   "http://YOUR_SERVER/api/v1/notes/search?q=docker&created_from=2026-01-01&created_to=2026-01-31"
+```
+
+```bash
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/notes/search?q=staging%20pipeline&tags=topic/ai&updated_from=2026-01-30"
 ```
 
 ### Search Note Ids
@@ -1686,17 +1721,30 @@ curl -X DELETE -u 'username:password' -H "X-User-ID: 1" \
 GET /reminders
 ```
 
-List triggered notifications (most recent first, max 50).
+List pending notifications: the reminders that have already fired, the ones still to come, or both.
 
 **Query Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
+| `scope` | string | `fired` (default) for the reminders whose time has passed and that have not been dismissed, most recent first, which is what the bell shows; `upcoming` for the ones still scheduled, soonest first; `all` for both, the fired ones first. Anything else answers 400 |
+| `limit` | int | Rows to return, 1 to 500 (default 50, the historical cap). Out of range answers 400 |
 | `workspace` | string | Filter by workspace |
 
+Each row carries `state` (`fired` or `upcoming`), `note_id`, `note_heading`, `workspace`, `message`, `trigger_at` (UTC), `recurrence`, `is_read` and `created`, plus a `task_id` when it is the reminder of one task of a tasklist note rather than of the note itself. A row whose note has since been moved to the trash keeps its reminder, with `note_heading` null.
+
+`unread_count` and `total_count` always count what has fired, whatever the scope, since they are the counters behind the bell; `upcoming_count` is added for `upcoming` and `all`. A session confined to a shared workspace only ever sees the reminders of that workspace.
+
+Only reminders are listed, never a due date without one: a task due tomorrow with no reminder has no row here (see `GET /tasks`).
+
 ```bash
+# What is still waiting, as the bell shows it
 curl -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/reminders
+
+# What is coming, soonest first
+curl -u 'username:password' -H "X-User-ID: 1" \
+  "http://YOUR_SERVER/api/v1/reminders?scope=upcoming&limit=100"
 ```
 
 ### Get Notification Count
@@ -2350,31 +2398,6 @@ curl -X POST -u 'username:password' -H "X-User-ID: 1" \
   -H "Content-Type: application/json" \
   -d '{"folder_id": 10, "target_folder_id": 20, "position": "after"}' \
   http://YOUR_SERVER/api/v1/folders/reorder
-```
-
-### Create Kanban Structure
-
-```
-POST /folders/kanban-structure
-```
-
-Create a Kanban board folder structure (a parent folder with column subfolders).
-
-**Request Body (JSON):**
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| `folder_name` | string | Yes | Name of the Kanban board folder |
-| `columns` | integer | Yes | Number of columns (1–9) |
-| `workspace` | string | No | Target workspace |
-| `parent_folder_id` | integer | No | Create inside this parent folder |
-| `language` | string | No | Language for default column names (default `en`) |
-
-```bash
-curl -X POST -u 'username:password' -H "X-User-ID: 1" \
-  -H "Content-Type: application/json" \
-  -d '{"workspace": "Personal", "folder_name": "Project Board", "columns": 3}' \
-  http://YOUR_SERVER/api/v1/folders/kanban-structure
 ```
 
 ### Update Folder Icon
@@ -4179,7 +4202,7 @@ curl http://YOUR_SERVER/api_health.php
 | `GET` | `/notes` | List notes |
 | `GET` | `/notes/with-attachments` | List notes with attachments |
 | `GET` | `/notes/templates` | List notes usable as templates |
-| `GET` | `/notes/resolve` | Resolve note by reference |
+| `GET` | `/notes/resolve` | Resolve note by reference or by folder path and title |
 | `GET` | `/notes/search` | Search notes |
 | `GET` | `/notes/search/ids` | Ids of the notes holding every word of a query |
 | `GET` | `/notes/{id}` | Get note |
@@ -4201,6 +4224,14 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/remove-folder` | Remove from folder |
 | `POST` | `/notes/reorder` | Reorder a note before/after another |
 | `POST` | `/notes/{id}/archive` | Archive into the Archives workspace |
+| `PUT` | `/notes/{id}/content-width` | Set the note's own width |
+| `PUT` | `/notes/{id}/title-style` | Set the title color and style |
+| `PUT` | `/notes/{id}/offline` | Keep the note offline, or stop |
+
+### Change Detection
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/changes` | Version tokens for a workspace tree and up to 20 notes |
 
 ### Note Locks
 | Method | Endpoint | Description |
@@ -4238,6 +4269,14 @@ curl http://YOUR_SERVER/api_health.php
 | `PATCH` | `/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}` | Update a subtask |
 | `DELETE` | `/notes/{id}/tasks/{taskId}/subtasks/{subtaskId}` | Delete a subtask |
 
+### Mentions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/mentions` | Mentions addressed to this profile |
+| `GET` | `/mentions/members` | Who can be mentioned here |
+| `POST` | `/mentions/{ownerId}/{noteId}/handled` | Mark a mention as handled |
+| `DELETE` | `/mentions/{ownerId}/{noteId}/handled` | Mark it as not handled |
+
 ### Reminders
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -4246,7 +4285,7 @@ curl http://YOUR_SERVER/api_health.php
 | `DELETE` | `/notes/{id}/reminder` | Remove note reminder |
 | `POST` | `/notes/{id}/task-reminder` | Set task reminder |
 | `DELETE` | `/notes/{id}/task-reminder` | Remove task reminder |
-| `GET` | `/reminders` | List notifications |
+| `GET` | `/reminders` | List notifications (fired, upcoming or all) |
 | `GET` | `/reminders/count` | Notification count |
 | `POST` | `/reminders/{id}/read` | Mark as read |
 | `POST` | `/reminders/{id}/dismiss` | Dismiss notification |
@@ -4290,7 +4329,8 @@ curl http://YOUR_SERVER/api_health.php
 | `PUT` | `/folders/{id}/favorite` | Set favorite state |
 | `POST` | `/folders/move-files` | Move files |
 | `POST` | `/folders/reorder` | Reorder folders |
-| `POST` | `/folders/kanban-structure` | Create Kanban |
+| `PUT` | `/folders/{id}/offline` | Keep the folder offline, or stop |
+| `POST` | `/folders/restore` | Restore a deleted folder |
 
 ### Folder Sharing
 | Method | Endpoint | Description |
@@ -4416,3 +4456,8 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/public/notes/lock/heartbeat` | Keep the edit lock alive |
 | `POST` | `/public/notes/lock/release` | Release the edit lock |
 | `GET` | `/public/statistics` | Instance statistics (statistics token, or none when public) |
+
+### Health Check
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api_health.php` | Service status, name and version (no authentication, full path) |

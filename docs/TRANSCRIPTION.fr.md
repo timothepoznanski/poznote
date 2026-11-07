@@ -77,7 +77,7 @@ Il répond `Model 'Systran/faster-whisper-small' downloaded` au bout de quelques
 - cochez **Activer la transcription** ;
 - choisissez **Speaches (local)** et saisissez l'URL `http://speaches:8000` ;
 - cliquez sur **Vérifier l'accès et lister les modèles**, puis choisissez `Systran/faster-whisper-small` dans **Modèle** ;
-- cochez les utilisateurs autorisés à s'en servir, vous compris ;
+- cochez les utilisateurs autorisés à s'en servir (en tant qu'administrateur, vous l'êtes toujours) ;
 - enregistrez.
 
 **5. Essayez.** Rechargez une note en HTTPS (ou via `localhost`, voir les [exigences du navigateur](#exigences-du-navigateur)), tapez `/dict`, autorisez le microphone, parlez, puis arrêtez.
@@ -119,7 +119,7 @@ Tout se trouve dans **Paramètres → Outils d'administration → Transcription*
 | Paramètre | Rôle |
 |---|---|
 | **Activer la transcription** | Interrupteur général de la configuration d'instance ci-dessous. |
-| **Utilisateurs autorisés** | Profils autorisés à utiliser le serveur de l'instance. Personne n'y a accès tant qu'il n'est pas coché, nouveaux profils compris. |
+| **Utilisateurs autorisés** | Profils autorisés à utiliser le serveur de l'instance. Personne n'y a accès tant qu'il n'est pas coché, nouveaux profils compris. Les administrateurs y ont toujours accès, leur ligne est donc cochée et grisée. |
 | **Serveur de transcription** | Préréglages qui remplissent l'URL et affichent ou masquent la clé API : Speaches, whisper.cpp, LocalAI, OpenAI ou Autre. |
 | **URL du serveur** | URL de base du serveur, par exemple `http://speaches:8000`. `/v1` et le chemin complet `/v1/audio/transcriptions` sont également acceptés. |
 | **Clé API** | Envoyée sous la forme `Authorization: Bearer`. Les serveurs locaux n'en demandent généralement pas ; OpenAI si. |

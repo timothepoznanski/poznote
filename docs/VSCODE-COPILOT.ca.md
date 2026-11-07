@@ -148,7 +148,7 @@ Un cop configurat, podeu interactuar amb la instància del Poznote directament d
 
 ### Creació i actualització de notes
 
-> **Espai de treball**: si no indiqueu l'espai de treball a la sol·licitud, la nota es crea a l'espai de treball per defecte de l'usuari connectat. Indiqueu explícitament l'espai de treball de destinació per evitar confusions, per exemple: *«a l'espai de treball “Projets”»*.
+> **Espai de treball**: indiqueu l'espai de treball de destinació a la sol·licitud, per exemple: *«a l'espai de treball “Projets”»*. Sense ell, el servidor fa servir el paràmetre `mcp_default_workspace`, o l'únic espai de treball del compte, i rebutja la crida quan el compte en té uns quants i aquest paràmetre és buit.
 
 ```
 @poznote Crea una nota titulada "Notes de la reunió" a l'espai de treball "Projets" amb contingut sobre la funció nova
@@ -285,7 +285,7 @@ Si VS Code Copilot no es pot connectar al servidor MCP:
 2. **Comproveu l'estat del contenidor Docker:**
    ```bash
    docker ps | grep mcp
-  docker compose logs mcp-server
+   docker compose logs mcp-server
    ```
 
 3. **Comproveu la vinculació del port:**
@@ -334,76 +334,7 @@ docker compose logs -f mcp-server
 
 ## Eines MCP disponibles
 
-El servidor MCP del Poznote ofereix les eines següents, que VS Code Copilot pot fer servir:
-
-### Gestió de notes
-- `get_note` - Obté una nota concreta pel seu ID
-- `list_notes` - Llista totes les notes
-- `search_notes` - Cerca notes per text, amb un interval opcional de dates de creació
-- `create_note` - Crea una nota, opcionalment amb una data de venciment o un recordatori
-- `update_note` - Actualitza una nota existent i/o en defineix la data de venciment o el recordatori
-- `delete_note` - Suprimeix una nota
-- `duplicate_note` - Duplica una nota
-- `convert_note` - Converteix una nota entre HTML i Markdown
-- `get_backlinks` - Obté les notes que enllacen a una nota
-
-### Recordatoris
-- `get_reminder` - Obté el recordatori definit en una nota
-- `set_reminder` - Defineix o substitueix el recordatori d'una nota, amb un interval de repetició opcional
-- `remove_reminder` - Elimina el recordatori d'una nota
-
-### Tasques
-- `list_tasks` - Llista les tasques d'una llista de tasques, amb els seus ID i dates de venciment
-- `add_task` - Afegeix una tasca, amb una data de venciment i un recordatori opcionals
-- `update_task` - Actualitza una tasca (text, data de venciment, recordatori, prioritat)
-- `complete_task` - Marca una tasca com a feta o la torna a obrir
-- `delete_task` - Suprimeix una tasca d'una llista de tasques
-- `add_subtask` - Afegeix una subtasca a una tasca d'una llista de tasques
-- `update_subtask` - Canvia el nom d'una subtasca o la marca com a feta o no feta
-- `delete_subtask` - Suprimeix una subtasca d'una tasca
-
-### Organització
-- `create_folder` - Crea una carpeta
-- `list_folders` - Llista totes les carpetes
-- `rename_folder` - Canvia el nom d'una carpeta
-- `delete_folder` - Suprimeix una carpeta i en mou les notes a la paperera
-- `list_workspaces` - Llista tots els espais de treball
-- `create_workspace` - Crea un espai de treball
-- `rename_workspace` - Canvia el nom d'un espai de treball
-- `delete_workspace` - Suprimeix un espai de treball (no es pot suprimir l'últim)
-- `list_tags` - Llista totes les etiquetes
-- `move_note_to_folder` - Mou una nota a una carpeta
-- `remove_note_from_folder` - Treu una nota d'una carpeta
-- `toggle_favorite` - Commuta l'estat de preferit
-
-### Gestió de la paperera
-- `get_trash` - Llista les notes de la paperera
-- `restore_note` - Restaura una nota de la paperera
-- `empty_trash` - Buida la paperera
-
-### Compartició
-- `share_note` - Activa la compartició pública
-- `unshare_note` - Desactiva la compartició pública
-- `get_note_share_status` - Obté l'estat de compartició
-- `list_shared` - Llista totes les notes i carpetes compartides públicament
-- `list_shared_with_me` - Llista les notes i les carpetes que altres usuaris han compartit amb aquest perfil
-
-### Fitxers adjunts
-- `list_attachments` - Llista els fitxers adjunts d'una nota
-
-### Sincronització amb Git
-- `get_git_sync_status` - Obté l'estat de la sincronització amb Git
-- `git_push` - Envia al repositori Git
-- `git_pull` - Obté del repositori Git
-
-### Sistema
-- `get_system_info` - Obté la informació de la versió del Poznote
-- `list_backups` - Llista les còpies de seguretat del sistema
-- `create_backup` - Crea una còpia de seguretat
-- `restore_backup` - Restaura una còpia de seguretat (substitueix les dades de l'usuari actual)
-- `delete_backup` - Suprimeix un fitxer de còpia de seguretat
-- `get_app_setting` - Obté un paràmetre de l'aplicació
-- `update_app_setting` - Actualitza un paràmetre de l'aplicació
+El servidor ofereix eines per a notes, tasques, recordatoris, carpetes, espais de treball, etiquetes, adjunts, revisions, compartició, sincronització amb Git i còpies de seguretat. Es llisten una a una, amb el que fa cadascuna, a la [documentació del servidor MCP](MCP-SERVER.ca.md#funcions), l'únic lloc on aquesta llista es manté actualitzada.
 
 ### Compatibilitat amb diversos usuaris
 

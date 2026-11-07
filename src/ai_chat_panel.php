@@ -76,10 +76,14 @@ $aiPanelSavedPrompts = poznoteAiSavedPrompts($con);
         </div>
         <div class="ai-chat-messages" id="ai-chat-messages">
             <?php if ($aiPanelReadOnly): ?>
-            <div class="ai-chat-empty"><?php echo t_h('ai_chat.empty_read_only', [], "Ask a question.\nThe assistant searches and reads the notes of every workspace shown on this dashboard, but changes nothing here."); ?></div>
+            <div class="ai-chat-empty"><?php echo t_h('ai_chat.empty_read_only', [], "Ask a question.\n\nThe assistant searches and reads the notes of every workspace shown on this dashboard, but changes nothing here.\n\nIt can also look at the images they contain."); ?></div>
             <?php else: ?>
             <div class="ai-chat-empty" data-i18n="ai_chat.empty">Ask a question.
-The assistant can search, read, create, edit, organize and delete your notes.</div>
+
+The assistant can search, read, create, edit,
+organize and delete your notes.
+
+It can also look at the images they contain.</div>
             <?php endif; ?>
         </div>
         <!-- The last conversations of the workspace; js/ai-chat.js fills it and shows it in place of the messages -->

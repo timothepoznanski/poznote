@@ -26,6 +26,8 @@ Una vez configurado, aparece un botón **Asistente IA** en la barra de iconos de
 
 El asistente dispone de herramientas para **buscar y leer tus notas**, y las usa por su cuenta: pregúntale "¿qué dicen mis notas sobre X?", pídele un resumen de varias notas o deja que encuentre esa nota que recuerdas a medias. Las respuestas se transmiten en tiempo real y se muestran en Markdown.
 
+También puede **ver las imágenes de tus notas**. Pega, arrastra o adjunta una imagen a una nota y luego pregunta qué muestra, qué dice la etiqueta que lleva, o pide que escriba sus datos en la nota: el asistente pide ver la imagen y la lee. Se muestran PNG, JPEG, GIF y WebP, estén adjuntos a la nota o guardados dentro de ella, hasta cuatro imágenes por respuesta, de 5 MB cada una y 8 MB en total; un diagrama de Excalidraw, un SVG y un PDF no se pueden mostrar. Esto requiere un modelo que acepte imágenes, consulta **Elegir un modelo** más abajo. Lo que está escrito dentro de una imagen se trata como un dato y nunca como una instrucción: una imagen que le pide al asistente borrar tus notas se te comunica, no se obedece.
+
 Cuando se lo pides explícitamente, también puede actuar sobre tus notas:
 
 - **escribir**: crear una nota, renombrarla o reescribir su contenido;
@@ -34,7 +36,7 @@ Cuando se lo pides explícitamente, también puede actuar sobre tus notas:
 - **tareas**: añadir, marcar, desmarcar, renombrar o eliminar las tareas de una nota de lista de tareas y sus subtareas, incluidas las fechas de vencimiento y los recordatorios de las tareas, y marcar o desmarcar una casilla dentro de una nota normal, sin reescribir el resto;
 - **eliminar**: mover a la papelera una nota, o una carpeta con sus subcarpetas y todas sus notas. Todo se puede restaurar desde la página Papelera: el asistente no tiene forma de eliminar nada definitivamente, ni ninguna herramienta para vaciar la papelera.
 
-La nota que tienes abierta forma parte del contexto: di "mejora el formato de esta nota" o "añade una conclusión aquí" y el asistente trabaja sobre ella, sin necesidad de indicar un id ni un título. Lee la última versión guardada por el editor, y "esta nota" te sigue si abres otra nota durante la conversación. Si nombras otra nota en tu pregunta, esa sigue teniendo prioridad. En el Panel no hay ninguna nota abierta, así que ahí debes nombrar la nota a la que te refieres.
+La nota que tienes abierta forma parte del contexto: di "mejora el formato de esta nota" o "añade una conclusión aquí" y el asistente trabaja sobre ella, sin necesidad de indicar un id ni un título. Un cambio que acabas de escribir o pegar se guarda antes de que salga tu mensaje, así que el asistente lee la nota tal como la ves, y "esta nota" te sigue si abres otra nota durante la conversación. Si nombras otra nota en tu pregunta, esa sigue teniendo prioridad. En el Panel no hay ninguna nota abierta, así que ahí debes nombrar la nota a la que te refieres.
 
 Dos líneas encima del campo de entrada muestran con qué trabaja el asistente: el **espacio de trabajo** en el que se ejecutan todas las herramientas y la **nota** a la que se refiere "esta nota" cuando hay una abierta.
 
@@ -62,7 +64,7 @@ Ve a **Configuración → Herramientas de administración → Asistente IA** (so
 
 Después usa **Comprobar el acceso y listar los modelos**, que verifica que el servidor es accesible y rellena la lista desplegable **Modelo** con los modelos que ofrece. La lista permanece vacía hasta que esa comprobación tiene éxito, así que este es el paso que te permite elegir un modelo.
 
-La configuración se aplica a toda la instancia: una vez activada por el administrador, todos los perfiles de usuario tienen el chat.
+La configuración se aplica a toda la instancia, pero el acceso se concede perfil por perfil: la misma página tiene una lista **Usuarios autorizados a usar el asistente de IA global**, y solo los usuarios marcados ven el chat. Un usuario nuevo no tiene acceso hasta que un administrador lo añade. Los administradores siempre tienen acceso, así que su fila aparece marcada y atenuada.
 
 ### Claves de API personales
 
@@ -71,6 +73,8 @@ La misma página ofrece la opción **Permitir claves API personales**. Cuando es
 ## Elegir un modelo
 
 Elige un modelo compatible con **llamadas a herramientas** (también llamadas "function calling"), por ejemplo `qwen3`, `llama3.1` o `mistral`. Las llamadas a herramientas son lo que permite al asistente recorrer tus notas: con un modelo que no las admite, el chat sigue funcionando (un aviso te lo indica) pero no puede acceder a tus notas por su cuenta.
+
+Para que el asistente **vea las imágenes de tus notas**, el modelo también tiene que aceptar imágenes (un modelo "vision" o "multimodal"). La mayoría de los modelos alojados de OpenAI, Anthropic y Google leen imágenes; en Ollama necesitas uno que lo indique, como `qwen2.5vl` o `llava`. Ninguna API compatible con OpenAI le dice a Poznote por adelantado si un modelo acepta imágenes, así que el asistente lo intenta: con un modelo de solo texto aparece un aviso en el chat y la respuesta se da sin la imagen.
 
 ### Esfuerzo de razonamiento
 
@@ -242,4 +246,4 @@ Un error que ocurre una vez que la respuesta ha empezado a llegar no se reintent
 
 ## Privacidad
 
-El servidor de IA se llama desde el servidor de Poznote, nunca desde tu navegador. Con una instancia local de Ollama o LM Studio, tus notas y conversaciones nunca salen de tu máquina. Con un proveedor en la nube, las partes de tus notas que el asistente lee para responder se envían a ese proveedor. Con las herramientas externas activadas, lo que el asistente les envía, por ejemplo una consulta de búsqueda, va a los servidores que hayas conectado.
+El servidor de IA se llama desde el servidor de Poznote, nunca desde tu navegador. Con una instancia local de Ollama o LM Studio, tus notas y conversaciones nunca salen de tu máquina. Con un proveedor en la nube, las partes de tus notas que el asistente lee para responder se envían a ese proveedor, incluida una imagen que le pidas mirar. Con las herramientas externas activadas, lo que el asistente les envía, por ejemplo una consulta de búsqueda, va a los servidores que hayas conectado.
