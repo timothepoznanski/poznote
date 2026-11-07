@@ -252,6 +252,40 @@ input[type="password"]::placeholder {
     display: none;
 }
 
+/* Tapped SSO button: the provider's page can take a second to show up on a
+   phone, so the button says the tap was taken. Armed by the inline script in
+   login.php, which runs before the first paint: js/login-page.js can still be
+   on its way when the button is tapped right after a release. */
+.oidc-button.is-loading::before {
+    content: '';
+    display: inline-block;
+    width: 0.95rem;
+    height: 0.95rem;
+    margin-right: 0.5rem;
+    vertical-align: -0.15rem;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: var(--pz-radius-circle);
+    animation: spin 0.8s linear infinite;
+}
+
+/* A second tap would restart the flow for nothing (new state and nonce). */
+.oidc-button.is-loading {
+    pointer-events: none;
+}
+
+/* The spin is the whole message, so it is slowed down rather than dropped. */
+@media (prefers-reduced-motion: reduce) {
+    .oidc-button.is-loading::before {
+        animation-duration: 2s;
+    }
+}
+
+@keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .login-button:hover {
     background: var(--pz-accent-hover);
 }

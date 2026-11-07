@@ -542,6 +542,32 @@ if (isset($_GET['oidc_error'])) {
                     other.hidden = false;
                     other.style.display = '';
                 })();
+
+                // Spinner on the tapped button until the provider's page takes
+                // over. Armed here and not in js/login-page.js, which can still
+                // be on its way when the button is tapped right after a release.
+                (function () {
+                    var buttons = document.querySelectorAll('.oidc-button');
+                    var reset = function () {
+                        Array.prototype.forEach.call(buttons, function (button) {
+                            button.classList.remove('is-loading');
+                            button.removeAttribute('aria-busy');
+                        });
+                    };
+                    Array.prototype.forEach.call(buttons, function (button) {
+                        button.addEventListener('click', function () {
+                            button.classList.add('is-loading');
+                            button.setAttribute('aria-busy', 'true');
+                            // The provider's page replaces this one. If it does
+                            // not, give the button back rather than leave a
+                            // spinner nobody can stop.
+                            setTimeout(reset, 20000);
+                        });
+                    });
+                    // Back button: the page can come back from the cache with
+                    // the class still on it.
+                    window.addEventListener('pageshow', reset);
+                })();
                 </script>
             <?php endif; ?>
             
