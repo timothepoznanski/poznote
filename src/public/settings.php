@@ -1933,6 +1933,17 @@ $localRestoreCardVisible = !empty(LocalBackupService::restorePageBackups());
                         </div>
                     </div>
                 </div>
+
+                <!-- Storage Statistics -->
+                <div class="home-card settings-card-clickable" id="storage-stats-card" data-href="admin/storage-stats.php">
+                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats', [], 'See storage usage across all users of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
+                    <div class="home-card-icon">
+                        <i class="lucide lucide-pie-chart"></i>
+                    </div>
+                    <div class="home-card-content">
+                        <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span>
+                    </div>
+                </div>
             </div>
 
             <div class="settings-group-title" data-group="appearance"><?php echo t_h('settings.groups.appearance', [], 'Appearance'); ?></div>
@@ -2028,17 +2039,6 @@ $localRestoreCardVisible = !empty(LocalBackupService::restorePageBackups());
                     </div>
                     <div class="home-card-content">
                         <span class="home-card-title"><?php echo t_h('settings.cards.activity_log', [], 'Activity log'); ?></span>
-                    </div>
-                </div>
-
-                <!-- Storage Statistics -->
-                <div class="home-card settings-card-clickable" id="storage-stats-card" data-href="admin/storage-stats.php">
-                    <span class="setting-help" data-tooltip="<?php echo t_h('settings.card_help.storage_stats', [], 'See storage usage across all users of this instance.'); ?>"><i class="lucide lucide-help-circle"></i></span>
-                    <div class="home-card-icon">
-                        <i class="lucide lucide-pie-chart"></i>
-                    </div>
-                    <div class="home-card-content">
-                        <span class="home-card-title"><?php echo t_h('settings.cards.storage_stats', [], 'Admin storage statistics'); ?></span>
                     </div>
                 </div>
             </div>
