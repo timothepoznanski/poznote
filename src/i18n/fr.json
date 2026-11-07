@@ -1476,6 +1476,8 @@
       "badge_hidden_count_admin": "{{count}} masqué(s), dont {{admin}} par l'administrateur",
       "badge_hidden_count_admin_columns": "{{me}} masqué(s) pour vous, {{users}} pour les utilisateurs",
       "badge_hidden_count": "{{count}} masqué(s)",
+      "count_hidden": "{{count}} masqué(s)",
+      "count_visible": "{{count}} affiché(s)",
       "check_all": "Tout cocher",
       "uncheck_all": "Tout décocher",
       "collapse_all": "Tout replier",
@@ -5961,6 +5963,9 @@
       "large": "Grand",
       "xlarge": "Très grand"
     },
+    "apply_size_to_all": "Appliquer à toutes",
+    "apply_size_to_all_hint": "Donner à toutes les notes la taille de titre de celle-ci",
+    "applied_size_to_all": "Taille du titre appliquée à toutes les notes",
     "change_icon": "Changer l'icône",
     "reset": "Rétablir par défaut"
   },

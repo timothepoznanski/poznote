@@ -507,6 +507,11 @@ $router->put('/notes/{id}/title-style', function($params) use ($notesController)
     $notesController->updateTitleStyle($params['id']);
 });
 
+// Same title size on every note ("Apply this size to all notes" of the menu)
+$router->put('/notes/title-style', function($params) use ($notesController) {
+    $notesController->applyTitleSizeToAll();
+});
+
 // Duplicate a note
 $router->post('/notes/{id}/duplicate', function($params) use ($notesController) {
     $notesController->duplicate($params['id']);

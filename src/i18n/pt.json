@@ -1480,6 +1480,8 @@
       "badge_hidden_count_admin": "{{count}} oculto(s) ({{admin}} pelo administrador)",
       "badge_hidden_count_admin_columns": "{{me}} oculto(s) para você, {{users}} para os usuários",
       "badge_hidden_count": "{{count}} oculto(s)",
+      "count_hidden": "{{count}} oculto(s)",
+      "count_visible": "{{count}} visível(eis)",
       "direct_copy_restore_section": "Página de restauração: seção «Restauração por cópia direta»",
       "local_backups_section": "Página de cópia: seção \"Backup numa pasta do servidor\"",
       "s3_backups_section": "Página de backup: seção «Backup no S3»",
@@ -5857,6 +5859,9 @@
       "large": "Grande",
       "xlarge": "Muito grande"
     },
+    "apply_size_to_all": "Aplicar a todas",
+    "apply_size_to_all_hint": "Dar a todas as notas o tamanho de título desta",
+    "applied_size_to_all": "Tamanho do título aplicado a todas as notas",
     "change_icon": "Alterar ícone",
     "reset": "Restaurar padrão"
   },

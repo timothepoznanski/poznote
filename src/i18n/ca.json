@@ -960,6 +960,8 @@
       "badge_hidden_count_admin": "{{count}} amagats ({{admin}} per l'administrador)",
       "badge_hidden_count_admin_columns": "{{me}} amagats per a vós, {{users}} per als usuaris",
       "badge_hidden_count": "{{count}} amagats",
+      "count_hidden": "{{count}} amagats",
+      "count_visible": "{{count}} visibles",
       "check_all": "Marca-ho tot",
       "uncheck_all": "Desmarca-ho tot",
       "collapse_all": "Redueix-ho tot",
@@ -5701,6 +5703,9 @@
       "large": "Gran",
       "xlarge": "Molt gran"
     },
+    "apply_size_to_all": "Aplica a totes",
+    "apply_size_to_all_hint": "Dona a totes les notes la mida de títol d'aquesta",
+    "applied_size_to_all": "Mida del títol aplicada a totes les notes",
     "change_icon": "Canvia la icona",
     "reset": "Restableix per defecte"
   },

@@ -960,6 +960,8 @@
       "badge_hidden_count_admin": "{{count}}개 숨김(관리자가 숨긴 항목 {{admin}}개)",
       "badge_hidden_count_admin_columns": "내 화면에서 {{me}}개, 사용자 화면에서 {{users}}개 숨김",
       "badge_hidden_count": "{{count}}개 숨김",
+      "count_hidden": "{{count}}개 숨김",
+      "count_visible": "{{count}}개 표시",
       "check_all": "모두 선택",
       "uncheck_all": "모두 선택 취소",
       "collapse_all": "모두 접기",
@@ -5701,6 +5703,9 @@
       "large": "크게",
       "xlarge": "아주 크게"
     },
+    "apply_size_to_all": "모든 노트에 적용",
+    "apply_size_to_all_hint": "이 노트의 제목 크기를 모든 노트에 적용합니다",
+    "applied_size_to_all": "모든 노트에 제목 크기를 적용했습니다",
     "change_icon": "아이콘 변경",
     "reset": "기본값으로 재설정"
   },

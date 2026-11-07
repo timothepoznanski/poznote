@@ -11,7 +11,9 @@
  *
  * The colour and the size are stored on the note (entries.title_color,
  * entries.title_size) through PUT /api/v1/notes/{id}/title-style, and each
- * pick is saved straight away. note_display.php renders them the way
+ * pick is saved straight away. "Apply size to all notes" copies the size of
+ * the opened note to every other one (PUT /api/v1/notes/title-style); the
+ * colour stays a property of each note. note_display.php renders them the way
  * applyStyle() does: the colour inline and !important on the field
  * (theme-init.js forces the title colour in dark mode), the size as
  * --note-title-size on the heading, which css/notes/editor.css and
@@ -48,6 +50,11 @@
         } else {
             alert(message);
         }
+    }
+
+    // The top-right toast of a save (js/ui.js), for what needs no acknowledging.
+    function notifySuccess(message) {
+        if (typeof window.poznoteShowToast === 'function') window.poznoteShowToast(message);
     }
 
     // The heading of a note, looked up again on each use: the note is
@@ -186,6 +193,37 @@
             });
     }
 
+    // Every note takes the title size of this one, the trash included so a
+    // note restored later keeps the same look. Only the size travels: each
+    // note keeps its own colour.
+    function applySizeToAll(noteId) {
+        var heading = headingOf(noteId);
+        if (!heading) return;
+        var size = readStyle(heading).size;
+
+        fetch('/api/v1/notes/title-style', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({ title_size: size })
+        })
+            .then(function (response) { return response.json(); })
+            .then(function (result) {
+                if (!result || !result.success) throw new Error((result && result.error) || 'save failed');
+                // Notes already rendered in the page follow at once.
+                document.querySelectorAll(HEADING_SELECTOR).forEach(function (other) {
+                    var style = readStyle(other);
+                    style.size = size;
+                    applyStyle(other, style);
+                });
+                notifySuccess(t('note_title_menu.applied_size_to_all', 'Title size applied to all notes'));
+            })
+            .catch(function (error) {
+                console.debug('note-title-menu: applySizeToAll() failed:', error);
+                notifyError();
+            });
+    }
+
     function openIconPicker(noteId) {
         var heading = headingOf(noteId);
         if (!heading || typeof window.showChangeNoteIconModal !== 'function') return;
@@ -239,10 +277,11 @@
         menu.appendChild(label);
     }
 
-    function addItem(menu, icon, label, run) {
+    function addItem(menu, icon, label, run, tooltip) {
         var item = document.createElement('button');
         item.type = 'button';
         item.className = 'note-title-menu-item';
+        if (tooltip) item.title = tooltip;
         var i = document.createElement('i');
         i.className = 'lucide ' + icon;
         i.setAttribute('aria-hidden', 'true');
@@ -305,6 +344,14 @@
             sizes.appendChild(button);
         });
         menu.appendChild(sizes);
+
+        addItem(
+            menu,
+            'lucide-copy',
+            t('note_title_menu.apply_size_to_all', 'Apply size to all notes'),
+            applySizeToAll,
+            t('note_title_menu.apply_size_to_all_hint', 'Give every note the title size of this one')
+        );
 
         var separator = document.createElement('div');
         separator.className = 'note-title-menu-separator';

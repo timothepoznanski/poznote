@@ -1,8 +1,13 @@
 // Public Folder Theme Toggle
 
 var PUBLIC_THEME_STORAGE_KEY = 'poznote-public-theme';
-var PUBLIC_FOLDER_COLLAPSED_STORAGE_PREFIX = 'poznote-public-folder-collapsed:';
-var publicFolderCollapsedStateLoaded = false;
+// Subfolders are served folded (public_folder.php), so what this browser
+// remembers is which ones the visitor opened. The previous key held the
+// opposite list, folded ids, and is dropped on sight rather than read as its
+// own opposite.
+var PUBLIC_FOLDER_EXPANDED_STORAGE_PREFIX = 'poznote-public-folder-expanded:';
+var PUBLIC_FOLDER_LEGACY_COLLAPSED_STORAGE_PREFIX = 'poznote-public-folder-collapsed:';
+var publicFolderExpandedStateLoaded = false;
 
 function blurAfterPointerActivation(element, event) {
     if (!element || typeof element.blur !== 'function') return;
@@ -108,54 +113,66 @@ function applyFilterToKanban() {
     });
 }
 
-function getPublicFolderCollapsedStorageKey() {
+function getPublicFolderShareStorageSuffix() {
     var token = document.body ? document.body.getAttribute('data-share-token') : '';
-    return PUBLIC_FOLDER_COLLAPSED_STORAGE_PREFIX + (token || window.location.pathname);
+    return token || window.location.pathname;
 }
 
-function loadPublicFolderCollapsedState() {
-    if (publicFolderCollapsedStateLoaded) {
+function getPublicFolderExpandedStorageKey() {
+    return PUBLIC_FOLDER_EXPANDED_STORAGE_PREFIX + getPublicFolderShareStorageSuffix();
+}
+
+function loadPublicFolderExpandedState() {
+    if (publicFolderExpandedStateLoaded) {
         return;
     }
-    publicFolderCollapsedStateLoaded = true;
+    publicFolderExpandedStateLoaded = true;
 
     try {
-        var stored = localStorage.getItem(getPublicFolderCollapsedStorageKey());
-        var collapsedFolderIds = stored ? JSON.parse(stored) : [];
-        if (!Array.isArray(collapsedFolderIds)) {
+        localStorage.removeItem(PUBLIC_FOLDER_LEGACY_COLLAPSED_STORAGE_PREFIX + getPublicFolderShareStorageSuffix());
+
+        var stored = localStorage.getItem(getPublicFolderExpandedStorageKey());
+        if (stored === null) {
+            // Never opened anything here: the folded groups the page came
+            // with are the answer.
             return;
         }
 
-        var collapsedLookup = {};
-        collapsedFolderIds.forEach(function(folderId) {
-            collapsedLookup[String(folderId)] = true;
+        var expandedFolderIds = JSON.parse(stored);
+        if (!Array.isArray(expandedFolderIds)) {
+            return;
+        }
+
+        var expandedLookup = {};
+        expandedFolderIds.forEach(function(folderId) {
+            expandedLookup[String(folderId)] = true;
         });
 
         getPublicFolderGroups().forEach(function(group) {
             var folderId = group.getAttribute('data-folder-id');
-            group.classList.toggle('is-collapsed', !!collapsedLookup[String(folderId)]);
+            group.classList.toggle('is-collapsed', !expandedLookup[String(folderId)]);
         });
     } catch (e) {
         // localStorage not available
-        console.debug('public_folder: loadPublicFolderCollapsedState() failed:', e);
+        console.debug('public_folder: loadPublicFolderExpandedState() failed:', e);
     }
 }
 
-function savePublicFolderCollapsedState() {
+function savePublicFolderExpandedState() {
     try {
-        var collapsedFolderIds = getPublicFolderGroups()
+        var expandedFolderIds = getPublicFolderGroups()
             .filter(function(group) {
-                return group.classList.contains('is-collapsed');
+                return !group.classList.contains('is-collapsed');
             })
             .map(function(group) {
                 return group.getAttribute('data-folder-id');
             })
             .filter(Boolean);
 
-        localStorage.setItem(getPublicFolderCollapsedStorageKey(), JSON.stringify(collapsedFolderIds));
+        localStorage.setItem(getPublicFolderExpandedStorageKey(), JSON.stringify(expandedFolderIds));
     } catch (e) {
         // localStorage not available
-        console.debug('public_folder: savePublicFolderCollapsedState() failed:', e);
+        console.debug('public_folder: savePublicFolderExpandedState() failed:', e);
     }
 }
 
@@ -247,7 +264,7 @@ function bindPublicFolderToggles() {
             if (!group) return;
 
             group.classList.toggle('is-collapsed');
-            savePublicFolderCollapsedState();
+            savePublicFolderExpandedState();
             updatePublicFolderToggles();
         });
     });
@@ -283,13 +300,13 @@ function bindPublicFolderToggles() {
             getPublicFolderGroups().forEach(function(group) {
                 group.classList.toggle('is-collapsed', shouldCollapse);
             });
-            savePublicFolderCollapsedState();
+            savePublicFolderExpandedState();
             updatePublicFolderToggles();
             blurAfterPointerActivation(toggleAllButton, event);
         });
     }
 
-    loadPublicFolderCollapsedState();
+    loadPublicFolderExpandedState();
     updatePublicFolderToggles();
 }
 

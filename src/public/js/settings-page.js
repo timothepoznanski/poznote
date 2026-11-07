@@ -4875,7 +4875,9 @@
             users.textContent = usersLabel;
             header.appendChild(me);
             header.appendChild(users);
-            items.insertBefore(header, items.firstChild);
+            // Under the check/uncheck-all row, which opens the list
+            var actions = items.querySelector('.ui-custom-items-actions');
+            items.insertBefore(header, actions ? actions.nextSibling : items.firstChild);
         });
 
         modal.querySelectorAll('.ui-custom-item').forEach(function (item) {
@@ -5185,6 +5187,12 @@
     }
 
     function updateSectionToggleBtn(section) {
+        // The hidden/shown counts in the heading follow the same state as the
+        // button, so they are refreshed from here (js/ui-customization.js).
+        if (typeof window.poznoteUpdateUiCustomizationCounts === 'function') {
+            window.poznoteUpdateUiCustomizationCounts(section);
+        }
+
         var btn = section.querySelector('.ui-custom-toggle-all');
         if (!btn) return;
 
@@ -5281,10 +5289,6 @@
                 updateCollapseAllBtn(modal);
                 return;
             }
-
-            // The check/uncheck-all button lives inside the title and has its
-            // own handler, so a click on it must not collapse the section.
-            if (e.target.closest('.ui-custom-toggle-all')) return;
 
             var title = e.target.closest('.ui-custom-section-title');
             if (!title) return;

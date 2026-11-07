@@ -1478,6 +1478,8 @@
       "badge_hidden_count_admin": "{{count}} 个已隐藏（其中 {{admin}} 个由管理员隐藏）",
       "badge_hidden_count_admin_columns": "为您隐藏 {{me}} 个，为用户隐藏 {{users}} 个",
       "badge_hidden_count": "{{count}} 个已隐藏",
+      "count_hidden": "{{count}} 个已隐藏",
+      "count_visible": "{{count}} 个显示中",
       "direct_copy_restore_section": "恢复页面:“通过直接复制恢复”部分",
       "local_backups_section": "备份页面：\"备份到服务器上的文件夹\"部分",
       "s3_backups_section": "备份页面:“备份到 S3”部分",
@@ -5953,6 +5955,9 @@
       "large": "大",
       "xlarge": "特大"
     },
+    "apply_size_to_all": "应用到所有笔记",
+    "apply_size_to_all_hint": "将此笔记的标题大小应用到所有笔记",
+    "applied_size_to_all": "已将标题大小应用到所有笔记",
     "change_icon": "更改图标",
     "reset": "恢复默认"
   },

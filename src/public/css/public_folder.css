@@ -341,20 +341,37 @@ html[data-theme='light'] .public-folder-body {
     --hover-bg: rgba(var(--pz-shadow-rgb), 0.04);
 }
 
+/* A long folder name is not wrapped: it keeps one line and scrolls sideways
+   under the finger, without showing a scrollbar. */
 .public-folder-body h1 {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
+    gap: 12px;
+    font-size: 1.4rem;
+    line-height: 1.3;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
     border-bottom: 2px solid var(--border-color);
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.public-folder-body h1::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }
 
 .public-folder-body h1 i {
+    flex: 0 0 auto;
     color: var(--link-color);
 }
 
 .public-folder-body h1 .folder-h1-emoji {
+    flex: 0 0 auto;
     font-style: normal;
     line-height: 1;
 }
@@ -603,6 +620,18 @@ body.public-folder-body:not(.public-folder-filter-active) .public-folder-group.i
         justify-content: center;
         flex-wrap: wrap;
         margin: 0 0 20px;
+        /* Slightly smaller buttons than on desktop, the row sits in the page */
+        --pz-search-toggle-size: 34px;
+    }
+
+    .public-folder-header-btn {
+        width: 34px;
+        height: 34px;
+    }
+
+    .public-folder-header-btn .lucide {
+        width: 16px;
+        height: 16px;
     }
 }
 
@@ -800,14 +829,14 @@ html[data-theme='light'] {
 /* Responsive design */
 @media (max-width: 768px) {
     .public-folder-body h1 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
         gap: 10px;
         margin-bottom: 20px;
         padding-bottom: 14px;
     }
 
     .public-folder-body h1 i {
-        font-size: 1.1rem;
+        font-size: 1.05rem;
     }
 
     .note-item {

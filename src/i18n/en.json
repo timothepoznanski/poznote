@@ -960,6 +960,8 @@
       "badge_hidden_count_admin": "{{count}} hidden ({{admin}} by the administrator)",
       "badge_hidden_count_admin_columns": "{{me}} hidden for you, {{users}} for users",
       "badge_hidden_count": "{{count}} hidden",
+      "count_hidden": "{{count}} hidden",
+      "count_visible": "{{count}} shown",
       "check_all": "Check all",
       "uncheck_all": "Uncheck all",
       "collapse_all": "Collapse all",
@@ -5701,6 +5703,9 @@
       "large": "Large",
       "xlarge": "Extra large"
     },
+    "apply_size_to_all": "Apply size to all notes",
+    "apply_size_to_all_hint": "Give every note the title size of this one",
+    "applied_size_to_all": "Title size applied to all notes",
     "change_icon": "Change icon",
     "reset": "Reset to default"
   },

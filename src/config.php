@@ -444,6 +444,39 @@ function poznoteGetCustomCssHref() {
 }
 
 /**
+ * The nonce the current page's Content-Security-Policy accepts for its own
+ * inline <script> blocks, or an empty string when the page did not issue one.
+ *
+ * Only the public pages serve a script-src without 'unsafe-inline', so only
+ * they call this with $issue. The nonce has to live here because the three
+ * snippets below are written into the head by the output handler, long after
+ * the page sent its header: without it they were blocked on a shared note
+ * ("Executing inline script violates ... 'nonce-...'"), so the theme list,
+ * the custom fonts and the extra stylesheet never reached a visitor.
+ */
+function poznoteCspScriptNonce(bool $issue = false): string {
+    static $nonce = '';
+
+    if ($nonce === '' && $issue) {
+        $nonce = base64_encode(random_bytes(16));
+    }
+
+    return $nonce;
+}
+
+/**
+ * The nonce as a ready-to-print attribute, empty on a page without one.
+ */
+function poznoteScriptNonceAttribute(): string {
+    $nonce = poznoteCspScriptNonce();
+    if ($nonce === '') {
+        return '';
+    }
+
+    return ' nonce="' . htmlspecialchars($nonce, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
+}
+
+/**
  * Render the extra stylesheet link tag.
  *
  * There is exactly one such element per page, and it is the only place a custom
@@ -474,7 +507,7 @@ function poznoteRenderCustomCssLinkTag() {
 
     // js/theme-init.js writes the tag on the pages that load it. The others
     // have no per-user theme, they get the global stylesheet as it is.
-    return '<script data-poznote-custom-css="1">(function(h){'
+    return '<script' . poznoteScriptNonceAttribute() . ' data-poznote-custom-css="1">(function(h){'
         . 'if(window.__poznoteWriteCustomCssLink){window.__poznoteWriteCustomCssLink(h);return;}'
         . 'var l=document.createElement("link");l.rel="stylesheet";l.id="poznote-custom-css";'
         . 'if(h){l.href=h;l.setAttribute("data-poznote-default-href",h);}'
@@ -506,7 +539,7 @@ function poznoteRenderThemeListScript() {
     // because a page in a subdirectory reaches it relatively.
     $editable = function_exists('isCurrentUserAdmin') && isCurrentUserAdmin();
 
-    return '<script>window.__poznoteThemeList=' . $json . ';'
+    return '<script' . poznoteScriptNonceAttribute() . '>window.__poznoteThemeList=' . $json . ';'
         . 'window.__poznoteThemeListEditable=' . ($editable ? 'true' : 'false') . ';</script>';
 }
 
@@ -527,7 +560,7 @@ function poznoteRenderCustomFontsScript() {
         return '';
     }
 
-    return '<script>window.__poznoteCustomFonts=' . $json . ';</script>';
+    return '<script' . poznoteScriptNonceAttribute() . '>window.__poznoteCustomFonts=' . $json . ';</script>';
 }
 
 /**

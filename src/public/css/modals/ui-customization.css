@@ -180,7 +180,8 @@
 }
 
 /* Collapsible sections: the whole title toggles, the chevron shows state.
-   Row order: title text, check/uncheck-all pushed right, then the chevron. */
+   Row order: title text, the two counts pushed right, then the chevron
+   (check/uncheck-all is the first row of the list below). */
 .ui-custom-section-title {
     display: flex;
     align-items: center;
@@ -194,8 +195,41 @@
     user-select: none;
 }
 
-.ui-custom-section-title .ui-custom-toggle-all {
+/* How many items of the section are hidden (red) and how many are shown
+   (green), each as a label: the tinted pill of the .filter-stats counters of
+   the list pages, scaled down for a heading. A folded title keeps them, so the
+   state of each list reads without opening it; a count of zero is left out
+   (settings-page.js and ui-customization-panel.js). */
+.ui-custom-section-counts {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* display: flex would beat the browser's [hidden] rule */
+.ui-custom-section-counts[hidden] {
+    display: none;
+}
+
+.ui-custom-count {
+    padding: 1px 8px;
+    border-radius: var(--pz-radius-sm);
+    font-size: 0.78em;
+    font-weight: var(--pz-weight-medium);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+}
+
+.ui-custom-count-hidden {
+    color: var(--pz-danger-text);
+    background-color: color-mix(in srgb, var(--pz-danger) 12%, var(--pz-bg));
+}
+
+.ui-custom-count-visible {
+    color: var(--pz-success-text);
+    background-color: color-mix(in srgb, var(--pz-success) 12%, var(--pz-bg));
 }
 
 .ui-custom-section-toggle {
@@ -282,6 +316,15 @@
 /* minmax(0, ...) rather than a bare 1fr: 1fr keeps a track at least as wide
    as its content, and the names do not wrap, so one long name widened the
    whole list past its card (#1559) */
+/* Check all / Uncheck all: the first row of the list it applies to, across
+   its columns, so it folds away with the list instead of sitting in the
+   heading */
+.ui-custom-items-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    margin-bottom: 2px;
+}
+
 .ui-custom-items {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

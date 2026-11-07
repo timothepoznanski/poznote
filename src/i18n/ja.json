@@ -960,6 +960,8 @@
       "badge_hidden_count_admin": "{{count}}件を非表示（うち管理者による非表示{{admin}}件）",
       "badge_hidden_count_admin_columns": "自分は{{me}}件、ユーザーは{{users}}件を非表示",
       "badge_hidden_count": "{{count}}件を非表示",
+      "count_hidden": "{{count}}件を非表示",
+      "count_visible": "{{count}}件を表示",
       "check_all": "すべてチェック",
       "uncheck_all": "すべてのチェックを外す",
       "collapse_all": "すべて折りたたむ",
@@ -5701,6 +5703,9 @@
       "large": "大",
       "xlarge": "特大"
     },
+    "apply_size_to_all": "すべてのノートに適用",
+    "apply_size_to_all_hint": "このノートのタイトルサイズをすべてのノートに適用します",
+    "applied_size_to_all": "タイトルサイズをすべてのノートに適用しました",
     "change_icon": "アイコンを変更",
     "reset": "デフォルトに戻す"
   },

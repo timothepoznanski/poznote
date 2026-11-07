@@ -22,7 +22,9 @@ foreach (ALLOWED_IFRAME_DOMAINS as $domain) {
 
 // Per-request nonce so the page's own inline <script> blocks can run while
 // 'unsafe-inline' stays out of script-src (prevents injected inline scripts).
-$cspNonce = base64_encode(random_bytes(16));
+// Issued through config.php so the snippets the output handler writes into the
+// head (theme list, custom fonts, extra stylesheet) carry the same nonce.
+$cspNonce = poznoteCspScriptNonce(true);
 
 // Set security headers for public notes
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-{$cspNonce}' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-src {$frameSrcDomains}; frame-ancestors 'self'; form-action 'self';");
@@ -931,62 +933,69 @@ if (poznoteMarkdownColoredEnabled($markdownColoredTheme)) {
     <div class="public-note-layout">
         <div class="public-note-main" id="publicNoteMain">
             <div class="public-note">
-                <?php if (!empty($publicAttachments)): ?>
-                    <div class="note-attachments-row public-note-attachments-row">
-                        <span class="lucide lucide-paperclip icon_attachment" aria-hidden="true"></span>
-                        <span class="note-attachments-list">
-                            <?php foreach ($publicAttachments as $attachment): ?>
-                                <a
-                                    class="attachment-link"
-                                    href="<?php echo htmlspecialchars($attachment['url'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
-                                    target="_blank"
-                                    rel="noopener"
-                                    title="<?php echo t_h('attachments.actions.download', ['filename' => $attachment['filename']], 'Download {{filename}}', $currentLang); ?>"
-                                ><?php echo htmlspecialchars($attachment['filename'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></a>
-                            <?php endforeach; ?>
-                        </span>
-                    </div>
-                <?php endif; ?>
-                <div class="public-note-header">
-                    <?php
-                    $pnShowIcons = getSetting('show_note_icons', '1') === '1';
-                    $pnIconRaw = ($pnShowIcons && !empty($note['icon'])) ? convertFontAwesomeToLucide($note['icon']) : null;
-                    $pnIconColor = ($pnShowIcons && !empty($note['icon_color'])) ? $note['icon_color'] : null;
-                    $pnIsEmoji = $pnIconRaw && !str_contains($pnIconRaw, 'lucide');
-                    $pnIconClasses = null;
-                    $pnIconStyle = '';
-                    $pnIconColorAttr = '';
-                    if (!$pnIsEmoji && $pnIconRaw) {
-                        $pnIconClasses = str_contains($pnIconRaw, 'lucide ') ? $pnIconRaw : 'lucide ' . $pnIconRaw;
-                        $pnIconColorCss = poznoteIconColorCss($pnIconColor);
-                        $pnIconStyle = $pnIconColorCss !== '' ? ' style="color: ' . htmlspecialchars($pnIconColorCss, ENT_QUOTES) . ' !important;"' : '';
-                        $pnIconColorAttr = $pnIconColor ? ' data-icon-color="' . htmlspecialchars($pnIconColor, ENT_QUOTES) . '"' : '';
-                    }
-                    ?>
-                    <h1>
-                        <?php if ($pnIsEmoji): ?>
-                            <span class="public-note-title-icon"><?php echo htmlspecialchars($pnIconRaw); ?></span>
-                        <?php elseif ($pnIconClasses): ?>
-                            <i class="<?php echo htmlspecialchars($pnIconClasses); ?>"<?php echo $pnIconStyle . $pnIconColorAttr; ?>></i>
-                        <?php endif; ?>
-                        <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?>
-                    </h1>
-                    <div class="public-note-header-actions">
-                        <?php if ($noteBodyEditable): ?>
-                        <button id="publicEditCancel" class="theme-toggle-btn public-edit-cancel-btn" title="<?php echo t_h('common.cancel', [], 'Cancel', $currentLang); ?>" hidden>
-                            <i class="lucide lucide-x"></i>
-                        </button>
-                        <button id="publicEditSave" class="theme-toggle-btn public-edit-save-btn" title="<?php echo t_h('common.save', [], 'Save', $currentLang); ?>" hidden>
-                            <i class="lucide lucide-check"></i>
-                        </button>
-                        <button id="publicEditToggle" class="theme-toggle-btn public-edit-btn" title="<?php echo t_h('public.edit.button', [], 'Edit', $currentLang); ?>">
-                            <i class="lucide lucide-pencil"></i>
-                        </button>
-                        <?php endif; ?>
-                        <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
-                            <i class="lucide lucide-moon"></i>
-                        </button>
-                    </div>
+                <?php // Attachments row, title and action buttons in one block: the
+                      // buttons keep the top right corner of the card even when an
+                      // attachment chip takes the first line. ?>
+                <div class="public-note-top">
+                  <div class="public-note-top-main">
+                  <?php if (!empty($publicAttachments)): ?>
+                      <div class="note-attachments-row public-note-attachments-row">
+                          <span class="lucide lucide-paperclip icon_attachment" aria-hidden="true"></span>
+                          <span class="note-attachments-list">
+                              <?php foreach ($publicAttachments as $attachment): ?>
+                                  <a
+                                      class="attachment-link"
+                                      href="<?php echo htmlspecialchars($attachment['url'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>"
+                                      target="_blank"
+                                      rel="noopener"
+                                      title="<?php echo t_h('attachments.actions.download', ['filename' => $attachment['filename']], 'Download {{filename}}', $currentLang); ?>"
+                                  ><?php echo htmlspecialchars($attachment['filename'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?></a>
+                              <?php endforeach; ?>
+                          </span>
+                      </div>
+                  <?php endif; ?>
+                  <div class="public-note-header">
+                      <?php
+                      $pnShowIcons = getSetting('show_note_icons', '1') === '1';
+                      $pnIconRaw = ($pnShowIcons && !empty($note['icon'])) ? convertFontAwesomeToLucide($note['icon']) : null;
+                      $pnIconColor = ($pnShowIcons && !empty($note['icon_color'])) ? $note['icon_color'] : null;
+                      $pnIsEmoji = $pnIconRaw && !str_contains($pnIconRaw, 'lucide');
+                      $pnIconClasses = null;
+                      $pnIconStyle = '';
+                      $pnIconColorAttr = '';
+                      if (!$pnIsEmoji && $pnIconRaw) {
+                          $pnIconClasses = str_contains($pnIconRaw, 'lucide ') ? $pnIconRaw : 'lucide ' . $pnIconRaw;
+                          $pnIconColorCss = poznoteIconColorCss($pnIconColor);
+                          $pnIconStyle = $pnIconColorCss !== '' ? ' style="color: ' . htmlspecialchars($pnIconColorCss, ENT_QUOTES) . ' !important;"' : '';
+                          $pnIconColorAttr = $pnIconColor ? ' data-icon-color="' . htmlspecialchars($pnIconColor, ENT_QUOTES) . '"' : '';
+                      }
+                      ?>
+                      <h1>
+                          <?php if ($pnIsEmoji): ?>
+                              <span class="public-note-title-icon"><?php echo htmlspecialchars($pnIconRaw); ?></span>
+                          <?php elseif ($pnIconClasses): ?>
+                              <i class="<?php echo htmlspecialchars($pnIconClasses); ?>"<?php echo $pnIconStyle . $pnIconColorAttr; ?>></i>
+                          <?php endif; ?>
+                          <?php echo htmlspecialchars($note['heading'] ?: 'Untitled'); ?>
+                      </h1>
+                  </div>
+                  </div>
+                  <div class="public-note-header-actions">
+                      <?php if ($noteBodyEditable): ?>
+                      <button id="publicEditCancel" class="theme-toggle-btn public-edit-cancel-btn" title="<?php echo t_h('common.cancel', [], 'Cancel', $currentLang); ?>" hidden>
+                          <i class="lucide lucide-x"></i>
+                      </button>
+                      <button id="publicEditSave" class="theme-toggle-btn public-edit-save-btn" title="<?php echo t_h('common.save', [], 'Save', $currentLang); ?>" hidden>
+                          <i class="lucide lucide-check"></i>
+                      </button>
+                      <button id="publicEditToggle" class="theme-toggle-btn public-edit-btn" title="<?php echo t_h('public.edit.button', [], 'Edit', $currentLang); ?>">
+                          <i class="lucide lucide-pencil"></i>
+                      </button>
+                      <?php endif; ?>
+                      <button id="themeToggle" class="theme-toggle-btn" title="Toggle theme">
+                          <i class="lucide lucide-moon"></i>
+                      </button>
+                  </div>
                 </div>
                 <div class="content<?php echo $noteType === 'markdown' ? ' public-note-markdown' : ''; ?>"><?php echo $content; ?></div>
             </div>
