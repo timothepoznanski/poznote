@@ -5703,6 +5703,9 @@
       "large": "Gran",
       "xlarge": "Molt gran"
     },
+    "apply_size_to_all": "Aplica a totes",
+    "apply_size_to_all_hint": "Dona a totes les notes la mida de títol d'aquesta",
+    "applied_size_to_all": "Mida del títol aplicada a totes les notes",
     "change_icon": "Canvia la icona",
     "reset": "Restableix per defecte"
   },

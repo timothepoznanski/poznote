@@ -735,6 +735,40 @@ curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
   http://YOUR_SERVER/api/v1/notes/123/title-style
 ```
 
+### Set the Same Title Size on Every Note
+
+```
+PUT /notes/title-style
+```
+
+Give every note the same title font size, as the "Apply size to all notes" entry of the title's right-click menu does. Only the size is set: each note keeps its own title color. Notes in the trash are set too, so a note restored later keeps the same look, and the notes keep their `updated` date.
+
+**Request Body (JSON):**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title_size` | integer or null | Yes | Font size of the title in pixels (12 to 64), `null` for the default size |
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Title size applied to all notes",
+  "title_size": 30,
+  "updated": 42
+}
+```
+
+`updated` counts the notes that changed, the ones already at that size are left alone.
+
+```bash
+curl -X PUT -u 'username:password' -H "X-User-ID: 1" \
+  -H "Content-Type: application/json" \
+  -d '{"title_size": 30}' \
+  http://YOUR_SERVER/api/v1/notes/title-style
+```
+
 ### Set Kanban Completed State
 
 ```
@@ -4226,6 +4260,7 @@ curl http://YOUR_SERVER/api_health.php
 | `POST` | `/notes/{id}/archive` | Archive into the Archives workspace |
 | `PUT` | `/notes/{id}/content-width` | Set the note's own width |
 | `PUT` | `/notes/{id}/title-style` | Set the title color and style |
+| `PUT` | `/notes/title-style` | Set the same title size on every note |
 | `PUT` | `/notes/{id}/offline` | Keep the note offline, or stop |
 
 ### Change Detection

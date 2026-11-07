@@ -5703,6 +5703,9 @@
       "large": "大",
       "xlarge": "特大"
     },
+    "apply_size_to_all": "すべてのノートに適用",
+    "apply_size_to_all_hint": "このノートのタイトルサイズをすべてのノートに適用します",
+    "applied_size_to_all": "タイトルサイズをすべてのノートに適用しました",
     "change_icon": "アイコンを変更",
     "reset": "デフォルトに戻す"
   },

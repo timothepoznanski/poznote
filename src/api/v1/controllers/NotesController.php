@@ -2067,6 +2067,65 @@ class NotesController {
     }
 
     /**
+     * PUT /api/v1/notes/title-style
+     * Give every note the same title size, from the "Apply this size to all
+     * notes" entry of the title's right-click menu.
+     * Body: { "title_size": 30 }
+     *   title_size   font size in px (12 to 64); null for the default size
+     *
+     * Only the size travels: the colour stays a property of each note. Notes
+     * in the trash are set too, so one restored later keeps the same look.
+     * A session confined to a shared workspace (auth.php) only touches the
+     * notes of that workspace.
+     *
+     * Presentation state like the content width, so the notes keep their
+     * "updated" date and nothing is pushed to Git.
+     */
+    public function applyTitleSizeToAll(): void {
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($input)
+            || !array_key_exists('title_size', $input)) {
+            $this->sendError(400, 'Invalid JSON in request body: expected "title_size"');
+            return;
+        }
+
+        $titleSize = $input['title_size'];
+        if ($titleSize !== null) {
+            $titleSize = filter_var($titleSize, FILTER_VALIDATE_INT, ['options' => ['min_range' => 12, 'max_range' => 64]]);
+            if ($titleSize === false) {
+                $this->sendError(400, 'Invalid value for "title_size": expected a size in px between 12 and 64, or null');
+                return;
+            }
+        }
+
+        try {
+            // IS NOT compares NULL as a value, so the notes already at that
+            // size are left alone and the count is the number of changes.
+            $sql = 'UPDATE entries SET title_size = ? WHERE title_size IS NOT ?';
+            $params = [$titleSize, $titleSize];
+            $scopeName = function_exists('getSharedWorkspaceScopeName') ? getSharedWorkspaceScopeName() : null;
+            if ($scopeName !== null) {
+                $sql .= ' AND workspace = ?';
+                $params[] = $scopeName;
+            }
+
+            $stmt = $this->con->prepare($sql);
+            if (!$stmt->execute($params)) {
+                $this->sendError(500, 'Database error while applying the title size');
+                return;
+            }
+
+            $this->sendSuccess([
+                'message' => 'Title size applied to all notes',
+                'title_size' => $titleSize,
+                'updated' => $stmt->rowCount()
+            ]);
+        } catch (Exception $e) {
+            $this->sendError(500, 'Database error occurred');
+        }
+    }
+
+    /**
      * DELETE /api/v1/notes/{id}
      * Delete a note (soft delete by default)
      * 

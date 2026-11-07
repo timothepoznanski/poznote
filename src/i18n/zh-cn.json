@@ -5955,6 +5955,9 @@
       "large": "大",
       "xlarge": "特大"
     },
+    "apply_size_to_all": "应用到所有笔记",
+    "apply_size_to_all_hint": "将此笔记的标题大小应用到所有笔记",
+    "applied_size_to_all": "已将标题大小应用到所有笔记",
     "change_icon": "更改图标",
     "reset": "恢复默认"
   },

@@ -5859,6 +5859,9 @@
       "large": "Grande",
       "xlarge": "Muito grande"
     },
+    "apply_size_to_all": "Aplicar a todas",
+    "apply_size_to_all_hint": "Dar a todas as notas o tamanho de título desta",
+    "applied_size_to_all": "Tamanho do título aplicado a todas as notas",
     "change_icon": "Alterar ícone",
     "reset": "Restaurar padrão"
   },

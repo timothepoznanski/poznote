@@ -5703,6 +5703,9 @@
       "large": "크게",
       "xlarge": "아주 크게"
     },
+    "apply_size_to_all": "모든 노트에 적용",
+    "apply_size_to_all_hint": "이 노트의 제목 크기를 모든 노트에 적용합니다",
+    "applied_size_to_all": "모든 노트에 제목 크기를 적용했습니다",
     "change_icon": "아이콘 변경",
     "reset": "기본값으로 재설정"
   },

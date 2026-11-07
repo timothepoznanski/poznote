@@ -5703,6 +5703,9 @@
       "large": "Large",
       "xlarge": "Extra large"
     },
+    "apply_size_to_all": "Apply size to all notes",
+    "apply_size_to_all_hint": "Give every note the title size of this one",
+    "applied_size_to_all": "Title size applied to all notes",
     "change_icon": "Change icon",
     "reset": "Reset to default"
   },
