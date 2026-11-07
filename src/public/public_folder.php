@@ -5,6 +5,7 @@ require_once __DIR__ . '/../functions.php';
 require_once __DIR__ . '/../note_loader.php';
 require_once __DIR__ . '/../markdown_parser.php';
 require_once __DIR__ . '/../public_helpers.php';
+require_once __DIR__ . '/../lib/note-sort.php';
 
 $currentLang = getUserLanguage();
 
@@ -160,9 +161,30 @@ try {
         ]);
     }
 
+    // The share lists folders and notes in the order the owner's own tree
+    // shows them: the single sort mode of the sidebar (#1442, the comparators
+    // of src/lib/note-sort.php), and the setting that puts a folder's own
+    // notes before or after its subfolders. Nothing on the public page lets a
+    // visitor reorder anything, so the owner's order is the only one there is.
+    $publicSortMode = poznoteNormalizeNoteSort(getSetting('note_list_sort', POZNOTE_NOTE_SORT_DEFAULT));
+    $notesAfterFoldersSetting = getSetting('notes_without_folders_after_folders', '1');
+    $publicNotesBeforeFolders = ($notesAfterFoldersSetting === '0' || $notesAfterFoldersSetting === 'false');
+    // Ordering by name or by type reads on a key a position cannot express,
+    // so the notes go last, as notes_list.php does.
+    if ($publicSortMode === 'heading_asc' || $publicSortMode === 'type_asc') {
+        $publicNotesBeforeFolders = false;
+    }
+    $compareFoldersForShare = static function (array $a, array $b) use ($publicSortMode) {
+        return poznoteCompareFolders($publicSortMode, $a, $b);
+    };
+    $compareNotesForShare = static function (array $a, array $b) use ($publicSortMode) {
+        return poznoteCompareNotes($publicSortMode, $a, $b);
+    };
+
     // Faster approach: fetch all folders to build hierarchy in memory
+    // `created` and `display_order` are what the date and Custom modes read.
     $allFoldersPool = [];
-    $stmt = $con->prepare('SELECT id, name, parent_id, display_order, icon, icon_color FROM folders WHERE workspace = ? ORDER BY CASE WHEN display_order > 0 THEN 0 ELSE 1 END, display_order, name COLLATE NOCASE');
+    $stmt = $con->prepare('SELECT id, name, parent_id, display_order, created, icon, icon_color FROM folders WHERE workspace = ? ORDER BY name COLLATE NOCASE');
     $stmt->execute([$folder['workspace']]);
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         $allFoldersPool[$row['id']] = $row;
@@ -203,14 +225,22 @@ try {
         $subfoldersByParent[$parentKey][] = $allFoldersPool[$subfolderId];
     }
 
+    foreach ($subfoldersByParent as &$siblingFolders) {
+        usort($siblingFolders, $compareFoldersForShare);
+    }
+    unset($siblingFolders);
+
     // Get direct subfolders for Kanban mapping
     $directSubfolders = [];
     $directSubfolderIds = [];
     foreach ($allFoldersPool as $fid => $f) {
         if ((int)$f['parent_id'] === (int)$folder_id) {
             $directSubfolders[] = $f;
-            $directSubfolderIds[] = $fid;
         }
+    }
+    usort($directSubfolders, $compareFoldersForShare);
+    foreach ($directSubfolders as $directSubfolder) {
+        $directSubfolderIds[] = (int)$directSubfolder['id'];
     }
 
     // Map each descendant to its root-level ancestor (direct child of the shared folder)
@@ -239,7 +269,7 @@ try {
 
     // A shortcut without its own icon inherits the icon of the note it links to.
     $stmt = $con->prepare("
-        SELECT e.id, e.heading, e.created, e.type, e.folder_id,
+        SELECT e.id, e.heading, e.created, e.updated, e.type, e.folder_id, e.display_order,
                COALESCE(NULLIF(e.icon, ''), lo.icon) AS icon,
                CASE WHEN NULLIF(e.icon, '') IS NULL THEN lo.icon_color ELSE e.icon_color END AS icon_color,
                sn.token
@@ -275,6 +305,15 @@ try {
             $kanbanData[$rootDirId][] = $note;
         }
     }
+
+    foreach ($notesByFolder as &$folderNotesGroup) {
+        usort($folderNotesGroup, $compareNotesForShare);
+    }
+    unset($folderNotesGroup);
+    foreach ($kanbanData as &$kanbanColumnNotes) {
+        usort($kanbanColumnNotes, $compareNotesForShare);
+    }
+    unset($kanbanColumnNotes);
 
     // Prepare folder names and icons for titles and sort groups
     $folderNames = [];
@@ -382,13 +421,15 @@ $noteBaseUrl = '';
         </div>
     <?php else: ?>
         <div id="listView">
-            <?php 
-            // Render root notes first, then descendant folders recursively.
+            <?php
+            // The notes of the shared folder itself and its subfolders, in the
+            // order and on the side the owner's tree puts them
+            // ($publicNotesBeforeFolders).
             $directNotes = $notesByFolder[$folder_id] ?? [];
             unset($notesByFolder[$folder_id]);
             ?>
 
-            <?php if (!empty($directNotes)): ?>
+            <?php if ($publicNotesBeforeFolders && !empty($directNotes)): ?>
                 <ul class="notes-list">
                     <?php foreach ($directNotes as $note): ?>
                         <?php renderPublicNoteItem($note, $noteBaseUrl, $token); ?>
@@ -397,8 +438,16 @@ $noteBaseUrl = '';
             <?php endif; ?>
 
             <?php foreach ($subfoldersByParent[(int)$folder_id] ?? [] as $subfolder): ?>
-                <?php renderPublicFolderBranch((int)$subfolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $token, 0); ?>
+                <?php renderPublicFolderBranch((int)$subfolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $token, 0, $publicNotesBeforeFolders); ?>
             <?php endforeach; ?>
+
+            <?php if (!$publicNotesBeforeFolders && !empty($directNotes)): ?>
+                <ul class="notes-list">
+                    <?php foreach ($directNotes as $note): ?>
+                        <?php renderPublicNoteItem($note, $noteBaseUrl, $token); ?>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         </div>
 
         <div id="kanbanView" class="is-hidden">
@@ -509,7 +558,7 @@ $noteBaseUrl = '';
         return false;
     }
 
-    function renderPublicFolderBranch($folderId, $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $folderToken, $depth = 0) {
+    function renderPublicFolderBranch($folderId, $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $folderToken, $depth = 0, $notesBeforeFolders = false) {
         if (!publicFolderBranchHasNotes($folderId, $subfoldersByParent, $notesByFolder)) {
             return;
         }
@@ -543,7 +592,7 @@ $noteBaseUrl = '';
                 <?php echo htmlspecialchars($folderNames[$folderId] ?? 'Subfolder'); ?>
             </h2>
 
-            <?php if (!empty($folderNotes)): ?>
+            <?php if ($notesBeforeFolders && !empty($folderNotes)): ?>
                 <ul class="notes-list">
                     <?php foreach ($folderNotes as $note): ?>
                         <?php renderPublicNoteItem($note, $noteBaseUrl, $folderToken); ?>
@@ -552,8 +601,16 @@ $noteBaseUrl = '';
             <?php endif; ?>
 
             <?php foreach ($subfoldersByParent[$folderId] ?? [] as $childFolder): ?>
-                <?php renderPublicFolderBranch((int)$childFolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $folderToken, $depth + 1); ?>
+                <?php renderPublicFolderBranch((int)$childFolder['id'], $subfoldersByParent, $notesByFolder, $folderNames, $folderIcons, $noteBaseUrl, $folderToken, $depth + 1, $notesBeforeFolders); ?>
             <?php endforeach; ?>
+
+            <?php if (!$notesBeforeFolders && !empty($folderNotes)): ?>
+                <ul class="notes-list">
+                    <?php foreach ($folderNotes as $note): ?>
+                        <?php renderPublicNoteItem($note, $noteBaseUrl, $folderToken); ?>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
         </div>
         <?php
     }
